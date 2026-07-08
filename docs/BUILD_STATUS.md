@@ -8,7 +8,7 @@ Tracks the `SCED_BUILD_BRIEF.md` priorities. This session delivered the
 
 | # | System | Status | Where |
 |---|--------|--------|-------|
-| P0 | Vertical slice loads (Elias + 2 sig + weakness) | ✅ generated | `dist/stillhour_starter.json` |
+| P0 | Vertical slice loads (Elias + 2 sig + weakness) | ✅ generated + loadable mod | `dist/stillhour_starter.json`; full loadable save `dist/the_still_hour_mod.json` (`pipeline/bundle_mod.py`) |
 | P1 | Card pipeline → all player cards | ✅ done | `pipeline/build_cards.py`, `pipeline/stillhour_cards_spec.json`, `dist/the_still_hour.json` (30 cards) |
 | P2 | Campaign state manager (Memory/Dissonance/Hourglass/Years/Knowledge/flags) + persistence | ✅ core done | `src/StillHour/CampaignState.ttslua` |
 | P3 | `[static]` token + Dissonance bands + chaos-bag banding | ✅ done | `src/StillHour/Dissonance.ttslua`, `Constants.ttslua` |
@@ -16,7 +16,7 @@ Tracks the `SCED_BUILD_BRIEF.md` priorities. This session delivered the
 | P5 | The Latecomer (undefeatable / Hold Back / hunts most-Memory) | ⏳ not started | — |
 | P6 | Occultation clock + location fact-toggles | 🟡 clock done; location toggles pending | `src/StillHour/Hourglass.ttslua` |
 | P7 | Aging bracket drift + interlude UI | 🟡 bracket math done; UI pending | `src/StillHour/Aging.ttslua` |
-| P8 | Package as `the_still_hour.json` download-box asset | 🟡 deck JSON emitted; placeholder box pending | `dist/` |
+| P8 | Package as `the_still_hour.json` download-box asset | 🟡 loadable save emitted (`the_still_hour_mod.json`); GitHub-release download-box still pending | `dist/`, `pipeline/bundle_mod.py` |
 
 Legend: ✅ done · 🟡 partial · ⏳ not started
 

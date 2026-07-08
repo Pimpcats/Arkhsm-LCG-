@@ -35,10 +35,15 @@ docs/
 
 ```bash
 python3 pipeline/build_cards.py            # -> dist/the_still_hour.json (30 cards)
-python3 pipeline/build_cards.py --only sthr-elias sthr-lamp sthr-donebefore sthr-eighthgrave
+python3 pipeline/bundle_mod.py             # -> dist/the_still_hour_mod.json (LOADABLE TTS SAVE)
 lua5.4  pipeline/lua_smoketest.lua         # Lua system tests (54 assertions)
+lua5.4  pipeline/verify_bundle.lua         # load the mod bundle in a stubbed TTS env
 python3 pipeline/simulate.py               # balance simulation report + assertions
 ```
+
+**To play/test in Tabletop Simulator:** build the two commands above, then load
+`dist/the_still_hour_mod.json` — see **`docs/LOADING.md`**. It spawns the card
+bag + a scripted Control token; click **Run Tests** for an in-engine pass.
 
 ## Testing & simulation
 
