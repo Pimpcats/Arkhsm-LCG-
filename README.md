@@ -36,8 +36,27 @@ docs/
 ```bash
 python3 pipeline/build_cards.py            # -> dist/the_still_hour.json (30 cards)
 python3 pipeline/build_cards.py --only sthr-elias sthr-lamp sthr-donebefore sthr-eighthgrave
-lua5.4  pipeline/lua_smoketest.lua         # run the Lua system tests
+lua5.4  pipeline/lua_smoketest.lua         # Lua system tests (54 assertions)
+python3 pipeline/simulate.py               # balance simulation report + assertions
 ```
+
+## Testing & simulation
+
+Two complementary layers, plus an in-engine harness:
+
+- **`pipeline/lua_smoketest.lua`** — offline functional tests of the Lua modules
+  (state persistence, bands, loop flags, clock, aging, CO-001 spend). 54 asserts.
+- **`pipeline/simulate.py`** — Monte-Carlo *balance* model: chaos-bag success
+  curve (reproduces 25/56/75), Memory economy vs the official-XP benchmark
+  (~40–50/investigator), Dissonance pacing (cautious vs greedy), and the aging
+  spread. Validates the math the design docs cite. `--trials/--loops/--quiet`.
+- **`tests/tts_console_harness.lua`** — runs the *same* assertions inside
+  Tabletop Simulator against the real bundled modules, with a live
+  loop→reset→interlude walkthrough. Attach to an object and click its button, or
+  `>execute runStillHourTests()` from the console (see the file header).
+
+The simulator validates probabilities/economy/pacing; it cannot validate fun or
+catch rules-interaction surprises — those still need real play in TTS.
 
 ## Status
 
