@@ -46,12 +46,11 @@ function Constants.forCount(n)
     resetThreshold = reset,
     latecomerThreshold = latecomer,
     memoryCap = 6 * n,
-    -- FLAG (design-doc conflict): guide v0.5 states BOTH "3 x investigators" and
-    -- "(12 at three players)" / "contest 12", but 3 x 3 = 9, not 12. We implement
-    -- the parametric formula (3 x investigators = 9 at 3p) because the code must
-    -- scale by it, and surface this in docs/BUILD_STATUS.md for the owner to
-    -- resolve. If 12 is the intended baseline, change this to 4 * n.
-    contestTarget = 3 * n,
+    -- Finale contest target = 4 x investigators (8 / 12 / 16 at 2 / 3 / 4p).
+    -- Resolved by CO-001: the guide's "12 at three players" was intended and
+    -- "3 x investigators" was an arithmetic slip (3 x 3 = 9). Nine made the
+    -- finale too easy and undercut the "cost is age" payoff.
+    contestTarget = 4 * n,
     scarCap = math.floor(reset / 3),
     bandGlitchStart = math.floor(reset / 3),
     bandNoticedStart = math.floor(2 * reset / 3),

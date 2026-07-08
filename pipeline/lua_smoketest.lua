@@ -63,9 +63,10 @@ local c3 = Constants.forCount(3)
 check("reset threshold = 18", c3.resetThreshold == 18)
 check("latecomer threshold = 12", c3.latecomerThreshold == 12)
 check("memory cap = 18", c3.memoryCap == 18)
--- NOTE: design-doc conflict — guide says both "3x inv" and "12 at 3p" (9 != 12).
--- We implement the parametric 3x formula (= 9 at 3p); flagged in BUILD_STATUS.md.
-check("contest target = 9 (3x inv; see flagged conflict)", c3.contestTarget == 9)
+-- CO-001: finale contest target = 4 x investigators (8 / 12 / 16 at 2 / 3 / 4p).
+check("contest target = 12 at n=3", c3.contestTarget == 12)
+check("contest target = 8 at n=2", Constants.forCount(2).contestTarget == 8)
+check("contest target = 16 at n=4", Constants.forCount(4).contestTarget == 16)
 check("scar cap = 6", c3.scarCap == 6)
 check("band of 5 is Calm", Constants.bandFor(5, 3) == "Calm")
 check("band of 6 is Glitch", Constants.bandFor(6, 3) == "Glitch")
@@ -130,6 +131,14 @@ CampaignState.deserialize(blob)
 check("restored Memory = 18", CampaignState.getBankedMemory() == 18)
 check("restored Knowledge", CampaignState.knows("the-thirteenth-toll") == true)
 check("restored Years", CampaignState.getYears("sthr-elias") == 3)
+
+print("== CO-001: Memory is experience — level-ups (=level) and Recollections (memoryCost) ==")
+CampaignState.init(3)
+CampaignState.bankMemory(10)
+check("upgrade to level 3 debits exactly 3", CampaignState.purchaseUpgrade(3) == true and CampaignState.getBankedMemory() == 7)
+check("Recollection debits its memoryCost (5)", CampaignState.purchaseRecollection(5) == true and CampaignState.getBankedMemory() == 2)
+check("cannot overdraw the pool (need 4, have 2)", CampaignState.purchaseUpgrade(4) == false and CampaignState.getBankedMemory() == 2)
+check("both wrappers share one pool", CampaignState.spendMemory(2) == true and CampaignState.getBankedMemory() == 0)
 
 print("== P6: a big Skip resolves intervening Hours; 'The Hour Was Wrong' removes Hour IV ==")
 CampaignState.init(3)

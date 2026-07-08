@@ -122,14 +122,28 @@ function CampaignState.bankMemory(amount)
   return state.bankedMemory
 end
 
---- Attempt to spend banked Memory (buying a Recollection). Returns success bool.
+--- Attempt to debit `cost` banked Memory. Returns false (no change) on overdraw.
+-- Memory is a general experience currency (CO-001): it buys both regular card
+-- level-ups (cost = card level) and Recollections (cost = memoryCost). This is
+-- the core debit; see the semantic wrappers below.
 function CampaignState.spendMemory(cost)
   cost = cost or 0
-  if state.bankedMemory < cost then
+  if cost < 0 or state.bankedMemory < cost then
     return false
   end
   state.bankedMemory = state.bankedMemory - cost
   return true
+end
+
+--- Buy a normal higher-level card upgrade: cost = the target card's level (1-5),
+-- exactly like official XP. Returns success bool.
+function CampaignState.purchaseUpgrade(cardLevel)
+  return CampaignState.spendMemory(cardLevel or 0)
+end
+
+--- Buy a Recollection into a deck: cost = its listed memoryCost. Returns success bool.
+function CampaignState.purchaseRecollection(memoryCost)
+  return CampaignState.spendMemory(memoryCost or 0)
 end
 
 ----------------------------------------------------------------- dissonance --

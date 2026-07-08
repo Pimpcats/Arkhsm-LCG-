@@ -40,16 +40,24 @@ The brief says: *where the brief and a design doc disagree, the design doc wins 
 flag the conflict, don't silently resolve.* These are conflicts **within/between
 the design docs themselves**. Resolution applied is noted; change if wrong.
 
-1. **Contest target — `3 × investigators` vs "12 at three players".**
-   Guide v0.5 §9/§10 states both, but 3 × 3 = **9**, not 12. Implemented the
-   parametric formula `contestTarget = 3 * n` (= 9 at 3p) because the code must
-   scale by it. If 12 is the playtested baseline, set `contestTarget = 4 * n` in
-   `Constants.ttslua`. **Balance-relevant — needs an owner call.**
+1. **Contest target — `3 × investigators` vs "12 at three players". ✅ RESOLVED
+   (CO-001).** The "12 at three players" prose was intended; `3 × 3 = 9` was an
+   arithmetic slip. Now `contestTarget = 4 * n` (8 / 12 / 16 at 2 / 3 / 4p). Guide
+   §9/§10 wording corrected; smoke test asserts 8/12/16.
 
-2. **Memory soft cap — 10 → 15 → 18.** design v0.1 (10) → cards v0.2 (15) →
-   aging v0.3 / guide v0.5 (18 = 6 × investigators). Implemented the latest
-   (`memoryCap = 6 * n`). Later doc supersedes earlier — consistent with the
-   version chain.
+2. **Memory soft cap — 10 → 15 → 18. ✅ RESOLVED.** design v0.1 (10) → cards v0.2
+   (15) → aging v0.3 / guide v0.5 (18 = 6 × investigators). Implemented the latest
+   (`memoryCap = 6 * n`); confirmed correct by CO-001. Stale "15" wording in
+   cards v0.2 §A corrected to 18 while editing that line.
+
+2a. **Memory = experience (economy). ✅ RESOLVED (CO-001).** Memory is a general
+   experience currency, not Recollections-only: it buys normal card level-ups at
+   **1 Memory per card level** (like XP) **and** Recollections at their
+   `memoryCost`. Benchmark: total campaign spend ~120–140 shared (~**42–47 per
+   investigator**) matches official Arkham XP (~40–50/investigator); the 18/loop
+   carryover cap remains the governor. `CampaignState` spend path generalized
+   (`purchaseUpgrade(level)` / `purchaseRecollection(memoryCost)`); design §1.1,
+   cards §A, and guide interlude step 3 reworded.
 
 3. **Dissonance thresholds — 8/12 → 12/18.** cards v0.2 §A uses absolute 8/12
    (its own note says those were the 1–2p numbers); encounter v0.4 / aging v0.3 /
