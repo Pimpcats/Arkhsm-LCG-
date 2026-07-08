@@ -1,0 +1,145 @@
+[
+  {
+    "deck": 95010, "id": "sthr-elias", "type": "Investigator", "name": "Elias Warde",
+    "subtitle": "The Ninth Death", "class": "Guardian", "traits": "Believer. Warden.",
+    "wil": 3, "int": 2, "com": 4, "agi": 3, "health": 9, "sanity": 5,
+    "signatures": [{ "sthr-lamp": 1, "sthr-donebefore": 1, "sthr-eighthgrave": 1 }],
+    "elderSign": "+1. If there are 3 or more Memory on Elias, this token is +3 instead, and heal 1 damage from Elias."
+  },
+  {
+    "deck": 95011, "id": "sthr-lamp", "type": "Asset", "name": "The Ambergrove Lamp",
+    "subtitle": "", "class": "Guardian", "traits": "Item. Tool.", "cost": 2, "level": 0, "slot": "Hand"
+  },
+  {
+    "deck": 95012, "id": "sthr-donebefore", "type": "Skill", "name": "I've Done This Before",
+    "subtitle": "", "class": "Guardian", "traits": "Innate. Recollection.", "level": 0, "wildIcons": 1
+  },
+  {
+    "deck": 95013, "id": "sthr-eighthgrave", "type": "Treachery", "name": "The Eighth Grave",
+    "subtitle": "", "class": "Neutral", "traits": "Curse. Memory.", "weakness": true
+  },
+
+  {
+    "deck": 95014, "id": "sthr-ayako", "type": "Investigator", "name": "Dr. Ayako Sōma",
+    "subtitle": "The Translator", "class": "Seeker", "traits": "Scholar. Chronicler.",
+    "wil": 3, "int": 5, "com": 1, "agi": 3, "health": 5, "sanity": 8,
+    "signatures": [{ "sthr-lexicon": 1, "sthr-itmeanswait": 1, "sthr-untranslatable": 1 }],
+    "elderSign": "+2. Draw 1 card. If it is a Recollection, it costs 2 less to play this turn."
+  },
+  {
+    "deck": 95015, "id": "sthr-lexicon", "type": "Asset", "name": "The Lexicon of the Hour",
+    "subtitle": "", "class": "Seeker", "traits": "Item. Tome.", "cost": 2, "level": 0, "slot": "Hand",
+    "uses": [{ "count": 0, "type": "Secret", "token": "secret" }]
+  },
+  {
+    "deck": 95016, "id": "sthr-itmeanswait", "type": "Event", "name": "It Means 'Wait'",
+    "subtitle": "", "class": "Seeker", "traits": "Insight.", "cost": 0
+  },
+  {
+    "deck": 95017, "id": "sthr-untranslatable", "type": "Treachery", "name": "Untranslatable",
+    "subtitle": "", "class": "Neutral", "traits": "Madness.", "weakness": true
+  },
+
+  {
+    "deck": 95018, "id": "sthr-cass", "type": "Investigator", "name": "Cass Lindqvist",
+    "subtitle": "The Card Counter", "class": "Rogue", "traits": "Criminal. Drifter.",
+    "wil": 2, "int": 3, "com": 3, "agi": 5, "health": 7, "sanity": 6,
+    "signatures": [{ "sthr-markeddeck": 1, "sthr-seenthishand": 1, "sthr-housewins": 1 }],
+    "elderSign": "+1. Gain 1 resource for each Memory on Cass (maximum +3 resources)."
+  },
+  {
+    "deck": 95019, "id": "sthr-markeddeck", "type": "Asset", "name": "Marked Deck",
+    "subtitle": "", "class": "Rogue", "traits": "Item. Illicit.", "cost": 1, "level": 0, "slot": "Hand"
+  },
+  {
+    "deck": 95020, "id": "sthr-seenthishand", "type": "Event", "name": "Seen This Hand Before",
+    "subtitle": "", "class": "Rogue", "traits": "Fortune. Insight.", "cost": 1
+  },
+  {
+    "deck": 95021, "id": "sthr-housewins", "type": "Enemy", "name": "The House Always Wins",
+    "subtitle": "", "class": "Neutral", "traits": "Humanoid. Criminal.", "weakness": true
+  },
+
+  {
+    "deck": 95022, "id": "sthr-seraphine", "type": "Investigator", "name": "Seraphine Vale",
+    "subtitle": "The Medium", "class": "Mystic", "traits": "Sorcerer. Cursed.",
+    "wil": 5, "int": 3, "com": 2, "agi": 2, "health": 6, "sanity": 8,
+    "signatures": [{ "sthr-bell": 1, "sthr-rememberending": 1, "sthr-debtofhours": 1 }],
+    "elderSign": "+X, where X = current Dissonance (maximum +5). After this skill test, reduce Dissonance by the amount this token added."
+  },
+  {
+    "deck": 95023, "id": "sthr-bell", "type": "Asset", "name": "The Bell of Ambergrove",
+    "subtitle": "", "class": "Mystic", "traits": "Relic.", "cost": 3, "level": 0, "slot": "Accessory",
+    "uses": [{ "count": 3, "type": "Charge", "token": "resource" }]
+  },
+  {
+    "deck": 95024, "id": "sthr-rememberending", "type": "Event", "name": "I Remember the Ending",
+    "subtitle": "", "class": "Mystic", "traits": "Spell. Insight.", "cost": 2
+  },
+  {
+    "deck": 95025, "id": "sthr-debtofhours", "type": "Treachery", "name": "The Debt of Hours",
+    "subtitle": "", "class": "Neutral", "traits": "Curse.", "weakness": true
+  },
+
+  {
+    "deck": 95026, "id": "sthr-birdie", "type": "Investigator", "name": "\"Birdie\" Okonkwo",
+    "subtitle": "The One Who Wandered", "class": "Survivor", "traits": "Drifter. Wayward.",
+    "wil": 3, "int": 3, "com": 2, "agi": 4, "health": 6, "sanity": 7,
+    "signatures": [{ "sthr-compass": 1, "sthr-igetout": 1, "sthr-nobodybelieves": 1 }],
+    "elderSign": "+1. If you have already failed a skill test this round, this token is +3 instead."
+  },
+  {
+    "deck": 95027, "id": "sthr-compass", "type": "Asset", "name": "Lucky Compass",
+    "subtitle": "", "class": "Survivor", "traits": "Item. Charm.", "cost": 1, "level": 0, "slot": "Accessory"
+  },
+  {
+    "deck": 95028, "id": "sthr-igetout", "type": "Event", "name": "I Get Out",
+    "subtitle": "", "class": "Survivor", "traits": "Gambit.", "cost": 0
+  },
+  {
+    "deck": 95029, "id": "sthr-nobodybelieves", "type": "Treachery", "name": "Nobody Believes Her",
+    "subtitle": "", "class": "Neutral", "traits": "Madness.", "weakness": true
+  },
+
+  {
+    "deck": 95030, "id": "sthr-foreknowledge", "type": "Skill", "name": "Foreknowledge",
+    "subtitle": "", "class": "Neutral", "traits": "Innate. Recollection.", "level": 0, "wildIcons": 1, "memoryCost": 3
+  },
+  {
+    "deck": 95031, "id": "sthr-dejavu", "type": "Event", "name": "Déjà Vu",
+    "subtitle": "", "class": "Neutral", "traits": "Insight. Recollection.", "level": 0, "cost": 1, "memoryCost": 4
+  },
+  {
+    "deck": 95032, "id": "sthr-musclememory", "type": "Skill", "name": "Muscle Memory",
+    "subtitle": "", "class": "Neutral", "traits": "Innate. Recollection.", "level": 0, "wildIcons": 1, "memoryCost": 3
+  },
+  {
+    "deck": 95033, "id": "sthr-rehearsedescape", "type": "Event", "name": "Rehearsed Escape",
+    "subtitle": "", "class": "Neutral", "traits": "Trick. Recollection.", "level": 0, "cost": 0, "memoryCost": 3
+  },
+  {
+    "deck": 95034, "id": "sthr-longwayround", "type": "Event", "name": "The Long Way Round",
+    "subtitle": "", "class": "Neutral", "traits": "Trick. Recollection.", "level": 0, "cost": 1, "memoryCost": 2
+  },
+  {
+    "deck": 95035, "id": "sthr-borrowedtime", "type": "Asset", "name": "Borrowed Time",
+    "subtitle": "", "class": "Neutral", "traits": "Item. Recollection.", "level": 0, "cost": 2, "memoryCost": 4,
+    "uses": [{ "count": 3, "type": "Memory", "token": "resource" }]
+  },
+  {
+    "deck": 95036, "id": "sthr-thistimeforsure", "type": "Event", "name": "This Time For Sure",
+    "subtitle": "", "class": "Neutral", "traits": "Insight. Recollection.", "level": 0, "cost": 2, "memoryCost": 4
+  },
+  {
+    "deck": 95037, "id": "sthr-anchorpoint", "type": "Asset", "name": "Anchor Point",
+    "subtitle": "", "class": "Neutral", "traits": "Talent. Recollection.", "level": 0, "cost": 0, "permanent": true, "memoryCost": 3
+  },
+  {
+    "deck": 95038, "id": "sthr-cassandrasnotebook", "type": "Asset", "name": "Cassandra's Notebook",
+    "subtitle": "", "class": "Neutral", "traits": "Item. Tome. Recollection.", "level": 0, "cost": 2, "slot": "Hand", "memoryCost": 4
+  },
+  {
+    "deck": 95039, "id": "sthr-hourlearnedname", "type": "Event", "name": "The Hour I Learned Your Name",
+    "subtitle": "", "class": "Neutral", "traits": "Spell. Recollection.", "level": 0, "cost": 3, "memoryCost": 5
+  }
+]

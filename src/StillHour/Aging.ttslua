@@ -1,0 +1,138 @@
+--- THE STILL HOUR — the Aging system (P7, data model).
+--
+-- The price of living the same night is years (aging_3p_v0.3 §1). Years accrue
+-- per investigator at each interlude; brackets apply a "body for mind" stat
+-- drift. This module owns the bracket math; it reads/writes Years and the locked
+-- drift choice through CampaignState. Applying the stat changes to a physical
+-- investigator sheet is the host's job (delegated via the returned drift).
+--
+-- Years gained this loop, per investigator:
+--   +1 base (the night always takes something)
+--   +1 if defeated during the loop
+--   +1 if the loop ended at the danger threshold or higher (Dissonance >= 4x inv)
+--   +1 if they leaned on the loop (raised Dissonance 3+ times OR spent 4+ Memory)
+--
+-- Brackets (checked at each interlude; higher bracket REPLACES lower — no stacking):
+--   Prime     0-4   no change
+--   Weathered 5-9   -1 one physical skill (com/agi), +1 one mental skill (wil/int)
+--   Elder     10-14 Weathered drift, +1 more to the mental skill, -1 max health,
+--                   begin each loop with 1 Memory on your investigator card
+--   Ancient   15+   Elder drift, -1 max sanity, unlocks "Take Its Place";
+--                   at 18 Years the investigator ages out (removed)
+--
+-- The physical/mental skills are chosen once on entering Weathered and LOCKED
+-- (reused at Elder/Ancient). Skill values floor at 1; max health/sanity never
+-- reach 0 from these deltas.
+
+local CampaignState = require("StillHour/CampaignState")
+
+local Aging = {}
+
+Aging.PRIME = "Prime"
+Aging.WEATHERED = "Weathered"
+Aging.ELDER = "Elder"
+Aging.ANCIENT = "Ancient"
+Aging.AGE_OUT_YEARS = 18
+
+Aging.PHYSICAL_SKILLS = { combat = true, agility = true }
+Aging.MENTAL_SKILLS = { willpower = true, intellect = true }
+
+--- Bracket name for a Years total.
+function Aging.bracketForYears(years)
+  years = years or 0
+  if years >= 15 then return Aging.ANCIENT end
+  if years >= 10 then return Aging.ELDER end
+  if years >= 5 then return Aging.WEATHERED end
+  return Aging.PRIME
+end
+
+--- Years gained this loop from the four conditions.
+-- @param cond table {defeated, endedInDanger, leanedOnLoop} (booleans)
+function Aging.computeYearsGained(cond)
+  cond = cond or {}
+  local y = 1
+  if cond.defeated then y = y + 1 end
+  if cond.endedInDanger then y = y + 1 end
+  if cond.leanedOnLoop then y = y + 1 end
+  return y
+end
+
+--- Did the loop end in the danger band (Dissonance >= Latecomer threshold)?
+-- Measure BEFORE reset (reset drops Dissonance to the scar).
+function Aging.loopEndedInDanger(dissonanceAtEnd, investigatorCount)
+  local Constants = require("StillHour/Constants")
+  return dissonanceAtEnd >= Constants.forCount(investigatorCount).latecomerThreshold
+end
+
+--- "Leaned on the loop" test: raised Dissonance 3+ times OR spent 4+ Memory
+-- on loop-power effects this loop. Caller supplies the tallies.
+function Aging.leanedOnLoop(dissonanceRaises, memorySpentOnPower)
+  return (dissonanceRaises or 0) >= 3 or (memorySpentOnPower or 0) >= 4
+end
+
+--- Apply an interlude's aging to one investigator.
+-- @param investigatorId string
+-- @param cond table {defeated, endedInDanger, leanedOnLoop}
+-- @param lockedChoice table|nil {physical="combat"|"agility", mental="willpower"|"intellect"}
+--        required the first time the investigator enters Weathered; ignored after.
+-- @return table {years, bracket, bracketChanged, agedOut, drift}
+function Aging.applyInterlude(investigatorId, cond, lockedChoice)
+  local before = Aging.bracketForYears(CampaignState.getYears(investigatorId))
+  local gained = Aging.computeYearsGained(cond)
+  local years = CampaignState.addYears(investigatorId, gained)
+  local bracket = Aging.bracketForYears(years)
+
+  -- Lock the physical/mental drift choice the first time we reach Weathered+.
+  local record = CampaignState.getBracket(investigatorId) or {}
+  if bracket ~= Aging.PRIME and not record.physical and lockedChoice then
+    record.physical = lockedChoice.physical
+    record.mental = lockedChoice.mental
+  end
+  record.bracket = bracket
+  CampaignState.setBracket(investigatorId, record)
+
+  return {
+    years = years,
+    yearsGained = gained,
+    bracket = bracket,
+    bracketChanged = (bracket ~= before),
+    agedOut = years >= Aging.AGE_OUT_YEARS,
+    needsLockedChoice = (bracket ~= Aging.PRIME and not record.physical),
+    drift = Aging.driftFor(investigatorId),
+  }
+end
+
+--- The cumulative stat drift for an investigator's current bracket.
+-- Deltas are relative to the printed base stat line; the host applies them with
+-- a floor of 1 on skills. Returns nil for Prime (no change).
+-- @return table|nil {physicalSkill, mentalSkill, skillDeltas={physical,mental},
+--                    maxHealthDelta, maxSanityDelta, startLoopMemory, unlocksTakeItsPlace}
+function Aging.driftFor(investigatorId)
+  local years = CampaignState.getYears(investigatorId)
+  local bracket = Aging.bracketForYears(years)
+  if bracket == Aging.PRIME then
+    return nil
+  end
+  local record = CampaignState.getBracket(investigatorId) or {}
+  local drift = {
+    physicalSkill = record.physical,   -- "combat" | "agility" (may be nil until chosen)
+    mentalSkill = record.mental,       -- "willpower" | "intellect"
+    skillDeltas = { physical = -1, mental = 1 },
+    maxHealthDelta = 0,
+    maxSanityDelta = 0,
+    startLoopMemory = 0,
+    unlocksTakeItsPlace = false,
+  }
+  if bracket == Aging.ELDER or bracket == Aging.ANCIENT then
+    drift.skillDeltas.mental = 2       -- +1 more to the mental skill
+    drift.maxHealthDelta = -1
+    drift.startLoopMemory = 1
+  end
+  if bracket == Aging.ANCIENT then
+    drift.maxSanityDelta = -1
+    drift.unlocksTakeItsPlace = true
+  end
+  return drift
+end
+
+return Aging

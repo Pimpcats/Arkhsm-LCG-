@@ -1,0 +1,95 @@
+--- THE STILL HOUR — Dissonance bands + the [static] chaos token (P3).
+--
+-- Owns the *chaos-bag consequences* of Dissonance. The value itself lives in
+-- CampaignState; this module reconciles the bag's baseline [static] count to the
+-- current band and implements the token's on-reveal behaviour.
+--
+-- The [static] token (encounter v0.4 §0):
+--   * modifier -3
+--   * when revealed: raise Dissonance by 1  ("the glitch feeds itself")
+--
+-- Baseline [static] count in the bag by band (auto-managed here):
+--   Calm 0 · Glitch 1 · Noticed 2
+-- Cards may add *temporary* extra [static] on top; those are the card's own
+-- responsibility and are not tracked as baseline.
+--
+-- Chaos-bag edits go through an injected `bag` adapter (a thin wrapper over
+-- SCED's existing chaos-bag / bless-curse manager) — never by mutating the bag
+-- object directly (SCED_BUILD_BRIEF §6). The adapter must implement:
+--     bag.setBaselineStatic(n)   -- ensure exactly n baseline [static] tokens
+-- and optionally:
+--     bag.addStatic(n) / bag.removeStatic(n)
+
+local Constants = require("StillHour/Constants")
+local CampaignState = require("StillHour/CampaignState")
+
+local Dissonance = {}
+
+Dissonance.STATIC_MODIFIER = -3
+Dissonance.STATIC_TOKEN_TYPE = "static"
+
+--- Baseline [static] count for a band.
+local function baselineStaticForBand(band)
+  return Constants.STATIC_BY_BAND[band] or 0
+end
+
+--- Reconcile the bag's baseline [static] tokens to the current band.
+-- Safe to call any time (idempotent). Returns the baseline count now expected.
+function Dissonance.syncBag(bag)
+  local target = baselineStaticForBand(CampaignState.band())
+  if bag and bag.setBaselineStatic then
+    bag.setBaselineStatic(target)
+  end
+  return target
+end
+
+--- Handle a band transition by adjusting the bag from `before` to `after`.
+local function reconcileBand(bag, before, after)
+  if before == after then
+    return
+  end
+  local target = baselineStaticForBand(after)
+  if not bag then
+    return
+  end
+  if bag.setBaselineStatic then
+    bag.setBaselineStatic(target)
+  elseif bag.addStatic and bag.removeStatic then
+    local delta = target - baselineStaticForBand(before)
+    if delta > 0 then
+      bag.addStatic(delta)
+    elseif delta < 0 then
+      bag.removeStatic(-delta)
+    end
+  end
+end
+
+--- Raise Dissonance and reconcile the bag / report boss + reset transitions.
+-- @return table {value, band, latecomerArriving, reachedReset}
+function Dissonance.raise(n, bag)
+  local value, before, after, reachedReset = CampaignState.raiseDissonance(n or 1)
+  reconcileBand(bag, before, after)
+  return {
+    value = value,
+    band = after,
+    latecomerArriving = CampaignState.latecomerShouldArrive()
+      and not CampaignState.isLatecomerInPlay(),
+    reachedReset = reachedReset,
+  }
+end
+
+--- Reduce Dissonance and reconcile the bag.
+function Dissonance.reduce(n, bag)
+  local value, before, after = CampaignState.reduceDissonance(n or 1)
+  reconcileBand(bag, before, after)
+  return { value = value, band = after }
+end
+
+--- The [static] token's symbol effect: after it is revealed, raise Dissonance by 1.
+-- Returns the same info table as raise(), so callers can react to a boss/reset
+-- transition triggered by the reveal itself.
+function Dissonance.onStaticRevealed(bag)
+  return Dissonance.raise(1, bag)
+end
+
+return Dissonance

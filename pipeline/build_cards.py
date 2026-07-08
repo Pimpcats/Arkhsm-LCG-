@@ -1,0 +1,171 @@
+#!/usr/bin/env python3
+"""
+build_cards.py — THE STILL HOUR card generator for SCED (Tabletop Simulator).
+
+Turns the compact card spec into valid SCED `Card` objects (GMNotes metadata +
+CustomDeck image refs + CardID/GUID/Tags). This is the authoring path described in
+SCED_BUILD_BRIEF §4: spec -> SCED objects.
+
+Usage:
+    python3 build_cards.py                      # full deck -> dist/the_still_hour.json
+    python3 build_cards.py --spec my.json       # alternate spec
+    python3 build_cards.py --out path.json      # alternate output
+    python3 build_cards.py --only sthr-elias sthr-lamp sthr-donebefore sthr-eighthgrave
+                                                # Elias vertical slice -> dist/stillhour_starter.json
+
+Structure verified against Arkham SCE 4.8.0:
+  - Card object: Name="Card", Tags=[<Type>,"PlayerCard"], SidewaysCard=True only for Investigators.
+  - CardID = int(deckId + 2-digit gridIndex). Each card uses its own 1x1 deck (index 00),
+    except Investigators, which use a unique deckbuilding back (UniqueBack=True).
+  - GMNotes = JSON *mechanical* metadata only; printed rules text lives on the ART, not here.
+
+Deterministic GUIDs: GUID is derived from the card id (sha1) so re-running the
+generator produces a stable diff instead of churning random GUIDs every build.
+"""
+import argparse
+import hashlib
+import json
+import os
+
+ARKHAM_ICONS = {
+    "Name": "font_arkhamicons", "Type": 1,
+    "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/",
+}
+
+# --- PLACEHOLDER art (swap for Strange Eons frames + generated art hosted on a CDN) ---
+PH = "https://placehold.co"
+
+
+def face_ph(name, land=False):
+    dim = "750x523" if land else "419x600"
+    return f"{PH}/{dim}/141428/e8b24a/png?text={name.replace(' ', '+')}"
+
+
+PLAYER_BACK = f"{PH}/419x600/0c0c14/8a8a99/png?text=The+Still+Hour"
+
+# GMNotes icon-field name map (spec key -> metadata key)
+ICON_FIELDS = {
+    "wil": "willpowerIcons", "int": "intellectIcons", "com": "combatIcons",
+    "agi": "agilityIcons", "wild": "wildIcons",
+}
+
+
+def guid(card_id):
+    """Stable 6-hex-char GUID derived from the card id, so builds are reproducible."""
+    return hashlib.sha1(card_id.encode("utf-8")).hexdigest()[:6]
+
+
+def transform():
+    return {"posX": 0, "posY": 1.5, "posZ": 0, "rotX": 0, "rotY": 180, "rotZ": 0,
+            "scaleX": 1.15, "scaleY": 1, "scaleZ": 1.15}
+
+
+def build_gmnotes(c):
+    """Emit only the metadata fields relevant to this card's type."""
+    t = c["type"]
+    m = {"id": c["id"], "type": t, "class": c["class"], "traits": c["traits"],
+         "cycle": "The Still Hour"}
+    if t == "Investigator":
+        m.update({
+            "willpowerIcons": c["wil"], "intellectIcons": c["int"],
+            "combatIcons": c["com"], "agilityIcons": c["agi"],
+            "health": c["health"], "sanity": c["sanity"],
+            "signatures": c["signatures"],
+            "elderSignEffect": {"description": c["elderSign"]},
+        })
+    else:
+        if "cost" in c:
+            m["cost"] = c["cost"]
+        if "level" in c:
+            m["level"] = c["level"]
+        for spec_key, meta_key in ICON_FIELDS.items():
+            if c.get(spec_key + "Icons"):
+                m[meta_key] = c[spec_key + "Icons"]
+        if c.get("slot"):
+            m["slot"] = c["slot"]
+        if c.get("uses"):
+            m["uses"] = c["uses"]
+        if c.get("permanent"):
+            m["permanent"] = True
+        if c.get("startsInPlay"):
+            m["startsInPlay"] = True
+        if c.get("weakness"):
+            m["weakness"] = True
+        # Campaign-economy metadata: Memory price to add a Recollection to a deck.
+        # Read by the StillHour interlude UI (mechanical, not printed rules text).
+        if "memoryCost" in c:
+            m["memoryCost"] = c["memoryCost"]
+    return json.dumps(m, separators=(",", ":"))
+
+
+def build_card(c):
+    is_inv = c["type"] == "Investigator"
+    deck_id = str(c["deck"])
+    return {
+        "Name": "Card", "Nickname": c["name"], "Description": c.get("subtitle", ""),
+        "GUID": guid(c["id"]), "CardID": int(deck_id + "00"), "SidewaysCard": is_inv,
+        "Tags": [c["type"], "PlayerCard"], "LuaScript": "", "LuaScriptState": "",
+        "GMNotes": build_gmnotes(c), "Transform": transform(),
+        "CustomUIAssets": [ARKHAM_ICONS],
+        "CustomDeck": {deck_id: {
+            "FaceURL": face_ph(c["name"], land=is_inv),
+            "BackURL": face_ph(c["name"] + " (Deckbuilding)", land=True) if is_inv else PLAYER_BACK,
+            "NumWidth": 1, "NumHeight": 1, "Type": 0,
+            "UniqueBack": is_inv, "BackIsHidden": is_inv}},
+    }
+
+
+def build_bag(cards, nickname):
+    return {
+        "Name": "Bag", "Nickname": nickname, "Description": "",
+        "GUID": guid("bag:" + nickname), "Tags": ["StillHour"], "Transform": transform(),
+        "ContainedObjects": cards,
+    }
+
+
+def main():
+    here = os.path.dirname(os.path.abspath(__file__))
+    root = os.path.dirname(here)
+    ap = argparse.ArgumentParser(description="Generate SCED Card objects for THE STILL HOUR.")
+    ap.add_argument("--spec", default=os.path.join(here, "stillhour_cards_spec.json"))
+    ap.add_argument("--out", default=None)
+    ap.add_argument("--only", nargs="*", default=None,
+                    help="Restrict output to these card ids (e.g. the Elias starter slice).")
+    args = ap.parse_args()
+
+    spec = json.load(open(args.spec))
+    if args.only:
+        wanted = set(args.only)
+        spec = [c for c in spec if c["id"] in wanted]
+        missing = wanted - {c["id"] for c in spec}
+        if missing:
+            raise SystemExit(f"--only referenced unknown card ids: {sorted(missing)}")
+        nickname = "THE STILL HOUR — Starter Slice"
+        default_out = os.path.join(root, "dist", "stillhour_starter.json")
+    else:
+        nickname = "THE STILL HOUR — Player Cards"
+        default_out = os.path.join(root, "dist", "the_still_hour.json")
+
+    out_path = args.out or default_out
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+
+    cards = [build_card(c) for c in spec]
+    out = {"ObjectStates": [build_bag(cards, nickname)]}
+    with open(out_path, "w") as f:
+        json.dump(out, f, indent=2)
+
+    # Validate: round-trip + metadata parses + no duplicate CardIDs/ids.
+    d = json.load(open(out_path))
+    seen_ids, seen_cardids = set(), set()
+    for card in d["ObjectStates"][0]["ContainedObjects"]:
+        md = json.loads(card["GMNotes"])
+        assert md["id"] not in seen_ids, f"duplicate card id {md['id']}"
+        assert card["CardID"] not in seen_cardids, f"duplicate CardID {card['CardID']}"
+        seen_ids.add(md["id"])
+        seen_cardids.add(card["CardID"])
+        print(f"OK  {card['Nickname']:28} CardID={card['CardID']} type={md['type']:12} id={md['id']}")
+    print(f"\nWrote {out_path}  ({len(cards)} cards in a bag)")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,202 @@
+{
+  "ObjectStates": [
+    {
+      "Name": "Bag",
+      "Nickname": "THE STILL HOUR \u2014 Starter Slice",
+      "Description": "",
+      "GUID": "f8209b",
+      "Tags": [
+        "StillHour"
+      ],
+      "Transform": {
+        "posX": 0,
+        "posY": 1.5,
+        "posZ": 0,
+        "rotX": 0,
+        "rotY": 180,
+        "rotZ": 0,
+        "scaleX": 1.15,
+        "scaleY": 1,
+        "scaleZ": 1.15
+      },
+      "ContainedObjects": [
+        {
+          "Name": "Card",
+          "Nickname": "Elias Warde",
+          "Description": "The Ninth Death",
+          "GUID": "57e75d",
+          "CardID": 9501000,
+          "SidewaysCard": true,
+          "Tags": [
+            "Investigator",
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "GMNotes": "{\"id\":\"sthr-elias\",\"type\":\"Investigator\",\"class\":\"Guardian\",\"traits\":\"Believer. Warden.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":2,\"combatIcons\":4,\"agilityIcons\":3,\"health\":9,\"sanity\":5,\"signatures\":[{\"sthr-lamp\":1,\"sthr-donebefore\":1,\"sthr-eighthgrave\":1}],\"elderSignEffect\":{\"description\":\"+1. If there are 3 or more Memory on Elias, this token is +3 instead, and heal 1 damage from Elias.\"}}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95010": {
+              "FaceURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Elias+Warde",
+              "BackURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Elias+Warde+(Deckbuilding)",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": true,
+              "BackIsHidden": true
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "The Ambergrove Lamp",
+          "Description": "",
+          "GUID": "052059",
+          "CardID": 9501100,
+          "SidewaysCard": false,
+          "Tags": [
+            "Asset",
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "GMNotes": "{\"id\":\"sthr-lamp\",\"type\":\"Asset\",\"class\":\"Guardian\",\"traits\":\"Item. Tool.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"slot\":\"Hand\"}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95011": {
+              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Ambergrove+Lamp",
+              "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "I've Done This Before",
+          "Description": "",
+          "GUID": "9ab227",
+          "CardID": 9501200,
+          "SidewaysCard": false,
+          "Tags": [
+            "Skill",
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "GMNotes": "{\"id\":\"sthr-donebefore\",\"type\":\"Skill\",\"class\":\"Guardian\",\"traits\":\"Innate. Recollection.\",\"cycle\":\"The Still Hour\",\"level\":0,\"wildIcons\":1}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95012": {
+              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=I've+Done+This+Before",
+              "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "The Eighth Grave",
+          "Description": "",
+          "GUID": "c0ab9a",
+          "CardID": 9501300,
+          "SidewaysCard": false,
+          "Tags": [
+            "Treachery",
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "GMNotes": "{\"id\":\"sthr-eighthgrave\",\"type\":\"Treachery\",\"class\":\"Neutral\",\"traits\":\"Curse. Memory.\",\"cycle\":\"The Still Hour\",\"weakness\":true}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95013": {
+              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Eighth+Grave",
+              "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
