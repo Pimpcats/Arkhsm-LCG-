@@ -110,8 +110,9 @@ actual play session:
 4. **Chaos-bag integration**: wire `Dissonance.syncBag` to SCED's real bag
    manager (adapter stub documented in INTEGRATION §3) and add a physical
    `[static]` token.
-5. **Art** (cosmetic — placeholders load today): CardForge/Strange Eons pipeline
-   per the art briefs, then swap FaceURLs and rebuild.
+5. **Art** (cosmetic — placeholders load today): see **`docs/ART_HANDOFF.md`** —
+   complete 41-face scene-mode manifest is ready; CardForge build + GPU batch +
+   Strange Eons framing are the remaining (machine-side) work.
 6. **P8 last mile**: upload `dist/downloads/the_still_hour.json` to a release
    URL and verify `placeholderDownload` in the fork.
 

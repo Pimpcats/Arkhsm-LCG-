@@ -228,6 +228,14 @@ function runStillHourTests()
   CampaignState.unlockFact("the-hour-was-wrong")
   P, F = check("finale assembles with name+vote+one deep", Knowledge.assembleFinale() and Knowledge.finaleAttemptable(), P, F)
 
+  -- Victory (Memory): once per campaign per Named enemy; survives resets.
+  CampaignState.init(3)
+  P, F = check("Victory claims once and banks its Memory",
+    CampaignState.claimVictory("sthr-bellringer", 2) and CampaignState.getBankedMemory() == 2
+    and CampaignState.claimVictory("sthr-bellringer", 2) == false, P, F)
+  CampaignState.reset()
+  P, F = check("Victory log survives a reset", CampaignState.isVictoryClaimed("sthr-bellringer"), P, F)
+
   -- P7: aging stat drift + interlude spend.
   local base = { wil = 5, int = 5, com = 1, agi = 3, health = 5, sanity = 8 }
   CampaignState.init(3); CampaignState.addYears("sthr-ayako", 14)

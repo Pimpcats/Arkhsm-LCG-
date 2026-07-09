@@ -151,6 +151,138 @@
               "BackIsHidden": false
             }
           }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "The Bell-Ringer Beneath",
+          "Description": "What Pulls the Thirteenth Toll",
+          "GUID": "8fcd82",
+          "CardID": 9504300,
+          "SidewaysCard": false,
+          "Tags": [
+            "Enemy",
+            "EncounterCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "GMNotes": "{\"id\":\"sthr-bellringer\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Monster. Named.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1,\"victory\":2}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95043": {
+              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Bell-Ringer+Beneath",
+              "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "What Wears the Sheriff",
+          "Description": "Giving the Same Speech",
+          "GUID": "0bdec5",
+          "CardID": 9504400,
+          "SidewaysCard": false,
+          "Tags": [
+            "Enemy",
+            "EncounterCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "GMNotes": "{\"id\":\"sthr-wearssheriff\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Humanoid. Monster. Named.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1,\"victory\":3}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95044": {
+              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=What+Wears+the+Sheriff",
+              "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "The One Who Rides Forever",
+          "Description": "Round and Round",
+          "GUID": "dc1b17",
+          "CardID": 9504500,
+          "SidewaysCard": false,
+          "Tags": [
+            "Enemy",
+            "EncounterCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "GMNotes": "{\"id\":\"sthr-onewhorides\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Humanoid. Named.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1,\"victory\":2}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95045": {
+              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+One+Who+Rides+Forever",
+              "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
         }
       ]
     }

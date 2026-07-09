@@ -130,6 +130,38 @@ Because it is a known sequence, players who have looped *see it coming* — whic
 
 ---
 
+## §5b. ENCOUNTER SET — "The Named of Ambergrove" (Victory elites)
+
+*Optional district elites — not every district fields one. Each guards a deep
+objective's territory in Act II. They are the campaign's Victory analog.*
+
+> **Victory X (Memory) — rule.** Forced – When an enemy with **Victory X** is
+> defeated: if its name is not on the campaign log's **Victory list**, record it
+> and add **X** to banked Memory. Each name yields its Victory **once per
+> campaign** — the night repeats, and the Named return with it, but you only
+> learn a face once. *(Wording note: the log gate is what stops loop-farming; a
+> returned Named enemy is still an obstacle, it is just no longer a payday. The
+> Memory goes straight to banked — the insight outlives the loop by definition.)*
+
+**THE BELL-RINGER BENEATH** — Enemy. **Elite.** Monster. Named. Unique. ×1 *(Drowned Church, Act II)*
+> **Fight 3 · Health 5 · Evade 2** — damage 1 / horror 2 — **Victory 2.**
+> Spawns in the Flooded Crypt when it opens. **Retaliate.**
+> **Forced** – When the Hourglass reaches Hour III while the Bell-Ringer is in play: it readies and attacks the nearest investigator (it pulls the rope; the toll answers).
+> **Wording note.** Ties its menace to the clock, not to Dissonance — fighting it near Hour III is the trap the fact "The Thirteenth Toll" teaches you to see coming.
+
+**WHAT WEARS THE SHERIFF** — Enemy. **Elite.** Humanoid. Monster. Named. Unique. ×1 *(The Square, Act II)*
+> **Fight 4 · Health 6 · Evade 2** — damage 2 / horror 1 — **Victory 3.**
+> Spawns at the Records Office when the deep objective is attempted. **Hunter.**
+> While What Wears the Sheriff is in play, the Records Office gains shroud +1 (it does not want you reading the ledger).
+> **Wording note.** The campaign's toughest Named — it guards the vote, the finale's required input, so its Victory 3 prices the fight players cannot fully avoid.
+
+**THE ONE WHO RIDES FOREVER** — Enemy. **Elite.** Humanoid. Named. Unique. ×1 *(Fairground, Act II)*
+> **Fight 3 · Health 4 · Evade 3** — damage 1 / horror 2 — **Victory 2.**
+> Spawns at the Wheel. **Prey** – the investigator with the most Memory on their cards. Cannot be damaged while ready (evade it first; it only comes apart mid-turn, between rotations).
+> **Wording note.** An evade-then-fight puzzle for the Fairground's agility theme; the ready-immunity is the one clause that makes it more than a stat block.
+
+---
+
 ## §6. ENCOUNTER SET — "The Weight of Years" (aging-linked treacheries)
 
 *The encounter-side of the Aging system — the night literally takes years.*
@@ -154,6 +186,7 @@ Because it is a known sequence, players who have looped *see it coming* — whic
 - **Boss set (§5):** set aside; the Appointed manifests as its Approach advances (Dissonance bands / Hours V–VIII), and **The Crossing** advances the Approach. The Whispers shuffle in only from Act II onward.
 - **The Occultation (§1):** never shuffled — it is the clock, arranged in order I→IX at setup and edited by Knowledge facts.
 - **Node-specific sets:** each of the six Ambergrove nodes adds its own small set (2–4 cards) on top of the spine — those ship with the node objectives.
+- **The Named (§5b):** optional district Victory elites, added alongside their district's node set from Act II onward (not every district fields one).
 - **Static token count** in the bag is set by the Dissonance band automatically (§0); cards in §2/§4 add *temporary* extras on top.
 
 ---

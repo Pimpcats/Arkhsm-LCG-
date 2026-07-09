@@ -59,6 +59,8 @@ The Still Hour is not played as a line of separate scenarios. It is played as **
 
 **Echoes & the Appointed.** Echoes are **Sleepwalking** in the Calm band and wake in Glitch+. The Appointed climbs an **Approach** (Unseen → Sensed → Emerging → Arrived), driven up by the clock (Hours V/VII/VIII) and the Dissonance bands. It cannot be defeated — only **Held Back**, pushing it back one stage and rewinding the Hourglass an Hour (`encounter v0.4 §5`, CO-002).
 
+**The Named (Victory).** Some districts field a **Named** Elite in Act II, guarding a deep objective (`encounter v0.4 §5b`). Defeating one records its name on the log and banks its **Victory X** Memory — once per campaign per name. They return every loop like everything else in Ambergrove; only the first lesson pays.
+
 ---
 
 ## 3. THE AMBERGROVE MAP

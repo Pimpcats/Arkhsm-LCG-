@@ -1,142 +1,40 @@
 [
   {
     "id": "sthr-elias",
-    "card_type": "Investigator",
-    "frame": "investigator_front",
-    "aspect": "landscape",
-    "gen_size": [
-      1024,
-      768
-    ],
-    "prompt": "Elias Warde, weathered lighthouse keeper in his late fifties, grey-streaked beard, deep-set tired resolute eyes, heavy dark oilcloth coat, holding a lantern, half-length portrait, standing before a dark unlit lighthouse at night, salt wind. cosmic horror illustration, painterly, muted desaturated palette, 1920s New England coastal town, eerie stillness, starless folding sky, cinematic soft lighting, oil-paint texture, subtle grain, Arkham Horror card art style, atmospheric, unsettling",
-    "negative": "text, watermark, signature, frame, border, ui, logo, deformed hands, extra fingers, modern clothing, bright saturated colors, cartoon, 3d render, cheerful, sunny, lens flare, cluttered",
-    "reference": "ref:elias_canonical.png (weight 0.7)  OR  lora:elias",
-    "seed": 101
+    "art_type": "investigator_portrait",
+    "scene": "standing before a dark unlit lighthouse at night, salt wind pulling at his coat",
+    "seed": 7240,
+    "character": "elias"
   },
   {
     "id": "sthr-elias-back",
-    "card_type": "Investigator",
-    "frame": "investigator_back",
-    "aspect": "landscape",
-    "gen_size": [
-      1024,
-      768
-    ],
-    "prompt": null,
-    "negative": null,
-    "reference": null,
-    "seed": 1
+    "art_type": "investigator_portrait",
+    "no_art": true,
+    "frame": "investigator_back"
   },
   {
     "id": "sthr-lamp",
-    "card_type": "Asset",
-    "frame": "asset",
-    "aspect": "portrait",
-    "gen_size": [
-      768,
-      1024
-    ],
-    "prompt": "an old brass storm-lantern glowing faint amber in fog, close-up still life. cosmic horror illustration, painterly, muted desaturated palette, 1920s New England coastal town, eerie stillness, starless folding sky, cinematic soft lighting, oil-paint texture, subtle grain, Arkham Horror card art style, atmospheric, unsettling",
-    "negative": "text, watermark, signature, frame, border, ui, logo, deformed hands, extra fingers, modern clothing, bright saturated colors, cartoon, 3d render, cheerful, sunny, lens flare, cluttered",
-    "reference": "moodboard:still_hour_style",
-    "seed": 111
+    "art_type": "asset",
+    "scene": "an old brass storm-lantern glowing faint amber in fog, close-up still life",
+    "seed": 6540
   },
   {
     "id": "sthr-donebefore",
-    "card_type": "Skill",
-    "frame": "skill",
-    "aspect": "portrait",
-    "gen_size": [
-      768,
-      1024
-    ],
-    "prompt": "a man's hands gripping a rail, knuckles white, ghostly repeated afterimages of the same gesture. cosmic horror illustration, painterly, muted desaturated palette, 1920s New England coastal town, eerie stillness, starless folding sky, cinematic soft lighting, oil-paint texture, subtle grain, Arkham Horror card art style, atmospheric, unsettling",
-    "negative": "text, watermark, signature, frame, border, ui, logo, deformed hands, extra fingers, modern clothing, bright saturated colors, cartoon, 3d render, cheerful, sunny, lens flare, cluttered",
-    "reference": "moodboard:still_hour_style",
-    "seed": 112
+    "art_type": "skill",
+    "scene": "hands gripping a rail, knuckles white, ghostly repeated afterimages of the same gesture",
+    "seed": 2901,
+    "character": "elias"
   },
   {
     "id": "sthr-eighthgrave",
-    "card_type": "Treachery",
-    "frame": "treachery",
-    "aspect": "portrait",
-    "gen_size": [
-      768,
-      1024
-    ],
-    "prompt": "eight identical fresh graves in a row under a folding starless sky, one open and empty. cosmic horror illustration, painterly, muted desaturated palette, 1920s New England coastal town, eerie stillness, starless folding sky, cinematic soft lighting, oil-paint texture, subtle grain, Arkham Horror card art style, atmospheric, unsettling",
-    "negative": "text, watermark, signature, frame, border, ui, logo, deformed hands, extra fingers, modern clothing, bright saturated colors, cartoon, 3d render, cheerful, sunny, lens flare, cluttered",
-    "reference": "moodboard:still_hour_style",
-    "seed": 113
+    "art_type": "treachery",
+    "scene": "eight identical fresh graves in a row under a folding starless sky, one open and empty",
+    "seed": 3720
   },
   {
-    "id": "loc-lantern-room",
-    "card_type": "Location",
-    "frame": "location_front",
-    "aspect": "portrait",
-    "gen_size": [
-      768,
-      1024
-    ],
-    "prompt": "the top room of a lighthouse, cold dark lamp mechanism, cracked glass, sea beyond. cosmic horror illustration, painterly, muted desaturated palette, 1920s New England coastal town, eerie stillness, starless folding sky, cinematic soft lighting, oil-paint texture, subtle grain, Arkham Horror card art style, atmospheric, unsettling",
-    "negative": "text, watermark, signature, frame, border, ui, logo, deformed hands, extra fingers, modern clothing, bright saturated colors, cartoon, 3d render, cheerful, sunny, lens flare, cluttered",
-    "reference": "moodboard:still_hour_style",
-    "seed": 201
-  },
-  {
-    "id": "echo-congregation",
-    "card_type": "Enemy",
-    "frame": "enemy",
-    "aspect": "portrait",
-    "gen_size": [
-      768,
-      1024
-    ],
-    "prompt": "a silent crowd of townsfolk frozen mid-gesture, faces turned slightly wrong, grey light. cosmic horror illustration, painterly, muted desaturated palette, 1920s New England coastal town, eerie stillness, starless folding sky, cinematic soft lighting, oil-paint texture, subtle grain, Arkham Horror card art style, atmospheric, unsettling",
-    "negative": "text, watermark, signature, frame, border, ui, logo, deformed hands, extra fingers, modern clothing, bright saturated colors, cartoon, 3d render, cheerful, sunny, lens flare, cluttered",
-    "reference": "moodboard:still_hour_style",
-    "seed": 301
-  },
-  {
-    "id": "treach-lost-hour",
-    "card_type": "Treachery",
-    "frame": "treachery",
-    "aspect": "portrait",
-    "gen_size": [
-      768,
-      1024
-    ],
-    "prompt": "a pocket watch with the hands blurring forward, clock face dissolving into fog. cosmic horror illustration, painterly, muted desaturated palette, 1920s New England coastal town, eerie stillness, starless folding sky, cinematic soft lighting, oil-paint texture, subtle grain, Arkham Horror card art style, atmospheric, unsettling",
-    "negative": "text, watermark, signature, frame, border, ui, logo, deformed hands, extra fingers, modern clothing, bright saturated colors, cartoon, 3d render, cheerful, sunny, lens flare, cluttered",
-    "reference": "moodboard:still_hour_style",
-    "seed": 401
-  },
-  {
-    "id": "hour-iii-toll",
-    "card_type": "Agenda",
-    "frame": "agenda",
-    "aspect": "landscape",
-    "gen_size": [
-      1024,
-      768
-    ],
-    "prompt": "a drowned church belfry, a great bronze bell mid-swing, water rising in the nave. cosmic horror illustration, painterly, muted desaturated palette, 1920s New England coastal town, eerie stillness, starless folding sky, cinematic soft lighting, oil-paint texture, subtle grain, Arkham Horror card art style, atmospheric, unsettling",
-    "negative": "text, watermark, signature, frame, border, ui, logo, deformed hands, extra fingers, modern clothing, bright saturated colors, cartoon, 3d render, cheerful, sunny, lens flare, cluttered",
-    "reference": "moodboard:still_hour_style",
-    "seed": 501
-  },
-  {
-    "id": "enemy-appointed",
-    "card_type": "Enemy",
-    "frame": "enemy",
-    "aspect": "portrait",
-    "gen_size": [
-      768,
-      1024
-    ],
-    "prompt": "a tall wrong silhouette at the far end of an empty street, too many angles, not quite arriving, featureless, dread, negative space. cosmic horror illustration, painterly, muted desaturated palette, 1920s New England coastal town, eerie stillness, starless folding sky, cinematic soft lighting, oil-paint texture, subtle grain, Arkham Horror card art style, atmospheric, unsettling",
-    "negative": "text, watermark, signature, frame, border, ui, logo, deformed hands, extra fingers, modern clothing, bright saturated colors, cartoon, 3d render, cheerful, sunny, lens flare, cluttered",
-    "reference": "moodboard:still_hour_style",
-    "seed": 666
+    "id": "sthr-appointed",
+    "art_type": "enemy",
+    "scene": "a tall wrong silhouette at the far end of an empty street, too many angles, not quite arriving, featureless, dread, negative space",
+    "seed": 2306
   }
 ]

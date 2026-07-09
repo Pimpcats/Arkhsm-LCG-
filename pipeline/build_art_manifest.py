@@ -1,92 +1,143 @@
 #!/usr/bin/env python3
 """
-build_art_manifest.py — emits the machine-readable art job list the overnight
-batch runner consumes (one entry per card face). Mirrors build_cards.py.
-Run: python3 build_art_manifest.py  ->  art_manifest_starter.json
-Each entry = {id, card_type, frame, aspect, gen_size, prompt, negative, reference, seed}.
-The pipeline: manifest -> Krea batch (illustration) -> Strange Eons (frame) -> sheet -> CDN -> URL rewrite.
+build_art_manifest.py — emits the SCENE-MODE art manifest CardForge consumes
+(CARDFORGE_BRIEF §5): one job per card face, {id, art_type, character?, scene,
+seed}. CardForge owns prompt composition (house style + art-type profile +
+character LoRA + scene), so entries carry SUBJECT text only.
+
+The job list is DERIVED from the card specs (stillhour_cards_spec.json +
+stillhour_encounter_spec.json), so it cannot drift from the real cards: a card
+added to a spec without a scene here fails the build loudly.
+
+Run: python3 pipeline/build_art_manifest.py   (from repo root or pipeline/)
+Out: pipeline/art_manifest.json          (full set)
+     pipeline/art_manifest_starter.json  (first-milestone subset, Elias slice + boss)
 """
 import json
+import os
 
-# ---- HOUSE STYLE (prepended to every illustration prompt) ----
-STYLE = ("cosmic horror illustration, painterly, muted desaturated palette, "
-         "1920s New England coastal town, eerie stillness, starless folding sky, "
-         "cinematic soft lighting, oil-paint texture, subtle grain, "
-         "Arkham Horror card art style, atmospheric, unsettling")
-NEG = ("text, watermark, signature, frame, border, ui, logo, deformed hands, "
-       "extra fingers, modern clothing, bright saturated colors, cartoon, 3d render, "
-       "cheerful, sunny, lens flare, cluttered")
+HERE = os.path.dirname(os.path.abspath(__file__))
 
-# ---- CHARACTER BIBLE (keeps each investigator consistent across their cards) ----
-# For production: generate one canonical portrait each, then train a per-investigator
-# LoRA OR pass the portrait as a weighted reference image on every one of their cards.
-CHARS = {
- "elias": "Elias Warde, weathered lighthouse keeper in his late fifties, grey-streaked "
-          "beard, deep-set tired resolute eyes, heavy dark oilcloth coat, holding a lantern",
- "ayako": "Dr. Ayako Soma, Japanese woman in her thirties, sharp intelligent gaze, wire "
-          "spectacles, ink-stained fingers, dark travelling coat, notebook in hand",
- "cass":  "Cass Lindqvist, sharp-featured woman in her late twenties, short slicked hair, "
-          "worn pinstripe waistcoat, a deck of cards, wary confident half-smile",
- "sera":  "Seraphine Vale, pale spiritualist woman in her forties, dark hair loose, haunted "
-          "distant eyes, layered dark shawls, faint occult jewelry",
- "birdie":"Birdie Okonkwo, young Black woman in her early twenties, patched practical coat, "
-          "alert scrappy expression, a small brass compass on a cord",
+# ---- card type -> CardForge art-type profile (art_profiles.json) ----
+ART_TYPE = {
+    "Investigator": "investigator_portrait",
+    "Asset": "asset",
+    "Event": "event",
+    "Skill": "skill",
+    "Treachery": "treachery",
+    "Enemy": "enemy",
 }
 
-# frame -> (aspect, generation size) for the ILLUSTRATION area (Strange Eons crops into the frame)
-FRAME = {
- "investigator_front":("landscape",(1024,768)), "investigator_back":("landscape",(1024,768)),
- "asset":("portrait",(768,1024)), "event":("portrait",(768,1024)), "skill":("portrait",(768,1024)),
- "treachery":("portrait",(768,1024)), "enemy":("portrait",(768,1024)),
- "location_front":("portrait",(768,1024)), "location_back":("portrait",(768,1024)),
- "agenda":("landscape",(1024,768)), "act":("landscape",(1024,768)),
- "minicard":("portrait",(512,768)), "story":("landscape",(1024,768)),
+# ---- which cards render with a character LoRA/reference (art_profiles allow_character) ----
+CHARACTER = {
+    "sthr-elias": "elias", "sthr-donebefore": "elias",
+    "sthr-ayako": "ayako", "sthr-itmeanswait": "ayako",
+    "sthr-cass": "cass", "sthr-seenthishand": "cass",
+    "sthr-seraphine": "sera", "sthr-rememberending": "sera",
+    "sthr-birdie": "birdie", "sthr-igetout": "birdie",
 }
 
-def entry(id, frame, scene, char=None, seed=1, no_art=False):
-    aspect, size = FRAME[frame]
-    if no_art:
-        prompt = None; neg = None; ref = None
-    else:
-        who = CHARS[char]+", " if char else ""
-        prompt = f"{who}{scene}. {STYLE}"
-        neg = NEG
-        ref = (f"ref:{char}_canonical.png (weight 0.7)  OR  lora:{char}") if char else "moodboard:still_hour_style"
-    return {"id":id,"card_type":frame.split("_")[0].capitalize(),"frame":frame,
-            "aspect":aspect,"gen_size":list(size),"prompt":prompt,"negative":neg,
-            "reference":ref,"seed":seed}
+# ---- the scenes (subject only — style/type framing is CardForge's job) ----
+SCENES = {
+    # investigators
+    "sthr-elias": "standing before a dark unlit lighthouse at night, salt wind pulling at his coat",
+    "sthr-ayako": "in a lamplit reading room past midnight, surrounded by open books, one page glowing faintly wrong",
+    "sthr-cass": "alone at a card table, dealing the same hand again, smoke hanging motionless in the air",
+    "sthr-seraphine": "mid-seance, reaching toward a darkness that reaches back, candle flames bending sideways",
+    "sthr-birdie": "on an empty night road at the edge of town, glancing back over her shoulder, distant lit windows",
+    # Elias signatures/weakness
+    "sthr-lamp": "an old brass storm-lantern glowing faint amber in fog, close-up still life",
+    "sthr-donebefore": "hands gripping a rail, knuckles white, ghostly repeated afterimages of the same gesture",
+    "sthr-eighthgrave": "eight identical fresh graves in a row under a folding starless sky, one open and empty",
+    # Ayako
+    "sthr-lexicon": "a battered journal filled with spiraling unreadable script, annotations crowding the margins, candlelight",
+    "sthr-itmeanswait": "a raised hand in a stillness gesture toward an unseen presence, dust motes frozen mid-air",
+    "sthr-untranslatable": "a page of writhing script that hurts to look at, the letters casting shadows in the wrong direction",
+    # Cass
+    "sthr-markeddeck": "a worn deck of playing cards fanned on green felt, tiny scratches on the backs catching lamplight",
+    "sthr-seenthishand": "catching a falling card mid-air without looking at it, barroom blur behind",
+    "sthr-housewins": "a debt collector in a long coat at the end of a hallway, ledger in hand, face in shadow, patient",
+    # Seraphine
+    "sthr-bell": "a small bronze hand-bell on dark velvet, its surface etched with hour markings, faint blue afterglow",
+    "sthr-rememberending": "her eyes reflecting a scene that has not happened yet, the room around her dissolving",
+    "sthr-debtofhours": "a grandfather clock with its hands spinning backward, shadow spilling from the open case like water",
+    # Birdie
+    "sthr-compass": "a small brass compass in an open palm, needle pointing at nothing on the map beneath",
+    "sthr-igetout": "slipping through a closing door of light, reaching hands just missing her coat",
+    "sthr-nobodybelieves": "a crowd of townsfolk looking straight through the viewer, one empty space where a person should be",
+    # Recollections
+    "sthr-foreknowledge": "a chess move played before the opponent's hand has left the piece, afterimages of futures",
+    "sthr-dejavu": "the same doorway twice in one image, mirrored, a single figure entering both",
+    "sthr-musclememory": "hands performing a delicate task in total darkness, perfect and sure, faint motion trails",
+    "sthr-rehearsedescape": "a night alley with an escape route chalk-marked in glowing lines only the viewer can see",
+    "sthr-longwayround": "a street map with one path burned through it, footsteps skipping impossible distances",
+    "sthr-borrowedtime": "an hourglass with sand flowing upward into the top bulb, cradled in careful hands",
+    "sthr-thistimeforsure": "the same die frozen mid-tumble at five angles at once, one face beginning to glow",
+    "sthr-anchorpoint": "a single fixed lit window on a street where everything else blurs with motion",
+    "sthr-cassandrasnotebook": "a notebook whose ink writes itself, the pages ahead already filled, pen hovering unheld",
+    "sthr-hourlearnedname": "a name spoken as visible frost in the air, a vast shadow flinching back from it",
+    # the Appointed boss set (the Appointed's line is ART_SPEC's canonical key image)
+    "sthr-appointed": "a tall wrong silhouette at the far end of an empty street, too many angles, not quite arriving, featureless, dread, negative space",
+    "sthr-appointedwhisper": "an ear-shaped ripple in the air over a sleeping town, words visible as thin black threads",
+    "sthr-crossing": "a freestanding doorway in the town square, its far side showing the same square one hour later",
+    # the Named of Ambergrove (Victory elites)
+    "sthr-bellringer": "a drowned figure in sodden vestments hauling a bell rope in a flooded belfry, water past its waist, the bell mid-swing",
+    "sthr-wearssheriff": "a sheriff on courthouse steps frozen mid-speech, seams of pale light splitting his silhouette, the crowd not noticing",
+    "sthr-onewhorides": "a lone rider on a carousel horse at night, motion-blurred at the edges, face perfectly still and smiling",
+}
 
-# ---- STARTER MANIFEST: Elias slice + one of each encounter frame type ----
-MANIFEST = [
- entry("sthr-elias","investigator_front",
-       "half-length portrait, standing before a dark unlit lighthouse at night, salt wind", char="elias", seed=101),
- entry("sthr-elias-back","investigator_back","", no_art=True),          # deckbuilding back = text only
- entry("sthr-lamp","asset",
-       "an old brass storm-lantern glowing faint amber in fog, close-up still life", seed=111),
- entry("sthr-donebefore","skill",
-       "a man's hands gripping a rail, knuckles white, ghostly repeated afterimages of the same gesture", seed=112),
- entry("sthr-eighthgrave","treachery",
-       "eight identical fresh graves in a row under a folding starless sky, one open and empty", seed=113),
- entry("loc-lantern-room","location_front",
-       "the top room of a lighthouse, cold dark lamp mechanism, cracked glass, sea beyond", seed=201),
- entry("echo-congregation","enemy",
-       "a silent crowd of townsfolk frozen mid-gesture, faces turned slightly wrong, grey light", seed=301),
- entry("treach-lost-hour","treachery",
-       "a pocket watch with the hands blurring forward, clock face dissolving into fog", seed=401),
- entry("hour-iii-toll","agenda",
-       "a drowned church belfry, a great bronze bell mid-swing, water rising in the nave", seed=501),
- entry("enemy-appointed","enemy",
-       "a tall wrong silhouette at the far end of an empty street, too many angles, not quite arriving, "
-       "featureless, dread, negative space", seed=666),
-]
+# deterministic seeds: stable per card id, spaced so variants don't collide
+def seed_for(card_id):
+    return 100 + (sum(ord(c) for c in card_id) * 7) % 8000
 
-json.dump(MANIFEST, open("art_manifest_starter.json","w"), indent=2)
 
-# validate
-d = json.load(open("art_manifest_starter.json"))
-art = [e for e in d if e["prompt"]]
-print(f"{len(d)} card faces ({len(art)} need illustration, {len(d)-len(art)} text-only)")
-for e in d:
-    tag = "TEXT-ONLY" if not e["prompt"] else f"{e['aspect']:9} {e['gen_size']}"
-    print(f"  {e['id']:22} {e['frame']:19} {tag}")
-print("\nWrote art_manifest_starter.json")
+def load_spec(name):
+    return json.load(open(os.path.join(HERE, name)))
+
+
+def main():
+    cards = load_spec("stillhour_cards_spec.json") + load_spec("stillhour_encounter_spec.json")
+    manifest = []
+    missing = []
+    for c in cards:
+        cid = c["id"]
+        if cid not in SCENES:
+            missing.append(cid)
+            continue
+        job = {
+            "id": cid,
+            "art_type": ART_TYPE[c["type"]],
+            "scene": SCENES[cid],
+            "seed": seed_for(cid),
+        }
+        if cid in CHARACTER:
+            job["character"] = CHARACTER[cid]
+        manifest.append(job)
+        # investigators also need a text-only deckbuilding back (Strange Eons renders it)
+        if c["type"] == "Investigator":
+            manifest.append({"id": cid + "-back", "art_type": "investigator_portrait",
+                             "no_art": True, "frame": "investigator_back"})
+    if missing:
+        raise SystemExit("cards in the spec with NO SCENE (add them to SCENES): " + ", ".join(missing))
+
+    out = os.path.join(HERE, "art_manifest.json")
+    json.dump(manifest, open(out, "w"), indent=2)
+
+    # first-milestone subset (ART_PIPELINE_BRIEF Part D): the Elias slice + the boss
+    starter_ids = {"sthr-elias", "sthr-elias-back", "sthr-lamp", "sthr-donebefore",
+                   "sthr-eighthgrave", "sthr-appointed"}
+    starter = [j for j in manifest if j["id"] in starter_ids]
+    json.dump(starter, open(os.path.join(HERE, "art_manifest_starter.json"), "w"), indent=2)
+
+    art = [j for j in manifest if not j.get("no_art")]
+    print(f"art_manifest.json: {len(manifest)} faces ({len(art)} illustrated, {len(manifest)-len(art)} text-only)")
+    print(f"art_manifest_starter.json: {len(starter)} faces (first milestone)")
+    by_type = {}
+    for j in art:
+        by_type[j["art_type"]] = by_type.get(j["art_type"], 0) + 1
+    for t, n in sorted(by_type.items()):
+        print(f"  {t:22} {n}")
+
+
+if __name__ == "__main__":
+    main()

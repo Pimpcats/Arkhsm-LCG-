@@ -142,6 +142,7 @@ local function freshState(n)
     years = {},              -- investigatorId -> integer
     brackets = {},           -- investigatorId -> {bracket, physical, mental}
     appointedStage = 0,      -- The Appointed's Approach: 0 Unseen..3 Arrived (CO-002)
+    victoryLog = {},         -- enemyId -> true (Victory claimed; once per campaign)
   }
 end
 
@@ -191,6 +192,7 @@ function CampaignState.deserialize(saved, decoder)
     state.years = state.years or {}
     state.brackets = state.brackets or {}
     state.appointedStage = state.appointedStage or 0
+    state.victoryLog = state.victoryLog or {}
   end
   return state
 end
@@ -404,6 +406,29 @@ end
 --- Is the Appointed manifested on the board (stage >= 1)?
 function CampaignState.isAppointedInPlay()
   return state.appointedStage >= 1
+end
+
+------------------------------------------------------------ victory (Memory) --
+
+-- Victory X in a loop campaign: defeated enemies return next loop, so Victory
+-- banks ONCE per named enemy per campaign — the night repeats, but you only
+-- learn a face once. The claim log lives on the campaign log (persists across
+-- resets; reset() must NOT clear it).
+
+--- Has this enemy's Victory already been claimed this campaign?
+function CampaignState.isVictoryClaimed(enemyId)
+  return state.victoryLog[enemyId] == true
+end
+
+--- Claim an enemy's Victory: banks `memoryValue` the first time only.
+-- Returns true if newly claimed (Memory banked), false if already claimed.
+function CampaignState.claimVictory(enemyId, memoryValue)
+  if state.victoryLog[enemyId] then
+    return false
+  end
+  state.victoryLog[enemyId] = true
+  CampaignState.bankMemory(memoryValue or 0)
+  return true
 end
 
 ------------------------------------------------------------------ loop flow --
@@ -1676,6 +1701,14 @@ function runStillHourTests()
   CampaignState.unlockFact("the-appointeds-name"); CampaignState.unlockFact("the-vote-that-never-ends")
   CampaignState.unlockFact("the-hour-was-wrong")
   P, F = check("finale assembles with name+vote+one deep", Knowledge.assembleFinale() and Knowledge.finaleAttemptable(), P, F)
+
+  -- Victory (Memory): once per campaign per Named enemy; survives resets.
+  CampaignState.init(3)
+  P, F = check("Victory claims once and banks its Memory",
+    CampaignState.claimVictory("sthr-bellringer", 2) and CampaignState.getBankedMemory() == 2
+    and CampaignState.claimVictory("sthr-bellringer", 2) == false, P, F)
+  CampaignState.reset()
+  P, F = check("Victory log survives a reset", CampaignState.isVictoryClaimed("sthr-bellringer"), P, F)
 
   -- P7: aging stat drift + interlude spend.
   local base = { wil = 5, int = 5, com = 1, agi = 3, health = 5, sanity = 8 }

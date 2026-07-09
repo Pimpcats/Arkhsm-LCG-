@@ -64,6 +64,15 @@ Current banked Memory: **______**  (soft cap **18** — reduce to 18 at each loo
 
 ---
 
+## VICTORY — THE NAMED
+*Record when defeated; each banks its Memory once per campaign.*
+
+- ☐ **The Bell-Ringer Beneath** *(Church, Victory 2)* — banked: ☐
+- ☐ **What Wears the Sheriff** *(Square, Victory 3)* — banked: ☐
+- ☐ **The One Who Rides Forever** *(Fairground, Victory 2)* — banked: ☐
+
+---
+
 ## THREADS & CHOICES
 - Seraphine — "Who Opened the Door": ☐ unheard ☐ suspected ☐ **known** (Vote + Name)
 - The Ticket-Taker's Bargain: ☐ never heard ☐ **heard** (epilogue flag)

@@ -13,5 +13,21 @@
     "deck": 95042, "id": "sthr-crossing", "type": "Treachery", "name": "The Crossing",
     "subtitle": "", "class": "Mythos", "traits": "",
     "encounter": true, "quantity": 1
+  },
+
+  {
+    "deck": 95043, "id": "sthr-bellringer", "type": "Enemy", "name": "The Bell-Ringer Beneath",
+    "subtitle": "What Pulls the Thirteenth Toll", "class": "Mythos", "traits": "Monster. Named.",
+    "encounter": true, "unique": true, "elite": true, "victory": 2, "quantity": 1
+  },
+  {
+    "deck": 95044, "id": "sthr-wearssheriff", "type": "Enemy", "name": "What Wears the Sheriff",
+    "subtitle": "Giving the Same Speech", "class": "Mythos", "traits": "Humanoid. Monster. Named.",
+    "encounter": true, "unique": true, "elite": true, "victory": 3, "quantity": 1
+  },
+  {
+    "deck": 95045, "id": "sthr-onewhorides", "type": "Enemy", "name": "The One Who Rides Forever",
+    "subtitle": "Round and Round", "class": "Mythos", "traits": "Humanoid. Named.",
+    "encounter": true, "unique": true, "elite": true, "victory": 2, "quantity": 1
   }
 ]

@@ -104,6 +104,10 @@ def build_gmnotes(c):
             m["elite"] = True
         if "quantity" in c:
             m["quantity"] = c["quantity"]
+        # Victory X (Memory): banked once per campaign per named enemy when
+        # defeated (loop campaigns respawn enemies; the log gates the claim).
+        if "victory" in c:
+            m["victory"] = c["victory"]
     return json.dumps(m, separators=(",", ":"))
 
 

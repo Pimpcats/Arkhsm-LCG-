@@ -28,6 +28,14 @@ Shared pool/loop: median **17**, 5–95th **14–20**; carry cap **18**.
 - Campaign total per investigator: 6 loops 34 · 7 loops 40 · 8 loops **45** —
   the official-XP benchmark (40–50) is reached over the 7–8-loop window.
 
+## Victory (the Named) — economy impact
+Three Named elites carry Victory 2/3/2 = **7 banked Memory per campaign, total**,
+gated once-per-name on the log (the Named respawn each loop; only the first
+defeat pays). Spread over 6–8 loops that is **~1 Memory/loop** — inside the
+income model's noise band (5–95th 14–20), so no re-tune of the ~17/loop figure
+is needed. The real cost of hunting one is **Hours** (a fight is 2–4 actions
+against the ~6-round clock), which is the intended risk-for-Memory trade.
+
 ## Aging
 Over 7 loops: clean → **Weathered 100%** · typical → **Elder 64% / Ancient 35%**
 · reckless → **Aged out 100%**.

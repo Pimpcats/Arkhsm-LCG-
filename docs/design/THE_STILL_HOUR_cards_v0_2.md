@@ -23,6 +23,7 @@ These terms are referenced by card text. They must be defined *before* the cards
 - **Hourglass.** The shared loop clock. It advances by time and by **Skip** effects, and is spent/rewound only by specific cards, always at a Dissonance cost.
 - **Static** (`[static]`). A token added to the chaos bag at Dissonance 4+. Modifier **−3**; its symbol effect: *after this token is revealed, raise Dissonance by 1.* (The glitch feeds itself.)
 - **Echo.** A non-Elite enemy subtype (townsfolk repeating their last moments).
+- **Victory X (Memory).** Some **Named** Elite enemies carry Victory X. When one is defeated, record its name on the campaign log's Victory list; if it was not already recorded, add X to banked Memory. **Once per campaign per name** — the Named return each loop, but you only learn a face once (`encounter v0.4 §5b`).
 - **The Appointed.** The Elite enemy aspect of the entity. It occupies an **Approach** stage (Unseen → Sensed → Emerging → Arrived), driven up by the clock and the Dissonance bands; it manifests on the board while Sensed or later. **It cannot be defeated, only Held Back** — pushed back one stage, rewinding the Hourglass. *(Full rules: `CO-002` / `encounter v0.4 §5`; supersedes this doc's original "enters play at Dissonance 8+" spawn model.)*
 - **Carry-over.**
   - *Between nodes of the same loop:* board state resets (damage, in-play cards, resources) **except** Memory on cards, banked Memory, Dissonance, the Hourglass, the Knowledge Track, and all "once per loop" flags, which persist.

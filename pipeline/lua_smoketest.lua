@@ -227,6 +227,25 @@ CampaignState.init(3)
 CampaignState.deserialize(blob2)
 check("Approach stage survives serialize/deserialize", Appointed.stage() == 3)
 
+print("== Victory (Memory): once per campaign per named enemy ==")
+CampaignState.init(3)
+check("first defeat claims Victory and banks its Memory",
+  CampaignState.claimVictory("sthr-bellringer", 2) == true and CampaignState.getBankedMemory() == 2)
+check("second defeat of the same name banks nothing",
+  CampaignState.claimVictory("sthr-bellringer", 2) == false and CampaignState.getBankedMemory() == 2)
+CampaignState.reset() -- the night repeats; the Named return...
+check("Victory claim survives a reset (log, not board state)",
+  CampaignState.isVictoryClaimed("sthr-bellringer") == true)
+check("...and still cannot be re-claimed next loop",
+  CampaignState.claimVictory("sthr-bellringer", 2) == false and CampaignState.getBankedMemory() == 2)
+check("a different Named enemy claims independently",
+  CampaignState.claimVictory("sthr-wearssheriff", 3) == true and CampaignState.getBankedMemory() == 5)
+local vblob = CampaignState.serialize()
+CampaignState.init(3)
+CampaignState.deserialize(vblob)
+check("Victory log survives serialize/deserialize",
+  CampaignState.isVictoryClaimed("sthr-bellringer") and CampaignState.isVictoryClaimed("sthr-wearssheriff"))
+
 print("== P6: location fact-toggles + Knowledge gates ==")
 CampaignState.init(3)
 check("Lantern Room starts on its front", Locations.activeFace("lantern-room") == "front")
