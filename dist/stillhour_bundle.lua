@@ -26,9 +26,9 @@ __modules["StillHour/Constants"] = function()
 --
 -- Rules encoded:
 --   reset threshold R  = 6 x investigators   (Dissonance hits R -> loop resets)
---   Latecomer arrival  = 4 x investigators   (Noticed band; boss enters)
+--   Appointed Arrived  = 4 x investigators   (Noticed band; the Appointed arrives)
 --   Memory soft cap    = 6 x investigators
---   contest target     = 3 x investigators   (finale)
+--   contest target     = 4 x investigators   (finale; 8/12/16 at 2/3/4p — CO-001)
 --   scar cap           = floor(R / 3)         (start-of-loop Dissonance ceiling)
 --   bands              = thirds of R: Calm / Glitch / Noticed
 --
@@ -56,16 +56,16 @@ Constants.HOUR_LAST = 9
 function Constants.forCount(n)
   n = math.max(1, math.floor(n or 3))
   local reset = 6 * n
-  local latecomer = 4 * n
+  local appointed = 4 * n
   if n == 1 then
     -- Documented solo override (guide §10): looser than 4/6.
     reset = 9
-    latecomer = 6
+    appointed = 6
   end
   return {
     investigators = n,
     resetThreshold = reset,
-    latecomerThreshold = latecomer,
+    appointedThreshold = appointed,
     memoryCap = 6 * n,
     -- Finale contest target = 4 x investigators (8 / 12 / 16 at 2 / 3 / 4p).
     -- Resolved by CO-001: the guide's "12 at three players" was intended and
@@ -141,7 +141,7 @@ local function freshState(n)
     testTypesLastLoop = {},  -- snapshot of the previous loop (Muscle Memory reads this)
     years = {},              -- investigatorId -> integer
     brackets = {},           -- investigatorId -> {bracket, physical, mental}
-    latecomerInPlay = false,
+    appointedStage = 0,      -- The Appointed's Approach: 0 Unseen..3 Arrived (CO-002)
   }
 end
 
@@ -190,6 +190,7 @@ function CampaignState.deserialize(saved, decoder)
     state.testTypesLastLoop = state.testTypesLastLoop or {}
     state.years = state.years or {}
     state.brackets = state.brackets or {}
+    state.appointedStage = state.appointedStage or 0
   end
   return state
 end
@@ -263,7 +264,7 @@ local function setDissonanceClamped(v)
 end
 
 --- Raise Dissonance. Returns new value, the band before, and the band after,
--- so the caller (Dissonance module) can drive chaos-bag / Latecomer hooks.
+-- so the caller (Dissonance module) can drive chaos-bag / Appointed hooks.
 function CampaignState.raiseDissonance(n)
   local before = CampaignState.band()
   local reachedReset = false
@@ -282,9 +283,11 @@ function CampaignState.reduceDissonance(n)
   return state.dissonance, before, CampaignState.band()
 end
 
---- True once Dissonance has reached the Latecomer arrival threshold.
-function CampaignState.latecomerShouldArrive()
-  return state.dissonance >= CampaignState.constants().latecomerThreshold
+--- True once Dissonance has reached the Appointed's Arrived threshold (Noticed
+-- band start = 4 x investigators). The Approach is driven by band-entry EVENTS
+-- (see Dissonance.raise); this is the corresponding level check.
+function CampaignState.dissonanceAtAppointedThreshold()
+  return state.dissonance >= CampaignState.constants().appointedThreshold
 end
 
 ------------------------------------------------------------------ hourglass --
@@ -370,14 +373,37 @@ function CampaignState.setBracket(investigatorId, bracketData)
   state.brackets[investigatorId] = bracketData
 end
 
------------------------------------------------------------------- latecomer --
+-------------------------------------------------------- the appointed (P5) --
 
-function CampaignState.isLatecomerInPlay()
-  return state.latecomerInPlay == true
+-- The Appointed occupies an Approach stage 0..3 (Unseen/Sensed/Emerging/Arrived,
+-- CO-002 §1). It only ever ratchets UP via driver events (clock, Dissonance
+-- bands, cards); Hold Back pushes it back one stage. It is on the board while
+-- stage >= 1. Persisted in state.appointedStage; reset() sets it to 0.
+
+function CampaignState.getAppointedStage()
+  return state.appointedStage
 end
 
-function CampaignState.setLatecomerInPlay(v)
-  state.latecomerInPlay = (v == true)
+--- Ratchet the Approach UP to at least driverStage (clamped 0..3). Never lowers
+-- the stage — a driver can only raise it, so calling with a lower value is a
+-- no-op. Returns the resulting stage.
+function CampaignState.advanceAppointed(driverStage)
+  local target = math.max(0, math.min(3, math.floor(driverStage or 0)))
+  if target > state.appointedStage then
+    state.appointedStage = target
+  end
+  return state.appointedStage
+end
+
+--- Push the Approach back one stage (Hold Back success), clamped >= 0.
+function CampaignState.pushBackAppointed()
+  state.appointedStage = math.max(0, state.appointedStage - 1)
+  return state.appointedStage
+end
+
+--- Is the Appointed manifested on the board (stage >= 1)?
+function CampaignState.isAppointedInPlay()
+  return state.appointedStage >= 1
 end
 
 ------------------------------------------------------------------ loop flow --
@@ -400,7 +426,7 @@ function CampaignState.reset()
   state.oncePerLoopFlags = {}
   state.testTypesLastLoop = state.testTypesThisLoop
   state.testTypesThisLoop = {}
-  state.latecomerInPlay = false
+  state.appointedStage = 0
   return state
 end
 
@@ -486,16 +512,30 @@ local function reconcileBand(bag, before, after)
   end
 end
 
---- Raise Dissonance and reconcile the bag / report boss + reset transitions.
--- @return table {value, band, latecomerArriving, reachedReset}
+--- On entering a new Dissonance band, drive the Appointed's Approach (CO-002 §1):
+-- entering Glitch -> at least Sensed (1); entering Noticed -> Arrived (3).
+-- Event-based (only on band change); advanceAppointed only ratchets up.
+local function driveAppointedOnBand(before, after)
+  if before == after then
+    return
+  end
+  if after == Constants.BAND_NOTICED then
+    CampaignState.advanceAppointed(3)
+  elseif after == Constants.BAND_GLITCH then
+    CampaignState.advanceAppointed(1)
+  end
+end
+
+--- Raise Dissonance, reconcile the bag, drive the Appointed on a band change.
+-- @return table {value, band, appointedStage, reachedReset}
 function Dissonance.raise(n, bag)
   local value, before, after, reachedReset = CampaignState.raiseDissonance(n or 1)
   reconcileBand(bag, before, after)
+  driveAppointedOnBand(before, after)
   return {
     value = value,
     band = after,
-    latecomerArriving = CampaignState.latecomerShouldArrive()
-      and not CampaignState.isLatecomerInPlay(),
+    appointedStage = CampaignState.getAppointedStage(),
     reachedReset = reachedReset,
   }
 end
@@ -577,7 +617,7 @@ __modules["StillHour/Hourglass"] = function()
 -- per-Hour handlers via the knows() checks.
 --
 -- Board-specific consequences (who is at a Church, moving investigators off an
--- impassable location, spawning the Latecomer, etc.) are delegated to callbacks
+-- impassable location, advancing the Appointed, etc.) are delegated to callbacks
 -- in `ctx` so this module stays board-agnostic and testable. Any callback may be
 -- omitted; it is then a no-op.
 --
@@ -589,8 +629,8 @@ __modules["StillHour/Hourglass"] = function()
 --   ctx.onHourReached   -- function(hourNumber, descriptor)
 --   ctx.onReset         -- function()
 --   ctx.onFinaleAttemptable -- function()
---   ctx.moveLatecomerCloser -- function()
---   ctx.spawnLatecomer  -- function(exhausted)
+--   ctx.onAppointedAdvance  -- function(stage) board hook after the clock ratchets
+--                              the Appointed's Approach (Hours V/VII/VIII)
 --   ctx.addStatic       -- function(n) temporary bag static (Hour VI)
 --   ctx.removeStatic    -- function(n) (Hour VI when almanac fact known)
 --   ctx.enemiesGetFightBonus -- function(n) (Hour VIII)
@@ -617,6 +657,16 @@ local function raiseDissonance(ctx, n)
     return ctx.dissonance.raise(n, ctx.bag)
   end
   return CampaignState.raiseDissonance(n)
+end
+
+-- Ratchet the Appointed's Approach up as the clock reaches its trigger Hours
+-- (CO-002 §1): Hour V -> Sensed(1), VII -> Emerging(2), VIII -> Arrived(3).
+local function advanceAppointed(ctx, stage)
+  local s = CampaignState.advanceAppointed(stage)
+  if ctx and ctx.onAppointedAdvance then
+    ctx.onAppointedAdvance(s)
+  end
+  return s
 end
 
 --- Is this Hour structurally removed from the clock by a Knowledge fact?
@@ -659,13 +709,14 @@ local HOUR_HANDLERS = {
   end,
 
   [5] = function(ctx)
+    advanceAppointed(ctx, 1)  -- Hour V -> at least Sensed
     if CampaignState.band() ~= Constants.BAND_CALM then
       if ctx and ctx.awakenSleepwalkingEchoes then
         ctx.awakenSleepwalkingEchoes()
       end
-      return "Sleepwalking Echoes awaken."
+      return "The streets empty. Sleepwalking Echoes awaken; the Appointed is Sensed."
     end
-    return "The streets empty (Echoes stay asleep in the Calm band)."
+    return "The streets empty. The Appointed is Sensed (Echoes still asleep in Calm)."
   end,
 
   [6] = function(ctx)
@@ -678,17 +729,16 @@ local HOUR_HANDLERS = {
   end,
 
   [7] = function(ctx)
-    if not CampaignState.isLatecomerInPlay() then
-      if ctx and ctx.moveLatecomerCloser then ctx.moveLatecomerCloser() end
-      return "The guest approaches (Latecomer moves 1 Hour closer)."
-    end
-    return "The guest approaches."
+    advanceAppointed(ctx, 2)  -- Hour VII -> at least Emerging
+    return "The guest approaches. The Appointed is Emerging"
+      .. (CampaignState.knows("the-appointeds-name") and " (arriving exhausted)." or ".")
   end,
 
   [8] = function(ctx)
     raiseDissonance(ctx, 2)
+    advanceAppointed(ctx, 3)  -- Hour VIII -> Arrived
     if ctx and ctx.enemiesGetFightBonus then ctx.enemiesGetFightBonus(1) end
-    return "Raise Dissonance by 2. All enemies get +1 Fight until reset."
+    return "Almost. Raise Dissonance by 2; all enemies +1 Fight; the Appointed has Arrived."
   end,
 
   [9] = function(ctx)
@@ -823,11 +873,11 @@ function Aging.computeYearsGained(cond)
   return y
 end
 
---- Did the loop end in the danger band (Dissonance >= Latecomer threshold)?
+--- Did the loop end in the danger band (Dissonance >= the Appointed threshold)?
 -- Measure BEFORE reset (reset drops Dissonance to the scar).
 function Aging.loopEndedInDanger(dissonanceAtEnd, investigatorCount)
   local Constants = require("StillHour/Constants")
-  return dissonanceAtEnd >= Constants.forCount(investigatorCount).latecomerThreshold
+  return dissonanceAtEnd >= Constants.forCount(investigatorCount).appointedThreshold
 end
 
 --- "Leaned on the loop" test: raised Dissonance 3+ times OR spent 4+ Memory
@@ -905,6 +955,161 @@ return Aging
 
 end
 
+__modules["StillHour/Appointed"] = function()
+--- THE STILL HOUR — THE APPOINTED (P5 / CO-002).
+--
+-- The boss is not a monster that spawns; it is an arrival the night owes. It
+-- occupies an Approach stage (Unseen -> Sensed -> Emerging -> Arrived) tracked in
+-- CampaignState.appointedStage, and manifests on the board once Sensed. It cannot
+-- be attacked, evaded, or defeated — only HELD BACK (pushed back one stage) to
+-- buy time on the clock.
+--
+-- This module owns the enemy's *behaviour*: manifest/remove by stage, the
+-- stage-gated Forced effects, Prey selection, and the Hold Back action. Board
+-- specifics (placing the figure, dealing damage to a seat) are delegated to a
+-- `ctx` of callbacks so the module stays board-agnostic and testable; any
+-- callback may be omitted (then it is a no-op).
+--
+-- Approach advancement lives OUTSIDE this module, on purpose: the clock
+-- (Hourglass.ttslua, Hours V/VII/VIII) and Dissonance bands (Dissonance.ttslua,
+-- entering Glitch/Noticed) call CampaignState.advanceAppointed(). Cards (The
+-- Crossing, The Debt of Hours) do the same. This module reads the resulting
+-- stage; it never advances itself.
+
+local Constants = require("StillHour/Constants")
+local CampaignState = require("StillHour/CampaignState")
+local Hourglass = require("StillHour/Hourglass")
+
+local Appointed = {}
+
+Appointed.STAGE_NAMES = { [0] = "Unseen", [1] = "Sensed", [2] = "Emerging", [3] = "Arrived" }
+Appointed.HOLD_BACK_DIFFICULTY = 4          -- test [wil] or [com] (4)
+Appointed.ARRIVED_DAMAGE = 2
+Appointed.ARRIVED_HORROR = 2
+
+------------------------------------------------------------------ stage read --
+
+function Appointed.stage()
+  return CampaignState.getAppointedStage()
+end
+
+function Appointed.stageName()
+  return Appointed.STAGE_NAMES[CampaignState.getAppointedStage()]
+end
+
+--- On the board while Sensed or later (stage >= 1).
+function Appointed.isManifest()
+  return CampaignState.getAppointedStage() >= 1
+end
+
+--- Gains Hunter while Emerging or later (stage >= 2).
+function Appointed.isHunter()
+  return CampaignState.getAppointedStage() >= 2
+end
+
+--------------------------------------------------------------------- targeting --
+
+--- Prey = the investigator with the most on-card Memory. Pass a map
+-- { investigatorId = memoryCount }. Ties resolve to the first max seen.
+function Appointed.prey(memoryByInvestigator)
+  local best, bestId
+  for id, m in pairs(memoryByInvestigator or {}) do
+    if best == nil or m > best then
+      best = m
+      bestId = id
+    end
+  end
+  return bestId
+end
+
+------------------------------------------------------------- board manifest --
+
+--- Reconcile the board figure to the current stage: place it at the farthest
+-- location when it should be manifest and isn't; remove it when stage drops to 0.
+-- ctx.isOnBoard() -> bool, ctx.placeAtFarthest(), ctx.removeFromBoard().
+function Appointed.syncBoard(ctx)
+  local onBoard = ctx and ctx.isOnBoard and ctx.isOnBoard()
+  if Appointed.isManifest() then
+    if not onBoard and ctx and ctx.placeAtFarthest then
+      ctx.placeAtFarthest()
+    end
+  else
+    if onBoard and ctx and ctx.removeFromBoard then
+      ctx.removeFromBoard()
+    end
+  end
+end
+
+--------------------------------------------------------- stage-gated effects --
+
+--- End of round, while Sensed (stage 1 only): each investigator at its location
+-- takes 1 horror. Returns horror dealt (0 if not Sensed).
+function Appointed.onRoundEnd(ctx)
+  if CampaignState.getAppointedStage() == 1 then
+    if ctx and ctx.horrorToInvestigatorsAtLocation then
+      ctx.horrorToInvestigatorsAtLocation(1)
+    end
+    return 1
+  end
+  return 0
+end
+
+--- On engaging an investigator, while Emerging (stage 2): that investigator
+-- takes 1 horror. Returns horror dealt (0 if not Emerging).
+function Appointed.onEngage(ctx)
+  if CampaignState.getAppointedStage() == 2 then
+    if ctx and ctx.horrorToEngaged then
+      ctx.horrorToEngaged(1)
+    end
+    return 1
+  end
+  return 0
+end
+
+--- The Appointed attacks. ONLY while Arrived (stage 3) does it deal damage: 2
+-- damage + 2 horror, then raise Dissonance by 1. A Sensed/Emerging figure does
+-- not attack, so this returns zeros below stage 3.
+-- @return table {damage, horror, dissonanceRaised}
+function Appointed.onAttack(deps)
+  if CampaignState.getAppointedStage() < 3 then
+    return { damage = 0, horror = 0, dissonanceRaised = false }
+  end
+  if deps and deps.dissonance then
+    deps.dissonance.raise(1, deps.bag)
+  else
+    CampaignState.raiseDissonance(1)
+  end
+  return { damage = Appointed.ARRIVED_DAMAGE, horror = Appointed.ARRIVED_HORROR, dissonanceRaised = true }
+end
+
+----------------------------------------------------------------- counterplay --
+
+--- Hold Back — call this on a SUCCESSFUL [wil]/[com] (4) test. Pushes the
+-- Approach back one stage AND rewinds the Hourglass by 1 Hour, then reconciles
+-- the board. Returns the new stage.
+function Appointed.holdBack(ctx)
+  local newStage = CampaignState.pushBackAppointed()
+  Hourglass.rewind(1, ctx)
+  Appointed.syncBoard(ctx)
+  return newStage
+end
+
+--- It cannot be defeated. Any effect that would defeat or remove it is replaced
+-- (it does not leave play). Always returns false ("was not defeated").
+function Appointed.attemptDefeat()
+  return false
+end
+
+--- It cannot be attacked or evaded either — expose these for callers/UX so the
+-- three "cannot" clauses live in one place.
+Appointed.canBeAttacked = false
+Appointed.canBeEvaded = false
+Appointed.canBeDefeated = false
+
+return Appointed
+
+end
+
 -- ===== control entry script =====
 -- THE STILL HOUR — control object entry script.
 -- Appended by pipeline/bundle_mod.py AFTER the inlined module table, so the
@@ -917,6 +1122,7 @@ local Dissonance    = require("StillHour/Dissonance")
 local LoopFlags     = require("StillHour/LoopFlags")
 local Hourglass     = require("StillHour/Hourglass")
 local Aging         = require("StillHour/Aging")
+local Appointed     = require("StillHour/Appointed")
 
 -- A no-op chaos-bag adapter so the demo buttons never error before the real
 -- SCED chaos-bag wiring is in place (Dissonance also tolerates bag == nil).
@@ -957,10 +1163,10 @@ end
 function shStatus()
   local c = CampaignState.constants()
   print(string.format(
-    "STILL HOUR | loop %d | Memory %d/%d | Dissonance %d/%d (%s) | Hour %s | contest target %d",
+    "STILL HOUR | loop %d | Memory %d/%d | Dissonance %d/%d (%s) | Hour %s | Appointed: %s | contest %d",
     CampaignState.getLoopsCompleted(), CampaignState.getBankedMemory(), c.memoryCap,
     CampaignState.getDissonance(), c.resetThreshold, CampaignState.band(),
-    Hourglass.HOUR_NAMES[CampaignState.getHour()] or "?", c.contestTarget))
+    Hourglass.HOUR_NAMES[CampaignState.getHour()] or "?", Appointed.stageName(), c.contestTarget))
 end
 
 function shAdvanceHour()
@@ -971,9 +1177,10 @@ function shAdvanceHour()
 end
 
 function shRaiseDissonance()
+  local before = Appointed.stage()
   local info = Dissonance.raise(1, demoBag)
   print("Dissonance -> " .. info.value .. " (" .. info.band .. ")" ..
-    (info.latecomerArriving and "  ** the Latecomer stirs **" or ""))
+    (info.appointedStage > before and ("  ** the Appointed advances to " .. Appointed.stageName() .. " **") or ""))
   if info.reachedReset then print("  Dissonance hit the reset threshold — the loop ends.") ; shReset() end
 end
 
@@ -996,19 +1203,37 @@ function runStillHourTests()
   print("──────── THE STILL HOUR — in-engine tests ────────")
 
   local c3 = Constants.forCount(3)
-  P, F = check("reset 18 / latecomer 12 at 3p", c3.resetThreshold == 18 and c3.latecomerThreshold == 12, P, F)
+  P, F = check("reset 18 / appointed 12 at 3p", c3.resetThreshold == 18 and c3.appointedThreshold == 12, P, F)
   P, F = check("contest target 12 at 3p (CO-001 4*n)", c3.contestTarget == 12, P, F)
 
   local bag = { count = 0 }
   bag.setBaselineStatic = function(m) bag.count = m end
   CampaignState.init(3); Dissonance.syncBag(bag)
-  P, F = check("Calm -> 0 [static]", bag.count == 0, P, F)
+  P, F = check("Calm -> 0 [static]; Appointed Unseen", bag.count == 0 and Appointed.stage() == 0, P, F)
   Dissonance.raise(6, bag)
-  P, F = check("Glitch -> 1 [static]; Dissonance 6", bag.count == 1 and CampaignState.getDissonance() == 6, P, F)
+  P, F = check("Glitch -> 1 [static]; Appointed Sensed (1)", bag.count == 1 and Appointed.stage() == 1, P, F)
   local info = Dissonance.raise(6, bag)
-  P, F = check("Noticed -> 2 [static]; Latecomer arriving", bag.count == 2 and info.latecomerArriving, P, F)
+  P, F = check("Noticed -> 2 [static]; Appointed Arrived (3)", bag.count == 2 and info.appointedStage == 3, P, F)
   local before = CampaignState.getDissonance(); Dissonance.onStaticRevealed(bag)
   P, F = check("[static] reveal raises Dissonance", CampaignState.getDissonance() == before + 1, P, F)
+
+  -- P5: staged Approach via the clock, Hold Back, undefeatable.
+  CampaignState.init(3)
+  Hourglass.advance(4, {})  -- reach Hour V -> Sensed
+  P, F = check("Hour V -> Appointed Sensed (1)", Appointed.stage() == 1, P, F)
+  Hourglass.advance(3, {})  -- reach Hour VIII -> Arrived
+  P, F = check("Hour VIII -> Appointed Arrived (3)", Appointed.stage() == 3, P, F)
+  local dBefore = CampaignState.getDissonance()
+  local atk = Appointed.onAttack({})
+  P, F = check("Arrived attacks 2/2 and raises Dissonance",
+    atk.damage == 2 and atk.horror == 2 and CampaignState.getDissonance() == dBefore + 1, P, F)
+  local hourBefore = CampaignState.getHour()
+  local newStage = Appointed.holdBack({})
+  P, F = check("Hold Back drops one stage and rewinds one Hour",
+    newStage == 2 and CampaignState.getHour() == hourBefore - 1, P, F)
+  P, F = check("Appointed cannot be defeated", Appointed.attemptDefeat() == false, P, F)
+  CampaignState.init(3); CampaignState.advanceAppointed(1)
+  P, F = check("Sensed figure deals no attack damage", Appointed.onAttack({}).damage == 0, P, F)
 
   CampaignState.init(3)
   P, F = check("once-per-loop free at node A", LoopFlags.use("igetout:White") == true, P, F)

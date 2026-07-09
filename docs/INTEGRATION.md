@@ -16,6 +16,7 @@ SCED-fork/
       LoopFlags.ttslua
       Hourglass.ttslua
       Aging.ttslua
+      Appointed.ttslua
 ```
 
 `require` paths use the bundle-root-relative form `require("StillHour/X")`.
@@ -70,8 +71,8 @@ Calm 0 / Glitch 1 / Noticed 2 (`Constants.STATIC_BY_BAND`).
 
 The `[static]` token itself: modifier **−3**, and on reveal call
 `Dissonance.onStaticRevealed(bag)` (raises Dissonance by 1, which may itself
-cross a band and reconcile the bag, or trigger the Latecomer/reset — the return
-table reports `latecomerArriving` / `reachedReset`).
+cross a band and reconcile the bag, or advance the Appointed / trigger a reset —
+the return table reports `appointedStage` / `reachedReset`).
 
 ## 4. Cards → manager (P4/P6/P7)
 

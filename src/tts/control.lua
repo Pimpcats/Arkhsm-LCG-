@@ -9,6 +9,7 @@ local Dissonance    = require("StillHour/Dissonance")
 local LoopFlags     = require("StillHour/LoopFlags")
 local Hourglass     = require("StillHour/Hourglass")
 local Aging         = require("StillHour/Aging")
+local Appointed     = require("StillHour/Appointed")
 
 -- A no-op chaos-bag adapter so the demo buttons never error before the real
 -- SCED chaos-bag wiring is in place (Dissonance also tolerates bag == nil).
@@ -49,10 +50,10 @@ end
 function shStatus()
   local c = CampaignState.constants()
   print(string.format(
-    "STILL HOUR | loop %d | Memory %d/%d | Dissonance %d/%d (%s) | Hour %s | contest target %d",
+    "STILL HOUR | loop %d | Memory %d/%d | Dissonance %d/%d (%s) | Hour %s | Appointed: %s | contest %d",
     CampaignState.getLoopsCompleted(), CampaignState.getBankedMemory(), c.memoryCap,
     CampaignState.getDissonance(), c.resetThreshold, CampaignState.band(),
-    Hourglass.HOUR_NAMES[CampaignState.getHour()] or "?", c.contestTarget))
+    Hourglass.HOUR_NAMES[CampaignState.getHour()] or "?", Appointed.stageName(), c.contestTarget))
 end
 
 function shAdvanceHour()
@@ -63,9 +64,10 @@ function shAdvanceHour()
 end
 
 function shRaiseDissonance()
+  local before = Appointed.stage()
   local info = Dissonance.raise(1, demoBag)
   print("Dissonance -> " .. info.value .. " (" .. info.band .. ")" ..
-    (info.latecomerArriving and "  ** the Latecomer stirs **" or ""))
+    (info.appointedStage > before and ("  ** the Appointed advances to " .. Appointed.stageName() .. " **") or ""))
   if info.reachedReset then print("  Dissonance hit the reset threshold — the loop ends.") ; shReset() end
 end
 
@@ -88,19 +90,37 @@ function runStillHourTests()
   print("──────── THE STILL HOUR — in-engine tests ────────")
 
   local c3 = Constants.forCount(3)
-  P, F = check("reset 18 / latecomer 12 at 3p", c3.resetThreshold == 18 and c3.latecomerThreshold == 12, P, F)
+  P, F = check("reset 18 / appointed 12 at 3p", c3.resetThreshold == 18 and c3.appointedThreshold == 12, P, F)
   P, F = check("contest target 12 at 3p (CO-001 4*n)", c3.contestTarget == 12, P, F)
 
   local bag = { count = 0 }
   bag.setBaselineStatic = function(m) bag.count = m end
   CampaignState.init(3); Dissonance.syncBag(bag)
-  P, F = check("Calm -> 0 [static]", bag.count == 0, P, F)
+  P, F = check("Calm -> 0 [static]; Appointed Unseen", bag.count == 0 and Appointed.stage() == 0, P, F)
   Dissonance.raise(6, bag)
-  P, F = check("Glitch -> 1 [static]; Dissonance 6", bag.count == 1 and CampaignState.getDissonance() == 6, P, F)
+  P, F = check("Glitch -> 1 [static]; Appointed Sensed (1)", bag.count == 1 and Appointed.stage() == 1, P, F)
   local info = Dissonance.raise(6, bag)
-  P, F = check("Noticed -> 2 [static]; Latecomer arriving", bag.count == 2 and info.latecomerArriving, P, F)
+  P, F = check("Noticed -> 2 [static]; Appointed Arrived (3)", bag.count == 2 and info.appointedStage == 3, P, F)
   local before = CampaignState.getDissonance(); Dissonance.onStaticRevealed(bag)
   P, F = check("[static] reveal raises Dissonance", CampaignState.getDissonance() == before + 1, P, F)
+
+  -- P5: staged Approach via the clock, Hold Back, undefeatable.
+  CampaignState.init(3)
+  Hourglass.advance(4, {})  -- reach Hour V -> Sensed
+  P, F = check("Hour V -> Appointed Sensed (1)", Appointed.stage() == 1, P, F)
+  Hourglass.advance(3, {})  -- reach Hour VIII -> Arrived
+  P, F = check("Hour VIII -> Appointed Arrived (3)", Appointed.stage() == 3, P, F)
+  local dBefore = CampaignState.getDissonance()
+  local atk = Appointed.onAttack({})
+  P, F = check("Arrived attacks 2/2 and raises Dissonance",
+    atk.damage == 2 and atk.horror == 2 and CampaignState.getDissonance() == dBefore + 1, P, F)
+  local hourBefore = CampaignState.getHour()
+  local newStage = Appointed.holdBack({})
+  P, F = check("Hold Back drops one stage and rewinds one Hour",
+    newStage == 2 and CampaignState.getHour() == hourBefore - 1, P, F)
+  P, F = check("Appointed cannot be defeated", Appointed.attemptDefeat() == false, P, F)
+  CampaignState.init(3); CampaignState.advanceAppointed(1)
+  P, F = check("Sensed figure deals no attack damage", Appointed.onAttack({}).damage == 0, P, F)
 
   CampaignState.init(3)
   P, F = check("once-per-loop free at node A", LoopFlags.use("igetout:White") == true, P, F)

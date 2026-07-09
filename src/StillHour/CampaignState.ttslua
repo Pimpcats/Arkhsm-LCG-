@@ -42,7 +42,7 @@ local function freshState(n)
     testTypesLastLoop = {},  -- snapshot of the previous loop (Muscle Memory reads this)
     years = {},              -- investigatorId -> integer
     brackets = {},           -- investigatorId -> {bracket, physical, mental}
-    latecomerInPlay = false,
+    appointedStage = 0,      -- The Appointed's Approach: 0 Unseen..3 Arrived (CO-002)
   }
 end
 
@@ -91,6 +91,7 @@ function CampaignState.deserialize(saved, decoder)
     state.testTypesLastLoop = state.testTypesLastLoop or {}
     state.years = state.years or {}
     state.brackets = state.brackets or {}
+    state.appointedStage = state.appointedStage or 0
   end
   return state
 end
@@ -164,7 +165,7 @@ local function setDissonanceClamped(v)
 end
 
 --- Raise Dissonance. Returns new value, the band before, and the band after,
--- so the caller (Dissonance module) can drive chaos-bag / Latecomer hooks.
+-- so the caller (Dissonance module) can drive chaos-bag / Appointed hooks.
 function CampaignState.raiseDissonance(n)
   local before = CampaignState.band()
   local reachedReset = false
@@ -183,9 +184,11 @@ function CampaignState.reduceDissonance(n)
   return state.dissonance, before, CampaignState.band()
 end
 
---- True once Dissonance has reached the Latecomer arrival threshold.
-function CampaignState.latecomerShouldArrive()
-  return state.dissonance >= CampaignState.constants().latecomerThreshold
+--- True once Dissonance has reached the Appointed's Arrived threshold (Noticed
+-- band start = 4 x investigators). The Approach is driven by band-entry EVENTS
+-- (see Dissonance.raise); this is the corresponding level check.
+function CampaignState.dissonanceAtAppointedThreshold()
+  return state.dissonance >= CampaignState.constants().appointedThreshold
 end
 
 ------------------------------------------------------------------ hourglass --
@@ -271,14 +274,37 @@ function CampaignState.setBracket(investigatorId, bracketData)
   state.brackets[investigatorId] = bracketData
 end
 
------------------------------------------------------------------- latecomer --
+-------------------------------------------------------- the appointed (P5) --
 
-function CampaignState.isLatecomerInPlay()
-  return state.latecomerInPlay == true
+-- The Appointed occupies an Approach stage 0..3 (Unseen/Sensed/Emerging/Arrived,
+-- CO-002 §1). It only ever ratchets UP via driver events (clock, Dissonance
+-- bands, cards); Hold Back pushes it back one stage. It is on the board while
+-- stage >= 1. Persisted in state.appointedStage; reset() sets it to 0.
+
+function CampaignState.getAppointedStage()
+  return state.appointedStage
 end
 
-function CampaignState.setLatecomerInPlay(v)
-  state.latecomerInPlay = (v == true)
+--- Ratchet the Approach UP to at least driverStage (clamped 0..3). Never lowers
+-- the stage — a driver can only raise it, so calling with a lower value is a
+-- no-op. Returns the resulting stage.
+function CampaignState.advanceAppointed(driverStage)
+  local target = math.max(0, math.min(3, math.floor(driverStage or 0)))
+  if target > state.appointedStage then
+    state.appointedStage = target
+  end
+  return state.appointedStage
+end
+
+--- Push the Approach back one stage (Hold Back success), clamped >= 0.
+function CampaignState.pushBackAppointed()
+  state.appointedStage = math.max(0, state.appointedStage - 1)
+  return state.appointedStage
+end
+
+--- Is the Appointed manifested on the board (stage >= 1)?
+function CampaignState.isAppointedInPlay()
+  return state.appointedStage >= 1
 end
 
 ------------------------------------------------------------------ loop flow --
@@ -301,7 +327,7 @@ function CampaignState.reset()
   state.oncePerLoopFlags = {}
   state.testTypesLastLoop = state.testTypesThisLoop
   state.testTypesThisLoop = {}
-  state.latecomerInPlay = false
+  state.appointedStage = 0
   return state
 end
 

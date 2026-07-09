@@ -64,16 +64,30 @@ local function reconcileBand(bag, before, after)
   end
 end
 
---- Raise Dissonance and reconcile the bag / report boss + reset transitions.
--- @return table {value, band, latecomerArriving, reachedReset}
+--- On entering a new Dissonance band, drive the Appointed's Approach (CO-002 §1):
+-- entering Glitch -> at least Sensed (1); entering Noticed -> Arrived (3).
+-- Event-based (only on band change); advanceAppointed only ratchets up.
+local function driveAppointedOnBand(before, after)
+  if before == after then
+    return
+  end
+  if after == Constants.BAND_NOTICED then
+    CampaignState.advanceAppointed(3)
+  elseif after == Constants.BAND_GLITCH then
+    CampaignState.advanceAppointed(1)
+  end
+end
+
+--- Raise Dissonance, reconcile the bag, drive the Appointed on a band change.
+-- @return table {value, band, appointedStage, reachedReset}
 function Dissonance.raise(n, bag)
   local value, before, after, reachedReset = CampaignState.raiseDissonance(n or 1)
   reconcileBand(bag, before, after)
+  driveAppointedOnBand(before, after)
   return {
     value = value,
     band = after,
-    latecomerArriving = CampaignState.latecomerShouldArrive()
-      and not CampaignState.isLatecomerInPlay(),
+    appointedStage = CampaignState.getAppointedStage(),
     reachedReset = reachedReset,
   }
 end

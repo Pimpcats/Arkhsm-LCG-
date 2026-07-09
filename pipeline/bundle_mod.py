@@ -24,6 +24,7 @@ MODULES = [
     "LoopFlags",
     "Hourglass",
     "Aging",
+    "Appointed",
 ]
 
 PREAMBLE = """-- ============================================================================
@@ -74,6 +75,13 @@ def build_save(root, bundle):
     card_bag = json.load(open(deck_path))["ObjectStates"][0]
     card_bag["Transform"] = transform(-3)
 
+    # The encounter bag (The Appointed set), if generated.
+    enc_path = os.path.join(root, "dist", "the_still_hour_encounter.json")
+    encounter_bag = None
+    if os.path.exists(enc_path):
+        encounter_bag = json.load(open(enc_path))["ObjectStates"][0]
+        encounter_bag["Transform"] = transform(-6)
+
     control = {
         "Name": "BlockSquare",
         "Transform": transform(3),
@@ -104,7 +112,7 @@ def build_save(root, bundle):
         "Rules": "",
         "TabStates": {},
         "VersionNumber": "",
-        "ObjectStates": [card_bag, control],
+        "ObjectStates": [o for o in (card_bag, encounter_bag, control) if o is not None],
     }
 
 
@@ -126,13 +134,14 @@ def main():
     # Validate the save round-trips and the control script embedded cleanly.
     reloaded = json.load(open(save_path, encoding="utf-8"))
     objs = reloaded["ObjectStates"]
-    assert len(objs) == 2, "expected card bag + control object"
     ctrl = next(o for o in objs if o.get("Nickname", "").endswith("Control"))
     assert "runStillHourTests" in ctrl["LuaScript"], "control script missing harness"
-    cards = next(o for o in objs if o.get("ContainedObjects"))
+    bags = [o for o in objs if o.get("ContainedObjects")]
+    total_cards = sum(len(b["ContainedObjects"]) for b in bags)
     print("OK  bundle:   %s  (%d bytes Lua)" % (bundle_path, len(bundle)))
     print("OK  save:     %s" % save_path)
-    print("OK  contents: %d-card bag + '%s'" % (len(cards["ContainedObjects"]), ctrl["Nickname"]))
+    print("OK  contents: %d objects, %d cards across %d bag(s) + '%s'"
+          % (len(objs), total_cards, len(bags), ctrl["Nickname"]))
 
 
 if __name__ == "__main__":

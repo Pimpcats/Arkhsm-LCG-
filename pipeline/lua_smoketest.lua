@@ -49,6 +49,7 @@ local Dissonance = require("StillHour/Dissonance")
 local LoopFlags = require("StillHour/LoopFlags")
 local Hourglass = require("StillHour/Hourglass")
 local Aging = require("StillHour/Aging")
+local Appointed = require("StillHour/Appointed")
 
 -- A fake chaos-bag adapter that records the baseline static count.
 local function fakeBag()
@@ -61,7 +62,7 @@ bag.setBaselineStatic = function(n) bag.count = n end
 print("== Constants (3-player baseline) ==")
 local c3 = Constants.forCount(3)
 check("reset threshold = 18", c3.resetThreshold == 18)
-check("latecomer threshold = 12", c3.latecomerThreshold == 12)
+check("appointed threshold = 12", c3.appointedThreshold == 12)
 check("memory cap = 18", c3.memoryCap == 18)
 -- CO-001: finale contest target = 4 x investigators (8 / 12 / 16 at 2 / 3 / 4p).
 check("contest target = 12 at n=3", c3.contestTarget == 12)
@@ -71,7 +72,7 @@ check("scar cap = 6", c3.scarCap == 6)
 check("band of 5 is Calm", Constants.bandFor(5, 3) == "Calm")
 check("band of 6 is Glitch", Constants.bandFor(6, 3) == "Glitch")
 check("band of 12 is Noticed", Constants.bandFor(12, 3) == "Noticed")
-check("solo override 6/9", Constants.forCount(1).resetThreshold == 9 and Constants.forCount(1).latecomerThreshold == 6)
+check("solo override 6/9", Constants.forCount(1).resetThreshold == 9 and Constants.forCount(1).appointedThreshold == 6)
 
 print("== P3: Dissonance bands drive the [static] baseline ==")
 CampaignState.init(3)
@@ -80,12 +81,12 @@ check("Calm -> 0 static", bag.count == 0)
 Dissonance.raise(6, bag) -- cross into Glitch (6)
 check("Dissonance now 6", CampaignState.getDissonance() == 6)
 check("Glitch -> 1 static", bag.count == 1)
-Dissonance.raise(6, bag) -- 12 -> Noticed
+local info = Dissonance.raise(6, bag) -- 12 -> Noticed
 check("Noticed -> 2 static", bag.count == 2)
-local info = Dissonance.raise(0, bag) -- no-op, but boss should be arriving at 12
-check("latecomer arriving at 12", info.latecomerArriving == true)
+check("entering Noticed drives Appointed to Arrived (3)", info.appointedStage == 3)
 Dissonance.reduce(7, bag) -- back to 5 -> Calm
 check("reduce back to Calm -> 0 static", bag.count == 0 and CampaignState.getDissonance() == 5)
+check("reducing Dissonance does NOT lower the Appointed (ratchet up only)", CampaignState.getAppointedStage() == 3)
 
 print("== P3: revealing [static] raises Dissonance ==")
 local before = CampaignState.getDissonance()
@@ -178,6 +179,50 @@ check("Elder mental delta +2", drift.skillDeltas.mental == 2)
 check("Elder max health -1", drift.maxHealthDelta == -1)
 check("Elder starts loop with 1 Memory", drift.startLoopMemory == 1)
 check("Elder keeps locked mental skill = intellect", drift.mentalSkill == "intellect")
+
+print("== P5: The Appointed — staged, clock-driven Approach (CO-002) ==")
+CampaignState.init(3)
+check("starts Unseen (0)", Appointed.stage() == 0)
+-- Clock drivers ratchet the Approach up.
+Hourglass.advance(4, {}) -- reach Hour V
+check("Hour V -> Sensed (>=1)", Appointed.stage() == 1)
+Hourglass.advance(2, {}) -- reach Hour VII
+check("Hour VII -> Emerging (>=2)", Appointed.stage() == 2)
+Hourglass.advance(1, {}) -- reach Hour VIII
+check("Hour VIII -> Arrived (3)", Appointed.stage() == 3)
+-- Ratchets up only: a lower driver never lowers it.
+CampaignState.advanceAppointed(1)
+check("advanceAppointed only ratchets up", Appointed.stage() == 3)
+check("clamps at 3", CampaignState.advanceAppointed(9) == 3)
+-- Arrived attack: 2/2 + raise Dissonance; Hold Back drops one stage + rewinds one Hour.
+local dBefore = CampaignState.getDissonance()
+local atk = Appointed.onAttack({})
+check("Arrived attacks 2/2", atk.damage == 2 and atk.horror == 2)
+check("Arrived attack raises Dissonance", CampaignState.getDissonance() == dBefore + 1)
+local hourBefore = CampaignState.getHour()
+local newStage = Appointed.holdBack({})
+check("Hold Back drops exactly one stage", newStage == 2)
+check("Hold Back rewinds exactly one Hour", CampaignState.getHour() == hourBefore - 1)
+-- Sensed figure deals no attack damage; undefeatable; reset -> 0.
+CampaignState.init(3); CampaignState.advanceAppointed(1)
+check("Sensed figure deals no attack damage", Appointed.onAttack({}).damage == 0)
+check("cannot be defeated (defeat-replacement)", Appointed.attemptDefeat() == false)
+check("clamps at 0 via pushBack", (function() CampaignState.pushBackAppointed(); return CampaignState.pushBackAppointed() end)() == 0)
+CampaignState.advanceAppointed(2)
+CampaignState.reset()
+check("reset() zeroes the Approach", Appointed.stage() == 0)
+-- Dissonance-band driver: entering Glitch -> Sensed, Noticed -> Arrived.
+CampaignState.init(3)
+Dissonance.raise(6, {}) -- into Glitch
+check("entering Glitch -> Sensed (1)", Appointed.stage() == 1)
+Dissonance.raise(6, {}) -- into Noticed
+check("entering Noticed -> Arrived (3)", Appointed.stage() == 3)
+-- Persists across serialize/deserialize and node travel (no reset).
+CampaignState.advanceAppointed(3)
+local blob2 = CampaignState.serialize()
+CampaignState.init(3)
+CampaignState.deserialize(blob2)
+check("Approach stage survives serialize/deserialize", Appointed.stage() == 3)
 
 print("")
 print(string.format("RESULT: %d passed, %d failed", passed, failed))

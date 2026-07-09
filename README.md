@@ -66,7 +66,7 @@ catch rules-interaction surprises — those still need real play in TTS.
 ## Status
 
 Card pipeline (all player cards) and the campaign state manager core (P1–P4, plus
-the P6 clock and P7 aging math) are implemented and tested offline. The Latecomer
+the P6 clock and P7 aging math) are implemented and tested offline. The Appointed
 enemy (P5), location fact-toggles (P6), and the interlude UI (P7) are next. See
 `docs/BUILD_STATUS.md` for the full ladder and the flagged design-doc conflicts,
 and `docs/INTEGRATION.md` for SCED wiring.

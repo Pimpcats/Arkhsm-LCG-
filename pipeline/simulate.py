@@ -11,7 +11,7 @@ Four reports, each with pass/fail assertions where the design docs give a target
   1. Success curve      — chaos-bag success % by test delta and Dissonance band.
   2. Memory economy      — banked/loop and the per-investigator campaign total,
                            checked against the official Arkham XP benchmark (~40-50).
-  3. Dissonance pacing   — rounds to the Latecomer / reset for cautious vs greedy.
+  3. Dissonance pacing   — rounds to the Appointed's arrival / reset for cautious vs greedy.
   4. Aging spread        — final bracket distribution by playstyle over a campaign.
 
 Run:
@@ -122,7 +122,7 @@ def simulate_economy(trials, loops, investigators, rng):
 # leans on Recollections/loop-powers and self-inflicts Dissonance.
 #
 # ASSUMPTION: per-round Dissonance gain per style (mean, sd). Targets from the
-# docs: cautious ~13 rounds to the Latecomer; greedy ~5.5 to Latecomer, ~8 to
+# docs: cautious ~13 rounds to the Appointed; greedy ~5.5 to the Appointed, ~8 to
 # reset (aging_3p_v0.3 §2.2).
 DECK_DISSONANCE_PER_ROUND = 0.8
 STYLE_EXTRA = {           # extra Dissonance/round from foreknowledge use
@@ -254,17 +254,17 @@ def main():
 
     # ---- 3. pacing ----
     reset_threshold = 6 * n if n != 1 else 9
-    latecomer_threshold = 4 * n if n != 1 else 6
-    cautious = simulate_pacing(args.trials, n, rng, "cautious", latecomer_threshold)
-    greedy_late = simulate_pacing(args.trials, n, rng, "greedy", latecomer_threshold)
+    appointed_threshold = 4 * n if n != 1 else 6
+    cautious = simulate_pacing(args.trials, n, rng, "cautious", appointed_threshold)
+    greedy_late = simulate_pacing(args.trials, n, rng, "greedy", appointed_threshold)
     greedy_reset = simulate_pacing(args.trials, n, rng, "greedy", reset_threshold)
     if not args.quiet:
         print("\n== 3. Dissonance pacing (rounds) ==")
-        print("  cautious -> Latecomer ({}): {:.1f}".format(latecomer_threshold, cautious))
-        print("  greedy   -> Latecomer ({}): {:.1f}".format(latecomer_threshold, greedy_late))
+        print("  cautious -> Appointed ({}): {:.1f}".format(appointed_threshold, cautious))
+        print("  greedy   -> Appointed ({}): {:.1f}".format(appointed_threshold, greedy_late))
         print("  greedy   -> reset     ({}): {:.1f}".format(reset_threshold, greedy_reset))
-    assert_("cautious reaches the Latecomer later than greedy", cautious > greedy_late)
-    assert_("greedy wakes the Latecomer mid-node (4-8 rounds)", 4 <= greedy_late <= 8)
+    assert_("cautious reaches the Appointed later than greedy", cautious > greedy_late)
+    assert_("greedy wakes the Appointed mid-node (4-8 rounds)", 4 <= greedy_late <= 8)
 
     # ---- 4. aging ----
     if not args.quiet:

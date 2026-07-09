@@ -53,8 +53,9 @@ function runStillHourTests()
   local LoopFlags = tryRequire("StillHour/LoopFlags")
   local Hourglass = tryRequire("StillHour/Hourglass")
   local Aging = tryRequire("StillHour/Aging")
+  local Appointed = tryRequire("StillHour/Appointed")
 
-  if not (Constants and CampaignState and Dissonance and LoopFlags and Hourglass and Aging) then
+  if not (Constants and CampaignState and Dissonance and LoopFlags and Hourglass and Aging and Appointed) then
     print("[SKIP] StillHour modules are not bundled into this build yet.")
     print("       Add src/StillHour to the build (see docs/INTEGRATION.md), then re-run.")
     return
@@ -62,8 +63,8 @@ function runStillHourTests()
 
   -- 1. Constants (CO-001: contest = 4 x investigators).
   local c3 = Constants.forCount(3)
-  check("reset threshold 18 / latecomer 12 at 3p",
-    c3.resetThreshold == 18 and c3.latecomerThreshold == 12)
+  check("reset threshold 18 / appointed 12 at 3p",
+    c3.resetThreshold == 18 and c3.appointedThreshold == 12)
   check("contest target 12 at 3p (CO-001 4*n)", c3.contestTarget == 12)
   check("memory cap 18, scar cap 6", c3.memoryCap == 18 and c3.scarCap == 6)
 
@@ -76,11 +77,26 @@ function runStillHourTests()
   Dissonance.raise(6, bag)
   check("Glitch band -> 1 [static]; Dissonance 6", bag.count == 1 and CampaignState.getDissonance() == 6)
   local info = Dissonance.raise(6, bag)
-  check("Noticed band -> 2 [static]; Latecomer arriving",
-    bag.count == 2 and info.latecomerArriving == true)
+  check("Noticed band -> 2 [static]; Appointed Arrived (3)",
+    bag.count == 2 and info.appointedStage == 3)
   local before = CampaignState.getDissonance()
   Dissonance.onStaticRevealed(bag)
   check("revealing [static] raises Dissonance by 1", CampaignState.getDissonance() == before + 1)
+
+  -- P5. The Appointed: clock-driven staged Approach, Hold Back, undefeatable.
+  CampaignState.init(3)
+  Hourglass.advance(4, {})  -- Hour V
+  check("Hour V -> Appointed Sensed (1)", Appointed.stage() == 1)
+  Hourglass.advance(3, {})  -- Hour VIII
+  check("Hour VIII -> Appointed Arrived (3)", Appointed.stage() == 3)
+  local dPre = CampaignState.getDissonance()
+  local atk = Appointed.onAttack({})
+  check("Arrived attacks 2/2 and raises Dissonance",
+    atk.damage == 2 and atk.horror == 2 and CampaignState.getDissonance() == dPre + 1)
+  local hPre = CampaignState.getHour()
+  check("Hold Back drops one stage and rewinds one Hour",
+    Appointed.holdBack({}) == 2 and CampaignState.getHour() == hPre - 1)
+  check("cannot be defeated", Appointed.attemptDefeat() == false)
 
   -- 3. Once-per-loop flags persist across node travel, clear on reset (P4).
   CampaignState.init(3)

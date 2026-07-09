@@ -1,5 +1,5 @@
 # THE STILL HOUR — Encounter Deck
-### v0.4 · the shared campaign encounter spine + the Occultation clock + the Latecomer boss set
+### v0.4 · the shared campaign encounter spine + the Occultation clock + the Appointed boss set
 
 Written to the same errata-grade standard as `cards_v0.2`, and consistent with the 3-player constants in `aging_3p_v0.3`. This is the **reusable spine** used across every node; node-specific encounter cards ship later with the six node objectives.
 
@@ -12,7 +12,7 @@ Written to the same errata-grade standard as `cards_v0.2`, and consistent with t
 - **Dissonance bands (refined for scaling).** Bands are **thirds of the reset threshold R** (R = 6 × investigators; **R = 18 at three players**), so they scale with player count and stay consistent with `v0.3`:
   - **Calm** — Dissonance 0 to R/3−1 (**0–5** at 3p)
   - **Glitch** — R/3 to 2R/3−1 (**6–11**): the chaos bag gains 1 `[static]`; Echoes wake.
-  - **Noticed** — 2R/3 to R−1 (**12–17**): the bag gains a 2nd `[static]`; the Latecomer enters play.
+  - **Noticed** — 2R/3 to R−1 (**12–17**): the bag gains a 2nd `[static]`; entering this band drives the Appointed to its **Arrived** stage (CO-002).
   - **Reset** — R (**18**): the loop resets.
   - *(This refines the absolute 4-7/8-11 bands in `v0.2 §A`, which were the 1–2 player numbers. Same shape, now player-count-correct.)*
 - **`[static]` token** — modifier **−3**; when revealed, raise Dissonance by 1.
@@ -36,7 +36,7 @@ Because it is a known sequence, players who have looped *see it coming* — whic
 | **IV** | The Road Gives Way | The location with the fewest clues becomes impassable until the next Hour (investigators there are moved to a connecting location; that move is a **Skip**). | If you Know **"The Hour Was Wrong,"** remove this Hour from the Occultation entirely. |
 | **V** | The Streets Empty | Each Sleepwalking Echo in play awakens if Dissonance is in the Glitch band or higher. | — |
 | **VI** | The Wrong Sky | Add 1 `[static]` token to the chaos bag until the next reset. | If you Know **"What the Almanac Hid,"** instead each investigator *removes* 1 `[static]`. |
-| **VII** | The Guest Approaches | If the Latecomer is not in play, it moves 1 Hour closer (place its arrival marker; at Hour VIII it enters even below the Noticed band). | If you Know **"The Latecomer's Name,"** it enters *exhausted*. |
+| **VII** | The Guest Approaches | Advance the Appointed's Approach to at least **Emerging** (Hour VIII advances it to **Arrived**) — see §5 / CO-002. | If you Know **"The Appointed's Name,"** it arrives *exhausted*. |
 | **VIII** | Almost | Raise Dissonance by 2. All enemies get +1 Fight until the next reset. | — |
 | **IX** | **The Appointed Hour** | The night ends. **Trigger a reset** (see campaign rules). No test, no escape — only what you carry forward. | If you Know **"The Way the Night Breaks,"** you may attempt the finale here instead of resetting. |
 
@@ -105,26 +105,28 @@ Because it is a known sequence, players who have looped *see it coming* — whic
 
 ---
 
-## §5. ENCOUNTER SET — "The Latecomer" (boss)
+## §5. ENCOUNTER SET — "The Appointed" (boss)
 
-*Seeded aside, not shuffled. Enters play when Dissonance reaches the Noticed band (12 at 3p) or when Hour VIII forces it (§1).*
+> **Superseded by CO-002.** The boss was renamed from *The Latecomer* to **The Appointed** and rebuilt as a staged, clock-driven **Approach** (Unseen → Sensed → Emerging → Arrived). Full spec in `CO-002_the_appointed.md`; card text below matches it. It is not seeded to spawn — it manifests on the board as its Approach advances (the clock at Hours V/VII/VIII, entering the Glitch/Noticed Dissonance bands, and card effects), and is pushed back only by **Hold Back**.
 
-**THE LATECOMER** — Enemy. **Elite.** Hunter. Monster. ×1
-> **Fight 4 · Health — · Evade —** — damage 2 / horror 2
-> **Prey** – the investigator with the most Memory. Hunter.
-> The Latecomer cannot be attacked, cannot be evaded, and **cannot be defeated.**
-> `[action]` **Hold Back:** Test `[wil]` **or** `[com]` (4). If you succeed, exhaust the Latecomer and rewind the Hourglass by 1 Hour.
-> **Forced** – When the Latecomer attacks: after it resolves, raise Dissonance by 1.
-> **Forced** – When the Latecomer would be defeated or leave play by any effect: instead, it does not.
-> **Wording note.** Health/Evade are "—" and the two "cannot" lines plus the defeat-replacement close every removal vector (damage, evade-to-disengage, "discard an enemy" tech, defeat triggers) — this is what makes "only delayed" airtight rather than a flavor line. **Hold Back** is a normal `[action]` (so it costs an action and can fail), gives the two most on-theme stats a use, and turns "combat" against it into buying time on the clock. It attacks for 2/2 *and* feeds Dissonance, so ignoring it spirals you toward reset — the intended relentless-clock pressure.
+**THE APPOINTED** — Enemy. **Elite.** Monster. Unique. ×1
+> **Fight 4 · Health — · Evade —** — damage 2 / horror 2 *(Arrived)*
+> **Prey** – the investigator with the most Memory. The Appointed cannot be attacked, cannot be evaded, and **cannot be defeated.**
+> It occupies an **Approach** stage (Unseen → Sensed → Emerging → Arrived) and manifests at the location farthest from the investigators while Sensed or later. Its Approach advances per the campaign rules (clock, Dissonance, and card effects) and never rises above Arrived.
+> `[action]` **Hold Back:** Test `[wil]` or `[com]` (4). If you succeed, push the Appointed back one Approach stage and rewind the Hourglass by 1 Hour.
+> **While Sensed:** it does not move or attack. **Forced** – At the end of the round, each investigator at its location takes 1 horror.
+> **While Emerging:** it gains **Hunter** and moves toward its prey. **Forced** – When it engages an investigator: that investigator takes 1 horror.
+> **While Arrived:** it gains **Hunter**. **Forced** – When it attacks: it deals 2 damage and 2 horror, then raise Dissonance by 1.
+> **Forced** – When the Appointed would be defeated or leave play by any effect: instead, it does not.
+> **Wording note.** The three "cannot" clauses plus the defeat-replacement close every removal vector; behaviour is gated by stage so a Sensed/Emerging figure can't attack as if Arrived; Hold Back is an `[action]` (costs a turn, can fail) at any manifest stage.
 
 **THE CROSSING** — Treachery. ×1
-> Revelation — If the Latecomer is not in play, put it into play at the location farthest from the investigators (it is arriving). If it is already in play, it readies and moves toward its prey. Then raise Dissonance by 1.
-> **Wording note.** Doubles as the arrival trigger *and* an in-play accelerant, so one card covers both states without a dead draw.
+> Revelation — Advance the Appointed's Approach by 1 stage (to a minimum of Sensed). Then raise Dissonance by 1.
+> **Wording note.** The former "put the Latecomer into play" is now "advance the Approach" — same net effect, fits the staged model, and never double-spawns.
 
-**THE LATECOMER'S WHISPER** — Treachery. Peril. ×2
-> Revelation — It knows your name now. Take 1 horror. If the Latecomer is in play, take 2 horror instead and raise Dissonance by 1.
-> **Wording note.** Scales cleanly with whether the boss is out; Peril prevents spreading the horror. Kept low pre-arrival so the card isn't oppressive when drawn early.
+**THE APPOINTED'S WHISPER** — Treachery. Peril. ×2
+> Revelation — It knows your name now. Take 1 horror. If the Appointed is **Emerging or Arrived**, take 2 horror instead and raise Dissonance by 1.
+> **Wording note.** Scales with how far the Approach has come; Peril prevents spreading the horror. Kept low early so it isn't oppressive before the Appointed manifests.
 
 ---
 
@@ -149,7 +151,7 @@ Because it is a known sequence, players who have looped *see it coming* — whic
 ## §7. Building the encounter deck
 
 - **Shared spine (every node):** all of §2, §3, §4, and §6 — **26 cards**. This is the reusable core.
-- **Boss set (§5):** set aside; the Latecomer/Crossing enter via Dissonance or Hour VIII. The Whispers shuffle in only from Act II onward.
+- **Boss set (§5):** set aside; the Appointed manifests as its Approach advances (Dissonance bands / Hours V–VIII), and **The Crossing** advances the Approach. The Whispers shuffle in only from Act II onward.
 - **The Occultation (§1):** never shuffled — it is the clock, arranged in order I→IX at setup and edited by Knowledge facts.
 - **Node-specific sets:** each of the six Ambergrove nodes adds its own small set (2–4 cards) on top of the spine — those ship with the node objectives.
 - **Static token count** in the bag is set by the Dissonance band automatically (§0); cards in §2/§4 add *temporary* extras on top.
@@ -161,7 +163,7 @@ Because it is a known sequence, players who have looped *see it coming* — whic
 Ran the shared pool through the same method as the player-card tuning:
 
 - **Hourglass** advances **~1.5 Hours/round** at three players (deck Skips ~0.45 + baseline clock 1.0) → a 9-Hour loop runs **~6 rounds**. Good node length.
-- **Dissonance from the deck alone** climbs **~0.8/round** → it would take **~14 rounds** to reach the Latecomer on its own, longer than a node. So the mythos deck is **secondary** pressure; **your foreknowledge use is the primary driver** of Dissonance — exactly the intended "your choices wake the loop, not the dice."
+- **Dissonance from the deck alone** climbs **~0.8/round** → it would take **~14 rounds** to reach the Appointed's arrival on its own, longer than a node. So the mythos deck is **secondary** pressure; **your foreknowledge use is the primary driver** of Dissonance — exactly the intended "your choices wake the loop, not the dice."
 - Horror-weighted (Drowned Choir, Whisper, Rewind's fail branch) vs. damage-light: the deck leans on **sanity and the clock**, which suits a cast with generally healthy sanity and lower health — pressure lands where the party is thinner.
 
 *Provisional until table play; validates pacing, not drama.*

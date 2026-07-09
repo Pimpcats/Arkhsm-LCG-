@@ -42,6 +42,7 @@ def face_ph(name, land=False):
 
 
 PLAYER_BACK = f"{PH}/419x600/0c0c14/8a8a99/png?text=The+Still+Hour"
+ENCOUNTER_BACK = f"{PH}/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)"
 
 # GMNotes icon-field name map (spec key -> metadata key)
 ICON_FIELDS = {
@@ -95,21 +96,37 @@ def build_gmnotes(c):
         # Read by the StillHour interlude UI (mechanical, not printed rules text).
         if "memoryCost" in c:
             m["memoryCost"] = c["memoryCost"]
+        # Encounter-card metadata (enemies/treacheries). Fight/health/evade live on
+        # the art; only classification/flags belong here.
+        if c.get("unique"):
+            m["unique"] = True
+        if c.get("elite"):
+            m["elite"] = True
+        if "quantity" in c:
+            m["quantity"] = c["quantity"]
     return json.dumps(m, separators=(",", ":"))
 
 
 def build_card(c):
     is_inv = c["type"] == "Investigator"
+    is_encounter = bool(c.get("encounter"))
     deck_id = str(c["deck"])
+    tag = "EncounterCard" if is_encounter else "PlayerCard"
+    if is_inv:
+        back = face_ph(c["name"] + " (Deckbuilding)", land=True)
+    elif is_encounter:
+        back = ENCOUNTER_BACK
+    else:
+        back = PLAYER_BACK
     return {
         "Name": "Card", "Nickname": c["name"], "Description": c.get("subtitle", ""),
         "GUID": guid(c["id"]), "CardID": int(deck_id + "00"), "SidewaysCard": is_inv,
-        "Tags": [c["type"], "PlayerCard"], "LuaScript": "", "LuaScriptState": "",
+        "Tags": [c["type"], tag], "LuaScript": "", "LuaScriptState": "",
         "GMNotes": build_gmnotes(c), "Transform": transform(),
         "CustomUIAssets": [ARKHAM_ICONS],
         "CustomDeck": {deck_id: {
             "FaceURL": face_ph(c["name"], land=is_inv),
-            "BackURL": face_ph(c["name"] + " (Deckbuilding)", land=True) if is_inv else PLAYER_BACK,
+            "BackURL": back,
             "NumWidth": 1, "NumHeight": 1, "Type": 0,
             "UniqueBack": is_inv, "BackIsHidden": is_inv}},
     }
@@ -121,6 +138,25 @@ def build_bag(cards, nickname):
         "GUID": guid("bag:" + nickname), "Tags": ["StillHour"], "Transform": transform(),
         "ContainedObjects": cards,
     }
+
+
+def generate(spec, out_path, nickname):
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    cards = [build_card(c) for c in spec]
+    with open(out_path, "w") as f:
+        json.dump({"ObjectStates": [build_bag(cards, nickname)]}, f, indent=2)
+
+    # Validate: round-trip + metadata parses + no duplicate CardIDs/ids.
+    d = json.load(open(out_path))
+    seen_ids, seen_cardids = set(), set()
+    for card in d["ObjectStates"][0]["ContainedObjects"]:
+        md = json.loads(card["GMNotes"])
+        assert md["id"] not in seen_ids, f"duplicate card id {md['id']}"
+        assert card["CardID"] not in seen_cardids, f"duplicate CardID {card['CardID']}"
+        seen_ids.add(md["id"])
+        seen_cardids.add(card["CardID"])
+        print(f"OK  {card['Nickname']:28} CardID={card['CardID']} type={md['type']:12} id={md['id']}")
+    print(f"Wrote {out_path}  ({len(cards)} cards in a bag)\n")
 
 
 def main():
@@ -140,31 +176,18 @@ def main():
         missing = wanted - {c["id"] for c in spec}
         if missing:
             raise SystemExit(f"--only referenced unknown card ids: {sorted(missing)}")
-        nickname = "THE STILL HOUR — Starter Slice"
-        default_out = os.path.join(root, "dist", "stillhour_starter.json")
-    else:
-        nickname = "THE STILL HOUR — Player Cards"
-        default_out = os.path.join(root, "dist", "the_still_hour.json")
+        generate(spec, args.out or os.path.join(root, "dist", "stillhour_starter.json"),
+                 "THE STILL HOUR — Starter Slice")
+        return
 
-    out_path = args.out or default_out
-    os.makedirs(os.path.dirname(out_path), exist_ok=True)
-
-    cards = [build_card(c) for c in spec]
-    out = {"ObjectStates": [build_bag(cards, nickname)]}
-    with open(out_path, "w") as f:
-        json.dump(out, f, indent=2)
-
-    # Validate: round-trip + metadata parses + no duplicate CardIDs/ids.
-    d = json.load(open(out_path))
-    seen_ids, seen_cardids = set(), set()
-    for card in d["ObjectStates"][0]["ContainedObjects"]:
-        md = json.loads(card["GMNotes"])
-        assert md["id"] not in seen_ids, f"duplicate card id {md['id']}"
-        assert card["CardID"] not in seen_cardids, f"duplicate CardID {card['CardID']}"
-        seen_ids.add(md["id"])
-        seen_cardids.add(card["CardID"])
-        print(f"OK  {card['Nickname']:28} CardID={card['CardID']} type={md['type']:12} id={md['id']}")
-    print(f"\nWrote {out_path}  ({len(cards)} cards in a bag)")
+    # Default full build: player cards, plus the encounter deck if its spec exists.
+    generate(spec, args.out or os.path.join(root, "dist", "the_still_hour.json"),
+             "THE STILL HOUR — Player Cards")
+    enc_spec_path = os.path.join(here, "stillhour_encounter_spec.json")
+    if args.out is None and os.path.exists(enc_spec_path):
+        generate(json.load(open(enc_spec_path)),
+                 os.path.join(root, "dist", "the_still_hour_encounter.json"),
+                 "THE STILL HOUR — The Appointed")
 
 
 if __name__ == "__main__":

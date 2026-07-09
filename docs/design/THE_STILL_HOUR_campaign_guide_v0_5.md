@@ -32,8 +32,8 @@ The Still Hour is not played as a line of separate scenarios. It is played as **
 **The board persists within a loop.** You are living one relentless night; damage, resources, and cards in play do **not** reset when you travel between districts. The reset is your only breather — and your only checkpoint. *(This refines the between-nodes carry-over line in `cards v0.2 §A`: within a loop, the board persists; only a reset wipes it.)*
 
 **Acts are progression gates, not separate scenarios:**
-- **Act I — Learning the Rules** (roughly loops 1–3): only **surface** objectives are available; the Latecomer sleeps.
-- **Act II — The Shape of the Hour** (once **3+ surface facts** are known): **deep** objectives open; the Latecomer can arrive; the Whisper cards enter the encounter deck.
+- **Act I — Learning the Rules** (roughly loops 1–3): only **surface** objectives are available; the Appointed sleeps.
+- **Act II — The Shape of the Hour** (once **3+ surface facts** are known): **deep** objectives open; the Appointed can arrive; the Whisper cards enter the encounter deck.
 - **The Last Hour** (once **"The Way the Night Breaks"** is known): the finale may be attempted.
 
 ---
@@ -44,12 +44,12 @@ The Still Hour is not played as a line of separate scenarios. It is played as **
 1. Set the Hourglass to **Hour I**. Arrange the Occultation deck (Hours I–IX) in order, applying every Knowledge edit currently flagged on the log (`encounter v0.4 §1`).
 2. Set **Dissonance** to the **scar floor** = number of completed loops so far, maximum **6**.
 3. Build the chaos bag for the current Dissonance **band** (Calm 0–5, Glitch 6–11, Noticed 12–17; add `[static]` tokens per band — `encounter v0.4 §0`).
-4. Build the encounter deck: the shared spine (`encounter v0.4 §2,§3,§6`) + the node sets of any districts you intend to visit + (Act II onward) the Whispers. Set the Latecomer aside.
+4. Build the encounter deck: the shared spine (`encounter v0.4 §2,§3,§6`) + the node sets of any districts you intend to visit + (Act II onward) the Whispers. Set the Appointed aside.
 5. Place all investigators at **The Square**. Return any Memory on cards to its owner (Memory carries as **banked**, not on cards, between loops).
 
 **Memory.** Tokens earned during the loop sit on cards; at the interlude they bank. **Banked Memory is capped at 18** at the start of each loop (6 × investigators). Spent only on Recollections. Two distinct pools — *on-card* (in-scenario fuel) and *banked* (campaign currency) — are always named explicitly.
 
-**Dissonance.** Shared track, 0–18. Rises when you act on foreknowledge (playing Recollections, foreknowledge abilities, and certain encounter cards). At **12** the Latecomer arrives; at **18** the loop resets. It only falls via specific cards.
+**Dissonance.** Shared track, 0–18. Rises when you act on foreknowledge (playing Recollections, foreknowledge abilities, and certain encounter cards). At **12** the Appointed arrives; at **18** the loop resets. It only falls via specific cards.
 
 **The Hourglass & the Occultation.** The clock advances ~1 Hour of its own accord each round, plus any **Skip** effects (including **travel between districts, which costs 1 Hour**). Each Hour reached resolves its Occultation effect in order.
 
@@ -57,7 +57,7 @@ The Still Hour is not played as a line of separate scenarios. It is played as **
 
 **Aging.** At each interlude every investigator gains **Years** (`aging v0.3 §1`): +1 base, +1 if defeated that loop, +1 if the loop ended at Dissonance 12+, +1 if they leaned on the loop (raised Dissonance 3+ times or spent 4+ Memory). Brackets: **Prime 0–4, Weathered 5–9, Elder 10–14, Ancient 15+**, each with its drift. At **18 Years** an investigator ages out.
 
-**Echoes & the Latecomer.** Echoes are **Sleepwalking** in the Calm band and wake in Glitch+. The Latecomer cannot be defeated, only **Held Back** to buy time (`encounter v0.4 §5`).
+**Echoes & the Appointed.** Echoes are **Sleepwalking** in the Calm band and wake in Glitch+. The Appointed cannot be defeated, only **Held Back** to buy time (`encounter v0.4 §5`).
 
 ---
 
@@ -102,7 +102,7 @@ A small inland town under a starless, snagged sky. **The Square** is the hub; tr
 
 **Teaching scenario. Linear. Ends in a scripted first reset.**
 
-**Setup.** Place three locations in a row: **The Square**, **The Long Pier**, **The Almanac Steps**. Investigators begin at the Square. Hourglass at Hour I. Dissonance 0. Encounter deck: shared spine only (no Whispers, no Latecomer). Chaos bag: Calm band.
+**Setup.** Place three locations in a row: **The Square**, **The Long Pier**, **The Almanac Steps**. Investigators begin at the Square. Hourglass at Hour I. Dissonance 0. Encounter deck: shared spine only (no Whispers, no Appointed). Chaos bag: Calm band.
 
 **Locations.**
 - **The Square** — shroud 1, 2 clues. *"Everyone is out for the occultation. None of them will look at you twice — not this time, not ever."*
@@ -207,10 +207,10 @@ Each district has a **surface objective** (Act I) and a **deep objective** (Act 
 **Surface objective — "what the almanac hid."** Discover 6 clues, then set the Press to reprint the true occultation time.
 → Unlock **"What the Almanac Hid."** *Edit (printed on Hour VI):* at the Wrong Sky, investigators *remove* a `[static]` instead of adding one.
 
-**Deep objective — "the latecomer's name."** (Act II, requires **"What the Almanac Hid"** + **"The Vote That Never Ends"**) The **Sealed Study** opens. Inside is the name the town spoke to call the thing through.
-→ Unlock **"The Latecomer's Name"** + completes **"Who Opened the Door"** (Seraphine's thread). *Edit (printed on Hour VII):* the Latecomer arrives exhausted. *Finale:* required input for every resolution except **The Loop Wins**; naming it is what makes the crossing contestable.
+**Deep objective — "the appointed's name."** (Act II, requires **"What the Almanac Hid"** + **"The Vote That Never Ends"**) The **Sealed Study** opens. Inside is the name the town spoke to call the thing through.
+→ Unlock **"The Appointed's Name"** + completes **"Who Opened the Door"** (Seraphine's thread). *Edit (printed on Hour VII):* the Appointed arrives exhausted. *Finale:* required input for every resolution except **The Loop Wins**; naming it is what makes the crossing contestable.
 
-**Assembling the finale.** When you know **"The Latecomer's Name,"** **"The Vote That Never Ends,"** and any **one** other deep fact, unlock **"The Way the Night Breaks."** The finale may now be attempted.
+**Assembling the finale.** When you know **"The Appointed's Name,"** **"The Vote That Never Ends,"** and any **one** other deep fact, unlock **"The Way the Night Breaks."** The finale may now be attempted.
 
 ---
 
@@ -230,14 +230,14 @@ Each district has a **surface objective** (Act I) and a **deep objective** (Act 
 | The Wheel Still Turns | Fairground (surface) | Reorder top 2 encounter cards once per loop. |
 | The Ticket-Taker's Bargain | Fairground (deep) | Unlocks **Let It In**; flags the epilogue. |
 | What the Almanac Hid | Almanac (surface) | Remove `[static]` at Hour VI. |
-| The Latecomer's Name | Almanac (deep) | Latecomer arrives exhausted; required for the finale. |
+| The Appointed's Name | Almanac (deep) | Appointed arrives exhausted; required for the finale. |
 | The Way the Night Breaks | (assembled) | Unlocks the finale attempt. |
 
 ---
 
 ## 8. ACT TRANSITIONS
 
-- **Act I → Act II** triggers at the interlude after you hold **3+ surface facts** (or after completing Loop 3, whichever comes first). From the next loop: deep objectives open; add the **Whisper** cards; the Latecomer may arrive at the Noticed band.
+- **Act I → Act II** triggers at the interlude after you hold **3+ surface facts** (or after completing Loop 3, whichever comes first). From the next loop: deep objectives open; add the **Whisper** cards; the Appointed may arrive at the Noticed band.
 - **The Last Hour** becomes attemptable once **"The Way the Night Breaks"** is known. You may keep looping to prepare (banking Memory, buying Recollections, and — knowingly — aging) or attempt it.
 
 ---
@@ -248,14 +248,14 @@ Each district has a **surface objective** (Act I) and a **deep objective** (Act 
 
 **Attempting the finale.** During any loop after **"The Way the Night Breaks"** is known, an investigator who reaches the **Almanac House Sealed Study** may declare **The Last Hour** (or it triggers automatically if you let the Hourglass reach Hour IX while the fact is known — `encounter v0.4 §1`).
 
-**Setup.** The Latecomer enters play immediately if not already present, at the location farthest from the investigators. Dissonance does not reset. Play proceeds under a single objective: **contest the crossing** — accumulate **"contest" progress** equal to **4 × investigators (12 at three players)** by Holding Back the Latecomer, spending Knowledge, and reaching the Study, before the Hourglass reaches Hour IX. Each **Hold Back** success and each deep fact spent adds 1 contest progress.
+**Setup.** The Appointed enters play immediately if not already present, at the location farthest from the investigators. Dissonance does not reset. Play proceeds under a single objective: **contest the crossing** — accumulate **"contest" progress** equal to **4 × investigators (12 at three players)** by Holding Back the Appointed, spending Knowledge, and reaching the Study, before the Hourglass reaches Hour IX. Each **Hold Back** success and each deep fact spent adds 1 contest progress.
 
 **Resolution generator.** When the finale ends (contest reached, or Hour IX, or all defeated), read the resolution matched by the campaign log, checked **top to bottom** (use the first that qualifies):
 
 | # | Condition | Resolution |
 |---|---|---|
 | R1 | Contest reached **and** an **Ancient** investigator is present | **Take Its Place.** One Ancient becomes the night's new anchor — kept behind, decades older, so the loop ends for everyone else. The town wakes for the first time in a hundred years. *(Softened if "Who Walks Beside You" is known.)* |
-| R2 | Contest reached **and** you know **The Vote That Never Ends** + **The Latecomer's Name** | **Close the Door.** You pay the price the town agreed to and never paid: everyone present ages **+3 Years at once**, and the door closes. The cleanest true ending — bought with years. |
+| R2 | Contest reached **and** you know **The Vote That Never Ends** + **The Appointed's Name** | **Close the Door.** You pay the price the town agreed to and never paid: everyone present ages **+3 Years at once**, and the door closes. The cleanest true ending — bought with years. |
 | R3 | Contest reached **and** **The Keeper's Ninth Death** is known | **Break Through.** You force the night open and all survivors escape — but the loop is only *paused*. Bittersweet epilogue: was it really ended? |
 | R4 | Contest reached (no special facts) | **Seal by Force.** The door is sealed but not closed; one investigator (chosen) ages out doing it. |
 | R5 | Not reached, but **banked Memory ≥ 12** | **Next Time.** The loop wins tonight — but you wake at First Dark closer than ever. Begin a new loop; the finale may be re-attempted. |

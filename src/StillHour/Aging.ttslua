@@ -57,11 +57,11 @@ function Aging.computeYearsGained(cond)
   return y
 end
 
---- Did the loop end in the danger band (Dissonance >= Latecomer threshold)?
+--- Did the loop end in the danger band (Dissonance >= the Appointed threshold)?
 -- Measure BEFORE reset (reset drops Dissonance to the scar).
 function Aging.loopEndedInDanger(dissonanceAtEnd, investigatorCount)
   local Constants = require("StillHour/Constants")
-  return dissonanceAtEnd >= Constants.forCount(investigatorCount).latecomerThreshold
+  return dissonanceAtEnd >= Constants.forCount(investigatorCount).appointedThreshold
 end
 
 --- "Leaned on the loop" test: raised Dissonance 3+ times OR spent 4+ Memory

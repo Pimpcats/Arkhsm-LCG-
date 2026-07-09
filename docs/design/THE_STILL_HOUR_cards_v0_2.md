@@ -19,11 +19,11 @@ These terms are referenced by card text. They must be defined *before* the cards
 - **"Limit once per loop."** The ability may be used once between resets, **even across different nodes of the same loop.** *(This is the one limit the base game does not have; it requires the mod to persist the used-flag across nodes and clear it on reset — see §E.)*
 - **Memory.** A resource represented by tokens on investigator/asset cards and a shared **banked Memory** value on the campaign log. Memory on cards is added to banked Memory during the **interlude** after each node. Banked Memory is **spent as experience — level-ups at 1 Memory per card level, plus Recollections at their listed cost.** At the start of each loop, banked Memory above **18** (6 × investigators) is lost.
 - **Recollection.** A player-card trait. Recollection cards are added to a deck only by spending banked Memory during an interlude (they are the campaign's XP-analog). Investigator deckbuilding lines grant Recollection access to all five.
-- **Dissonance.** A shared campaign track, 0–12. Raised when investigators act on foreknowledge. Drives the chaos bag and the Latecomer (design §1.4). **Start-of-loop Dissonance = the number of completed loops so far (the "scar"), to a maximum of 4.** Within a loop it only rises unless a card reduces it.
+- **Dissonance.** A shared campaign track, 0–12. Raised when investigators act on foreknowledge. Drives the chaos bag and the Appointed (design §1.4). **Start-of-loop Dissonance = the number of completed loops so far (the "scar"), to a maximum of 4.** Within a loop it only rises unless a card reduces it.
 - **Hourglass.** The shared loop clock. It advances by time and by **Skip** effects, and is spent/rewound only by specific cards, always at a Dissonance cost.
 - **Static** (`[static]`). A token added to the chaos bag at Dissonance 4+. Modifier **−3**; its symbol effect: *after this token is revealed, raise Dissonance by 1.* (The glitch feeds itself.)
 - **Echo.** A non-Elite enemy subtype (townsfolk repeating their last moments).
-- **The Latecomer.** The Elite enemy aspect of the entity. Enters play at Dissonance 8+. **It cannot be defeated, only delayed** (fight/evade against it advance/rewind the Hourglass rather than dealing lasting damage — full rules on its card).
+- **The Appointed.** The Elite enemy aspect of the entity. Enters play at Dissonance 8+. **It cannot be defeated, only delayed** (fight/evade against it advance/rewind the Hourglass rather than dealing lasting damage — full rules on its card).
 - **Carry-over.**
   - *Between nodes of the same loop:* board state resets (damage, in-play cards, resources) **except** Memory on cards, banked Memory, Dissonance, the Hourglass, the Knowledge Track, and all "once per loop" flags, which persist.
   - *Across a reset:* banked Memory (soft-capped), the Knowledge Track, and campaign-log flags persist; Dissonance drops to the new scar value; the Hourglass resets; "once per loop" flags clear.
@@ -91,7 +91,7 @@ Stat line order: `[wil / int / com / agi]`. Numbers are tuned against the simula
 
 **Deckbuilding:** Mystic 0–5, Neutral 0–5, up to 5 Seeker cards 0–2, any number of Recollection cards. Deck size **30**.
 
-> **Wording note.** "**raise Dissonance by 1**" is the cost — framed as paying into a shared track, so it's legible and can't be prevented by damage-prevention effects. **Limit twice per round** hard-caps her tempo engine; the sim shows even at max use she wakes the Latecomer in 2–4 rounds, so the limit plus the self-inflicted Dissonance are the two brakes. The elder sign **reduces by the amount it added** (a self-consistent "spend the paradox" purge) and is capped +5 so it can't scale to absurdity in the late game when Dissonance floors are high.
+> **Wording note.** "**raise Dissonance by 1**" is the cost — framed as paying into a shared track, so it's legible and can't be prevented by damage-prevention effects. **Limit twice per round** hard-caps her tempo engine; the sim shows even at max use she wakes the Appointed in 2–4 rounds, so the limit plus the self-inflicted Dissonance are the two brakes. The elder sign **reduces by the amount it added** (a self-consistent "spend the paradox" purge) and is capped +5 so it can't scale to absurdity in the late game when Dissonance floors are high.
 
 ---
 
@@ -130,7 +130,7 @@ Stat line order: `[wil / int / com / agi]`. Numbers are tuned against the simula
 > **Wording note.** The `[free]` + exhaust means one use per round despite being free; "cancel the *when revealed* effect" is scoped so it can't retroactively cancel a Static token already drawn (a token and a treachery are different objects — this prevents a category error at the table).
 
 **"IT MEANS 'WAIT'"** — *Event.* Signature. Fast. Cost 0. (Ayako)
-> Play when you would be affected by a card in the **Occultation** or **The Latecomer** encounter set. If you have 3 or more banked Memory, cancel that effect.
+> Play when you would be affected by a card in the **Occultation** or **The Appointed** encounter set. If you have 3 or more banked Memory, cancel that effect.
 > **Wording note.** "Play when you **would be** affected" is an interrupt so the cancel is legal; gating on **banked** (not card) Memory ties her defensive tech to campaign progress and prevents a turn-one blank.
 
 **MARKED DECK** — *Asset. Item. Illicit.* Unique. Cost 1. (Cass)
@@ -175,7 +175,7 @@ Stat line order: `[wil / int / com / agi]`. Numbers are tuned against the simula
 > **Wording note.** The evade-lock references **on-card** Memory (an in-scenario, visible value) so it's checkable mid-fight; the defeat penalty hits **banked** Memory (the campaign resource) so the debt is paid in the currency that matters. Two different Memory pools, named explicitly to avoid ambiguity.
 
 **THE DEBT OF HOURS** — *Treachery. Weakness.* (Seraphine)
-> Revelation — If Dissonance is 8 or higher: put the Latecomer into play (or, if it is already in play, it gets +2 `[com]` and moves toward you). If Dissonance is 4–7: take 2 horror. If Dissonance is 0–3: raise Dissonance by 1.
+> Revelation — If Dissonance is 8 or higher: put the Appointed into play (or, if it is already in play, it gets +2 `[com]` and moves toward you). If Dissonance is 4–7: take 2 horror. If Dissonance is 0–3: raise Dissonance by 1.
 > **Wording note.** Every branch does *something* (no dead draw), and the branches read from the current Dissonance value at reveal — the escalating punishment mirrors her own risk appetite.
 
 **NOBODY BELIEVES HER** — *Treachery. Weakness.* (Birdie)
@@ -197,7 +197,7 @@ All have trait **Recollection.** Costs shown are the **Memory** price to add to 
 | **This Time For Sure** | Event | 4 | Play after you fail a skill test; raise Dissonance by 1: retry that test once with a +2 bonus. | "retry that test once" bounds it to a single re-attempt; interrupt not needed (after-fail reaction). |
 | **Anchor Point** | Asset · Permanent | 3 | At the start of each loop, gain 1 Memory. | Permanent + start-of-loop hook; a single fixed thing you always remember. |
 | **Cassandra's Notebook** | Asset · Tome | 4 | `[reaction]` After you unlock a Knowledge fact: draw 2 cards. Limit once per loop. | Ties card draw to the progression system without becoming a per-node engine. |
-| **The Hour I Learned Your Name** | Event · Spell | 5 | Deal damage to the Latecomer equal to the number of Knowledge facts you have about it (see its card), then rewind the Hourglass by 1. Limit once per loop. | Damage sourced from the log; only meaningful once you've done the investigation — anti-blank. |
+| **The Hour I Learned Your Name** | Event · Spell | 5 | Deal damage to the Appointed equal to the number of Knowledge facts you have about it (see its card), then rewind the Hourglass by 1. Limit once per loop. | Damage sourced from the log; only meaningful once you've done the investigation — anti-blank. |
 
 ---
 
@@ -206,7 +206,7 @@ All have trait **Recollection.** Costs shown are the **Memory** price to add to 
 Ran a chaos-bag + economy simulation (20k–40k trials per test). Headlines:
 
 - **Success curve is authentic:** ≈25% at delta 0, ≈56% at +1, ≈75% at +2 (calm bag). Dissonance squeezes *marginal* tests (delta 0–2 drop ~10 pts at "noticed") without touching overkill tests — the intended pressure shape.
-- **Dissonance pacing is locked:** from a fresh loop, cautious play reaches the Latecomer (8) in ~15 rounds (i.e., usually not within a node), greedy play in ~6 and self-destructs (12) by ~9. Late-loop scar floors compress this appropriately (floor 4 greedy: ~3 rounds).
+- **Dissonance pacing is locked:** from a fresh loop, cautious play reaches the Appointed (8) in ~15 rounds (i.e., usually not within a node), greedy play in ~6 and self-destructs (12) by ~9. Late-loop scar floors compress this appropriately (floor 4 greedy: ~3 rounds).
 - **Memory economy (post-fix):** ~14 banked/loop 2-handed (soft cap 15 wastes only 19% of the time), ~10 true-solo → **~2–4 Recollections/loop**. This is the XP-analog curve I wanted.
 - **Combos are strong-but-bounded:** Cass's full engine → 94% on her key test + ~0.5 resource/test at a cost of cards/Dissonance/Memory. Birdie fail-farm is tempo-negative. Seraphine's engine self-limits via forced Dissonance. **No infinite loops, no ~100% trivialization.** Combos allowed, as requested.
 - **Table-size caveat:** the cast is tuned for **2-handed** (your likely mode). True-solo is playable but Elias (protector) and Ayako (no combat) are visibly built for a partner. Recommend 2-handed as the default; I added Elias's second clause specifically so he still earns Memory alone.
@@ -226,15 +226,15 @@ Everything above is **data-first** — it drops into SCED as `Card` objects + `G
 2. **Dissonance track** object + `[static]` token that raises it on reveal + chaos-bag banding — Medium.
 3. **Hourglass** shared clock with advance/rewind API — Medium.
 4. **Campaign state persistence:** banked Memory (soft cap 15), Dissonance scar-on-reset, Knowledge flags, **per-loop test-type flags** (for Muscle Memory), and **"once per loop" flag persistence across nodes** — High. This is the single most important custom system; several cards above are meaningless without it.
-5. **The Latecomer** enemy (Dissonance-gated spawn, delay-not-defeat) — High.
+5. **The Appointed** enemy (Dissonance-gated spawn, delay-not-defeat) — High.
 6. **Location front/back toggles** driven by Knowledge facts — Medium–High.
 
-**If you want to hand this to Claude Code**, the clean brief is: *"Fork argonui/SCED. Implement a `StillHour` campaign module: (a) a Dissonance/Memory/Hourglass state manager persisted in campaign save; (b) a `[static]` chaos token; (c) once-per-loop and per-loop-flag bookkeeping surviving node transitions; (d) the Latecomer enemy behavior; (e) location fact-toggles. Cards themselves are authored as JSON with the `GMNotes` schema already in the mod."* I can write that brief out in full, plus the card JSON, whenever you're ready to move over.
+**If you want to hand this to Claude Code**, the clean brief is: *"Fork argonui/SCED. Implement a `StillHour` campaign module: (a) a Dissonance/Memory/Hourglass state manager persisted in campaign save; (b) a `[static]` chaos token; (c) once-per-loop and per-loop-flag bookkeeping surviving node transitions; (d) the Appointed enemy behavior; (e) location fact-toggles. Cards themselves are authored as JSON with the `GMNotes` schema already in the mod."* I can write that brief out in full, plus the card JSON, whenever you're ready to move over.
 
 ---
 
 ### Open items still on me
-- Full **encounter card text** (Occultation deck, Echoes, Static treacheries, the Latecomer's card) — same errata-grade pass.
+- Full **encounter card text** (Occultation deck, Echoes, Static treacheries, the Appointed's card) — same errata-grade pass.
 - The **six node objectives** + finale generator table.
 - The **campaign guide** (branching narrative + resolutions + log sheet).
 - Your call on **finale bleakness** and whether to lock **2-handed** as the assumed player count.

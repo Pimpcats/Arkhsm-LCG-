@@ -48,13 +48,13 @@ The cast is now tuned for **3 investigators** as the assumed baseline. Two const
 ### 2.1 Memory soft cap → **18** (rule: **6 × investigators**)
 Simulation: a 3-player shared pool banks **~17 Memory/loop** (5–95th: 14–20). Testing caps: 15 wastes 82% of the time (far too low), **18 wastes 21%** (bites occasionally, forces spending — correct), 20 wastes 2% (too loose). So **soft cap = 6 × investigator count** → **18 at three players**. This supports **~1.4 Recollections per player per loop** against a shared demand of ~24 Memory/loop — a healthy, slightly tight XP-analog for three decks.
 
-### 2.2 Dissonance thresholds → Latecomer **12**, reset **18** (rules: **4× and 6× investigators**)
-A shared Dissonance track with three actors climbs three times as fast. At the old 8/12 thresholds, a greedy 3-player group wakes the Latecomer in ~4 rounds and resets in ~5.6 — they could never use the loop's power. Scaling to **12 / 18** restores the target window:
+### 2.2 Dissonance thresholds → Appointed **12**, reset **18** (rules: **4× and 6× investigators**)
+A shared Dissonance track with three actors climbs three times as fast. At the old 8/12 thresholds, a greedy 3-player group wakes the Appointed in ~4 rounds and resets in ~5.6 — they could never use the loop's power. Scaling to **12 / 18** restores the target window:
 
-- **Cautious 3p:** ~13 rounds to the Latecomer (survives a normal node comfortably).
-- **Greedy 3p:** ~5.5 rounds to the Latecomer, ~8 to a reset (flirting with danger mid-to-late node; reckless play still self-destructs).
+- **Cautious 3p:** ~13 rounds to the Appointed (survives a normal node comfortably).
+- **Greedy 3p:** ~5.5 rounds to the Appointed, ~8 to a reset (flirting with danger mid-to-late node; reckless play still self-destructs).
 
-Rules: **Latecomer threshold = 4 × investigators; reset = 6 × investigators** (3p → 12/18; 2p → 8/12; 1p → 6/9 recommended for solo, a touch looser than the pure 4×/6× to keep true-solo playable).
+Rules: **Appointed threshold = 4 × investigators; reset = 6 × investigators** (3p → 12/18; 2p → 8/12; 1p → 6/9 recommended for solo, a touch looser than the pure 4×/6× to keep true-solo playable).
 
 ### 2.3 Two derived constants
 - **Scar floor** (start-of-loop Dissonance): = completed loops so far, capped at **6** for a 3-player game (⅓ of the reset threshold), so late loops open near — but not inside — the danger band.
@@ -90,7 +90,7 @@ The available endings by the party's age profile:
 ## §5. Updated balance verdict
 
 - **3-player economy:** ~17 Memory/loop, soft cap 18 → ~1.4 Recollections/player/loop. Tight and healthy.
-- **3-player Dissonance:** thresholds 12/18 reproduce the intended window (cautious survives a node; greedy flirts with the Latecomer mid-late; recklessness resets). Locked.
+- **3-player Dissonance:** thresholds 12/18 reproduce the intended window (cautious survives a node; greedy flirts with the Appointed mid-late; recklessness resets). Locked.
 - **Aging pacing:** clean +1/loop, typical +2, reckless +4 → a ~6–8-loop campaign lands clean players around Weathered and typical players around Elder at the finale, with Ancient/age-out reserved for the reckless or for overtime. The bracket spread is wide enough to make the finale gate meaningful without forcing a single path.
 - Still provisional until table play; the sim validates pacing and economy, not the drama.
 
@@ -98,7 +98,7 @@ The available endings by the party's age profile:
 
 ### Remaining open items (all on me)
 1. **Campaign length** — I've assumed **~6–8 loops**, finale openable after ~loop 4. If your group wants shorter/longer, I re-space the Age brackets and the Knowledge Track to match. (Only thing I'd still like your read on.)
-2. Full **encounter card text** — the Occultation deck, Echoes, Static treacheries, and the **Latecomer**'s card, to the same errata-grade standard.
+2. Full **encounter card text** — the Occultation deck, Echoes, Static treacheries, and the **Appointed**'s card, to the same errata-grade standard.
 3. The **six node objectives** + the finale generator table (Knowledge × Dissonance × Age → resolution).
 4. The **campaign guide** + a printable **campaign-log sheet** (Years, brackets, Memory, Dissonance, Knowledge, the dead).
 5. On request: the full **Claude Code brief** + starter **card JSON** to begin the SCED build.

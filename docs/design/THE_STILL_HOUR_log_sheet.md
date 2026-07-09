@@ -56,7 +56,7 @@ Current banked Memory: **______**  (soft cap **18** — reduce to 18 at each loo
 - ☐ **The Wheel Still Turns** *(Fairground)* — reorder the top 2 encounter cards once per loop.
 - ☐ **The Ticket-Taker's Bargain** *(Fairground deep)* — unlocks **Let It In**; flags the epilogue.
 - ☐ **What the Almanac Hid** *(Almanac)* — remove a `[static]` at Hour VI.
-- ☐ **The Latecomer's Name** *(Almanac deep)* — Latecomer arrives exhausted; required for the finale.
+- ☐ **The Appointed's Name** *(Almanac deep)* — Appointed arrives exhausted; required for the finale.
 - ☐ **The Way the Night Breaks** *(assembled: Name + Vote + one other deep fact)* — **the finale may be attempted.**
 
 **Surface facts held:** ____ / 6   → Act II opens at **3+**.

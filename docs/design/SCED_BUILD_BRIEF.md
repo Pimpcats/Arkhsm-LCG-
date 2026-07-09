@@ -8,7 +8,7 @@ The design is authoritative in these files (read them first, in order):
 1. `THE_STILL_HOUR_design.md` — concept + the five novel systems.
 2. `THE_STILL_HOUR_cards_v0.2.md` — investigators, signatures, weaknesses, Recollections, with exact wording.
 3. `THE_STILL_HOUR_aging_3p_v0.3.md` — the Aging system + 3-player constants.
-4. `THE_STILL_HOUR_encounter_v0.4.md` — encounter deck, the Occultation clock, the Latecomer.
+4. `THE_STILL_HOUR_encounter_v0.4.md` — encounter deck, the Occultation clock, the Appointed.
 5. `THE_STILL_HOUR_campaign_guide_v0.5.md` — every scenario, interludes, the finale generator.
 6. `THE_STILL_HOUR_log_sheet.md` — the persistent campaign log fields.
 
@@ -46,7 +46,7 @@ Card content is **data** (see §4). Everything below is the custom Lua. Prioriti
 
 **P4 — Loop bookkeeping across nodes.** Implement "once per loop" and "did you perform test-type X last loop" (for `Muscle Memory`) as flags that persist across node transitions within a loop and clear on reset. *Accept:* an ability marked once-per-loop used at node A is unavailable at node B of the same loop, available again after a reset.
 
-**P5 — The Latecomer.** Elite enemy that cannot be defeated/attacked/evaded; only **Hold Back** (an action test) exhausts it and rewinds the Hourglass; it attacks 2/2 and raises Dissonance; enters at the Noticed band or Hour VIII. *Accept:* no effect removes it; Hold Back works; it hunts the highest-Memory investigator.
+**P5 — The Appointed.** Elite enemy that cannot be defeated/attacked/evaded; only **Hold Back** (an action test) exhausts it and rewinds the Hourglass; it attacks 2/2 and raises Dissonance; enters at the Noticed band or Hour VIII. *Accept:* no effect removes it; Hold Back works; it hunts the highest-Memory investigator.
 
 **P6 — Occultation clock + location toggles.** The Hour deck (fixed I–IX) resolves "when reached" effects as the Hourglass advances (resolving each skipped Hour in order); Knowledge facts edit specific Hours and flip location fronts/backs. *Accept:* a big Skip resolves intermediate Hours; flagging "The Hour Was Wrong" removes Hour IV.
 

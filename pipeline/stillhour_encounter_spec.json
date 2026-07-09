@@ -1,0 +1,17 @@
+[
+  {
+    "deck": 95040, "id": "sthr-appointed", "type": "Enemy", "name": "The Appointed",
+    "subtitle": "", "class": "Mythos", "traits": "Monster.",
+    "encounter": true, "unique": true, "elite": true, "quantity": 1
+  },
+  {
+    "deck": 95041, "id": "sthr-appointedwhisper", "type": "Treachery", "name": "The Appointed's Whisper",
+    "subtitle": "", "class": "Mythos", "traits": "",
+    "encounter": true, "quantity": 2
+  },
+  {
+    "deck": 95042, "id": "sthr-crossing", "type": "Treachery", "name": "The Crossing",
+    "subtitle": "", "class": "Mythos", "traits": "",
+    "encounter": true, "quantity": 1
+  }
+]

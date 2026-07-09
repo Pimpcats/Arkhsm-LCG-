@@ -10,7 +10,7 @@
 
 On the night of the **Occultation** — a rare astronomical event the almanacs got wrong by exactly one hour — something that lives *outside* time tried to arrive in Ambergrove. It did not finish. The night has been repeating ever since, snagged on the moment of its almost-arrival, and each loop it gets a little closer to finishing the crossing.
 
-The five investigators were standing too close when it first reached through. They are **unstuck**: they carry memory across the resets. Everyone else in Ambergrove lives the same hours over and over, blind. The campaign is the investigators' attempt to understand the loop, weaponize their memory of it, and end it — before the thing they call **The Latecomer** finally arrives on time.
+The five investigators were standing too close when it first reached through. They are **unstuck**: they carry memory across the resets. Everyone else in Ambergrove lives the same hours over and over, blind. The campaign is the investigators' attempt to understand the loop, weaponize their memory of it, and end it — before the thing they call **The Appointed** finally arrives on time.
 
 ### Design pillars
 1. **Memory is progression.** You don't get stronger by winning scenarios in a line. You get stronger by *remembering*. Death is not the end of the campaign; it is the end of a loop.
@@ -43,10 +43,10 @@ Five interlocking systems. Two are lightweight; three are the reason this campai
 
 ### 1.4 Dissonance (the risk track)
 - A shared campaign track (0–12) that rises when investigators **act on foreknowledge**: playing Recollections, using loop-aware abilities, skipping content you "already did."
-- Dissonance drives the **chaos bag** (replaces raw difficulty scaling) and wakes **The Latecomer**:
-  - **0–3** — the loop is calm. The Latecomer sleeps.
+- Dissonance drives the **chaos bag** (replaces raw difficulty scaling) and wakes **The Appointed**:
+  - **0–3** — the loop is calm. The Appointed sleeps.
   - **4–7** — glitches. Add ↷ (Static) tokens; Echoes begin to hunt.
-  - **8–11** — the loop *notices you*. The Latecomer enters play as a Hunter.
+  - **8–11** — the loop *notices you*. The Appointed enters play as a Hunter.
   - **12** — the night ends early. Immediate hard reset (loop failure), but you keep Memory.
 - Central tension: your memory is your only edge, and using it is the thing that gets you killed.
 
@@ -68,7 +68,7 @@ You don't yet know it's a loop. A straight scenario through the Occultation. It 
 The Ambergrove map opens: **The Lighthouse, The Drowned Church, The Sunken Road, Town Hall, The Fairground, The Almanac House.** Each is a self-contained set-piece (mini-scenario) with its own objective and a Knowledge Track node. Each loop you get an Hourglass budget to visit **2–3** nodes. You choose the route. Cracking a node's mystery unlocks its fact permanently. Dissonance introduced as a temptation, not yet a threat.
 
 ### Act II — "The Shape of the Hour" (loops 4–6)
-The Latecomer becomes aware (Dissonance-gated). Echoes hunt across nodes. New "deep" objectives appear at nodes you've already cracked (the second layer). You learn *why* the loop exists and *who* opened the door (Seraphine's thread). A **point of no return**: once enough of the Knowledge Track is lit, you may attempt the finale — or keep looping to prepare, trading Dissonance for readiness.
+The Appointed becomes aware (Dissonance-gated). Echoes hunt across nodes. New "deep" objectives appear at nodes you've already cracked (the second layer). You learn *why* the loop exists and *who* opened the door (Seraphine's thread). A **point of no return**: once enough of the Knowledge Track is lit, you may attempt the finale — or keep looping to prepare, trading Dissonance for readiness.
 
 ### Finale — "The Last Hour" (variable)
 Setup is **generated from the campaign log**: which facts you know, total Memory, current Dissonance, who has died, and key choices. The finale has **multiple resolutions**, e.g.:
@@ -89,7 +89,7 @@ Memory (banked) · Dissonance · Recollections owned · Knowledge Track (facts f
 
 New encounter sets themed to the loop. Full card lists come after the arc is signed off; representative cards below.
 
-- **The Latecomer** *(the boss aspect)* — Elite. Hunter. **Cannot be defeated, only delayed.** Enters play at Dissonance ≥ 8. Its fight/evade attempts don't kill it; they buy Hourglass room. Scales with Dissonance.
+- **The Appointed** *(the boss aspect)* — Elite. Hunter. **Cannot be defeated, only delayed.** Enters play at Dissonance ≥ 8. Its fight/evade attempts don't kill it; they buy Hourglass room. Scales with Dissonance.
 - **Echoes** *(townsfolk repeating their last moments)* — non-Elite enemies frozen mid-gesture; harmless until Dissonance rises, then they turn.
 - **Static** *(reality glitching)* — treacheries: **Skip** (advance the Hourglass), **Rewind** (redo a bad thing you just did), **Wrong Turn** (the map shifts — swap two locations), **Familiar Stranger** (an Echo attacks the investigator with the most Memory).
 - **The Occultation** *(the clock deck)* — the encounter cards that drive the Hourglass and the reset.
@@ -122,7 +122,7 @@ One per core class. Each remembers the loop for a different reason, and each has
 ---
 
 ### 4.2 DR. AYAKO SŌMA — "The Translator" · Seeker
-*A linguist who came to Ambergrove chasing a dead language — and found it being spoken by the night itself. She is trying to read what the Latecomer is saying.*
+*A linguist who came to Ambergrove chasing a dead language — and found it being spoken by the night itself. She is trying to read what the Appointed is saying.*
 
 - **Class:** Seeker **Traits:** *Scholar. Chronicler.*
 - **Stats:** `3 / 5 / 1 / 3` **Health:** 5 **Sanity:** 8
@@ -132,7 +132,7 @@ One per core class. Each remembers the loop for a different reason, and each has
 
 **Signatures**
 - **The Lexicon of the Hour** — *Asset. Tome.* Unique. Cost 2. Starts with 0 **entries** (uses). After you succeed at an [intellect] test by 2+, add 1 entry (max 5). *Exhaust, spend 1 entry:* choose one — get +2 to an [intellect] test, **or** cancel a non-Elite **Static** treachery's effect (you translated it in time).
-- **"It Means 'Wait'"** — *Event.* Signature. Fast. Cost 0. Play when you would be affected by a card in the **Occultation** or **The Latecomer** set. If you have 3+ Memory, cancel that effect. *(Some of it is just a request to hold on.)*
+- **"It Means 'Wait'"** — *Event.* Signature. Fast. Cost 0. Play when you would be affected by a card in the **Occultation** or **The Appointed** set. If you have 3+ Memory, cancel that effect. *(Some of it is just a request to hold on.)*
 
 **Weakness**
 - **Untranslatable** — *Treachery. Weakness.* Revelation — Some words unmake the reader. Take horror equal to half your banked Memory, rounded up (max 5). The more of the night you carry, the more it costs to look directly at it.
@@ -171,7 +171,7 @@ One per core class. Each remembers the loop for a different reason, and each has
 - **"I Remember the Ending"** — *Event. Spell.* Signature. Cost 2. Once per loop. Test [willpower] (X = current Dissonance). If you succeed: look at the top 3 cards of the Occultation deck; you may cancel the next Hourglass advance. *(You have seen how this night ends. Not this time.)*
 
 **Weakness**
-- **The Debt of Hours** — *Treachery. Weakness.* Revelation — Paradox comes due. If Dissonance is 8+, put the **Latecomer** into play (or, if already in play, it gets +2 fight and moves toward you). If Dissonance is 4–7, take 2 horror. If 0–3, take 1 Dissonance — you cannot stop reaching for it.
+- **The Debt of Hours** — *Treachery. Weakness.* Revelation — Paradox comes due. If Dissonance is 8+, put the **Appointed** into play (or, if already in play, it gets +2 fight and moves toward you). If Dissonance is 4–7, take 2 horror. If 0–3, take 1 Dissonance — you cannot stop reaching for it.
 
 ---
 
@@ -208,7 +208,7 @@ Cross-class. Bought with Memory during interludes (a Memory→card economy repla
 | **This Time For Sure** | Event | 2 | After you fail a test: retry it once with +2. Take 1 Dissonance. |
 | **Anchor Point** | Asset (permanent) | — | At the start of each loop, gain 1 Memory. Bought once; represents a fixed thing you always remember. |
 | **Cassandra's Notebook** | Asset. Tome | 2 | Once per turn, when you unlock a Knowledge fact, draw 2 cards. |
-| **The Hour I Learned Your Name** | Event (Spell) | 3 | Deal X damage to the Latecomer where X = facts you Know about it; delays it a full Hour. |
+| **The Hour I Learned Your Name** | Event (Spell) | 3 | Deal X damage to the Appointed where X = facts you Know about it; delays it a full Hour. |
 
 Each has a leveled/upgraded variant purchasable at higher Memory cost, mirroring standard 0→3→5 XP curves.
 
@@ -241,11 +241,11 @@ From cracking open `Arkham SCE 4.8.0.json`: the engine is data-driven — cards 
 | **The Hourglass (persistent clock)** | New shared token + Lua; behaves like a campaign-spanning agenda counter. | Medium |
 | **Memory persistence across scenarios** | SCED has campaign save/log + import/export. Store Memory/Dissonance/Knowledge in campaign state. | Medium |
 | **Knowledge Track unlocks flipping location fronts/backs** | Location cards support unique backs already; Lua toggles which face/objective is active per fact flag. | Medium–High |
-| **The Latecomer** (Dissonance-gated spawn, undefeatable-only-delayed) | Custom enemy Lua + spawn hooks. | High |
+| **The Appointed** (Dissonance-gated spawn, undefeatable-only-delayed) | Custom enemy Lua + spawn hooks. | High |
 | **Recollection "did you do X last loop" checks** | Needs the campaign log to record per-loop flags; Lua reads them at commit time. | High |
 | Distribution | Package as SCED-downloads JSON behind a download-box placeholder (mechanism confirmed in the file: `placeholderDownload` → GitHub release). | Low–Medium |
 
-Nothing here is blocked by the engine. The three genuinely custom pieces are **the Latecomer, the loop-flag bookkeeping, and the Knowledge Track toggles** — all scriptable, all scoped above.
+Nothing here is blocked by the engine. The three genuinely custom pieces are **the Appointed, the loop-flag bookkeeping, and the Knowledge Track toggles** — all scriptable, all scoped above.
 
 ---
 

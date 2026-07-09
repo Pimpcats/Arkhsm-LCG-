@@ -14,7 +14,7 @@
 -- per-Hour handlers via the knows() checks.
 --
 -- Board-specific consequences (who is at a Church, moving investigators off an
--- impassable location, spawning the Latecomer, etc.) are delegated to callbacks
+-- impassable location, advancing the Appointed, etc.) are delegated to callbacks
 -- in `ctx` so this module stays board-agnostic and testable. Any callback may be
 -- omitted; it is then a no-op.
 --
@@ -26,8 +26,8 @@
 --   ctx.onHourReached   -- function(hourNumber, descriptor)
 --   ctx.onReset         -- function()
 --   ctx.onFinaleAttemptable -- function()
---   ctx.moveLatecomerCloser -- function()
---   ctx.spawnLatecomer  -- function(exhausted)
+--   ctx.onAppointedAdvance  -- function(stage) board hook after the clock ratchets
+--                              the Appointed's Approach (Hours V/VII/VIII)
 --   ctx.addStatic       -- function(n) temporary bag static (Hour VI)
 --   ctx.removeStatic    -- function(n) (Hour VI when almanac fact known)
 --   ctx.enemiesGetFightBonus -- function(n) (Hour VIII)
@@ -54,6 +54,16 @@ local function raiseDissonance(ctx, n)
     return ctx.dissonance.raise(n, ctx.bag)
   end
   return CampaignState.raiseDissonance(n)
+end
+
+-- Ratchet the Appointed's Approach up as the clock reaches its trigger Hours
+-- (CO-002 §1): Hour V -> Sensed(1), VII -> Emerging(2), VIII -> Arrived(3).
+local function advanceAppointed(ctx, stage)
+  local s = CampaignState.advanceAppointed(stage)
+  if ctx and ctx.onAppointedAdvance then
+    ctx.onAppointedAdvance(s)
+  end
+  return s
 end
 
 --- Is this Hour structurally removed from the clock by a Knowledge fact?
@@ -96,13 +106,14 @@ local HOUR_HANDLERS = {
   end,
 
   [5] = function(ctx)
+    advanceAppointed(ctx, 1)  -- Hour V -> at least Sensed
     if CampaignState.band() ~= Constants.BAND_CALM then
       if ctx and ctx.awakenSleepwalkingEchoes then
         ctx.awakenSleepwalkingEchoes()
       end
-      return "Sleepwalking Echoes awaken."
+      return "The streets empty. Sleepwalking Echoes awaken; the Appointed is Sensed."
     end
-    return "The streets empty (Echoes stay asleep in the Calm band)."
+    return "The streets empty. The Appointed is Sensed (Echoes still asleep in Calm)."
   end,
 
   [6] = function(ctx)
@@ -115,17 +126,16 @@ local HOUR_HANDLERS = {
   end,
 
   [7] = function(ctx)
-    if not CampaignState.isLatecomerInPlay() then
-      if ctx and ctx.moveLatecomerCloser then ctx.moveLatecomerCloser() end
-      return "The guest approaches (Latecomer moves 1 Hour closer)."
-    end
-    return "The guest approaches."
+    advanceAppointed(ctx, 2)  -- Hour VII -> at least Emerging
+    return "The guest approaches. The Appointed is Emerging"
+      .. (CampaignState.knows("the-appointeds-name") and " (arriving exhausted)." or ".")
   end,
 
   [8] = function(ctx)
     raiseDissonance(ctx, 2)
+    advanceAppointed(ctx, 3)  -- Hour VIII -> Arrived
     if ctx and ctx.enemiesGetFightBonus then ctx.enemiesGetFightBonus(1) end
-    return "Raise Dissonance by 2. All enemies get +1 Fight until reset."
+    return "Almost. Raise Dissonance by 2; all enemies +1 Fight; the Appointed has Arrived."
   end,
 
   [9] = function(ctx)

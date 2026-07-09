@@ -50,7 +50,7 @@ Each is `character/subject, {scene}. {STYLE}` + the shared negative. Scenes shou
 - **Signature asset/event/skill** *(portrait)* — the object or a tight gesture, still-life or hands, not the full character. *e.g. The Ambergrove Lamp: "an old brass storm-lantern glowing faint amber in fog."*
 - **Location** *(portrait)* — an empty, wrong-feeling place; front = this loop, back = the "remembered" calmer version once a Knowledge fact flips it. Generate both faces with a shared composition, the back lighter/stiller.
 - **Echo enemy** *(portrait)* — townsfolk frozen mid-gesture, faces "turned slightly wrong," grey light. Uncanny, never gory.
-- **The Latecomer** *(portrait)* — the campaign's key image: "a tall wrong silhouette at the far end of an empty street, too many angles, not quite arriving, featureless, dread, negative space." Restraint is the point — never fully resolve it.
+- **The Appointed** *(portrait)* — the campaign's key image: "a tall wrong silhouette at the far end of an empty street, too many angles, not quite arriving, featureless, dread, negative space." Restraint is the point — never fully resolve it.
 - **Treachery** *(portrait)* — a single symbolic beat (a watch blurring forward, ink running backward, eight graves).
 - **Hour cards (agenda frame)** *(landscape)* — the night escalating: the bell, the wrong sky, the road giving way.
 

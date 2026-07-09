@@ -1,0 +1,158 @@
+{
+  "ObjectStates": [
+    {
+      "Name": "Bag",
+      "Nickname": "THE STILL HOUR \u2014 The Appointed",
+      "Description": "",
+      "GUID": "21304f",
+      "Tags": [
+        "StillHour"
+      ],
+      "Transform": {
+        "posX": 0,
+        "posY": 1.5,
+        "posZ": 0,
+        "rotX": 0,
+        "rotY": 180,
+        "rotZ": 0,
+        "scaleX": 1.15,
+        "scaleY": 1,
+        "scaleZ": 1.15
+      },
+      "ContainedObjects": [
+        {
+          "Name": "Card",
+          "Nickname": "The Appointed",
+          "Description": "",
+          "GUID": "5eb71d",
+          "CardID": 9504000,
+          "SidewaysCard": false,
+          "Tags": [
+            "Enemy",
+            "EncounterCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "GMNotes": "{\"id\":\"sthr-appointed\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Monster.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95040": {
+              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Appointed",
+              "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "The Appointed's Whisper",
+          "Description": "",
+          "GUID": "fcd3da",
+          "CardID": 9504100,
+          "SidewaysCard": false,
+          "Tags": [
+            "Treachery",
+            "EncounterCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "GMNotes": "{\"id\":\"sthr-appointedwhisper\",\"type\":\"Treachery\",\"class\":\"Mythos\",\"traits\":\"\",\"cycle\":\"The Still Hour\",\"quantity\":2}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95041": {
+              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Appointed's+Whisper",
+              "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "The Crossing",
+          "Description": "",
+          "GUID": "69bc02",
+          "CardID": 9504200,
+          "SidewaysCard": false,
+          "Tags": [
+            "Treachery",
+            "EncounterCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "GMNotes": "{\"id\":\"sthr-crossing\",\"type\":\"Treachery\",\"class\":\"Mythos\",\"traits\":\"\",\"cycle\":\"The Still Hour\",\"quantity\":1}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95042": {
+              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Crossing",
+              "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
