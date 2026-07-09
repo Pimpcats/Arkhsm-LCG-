@@ -7,7 +7,7 @@
 --   reset threshold R  = 6 x investigators   (Dissonance hits R -> loop resets)
 --   Latecomer arrival  = 4 x investigators   (Noticed band; boss enters)
 --   Memory soft cap    = 6 x investigators
---   contest target     = 3 x investigators   (finale)
+--   contest target     = 4 x investigators   (finale; 8/12/16 at 2/3/4p — CO-001)
 --   scar cap           = floor(R / 3)         (start-of-loop Dissonance ceiling)
 --   bands              = thirds of R: Calm / Glitch / Noticed
 --
