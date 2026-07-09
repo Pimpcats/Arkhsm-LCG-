@@ -23,7 +23,7 @@ These terms are referenced by card text. They must be defined *before* the cards
 - **Hourglass.** The shared loop clock. It advances by time and by **Skip** effects, and is spent/rewound only by specific cards, always at a Dissonance cost.
 - **Static** (`[static]`). A token added to the chaos bag at Dissonance 4+. Modifier **−3**; its symbol effect: *after this token is revealed, raise Dissonance by 1.* (The glitch feeds itself.)
 - **Echo.** A non-Elite enemy subtype (townsfolk repeating their last moments).
-- **The Appointed.** The Elite enemy aspect of the entity. Enters play at Dissonance 8+. **It cannot be defeated, only delayed** (fight/evade against it advance/rewind the Hourglass rather than dealing lasting damage — full rules on its card).
+- **The Appointed.** The Elite enemy aspect of the entity. It occupies an **Approach** stage (Unseen → Sensed → Emerging → Arrived), driven up by the clock and the Dissonance bands; it manifests on the board while Sensed or later. **It cannot be defeated, only Held Back** — pushed back one stage, rewinding the Hourglass. *(Full rules: `CO-002` / `encounter v0.4 §5`; supersedes this doc's original "enters play at Dissonance 8+" spawn model.)*
 - **Carry-over.**
   - *Between nodes of the same loop:* board state resets (damage, in-play cards, resources) **except** Memory on cards, banked Memory, Dissonance, the Hourglass, the Knowledge Track, and all "once per loop" flags, which persist.
   - *Across a reset:* banked Memory (soft-capped), the Knowledge Track, and campaign-log flags persist; Dissonance drops to the new scar value; the Hourglass resets; "once per loop" flags clear.
@@ -175,8 +175,8 @@ Stat line order: `[wil / int / com / agi]`. Numbers are tuned against the simula
 > **Wording note.** The evade-lock references **on-card** Memory (an in-scenario, visible value) so it's checkable mid-fight; the defeat penalty hits **banked** Memory (the campaign resource) so the debt is paid in the currency that matters. Two different Memory pools, named explicitly to avoid ambiguity.
 
 **THE DEBT OF HOURS** — *Treachery. Weakness.* (Seraphine)
-> Revelation — If Dissonance is 8 or higher: put the Appointed into play (or, if it is already in play, it gets +2 `[com]` and moves toward you). If Dissonance is 4–7: take 2 horror. If Dissonance is 0–3: raise Dissonance by 1.
-> **Wording note.** Every branch does *something* (no dead draw), and the branches read from the current Dissonance value at reveal — the escalating punishment mirrors her own risk appetite.
+> Revelation — If Dissonance is in the **Noticed** band: advance the Appointed's Approach by 1 stage. If in the **Glitch** band: take 2 horror. If in the **Calm** band: raise Dissonance by 1.
+> **Wording note.** Every branch does *something* (no dead draw), and the branches read the current band at reveal — the escalating punishment mirrors her own risk appetite. *(CO-002: the top branch now pushes the staged Approach instead of spawning; bands replace the original 8+/4–7/0–3 absolute thresholds so it scales with player count.)*
 
 **NOBODY BELIEVES HER** — *Treachery. Weakness.* (Birdie)
 > Revelation — Until the end of the round, card abilities controlled by other investigators cannot target Birdie or her cards, and other investigators cannot take actions that would resolve effects on Birdie or her cards. If Birdie is the only investigator at her location, take 1 horror.

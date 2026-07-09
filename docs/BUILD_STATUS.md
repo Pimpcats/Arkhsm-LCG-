@@ -77,6 +77,14 @@ the design docs themselves**. Resolution applied is noted; change if wrong.
    Recollection trait is harmless here but atypical. Kept as provided for
    consistency with the starter; flag if the trait should be dropped.
 
+6. **Act I vs the Appointed's clock drivers (open — owner's call).** Guide v0.5
+   originally said "Act I: the Appointed sleeps," but CO-002's Approach drivers
+   (Hour V → Sensed, VII → Emerging, VIII → Arrived) run every loop with no Act
+   gating, and the code implements CO-002. The guide's Act I line has been
+   reworded to match CO-002 (Whispers stay Act-gated; the Approach does not). If
+   Act I should cap the Approach (e.g. at Sensed), that's a small gate in
+   `Hourglass.ttslua`/`Dissonance.ttslua` — say the word.
+
 **Version precedence used for numeric constants:** design v0.1 → cards v0.2 →
 aging/3p v0.3 → encounter v0.4 → guide v0.5 (latest wins).
 

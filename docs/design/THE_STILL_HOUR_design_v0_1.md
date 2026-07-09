@@ -4,6 +4,8 @@
 
 > An original cosmic-horror campaign built around one idea no published campaign uses: **the night does not end.** The town of Ambergrove is caught repeating the same span of hours. Five people remember. Everyone else does not.
 
+> *v0.1 is the concept document; where numbers or boss rules differ from later docs, the later docs win: Dissonance bands scale `4×/6× investigators` (encounter v0.4), Memory spends as experience (CO-001), and the boss is the staged **Appointed** — it approaches, it is never merely "put into play" (CO-002).*
+
 ---
 
 ## 0. High concept

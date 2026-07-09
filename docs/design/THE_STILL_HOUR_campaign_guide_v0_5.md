@@ -32,8 +32,8 @@ The Still Hour is not played as a line of separate scenarios. It is played as **
 **The board persists within a loop.** You are living one relentless night; damage, resources, and cards in play do **not** reset when you travel between districts. The reset is your only breather — and your only checkpoint. *(This refines the between-nodes carry-over line in `cards v0.2 §A`: within a loop, the board persists; only a reset wipes it.)*
 
 **Acts are progression gates, not separate scenarios:**
-- **Act I — Learning the Rules** (roughly loops 1–3): only **surface** objectives are available; the Appointed sleeps.
-- **Act II — The Shape of the Hour** (once **3+ surface facts** are known): **deep** objectives open; the Appointed can arrive; the Whisper cards enter the encounter deck.
+- **Act I — Learning the Rules** (roughly loops 1–3): only **surface** objectives are available. The Appointed is a pressure at the edge of the night — its Approach still climbs with the clock (CO-002), but its Whisper cards are not yet in the deck.
+- **Act II — The Shape of the Hour** (once **3+ surface facts** are known): **deep** objectives open; the Whisper cards enter the encounter deck; the night starts pushing back.
 - **The Last Hour** (once **"The Way the Night Breaks"** is known): the finale may be attempted.
 
 ---
@@ -44,12 +44,12 @@ The Still Hour is not played as a line of separate scenarios. It is played as **
 1. Set the Hourglass to **Hour I**. Arrange the Occultation deck (Hours I–IX) in order, applying every Knowledge edit currently flagged on the log (`encounter v0.4 §1`).
 2. Set **Dissonance** to the **scar floor** = number of completed loops so far, maximum **6**.
 3. Build the chaos bag for the current Dissonance **band** (Calm 0–5, Glitch 6–11, Noticed 12–17; add `[static]` tokens per band — `encounter v0.4 §0`).
-4. Build the encounter deck: the shared spine (`encounter v0.4 §2,§3,§6`) + the node sets of any districts you intend to visit + (Act II onward) the Whispers. Set the Appointed aside.
+4. Build the encounter deck: the shared spine (`encounter v0.4 §2,§3,§6`) + the node sets of any districts you intend to visit + (Act II onward) the Whispers. Set the Appointed aside at **Unseen** — it manifests only as its Approach advances (CO-002).
 5. Place all investigators at **The Square**. Return any Memory on cards to its owner (Memory carries as **banked**, not on cards, between loops).
 
-**Memory.** Tokens earned during the loop sit on cards; at the interlude they bank. **Banked Memory is capped at 18** at the start of each loop (6 × investigators). Spent only on Recollections. Two distinct pools — *on-card* (in-scenario fuel) and *banked* (campaign currency) — are always named explicitly.
+**Memory.** Tokens earned during the loop sit on cards; at the interlude they bank. **Banked Memory is capped at 18** at the start of each loop (6 × investigators). Spent as experience: Recollections at their listed cost, and card level-ups at 1 Memory per level (CO-001). Two distinct pools — *on-card* (in-scenario fuel) and *banked* (campaign currency) — are always named explicitly.
 
-**Dissonance.** Shared track, 0–18. Rises when you act on foreknowledge (playing Recollections, foreknowledge abilities, and certain encounter cards). At **12** the Appointed arrives; at **18** the loop resets. It only falls via specific cards.
+**Dissonance.** Shared track, 0–18. Rises when you act on foreknowledge (playing Recollections, foreknowledge abilities, and certain encounter cards). Entering the **Glitch** band (6) drives the Appointed's Approach to at least *Sensed*; entering **Noticed** (12) drives it to *Arrived*; at **18** the loop resets. It only falls via specific cards.
 
 **The Hourglass & the Occultation.** The clock advances ~1 Hour of its own accord each round, plus any **Skip** effects (including **travel between districts, which costs 1 Hour**). Each Hour reached resolves its Occultation effect in order.
 
@@ -57,7 +57,7 @@ The Still Hour is not played as a line of separate scenarios. It is played as **
 
 **Aging.** At each interlude every investigator gains **Years** (`aging v0.3 §1`): +1 base, +1 if defeated that loop, +1 if the loop ended at Dissonance 12+, +1 if they leaned on the loop (raised Dissonance 3+ times or spent 4+ Memory). Brackets: **Prime 0–4, Weathered 5–9, Elder 10–14, Ancient 15+**, each with its drift. At **18 Years** an investigator ages out.
 
-**Echoes & the Appointed.** Echoes are **Sleepwalking** in the Calm band and wake in Glitch+. The Appointed cannot be defeated, only **Held Back** to buy time (`encounter v0.4 §5`).
+**Echoes & the Appointed.** Echoes are **Sleepwalking** in the Calm band and wake in Glitch+. The Appointed climbs an **Approach** (Unseen → Sensed → Emerging → Arrived), driven up by the clock (Hours V/VII/VIII) and the Dissonance bands. It cannot be defeated — only **Held Back**, pushing it back one stage and rewinding the Hourglass an Hour (`encounter v0.4 §5`, CO-002).
 
 ---
 
@@ -152,7 +152,7 @@ Each district has a **surface objective** (Act I) and a **deep objective** (Act 
 → Unlock **"The Thirteenth Toll."** *Edit (already printed on Hour III):* the Church no longer adds its extra +1 Dissonance at the Toll.
 
 **Deep objective — "the hour was wrong."** (Act II) With the Toll known, the **Flooded Crypt** opens. Recover the drowned almanac-page (3 clues in the Crypt).
-→ Unlock **"The Hour Was Wrong."** *Edit:* **Hour IV — The Road Gives Way — is removed from the Occultation deck** for all future loops. This is one of the single most valuable facts (it stops the mid-loop road collapse forever).
+→ Unlock **"The Hour Was Wrong."** *Edit:* **Hour IV — The Road Gives Way — is removed from the Occultation deck** for all future loops. This is among the most valuable facts in the campaign (it stops the mid-loop road collapse forever).
 
 ---
 
@@ -237,18 +237,18 @@ Each district has a **surface objective** (Act I) and a **deep objective** (Act 
 
 ## 8. ACT TRANSITIONS
 
-- **Act I → Act II** triggers at the interlude after you hold **3+ surface facts** (or after completing Loop 3, whichever comes first). From the next loop: deep objectives open; add the **Whisper** cards; the Appointed may arrive at the Noticed band.
+- **Act I → Act II** triggers at the interlude after you hold **3+ surface facts** (or after completing Loop 3, whichever comes first). From the next loop: deep objectives open, and the **Whisper** cards enter the encounter deck. (The Appointed's Approach runs in every Act — see §2.)
 - **The Last Hour** becomes attemptable once **"The Way the Night Breaks"** is known. You may keep looping to prepare (banking Memory, buying Recollections, and — knowingly — aging) or attempt it.
 
 ---
 
 ## 9. FINALE — THE LAST HOUR
 
-> *You have lived this night more times than you can hold. You know the toll, the road, the wrong sky, the name. You know what the town agreed to. All that's left is to be there when it arrives — and to decide what you're willing to spend.*
+> *You have lived this night more times than you can hold. You know the toll, the road, the wrong sky, the name. You know what the town agreed to — an appointment made in ink and never kept. All that's left is to keep it — and to decide what you're willing to spend.*
 
 **Attempting the finale.** During any loop after **"The Way the Night Breaks"** is known, an investigator who reaches the **Almanac House Sealed Study** may declare **The Last Hour** (or it triggers automatically if you let the Hourglass reach Hour IX while the fact is known — `encounter v0.4 §1`).
 
-**Setup.** The Appointed enters play immediately if not already present, at the location farthest from the investigators. Dissonance does not reset. Play proceeds under a single objective: **contest the crossing** — accumulate **"contest" progress** equal to **4 × investigators (12 at three players)** by Holding Back the Appointed, spending Knowledge, and reaching the Study, before the Hourglass reaches Hour IX. Each **Hold Back** success and each deep fact spent adds 1 contest progress.
+**Setup.** The Appointed's Approach advances immediately to **Arrived**, manifesting at the location farthest from the investigators if it was not already on the board. Dissonance does not reset. Play proceeds under a single objective: **contest the crossing** — accumulate **"contest" progress** equal to **4 × investigators (12 at three players)** by Holding Back the Appointed, spending Knowledge, and reaching the Study, before the Hourglass reaches Hour IX. Each **Hold Back** success and each deep fact spent adds 1 contest progress.
 
 **Resolution generator.** When the finale ends (contest reached, or Hour IX, or all defeated), read the resolution matched by the campaign log, checked **top to bottom** (use the first that qualifies):
 
@@ -259,7 +259,7 @@ Each district has a **surface objective** (Act I) and a **deep objective** (Act 
 | R3 | Contest reached **and** **The Keeper's Ninth Death** is known | **Break Through.** You force the night open and all survivors escape — but the loop is only *paused*. Bittersweet epilogue: was it really ended? |
 | R4 | Contest reached (no special facts) | **Seal by Force.** The door is sealed but not closed; one investigator (chosen) ages out doing it. |
 | R5 | Not reached, but **banked Memory ≥ 12** | **Next Time.** The loop wins tonight — but you wake at First Dark closer than ever. Begin a new loop; the finale may be re-attempted. |
-| R6 | Not reached, banked Memory < 12 | **The Loop Wins.** The night takes you. The campaign ends. The town keeps repeating — and somewhere, five faces join the ones on the Sunken Road. |
+| R6 | Not reached, banked Memory < 12 | **The Loop Wins.** The night takes you. The campaign ends. The town keeps repeating — and somewhere on the Sunken Road, walking the same direction and never arriving, there are new faces beneath the hoods. |
 
 > **Design note.** Every "contest reached" branch is a *win with a different cost*, and the cost is always age or an investigator kept behind — the finale you asked for. R5 makes even failure a soft continue as long as you've been remembering. R6 is the only true loss, reserved for a party that never banked the night.
 
