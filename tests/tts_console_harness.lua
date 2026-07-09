@@ -54,8 +54,12 @@ function runStillHourTests()
   local Hourglass = tryRequire("StillHour/Hourglass")
   local Aging = tryRequire("StillHour/Aging")
   local Appointed = tryRequire("StillHour/Appointed")
+  local Knowledge = tryRequire("StillHour/Knowledge")
+  local Locations = tryRequire("StillHour/Locations")
+  local Interlude = tryRequire("StillHour/Interlude")
 
-  if not (Constants and CampaignState and Dissonance and LoopFlags and Hourglass and Aging and Appointed) then
+  if not (Constants and CampaignState and Dissonance and LoopFlags and Hourglass and Aging
+      and Appointed and Knowledge and Locations and Interlude) then
     print("[SKIP] StillHour modules are not bundled into this build yet.")
     print("       Add src/StillHour to the build (see docs/INTEGRATION.md), then re-run.")
     return
@@ -166,6 +170,33 @@ function runStillHourTests()
   check("years 5 -> Weathered, 10 -> Elder, 15 -> Ancient",
     Aging.bracketForYears(5) == "Weathered" and Aging.bracketForYears(10) == "Elder"
     and Aging.bracketForYears(15) == "Ancient")
+
+  -- 9. Location fact-toggles + Knowledge gates (P6).
+  CampaignState.init(3)
+  check("Lantern Room front until the lamp fact", Locations.activeFace("lantern-room") == "front")
+  CampaignState.unlockFact("the-lamp-was-never-lit")
+  check("Lantern Room flips to back with the fact", Locations.activeFace("lantern-room") == "back")
+  check("Sealed Study sealed until both facts", Locations.isSealed("sealed-study"))
+  CampaignState.unlockFact("what-the-almanac-hid")
+  CampaignState.unlockFact("the-vote-that-never-ends")
+  check("Sealed Study opens with both facts", Locations.isOpen("sealed-study"))
+  CampaignState.init(3)
+  CampaignState.unlockFact("the-lamp-was-never-lit")
+  CampaignState.unlockFact("the-thirteenth-toll")
+  CampaignState.unlockFact("the-road-remembers")
+  check("Act II opens at 3 surface facts", Knowledge.actIIOpen())
+
+  -- 10. Aging stat drift + interlude spend (P7).
+  CampaignState.init(3)
+  CampaignState.addYears("sthr-ayako", 14)
+  Aging.applyInterlude("sthr-ayako", {}, { physical = "combat", mental = "intellect" }) -- -> 15 Ancient
+  local st = Aging.applyDriftToStats({ wil = 5, int = 5, com = 1, agi = 3, health = 5, sanity = 8 }, "sthr-ayako")
+  check("Ancient drift: int 7, health 4, sanity 7, com floored 1",
+    st.int == 7 and st.health == 4 and st.sanity == 7 and st.com == 1)
+  CampaignState.init(3)
+  CampaignState.bankMemory(6)
+  check("Interlude buys Recollection at memoryCost",
+    Interlude.buyRecollection("sthr-longwayround") and CampaignState.getBankedMemory() == 4)
 
   print(string.format("──────────── RESULT: %d passed, %d failed ────────────", PASS, FAIL))
   broadcastToAll(string.format("Still Hour tests: %d passed, %d failed", PASS, FAIL),

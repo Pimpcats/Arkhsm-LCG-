@@ -14,8 +14,8 @@ Tracks the `SCED_BUILD_BRIEF.md` priorities. This session delivered the
 | P3 | `[static]` token + Dissonance bands + chaos-bag banding | ✅ done | `src/StillHour/Dissonance.ttslua`, `Constants.ttslua` |
 | P4 | Once-per-loop + per-loop test-type flags across node travel | ✅ done | `src/StillHour/LoopFlags.ttslua` (+ CampaignState) |
 | P5 | The Appointed (staged Approach, undefeatable / Hold Back / hunts most-Memory) | ✅ done (CO-002) | `src/StillHour/Appointed.ttslua`, `CampaignState.ttslua`, clock/band drivers; cards `dist/the_still_hour_encounter.json` |
-| P6 | Occultation clock + location fact-toggles | 🟡 clock done; location toggles pending | `src/StillHour/Hourglass.ttslua` |
-| P7 | Aging bracket drift + interlude UI | 🟡 bracket math done; UI pending | `src/StillHour/Aging.ttslua` |
+| P6 | Occultation clock + location fact-toggles | ✅ done | `src/StillHour/Hourglass.ttslua`, `Locations.ttslua`, `Knowledge.ttslua` |
+| P7 | Aging bracket drift + interlude | ✅ logic done; demo UI in control token | `src/StillHour/Aging.ttslua` (`applyDriftToStats`), `Interlude.ttslua` |
 | P8 | Package as `the_still_hour.json` download-box asset | 🟡 loadable save emitted (`the_still_hour_mod.json`); GitHub-release download-box still pending | `dist/`, `pipeline/bundle_mod.py` |
 
 Legend: ✅ done · 🟡 partial · ⏳ not started
@@ -25,7 +25,7 @@ Legend: ✅ done · 🟡 partial · ⏳ not started
 ```bash
 python3 pipeline/build_cards.py            # 30-card player deck + The Appointed encounter set
 python3 pipeline/bundle_mod.py             # loadable TTS save (dist/the_still_hour_mod.json)
-lua5.4  pipeline/lua_smoketest.lua         # 72 assertions across P2/P3/P4/P5/P6/P7
+lua5.4  pipeline/lua_smoketest.lua         # 99 assertions across P2/P3/P4/P5/P6/P7
 lua5.4  pipeline/verify_bundle.lua         # drive the mod bundle in a stubbed TTS env
 ```
 
@@ -88,8 +88,18 @@ aging/3p v0.3 → encounter v0.4 → guide v0.5 (latest wins).
   one stage + rewinds an Hour; undefeatable via the defeat-replacement. Board
   effects delegate to `ctx`. Remaining board wiring: hook the enemy card's Hold
   Back button and the manifest/place-at-farthest callbacks to the real SCED board.
-- **P6 location toggles**: flip location front/back faces off Knowledge flags.
-- **P7 interlude UI**: on-screen panel to add Years, bank Memory, buy
-  Recollections (reads `memoryCost` from each Recollection's GMNotes).
-- **Host wiring**: attach `CampaignState` to a state token object and register
-  its `onSave`/`onLoad` with SCED's campaign save — see `docs/INTEGRATION.md`.
+- **P6 location toggles** — ✅ done. `Locations.ttslua` decides each location's
+  active face (front/back off a Knowledge flip-fact) and sealed/open state;
+  `Knowledge.ttslua` is the fact registry + Act II / finale-assembly gates.
+  Remaining board wiring: flip the physical location card to the chosen face and
+  gate its clues on `isOpen`.
+- **P7 interlude** — ✅ logic done. `Aging.applyDriftToStats` returns the drifted
+  stat line (skills floor at 1); `Interlude.ttslua` orchestrates age → bank →
+  spend (Recollections at `memoryCost`, level-ups at `=level`) → `beginNextLoop`
+  (soft cap). The control token has an **Interlude Demo** button + `shBuy(id)`
+  console helper. Remaining: a full point-and-click buy panel and applying the
+  drift to the physical investigator sheet.
+- **Remaining**: P8 download-box packaging; the in-TTS load test; and per-system
+  board wiring called out above (Appointed board callbacks, location card flips,
+  interlude panel). Host wiring: attach `CampaignState` to a state token and
+  register its `onSave`/`onLoad` with SCED's campaign save — see `docs/INTEGRATION.md`.

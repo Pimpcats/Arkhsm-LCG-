@@ -25,6 +25,9 @@ MODULES = [
     "Hourglass",
     "Aging",
     "Appointed",
+    "Knowledge",
+    "Locations",
+    "Interlude",
 ]
 
 PREAMBLE = """-- ============================================================================

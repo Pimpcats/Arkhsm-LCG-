@@ -40,7 +40,7 @@ chunk()
 
 print("== driving the bundle as TTS would ==")
 env.onLoad(nil)
-assert(#buttons == 5, "expected 5 control buttons, got " .. #buttons)
+assert(#buttons == 7, "expected 7 control buttons, got " .. #buttons)
 print("  created " .. #buttons .. " buttons: " ..
   (function() local n = {} for _, b in ipairs(buttons) do n[#n + 1] = b.label end return table.concat(n, ", ") end)())
 

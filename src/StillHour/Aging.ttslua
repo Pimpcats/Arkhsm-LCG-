@@ -135,4 +135,33 @@ function Aging.driftFor(investigatorId)
   return drift
 end
 
+-- Map a skill name to the stat-line key used by `base`.
+local SKILL_KEY = { willpower = "wil", intellect = "int", combat = "com", agility = "agi" }
+
+--- Apply an investigator's current bracket drift to a printed stat line and
+-- return the effective line. Skills floor at 1; max health/sanity floor at 1
+-- (the brackets never bring a maximum to 0). `base` is a table with keys
+-- wil/int/com/agi/health/sanity. Non-destructive (returns a new table).
+function Aging.applyDriftToStats(base, investigatorId)
+  local out = {
+    wil = base.wil, int = base.int, com = base.com, agi = base.agi,
+    health = base.health, sanity = base.sanity,
+  }
+  local drift = Aging.driftFor(investigatorId)
+  if not drift then
+    return out
+  end
+  if drift.physicalSkill then
+    local k = SKILL_KEY[drift.physicalSkill]
+    out[k] = math.max(1, out[k] + drift.skillDeltas.physical)
+  end
+  if drift.mentalSkill then
+    local k = SKILL_KEY[drift.mentalSkill]
+    out[k] = math.max(1, out[k] + drift.skillDeltas.mental)
+  end
+  out.health = math.max(1, out.health + drift.maxHealthDelta)
+  out.sanity = math.max(1, out.sanity + drift.maxSanityDelta)
+  return out
+end
+
 return Aging

@@ -17,6 +17,9 @@ SCED-fork/
       Hourglass.ttslua
       Aging.ttslua
       Appointed.ttslua
+      Knowledge.ttslua
+      Locations.ttslua
+      Interlude.ttslua
 ```
 
 `require` paths use the bundle-root-relative form `require("StillHour/X")`.
@@ -87,8 +90,18 @@ the return table reports `appointedStage` / `reachedReset`).
   optional and default to no-ops, so a partial board still advances the clock.
 - **Aging**: at the interlude call `Aging.applyInterlude(id, cond, lockedChoice)`
   per investigator; apply the returned `drift` to the physical investigator sheet
-  (skills floor at 1). `cond.endedInDanger` must be computed from the loop-end
+  (or use `Aging.applyDriftToStats(baseStatLine, id)` to get the drifted line,
+  skills floored at 1). `cond.endedInDanger` must be computed from the loop-end
   Dissonance **before** `CampaignState.reset()` drops it to the scar.
+- **Locations (P6)**: `Locations.activeFace(id)` -> "front"/"back" (flip the
+  physical card to match); `Locations.isOpen(id)` gates a sealed location's clues.
+  `Knowledge.ttslua` holds the fact ids, the Act II gate (`actIIOpen`), and the
+  finale assembly (`assembleFinale` / `finaleAttemptable`). Unlock facts via
+  `Knowledge.unlock(id)` (validates the id) or `CampaignState.unlockFact(id)`.
+- **Interlude (P7)**: drive `Interlude.age*` / `bank` / `buyRecollection(id)` /
+  `buyUpgrade(level)` / `beginNextLoop` from the interlude panel. Recollection
+  prices live in `Interlude.RECOLLECTION_COST` (mirror of the cards' `memoryCost`);
+  in-engine you may instead read `memoryCost` off each card's GMNotes.
 
 ## 5. Loop flow ordering
 

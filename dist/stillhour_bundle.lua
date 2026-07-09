@@ -951,6 +951,35 @@ function Aging.driftFor(investigatorId)
   return drift
 end
 
+-- Map a skill name to the stat-line key used by `base`.
+local SKILL_KEY = { willpower = "wil", intellect = "int", combat = "com", agility = "agi" }
+
+--- Apply an investigator's current bracket drift to a printed stat line and
+-- return the effective line. Skills floor at 1; max health/sanity floor at 1
+-- (the brackets never bring a maximum to 0). `base` is a table with keys
+-- wil/int/com/agi/health/sanity. Non-destructive (returns a new table).
+function Aging.applyDriftToStats(base, investigatorId)
+  local out = {
+    wil = base.wil, int = base.int, com = base.com, agi = base.agi,
+    health = base.health, sanity = base.sanity,
+  }
+  local drift = Aging.driftFor(investigatorId)
+  if not drift then
+    return out
+  end
+  if drift.physicalSkill then
+    local k = SKILL_KEY[drift.physicalSkill]
+    out[k] = math.max(1, out[k] + drift.skillDeltas.physical)
+  end
+  if drift.mentalSkill then
+    local k = SKILL_KEY[drift.mentalSkill]
+    out[k] = math.max(1, out[k] + drift.skillDeltas.mental)
+  end
+  out.health = math.max(1, out.health + drift.maxHealthDelta)
+  out.sanity = math.max(1, out.sanity + drift.maxSanityDelta)
+  return out
+end
+
 return Aging
 
 end
@@ -1110,6 +1139,313 @@ return Appointed
 
 end
 
+__modules["StillHour/Knowledge"] = function()
+--- THE STILL HOUR — the Knowledge Track (P6 support).
+--
+-- The registry of facts about Ambergrove. Facts are unlocked by completing
+-- district objectives (CampaignState.unlockFact), never purchased. Flagged facts
+-- permanently edit the night — Hours (Hourglass), locations (Locations), and the
+-- finale gates handled here. This module is the single source of truth for the
+-- fact ids the rest of the code references, plus the Act/finale gates that read
+-- how many are known (campaign_guide_v0.5 §7-§8).
+
+local CampaignState = require("StillHour/CampaignState")
+
+local Knowledge = {}
+
+-- id -> { name, district, layer = "prologue"|"surface"|"deep"|"assembled" }
+Knowledge.FACTS = {
+  ["you-are-unstuck"]          = { name = "You Are Unstuck",           district = "Prologue",    layer = "prologue" },
+  ["the-lamp-was-never-lit"]   = { name = "The Lamp Was Never Lit",    district = "Lighthouse",  layer = "surface" },
+  ["the-keepers-ninth-death"]  = { name = "The Keeper's Ninth Death",  district = "Lighthouse",  layer = "deep" },
+  ["the-thirteenth-toll"]      = { name = "The Thirteenth Toll",       district = "Church",      layer = "surface" },
+  ["the-hour-was-wrong"]       = { name = "The Hour Was Wrong",        district = "Church",      layer = "deep" },
+  ["the-road-remembers"]       = { name = "The Road Remembers",        district = "Sunken Road", layer = "surface" },
+  ["who-walks-beside-you"]     = { name = "Who Walks Beside You",      district = "Sunken Road", layer = "deep" },
+  ["the-sheriff-is-already-dead"] = { name = "The Sheriff Is Already Dead", district = "Square", layer = "surface" },
+  ["the-vote-that-never-ends"] = { name = "The Vote That Never Ends",  district = "Square",      layer = "deep" },
+  ["the-wheel-still-turns"]    = { name = "The Wheel Still Turns",     district = "Fairground",  layer = "surface" },
+  ["the-ticket-takers-bargain"] = { name = "The Ticket-Taker's Bargain", district = "Fairground", layer = "deep" },
+  ["what-the-almanac-hid"]     = { name = "What the Almanac Hid",      district = "Almanac",     layer = "surface" },
+  ["the-appointeds-name"]      = { name = "The Appointed's Name",      district = "Almanac",     layer = "deep" },
+  ["the-way-the-night-breaks"] = { name = "The Way the Night Breaks",  district = "(assembled)", layer = "assembled" },
+}
+
+function Knowledge.knows(factId)
+  return CampaignState.knows(factId)
+end
+
+--- Unlock a fact by id. Returns true if newly unlocked. Errors on unknown id so
+-- typos surface immediately rather than silently no-op'ing.
+function Knowledge.unlock(factId)
+  assert(Knowledge.FACTS[factId], "unknown Knowledge fact: " .. tostring(factId))
+  return CampaignState.unlockFact(factId)
+end
+
+local function countKnownByLayer(layer)
+  local n = 0
+  for id, f in pairs(Knowledge.FACTS) do
+    if f.layer == layer and CampaignState.knows(id) then
+      n = n + 1
+    end
+  end
+  return n
+end
+
+function Knowledge.surfaceKnownCount()
+  return countKnownByLayer("surface")
+end
+
+function Knowledge.deepKnownCount()
+  return countKnownByLayer("deep")
+end
+
+--- Act II opens at the interlude once 3+ surface facts are known (guide §8).
+function Knowledge.actIIOpen()
+  return Knowledge.surfaceKnownCount() >= 3
+end
+
+--- "The Way the Night Breaks" assembles when you know The Appointed's Name, The
+-- Vote That Never Ends, and any ONE OTHER deep fact (guide §6.6).
+function Knowledge.canAssembleFinale()
+  if not (CampaignState.knows("the-appointeds-name") and CampaignState.knows("the-vote-that-never-ends")) then
+    return false
+  end
+  for id, f in pairs(Knowledge.FACTS) do
+    if f.layer == "deep" and id ~= "the-appointeds-name" and id ~= "the-vote-that-never-ends"
+        and CampaignState.knows(id) then
+      return true
+    end
+  end
+  return false
+end
+
+--- Unlock the assembled finale fact if its inputs are present. Returns true if it
+-- was newly assembled this call.
+function Knowledge.assembleFinale()
+  if Knowledge.canAssembleFinale() and not CampaignState.knows("the-way-the-night-breaks") then
+    return CampaignState.unlockFact("the-way-the-night-breaks")
+  end
+  return false
+end
+
+--- The finale may be attempted once the assembled fact is known.
+function Knowledge.finaleAttemptable()
+  return CampaignState.knows("the-way-the-night-breaks")
+end
+
+return Knowledge
+
+end
+
+__modules["StillHour/Locations"] = function()
+--- THE STILL HOUR — location fact-toggles (P6).
+--
+-- Ambergrove locations have a FRONT (this loop) and, for some, a BACK that a
+-- Knowledge fact flips to permanently — a calmer/more navigable version (design
+-- §3 "Unremembered"; guide §6). A few locations are SEALED until a fact opens
+-- them (the Flooded Crypt, the Sealed Study).
+--
+-- This module owns which face is active and whether a location is open, read off
+-- the Knowledge flags in campaign state. The board layer asks the module which
+-- face to show / whether the location is revealed; it never decides itself.
+--
+-- Fields per location:
+--   flipFact    -- fact id that flips FRONT -> BACK (nil = no back)
+--   sealedUntil -- list of fact ids ALL required to unseal (nil = always open)
+
+local CampaignState = require("StillHour/CampaignState")
+
+local Locations = {}
+
+Locations.LOCATIONS = {
+  -- The Lighthouse
+  ["lantern-room"]    = { name = "The Lantern Room",   district = "Lighthouse",  flipFact = "the-lamp-was-never-lit" },
+  ["winding-stair"]   = { name = "The Winding Stair",  district = "Lighthouse" },
+  ["keepers-quarters"] = { name = "The Keeper's Quarters", district = "Lighthouse" },
+  -- The Drowned Church
+  ["nave"]            = { name = "The Nave",           district = "Church" },
+  ["belfry"]          = { name = "The Belfry",         district = "Church" },
+  ["flooded-crypt"]   = { name = "The Flooded Crypt",  district = "Church", sealedUntil = { "the-thirteenth-toll" } },
+  ["vestry"]          = { name = "The Vestry",         district = "Church" },
+  -- The Sunken Road
+  ["milestones"]      = { name = "The Milestones",     district = "Sunken Road" },
+  ["low-bridge"]      = { name = "The Low Bridge",     district = "Sunken Road" },
+  ["the-turning"]     = { name = "The Turning",        district = "Sunken Road" },
+  -- The Square
+  ["town-hall-steps"] = { name = "The Town Hall Steps", district = "Square", flipFact = "the-sheriff-is-already-dead" },
+  ["records-office"]  = { name = "The Records Office", district = "Square" },
+  ["the-well"]        = { name = "The Well",           district = "Square" },
+  -- The Fairground
+  ["the-wheel"]       = { name = "The Wheel",          district = "Fairground" },
+  ["hall-of-mirrors"] = { name = "The Hall of Mirrors", district = "Fairground" },
+  ["ticket-booth"]    = { name = "The Ticket Booth",   district = "Fairground" },
+  -- The Almanac House
+  ["reading-room"]    = { name = "The Reading Room",   district = "Almanac" },
+  ["the-press"]       = { name = "The Press",          district = "Almanac" },
+  ["sealed-study"]    = { name = "The Sealed Study",   district = "Almanac",
+                          sealedUntil = { "what-the-almanac-hid", "the-vote-that-never-ends" } },
+}
+
+local function loc(id)
+  return assert(Locations.LOCATIONS[id], "unknown location: " .. tostring(id))
+end
+
+--- Which face is active: "back" once the flip fact is known, else "front".
+function Locations.activeFace(id)
+  local l = loc(id)
+  if l.flipFact and CampaignState.knows(l.flipFact) then
+    return "back"
+  end
+  return "front"
+end
+
+--- Sealed until every fact in sealedUntil is known.
+function Locations.isSealed(id)
+  local l = loc(id)
+  if not l.sealedUntil then
+    return false
+  end
+  for _, factId in ipairs(l.sealedUntil) do
+    if not CampaignState.knows(factId) then
+      return true
+    end
+  end
+  return false
+end
+
+function Locations.isOpen(id)
+  return not Locations.isSealed(id)
+end
+
+--- Convenience descriptor for the board layer / UI.
+function Locations.describe(id)
+  local l = loc(id)
+  return {
+    id = id,
+    name = l.name,
+    district = l.district,
+    face = Locations.activeFace(id),
+    sealed = Locations.isSealed(id),
+  }
+end
+
+--- All location ids in a district (for revealing a district on entry).
+function Locations.inDistrict(district)
+  local ids = {}
+  for id, l in pairs(Locations.LOCATIONS) do
+    if l.district == district then
+      ids[#ids + 1] = id
+    end
+  end
+  table.sort(ids)
+  return ids
+end
+
+return Locations
+
+end
+
+__modules["StillHour/Interlude"] = function()
+--- THE STILL HOUR — the interlude procedure (P7).
+--
+-- Runs after every reset (guide §4): age each investigator, bank on-card Memory,
+-- spend Memory (level-ups + Recollections), then begin the next loop (which
+-- enforces the soft cap). This module is the orchestration/logic layer; the TTS
+-- interlude panel (buttons in control.lua) calls into it. Board specifics —
+-- moving actual Memory tokens, swapping a physical stat line — are the caller's;
+-- this module owns the numbers and the rules.
+--
+-- Memory is a general experience currency (CO-001): buy Recollections at their
+-- memoryCost, and level up normal cards at 1 Memory per card level. Both debit
+-- the one shared banked pool via CampaignState.
+
+local CampaignState = require("StillHour/CampaignState")
+local Aging = require("StillHour/Aging")
+
+local Interlude = {}
+
+-- Recollection Memory prices (mirrors the memoryCost in the card spec / GMNotes).
+-- In-engine the panel can instead read memoryCost off each card's GMNotes; this
+-- table keeps the logic layer self-contained and testable.
+Interlude.RECOLLECTION_COST = {
+  ["sthr-foreknowledge"]      = 3,
+  ["sthr-dejavu"]             = 4,
+  ["sthr-musclememory"]       = 3,
+  ["sthr-rehearsedescape"]    = 3,
+  ["sthr-longwayround"]       = 2,
+  ["sthr-borrowedtime"]       = 4,
+  ["sthr-thistimeforsure"]    = 4,
+  ["sthr-anchorpoint"]        = 3,
+  ["sthr-cassandrasnotebook"] = 4,
+  ["sthr-hourlearnedname"]    = 5,
+}
+
+--------------------------------------------------------------------- aging --
+
+--- Age one investigator this interlude. `cond` = {defeated, endedInDanger,
+-- leanedOnLoop}; `lockedChoice` = {physical, mental} (needed the first time they
+-- enter Weathered). Returns the Aging result (years, bracket, drift, agedOut...).
+function Interlude.age(investigatorId, cond, lockedChoice)
+  return Aging.applyInterlude(investigatorId, cond, lockedChoice)
+end
+
+--- Age a whole party. `entries` = list of {id, cond, lockedChoice}. Returns a
+-- map id -> result.
+function Interlude.ageAll(entries)
+  local results = {}
+  for _, e in ipairs(entries or {}) do
+    results[e.id] = Interlude.age(e.id, e.cond, e.lockedChoice)
+  end
+  return results
+end
+
+--------------------------------------------------------------------- memory --
+
+--- Bank on-card Memory into the campaign pool (not yet capped; the cap applies
+-- at loop start).
+function Interlude.bank(amount)
+  return CampaignState.bankMemory(amount)
+end
+
+function Interlude.recollectionCost(cardId)
+  return Interlude.RECOLLECTION_COST[cardId]
+end
+
+function Interlude.canAfford(cost)
+  return cost ~= nil and CampaignState.getBankedMemory() >= cost
+end
+
+--- Buy a Recollection into a deck. Returns true on success, false if unknown id
+-- or the pool can't cover its memoryCost.
+function Interlude.buyRecollection(cardId)
+  local cost = Interlude.RECOLLECTION_COST[cardId]
+  if cost == nil then
+    return false
+  end
+  return CampaignState.purchaseRecollection(cost)
+end
+
+--- Level up a normal card: cost = the target card level (1-5). Returns success.
+function Interlude.buyUpgrade(cardLevel)
+  if type(cardLevel) ~= "number" or cardLevel < 1 or cardLevel > 5 then
+    return false
+  end
+  return CampaignState.purchaseUpgrade(cardLevel)
+end
+
+--------------------------------------------------------------- loop handoff --
+
+--- Begin the next loop's play: enforce the Memory soft cap (6 x investigators).
+-- Call at the end of the interlude, before loop setup.
+function Interlude.beginNextLoop()
+  return CampaignState.startLoop()
+end
+
+return Interlude
+
+end
+
 -- ===== control entry script =====
 -- THE STILL HOUR — control object entry script.
 -- Appended by pipeline/bundle_mod.py AFTER the inlined module table, so the
@@ -1123,6 +1459,9 @@ local LoopFlags     = require("StillHour/LoopFlags")
 local Hourglass     = require("StillHour/Hourglass")
 local Aging         = require("StillHour/Aging")
 local Appointed     = require("StillHour/Appointed")
+local Knowledge     = require("StillHour/Knowledge")
+local Locations     = require("StillHour/Locations")
+local Interlude     = require("StillHour/Interlude")
 
 -- A no-op chaos-bag adapter so the demo buttons never error before the real
 -- SCED chaos-bag wiring is in place (Dissonance also tolerates bag == nil).
@@ -1139,17 +1478,20 @@ function onLoad(saved)
   CampaignState.deserialize(saved)          -- empty/nil -> fresh state
   Dissonance.syncBag(demoBag)
 
+  -- row 1: play controls; row 2: interlude/knowledge demo (z offset)
   local defs = {
-    { "runStillHourTests", "Run Tests",    -1.1 },
-    { "shStatus",          "Status",       -0.55 },
-    { "shAdvanceHour",     "Advance Hour",  0.0 },
-    { "shRaiseDissonance", "+1 Dissonance", 0.55 },
-    { "shReset",           "Reset Loop",    1.1 },
+    { "runStillHourTests", "Run Tests",    -1.1, 1.4 },
+    { "shStatus",          "Status",       -0.55, 1.4 },
+    { "shAdvanceHour",     "Advance Hour",  0.0, 1.4 },
+    { "shRaiseDissonance", "+1 Dissonance", 0.55, 1.4 },
+    { "shReset",           "Reset Loop",    1.1, 1.4 },
+    { "shInterludeDemo",   "Interlude Demo", -0.55, 2.3 },
+    { "shKnowledgeStatus", "Knowledge",     0.55, 2.3 },
   }
   for _, d in ipairs(defs) do
     self.createButton({
       click_function = d[1], function_owner = self, label = d[2],
-      position = { d[3], 0.3, 1.4 }, rotation = { 0, 0, 0 },
+      position = { d[3], 0.3, d[4] }, rotation = { 0, 0, 0 },
       width = 620, height = 360, font_size = 110,
       color = { 0.15, 0.13, 0.2 }, font_color = { 0.95, 0.9, 0.7 },
     })
@@ -1189,6 +1531,48 @@ function shReset()
   Dissonance.syncBag(demoBag)
   print("The night folds. Loop reset — Memory/Knowledge/Years kept; Dissonance dropped to the scar.")
   shStatus()
+end
+
+-- P7 demo: run an interlude for a 3-investigator party with sample conditions,
+-- print the aging outcome per investigator, then cap and hand off to the loop.
+function shInterludeDemo()
+  print("── Interlude ──")
+  local entries = {
+    { id = "sthr-elias",   cond = { defeated = true }, lockedChoice = { physical = "combat", mental = "willpower" } },
+    { id = "sthr-ayako",   cond = { leanedOnLoop = true }, lockedChoice = { physical = "combat", mental = "intellect" } },
+    { id = "sthr-birdie",  cond = {} },
+  }
+  local results = Interlude.ageAll(entries)
+  for _, e in ipairs(entries) do
+    local r = results[e.id]
+    print(string.format("  %-13s +%d yr -> %d (%s)%s", e.id, r.yearsGained, r.years, r.bracket,
+      r.bracketChanged and "  << bracket change" or ""))
+  end
+  Interlude.bank(17)  -- sample on-card Memory banked this loop
+  Interlude.beginNextLoop()
+  print("  banked +17 Memory (capped to " .. CampaignState.getBankedMemory() .. "). "
+    .. "Buy Recollections with shBuy(\"sthr-longwayround\") etc.")
+end
+
+function shBuy(cardId)
+  if Interlude.buyRecollection(cardId) then
+    print("Bought " .. cardId .. " for " .. Interlude.recollectionCost(cardId)
+      .. " Memory. Banked now " .. CampaignState.getBankedMemory() .. ".")
+  else
+    print("Cannot buy " .. tostring(cardId) .. " (unknown id or not enough Memory).")
+  end
+end
+
+-- P6 demo: report Act/finale gates and any location whose face has flipped.
+function shKnowledgeStatus()
+  print(string.format("Knowledge: %d surface, %d deep. Act II %s. Finale %s.",
+    Knowledge.surfaceKnownCount(), Knowledge.deepKnownCount(),
+    Knowledge.actIIOpen() and "OPEN" or "closed",
+    Knowledge.finaleAttemptable() and "ATTEMPTABLE" or (Knowledge.canAssembleFinale() and "assemblable" or "locked")))
+  for _, id in ipairs({ "lantern-room", "town-hall-steps", "flooded-crypt", "sealed-study" }) do
+    local d = Locations.describe(id)
+    print(string.format("  %-16s face=%s%s", d.name, d.face, d.sealed and " (SEALED)" or ""))
+  end
 end
 
 --------------------------------------------------------------------- harness --
@@ -1276,6 +1660,37 @@ function runStillHourTests()
   P, F = check("aging brackets 5/10/15 -> Weathered/Elder/Ancient",
     Aging.bracketForYears(5) == "Weathered" and Aging.bracketForYears(10) == "Elder"
     and Aging.bracketForYears(15) == "Ancient", P, F)
+
+  -- P6: location fact-toggles + Knowledge gates.
+  CampaignState.init(3)
+  P, F = check("Lantern Room front until lamp fact", Locations.activeFace("lantern-room") == "front", P, F)
+  CampaignState.unlockFact("the-lamp-was-never-lit")
+  P, F = check("Lantern Room flips to back with the fact", Locations.activeFace("lantern-room") == "back", P, F)
+  P, F = check("Sealed Study sealed until both facts", Locations.isSealed("sealed-study"), P, F)
+  CampaignState.unlockFact("what-the-almanac-hid"); CampaignState.unlockFact("the-vote-that-never-ends")
+  P, F = check("Sealed Study opens with both facts", Locations.isOpen("sealed-study"), P, F)
+  CampaignState.init(3)
+  CampaignState.unlockFact("the-lamp-was-never-lit"); CampaignState.unlockFact("the-thirteenth-toll")
+  CampaignState.unlockFact("the-road-remembers")
+  P, F = check("Act II opens at 3 surface facts", Knowledge.actIIOpen(), P, F)
+  CampaignState.unlockFact("the-appointeds-name"); CampaignState.unlockFact("the-vote-that-never-ends")
+  CampaignState.unlockFact("the-hour-was-wrong")
+  P, F = check("finale assembles with name+vote+one deep", Knowledge.assembleFinale() and Knowledge.finaleAttemptable(), P, F)
+
+  -- P7: aging stat drift + interlude spend.
+  local base = { wil = 5, int = 5, com = 1, agi = 3, health = 5, sanity = 8 }
+  CampaignState.init(3); CampaignState.addYears("sthr-ayako", 14)
+  -- interlude pushes 14 -> 15 (Ancient) and locks the drift choice
+  Aging.applyInterlude("sthr-ayako", {}, { physical = "combat", mental = "intellect" })
+  local st = Aging.applyDriftToStats(base, "sthr-ayako")
+  P, F = check("Ancient drift: int 5->7, health/sanity -1, com floored at 1",
+    st.int == 7 and st.health == 4 and st.sanity == 7 and st.com == 1, P, F)
+  CampaignState.init(3); CampaignState.bankMemory(6)
+  P, F = check("Interlude buys Recollection at memoryCost (longwayround=2)",
+    Interlude.buyRecollection("sthr-longwayround") and CampaignState.getBankedMemory() == 4, P, F)
+  P, F = check("Interlude buys level-3 upgrade (=3)",
+    Interlude.buyUpgrade(3) and CampaignState.getBankedMemory() == 1, P, F)
+  P, F = check("Interlude rejects unaffordable purchase", Interlude.buyRecollection("sthr-hourlearnedname") == false, P, F)
 
   print(string.format("──────── RESULT: %d passed, %d failed ────────", P, F))
   broadcastToAll(string.format("Still Hour tests: %d passed, %d failed", P, F),

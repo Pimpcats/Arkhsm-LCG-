@@ -65,8 +65,9 @@ catch rules-interaction surprises — those still need real play in TTS.
 
 ## Status
 
-Card pipeline (all player cards) and the campaign state manager core (P1–P4, plus
-the P6 clock and P7 aging math) are implemented and tested offline. The Appointed
-enemy (P5), location fact-toggles (P6), and the interlude UI (P7) are next. See
-`docs/BUILD_STATUS.md` for the full ladder and the flagged design-doc conflicts,
-and `docs/INTEGRATION.md` for SCED wiring.
+P1–P7 are implemented and tested offline (99-assertion suite): the card pipeline,
+the campaign state manager, the `[static]`/Dissonance bands, loop bookkeeping, the
+Appointed (P5, staged Approach), the Occultation clock + location fact-toggles
+(P6), and aging drift + the interlude (P7). Remaining: P8 download-box packaging,
+the real in-TTS load test, and per-system board wiring (see `docs/BUILD_STATUS.md`).
+`docs/INTEGRATION.md` covers folding this into an SCED fork.

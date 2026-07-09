@@ -10,6 +10,9 @@ local LoopFlags     = require("StillHour/LoopFlags")
 local Hourglass     = require("StillHour/Hourglass")
 local Aging         = require("StillHour/Aging")
 local Appointed     = require("StillHour/Appointed")
+local Knowledge     = require("StillHour/Knowledge")
+local Locations     = require("StillHour/Locations")
+local Interlude     = require("StillHour/Interlude")
 
 -- A no-op chaos-bag adapter so the demo buttons never error before the real
 -- SCED chaos-bag wiring is in place (Dissonance also tolerates bag == nil).
@@ -26,17 +29,20 @@ function onLoad(saved)
   CampaignState.deserialize(saved)          -- empty/nil -> fresh state
   Dissonance.syncBag(demoBag)
 
+  -- row 1: play controls; row 2: interlude/knowledge demo (z offset)
   local defs = {
-    { "runStillHourTests", "Run Tests",    -1.1 },
-    { "shStatus",          "Status",       -0.55 },
-    { "shAdvanceHour",     "Advance Hour",  0.0 },
-    { "shRaiseDissonance", "+1 Dissonance", 0.55 },
-    { "shReset",           "Reset Loop",    1.1 },
+    { "runStillHourTests", "Run Tests",    -1.1, 1.4 },
+    { "shStatus",          "Status",       -0.55, 1.4 },
+    { "shAdvanceHour",     "Advance Hour",  0.0, 1.4 },
+    { "shRaiseDissonance", "+1 Dissonance", 0.55, 1.4 },
+    { "shReset",           "Reset Loop",    1.1, 1.4 },
+    { "shInterludeDemo",   "Interlude Demo", -0.55, 2.3 },
+    { "shKnowledgeStatus", "Knowledge",     0.55, 2.3 },
   }
   for _, d in ipairs(defs) do
     self.createButton({
       click_function = d[1], function_owner = self, label = d[2],
-      position = { d[3], 0.3, 1.4 }, rotation = { 0, 0, 0 },
+      position = { d[3], 0.3, d[4] }, rotation = { 0, 0, 0 },
       width = 620, height = 360, font_size = 110,
       color = { 0.15, 0.13, 0.2 }, font_color = { 0.95, 0.9, 0.7 },
     })
@@ -76,6 +82,48 @@ function shReset()
   Dissonance.syncBag(demoBag)
   print("The night folds. Loop reset — Memory/Knowledge/Years kept; Dissonance dropped to the scar.")
   shStatus()
+end
+
+-- P7 demo: run an interlude for a 3-investigator party with sample conditions,
+-- print the aging outcome per investigator, then cap and hand off to the loop.
+function shInterludeDemo()
+  print("── Interlude ──")
+  local entries = {
+    { id = "sthr-elias",   cond = { defeated = true }, lockedChoice = { physical = "combat", mental = "willpower" } },
+    { id = "sthr-ayako",   cond = { leanedOnLoop = true }, lockedChoice = { physical = "combat", mental = "intellect" } },
+    { id = "sthr-birdie",  cond = {} },
+  }
+  local results = Interlude.ageAll(entries)
+  for _, e in ipairs(entries) do
+    local r = results[e.id]
+    print(string.format("  %-13s +%d yr -> %d (%s)%s", e.id, r.yearsGained, r.years, r.bracket,
+      r.bracketChanged and "  << bracket change" or ""))
+  end
+  Interlude.bank(17)  -- sample on-card Memory banked this loop
+  Interlude.beginNextLoop()
+  print("  banked +17 Memory (capped to " .. CampaignState.getBankedMemory() .. "). "
+    .. "Buy Recollections with shBuy(\"sthr-longwayround\") etc.")
+end
+
+function shBuy(cardId)
+  if Interlude.buyRecollection(cardId) then
+    print("Bought " .. cardId .. " for " .. Interlude.recollectionCost(cardId)
+      .. " Memory. Banked now " .. CampaignState.getBankedMemory() .. ".")
+  else
+    print("Cannot buy " .. tostring(cardId) .. " (unknown id or not enough Memory).")
+  end
+end
+
+-- P6 demo: report Act/finale gates and any location whose face has flipped.
+function shKnowledgeStatus()
+  print(string.format("Knowledge: %d surface, %d deep. Act II %s. Finale %s.",
+    Knowledge.surfaceKnownCount(), Knowledge.deepKnownCount(),
+    Knowledge.actIIOpen() and "OPEN" or "closed",
+    Knowledge.finaleAttemptable() and "ATTEMPTABLE" or (Knowledge.canAssembleFinale() and "assemblable" or "locked")))
+  for _, id in ipairs({ "lantern-room", "town-hall-steps", "flooded-crypt", "sealed-study" }) do
+    local d = Locations.describe(id)
+    print(string.format("  %-16s face=%s%s", d.name, d.face, d.sealed and " (SEALED)" or ""))
+  end
 end
 
 --------------------------------------------------------------------- harness --
@@ -163,6 +211,37 @@ function runStillHourTests()
   P, F = check("aging brackets 5/10/15 -> Weathered/Elder/Ancient",
     Aging.bracketForYears(5) == "Weathered" and Aging.bracketForYears(10) == "Elder"
     and Aging.bracketForYears(15) == "Ancient", P, F)
+
+  -- P6: location fact-toggles + Knowledge gates.
+  CampaignState.init(3)
+  P, F = check("Lantern Room front until lamp fact", Locations.activeFace("lantern-room") == "front", P, F)
+  CampaignState.unlockFact("the-lamp-was-never-lit")
+  P, F = check("Lantern Room flips to back with the fact", Locations.activeFace("lantern-room") == "back", P, F)
+  P, F = check("Sealed Study sealed until both facts", Locations.isSealed("sealed-study"), P, F)
+  CampaignState.unlockFact("what-the-almanac-hid"); CampaignState.unlockFact("the-vote-that-never-ends")
+  P, F = check("Sealed Study opens with both facts", Locations.isOpen("sealed-study"), P, F)
+  CampaignState.init(3)
+  CampaignState.unlockFact("the-lamp-was-never-lit"); CampaignState.unlockFact("the-thirteenth-toll")
+  CampaignState.unlockFact("the-road-remembers")
+  P, F = check("Act II opens at 3 surface facts", Knowledge.actIIOpen(), P, F)
+  CampaignState.unlockFact("the-appointeds-name"); CampaignState.unlockFact("the-vote-that-never-ends")
+  CampaignState.unlockFact("the-hour-was-wrong")
+  P, F = check("finale assembles with name+vote+one deep", Knowledge.assembleFinale() and Knowledge.finaleAttemptable(), P, F)
+
+  -- P7: aging stat drift + interlude spend.
+  local base = { wil = 5, int = 5, com = 1, agi = 3, health = 5, sanity = 8 }
+  CampaignState.init(3); CampaignState.addYears("sthr-ayako", 14)
+  -- interlude pushes 14 -> 15 (Ancient) and locks the drift choice
+  Aging.applyInterlude("sthr-ayako", {}, { physical = "combat", mental = "intellect" })
+  local st = Aging.applyDriftToStats(base, "sthr-ayako")
+  P, F = check("Ancient drift: int 5->7, health/sanity -1, com floored at 1",
+    st.int == 7 and st.health == 4 and st.sanity == 7 and st.com == 1, P, F)
+  CampaignState.init(3); CampaignState.bankMemory(6)
+  P, F = check("Interlude buys Recollection at memoryCost (longwayround=2)",
+    Interlude.buyRecollection("sthr-longwayround") and CampaignState.getBankedMemory() == 4, P, F)
+  P, F = check("Interlude buys level-3 upgrade (=3)",
+    Interlude.buyUpgrade(3) and CampaignState.getBankedMemory() == 1, P, F)
+  P, F = check("Interlude rejects unaffordable purchase", Interlude.buyRecollection("sthr-hourlearnedname") == false, P, F)
 
   print(string.format("──────── RESULT: %d passed, %d failed ────────", P, F))
   broadcastToAll(string.format("Still Hour tests: %d passed, %d failed", P, F),
