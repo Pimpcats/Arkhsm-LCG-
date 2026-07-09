@@ -50,6 +50,27 @@ Two objects spawn: the card bag (left) and the Control token (right).
 lua5.4 pipeline/verify_bundle.lua   # loads the bundle in a stubbed TTS env, runs the harness + play buttons
 ```
 
+## Distributing it (P8 — the download box)
+
+For sharing rather than a local file, package it the SCED way:
+
+```bash
+python3 pipeline/build_cards.py && python3 pipeline/bundle_mod.py
+python3 pipeline/package_download.py    # -> dist/downloads/
+```
+
+- `dist/downloads/the_still_hour.json` — the **release asset**: one campaign box
+  holding the card bags + Control token. Upload it as a GitHub release asset at a
+  URL the mod's `SOURCE_REPO` resolves (`{SOURCE_REPO}/the_still_hour.json`).
+- `dist/downloads/the_still_hour_box.json` — the **placeholder box**: add this
+  object to the SCED game; its GMNotes is `{"filename":"the_still_hour"}` and its
+  Lua calls `GlobalApi.placeholderDownload("the_still_hour")` to fetch and spawn
+  the release asset in place of the box.
+
+Verify `GlobalApi.placeholderDownload`'s exact name/signature in your SCED fork
+before shipping; the box prints a clear message (instead of erroring) if it's
+called outside the mod.
+
 ## Regenerating after changes
 
 Edit `src/StillHour/*.ttslua` or `src/tts/control.lua`, then re-run

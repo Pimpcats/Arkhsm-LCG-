@@ -16,7 +16,7 @@ Tracks the `SCED_BUILD_BRIEF.md` priorities. This session delivered the
 | P5 | The Appointed (staged Approach, undefeatable / Hold Back / hunts most-Memory) | ✅ done (CO-002) | `src/StillHour/Appointed.ttslua`, `CampaignState.ttslua`, clock/band drivers; cards `dist/the_still_hour_encounter.json` |
 | P6 | Occultation clock + location fact-toggles | ✅ done | `src/StillHour/Hourglass.ttslua`, `Locations.ttslua`, `Knowledge.ttslua` |
 | P7 | Aging bracket drift + interlude | ✅ logic done; demo UI in control token | `src/StillHour/Aging.ttslua` (`applyDriftToStats`), `Interlude.ttslua` |
-| P8 | Package as `the_still_hour.json` download-box asset | 🟡 loadable save emitted (`the_still_hour_mod.json`); GitHub-release download-box still pending | `dist/`, `pipeline/bundle_mod.py` |
+| P8 | Package as `the_still_hour.json` download-box asset | ✅ built; upload + API-verify remain | `pipeline/package_download.py` → `dist/downloads/` + `src/tts/download_box.lua` |
 
 Legend: ✅ done · 🟡 partial · ⏳ not started
 
@@ -99,7 +99,14 @@ aging/3p v0.3 → encounter v0.4 → guide v0.5 (latest wins).
   (soft cap). The control token has an **Interlude Demo** button + `shBuy(id)`
   console helper. Remaining: a full point-and-click buy panel and applying the
   drift to the physical investigator sheet.
-- **Remaining**: P8 download-box packaging; the in-TTS load test; and per-system
-  board wiring called out above (Appointed board callbacks, location card flips,
-  interlude panel). Host wiring: attach `CampaignState` to a state token and
-  register its `onSave`/`onLoad` with SCED's campaign save — see `docs/INTEGRATION.md`.
+- **P8 download box** — ✅ built. `package_download.py` emits the release asset
+  `dist/downloads/the_still_hour.json` (campaign box: player + encounter bags +
+  Control token) and the placeholder `the_still_hour_box.json` (GMNotes
+  `{"filename":"the_still_hour"}` + `download_box.lua`). Remaining: upload the
+  release asset to a releases URL the mod's `SOURCE_REPO` resolves, and verify
+  `GlobalApi.placeholderDownload`'s signature in your fork (the box has a fallback
+  if it's absent).
+- **Remaining**: the in-TTS load test, and per-system board wiring (Appointed
+  board callbacks, location card flips, interlude panel). Host wiring: attach
+  `CampaignState` to a state token and register its `onSave`/`onLoad` with SCED's
+  campaign save — see `docs/INTEGRATION.md`.
