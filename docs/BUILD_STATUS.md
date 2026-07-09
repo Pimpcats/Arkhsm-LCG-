@@ -88,6 +88,35 @@ the design docs themselves**. Resolution applied is noted; change if wrong.
 **Version precedence used for numeric constants:** design v0.1 → cards v0.2 →
 aging/3p v0.3 → encounter v0.4 → guide v0.5 (latest wins).
 
+## Path to the table (what stands between now and a playable campaign)
+
+Everything below the line is done and tested offline; the ordered gaps to an
+actual play session:
+
+1. **In-TTS load test** (~an evening, needs your PC): load
+   `dist/the_still_hour_mod.json`, click **Run Tests** (expect 39/39), poke the
+   demo buttons. First real-engine validation.
+2. **Board wiring** (the biggest remaining build item): connect the logic
+   modules to physical objects — the Appointed's manifest/move/Hold-Back button
+   on its card, location cards flipping per `Locations.activeFace` and gating
+   clues on `isOpen`, Memory/Dissonance/Hourglass counters players can touch,
+   and the interlude buy panel. All logic exists; this is TTS plumbing.
+3. **Playable content minimum**: the Prologue + district locations exist as
+   *rules text* in the guide but not yet as location/objective **cards** in the
+   spec (only the 33 player/boss cards are generated). Generating the ~25
+   location cards + 6 district node sets + the 26-card shared encounter spine
+   from `encounter v0.4` through the existing pipeline is data entry, not new
+   code.
+4. **Chaos-bag integration**: wire `Dissonance.syncBag` to SCED's real bag
+   manager (adapter stub documented in INTEGRATION §3) and add a physical
+   `[static]` token.
+5. **Art** (cosmetic — placeholders load today): CardForge/Strange Eons pipeline
+   per the art briefs, then swap FaceURLs and rebuild.
+6. **P8 last mile**: upload `dist/downloads/the_still_hour.json` to a release
+   URL and verify `placeholderDownload` in the fork.
+
+A *rules-complete tabletop playtest* needs 1–3. Items 4–6 make it shippable.
+
 ## Next steps (in brief order)
 
 - **P5 Appointed** — ✅ done (CO-002). Staged Approach (Unseen→Sensed→Emerging→

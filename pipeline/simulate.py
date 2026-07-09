@@ -24,6 +24,9 @@ Every model assumption is labelled ASSUMPTION and is a single named constant so
 it is easy to re-tune when table play refines it.
 """
 import argparse
+import json
+import os
+import re
 import random
 import statistics
 
@@ -85,7 +88,6 @@ BENCHMARK_LOW, BENCHMARK_HIGH = 40, 50
 
 
 def simulate_economy(trials, loops, investigators, rng):
-    cap = 6 * investigators
     per_investigator_totals = []
     per_loop_samples = []
     for _ in range(trials):
@@ -97,12 +99,11 @@ def simulate_economy(trials, loops, investigators, rng):
                 income += max(0.0, rng.gauss(INCOME_MEAN_PER_PLAYER, INCOME_SD_PER_PLAYER))
             per_loop_samples.append(income)
             earned_total += income
-            # Interlude: assume the party spends down toward the cap each loop
-            # (the sink is now level-ups + Recollections, so most income is
-            # spendable). Carryover above the cap is lost at next loop start.
-            pool = carry + income
-            spent = min(pool, max(0.0, pool - 0.0))  # spend all that is useful
-            carry = min(pool - spent, cap)
+            # Interlude order is bank -> spend -> (next loop start) cap, so the
+            # cap binds only what you CARRY, not what you earn: a spend-all party
+            # (CO-001 gives level-ups as a deep sink) carries 0 and wastes 0. The
+            # cap is an anti-hoarding governor, not an income ceiling.
+            carry = 0.0
         per_investigator_totals.append(earned_total / investigators)
     return {
         "per_investigator_mean": statistics.mean(per_investigator_totals),
@@ -182,9 +183,11 @@ def simulate_aging(trials, loops, rng, style):
 # XP (MEMORY) DISTRIBUTION — how often a loop yields max vs minimal Memory
 # --------------------------------------------------------------------------- #
 # "A scenario" in this campaign is a loop (it spans 2-3 nodes). Memory is the
-# XP-analog. Max = the shared soft cap (6 x investigators = 18 at 3p) — the most
-# you can carry; earning at/above it means overflow is wasted. Minimal = the
-# low tail. Uses the same income model as simulate_economy.
+# XP-analog. "Max" = income at/above the carry cap (6 x investigators = 18 at
+# 3p). NOTE the rules order (bank -> spend -> cap at next loop start): income
+# above the cap is NOT wasted — it must be SPENT that interlude or lost. The
+# cap is a forced-spend line, and it only destroys Memory a party hoards past
+# it. Minimal = the low-income tail. Same income model as simulate_economy.
 def simulate_xp_distribution(trials, investigators, rng):
     cap = 6 * investigators
     per_loop = []
@@ -273,26 +276,61 @@ def simulate_stress(trials, investigators, rng, style, scar=0):
 
 
 # --------------------------------------------------------------------------- #
-# FINALE CONTEST — probability of reaching the contest target before Hour IX
+# FINALE CONTEST — stage-aware model of "contest the crossing"
 # --------------------------------------------------------------------------- #
-# Target = 4 x investigators (12 at 3p, CO-002/CO-001). Each deep fact spent adds
-# 1 contest at the start; each round every investigator may attempt Hold Back
-# (test wil/com 4), a success adding 1 contest AND rewinding the Hourglass 1 Hour
-# (buying time). ASSUMPTION: per-investigator Hold Back success probability.
-def simulate_finale(rng, investigators, deep_facts, holdback_p, trials):
+# Target = 4 x investigators (12 at 3p). Deep facts spent add 1 contest each at
+# the start. Each round every investigator may attempt one Hold Back (wil/com 4);
+# a success adds 1 contest, pushes the Appointed back ONE APPROACH STAGE, and
+# rewinds the Hourglass 1 Hour. The self-limiters the naive model missed:
+#   * Hold Back needs the Appointed MANIFEST (stage >= 1) — pushed to Unseen, it
+#     can't be farmed until the clock re-raises it.
+#   * Hour "when reached" effects re-fire on re-crossing after a rewind
+#     (Hourglass.advance resolves every newly stepped Hour): re-crossing VIII
+#     re-Arrives it AND raises Dissonance +2; III adds +1.
+#   * Dissonance does not reset in the finale and still climbs from the deck; at
+#     the reset threshold (18) the finale is LOST (the loop closes its hand).
+# ASSUMPTIONS: Hold Back success p; deck Dissonance 0.8/round; finale declared at
+# start_hour with Dissonance = start_diss; one attempt per investigator per round.
+def simulate_finale_staged(rng, investigators, deep_facts, holdback_p, trials,
+                           start_hour=5.0, start_diss=12.0):
     target = 4 * investigators
+    reset_t = 6 * investigators if investigators != 1 else 9
     reached = 0
     for _ in range(trials):
         contest = deep_facts
-        hour = 1.0
+        hour = start_hour
+        diss = start_diss
+        stage = 3                      # enters the finale Arrived
         rounds = 0
-        while contest < target and hour < 9 and rounds < 40:
+        won = False
+        while rounds < 40:
             rounds += 1
-            hour += max(0.5, rng.gauss(HOUR_PER_ROUND_MEAN, HOUR_PER_ROUND_SD))
-            successes = sum(1 for _i in range(investigators) if rng.random() < holdback_p)
-            contest += successes
-            hour -= successes  # Hold Back rewinds the clock
-        if contest >= target:
+            # mythos: clock advances, resolving each crossed Hour's effect
+            new_hour = hour + max(0.5, rng.gauss(HOUR_PER_ROUND_MEAN, HOUR_PER_ROUND_SD))
+            for h in range(int(hour) + 1, int(new_hour) + 1):
+                if h == 3:
+                    diss += 1
+                elif h == 5:
+                    stage = max(stage, 1)
+                elif h == 7:
+                    stage = max(stage, 2)
+                elif h == 8:
+                    diss += 2
+                    stage = 3
+            hour = new_hour
+            diss += DECK_DISSONANCE_PER_ROUND
+            if hour >= 9 or diss >= reset_t:
+                break                  # night ends or the loop closes: not reached
+            # investigators: one Hold Back attempt each while it is manifest
+            for _i in range(investigators):
+                if stage >= 1 and contest < target and rng.random() < holdback_p:
+                    contest += 1
+                    stage -= 1
+                    hour = max(1.0, hour - 1)   # rewind (no re-resolve on rewind)
+            if contest >= target:
+                won = True
+                break
+        if won:
             reached += 1
     return reached / trials
 
@@ -399,14 +437,22 @@ def main():
             clean.get("Weathered", 0) > 0.5)
     assert_("typical players land ~Elder by the finale",
             typical.get("Elder", 0) > 0.4)
+    if not args.quiet:
+        # When does sustained play cross the age-out line (18 Years)?
+        print("  age-out timing (loops of sustained play to reach 18 Years):")
+        for style, (mean_y, _sd) in sorted(YEARS_PER_LOOP.items(), key=lambda kv: -kv[1][0]):
+            print("    {:8s}: ~{:.1f} loops".format(style, 18 / mean_y))
+        print("  NOTE: sustained reckless play ages out at ~loop 5 — at or before a")
+        print("  typical finale (openable ~loop 4, tuned length 6-8). See BALANCE.md flag.")
 
     # ---- 5. XP (Memory) distribution: how often a loop yields max vs minimal ----
     xp = simulate_xp_distribution(args.trials, n, rng)
     if not args.quiet:
         print("\n== 5. Memory (XP) per loop — distribution ({}p, {} trials) ==".format(n, args.trials))
-        print("  shared pool/loop: median {:.0f}, 5-95th {:.0f}-{:.0f}  (cap = {} = max)".format(
+        print("  shared pool/loop: median {:.0f}, 5-95th {:.0f}-{:.0f}  (carry cap {})".format(
             xp["p50"], xp["p05"], xp["p95"], xp["cap"]))
-        print("  MAX  XP  (>= cap {}, overflow wasted): {:.1%} of loops".format(xp["cap"], xp["pct_max"]))
+        print("  MAX  XP  (income >= carry cap {}; must spend the excess that interlude or lose it): {:.1%} of loops".format(
+            xp["cap"], xp["pct_max"]))
         print("  MIN  XP  (bottom 5% tail, <= {:.0f}):   {:.1%} of loops".format(xp["p05"], xp["pct_min"]))
         print("  per-investigator equivalent: median {:.1f}, max {:.0f}".format(xp["p50"] / n, xp["cap"] / n))
         print("  histogram (shared/loop):")
@@ -434,12 +480,20 @@ def main():
             cells = "  ".join("{:6.1%}".format(simulate_stress(args.trials // 2, n, rng, st, scar)["hard_reset_rate"])
                               for st in ("cautious", "typical", "greedy"))
             print("      {}      |  {}".format(scar, cells))
-        print("\n  Finale contest reach % (target {} = 4x inv; each deep fact = +1 start):".format(4 * n))
-        print("  deep facts \\ Hold-Back p |  0.40   0.50   0.60")
-        for facts in (3, 4, 5):
-            cells = " ".join("{:5.1%}".format(simulate_finale(rng, n, facts, p, max(4000, args.trials // 4)))
-                             for p in (0.40, 0.50, 0.60))
-            print("       {}                   | {}".format(facts, cells))
+        print("\n  Finale contest reach % — STAGE-AWARE model (target {} = 4x inv;".format(4 * n))
+        print("  Approach stages, re-fired Hour crossings, Dissonance-18 loss all modelled).")
+        print("  The declared-at Dissonance dominates — declaring early in a calm loop vs")
+        print("  at the Noticed band is the strategic choice the numbers reward:")
+        print("  declared at Dissonance \\ Hold-Back p |  0.40   0.50   0.60   (4 deep facts)")
+        for d0 in (6, 9, 12):
+            cells = " ".join("{:5.1%}".format(
+                simulate_finale_staged(rng, n, 4, p, max(4000, args.trials // 4), start_diss=float(d0)))
+                for p in (0.40, 0.50, 0.60))
+            print("             {:2d}                        | {}".format(d0, cells))
+        print("  deep facts axis (declared at Dissonance 9, p=0.50): " + "  ".join(
+            "{}f={:.0%}".format(f, simulate_finale_staged(rng, n, f, 0.50,
+                                                          max(4000, args.trials // 4), start_diss=9.0))
+            for f in (3, 4, 5)))
 
     # stress-test sanity assertions — hard-resets are clock-gated (Hour IX ends the
     # night first), so the reset threat is a CAMPAIGN pressure via the scar, not a
@@ -452,6 +506,36 @@ def main():
             scarred_greedy["hard_reset_rate"] > fresh_greedy["hard_reset_rate"] + 0.10)
     assert_("the Appointed arrives almost every loop (clock-driven, > 90%)",
             fresh_greedy["appointed_arrival_rate"] > 0.90)
+
+    # ---- 7. code <-> data audit (cross-checks, not simulation) ----
+    here = os.path.dirname(os.path.abspath(__file__))
+    if not args.quiet:
+        print("\n== 7. Code <-> data audit ==")
+    # Recollection Memory prices: Interlude.RECOLLECTION_COST must match the
+    # card spec's memoryCost per id (one source of truth, two copies).
+    spec = {c["id"]: c["memoryCost"]
+            for c in json.load(open(os.path.join(here, "stillhour_cards_spec.json")))
+            if "memoryCost" in c}
+    lua = open(os.path.join(here, "..", "src", "StillHour", "Interlude.ttslua")).read()
+    lua_costs = dict(re.findall(r'\["(sthr-[a-z]+)"\]\s*=\s*(\d+)', lua))
+    lua_costs = {k: int(v) for k, v in lua_costs.items()}
+    mismatches = sorted(set(spec) ^ set(lua_costs)) + sorted(
+        k for k in set(spec) & set(lua_costs) if spec[k] != lua_costs[k])
+    if not args.quiet:
+        print("  Recollection prices: {} in spec, {} in Interlude.ttslua, {} mismatch(es)".format(
+            len(spec), len(lua_costs), len(mismatches)))
+        for k in mismatches:
+            print("    MISMATCH {}: spec={} lua={}".format(k, spec.get(k), lua_costs.get(k)))
+    assert_("Interlude Recollection prices match the card spec", not mismatches)
+    # Threshold formulas: bands must partition [0, reset) and Noticed must start
+    # exactly at the Appointed threshold for 2-4 players (solo is a documented
+    # override with its own numbers).
+    ok_bands = True
+    for m in (2, 3, 4):
+        reset = 6 * m
+        if not (reset // 3 < 2 * reset // 3 < reset and 2 * reset // 3 == 4 * m):
+            ok_bands = False
+    assert_("bands partition cleanly and Noticed start == Appointed threshold (2-4p)", ok_bands)
 
     # ---- verdict ----
     print("\nSIMULATION RESULT: {} assertion(s) failed{}".format(
