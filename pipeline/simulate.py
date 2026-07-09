@@ -179,6 +179,125 @@ def simulate_aging(trials, loops, rng, style):
 
 
 # --------------------------------------------------------------------------- #
+# XP (MEMORY) DISTRIBUTION — how often a loop yields max vs minimal Memory
+# --------------------------------------------------------------------------- #
+# "A scenario" in this campaign is a loop (it spans 2-3 nodes). Memory is the
+# XP-analog. Max = the shared soft cap (6 x investigators = 18 at 3p) — the most
+# you can carry; earning at/above it means overflow is wasted. Minimal = the
+# low tail. Uses the same income model as simulate_economy.
+def simulate_xp_distribution(trials, investigators, rng):
+    cap = 6 * investigators
+    per_loop = []
+    for _ in range(trials):
+        income = 0.0
+        for _p in range(investigators):
+            income += max(0.0, rng.gauss(INCOME_MEAN_PER_PLAYER, INCOME_SD_PER_PLAYER))
+        per_loop.append(income)
+    at_or_above_cap = sum(1 for x in per_loop if x >= cap) / trials
+    low = percentile(per_loop, 5)
+    at_or_below_low = sum(1 for x in per_loop if x <= low) / trials
+    # integer buckets for a compact histogram
+    buckets = {}
+    for x in per_loop:
+        b = int(round(x))
+        buckets[b] = buckets.get(b, 0) + 1
+    hist = sorted((b, c / trials) for b, c in buckets.items())
+    return {
+        "cap": cap, "mean": statistics.mean(per_loop),
+        "p05": low, "p50": percentile(per_loop, 50), "p95": percentile(per_loop, 95),
+        "pct_max": at_or_above_cap, "pct_min": at_or_below_low, "hist": hist,
+    }
+
+
+# --------------------------------------------------------------------------- #
+# BALANCE STRESS TEST — push each playstyle to failure and measure the rates
+# --------------------------------------------------------------------------- #
+# One loop, round by round: the Hourglass advances ~1.5 Hours/round (baseline +
+# deck Skips, encounter v0.4 §8); Dissonance climbs deck(0.8) + playstyle. The
+# loop ends at Hour IX (a natural reset) or Dissonance = reset threshold (a HARD
+# reset — the loop closed its hand on you). The Appointed's stage is derived from
+# the clock (V/VII/VIII) and bands (Glitch/Noticed), matching Appointed.ttslua.
+# ASSUMPTION: per-round Hour advance and the playstyle Dissonance gains.
+HOUR_PER_ROUND_MEAN = 1.5
+HOUR_PER_ROUND_SD = 0.3
+STRESS_STYLES = {           # extra Dissonance/round from foreknowledge use
+    "cautious": (0.15, 0.20),
+    "typical":  (0.70, 0.40),
+    "greedy":   (1.50, 0.50),
+}
+
+
+def simulate_stress_loop(rng, investigators, style, scar=0):
+    reset_t = 6 * investigators if investigators != 1 else 9
+    glitch = reset_t // 3
+    noticed = 2 * reset_t // 3
+    mean_extra, sd_extra = STRESS_STYLES[style]
+    # scar floor = start-of-loop Dissonance (= completed loops, capped) — this is
+    # how greedy play compounds across a campaign.
+    hour, diss, rounds = 1.0, float(scar), 0
+    arrived = False
+    arrived_round = None
+    while True:
+        rounds += 1
+        hour += max(0.5, rng.gauss(HOUR_PER_ROUND_MEAN, HOUR_PER_ROUND_SD))
+        diss += DECK_DISSONANCE_PER_ROUND + max(0.0, rng.gauss(mean_extra, sd_extra))
+        stage = 0
+        if hour >= 5: stage = max(stage, 1)
+        if hour >= 7: stage = max(stage, 2)
+        if hour >= 8: stage = 3
+        if diss >= noticed: stage = 3
+        elif diss >= glitch: stage = max(stage, 1)
+        if stage >= 3 and not arrived:
+            arrived, arrived_round = True, rounds
+        if diss >= reset_t:
+            return {"hard_reset": True, "arrived": arrived, "rounds": rounds, "arrived_round": arrived_round}
+        if hour >= 9 or rounds >= 60:
+            return {"hard_reset": False, "arrived": arrived, "rounds": rounds, "arrived_round": arrived_round}
+
+
+def simulate_stress(trials, investigators, rng, style, scar=0):
+    hard, arrived, rounds_sum, arr_rounds = 0, 0, 0, []
+    for _ in range(trials):
+        r = simulate_stress_loop(rng, investigators, style, scar)
+        hard += 1 if r["hard_reset"] else 0
+        arrived += 1 if r["arrived"] else 0
+        rounds_sum += r["rounds"]
+        if r["arrived_round"] is not None:
+            arr_rounds.append(r["arrived_round"])
+    return {
+        "hard_reset_rate": hard / trials,
+        "appointed_arrival_rate": arrived / trials,
+        "avg_rounds": rounds_sum / trials,
+        "avg_arrival_round": (statistics.mean(arr_rounds) if arr_rounds else None),
+    }
+
+
+# --------------------------------------------------------------------------- #
+# FINALE CONTEST — probability of reaching the contest target before Hour IX
+# --------------------------------------------------------------------------- #
+# Target = 4 x investigators (12 at 3p, CO-002/CO-001). Each deep fact spent adds
+# 1 contest at the start; each round every investigator may attempt Hold Back
+# (test wil/com 4), a success adding 1 contest AND rewinding the Hourglass 1 Hour
+# (buying time). ASSUMPTION: per-investigator Hold Back success probability.
+def simulate_finale(rng, investigators, deep_facts, holdback_p, trials):
+    target = 4 * investigators
+    reached = 0
+    for _ in range(trials):
+        contest = deep_facts
+        hour = 1.0
+        rounds = 0
+        while contest < target and hour < 9 and rounds < 40:
+            rounds += 1
+            hour += max(0.5, rng.gauss(HOUR_PER_ROUND_MEAN, HOUR_PER_ROUND_SD))
+            successes = sum(1 for _i in range(investigators) if rng.random() < holdback_p)
+            contest += successes
+            hour -= successes  # Hold Back rewinds the clock
+        if contest >= target:
+            reached += 1
+    return reached / trials
+
+
+# --------------------------------------------------------------------------- #
 def percentile(data, p):
     s = sorted(data)
     k = (len(s) - 1) * (p / 100.0)
@@ -280,6 +399,59 @@ def main():
             clean.get("Weathered", 0) > 0.5)
     assert_("typical players land ~Elder by the finale",
             typical.get("Elder", 0) > 0.4)
+
+    # ---- 5. XP (Memory) distribution: how often a loop yields max vs minimal ----
+    xp = simulate_xp_distribution(args.trials, n, rng)
+    if not args.quiet:
+        print("\n== 5. Memory (XP) per loop — distribution ({}p, {} trials) ==".format(n, args.trials))
+        print("  shared pool/loop: median {:.0f}, 5-95th {:.0f}-{:.0f}  (cap = {} = max)".format(
+            xp["p50"], xp["p05"], xp["p95"], xp["cap"]))
+        print("  MAX  XP  (>= cap {}, overflow wasted): {:.1%} of loops".format(xp["cap"], xp["pct_max"]))
+        print("  MIN  XP  (bottom 5% tail, <= {:.0f}):   {:.1%} of loops".format(xp["p05"], xp["pct_min"]))
+        print("  per-investigator equivalent: median {:.1f}, max {:.0f}".format(xp["p50"] / n, xp["cap"] / n))
+        print("  histogram (shared/loop):")
+        for b, share in xp["hist"]:
+            if share >= 0.005:
+                bar = "#" * int(round(share * 100))
+                mark = "  <- max/cap" if b >= xp["cap"] else ""
+                print("    {:>2}: {:5.1%} {}{}".format(b, share, bar, mark))
+
+    # ---- 6. balance stress test ----
+    scar_cap = reset_threshold // 3
+    if not args.quiet:
+        print("\n== 6. Balance stress test ({}p, {} trials/style) ==".format(n, args.trials))
+        print("  fresh loop (scar 0):")
+        print("  playstyle | hard-reset | Appointed Arrives | avg rounds | avg arrival round")
+        for style in ("cautious", "typical", "greedy"):
+            s = simulate_stress(args.trials, n, rng, style)
+            ar = "{:.1f}".format(s["avg_arrival_round"]) if s["avg_arrival_round"] else "  -"
+            print("  {:9s} |   {:5.1%}   |      {:5.1%}       |    {:4.1f}    |     {}".format(
+                style, s["hard_reset_rate"], s["appointed_arrival_rate"], s["avg_rounds"], ar))
+        # The reset threat compounds across a campaign via the scar floor.
+        print("\n  hard-reset % as the scar floor rises (late-campaign loops):")
+        print("  scar floor |  cautious   typical    greedy")
+        for scar in range(0, scar_cap + 1, 2):
+            cells = "  ".join("{:6.1%}".format(simulate_stress(args.trials // 2, n, rng, st, scar)["hard_reset_rate"])
+                              for st in ("cautious", "typical", "greedy"))
+            print("      {}      |  {}".format(scar, cells))
+        print("\n  Finale contest reach % (target {} = 4x inv; each deep fact = +1 start):".format(4 * n))
+        print("  deep facts \\ Hold-Back p |  0.40   0.50   0.60")
+        for facts in (3, 4, 5):
+            cells = " ".join("{:5.1%}".format(simulate_finale(rng, n, facts, p, max(4000, args.trials // 4)))
+                             for p in (0.40, 0.50, 0.60))
+            print("       {}                   | {}".format(facts, cells))
+
+    # stress-test sanity assertions — hard-resets are clock-gated (Hour IX ends the
+    # night first), so the reset threat is a CAMPAIGN pressure via the scar, not a
+    # single-loop one. Verify the scar makes greedy degrade.
+    fresh_greedy = simulate_stress(args.trials, n, rng, "greedy", 0)
+    scarred_greedy = simulate_stress(args.trials, n, rng, "greedy", scar_cap)
+    assert_("fresh loop rarely hard-resets for any style (clock ends it first, < 10%)",
+            fresh_greedy["hard_reset_rate"] < 0.10)
+    assert_("the scar floor makes greedy hard-reset materially more late-campaign",
+            scarred_greedy["hard_reset_rate"] > fresh_greedy["hard_reset_rate"] + 0.10)
+    assert_("the Appointed arrives almost every loop (clock-driven, > 90%)",
+            fresh_greedy["appointed_arrival_rate"] > 0.90)
 
     # ---- verdict ----
     print("\nSIMULATION RESULT: {} assertion(s) failed{}".format(
