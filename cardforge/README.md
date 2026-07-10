@@ -28,7 +28,9 @@ One window, three tabs, the whole pipeline:
 - **Frame — Strange Eons** — setup links (strangeeons.cgjennings.ca /
   github.com/CGJennings/strange-eons / Arkham plugin / fonts), the two owner
   config seams (class-map + setting keys), one-click frame-bundle generation
-  (SE script with your cards embedded), SE launch, exported-face coverage.
+  (SE script with your cards embedded), SE launch, exported-face coverage —
+  plus **Render glyph placeholders**: instant faces with real Arkham symbols
+  (`assets/fonts/ArkhamFontWithCodex.ttf` via `cardforge/glyphs.py`).
 - **Apply to Mod** — writes `pipeline/art_urls.json` (local `file:///` mode for
   instant TTS testing, or a hosted base URL) and rebuilds cards → mod →
   download package.

@@ -100,8 +100,27 @@ s = requests.get(BASE + "/api/status?campaign=still_hour").json()
 check("coverage: nothing framed yet", s["se"]["coverage"]["framed"] == []
       and s["se"]["coverage"]["total"] == 41)
 
+print("== GLYPHS: placeholder renderer through the app ==")
+from cardforge.glyphs import glyphify, statline_runs
+runs = glyphify("Test [wil] against [static] and [elder].")
+check("glyphify maps known markup and passes unknown through",
+      (True, "A") in runs and (True, "Q") in runs
+      and any("[static]" in c for g, c in runs if not g))
+check("statline interleaves numbers and glyphs",
+      statline_runs(3, 2, 4, 3)[1] == (True, "A"))
+r = requests.post(BASE + "/api/render_placeholders", json={}).json()
+check("render action accepted", r.get("started") or r.get("ok"))
+check("render completes", wait_idle(60))
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+check("all 41 faces covered by glyph placeholders",
+      len(s["se"]["coverage"]["framed"]) == 41 and not s["se"]["coverage"]["missing"])
+from PIL import Image
+check("rendered investigator is landscape with glyph statline drawn",
+      Image.open(os.path.join(faces_dir, "sthr-elias.png")).size == (750, 523))
+
 print("== APPLY: framed faces -> art_urls.json -> rebuilt mod ==")
-# simulate Strange Eons having exported two faces
+# reset to just three faces so the apply-count assertions below stay exact
+shutil.rmtree(faces_dir)
 os.makedirs(faces_dir, exist_ok=True)
 from cardforge.backends.base import STUB_PNG
 for fid in ("sthr-elias", "sthr-elias-back", "sthr-lamp"):

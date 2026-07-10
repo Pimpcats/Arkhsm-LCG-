@@ -13,7 +13,8 @@ the Victory elites.*
 | `docs/design/art_profiles.json`* / `cardforge_stub.py`* | Provided tooling seeds — profiles per art type, validated composition/ledger skeleton. (*shipped in the project zip; copy beside CardForge when you build it.*) |
 | CardForge itself | ✅ **built** — `cardforge/` (A1111 + ComfyUI backends, seeds/generate/contact/index CLI, resume ledger, dry-run mode; 20-check selftest). Runbook: `cardforge/README.md`. Live-backend smoke still needs your GPU. |
 | Strange Eons framing | 🟡 **orchestrated by CardForge Studio's Frame tab** (`cardforge/se_bridge.py`): generates the SE automation script with jobs embedded, launches SE, tracks face coverage. Owner still verifies the two plugin seams (class-map + setting keys) once against their SE install. |
-| Card faces today | placehold.co placeholders; the mod loads and plays with them. |
+| Arkham glyph font | ✅ vendored: `assets/fonts/ArkhamFontWithCodex.ttf` (+ `character_chart.png` legend). 22 symbols on letters A–V; mapping + `[wil]`-markup converter in `cardforge/glyphs.py` (a few class-icon letters flagged unconfirmed — verify vs the chart). |
+| Card faces today | **glyph-grade rendered placeholders available** — `python3 pipeline/render_placeholders.py` (or the Studio Frame tab button) draws all 41 faces with real Arkham statline/icon glyphs, class colors, cost, Victory; they flow through coverage → Apply like framed faces. placehold.co remains the zero-setup default in the shipped dist. |
 
 **Art blocks nothing.** The playtest path is independent; art can run last, in parallel.
 

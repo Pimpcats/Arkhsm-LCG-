@@ -153,6 +153,17 @@ def act_se_launch(p):
         return {"ok": False, "message": "launch failed ({}) — run manually: {}".format(e, cmd)}
 
 
+def act_render_placeholders(p):
+    """Glyph-grade placeholder faces (Arkham font statlines/icons) into the
+    faces dir — they flow through coverage -> Apply like any framed face."""
+    def render():
+        subprocess.run([sys.executable,
+                        os.path.join(ROOT, "pipeline", "render_placeholders.py")],
+                       check=True, cwd=ROOT)
+        log("glyph placeholder faces rendered into art/faces/")
+    return run_job("render-placeholders", render)
+
+
 def act_apply(p):
     """Write pipeline/art_urls.json from framed faces, then rebuild the mod."""
     mode = p.get("mode", "local")           # local (file://) | hosted
@@ -224,7 +235,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "index": act_index, "backend_check": act_backend_check,
            "choose": act_choose, "se_save_config": act_se_save_config,
            "se_bundle": act_se_bundle, "se_launch": act_se_launch,
-           "apply": act_apply}
+           "render_placeholders": act_render_placeholders, "apply": act_apply}
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -370,6 +381,7 @@ hi-res blanks: BGG thread.</p>
 <div class=row>
 <button class=act onclick="post('se_bundle')">1 · Write frame bundle</button>
 <button class=act onclick="post('se_launch')">2 · Launch Strange Eons</button>
+<button class=act onclick="post('render_placeholders')" title="No SE yet? Render glyph-grade placeholder faces (Arkham font statlines) straight into the faces dir">or: Render glyph placeholders</button>
 </div>
 <p id=se_bundle_state class=warn></p>
 <h3>Coverage</h3><div id=se_cov></div>
