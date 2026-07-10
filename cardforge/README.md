@@ -22,6 +22,12 @@ Drop a folder, run. That's the mod plug-in mechanism.
 python3 -m cardforge.studio        # opens http://127.0.0.1:8570
 ```
 
+**The hands-off flow (the owner is a PLAYER of this campaign):** one button —
+**⚡ Auto-build ALL → TTS** — runs generate → auto-pick → compose onto the real
+card frames → local URLs → rebuilt mod, with zero curation, so building the
+campaign doesn't spoil playing it. The **spoiler shield** (on by default) blurs
+encounter cards in the gallery; player cards stay visible and drag-adjustable.
+
 One window, three tabs, the whole pipeline:
 - **Illustrate** — backend check, Step-0 seeds, starter/full batches (dry-run
   toggle), live log, gallery with click-to-curate variants, contact sheets.

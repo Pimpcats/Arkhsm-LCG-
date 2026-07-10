@@ -191,6 +191,46 @@ def act_render_placeholders(p):
     return run_job("render-placeholders", render)
 
 
+def act_auto(p):
+    """Hands-off: generate all art -> auto-pick a variant per card -> compose
+    onto the real frames -> local file:/// URLs -> rebuild the TTS mod. No
+    curation step, so the owner never has to LOOK at spoiler cards; the drag
+    editor remains available afterwards for any card worth adjusting."""
+    campaign = p.get("campaign", "still_hour")
+    dry = bool(p.get("dry_run"))
+    def chain():
+        runner.run_generate(campaign, dry_run=dry)
+        runner.run_index(campaign)          # auto-picks lowest seed unless curated
+        subprocess.run([sys.executable,
+                        os.path.join(ROOT, "pipeline", "render_placeholders.py")],
+                       check=True, cwd=ROOT)
+        log("cards composed on the official frames")
+        _apply_local_and_rebuild(campaign)
+        log("AUTO-BUILD DONE — load dist/the_still_hour_mod.json in TTS")
+    return run_job("auto-build", chain)
+
+
+def _apply_local_and_rebuild(campaign):
+    cov = se_bridge.coverage(campaign)
+    faces_dir = os.path.join(ROOT, cov["faces_dir"])
+    urls = {}
+    for face_id in cov["framed"]:
+        if face_id.endswith("-back"):
+            continue
+        urls[face_id] = {"face": "file:///" + os.path.join(faces_dir, face_id + ".png")
+                         .replace(os.sep, "/").lstrip("/")}
+        back = os.path.join(faces_dir, face_id + "-back.png")
+        if os.path.exists(back):
+            urls[face_id]["back"] = "file:///" + back.replace(os.sep, "/").lstrip("/")
+    with open(os.path.join(ROOT, "pipeline", "art_urls.json"), "w") as f:
+        json.dump(urls, f, indent=2)
+    log("art_urls.json: {} card(s), local file:/// mode".format(len(urls)))
+    for script in ("build_cards.py", "bundle_mod.py", "package_download.py"):
+        subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", script)],
+                       check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+        log("rebuilt: pipeline/" + script)
+
+
 def act_export_tts(p):
     """The smooth path: index -> compose all faces with chosen art -> apply
     (local file:/// URLs) -> rebuild the mod. One click to a loadable TTS save."""
@@ -288,12 +328,17 @@ def status(campaign="still_hour"):
         if os.path.exists(p):
             for c in json.load(open(p)):
                 specs[c["id"]] = c["type"]
+    spoilers = set()
+    enc_spec = os.path.join(ROOT, "pipeline", "stillhour_encounter_spec.json")
+    if os.path.exists(enc_spec):
+        spoilers = {c["id"] for c in json.load(open(enc_spec))}
     boxes = {cid: rp.art_box(t) for cid, t in specs.items()}
     placements = rp.load_placements()
     for g in gallery:
         if g["id"] in boxes:
             g["artbox"] = boxes[g["id"]]
             g["placement"] = placements.get(g["id"], {"scale": 1.0, "ox": 0, "oy": 0})
+        g["spoiler"] = g["id"] in spoilers
     campaigns = sorted(d for d in os.listdir(os.path.join(ROOT, "campaigns"))
                        if os.path.isdir(os.path.join(ROOT, "campaigns", d)))
     return {"busy": _busy.is_set(), "campaign": campaign, "campaigns": campaigns,
@@ -311,7 +356,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "choose": act_choose, "se_save_config": act_se_save_config,
            "se_bundle": act_se_bundle, "se_launch": act_se_launch,
            "render_placeholders": act_render_placeholders, "apply": act_apply,
-           "place": act_place,
+           "place": act_place, "auto": act_auto,
            "export_tts": act_export_tts}
 
 
@@ -423,6 +468,12 @@ a{color:var(--gold)}h3{margin:4px 0 10px}label{color:var(--dim);font-size:12px}
 
 <section id=illustrate class=on><div class=panel>
 <div class=row>
+<button class=act style="font-size:15px;border-color:var(--gold);color:var(--gold)"
+onclick="post('auto',{dry_run:dry()})">&#9889; Auto-build ALL &rarr; TTS (hands-off)</button>
+<label title="Blur encounter cards so building the campaign doesn't spoil playing it">
+<input type=checkbox id=spoilshield checked onchange=refresh()> spoiler shield</label>
+</div>
+<div class=row>
 <button class=act onclick="post('backend_check')">Check backend</button>
 <button class=act onclick="post('seeds',{dry_run:dry()})">Step 0: Seeds</button>
 <button class=act onclick="post('generate',{starter:true,dry_run:dry()})">Starter batch</button>
@@ -522,8 +573,17 @@ const rep=s.report.generated!==undefined?
 (s.report.dry_run?'<span class="stat warn">dry-run</span>':'')+
 (s.report.warnings||[]).map(w=>`<div class=warn>&#9888; ${w}</div>`).join(''):'<span class=stat>no report yet</span>';
 document.getElementById('repline').innerHTML=rep;
-document.getElementById('gallery').innerHTML=s.gallery.map(g=>
-`<div class=card><div class=cid title="${g.id}">${g.id}</div>`+
+const shield=document.getElementById('spoilshield').checked;
+window.revealed=window.revealed||new Set();
+document.getElementById('gallery').innerHTML=s.gallery.map(g=>{
+const hide=shield&&g.spoiler&&!window.revealed.has(g.id);
+if(hide)return `<div class=card style="opacity:.85"><div class=cid>&#9888; encounter card</div>`+
+`<div style="height:120px;display:flex;align-items:center;justify-content:center;`+
+`background:repeating-linear-gradient(45deg,#1a1822,#1a1822 8px,#221e2e 8px,#221e2e 16px);`+
+`border-radius:6px;color:var(--dim);font-size:11px;text-align:center;cursor:pointer" `+
+`onclick="window.revealed.add('${g.id}');refresh()">`+
+`spoiler hidden<br>(auto-built for you)<br><small>click to reveal</small></div></div>`;
+return `<div class=card><div class=cid title="${g.id}">${g.id}</div>`+
 (g.face?`<img loading=lazy style="outline:2px solid #7dc87d" title="composed card" `+
 `src="/art?p=art/faces/${g.id}.png&ts=${Date.now()}">`+
 (g.chosen&&g.artbox?`<button class=act style="width:100%;font-size:11px;padding:3px" `+
@@ -531,7 +591,7 @@ document.getElementById('gallery').innerHTML=s.gallery.map(g=>
 `<div style="font-size:10px;color:var(--dim)">variants — click to slot into the card:</div>`+
 g.variants.map(v=>`<img loading=lazy class="${v===g.chosen?'chosen':''}" `+
 `src="/art?p=out/${s.campaign}/${g.id}/${v}" onclick="post('choose',{card:'${g.id}',file:'${v}'})">`).join('')+
-`</div>`).join('')||'<span style="color:var(--dim)">nothing generated yet</span>';
+`</div>`;}).join('')||'<span style="color:var(--dim)">nothing generated yet</span>';
 const se=s.se;document.getElementById('se_cmd').value=se.config.launch_command;
 document.getElementById('se_faces').value=se.config.faces_dir;
 document.getElementById('se_dpi').value=se.config.export_dpi;

@@ -182,6 +182,19 @@ check("lamp face real, lamp back still shared player back",
       lamp["CustomDeck"]["95011"]["FaceURL"].startswith("file:///")
       and "placehold.co" in lamp["CustomDeck"]["95011"]["BackURL"])
 
+print("== SPOILER SHIELD + AUTO-BUILD ==")
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+check("encounter cards flagged as spoilers",
+      next(g for g in s["gallery"] if g["id"] == "sthr-appointed")["spoiler"] is True
+      and next(g for g in s["gallery"] if g["id"] == "sthr-elias")["spoiler"] is False)
+check("spoiler shield present in the UI", "spoiler shield" in page and "Auto-build ALL" in page)
+r = requests.post(BASE + "/api/auto", json={"campaign": "still_hour", "dry_run": True}).json()
+check("auto-build accepted", r.get("started"))
+check("auto-build chain completes (generate->index->compose->apply->rebuild)", wait_idle(180))
+auto_urls = json.load(open(os.path.join(ROOT, "pipeline", "art_urls.json")))
+check("auto-build produced a fully-arted mod with zero curation",
+      len(auto_urls) == 36 and all(v["face"].startswith("file:///") for v in auto_urls.values()))
+
 print("== ONE-CLICK: Compose & Export to TTS ==")
 r = requests.post(BASE + "/api/export_tts", json={"campaign": "still_hour"}).json()
 check("export chain accepted", r.get("started"))
