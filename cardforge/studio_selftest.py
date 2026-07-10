@@ -90,6 +90,13 @@ check("bundle writes script + jobs (41 faces)", r.get("job_count") == 41
 script = open(r["script"]).read()
 check("jobs embedded in the SE script (no file IO in SE)",
       '"sthr-appointed"' in script and "createDefaultSheets" in script)
+jobs = json.load(open(r["jobs"]))
+appointed = next(j for j in jobs if j["id"] == "sthr-appointed")
+elias_back = next(j for j in jobs if j["id"] == "sthr-elias-back")
+check("jobs carry the print layer (rules text, enemy stats, back text)",
+      "Hold Back" in appointed["text"] and appointed.get("fight") == 4
+      and appointed.get("damage") == 2
+      and "Deck Size: 30" in elias_back["text"])
 check("owner classmap edit landed in the script", "arkham-asset-v3" in script)
 check("illustration paths flow from the index",
       json.load(open(r["jobs"]))[0].get("illustration") is not None

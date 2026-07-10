@@ -82,21 +82,33 @@ def _load_card_specs():
     return {c["id"]: c for c in cards}
 
 
+def _load_print_text():
+    path = os.path.join(runner.repo_root(), "pipeline", "stillhour_print_text.json")
+    if os.path.exists(path):
+        return {k: v for k, v in json.load(open(path)).items() if not k.startswith("_")}
+    return {}
+
+
 def build_jobs(campaign="still_hour"):
-    """One frame job per manifest face: spec fields + illustration path (from
-    CardForge's index.json when present). `text` stays empty — printed rules
-    text is authored in cards_v0.2/encounter_v0.4 and pasted/mapped by the
-    owner or a later text-extraction pass."""
+    """One frame job per manifest face: spec fields + the PRINT layer
+    (stillhour_print_text.json: rules text, flavor, enemy combat stats,
+    investigator back text — see docs/art_reference/CARD_ANATOMY.md) + the
+    illustration path from CardForge's index.json when present. Rules text uses
+    the repo's [wil]-style markup; convert to plugin tags or glyph letters at
+    frame time."""
     specs = _load_card_specs()
+    print_text = _load_print_text()
     manifest = runner.load_manifest(campaign)
     camp = runner.load_campaign(campaign)
     index_path = os.path.join(runner.out_dir_for(camp), "index.json")
     index = json.load(open(index_path)) if os.path.exists(index_path) else {}
     jobs = []
     for m in manifest:
-        base_id = m["id"][:-5] if m["id"].endswith("-back") else m["id"]
+        is_back = m["id"].endswith("-back")
+        base_id = m["id"][:-5] if is_back else m["id"]
         spec = specs.get(base_id, {})
-        jobs.append({
+        pt = print_text.get(base_id, {})
+        job = {
             "id": m["id"],
             "frame": m.get("frame") or m.get("art_type"),
             "text_only": bool(m.get("no_art")),
@@ -108,8 +120,18 @@ def build_jobs(campaign="still_hour"):
             "cost": spec.get("cost"),
             "stats": {k: spec.get(k) for k in ("wil", "int", "com", "agi",
                                                "health", "sanity") if k in spec},
-            "text": "",
-        })
+            "victory": spec.get("victory"),
+            "elite": bool(spec.get("elite")),
+            "text": pt.get("back_text" if is_back else "text", ""),
+            "flavor": pt.get("back_flavor" if is_back else "flavor", ""),
+        }
+        # enemy combat line lives only in the print layer
+        for k in ("fight", "evade", "damage", "horror"):
+            if k in pt:
+                job[k] = pt[k]
+        if "health" in pt:            # enemy health (investigator health is in stats)
+            job["enemy_health"] = pt["health"]
+        jobs.append(job)
     return jobs
 
 
