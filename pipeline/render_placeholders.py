@@ -28,6 +28,7 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, ROOT)
 
 from cardforge.glyphs import FONT_PATH, MARKUP, glyphify  # noqa: E402
+import template_render as T  # noqa: E402  (official-frame template mode)
 
 FACES_DIR = os.path.join(ROOT, "art", "faces")
 
@@ -55,7 +56,16 @@ def load_placements():
 
 # Art-window geometry per layout, shared with the Studio's placement editor.
 def art_box(card_type):
-    """(card_w, card_h, x0, y0, x1, y1) — the drag/scale target."""
+    """(card_w, card_h, x0, y0, x1, y1) — the drag/scale target. Template mode
+    (official frames present) uses the templates' art windows."""
+    if T.has_template("investigator_front"):
+        if card_type == "Investigator":
+            return (750, 523) + T.INV_FRONT["art"]
+        if card_type == "Enemy":
+            return (419, 600) + T.ENEMY["art"]
+        if card_type == "Treachery":
+            return (419, 600) + T.TREACHERY["art"]
+        return (419, 600, 54, 52, 407, 240)
     if card_type == "Investigator":
         return (750, 523, 24, 84, 264, 435)
     if card_type == "Enemy":
@@ -355,10 +365,178 @@ def render_player_card(c, pt, dest, art_path=None, placement=None):
     img.save(dest)
 
 
+# ------------------------------------------------- template mode (official frames) --
+
+def t_investigator_front(c, pt, dest, art_path=None, placement=None):
+    img = T.open_template("investigator_front")
+    d = ImageDraw.Draw(img)
+    R = T.INV_FRONT
+    color = T.CLASS_COLORS.get(c["class"], T.CLASS_COLORS["Neutral"])
+    # class disc
+    d.ellipse(list(R["class_disc"]), fill=color, outline=(25, 20, 16), width=2)
+    center_text(d, c["class"][0], (R["class_disc"][0] + R["class_disc"][2]) / 2,
+                R["class_disc"][1] + 12, _font(26, bold=True), T.SCROLL_INK)
+    # name + subtitle over the scroll
+    T.rrect(d, R["name"], T.SCROLL, radius=14)
+    center_text(d, c["name"], (R["name"][0] + R["name"][2]) / 2, R["name"][1] + 6,
+                _font(24, bold=True), T.SCROLL_INK)
+    T.rrect(d, R["subtitle"], T.PARCH_DARK, radius=10)
+    center_text(d, c["subtitle"], (R["subtitle"][0] + R["subtitle"][2]) / 2,
+                R["subtitle"][1] + 3, _font(15, italic=True), T.INK)
+    # stat strip base then coins
+    T.rrect(d, R["stats_strip"], T.SCROLL, radius=14)
+    skill_colors = [(58, 92, 148), (128, 66, 130), (150, 48, 44), (56, 116, 74)]
+    for (box, val, sc) in zip(R["stats"], (c["wil"], c["int"], c["com"], c["agi"]), skill_colors):
+        d.ellipse(list(box), fill=sc, outline=(20, 16, 12), width=2)
+        center_text(d, str(val), (box[0] + box[2]) / 2, box[1] + 8, _font(22, bold=True), T.SCROLL_INK)
+    # portrait
+    if art_path:
+        paste_cover(img, art_path, R["art"], placement)
+    else:
+        T.blank_art_window(d, R["art"])
+    # body panel
+    T.rrect(d, R["panel"], T.PARCH, radius=10)
+    px0, py0, px1, _ = R["panel"]
+    center_text(d, c.get("traits", ""), (px0 + px1) / 2, py0 + 8,
+                _font(15, bold=True, italic=True), T.INK)
+    y = draw_wrapped(d, pt.get("text", ""), px0 + 14, py0 + 34, 13, px1 - px0 - 28, T.INK)
+    if pt.get("flavor"):
+        draw_wrapped(d, pt["flavor"], px0 + 14, min(y + 6, R["hs_y"] - 60), 12,
+                     px1 - px0 - 28, T.FLAVOR_INK, italic=True)
+    # health / sanity
+    cx = (px0 + px1) / 2
+    d.ellipse([cx - 66, R["hs_y"], cx - 22, R["hs_y"] + 42], fill=T.RED, outline=(15, 12, 10), width=2)
+    center_text(d, str(c["health"]), cx - 44, R["hs_y"] + 6, _font(22, bold=True), T.SCROLL_INK)
+    d.ellipse([cx + 22, R["hs_y"], cx + 66, R["hs_y"] + 42], fill=T.BLUE, outline=(15, 12, 10), width=2)
+    center_text(d, str(c["sanity"]), cx + 44, R["hs_y"] + 6, _font(22, bold=True), T.SCROLL_INK)
+    T.cover_illus_credit(img, d, img.width, img.height, landscape=True)
+    img.save(dest)
+
+
+def t_investigator_back(c, pt, dest, art_path=None):
+    img = T.open_template("investigator_back")
+    d = ImageDraw.Draw(img)
+    R = T.INV_BACK
+    T.rrect(d, R["name"], T.SCROLL, radius=14)
+    center_text(d, c["name"], (R["name"][0] + R["name"][2]) / 2, R["name"][1] + 6,
+                _font(24, bold=True), T.SCROLL_INK)
+    T.rrect(d, R["subtitle"], T.PARCH_DARK, radius=10)
+    center_text(d, c["subtitle"], (R["subtitle"][0] + R["subtitle"][2]) / 2,
+                R["subtitle"][1] + 3, _font(15, italic=True), T.INK)
+    # polaroid portrait
+    d.rectangle(list(R["polaroid"]), fill=(238, 234, 224))
+    inner = (R["polaroid"][0] + 8, R["polaroid"][1] + 8, R["polaroid"][2] - 8, R["polaroid"][3] - 22)
+    if art_path:
+        paste_cover(img, art_path, inner)
+    else:
+        T.blank_art_window(d, inner, label="portrait")
+    # deckbuilding column + full-width bio
+    T.rrect(d, R["panel"], T.PARCH, radius=8)
+    T.rrect(d, R["panel_low"], T.PARCH, radius=8)
+    y = draw_wrapped(d, pt.get("back_text", ""), R["panel"][0] + 14, R["panel"][1] + 12,
+                     13, R["panel"][2] - R["panel"][0] - 28, T.INK)
+    draw_wrapped(d, pt.get("back_flavor", ""), R["panel_low"][0] + 14,
+                 max(y + 10, R["panel_low"][1] + 12), 13,
+                 R["panel_low"][2] - R["panel_low"][0] - 28, T.FLAVOR_INK, italic=True)
+    T.cover_illus_credit(img, d, img.width, img.height, landscape=True)
+    img.save(dest)
+
+
+def t_treachery(c, pt, dest, art_path=None, placement=None):
+    layout = "treachery_weakness" if c.get("weakness") else "treachery"
+    img = T.open_template(layout if T.has_template(layout) else "treachery")
+    d = ImageDraw.Draw(img)
+    R = T.TREACHERY
+    if art_path:
+        paste_cover(img, art_path, R["art"], placement)
+    else:
+        T.blank_art_window(d, R["art"])
+    # redraw the keyhole set-icon over the (new or blanked) art
+    d.ellipse(list(R["keyhole"]), fill=(24, 20, 18), outline=T.PARCH_DARK, width=2)
+    center_text(d, "?", (R["keyhole"][0] + R["keyhole"][2]) / 2,
+                R["keyhole"][1] + 8, _font(22, bold=True), T.PARCH_DARK)
+    T.rrect(d, R["type"], T.SCROLL, radius=6)
+    center_text(d, c["type"].upper(), (R["type"][0] + R["type"][2]) / 2,
+                R["type"][1] + 5, _font(14, bold=True), T.SCROLL_INK)
+    T.rrect(d, R["name"], T.PARCH_DARK, radius=8)
+    center_text(d, c["name"], (R["name"][0] + R["name"][2]) / 2, R["name"][1] + 5,
+                _font(18, bold=True), T.INK)
+    panel = R["panel"]
+    if c.get("weakness"):
+        T.rrect(d, R["weakness_bar"], (86, 28, 26), radius=6)
+        center_text(d, "WEAKNESS", (R["weakness_bar"][0] + R["weakness_bar"][2]) / 2,
+                    R["weakness_bar"][1] + 3, _font(12, bold=True), T.SCROLL_INK)
+        panel = R["panel_weak"]
+    T.rrect(d, panel, T.PARCH, radius=8)
+    center_text(d, c.get("traits", ""), (panel[0] + panel[2]) / 2, panel[1] + 6,
+                _font(14, bold=True, italic=True), T.INK)
+    y = draw_wrapped(d, pt.get("text", ""), panel[0] + 12, panel[1] + 30, 12,
+                     panel[2] - panel[0] - 24, T.INK)
+    if pt.get("flavor"):
+        draw_wrapped(d, pt["flavor"], panel[0] + 12, min(y + 6, panel[3] - 34), 11,
+                     panel[2] - panel[0] - 24, T.FLAVOR_INK, italic=True)
+    T.cover_illus_credit(img, d, img.width, img.height)
+    img.save(dest)
+
+
+def t_enemy(c, pt, dest, art_path=None, placement=None):
+    layout = "enemy_elite" if c.get("elite") and T.has_template("enemy_elite") else "enemy"
+    img = T.open_template(layout)
+    d = ImageDraw.Draw(img)
+    R = T.ENEMY
+    T.rrect(d, R["name"], T.SCROLL, radius=10)
+    center_text(d, c["name"], (R["name"][0] + R["name"][2]) / 2, R["name"][1] + 6,
+                _font(19, bold=True), T.SCROLL_INK)
+    # combat plates over the baked ones
+    for key, val, color in (("fight", pt.get("fight", "-"), (140, 48, 42)),
+                            ("health", pt.get("health") if pt.get("health") is not None else "—",
+                             (72, 66, 60)),
+                            ("evade", pt.get("evade", "-"), (58, 104, 66))):
+        b = R[key]
+        d.polygon([(b[0], b[1] + 8), ((b[0] + b[2]) / 2, b[1]), (b[2], b[1] + 8),
+                   (b[2], b[3] - 8), ((b[0] + b[2]) / 2, b[3]), (b[0], b[3] - 8)],
+                  fill=color, outline=(18, 14, 12))
+        center_text(d, str(val), (b[0] + b[2]) / 2, (b[1] + b[3]) / 2 - 12,
+                    _font(22, bold=True), T.SCROLL_INK)
+    T.rrect(d, R["traits"], T.PARCH_DARK, radius=6)
+    traits = c.get("traits", "") + ("  Elite." if c.get("elite")
+                                    and "Elite" not in c.get("traits", "") else "")
+    center_text(d, traits, (R["traits"][0] + R["traits"][2]) / 2, R["traits"][1] + 4,
+                _font(13, bold=True, italic=True), T.INK)
+    panel = R["panel"]
+    T.rrect(d, panel, T.PARCH, radius=8)
+    y = draw_wrapped(d, pt.get("text", ""), panel[0] + 12, panel[1] + 10, 12,
+                     panel[2] - panel[0] - 24, T.INK)
+    if pt.get("flavor"):
+        y = draw_wrapped(d, pt["flavor"], panel[0] + 12, y + 4, 11,
+                         panel[2] - panel[0] - 24, T.FLAVOR_INK, italic=True)
+    if c.get("victory"):
+        center_text(d, "Victory {}.".format(c["victory"]), (panel[0] + panel[2]) / 2,
+                    min(y + 4, panel[3] - 22), _font(14, bold=True), T.INK)
+    # ENEMY banner strip + damage/horror pips
+    bs = R["banner_strip"]
+    T.rrect(d, bs, T.PARCH, radius=8)
+    T.rrect(d, (bs[0] + 30, bs[1] + 4, bs[2] - 30, bs[1] + 26), T.SCROLL, radius=6)
+    center_text(d, "ENEMY", (bs[0] + bs[2]) / 2, bs[1] + 7, _font(13, bold=True), T.SCROLL_INK)
+    total = (pt.get("damage", 0) or 0) + (pt.get("horror", 0) or 0)
+    px = (bs[0] + bs[2]) / 2 - (total * 20 + 8) / 2
+    px = pips(d, px, bs[1] + 30, pt.get("damage", 0), T.RED, r=8)
+    pips(d, px + 8, bs[1] + 30, pt.get("horror", 0), T.BLUE, r=8)
+    if art_path:
+        paste_cover(img, art_path, R["art"], placement)
+    else:
+        T.blank_art_window(d, R["art"])
+    T.cover_illus_credit(img, d, img.width, img.height)
+    img.save(dest)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", nargs="*", help="render only these card ids")
+    ap.add_argument("--no-template", action="store_true",
+                    help="force the drawn (non-template) placeholder look")
     args = ap.parse_args()
+    use_tpl = (not args.no_template) and T.has_template("investigator_front")
     cards = json.load(open(os.path.join(HERE, "stillhour_cards_spec.json")))
     enc = os.path.join(HERE, "stillhour_encounter_spec.json")
     if os.path.exists(enc):
@@ -381,13 +559,18 @@ def main():
         place = placements.get(c["id"])
         composed += 1 if art else 0
         dest = os.path.join(FACES_DIR, c["id"] + ".png")
+        back_dest = os.path.join(FACES_DIR, c["id"] + "-back.png")
         if c["type"] == "Investigator":
-            render_investigator_front(c, pt, dest, art_path=art, placement=place)
-            render_investigator_back(c, pt, os.path.join(FACES_DIR, c["id"] + "-back.png"))
+            if use_tpl:
+                t_investigator_front(c, pt, dest, art_path=art, placement=place)
+                t_investigator_back(c, pt, back_dest, art_path=art)
+            else:
+                render_investigator_front(c, pt, dest, art_path=art, placement=place)
+                render_investigator_back(c, pt, back_dest)
         elif c["type"] == "Enemy":
-            render_enemy(c, pt, dest, art_path=art, placement=place)
+            (t_enemy if use_tpl else render_enemy)(c, pt, dest, art_path=art, placement=place)
         elif c["type"] == "Treachery":
-            render_treachery(c, pt, dest, art_path=art, placement=place)
+            (t_treachery if use_tpl else render_treachery)(c, pt, dest, art_path=art, placement=place)
         else:
             render_player_card(c, pt, dest, art_path=art, placement=place)
     n = len([f for f in os.listdir(FACES_DIR) if f.endswith(".png")])
