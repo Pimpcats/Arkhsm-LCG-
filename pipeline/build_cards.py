@@ -111,6 +111,19 @@ def build_gmnotes(c):
     return json.dumps(m, separators=(",", ":"))
 
 
+# Optional real-art overlay written by CardForge Studio's Apply tab:
+# pipeline/art_urls.json  {cardId: {"face": url, "back": url}} — URLs may be
+# hosted (https://...) or local (file:///...) for private TTS testing.
+def _load_art_urls():
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "art_urls.json")
+    if os.path.exists(path):
+        return json.load(open(path))
+    return {}
+
+
+ART_URLS = _load_art_urls()
+
+
 def build_card(c):
     is_inv = c["type"] == "Investigator"
     is_encounter = bool(c.get("encounter"))
@@ -122,6 +135,7 @@ def build_card(c):
         back = ENCOUNTER_BACK
     else:
         back = PLAYER_BACK
+    art = ART_URLS.get(c["id"], {})
     return {
         "Name": "Card", "Nickname": c["name"], "Description": c.get("subtitle", ""),
         "GUID": guid(c["id"]), "CardID": int(deck_id + "00"), "SidewaysCard": is_inv,
@@ -129,8 +143,8 @@ def build_card(c):
         "GMNotes": build_gmnotes(c), "Transform": transform(),
         "CustomUIAssets": [ARKHAM_ICONS],
         "CustomDeck": {deck_id: {
-            "FaceURL": face_ph(c["name"], land=is_inv),
-            "BackURL": back,
+            "FaceURL": art.get("face") or face_ph(c["name"], land=is_inv),
+            "BackURL": art.get("back") or back,
             "NumWidth": 1, "NumHeight": 1, "Type": 0,
             "UniqueBack": is_inv, "BackIsHidden": is_inv}},
     }

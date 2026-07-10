@@ -131,6 +131,15 @@ zero-code reuse. Acceptance: `python3 cardforge/selftest.py` (20 checks, green).
 Step-0 seed curation + LoRA training. Golden prompt fixtures (`prompts.json`)
 auto-compare when dropped at the repo root.
 
+**CardForge Studio** (`python3 -m cardforge.studio`) wraps it all in one local
+app: Illustrate tab (batch + gallery curation) · **Frame tab** (Strange Eons
+orchestration — generated automation bundle, launch, coverage; SE sources:
+strangeeons.cgjennings.ca, github.com/CGJennings/strange-eons) · Apply tab
+(art_urls.json overlay — file:/// local mode or hosted — + full mod rebuild).
+`studio_selftest.py`: 24 end-to-end checks over the live server, green. Owner
+seams: SE class-map/setting keys (once per plugin version) and the SE launch
+command.
+
 ## Next steps (in brief order)
 
 - **P5 Appointed** — ✅ done (CO-002). Staged Approach (Unseen→Sensed→Emerging→

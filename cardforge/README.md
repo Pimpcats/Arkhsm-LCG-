@@ -16,6 +16,26 @@ campaigns/<name>/
 
 Drop a folder, run. That's the mod plug-in mechanism.
 
+## CardForge Studio — the all-in-one app
+
+```bash
+python3 -m cardforge.studio        # opens http://127.0.0.1:8570
+```
+
+One window, three tabs, the whole pipeline:
+- **Illustrate** — backend check, Step-0 seeds, starter/full batches (dry-run
+  toggle), live log, gallery with click-to-curate variants, contact sheets.
+- **Frame — Strange Eons** — setup links (strangeeons.cgjennings.ca /
+  github.com/CGJennings/strange-eons / Arkham plugin / fonts), the two owner
+  config seams (class-map + setting keys), one-click frame-bundle generation
+  (SE script with your cards embedded), SE launch, exported-face coverage.
+- **Apply to Mod** — writes `pipeline/art_urls.json` (local `file:///` mode for
+  instant TTS testing, or a hosted base URL) and rebuilds cards → mod →
+  download package.
+
+Acceptance: `python3 cardforge/studio_selftest.py` (24 checks, drives the live
+server end-to-end). The CLI below remains for headless/scripted use.
+
 ## Runbook (owner's rig)
 
 ```bash

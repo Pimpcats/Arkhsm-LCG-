@@ -12,7 +12,7 @@ the Victory elites.*
 | `pipeline/art_manifest_starter.json` | ✅ 6-face first-milestone subset (Elias slice + the Appointed). |
 | `docs/design/art_profiles.json`* / `cardforge_stub.py`* | Provided tooling seeds — profiles per art type, validated composition/ledger skeleton. (*shipped in the project zip; copy beside CardForge when you build it.*) |
 | CardForge itself | ✅ **built** — `cardforge/` (A1111 + ComfyUI backends, seeds/generate/contact/index CLI, resume ledger, dry-run mode; 20-check selftest). Runbook: `cardforge/README.md`. Live-backend smoke still needs your GPU. |
-| Strange Eons framing script | ⏳ not built — `ART_PIPELINE_BRIEF` Stage 2. |
+| Strange Eons framing | 🟡 **orchestrated by CardForge Studio's Frame tab** (`cardforge/se_bridge.py`): generates the SE automation script with jobs embedded, launches SE, tracks face coverage. Owner still verifies the two plugin seams (class-map + setting keys) once against their SE install. |
 | Card faces today | placehold.co placeholders; the mod loads and plays with them. |
 
 **Art blocks nothing.** The playtest path is independent; art can run last, in parallel.
