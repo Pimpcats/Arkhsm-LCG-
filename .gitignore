@@ -4,3 +4,5 @@ out/
 state/
 art/
 se/
+assets/frames/*
+!assets/frames/README.md
