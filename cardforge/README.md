@@ -28,7 +28,12 @@ card frames → local URLs → rebuilt mod, with zero curation, so building the
 campaign doesn't spoil playing it. The **spoiler shield** (on by default) blurs
 encounter cards in the gallery; player cards stay visible and drag-adjustable.
 
-One window, three tabs, the whole pipeline:
+One window, four tabs, the whole pipeline:
+- **Cards** — the placement section: every card in the campaign, grouped by deck
+  (Investigators / Signatures & Weaknesses / Recollections / Encounter sets),
+  each shown on its real frame. Click a card → the placement editor opens: pick
+  a generated variant or **upload any image**, drag to position, scroll to size,
+  Save recomposes losslessly. Spoiler shield keeps encounter cards hidden.
 - **Illustrate** — backend check, Step-0 seeds, starter/full batches (dry-run
   toggle), live log, gallery with click-to-curate variants, contact sheets.
 - **Frame — Strange Eons** — setup links (strangeeons.cgjennings.ca /
@@ -41,8 +46,8 @@ One window, three tabs, the whole pipeline:
   instant TTS testing, or a hosted base URL) and rebuilds cards → mod →
   download package.
 
-Acceptance: `python3 cardforge/studio_selftest.py` (24 checks, drives the live
-server end-to-end). The CLI below remains for headless/scripted use.
+Acceptance: `python3 cardforge/studio_selftest.py` (53 checks, drives the live
+server end-to-end; JS is syntax-checked with node in CI passes). The CLI below remains for headless/scripted use.
 
 ## Runbook (owner's rig)
 

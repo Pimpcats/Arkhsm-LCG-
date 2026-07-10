@@ -182,6 +182,29 @@ check("lamp face real, lamp back still shared player back",
       lamp["CustomDeck"]["95011"]["FaceURL"].startswith("file:///")
       and "placehold.co" in lamp["CustomDeck"]["95011"]["BackURL"])
 
+print("== CARDS CATALOG (the placement section) ==")
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+check("catalog lists all 36 cards with art boxes",
+      len(s["cards"]) == 36 and all("artbox" in c for c in s["cards"]))
+groups = {c["group"] for c in s["cards"]}
+check("five deck groups", groups == {"Investigators", "Signatures & Weaknesses",
+      "Recollections", "Encounter — The Appointed", "Encounter — The Named"})
+check("group names byte-match the page's order list (em dashes)",
+      all(g in page for g in groups))
+check("faces_ver present for image cache-busting", isinstance(s["faces_ver"], int))
+r = requests.post(BASE + "/api/compose_one", json={"card": "sthr-bell"}).json()
+check("compose_one renders a single face on demand",
+      r.get("composed") and os.path.exists(os.path.join(faces_dir, "sthr-bell.png")))
+import base64 as _b64
+from cardforge.backends.base import STUB_PNG as _stub
+r = requests.post(BASE + "/api/upload_art",
+                  json={"card": "sthr-bell",
+                        "data_b64": "data:image/png;base64," + _b64.b64encode(_stub).decode()}).json()
+check("manual upload becomes the chosen art and recomposes",
+      r.get("file") == "upload_1.png"
+      and json.load(open(os.path.join(ROOT, "out", "still_hour", "index.json")))
+      ["sthr-bell"].endswith("upload_1.png"))
+
 print("== SPOILER SHIELD + AUTO-BUILD ==")
 s = requests.get(BASE + "/api/status?campaign=still_hour").json()
 check("encounter cards flagged as spoilers",

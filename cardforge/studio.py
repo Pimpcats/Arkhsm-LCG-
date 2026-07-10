@@ -110,23 +110,51 @@ def act_backend_check(p):
     return {"ok": ok, "message": "[{}] {}".format(camp.get("backend", "a1111"), msg)}
 
 
-def act_choose(p):
-    """Pick a variant AND immediately re-compose that card's face with it."""
-    camp = runner.load_campaign(p.get("campaign", "still_hour"))
+def _choose_art(campaign, card, filename):
+    """Point a card at an art file and recompose its face (synchronous, fast)."""
+    camp = runner.load_campaign(campaign)
     out_dir = runner.out_dir_for(camp)
-    card = p["card"]
     with open(os.path.join(out_dir, card, "chosen.txt"), "w") as f:
-        f.write(p["file"])
-    # update this card's index entry in place
+        f.write(filename)
     index_path = os.path.join(out_dir, "index.json")
     index = json.load(open(index_path)) if os.path.exists(index_path) else {}
-    index[card] = os.path.relpath(os.path.join(out_dir, card, p["file"]), ROOT)
+    index[card] = os.path.relpath(os.path.join(out_dir, card, filename), ROOT)
     with open(index_path, "w") as f:
         json.dump(index, f, indent=2)
-    # re-compose just this card (fast, synchronous)
     subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py"),
                     "--only", card], check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+
+
+def act_choose(p):
+    """Pick a variant AND immediately re-compose that card's face with it."""
+    _choose_art(p.get("campaign", "still_hour"), p["card"], p["file"])
     return {"ok": True, "composed": True}
+
+
+def act_compose_one(p):
+    """Compose one card's face (template + current art/placement), synchronous."""
+    subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py"),
+                    "--only", p["card"]], check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+    return {"ok": True, "composed": True}
+
+
+def act_upload_art(p):
+    """Manual art: accept a base64 image for a card, store it as a variant,
+    make it the chosen art, recompose. Lets the owner place art from ANY
+    source, not just CardForge output."""
+    import base64
+    campaign = p.get("campaign", "still_hour")
+    card = p["card"]
+    camp = runner.load_campaign(campaign)
+    card_dir = os.path.join(runner.out_dir_for(camp), card)
+    os.makedirs(card_dir, exist_ok=True)
+    existing = [f for f in os.listdir(card_dir) if f.startswith("upload_")]
+    fname = "upload_{}.png".format(len(existing) + 1)
+    raw = base64.b64decode(p["data_b64"].split(",", 1)[-1])
+    with open(os.path.join(card_dir, fname), "wb") as f:
+        f.write(raw)
+    _choose_art(campaign, card, fname)
+    return {"ok": True, "composed": True, "file": fname}
 
 
 def act_place(p):
@@ -339,10 +367,49 @@ def status(campaign="still_hour"):
             g["artbox"] = boxes[g["id"]]
             g["placement"] = placements.get(g["id"], {"scale": 1.0, "ox": 0, "oy": 0})
         g["spoiler"] = g["id"] in spoilers
+    # full card catalog, grouped by deck (the Cards tab)
+    def group_for(c):
+        if c.get("encounter"):
+            return "Encounter — The Named" if "Named" in c.get("traits", "") \
+                else "Encounter — The Appointed"
+        if c["type"] == "Investigator":
+            return "Investigators"
+        if "Recollection" in c.get("traits", "") and c.get("class") == "Neutral":
+            return "Recollections"
+        return "Signatures & Weaknesses"
+    catalog = []
+    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json"):
+        path = os.path.join(ROOT, "pipeline", spec_file)
+        if not os.path.exists(path):
+            continue
+        for c in json.load(open(path)):
+            cdir = os.path.join(out_dir, c["id"])
+            variants = sorted(f for f in os.listdir(cdir) if f.endswith(".png")) \
+                if os.path.isdir(cdir) else []
+            chosen_path = os.path.join(cdir, "chosen.txt")
+            chosen = open(chosen_path).read().strip() if os.path.exists(chosen_path) \
+                else (variants[0] if variants else None)
+            catalog.append({
+                "id": c["id"], "name": c["name"], "type": c["type"],
+                "class": c.get("class", ""), "group": group_for(c),
+                "face": os.path.exists(os.path.join(ROOT, "art", "faces", c["id"] + ".png")),
+                "spoiler": bool(c.get("encounter")),
+                "variants": variants, "chosen": chosen,
+            })
+    for c in catalog:
+        if c["id"] in boxes:
+            c["artbox"] = boxes[c["id"]]
+            c["placement"] = placements.get(c["id"], {"scale": 1.0, "ox": 0, "oy": 0})
     campaigns = sorted(d for d in os.listdir(os.path.join(ROOT, "campaigns"))
                        if os.path.isdir(os.path.join(ROOT, "campaigns", d)))
+    faces_dir_abs = os.path.join(ROOT, "art", "faces")
+    faces_ver = 0
+    if os.path.isdir(faces_dir_abs):
+        faces_ver = int(max((os.path.getmtime(os.path.join(faces_dir_abs, f))
+                             for f in os.listdir(faces_dir_abs)), default=0))
     return {"busy": _busy.is_set(), "campaign": campaign, "campaigns": campaigns,
             "backend": camp.get("backend"), "report": report, "gallery": gallery,
+            "cards": catalog, "faces_ver": faces_ver,
             "se": {"config": se_bridge.load_config(),
                    "bundle_exists": os.path.exists(
                        os.path.join(se_bridge.se_dir(), "frame_cards.js")),
@@ -356,7 +423,8 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "choose": act_choose, "se_save_config": act_se_save_config,
            "se_bundle": act_se_bundle, "se_launch": act_se_launch,
            "render_placeholders": act_render_placeholders, "apply": act_apply,
-           "place": act_place, "auto": act_auto,
+           "place": act_place, "auto": act_auto, "upload_art": act_upload_art,
+           "compose_one": act_compose_one,
            "export_tts": act_export_tts}
 
 
@@ -428,170 +496,266 @@ class Handler(BaseHTTPRequestHandler):
 
 
 PAGE = r"""<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CardForge Studio</title><style>
-:root{--bg:#12121a;--panel:#1b1b26;--ink:#e8e2cf;--dim:#8a8a99;--gold:#e8b24a;--line:#2c2c3a}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);
-font:14px/1.5 system-ui,sans-serif}
-header{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;gap:16px;align-items:baseline}
-header h1{font-size:18px;margin:0;color:var(--gold)}header small{color:var(--dim)}
-nav{display:flex;gap:4px;padding:10px 20px 0}
-nav button{background:none;border:1px solid var(--line);border-bottom:none;color:var(--dim);
-padding:8px 18px;border-radius:8px 8px 0 0;cursor:pointer;font-size:14px}
-nav button.on{background:var(--panel);color:var(--gold)}
-main{padding:16px 20px}section{display:none}section.on{display:block}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:0 10px 10px 10px;padding:16px}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
-button.act{background:#2a2338;border:1px solid #453a5e;color:var(--ink);padding:7px 14px;
-border-radius:7px;cursor:pointer}button.act:hover{border-color:var(--gold)}
-input,select,textarea{background:#12121a;border:1px solid var(--line);color:var(--ink);
-padding:6px 9px;border-radius:6px;font:inherit}
-textarea{width:100%;font-family:ui-monospace,monospace;font-size:12px}
-#log{background:#0c0c12;border:1px solid var(--line);border-radius:8px;padding:10px;
-height:200px;overflow-y:auto;font:12px ui-monospace,monospace;white-space:pre-wrap;margin-top:14px}
-.gal{display:flex;flex-wrap:wrap;gap:10px}.card{background:#12121a;border:1px solid var(--line);
-border-radius:8px;padding:8px;width:150px}.card img{width:100%;border-radius:4px;cursor:pointer}
-.card img.chosen{outline:2px solid var(--gold)}.card .cid{font-size:11px;color:var(--dim);
-overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.stat{display:inline-block;background:#12121a;border:1px solid var(--line);border-radius:6px;
-padding:4px 10px;margin-right:8px}.ok{color:#7dc87d}.warn{color:#e8b24a}.bad{color:#e87d7d}
-a{color:var(--gold)}h3{margin:4px 0 10px}label{color:var(--dim);font-size:12px}
-.cols{display:flex;gap:16px;flex-wrap:wrap}.cols>div{flex:1;min-width:320px}
+:root{--bg:#0e0e13;--surface:#17171f;--surface2:#1e1e28;--line:rgba(255,255,255,.08);
+--ink:#f2efe6;--dim:#9a97a3;--accent:#d9a648;--accent-ink:#1a1408;--good:#5fc47e;--bad:#e0716a;
+--r:14px;--shadow:0 8px 30px rgba(0,0,0,.45)}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);
+font:15px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+-webkit-font-smoothing:antialiased}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:14px;
+padding:14px 26px;background:rgba(14,14,19,.8);backdrop-filter:blur(18px);
+border-bottom:1px solid var(--line)}
+header h1{font-size:17px;font-weight:600;letter-spacing:.2px}
+header .sub{color:var(--dim);font-size:13px}
+.spacer{margin-left:auto}
+select,input[type=text],input[type=number],input[type=range],textarea{
+background:var(--surface2);border:1px solid var(--line);color:var(--ink);
+padding:7px 12px;border-radius:10px;font:inherit;font-size:13px;outline:none;
+transition:border-color .18s}
+select:focus,input:focus,textarea:focus{border-color:var(--accent)}
+textarea{width:100%;font:12px ui-monospace,SFMono-Regular,Menlo,monospace}
+button{font:inherit;cursor:pointer;transition:all .18s ease}
+.btn{background:var(--surface2);border:1px solid var(--line);color:var(--ink);
+padding:8px 16px;border-radius:10px;font-size:13.5px;font-weight:500}
+.btn:hover{border-color:rgba(255,255,255,.22);transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn.primary:hover{filter:brightness(1.08)}
+nav{display:flex;gap:2px;margin:18px auto 0;width:fit-content;background:var(--surface);
+border:1px solid var(--line);border-radius:12px;padding:3px}
+nav button{background:none;border:none;color:var(--dim);padding:7px 20px;border-radius:9px;
+font-size:13.5px;font-weight:500}
+nav button.on{background:var(--surface2);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.35)}
+main{max-width:1180px;margin:0 auto;padding:20px 26px 120px}
+section{display:none;animation:fade .22s ease}
+section.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+padding:20px;margin-top:16px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+h2{font-size:15px;font-weight:600;margin:22px 0 10px;letter-spacing:.2px}
+h2 small{color:var(--dim);font-weight:400;margin-left:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:14px}
+.tile{background:var(--surface2);border:1px solid var(--line);border-radius:12px;
+padding:8px;cursor:pointer;transition:all .18s ease}
+.tile:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:rgba(255,255,255,.18)}
+.tile img{width:100%;border-radius:8px;display:block;aspect-ratio:419/600;object-fit:cover;
+background:#101016}
+.tile img.land{aspect-ratio:750/523}
+.tile .nm{font-size:11.5px;font-weight:500;margin-top:7px;white-space:nowrap;
+overflow:hidden;text-overflow:ellipsis}
+.tile .tp{font-size:10.5px;color:var(--dim)}
+.tile.spoiler .veil{aspect-ratio:419/600;border-radius:8px;display:flex;flex-direction:column;
+align-items:center;justify-content:center;gap:4px;color:var(--dim);font-size:11px;text-align:center;
+background:repeating-linear-gradient(45deg,#15151d,#15151d 8px,#1b1b25 8px,#1b1b25 16px)}
+.stat{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);
+border:1px solid var(--line);border-radius:9px;padding:5px 12px;margin-right:8px;font-size:12.5px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--good)}
+.dot.busy{background:var(--accent);animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.35}}
+label{color:var(--dim);font-size:12.5px}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.gal .card{width:150px}
+.gal{display:flex;flex-wrap:wrap;gap:12px}
+.card{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:8px}
+.card img{width:100%;border-radius:6px;cursor:pointer;margin-top:4px}
+.card img.chosen{outline:2px solid var(--accent)}
+.card .cid{font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#drawer{position:fixed;left:0;right:0;bottom:0;z-index:6;background:rgba(16,16,22,.92);
+backdrop-filter:blur(16px);border-top:1px solid var(--line);transition:height .25s ease;height:34px;overflow:hidden}
+#drawer.open{height:220px}
+#drawer .bar{display:flex;align-items:center;gap:10px;padding:7px 26px;cursor:pointer;
+font-size:12px;color:var(--dim)}
+#log{padding:0 26px 12px;height:176px;overflow-y:auto;
+font:11.5px ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;color:#c9c5bb}
+#editor{display:none;position:fixed;inset:0;z-index:9;background:rgba(8,8,12,.72);
+backdrop-filter:blur(8px);animation:fade .2s ease}
+#ed_sheet{background:var(--surface);border:1px solid var(--line);border-radius:18px;
+box-shadow:var(--shadow);max-width:900px;margin:3.5vh auto;padding:18px 20px;max-height:93vh;overflow:auto}
+#ed_stage{position:relative;margin:12px auto;overflow:hidden;border-radius:10px;
+border:1px solid var(--line)}
+#ed_face{display:block;user-select:none;pointer-events:none}
+#ed_win{position:absolute;overflow:hidden;cursor:grab;outline:2px dashed var(--accent);
+outline-offset:-2px;border-radius:2px}
+#ed_art{position:absolute;user-select:none}
+#ed_strip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+#ed_strip img{height:74px;border-radius:8px;cursor:pointer;border:2px solid transparent;
+transition:all .15s}
+#ed_strip img:hover{transform:translateY(-2px)}
+#ed_strip img.on{border-color:var(--accent)}
+.hint{color:var(--dim);font-size:12px}
+hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 </style></head><body>
-<header><h1>CardForge Studio</h1><small>illustrate &rarr; frame &rarr; apply — THE STILL HOUR</small>
-<span style="margin-left:auto"><label>campaign </label><select id=campaign onchange=refresh()></select>
-<span id=busy class=warn></span></span></header>
+<header><h1>CardForge Studio</h1><span class=sub>THE STILL HOUR · fan content</span>
+<span class=spacer></span>
+<span id=busy class=stat><span class=dot id=busydot></span><span id=busytext>idle</span></span>
+<label>campaign</label><select id=campaign onchange=refresh()></select>
+<button class="btn primary" onclick="post('auto',{dry_run:dry()})" title="generate &rarr; place &rarr; compose &rarr; TTS, hands-off">&#9889; Auto-build ALL &rarr; TTS</button>
+</header>
 <nav>
-<button id=tab-illustrate class=on onclick="tab('illustrate')">Illustrate</button>
+<button id=tab-cards class=on onclick="tab('cards')">Cards</button>
+<button id=tab-illustrate onclick="tab('illustrate')">Illustrate</button>
 <button id=tab-frame onclick="tab('frame')">Frame &mdash; Strange Eons</button>
 <button id=tab-apply onclick="tab('apply')">Apply to Mod</button>
 </nav><main>
 
-<section id=illustrate class=on><div class=panel>
-<div class=row>
-<button class=act style="font-size:15px;border-color:var(--gold);color:var(--gold)"
-onclick="post('auto',{dry_run:dry()})">&#9889; Auto-build ALL &rarr; TTS (hands-off)</button>
-<label title="Blur encounter cards so building the campaign doesn't spoil playing it">
-<input type=checkbox id=spoilshield checked onchange=refresh()> spoiler shield</label>
+<section id=cards class=on>
+<div class=panel><div class=row>
+<span class=hint>Every card in the campaign, on its real frame. Click a card to place its art —
+drag to position, scroll to size. Encounter cards stay hidden behind the
+<b>spoiler shield</b> so building the campaign doesn&rsquo;t spoil playing it.</span>
+<span class=spacer></span>
+<label><input type=checkbox id=spoilshield checked onchange=refresh()> spoiler shield</label>
+<button class=btn onclick="post('render_placeholders')">Compose all faces</button>
 </div>
+<div id=cardgroups></div>
+</div></section>
+
+<section id=illustrate><div class=panel>
 <div class=row>
-<button class=act onclick="post('backend_check')">Check backend</button>
-<button class=act onclick="post('seeds',{dry_run:dry()})">Step 0: Seeds</button>
-<button class=act onclick="post('generate',{starter:true,dry_run:dry()})">Starter batch</button>
-<button class=act onclick="post('generate',{dry_run:dry()})">Full overnight batch</button>
-<button class=act onclick="post('contact')">Contact sheets</button>
-<button class=act onclick="post('index')">Build index</button>
+<button class=btn onclick="post('backend_check')">Check backend</button>
+<button class=btn onclick="post('seeds',{dry_run:dry()})">Step 0 · Seeds</button>
+<button class=btn onclick="post('generate',{starter:true,dry_run:dry()})">Starter batch</button>
+<button class=btn onclick="post('generate',{dry_run:dry()})">Full batch</button>
+<button class=btn onclick="post('contact')">Contact sheets</button>
 <label><input type=checkbox id=dryrun checked> dry-run (no GPU)</label>
 </div>
 <div id=repline class=row></div>
-<h3>Gallery <small style="color:var(--dim)">(click a variant to choose it for the index)</small></h3>
+<h2>Generated art <small>click a variant to slot it into its card</small></h2>
 <div id=gallery class=gal></div>
 </div></section>
 
 <section id=frame><div class=panel>
-<p>Strange Eons 3 is the framer: this tab generates the automation bundle, launches SE, and
-tracks exported faces. Get the tools once:
-<a href="https://strangeeons.cgjennings.ca" target=_blank>Strange Eons 3</a> ·
-<a href="https://github.com/CGJennings/strange-eons" target=_blank>source (CGJennings/strange-eons)</a> ·
-Arkham plugin: Toolbox &rarr; Manage Plug-ins &rarr; Catalog (current external build via the
-Barnaby Files guide / Mythos Busters Discord, + the AH font pack) ·
-hi-res blanks: BGG thread.</p>
-<div class=cols><div>
-<h3>Owner config (once per plugin version)</h3>
-<div class=row><label>launch command</label><input id=se_cmd size=48></div>
-<div class=row><label>faces dir</label><input id=se_faces size=20>
-<label>export DPI</label><input id=se_dpi size=5></div>
-<label>class-map keys (frame type &rarr; plugin component)</label>
-<textarea id=se_classmap rows=9></textarea>
-<label>setting keys (our field &rarr; plugin setting name)</label>
-<textarea id=se_keys rows=6></textarea>
-<div class=row><button class=act onclick=seSave()>Save config</button></div>
-</div><div>
-<h3>Run</h3>
-<div class=row>
-<button class=act onclick="post('se_bundle')">1 · Write frame bundle</button>
-<button class=act onclick="post('se_launch')">2 · Launch Strange Eons</button>
-<button class=act onclick="post('render_placeholders')" title="No SE yet? Render glyph-grade placeholder faces (Arkham font statlines) straight into the faces dir">or: Render glyph placeholders</button>
+<p class=hint>Strange Eons produces the pixel-perfect final cards; this tab drives it.
+Tools: <a href="https://strangeeons.cgjennings.ca" target=_blank>Strange Eons 3</a> &middot;
+<a href="https://github.com/CGJennings/strange-eons" target=_blank>source</a> &middot;
+Arkham plugin &amp; AH fonts via the Barnaby Files guide / Mythos Busters Discord.</p>
+<div class=row style="align-items:flex-start">
+<div style="flex:1;min-width:320px">
+<h2>Owner config <small>once per plugin version</small></h2>
+<div class=row><label>launch command</label><input type=text id=se_cmd size=42></div>
+<div class=row><label>faces dir</label><input type=text id=se_faces size=16>
+<label>DPI</label><input type=number id=se_dpi style="width:70px"></div>
+<label>class-map keys</label><textarea id=se_classmap rows=8></textarea>
+<label>setting keys</label><textarea id=se_keys rows=5></textarea>
+<div class=row style="margin-top:8px"><button class=btn onclick=seSave()>Save config</button></div>
 </div>
-<p id=se_bundle_state class=warn></p>
-<h3>Coverage</h3><div id=se_cov></div>
+<div style="flex:1;min-width:280px">
+<h2>Run</h2>
+<div class=row>
+<button class=btn onclick="post('se_bundle')">1 &middot; Write frame bundle</button>
+<button class=btn onclick="post('se_launch')">2 &middot; Launch Strange Eons</button>
+</div>
+<p id=se_bundle_state class=hint></p>
+<h2>Coverage</h2><div id=se_cov></div>
 </div></div>
 </div></section>
 
 <section id=apply><div class=panel>
-<div class=row><button class=act style="font-size:16px;border-color:var(--gold);color:var(--gold)"
-onclick="post('export_tts')">★ Compose cards &amp; Export to TTS (one click)</button>
-<span style="color:var(--dim)">index → compose faces with your chosen art → local file:/// URLs → rebuild the mod</span></div>
-<hr style="border-color:var(--line)">
-<p>Or step it manually: push framed faces into the TTS build: writes <code>pipeline/art_urls.json</code> and rebuilds
-cards &rarr; mod &rarr; download package. <b>local</b> mode uses <code>file:///</code> URLs —
-real art in TTS on this machine, no hosting. <b>hosted</b> swaps in your CDN base URL for sharing.</p>
+<div class=row>
+<button class="btn primary" onclick="post('export_tts')">Compose cards &amp; Export to TTS</button>
+<span class=hint>compose faces with your placed art &rarr; local file:/// URLs &rarr; rebuild the mod</span>
+</div>
+<hr>
 <div class=row>
 <select id=applymode><option value=local>local (file:///)</option><option value=hosted>hosted</option></select>
-<input id=baseurl size=44 placeholder="hosted base URL, e.g. https://cdn.example/stillhour">
-<button class=act onclick=applyArt()>Apply &amp; rebuild mod</button>
+<input type=text id=baseurl size=40 placeholder="hosted base URL (for sharing)">
+<button class=btn onclick=applyArt()>Apply manually</button>
+<span id=applyinfo></span>
 </div>
-<div id=applyinfo></div>
 </div></section>
+</main>
 
-<div id=editor style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9">
-<div style="background:var(--panel);border:1px solid var(--gold);border-radius:10px;max-width:860px;
-margin:4vh auto;padding:14px">
-<div class=row><b id=ed_title style="color:var(--gold)"></b>
-<span style="color:var(--dim);font-size:12px">drag the art to pan &middot; wheel or slider to scale &middot; recomposited from the original at full quality</span>
-<span style="margin-left:auto"><label>scale </label>
-<input type=range id=ed_scale min=0.5 max=3 step=0.02 style="width:160px" oninput=edPreview()>
-<button class=act onclick=edSave()>Save &amp; recompose</button>
-<button class=act onclick="document.getElementById('editor').style.display='none'">Close</button></span></div>
-<div id=ed_stage style="position:relative;margin:auto;overflow:hidden;border:1px solid var(--line)">
-<img id=ed_face style="display:block;user-select:none;pointer-events:none">
-<div id=ed_win style="position:absolute;overflow:hidden;cursor:grab;outline:2px dashed var(--gold)">
-<img id=ed_art draggable=false style="position:absolute;user-select:none"></div></div>
+<div id=editor onclick="if(event.target===this)edClose()">
+<div id=ed_sheet>
+<div class=row><b id=ed_title style="font-size:15px"></b>
+<span class=hint>drag to position &middot; scroll or slider to size &middot; always recomposited from the original, full quality</span>
+<span class=spacer></span>
+<label>size</label><input type=range id=ed_scale min=0.5 max=3 step=0.02 style="width:150px" oninput=edPreview()>
+<button class="btn primary" onclick=edSave()>Save</button>
+<button class=btn onclick=edClose()>Done</button></div>
+<div id=ed_stage>
+<img id=ed_face><div id=ed_win><img id=ed_art draggable=false></div>
+</div>
+<div class=row><span class=hint>art for this card — pick one, or bring your own:</span>
+<button class=btn style="font-size:12px;padding:5px 12px" onclick="document.getElementById('ed_file').click()">Upload image&hellip;</button>
+<input type=file id=ed_file accept="image/*" style="display:none" onchange=edUpload(this)>
+</div>
+<div id=ed_strip></div>
 </div></div>
-<div id=log></div></main><script>
-let seq=0, cur='illustrate';
-function tab(t){cur=t;for(const s of ['illustrate','frame','apply']){
-document.getElementById(s).classList.toggle('on',s===t);
-document.getElementById('tab-'+s).classList.toggle('on',s===t);}}
+
+<div id=drawer><div class=bar onclick="this.parentNode.classList.toggle('open')">
+<span>&#9650;</span> Activity</div><div id=log></div></div>
+
+<script>
+let seq=0, cur='cards', ed=null, ST=null;
+window.revealed=window.revealed||new Set();
+function tab(t){cur=t;for(const x of ['cards','illustrate','frame','apply']){
+document.getElementById(x).classList.toggle('on',x===t);
+document.getElementById('tab-'+x).classList.toggle('on',x===t);}}
 function dry(){return document.getElementById('dryrun').checked}
 function camp(){return document.getElementById('campaign').value||'still_hour'}
 async function post(action,params){params=params||{};params.campaign=camp();
 const r=await fetch('/api/'+action,{method:'POST',body:JSON.stringify(params)});
-const j=await r.json();if(j.message)addlog(j.message);refresh();}
+const j=await r.json();if(j.message)addlog(j.message);refresh();return j;}
 function addlog(l){const el=document.getElementById('log');
 el.textContent+=l+'\n';el.scrollTop=el.scrollHeight;}
-async function poll(){const r=await fetch('/api/log?since='+seq);
-for(const e of await r.json()){addlog(e.line);seq=e.seq+1;}setTimeout(poll,1200);}
+async function poll(){try{const r=await fetch('/api/log?since='+seq);
+for(const e of await r.json()){addlog(e.line);seq=e.seq+1;}}catch(e){}
+setTimeout(poll,1200);}
+
+function cardTile(c){
+const land=c.type==='Investigator';
+if(document.getElementById('spoilshield').checked&&c.spoiler&&!window.revealed.has(c.id))
+ return `<div class="tile spoiler" onclick="window.revealed.add('${c.id}');refresh()">`+
+ `<div class=veil>&#128274;<div>spoiler hidden</div><small>auto-built for you<br>tap to reveal</small></div>`+
+ `<div class=nm>encounter card</div><div class=tp>${c.group}</div></div>`;
+const img=c.face?`<img loading=lazy class="${land?'land':''}" src="/art?p=art/faces/${c.id}.png&ts=${ST}">`
+ :`<div class=veil style="aspect-ratio:${land?'750/523':'419/600'};background:#101016">no face yet</div>`;
+return `<div class=tile onclick='editArt(${JSON.stringify(c).replaceAll("'","&#39;")})'>${img}`+
+`<div class=nm title="${c.name}">${c.name}</div><div class=tp>${c.type} &middot; ${c.class}</div></div>`;}
+
+function renderCards(s){
+const groups={};
+for(const c of s.cards)(groups[c.group]=groups[c.group]||[]).push(c);
+const order=['Investigators','Signatures & Weaknesses','Recollections',
+'Encounter — The Appointed','Encounter — The Named'];
+document.getElementById('cardgroups').innerHTML=order.filter(g=>groups[g]).map(g=>
+`<h2>${g}<small>${groups[g].length} card${groups[g].length>1?'s':''}</small></h2>`+
+`<div class=grid>${groups[g].map(cardTile).join('')}</div>`).join('');}
+
 async function refresh(){const r=await fetch('/api/status?campaign='+camp());const s=await r.json();
+ST=s.faces_ver;
 const sel=document.getElementById('campaign');
 if(sel.options.length!==s.campaigns.length){sel.innerHTML='';
 for(const c of s.campaigns){const o=document.createElement('option');o.value=o.text=c;
 if(c===s.campaign)o.selected=true;sel.add(o);}}
-document.getElementById('busy').textContent=s.busy?'● working…':'';
+document.getElementById('busydot').className='dot'+(s.busy?' busy':'');
+document.getElementById('busytext').textContent=s.busy?'working&hellip;'.replace('&hellip;','…'):'idle';
+renderCards(s);
 const rep=s.report.generated!==undefined?
 `<span class=stat>generated <b>${s.report.generated}</b></span>`+
-`<span class=stat>failed <b class=${s.report.failed?'bad':'ok'}>${s.report.failed}</b></span>`+
-(s.report.dry_run?'<span class="stat warn">dry-run</span>':'')+
-(s.report.warnings||[]).map(w=>`<div class=warn>&#9888; ${w}</div>`).join(''):'<span class=stat>no report yet</span>';
+`<span class=stat>failed <b style="color:${s.report.failed?'var(--bad)':'var(--good)'}">${s.report.failed}</b></span>`+
+(s.report.dry_run?'<span class=stat>dry-run</span>':'')+
+(s.report.warnings||[]).map(w=>`<div class=hint>&#9888; ${w}</div>`).join(''):
+'<span class=stat>no batch run yet</span>';
 document.getElementById('repline').innerHTML=rep;
 const shield=document.getElementById('spoilshield').checked;
-window.revealed=window.revealed||new Set();
 document.getElementById('gallery').innerHTML=s.gallery.map(g=>{
-const hide=shield&&g.spoiler&&!window.revealed.has(g.id);
-if(hide)return `<div class=card style="opacity:.85"><div class=cid>&#9888; encounter card</div>`+
-`<div style="height:120px;display:flex;align-items:center;justify-content:center;`+
-`background:repeating-linear-gradient(45deg,#1a1822,#1a1822 8px,#221e2e 8px,#221e2e 16px);`+
-`border-radius:6px;color:var(--dim);font-size:11px;text-align:center;cursor:pointer" `+
-`onclick="window.revealed.add('${g.id}');refresh()">`+
-`spoiler hidden<br>(auto-built for you)<br><small>click to reveal</small></div></div>`;
-return `<div class=card><div class=cid title="${g.id}">${g.id}</div>`+
-(g.face?`<img loading=lazy style="outline:2px solid #7dc87d" title="composed card" `+
-`src="/art?p=art/faces/${g.id}.png&ts=${Date.now()}">`+
-(g.chosen&&g.artbox?`<button class=act style="width:100%;font-size:11px;padding:3px" `+
-`onclick='editArt(${JSON.stringify(g).replaceAll("'","&#39;")})'>adjust art \u2921</button>`:''):'')+
-`<div style="font-size:10px;color:var(--dim)">variants — click to slot into the card:</div>`+
+if(shield&&g.spoiler&&!window.revealed.has(g.id))
+ return `<div class=card style="width:150px"><div class=cid>&#128274; encounter card</div>`+
+ `<div class=veil style="height:110px;border-radius:6px;display:flex;align-items:center;`+
+ `justify-content:center;font-size:11px;color:var(--dim);cursor:pointer;`+
+ `background:repeating-linear-gradient(45deg,#15151d,#15151d 8px,#1b1b25 8px,#1b1b25 16px)" `+
+ `onclick="window.revealed.add('${g.id}');refresh()">tap to reveal</div></div>`;
+return `<div class=card style="width:150px"><div class=cid title="${g.id}">${g.id}</div>`+
+(g.face?`<img style="outline:2px solid var(--good)" title="composed card" src="/art?p=art/faces/${g.id}.png&ts=${ST}">`:'')+
 g.variants.map(v=>`<img loading=lazy class="${v===g.chosen?'chosen':''}" `+
 `src="/art?p=out/${s.campaign}/${g.id}/${v}" onclick="post('choose',{card:'${g.id}',file:'${v}'})">`).join('')+
-`</div>`;}).join('')||'<span style="color:var(--dim)">nothing generated yet</span>';
+`</div>`;}).join('')||'<span class=hint>nothing generated yet — run a batch, or upload art per card from the Cards tab</span>';
 const se=s.se;document.getElementById('se_cmd').value=se.config.launch_command;
 document.getElementById('se_faces').value=se.config.faces_dir;
 document.getElementById('se_dpi').value=se.config.export_dpi;
@@ -601,38 +765,54 @@ if(document.activeElement.id!=='se_keys')
  document.getElementById('se_keys').value=JSON.stringify(se.config.keys,null,2);
 document.getElementById('se_bundle_state').textContent=
  se.bundle_exists?'bundle ready: se/frame_cards.js':'no bundle yet — write it first';
-const cov=se.coverage;document.getElementById('se_cov').innerHTML=
-`<span class=stat>framed <b class=ok>${cov.framed.length}</b>/${cov.total}</span>`+
-`<span class=stat>faces dir <code>${cov.faces_dir}</code></span>`+
-(cov.missing.length?`<details><summary>${cov.missing.length} missing</summary>`+
-`<small>${cov.missing.join(', ')}</small></details>`:'<div class=ok>all faces framed</div>');
+const cov=se.coverage;
+document.getElementById('se_cov').innerHTML=
+`<span class=stat>framed <b style="color:var(--good)">${cov.framed.length}</b>/${cov.total}</span>`+
+`<span class=stat><code>${cov.faces_dir}</code></span>`;
 document.getElementById('applyinfo').innerHTML=
-`<span class=stat>framed faces ready: <b>${cov.framed.filter(f=>!f.endsWith('-back')).length}</b></span>`;
-}
-function seSave(){post('se_save_config',{launch_command:document.getElementById('se_cmd').value,
-faces_dir:document.getElementById('se_faces').value,export_dpi:document.getElementById('se_dpi').value,
-classmap:document.getElementById('se_classmap').value,keys:document.getElementById('se_keys').value});}
-function applyArt(){post('apply',{mode:document.getElementById('applymode').value,
-base_url:document.getElementById('baseurl').value});}
-let ed=null;
-function editArt(g){ed={g:g,scale:g.placement.scale,ox:g.placement.ox,oy:g.placement.oy,
-natW:0,natH:0,disp:1};
-const[cw,ch,x0,y0,x1,y1]=g.artbox;
-const maxW=820, disp=Math.min(1,maxW/cw); ed.disp=disp;
+`<span class=stat>faces ready: <b>${cov.framed.filter(f=>!f.endsWith('-back')).length}</b></span>`;}
+
+async function editArt(c){
+if(!c.face){await post('compose_one',{card:c.id});c.face=true;}
+ed={g:c,scale:(c.placement||{scale:1}).scale,ox:(c.placement||{ox:0}).ox,
+oy:(c.placement||{oy:0}).oy,natW:0,natH:0,disp:1};
+const[cw,ch,x0,y0,x1,y1]=c.artbox;
+const disp=Math.min(1,820/cw);ed.disp=disp;
 const stage=document.getElementById('ed_stage');
-stage.style.width=(cw*disp)+'px'; stage.style.height=(ch*disp)+'px';
+stage.style.width=(cw*disp)+'px';stage.style.height=(ch*disp)+'px';
 const face=document.getElementById('ed_face');
-face.src='/art?p=art/faces/'+g.id+'.png&ts='+Date.now();
+face.src='/art?p=art/faces/'+c.id+'.png&ts='+Date.now();
 face.style.width=(cw*disp)+'px';
 const win=document.getElementById('ed_win');
-win.style.left=(x0*disp)+'px'; win.style.top=(y0*disp)+'px';
-win.style.width=((x1-x0)*disp)+'px'; win.style.height=((y1-y0)*disp)+'px';
-const art=document.getElementById('ed_art');
-art.onload=()=>{ed.natW=art.naturalWidth;ed.natH=art.naturalHeight;edPreview();};
-art.src='/art?p=out/'+camp()+'/'+g.id+'/'+g.chosen;
-document.getElementById('ed_title').textContent=g.id;
+win.style.left=(x0*disp)+'px';win.style.top=(y0*disp)+'px';
+win.style.width=((x1-x0)*disp)+'px';win.style.height=((y1-y0)*disp)+'px';
+document.getElementById('ed_title').textContent=c.name;
 document.getElementById('ed_scale').value=ed.scale;
+edStrip();edLoadArt();
 document.getElementById('editor').style.display='block';}
+function edLoadArt(){const art=document.getElementById('ed_art');
+if(ed.g.chosen){art.style.display='block';
+art.onload=()=>{ed.natW=art.naturalWidth;ed.natH=art.naturalHeight;edPreview();};
+art.src='/art?p=out/'+camp()+'/'+ed.g.id+'/'+ed.g.chosen+'&ts='+Date.now();}
+else{art.style.display='none';}}
+function edStrip(){const el=document.getElementById('ed_strip');
+el.innerHTML=(ed.g.variants||[]).map(v=>
+`<img class="${v===ed.g.chosen?'on':''}" src="/art?p=out/${camp()}/${ed.g.id}/${v}" `+
+`onclick="edUse('${v}')">`).join('')||
+'<span class=hint>no art yet for this card — upload an image above, or run a batch</span>';}
+async function edUse(v){await post('choose',{card:ed.g.id,file:v});
+ed.g.chosen=v;ed.scale=1;ed.ox=0;ed.oy=0;
+document.getElementById('ed_scale').value=1;
+edStrip();edLoadArt();edFaceRefresh();}
+function edUpload(input){const f=input.files[0];if(!f)return;
+const rd=new FileReader();
+rd.onload=async()=>{const j=await post('upload_art',{card:ed.g.id,data_b64:rd.result});
+if(j.file){ed.g.variants=(ed.g.variants||[]).concat([j.file]);ed.g.chosen=j.file;
+ed.scale=1;ed.ox=0;ed.oy=0;document.getElementById('ed_scale').value=1;
+edStrip();edLoadArt();edFaceRefresh();}};
+rd.readAsDataURL(f);input.value='';}
+function edFaceRefresh(){document.getElementById('ed_face').src=
+'/art?p=art/faces/'+ed.g.id+'.png&ts='+Date.now();}
 function edPreview(){if(!ed||!ed.natW)return;
 ed.scale=parseFloat(document.getElementById('ed_scale').value);
 const[cw,ch,x0,y0,x1,y1]=ed.g.artbox;const bw=x1-x0,bh=y1-y0;
@@ -642,17 +822,22 @@ art.style.width=(ed.natW*cover)+'px';
 art.style.left=(-((ed.natW*cover)-(bw*ed.disp))/2+ed.ox*ed.disp)+'px';
 art.style.top =(-((ed.natH*cover)-(bh*ed.disp))/2+ed.oy*ed.disp)+'px';}
 (function(){const win=document.getElementById('ed_win');let drag=null;
-win.addEventListener('mousedown',e=>{drag={x:e.clientX,y:e.clientY,ox:ed.ox,oy:ed.oy};
-win.style.cursor='grabbing';e.preventDefault();});
+win.addEventListener('mousedown',e=>{if(!ed)return;
+drag={x:e.clientX,y:e.clientY,ox:ed.ox,oy:ed.oy};win.style.cursor='grabbing';e.preventDefault();});
 window.addEventListener('mousemove',e=>{if(!drag||!ed)return;
-ed.ox=drag.ox+(e.clientX-drag.x)/ed.disp; ed.oy=drag.oy+(e.clientY-drag.y)/ed.disp; edPreview();});
+ed.ox=drag.ox+(e.clientX-drag.x)/ed.disp;ed.oy=drag.oy+(e.clientY-drag.y)/ed.disp;edPreview();});
 window.addEventListener('mouseup',()=>{drag=null;win.style.cursor='grab';});
 win.addEventListener('wheel',e=>{e.preventDefault();const s=document.getElementById('ed_scale');
 s.value=Math.max(0.5,Math.min(3,parseFloat(s.value)-e.deltaY*0.0012));edPreview();});})();
 async function edSave(){if(!ed)return;
 await post('place',{card:ed.g.id,scale:ed.scale,ox:ed.ox,oy:ed.oy});
-document.getElementById('ed_face').src='/art?p=art/faces/'+ed.g.id+'.png&ts='+Date.now();
-addlog(ed.g.id+' recomposed with new placement');}
+edFaceRefresh();addlog(ed.g.id+' recomposed');}
+function edClose(){document.getElementById('editor').style.display='none';ed=null;refresh();}
+function seSave(){post('se_save_config',{launch_command:document.getElementById('se_cmd').value,
+faces_dir:document.getElementById('se_faces').value,export_dpi:document.getElementById('se_dpi').value,
+classmap:document.getElementById('se_classmap').value,keys:document.getElementById('se_keys').value});}
+function applyArt(){post('apply',{mode:document.getElementById('applymode').value,
+base_url:document.getElementById('baseurl').value});}
 refresh();poll();setInterval(refresh,4000);
 </script></body></html>"""
 
