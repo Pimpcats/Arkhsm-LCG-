@@ -20,6 +20,8 @@ Once real frames land here, the placeholder renderer can composite onto them
 (frame + illustration + print-layer text = near-final cards without SE) — that
 overlay calibration is a one-pass job once the images exist to measure.
 
-These are FFG's designs, community-recreated for personal fan use: fine for
-your table and the usual fan-content norms, not for sale or wide redistribution
-— which is why this folder is gitignored (README excepted).
+Scope (per the owner): strictly fan content — free, online only, for the
+community and the owner's own group. No printing, no sale. That matches the
+long-standing SCED/fan-content norms these community assets exist under; the
+folder stays gitignored (README excepted) so the frames travel by download, not
+by this repo.

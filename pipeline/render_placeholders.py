@@ -16,6 +16,7 @@ target so the mod reads like the game while art is pending.
 Run: python3 pipeline/render_placeholders.py   (from repo root)
 Out: art/faces/{id}.png  (flows through Frame coverage -> Apply)
 """
+import argparse
 import json
 import os
 import sys
@@ -29,6 +30,62 @@ sys.path.insert(0, ROOT)
 from cardforge.glyphs import FONT_PATH, MARKUP, glyphify  # noqa: E402
 
 FACES_DIR = os.path.join(ROOT, "art", "faces")
+
+
+def load_art_index():
+    """id -> chosen illustration path (CardForge's out/<campaign>/index.json)."""
+    path = os.path.join(ROOT, "out", "still_hour", "index.json")
+    if os.path.exists(path):
+        return json.load(open(path))
+    return {}
+
+
+PLACEMENTS_PATH = os.path.join(ROOT, "out", "still_hour", "placements.json")
+
+
+def load_placements():
+    """id -> {scale, ox, oy}: owner-dragged art placement, relative to the
+    cover baseline (scale 1.0 = exactly fills the window; ox/oy pan the art in
+    window pixels). Stored as data so every recomposite starts from the
+    ORIGINAL image — repeated adjustments never lose quality."""
+    if os.path.exists(PLACEMENTS_PATH):
+        return json.load(open(PLACEMENTS_PATH))
+    return {}
+
+
+# Art-window geometry per layout, shared with the Studio's placement editor.
+def art_box(card_type):
+    """(card_w, card_h, x0, y0, x1, y1) — the drag/scale target."""
+    if card_type == "Investigator":
+        return (750, 523, 24, 84, 264, 435)
+    if card_type == "Enemy":
+        return (419, 600, 12, 420, 407, 570)
+    if card_type == "Treachery":
+        return (419, 600, 12, 12, 407, 250)
+    return (419, 600, 54, 52, 407, 240)          # Asset / Event / Skill
+
+
+def paste_cover(img, art_path, box, placement=None):
+    """Paste an illustration into an art window. Baseline = cover-crop (fills
+    the window); `placement` scales/pans on top of that. Always resamples from
+    the original file with Lanczos, so placement edits are lossless-in, one
+    resample out."""
+    try:
+        art = Image.open(os.path.join(ROOT, art_path)).convert("RGB")
+    except Exception:
+        return False
+    p = placement or {}
+    bw, bh = box[2] - box[0], box[3] - box[1]
+    scale = max(bw / art.width, bh / art.height) * float(p.get("scale", 1.0))
+    art = art.resize((max(1, round(art.width * scale)), max(1, round(art.height * scale))),
+                     Image.LANCZOS)
+    # center, then pan by the stored offsets (window pixels)
+    px = (art.width - bw) / 2 - float(p.get("ox", 0))
+    py = (art.height - bh) / 2 - float(p.get("oy", 0))
+    canvas = Image.new("RGB", (bw, bh), (34, 31, 42))
+    canvas.paste(art, (-round(px), -round(py)))
+    img.paste(canvas, (box[0], box[1]))
+    return True
 
 CLASS_COLORS = {
     "Guardian": (43, 80, 140), "Seeker": (196, 132, 47), "Rogue": (55, 122, 83),
@@ -141,7 +198,7 @@ def body_box(draw, x0, y0, x1, y1):
 
 # ------------------------------------------------------------- layouts --
 
-def render_investigator_front(c, pt, dest):
+def render_investigator_front(c, pt, dest, art_path=None, placement=None):
     w, h = 750, 523
     img = Image.new("RGB", (w, h), BG)
     d = ImageDraw.Draw(img)
@@ -149,26 +206,34 @@ def render_investigator_front(c, pt, dest):
     # name banner + subtitle
     banner(d, 0, w, c["name"], color, height=46, size=28)
     center_text(d, c["subtitle"], w / 2, 50, _font(17, italic=True), GOLD)
-    # stat plates row (wil/int/com/agi with glyphs beneath)
-    gfont = _font(20, glyph=True)
-    x = 96
+    # portrait window left (Joe Diamond layout)
+    pbox = (24, 84, 264, h - 88)
+    d.rectangle(list(pbox), fill=(34, 31, 42))
+    if not (art_path and paste_cover(img, art_path, pbox, placement)):
+        center_text(d, "portrait", (pbox[0] + pbox[2]) / 2, 260, _font(15), DIM)
+    d.rectangle(list(pbox), outline=(70, 64, 82), width=2)
+    # stat plates row over the body column
+    gfont = _font(18, glyph=True)
+    x = 292
     for value, token in ((c["wil"], "[wil]"), (c["int"], "[int]"),
                          (c["com"], "[com]"), (c["agi"], "[agi]")):
-        stat_plate(d, x, 84, value, color)
-        center_text(d, MARKUP[token], x + 22, 140, gfont, INK)
-        x += 150
+        stat_plate(d, x, 80, value, color, size=40)
+        center_text(d, MARKUP[token], x + 20, 132, gfont, INK)
+        x += 112
     # body box: traits, ability, flavor
-    body_box(d, 24, 176, w - 24, h - 88)
-    center_text(d, c.get("traits", ""), w / 2, 184, _font(17, bold=True, italic=True), PANEL_INK)
-    y = draw_wrapped(d, pt.get("text", ""), 40, 214, 15, w - 84, PANEL_INK)
+    body_box(d, 280, 162, w - 20, h - 88)
+    center_text(d, c.get("traits", ""), (280 + w - 20) / 2, 170,
+                _font(16, bold=True, italic=True), PANEL_INK)
+    y = draw_wrapped(d, pt.get("text", ""), 294, 198, 13, w - 20 - 294 - 14, PANEL_INK)
     if pt.get("flavor"):
-        draw_wrapped(d, pt["flavor"], 40, min(y + 8, h - 130), 14, w - 84,
-                     (90, 74, 58), italic=True)
-    # health / sanity
-    d.ellipse([w / 2 - 90, h - 76, w / 2 - 42, h - 30], fill=RED, outline=(15, 15, 15))
-    center_text(d, str(c["health"]), w / 2 - 66, h - 68, _font(24, bold=True), INK)
-    d.ellipse([w / 2 + 42, h - 76, w / 2 + 90, h - 30], fill=BLUE, outline=(15, 15, 15))
-    center_text(d, str(c["sanity"]), w / 2 + 66, h - 68, _font(24, bold=True), INK)
+        draw_wrapped(d, pt["flavor"], 294, min(y + 6, h - 130), 12,
+                     w - 20 - 294 - 14, (90, 74, 58), italic=True)
+    # health / sanity (under the body column)
+    cx = (280 + w - 20) / 2
+    d.ellipse([cx - 76, h - 80, cx - 32, h - 36], fill=RED, outline=(15, 15, 15))
+    center_text(d, str(c["health"]), cx - 54, h - 74, _font(22, bold=True), INK)
+    d.ellipse([cx + 32, h - 80, cx + 76, h - 36], fill=BLUE, outline=(15, 15, 15))
+    center_text(d, str(c["sanity"]), cx + 54, h - 74, _font(22, bold=True), INK)
     footer(d, w, h, c["id"])
     img.save(dest)
 
@@ -188,7 +253,7 @@ def render_investigator_back(c, pt, dest):
     img.save(dest)
 
 
-def render_enemy(c, pt, dest):
+def render_enemy(c, pt, dest, art_path=None, placement=None):
     w, h = 419, 600
     img = Image.new("RGB", (w, h), BG)
     d = ImageDraw.Draw(img)
@@ -202,31 +267,39 @@ def render_enemy(c, pt, dest):
                (70, 66, 78), size=48)
     stat_plate(d, w / 2 + 76, y0, pt.get("evade", "-"), (46, 84, 60))
     # traits + text
-    body_box(d, 16, 144, w - 16, h - 150)
+    body_box(d, 16, 144, w - 16, 352)
     traits = c.get("traits", "") + ("  Elite." if c.get("elite") and
                                     "Elite" not in c.get("traits", "") else "")
-    center_text(d, traits, w / 2, 152, _font(15, bold=True, italic=True), PANEL_INK)
-    y = draw_wrapped(d, pt.get("text", ""), 30, 180, 13, w - 62, PANEL_INK)
+    center_text(d, traits, w / 2, 152, _font(14, bold=True, italic=True), PANEL_INK)
+    y = draw_wrapped(d, pt.get("text", ""), 30, 178, 12, w - 62, PANEL_INK)
     if pt.get("flavor"):
-        y = draw_wrapped(d, pt["flavor"], 30, y + 6, 12, w - 62, (90, 74, 58), italic=True)
+        y = draw_wrapped(d, pt["flavor"], 30, y + 4, 11, w - 62, (90, 74, 58), italic=True)
     if c.get("victory"):
-        center_text(d, "Victory {}.".format(c["victory"]), w / 2, min(y + 8, h - 190),
-                    _font(16, bold=True), PANEL_INK)
+        center_text(d, "Victory {}.".format(c["victory"]), w / 2, min(y + 4, 326),
+                    _font(15, bold=True), PANEL_INK)
     # ENEMY banner + damage/horror pips
-    banner(d, h - 144, w, "ENEMY", (30, 28, 36), height=30, size=16)
+    banner(d, 358, w, "ENEMY", (30, 28, 36), height=28, size=15)
     px = w / 2 - ((pt.get("damage", 0) + pt.get("horror", 0)) * 24 + 12) / 2
-    px = pips(d, px, h - 104, pt.get("damage", 0), RED)
-    pips(d, px + 12, h - 104, pt.get("horror", 0), BLUE)
+    px = pips(d, px, 392, pt.get("damage", 0), RED)
+    pips(d, px + 12, 392, pt.get("horror", 0), BLUE)
+    # art window at the bottom (official enemy layout)
+    abox = (12, 420, w - 12, h - 30)
+    d.rectangle(list(abox), fill=(34, 31, 42))
+    if not (art_path and paste_cover(img, art_path, abox, placement)):
+        center_text(d, "art", w / 2, 500, _font(14), DIM)
+    d.rectangle(list(abox), outline=(70, 64, 82), width=2)
     footer(d, w, h, c["id"])
     img.save(dest)
 
 
-def render_treachery(c, pt, dest):
+def render_treachery(c, pt, dest, art_path=None, placement=None):
     w, h = 419, 600
     img = Image.new("RGB", (w, h), BG)
     d = ImageDraw.Draw(img)
     # art area with the encounter-set keyhole placeholder
     d.rectangle([12, 12, w - 12, 250], fill=(34, 31, 42))
+    if art_path:
+        paste_cover(img, art_path, (12, 12, w - 12, 250), placement)
     d.ellipse([w / 2 - 26, 196, w / 2 + 26, 248], outline=GOLD, width=2)
     center_text(d, "?", w / 2, 206, _font(26, bold=True), GOLD)
     y = banner(d, 258, w, c["type"].upper(), (30, 28, 36), height=30, size=16)
@@ -243,7 +316,7 @@ def render_treachery(c, pt, dest):
     img.save(dest)
 
 
-def render_player_card(c, pt, dest):
+def render_player_card(c, pt, dest, art_path=None, placement=None):
     w, h = 419, 600
     img = Image.new("RGB", (w, h), BG)
     d = ImageDraw.Draw(img)
@@ -263,9 +336,11 @@ def render_player_card(c, pt, dest):
             d.rectangle([8, iy, 44, iy + 36], fill=color)
             center_text(d, MARKUP[token], 26, iy + 4, gfont, INK)
             iy += 42
-    # art placeholder area
+    # art window
     d.rectangle([54, 52, w - 12, 240], fill=(34, 31, 42))
-    center_text(d, c["type"], (54 + w - 12) / 2, 136, _font(16), DIM)
+    if not (art_path and paste_cover(img, art_path, (54, 52, w - 12, 240), placement)):
+        center_text(d, c["type"], (54 + w - 12) / 2, 136, _font(16), DIM)
+    d.rectangle([54, 52, w - 12, 240], outline=(70, 64, 82), width=2)
     body_box(d, 16, 250, w - 16, h - 60)
     center_text(d, c.get("traits", ""), w / 2, 258, _font(15, bold=True, italic=True), PANEL_INK)
     ty = draw_wrapped(d, pt.get("text", ""), 30, 286, 13, w - 62, PANEL_INK)
@@ -281,31 +356,43 @@ def render_player_card(c, pt, dest):
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--only", nargs="*", help="render only these card ids")
+    args = ap.parse_args()
     cards = json.load(open(os.path.join(HERE, "stillhour_cards_spec.json")))
     enc = os.path.join(HERE, "stillhour_encounter_spec.json")
     if os.path.exists(enc):
         cards += json.load(open(enc))
+    if args.only:
+        cards = [c for c in cards if c["id"] in set(args.only)]
     print_text = {k: v for k, v in
                   json.load(open(os.path.join(HERE, "stillhour_print_text.json"))).items()
                   if not k.startswith("_")}
+    art_index = load_art_index()
+    placements = load_placements()
     os.makedirs(FACES_DIR, exist_ok=True)
     missing_text = []
+    composed = 0
     for c in cards:
         pt = print_text.get(c["id"], {})
         if not pt.get("text"):
             missing_text.append(c["id"])
+        art = art_index.get(c["id"])
+        place = placements.get(c["id"])
+        composed += 1 if art else 0
         dest = os.path.join(FACES_DIR, c["id"] + ".png")
         if c["type"] == "Investigator":
-            render_investigator_front(c, pt, dest)
+            render_investigator_front(c, pt, dest, art_path=art, placement=place)
             render_investigator_back(c, pt, os.path.join(FACES_DIR, c["id"] + "-back.png"))
         elif c["type"] == "Enemy":
-            render_enemy(c, pt, dest)
+            render_enemy(c, pt, dest, art_path=art, placement=place)
         elif c["type"] == "Treachery":
-            render_treachery(c, pt, dest)
+            render_treachery(c, pt, dest, art_path=art, placement=place)
         else:
-            render_player_card(c, pt, dest)
+            render_player_card(c, pt, dest, art_path=art, placement=place)
     n = len([f for f in os.listdir(FACES_DIR) if f.endswith(".png")])
-    print("rendered {} face(s) -> {}".format(n, os.path.relpath(FACES_DIR, ROOT)))
+    print("rendered {} face(s) ({} with chosen art composited) -> {}".format(
+        n, composed, os.path.relpath(FACES_DIR, ROOT)))
     if missing_text:
         print("cards with NO rules text in the print layer: " + ", ".join(missing_text))
 

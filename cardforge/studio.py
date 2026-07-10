@@ -111,11 +111,38 @@ def act_backend_check(p):
 
 
 def act_choose(p):
+    """Pick a variant AND immediately re-compose that card's face with it."""
     camp = runner.load_campaign(p.get("campaign", "still_hour"))
-    card_dir = os.path.join(runner.out_dir_for(camp), p["card"])
-    with open(os.path.join(card_dir, "chosen.txt"), "w") as f:
+    out_dir = runner.out_dir_for(camp)
+    card = p["card"]
+    with open(os.path.join(out_dir, card, "chosen.txt"), "w") as f:
         f.write(p["file"])
-    return {"ok": True}
+    # update this card's index entry in place
+    index_path = os.path.join(out_dir, "index.json")
+    index = json.load(open(index_path)) if os.path.exists(index_path) else {}
+    index[card] = os.path.relpath(os.path.join(out_dir, card, p["file"]), ROOT)
+    with open(index_path, "w") as f:
+        json.dump(index, f, indent=2)
+    # re-compose just this card (fast, synchronous)
+    subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py"),
+                    "--only", card], check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+    return {"ok": True, "composed": True}
+
+
+def act_place(p):
+    """Save an art placement (drag/zoom) and recompose that card from the
+    original image — placement is data, so quality never degrades."""
+    card = p["card"]
+    placements_path = os.path.join(ROOT, "out", "still_hour", "placements.json")
+    placements = json.load(open(placements_path)) if os.path.exists(placements_path) else {}
+    placements[card] = {"scale": max(0.2, min(6.0, float(p.get("scale", 1.0)))),
+                        "ox": float(p.get("ox", 0)), "oy": float(p.get("oy", 0))}
+    os.makedirs(os.path.dirname(placements_path), exist_ok=True)
+    with open(placements_path, "w") as f:
+        json.dump(placements, f, indent=2)
+    subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py"),
+                    "--only", card], check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+    return {"ok": True, "composed": True}
 
 
 def act_se_save_config(p):
@@ -162,6 +189,38 @@ def act_render_placeholders(p):
                        check=True, cwd=ROOT)
         log("glyph placeholder faces rendered into art/faces/")
     return run_job("render-placeholders", render)
+
+
+def act_export_tts(p):
+    """The smooth path: index -> compose all faces with chosen art -> apply
+    (local file:/// URLs) -> rebuild the mod. One click to a loadable TTS save."""
+    campaign = p.get("campaign", "still_hour")
+    def chain():
+        runner.run_index(campaign)
+        subprocess.run([sys.executable,
+                        os.path.join(ROOT, "pipeline", "render_placeholders.py")],
+                       check=True, cwd=ROOT)
+        log("faces composed with chosen art")
+        cov = se_bridge.coverage(campaign)
+        faces_dir = os.path.join(ROOT, cov["faces_dir"])
+        urls = {}
+        for face_id in cov["framed"]:
+            if face_id.endswith("-back"):
+                continue
+            urls[face_id] = {"face": "file:///" + os.path.join(faces_dir, face_id + ".png")
+                             .replace(os.sep, "/").lstrip("/")}
+            back = os.path.join(faces_dir, face_id + "-back.png")
+            if os.path.exists(back):
+                urls[face_id]["back"] = "file:///" + back.replace(os.sep, "/").lstrip("/")
+        with open(os.path.join(ROOT, "pipeline", "art_urls.json"), "w") as f:
+            json.dump(urls, f, indent=2)
+        log("art_urls.json: {} card(s), local file:/// mode".format(len(urls)))
+        for script in ("build_cards.py", "bundle_mod.py", "package_download.py"):
+            subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", script)],
+                           check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+            log("rebuilt: pipeline/" + script)
+        log("DONE — load dist/the_still_hour_mod.json in Tabletop Simulator")
+    return run_job("export-to-tts", chain)
 
 
 def act_apply(p):
@@ -218,7 +277,23 @@ def status(campaign="still_hour"):
             chosen_path = os.path.join(cdir, "chosen.txt")
             chosen = open(chosen_path).read().strip() if os.path.exists(chosen_path) \
                 else (pngs[0] if pngs else None)
-            gallery.append({"id": cid, "variants": pngs, "chosen": chosen})
+            face = os.path.exists(os.path.join(ROOT, "art", "faces", cid + ".png"))
+            gallery.append({"id": cid, "variants": pngs, "chosen": chosen, "face": face})
+    # art-window geometry + placements for the drag editor
+    sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+    import render_placeholders as rp
+    specs = {}
+    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json"):
+        p = os.path.join(ROOT, "pipeline", spec_file)
+        if os.path.exists(p):
+            for c in json.load(open(p)):
+                specs[c["id"]] = c["type"]
+    boxes = {cid: rp.art_box(t) for cid, t in specs.items()}
+    placements = rp.load_placements()
+    for g in gallery:
+        if g["id"] in boxes:
+            g["artbox"] = boxes[g["id"]]
+            g["placement"] = placements.get(g["id"], {"scale": 1.0, "ox": 0, "oy": 0})
     campaigns = sorted(d for d in os.listdir(os.path.join(ROOT, "campaigns"))
                        if os.path.isdir(os.path.join(ROOT, "campaigns", d)))
     return {"busy": _busy.is_set(), "campaign": campaign, "campaigns": campaigns,
@@ -235,7 +310,9 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "index": act_index, "backend_check": act_backend_check,
            "choose": act_choose, "se_save_config": act_se_save_config,
            "se_bundle": act_se_bundle, "se_launch": act_se_launch,
-           "render_placeholders": act_render_placeholders, "apply": act_apply}
+           "render_placeholders": act_render_placeholders, "apply": act_apply,
+           "place": act_place,
+           "export_tts": act_export_tts}
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -268,7 +345,8 @@ class Handler(BaseHTTPRequestHandler):
             # serve an output image (gallery thumbnails)
             rel = os.path.normpath(q.get("p", "")).lstrip(os.sep)
             path = os.path.join(ROOT, rel)
-            if not path.startswith(os.path.join(ROOT, "out")) or not os.path.exists(path):
+            allowed = (os.path.join(ROOT, "out"), os.path.join(ROOT, "art"))
+            if not path.startswith(allowed) or not os.path.exists(path):
                 self._json({"error": "not found"}, 404)
                 return
             data = open(path, "rb").read()
@@ -389,7 +467,11 @@ hi-res blanks: BGG thread.</p>
 </div></section>
 
 <section id=apply><div class=panel>
-<p>Push framed faces into the TTS build: writes <code>pipeline/art_urls.json</code> and rebuilds
+<div class=row><button class=act style="font-size:16px;border-color:var(--gold);color:var(--gold)"
+onclick="post('export_tts')">★ Compose cards &amp; Export to TTS (one click)</button>
+<span style="color:var(--dim)">index → compose faces with your chosen art → local file:/// URLs → rebuild the mod</span></div>
+<hr style="border-color:var(--line)">
+<p>Or step it manually: push framed faces into the TTS build: writes <code>pipeline/art_urls.json</code> and rebuilds
 cards &rarr; mod &rarr; download package. <b>local</b> mode uses <code>file:///</code> URLs —
 real art in TTS on this machine, no hosting. <b>hosted</b> swaps in your CDN base URL for sharing.</p>
 <div class=row>
@@ -400,6 +482,20 @@ real art in TTS on this machine, no hosting. <b>hosted</b> swaps in your CDN bas
 <div id=applyinfo></div>
 </div></section>
 
+<div id=editor style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9">
+<div style="background:var(--panel);border:1px solid var(--gold);border-radius:10px;max-width:860px;
+margin:4vh auto;padding:14px">
+<div class=row><b id=ed_title style="color:var(--gold)"></b>
+<span style="color:var(--dim);font-size:12px">drag the art to pan &middot; wheel or slider to scale &middot; recomposited from the original at full quality</span>
+<span style="margin-left:auto"><label>scale </label>
+<input type=range id=ed_scale min=0.5 max=3 step=0.02 style="width:160px" oninput=edPreview()>
+<button class=act onclick=edSave()>Save &amp; recompose</button>
+<button class=act onclick="document.getElementById('editor').style.display='none'">Close</button></span></div>
+<div id=ed_stage style="position:relative;margin:auto;overflow:hidden;border:1px solid var(--line)">
+<img id=ed_face style="display:block;user-select:none;pointer-events:none">
+<div id=ed_win style="position:absolute;overflow:hidden;cursor:grab;outline:2px dashed var(--gold)">
+<img id=ed_art draggable=false style="position:absolute;user-select:none"></div></div>
+</div></div>
 <div id=log></div></main><script>
 let seq=0, cur='illustrate';
 function tab(t){cur=t;for(const s of ['illustrate','frame','apply']){
@@ -428,6 +524,11 @@ const rep=s.report.generated!==undefined?
 document.getElementById('repline').innerHTML=rep;
 document.getElementById('gallery').innerHTML=s.gallery.map(g=>
 `<div class=card><div class=cid title="${g.id}">${g.id}</div>`+
+(g.face?`<img loading=lazy style="outline:2px solid #7dc87d" title="composed card" `+
+`src="/art?p=art/faces/${g.id}.png&ts=${Date.now()}">`+
+(g.chosen&&g.artbox?`<button class=act style="width:100%;font-size:11px;padding:3px" `+
+`onclick='editArt(${JSON.stringify(g).replaceAll("'","&#39;")})'>adjust art \u2921</button>`:''):'')+
+`<div style="font-size:10px;color:var(--dim)">variants — click to slot into the card:</div>`+
 g.variants.map(v=>`<img loading=lazy class="${v===g.chosen?'chosen':''}" `+
 `src="/art?p=out/${s.campaign}/${g.id}/${v}" onclick="post('choose',{card:'${g.id}',file:'${v}'})">`).join('')+
 `</div>`).join('')||'<span style="color:var(--dim)">nothing generated yet</span>';
@@ -453,6 +554,45 @@ faces_dir:document.getElementById('se_faces').value,export_dpi:document.getEleme
 classmap:document.getElementById('se_classmap').value,keys:document.getElementById('se_keys').value});}
 function applyArt(){post('apply',{mode:document.getElementById('applymode').value,
 base_url:document.getElementById('baseurl').value});}
+let ed=null;
+function editArt(g){ed={g:g,scale:g.placement.scale,ox:g.placement.ox,oy:g.placement.oy,
+natW:0,natH:0,disp:1};
+const[cw,ch,x0,y0,x1,y1]=g.artbox;
+const maxW=820, disp=Math.min(1,maxW/cw); ed.disp=disp;
+const stage=document.getElementById('ed_stage');
+stage.style.width=(cw*disp)+'px'; stage.style.height=(ch*disp)+'px';
+const face=document.getElementById('ed_face');
+face.src='/art?p=art/faces/'+g.id+'.png&ts='+Date.now();
+face.style.width=(cw*disp)+'px';
+const win=document.getElementById('ed_win');
+win.style.left=(x0*disp)+'px'; win.style.top=(y0*disp)+'px';
+win.style.width=((x1-x0)*disp)+'px'; win.style.height=((y1-y0)*disp)+'px';
+const art=document.getElementById('ed_art');
+art.onload=()=>{ed.natW=art.naturalWidth;ed.natH=art.naturalHeight;edPreview();};
+art.src='/art?p=out/'+camp()+'/'+g.id+'/'+g.chosen;
+document.getElementById('ed_title').textContent=g.id;
+document.getElementById('ed_scale').value=ed.scale;
+document.getElementById('editor').style.display='block';}
+function edPreview(){if(!ed||!ed.natW)return;
+ed.scale=parseFloat(document.getElementById('ed_scale').value);
+const[cw,ch,x0,y0,x1,y1]=ed.g.artbox;const bw=x1-x0,bh=y1-y0;
+const cover=Math.max(bw/ed.natW,bh/ed.natH)*ed.scale*ed.disp;
+const art=document.getElementById('ed_art');
+art.style.width=(ed.natW*cover)+'px';
+art.style.left=(-((ed.natW*cover)-(bw*ed.disp))/2+ed.ox*ed.disp)+'px';
+art.style.top =(-((ed.natH*cover)-(bh*ed.disp))/2+ed.oy*ed.disp)+'px';}
+(function(){const win=document.getElementById('ed_win');let drag=null;
+win.addEventListener('mousedown',e=>{drag={x:e.clientX,y:e.clientY,ox:ed.ox,oy:ed.oy};
+win.style.cursor='grabbing';e.preventDefault();});
+window.addEventListener('mousemove',e=>{if(!drag||!ed)return;
+ed.ox=drag.ox+(e.clientX-drag.x)/ed.disp; ed.oy=drag.oy+(e.clientY-drag.y)/ed.disp; edPreview();});
+window.addEventListener('mouseup',()=>{drag=null;win.style.cursor='grab';});
+win.addEventListener('wheel',e=>{e.preventDefault();const s=document.getElementById('ed_scale');
+s.value=Math.max(0.5,Math.min(3,parseFloat(s.value)-e.deltaY*0.0012));edPreview();});})();
+async function edSave(){if(!ed)return;
+await post('place',{card:ed.g.id,scale:ed.scale,ox:ed.ox,oy:ed.oy});
+document.getElementById('ed_face').src='/art?p=art/faces/'+ed.g.id+'.png&ts='+Date.now();
+addlog(ed.g.id+' recomposed with new placement');}
 refresh();poll();setInterval(refresh,4000);
 </script></body></html>"""
 

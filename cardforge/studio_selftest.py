@@ -67,11 +67,36 @@ check("report shows generated faces", s["report"]["generated"] >= 5 and s["repor
 check("gallery lists cards with variants",
       any(g["id"] == "sthr-appointed" and g["variants"] for g in s["gallery"]))
 gal = next(g for g in s["gallery"] if g["id"] == "sthr-elias")
-requests.post(BASE + "/api/choose",
-              json={"campaign": "still_hour", "card": "sthr-elias", "file": gal["variants"][-1]})
+r = requests.post(BASE + "/api/choose",
+                  json={"campaign": "still_hour", "card": "sthr-elias",
+                        "file": gal["variants"][-1]}).json()
 s = requests.get(BASE + "/api/status?campaign=still_hour").json()
 check("variant curation sticks (chosen.txt)",
       next(g for g in s["gallery"] if g["id"] == "sthr-elias")["chosen"] == gal["variants"][-1])
+check("choosing a variant instantly composes the card face",
+      r.get("composed") and next(g for g in s["gallery"] if g["id"] == "sthr-elias")["face"]
+      and os.path.exists(os.path.join(faces_dir, "sthr-elias.png")))
+check("composed face serves from /art",
+      requests.get(BASE + "/art?p=art/faces/sthr-elias.png").status_code == 200)
+check("gallery carries art-window geometry + placement for the editor",
+      "artbox" in next(g for g in s["gallery"] if g["id"] == "sthr-elias")
+      and next(g for g in s["gallery"] if g["id"] == "sthr-elias")["placement"]["scale"] == 1.0)
+# stub art is uniform grey (placement would be invisible) — swap in a gradient
+from PIL import Image as _Img
+grad = _Img.new("RGB", (400, 300))
+grad.putdata([(x % 256, (x * 7) % 256, (x * 13) % 256) for x in range(400 * 300)])
+grad.save(os.path.join(ROOT, "out", "still_hour", "sthr-elias", gal["variants"][-1]))
+requests.post(BASE + "/api/choose",
+              json={"campaign": "still_hour", "card": "sthr-elias", "file": gal["variants"][-1]})
+size_before = os.path.getsize(os.path.join(faces_dir, "sthr-elias.png"))
+r = requests.post(BASE + "/api/place",
+                  json={"card": "sthr-elias", "scale": 1.8, "ox": 30, "oy": -12}).json()
+check("drag/zoom placement saves and recomposes", r.get("composed"))
+placements = json.load(open(os.path.join(ROOT, "out", "still_hour", "placements.json")))
+check("placement stored as data (scale 1.8, pan 30/-12)",
+      placements["sthr-elias"]["scale"] == 1.8 and placements["sthr-elias"]["ox"] == 30)
+check("recomposite actually changed the face",
+      os.path.getsize(os.path.join(faces_dir, "sthr-elias.png")) != size_before)
 requests.post(BASE + "/api/index", json={"campaign": "still_hour"})
 wait_idle()
 img = requests.get(BASE + "/art?p=out/still_hour/sthr-elias/" + gal["variants"][0])
@@ -104,7 +129,8 @@ check("illustration paths flow from the index",
 r = requests.post(BASE + "/api/se_launch", json={}).json()
 check("launch runs the configured command", r.get("ok"))
 s = requests.get(BASE + "/api/status?campaign=still_hour").json()
-check("coverage: nothing framed yet", s["se"]["coverage"]["framed"] == []
+check("coverage: only the click-composed card (front + investigator back)",
+      set(s["se"]["coverage"]["framed"]) == {"sthr-elias", "sthr-elias-back"}
       and s["se"]["coverage"]["total"] == 41)
 
 print("== GLYPHS: placeholder renderer through the app ==")
@@ -155,6 +181,23 @@ check("unframed cards keep placeholders",
 check("lamp face real, lamp back still shared player back",
       lamp["CustomDeck"]["95011"]["FaceURL"].startswith("file:///")
       and "placehold.co" in lamp["CustomDeck"]["95011"]["BackURL"])
+
+print("== ONE-CLICK: Compose & Export to TTS ==")
+r = requests.post(BASE + "/api/export_tts", json={"campaign": "still_hour"}).json()
+check("export chain accepted", r.get("started"))
+check("export chain completes", wait_idle(120))
+urls = json.load(open(os.path.join(ROOT, "pipeline", "art_urls.json")))
+check("all 36 cards exported with file:/// faces",
+      len(urls) == 36 and all(v["face"].startswith("file:///") for v in urls.values()))
+mod = json.load(open(os.path.join(ROOT, "dist", "the_still_hour_mod.json")))
+bags = [o for o in mod["ObjectStates"] if o.get("ContainedObjects")]
+allcards = [c for b in bags for c in b["ContainedObjects"]]
+check("every card in the mod carries a composed face",
+      all(c["CustomDeck"][list(c["CustomDeck"])[0]]["FaceURL"].startswith("file:///")
+          for c in allcards))
+check("chosen art composited into the exported elias face",
+      "sthr-elias" in urls and os.path.getsize(
+          os.path.join(faces_dir, "sthr-elias.png")) > 8000)
 
 # leave the repo clean: drop the overlay and rebuild placeholders
 os.remove(os.path.join(ROOT, "pipeline", "art_urls.json"))
