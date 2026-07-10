@@ -18,6 +18,14 @@ the Victory elites.*
 | Arkham glyph font | ✅ vendored: `assets/fonts/ArkhamFontWithCodex.ttf` (+ `character_chart.png` legend). 22 symbols on letters A–V; mapping + `[wil]`-markup converter in `cardforge/glyphs.py` (a few class-icon letters flagged unconfirmed — verify vs the chart). |
 | Card faces today | **glyph-grade rendered placeholders available** — `python3 pipeline/render_placeholders.py` (or the Studio Frame tab button) draws all 41 faces with real Arkham statline/icon glyphs, class colors, cost, Victory; they flow through coverage → Apply like framed faces. placehold.co remains the zero-setup default in the shipped dist. |
 
+**Owner decisions (see `docs/design/OPTIONS_framing_and_model.md`):** framing =
+Strange Eons + **jaqenZann's external plugin** (NOT the outdated in-app catalog
+build) + the MB-Discord font pack, hybrid sequencing allowed; model =
+**Painter's Checkpoint v1.1** primary (ZavyChromaXL / DreamShaper XL bake-off,
+per-type overrides allowed, Painter's for the upscale pass); prompts = the
+composed prompts as-is. The in-app template mode (the owner's reference frames)
+covers play NOW; SE remains the pixel-perfect path.
+
 **Art blocks nothing.** The playtest path is independent; art can run last, in parallel.
 
 ## Face inventory

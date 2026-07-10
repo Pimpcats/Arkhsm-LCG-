@@ -60,6 +60,13 @@ pip install requests Pillow
 #    - Start your backend with its API on:  A1111: --api   ComfyUI: (default)
 python3 -m cardforge.cardforge backends check --campaign still_hour
 
+# 1b. Model (owner pick, OPTIONS doc): Painter's Checkpoint v1.1 (SDXL,
+#     Civitai 240154) — painterly + strong night scenes, fits the campaign; set
+#     its filename as "checkpoint" in campaign.json. Bake-off: render the 5
+#     seed portraits + sthr-appointed on Painter's vs ZavyChromaXL/DreamShaper
+#     XL; per-art-type checkpoint overrides supported in art_profiles.json.
+#     Train the 5 character LoRAs ON the chosen portrait checkpoint (LoRAs are
+#     checkpoint-family-bound). Use Painter's for the hires/upscale pass.
 # 2. Step 0 — canonical portraits (the one creative seed)
 python3 -m cardforge.cardforge seeds --campaign still_hour --variants 4
 #    Curate out/still_hour/seeds/<char>/, train per-investigator LoRAs (or keep

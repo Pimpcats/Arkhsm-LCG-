@@ -631,8 +631,9 @@ drag to position, scroll to size. Encounter cards stay hidden behind the
 <section id=frame><div class=panel>
 <p class=hint>Strange Eons produces the pixel-perfect final cards; this tab drives it.
 Tools: <a href="https://strangeeons.cgjennings.ca" target=_blank>Strange Eons 3</a> &middot;
-<a href="https://github.com/CGJennings/strange-eons" target=_blank>source</a> &middot;
-Arkham plugin &amp; AH fonts via the Barnaby Files guide / Mythos Busters Discord.</p>
+<a href="https://github.com/CGJennings/strange-eons" target=_blank>source</a>.
+<b>Plugin: skip the in-app catalog (outdated)</b> — use jaqenZann&rsquo;s external build via the
+Barnaby Files guide; AH font pack via the Mythos Busters Discord.</p>
 <div class=row style="align-items:flex-start">
 <div style="flex:1;min-width:320px">
 <h2>Owner config <small>once per plugin version</small></h2>
