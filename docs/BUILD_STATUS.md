@@ -118,6 +118,19 @@ actual play session:
 
 A *rules-complete tabletop playtest* needs 1–3. Items 4–6 make it shippable.
 
+## CardForge (art batch tool)
+
+✅ Built per `CARDFORGE_BRIEF` + `HANDOFF_cardforge`: `cardforge/` package with
+A1111 + ComfyUI adapters (tagged-node workflow injection), prompt composition,
+character resolver (JSON now; interface ready for the character-select tool),
+crash-safe resume ledger, variants, report, contact sheets, `index.json`, a
+`seeds` step-0 command, and a `--dry-run` mode that emits exact HTTP payloads.
+Campaigns are plug-in folders (`campaigns/<name>/`) — the `demo` campaign proves
+zero-code reuse. Acceptance: `python3 cardforge/selftest.py` (20 checks, green).
+**Needs the owner's rig:** live P0 smoke on both backends, checkpoint config,
+Step-0 seed curation + LoRA training. Golden prompt fixtures (`prompts.json`)
+auto-compare when dropped at the repo root.
+
 ## Next steps (in brief order)
 
 - **P5 Appointed** — ✅ done (CO-002). Staged Approach (Unseen→Sensed→Emerging→

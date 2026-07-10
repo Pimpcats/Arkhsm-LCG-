@@ -1,0 +1,40 @@
+[
+  {
+    "id": "sthr-elias",
+    "art_type": "investigator_portrait",
+    "scene": "standing before a dark unlit lighthouse at night, salt wind pulling at his coat",
+    "seed": 7240,
+    "character": "elias"
+  },
+  {
+    "id": "sthr-elias-back",
+    "art_type": "investigator_portrait",
+    "no_art": true,
+    "frame": "investigator_back"
+  },
+  {
+    "id": "sthr-lamp",
+    "art_type": "asset",
+    "scene": "an old brass storm-lantern glowing faint amber in fog, close-up still life",
+    "seed": 6540
+  },
+  {
+    "id": "sthr-donebefore",
+    "art_type": "skill",
+    "scene": "hands gripping a rail, knuckles white, ghostly repeated afterimages of the same gesture",
+    "seed": 2901,
+    "character": "elias"
+  },
+  {
+    "id": "sthr-eighthgrave",
+    "art_type": "treachery",
+    "scene": "eight identical fresh graves in a row under a folding starless sky, one open and empty",
+    "seed": 3720
+  },
+  {
+    "id": "sthr-appointed",
+    "art_type": "enemy",
+    "scene": "a tall wrong silhouette at the far end of an empty street, too many angles, not quite arriving, featureless, dread, negative space",
+    "seed": 2306
+  }
+]

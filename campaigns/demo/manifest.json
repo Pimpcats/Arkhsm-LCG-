@@ -1,0 +1,5 @@
+[
+  { "id": "demo-station", "art_type": "location", "scene": "an empty train platform at night, one flickering lamp", "seed": 11 },
+  { "id": "demo-stranger", "art_type": "enemy", "scene": "a coated figure at the end of the platform, featureless under the brim of a hat", "seed": 12 },
+  { "id": "demo-ticket", "art_type": "asset", "scene": "a punched paper ticket for a route that does not exist, macro still life", "seed": 13 }
+]
