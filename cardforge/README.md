@@ -34,8 +34,11 @@ One window, four tabs, the whole pipeline:
   each shown on its real frame. Click a card → the placement editor opens: pick
   a generated variant or **upload any image**, drag to position, scroll to size,
   Save recomposes losslessly. Spoiler shield keeps encounter cards hidden.
-- **Illustrate** — backend check, Step-0 seeds, starter/full batches (dry-run
-  toggle), live log, gallery with click-to-curate variants, contact sheets.
+- **Illustrate** — the backend rig (where A1111/ComfyUI live on this machine,
+  from `rig.json`): **one-click Launch backend**, and every generate job
+  auto-launches it and waits for its API if it isn't already running. Plus
+  Step-0 seeds, starter/full batches (dry-run toggle), live log, gallery with
+  click-to-curate variants, contact sheets.
 - **Frame — Strange Eons** — setup links (strangeeons.cgjennings.ca /
   github.com/CGJennings/strange-eons / Arkham plugin / fonts), the two owner
   config seams (class-map + setting keys), one-click frame-bundle generation
@@ -46,8 +49,10 @@ One window, four tabs, the whole pipeline:
   instant TTS testing, or a hosted base URL) and rebuilds cards → mod →
   download package.
 
-Acceptance: `python3 cardforge/studio_selftest.py` (53 checks, drives the live
-server end-to-end; JS is syntax-checked with node in CI passes). The CLI below remains for headless/scripted use.
+Acceptance: `python3 cardforge/studio_selftest.py` (60 checks, drives the live
+server end-to-end — including a real backend auto-launch loop against a fake
+A1111 API and a Windows-locale regression; JS is syntax-checked with node in
+CI passes). The CLI below remains for headless/scripted use.
 
 ## Runbook (owner's rig)
 
@@ -57,7 +62,10 @@ pip install requests Pillow
 # 1. Configure
 #    - campaigns/still_hour/campaign.json: set "checkpoint" to your model file,
 #      set "backend" ("a1111" | "comfy") and "base_url" if not default.
-#    - Start your backend with its API on:  A1111: --api   ComfyUI: (default)
+#    - rig.json (repo root): where the backend lives + how to start it — the
+#      Studio launches it for you (pre-set: A1111 at C:/SD/SDXL via
+#      "webui.bat --api"; if you rely on custom COMMANDLINE_ARGS, point it at
+#      webui-user.bat and add --api to that file). Headless equivalent:
 python3 -m cardforge.cardforge backends check --campaign still_hour
 
 # 1b. Model (owner pick, OPTIONS doc): Painter's Checkpoint v1.1 (SDXL,

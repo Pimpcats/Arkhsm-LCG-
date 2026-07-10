@@ -31,14 +31,14 @@ def campaign_dir(name):
 
 def load_campaign(name):
     path = os.path.join(campaign_dir(name), "campaign.json")
-    camp = json.load(open(path))
+    camp = json.load(open(path, encoding="utf-8"))
     camp["name"] = name
     return camp
 
 
 def load_profiles():
     return json.load(open(os.path.join(repo_root(), "cardforge", "profiles",
-                                       "art_profiles.json")))
+                                       "art_profiles.json"), encoding="utf-8"))
 
 
 def load_manifest(name, starter=False):
@@ -46,7 +46,7 @@ def load_manifest(name, starter=False):
     path = os.path.join(campaign_dir(name), fname)
     if not os.path.exists(path) and starter:
         path = os.path.join(repo_root(), "pipeline", "art_manifest_starter.json")
-    return [j for j in json.load(open(path)) if not j.get("_comment")]
+    return [j for j in json.load(open(path, encoding="utf-8")) if not j.get("_comment")]
 
 
 def make_backend(camp, dry_run=False):
@@ -149,7 +149,7 @@ def run_generate(campaign_name, only=None, art_type=None, variants_override=None
 
 def _write_report(out_dir, report):
     os.makedirs(out_dir, exist_ok=True)
-    with open(os.path.join(out_dir, "report.json"), "w") as f:
+    with open(os.path.join(out_dir, "report.json"), "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)
 
 
@@ -194,7 +194,7 @@ def run_contact(campaign_name, thumb=256, cols=6):
     report_path = os.path.join(out_dir, "report.json")
     if not os.path.exists(report_path):
         raise SystemExit("no report.json — run generate first")
-    report = json.load(open(report_path))
+    report = json.load(open(report_path, encoding="utf-8"))
     by_type = {}
     for g in report["generated"]:
         by_type.setdefault(g["art_type"], []).append(g)
@@ -224,10 +224,10 @@ def run_index(campaign_name):
         if not pngs:
             continue
         chosen_marker = os.path.join(card_dir, "chosen.txt")
-        chosen = open(chosen_marker).read().strip() if os.path.exists(chosen_marker) else pngs[0]
+        chosen = open(chosen_marker, encoding="utf-8").read().strip() if os.path.exists(chosen_marker) else pngs[0]
         index[card_id] = os.path.relpath(os.path.join(card_dir, chosen), repo_root())
     dest = os.path.join(out_dir, "index.json")
-    with open(dest, "w") as f:
+    with open(dest, "w", encoding="utf-8") as f:
         json.dump(index, f, indent=2)
     print("index.json: {} card(s) -> {}".format(len(index), os.path.relpath(dest, repo_root())))
     return index

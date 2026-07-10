@@ -44,6 +44,6 @@ class Backend:
     def _write_payload(self, job_key, payload):
         os.makedirs(self.payload_dir, exist_ok=True)
         path = os.path.join(self.payload_dir, "{}.{}.json".format(job_key, self.name))
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(payload, f, indent=2)
         return path

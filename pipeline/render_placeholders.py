@@ -37,7 +37,7 @@ def load_art_index():
     """id -> chosen illustration path (CardForge's out/<campaign>/index.json)."""
     path = os.path.join(ROOT, "out", "still_hour", "index.json")
     if os.path.exists(path):
-        return json.load(open(path))
+        return json.load(open(path, encoding="utf-8"))
     return {}
 
 
@@ -50,7 +50,7 @@ def load_placements():
     window pixels). Stored as data so every recomposite starts from the
     ORIGINAL image — repeated adjustments never lose quality."""
     if os.path.exists(PLACEMENTS_PATH):
-        return json.load(open(PLACEMENTS_PATH))
+        return json.load(open(PLACEMENTS_PATH, encoding="utf-8"))
     return {}
 
 
@@ -537,14 +537,14 @@ def main():
                     help="force the drawn (non-template) placeholder look")
     args = ap.parse_args()
     use_tpl = (not args.no_template) and T.has_template("investigator_front")
-    cards = json.load(open(os.path.join(HERE, "stillhour_cards_spec.json")))
+    cards = json.load(open(os.path.join(HERE, "stillhour_cards_spec.json"), encoding="utf-8"))
     enc = os.path.join(HERE, "stillhour_encounter_spec.json")
     if os.path.exists(enc):
-        cards += json.load(open(enc))
+        cards += json.load(open(enc, encoding="utf-8"))
     if args.only:
         cards = [c for c in cards if c["id"] in set(args.only)]
     print_text = {k: v for k, v in
-                  json.load(open(os.path.join(HERE, "stillhour_print_text.json"))).items()
+                  json.load(open(os.path.join(HERE, "stillhour_print_text.json"), encoding="utf-8")).items()
                   if not k.startswith("_")}
     art_index = load_art_index()
     placements = load_placements()

@@ -117,7 +117,7 @@ def build_gmnotes(c):
 def _load_art_urls():
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "art_urls.json")
     if os.path.exists(path):
-        return json.load(open(path))
+        return json.load(open(path, encoding="utf-8"))
     return {}
 
 
@@ -161,11 +161,11 @@ def build_bag(cards, nickname):
 def generate(spec, out_path, nickname):
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     cards = [build_card(c) for c in spec]
-    with open(out_path, "w") as f:
+    with open(out_path, "w", encoding="utf-8") as f:
         json.dump({"ObjectStates": [build_bag(cards, nickname)]}, f, indent=2)
 
     # Validate: round-trip + metadata parses + no duplicate CardIDs/ids.
-    d = json.load(open(out_path))
+    d = json.load(open(out_path, encoding="utf-8"))
     seen_ids, seen_cardids = set(), set()
     for card in d["ObjectStates"][0]["ContainedObjects"]:
         md = json.loads(card["GMNotes"])
@@ -187,7 +187,7 @@ def main():
                     help="Restrict output to these card ids (e.g. the Elias starter slice).")
     args = ap.parse_args()
 
-    spec = json.load(open(args.spec))
+    spec = json.load(open(args.spec, encoding="utf-8"))
     if args.only:
         wanted = set(args.only)
         spec = [c for c in spec if c["id"] in wanted]
@@ -203,7 +203,7 @@ def main():
              "THE STILL HOUR — Player Cards")
     enc_spec_path = os.path.join(here, "stillhour_encounter_spec.json")
     if args.out is None and os.path.exists(enc_spec_path):
-        generate(json.load(open(enc_spec_path)),
+        generate(json.load(open(enc_spec_path, encoding="utf-8")),
                  os.path.join(root, "dist", "the_still_hour_encounter.json"),
                  "THE STILL HOUR — The Appointed")
 

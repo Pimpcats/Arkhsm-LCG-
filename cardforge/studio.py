@@ -31,10 +31,13 @@ from urllib.parse import urlparse, parse_qs
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from cardforge import runner, se_bridge  # noqa: E402
+from cardforge import rig, runner, se_bridge  # noqa: E402
 
 PORT = 8570
 ROOT = runner.repo_root()
+# children (pipeline scripts) always read/write the repo's files as UTF-8,
+# whatever the OS locale says (Windows defaults to cp1252 otherwise)
+os.environ.setdefault("PYTHONUTF8", "1")
 
 _log = []                 # (seq, line)
 _log_lock = threading.Lock()
@@ -84,16 +87,31 @@ def run_job(name, fn, *args, **kw):
 
 # ------------------------------------------------------------------ actions --
 
+def _backend_first(_campaign, _dry, fn, *args, **kw):
+    """A GPU job as one unit of work: make sure the backend is up (launching
+    it per rig.json if needed), then run the batch. Dry-run skips the check.
+    (Leading underscores keep these names clear of the wrapped fn's kwargs.)"""
+    def work():
+        rig.ensure_up(runner.load_campaign(_campaign), dry_run=_dry)
+        fn(*args, **kw)
+    return work
+
+
 def act_generate(p):
     campaign = p.get("campaign", "still_hour")
-    return run_job("generate", runner.run_generate, campaign,
-                   only=set(p["only"].split()) if p.get("only") else None,
-                   dry_run=bool(p.get("dry_run")), starter=bool(p.get("starter")))
+    dry = bool(p.get("dry_run"))
+    return run_job("generate", _backend_first(
+        campaign, dry, runner.run_generate, campaign,
+        only=set(p["only"].split()) if p.get("only") else None,
+        dry_run=dry, starter=bool(p.get("starter"))))
 
 
 def act_seeds(p):
-    return run_job("seeds", runner.run_seeds, p.get("campaign", "still_hour"),
-                   variants=int(p.get("variants", 4)), dry_run=bool(p.get("dry_run")))
+    campaign = p.get("campaign", "still_hour")
+    dry = bool(p.get("dry_run"))
+    return run_job("seeds", _backend_first(
+        campaign, dry, runner.run_seeds, campaign,
+        variants=int(p.get("variants", 4)), dry_run=dry))
 
 
 def act_contact(p):
@@ -110,16 +128,41 @@ def act_backend_check(p):
     return {"ok": ok, "message": "[{}] {}".format(camp.get("backend", "a1111"), msg)}
 
 
+def act_rig_save(p):
+    """Persist the backend rig fields (folder / launch command) for the
+    campaign's backend kind into rig.json."""
+    camp = runner.load_campaign(p.get("campaign", "still_hour"))
+    kind = camp.get("backend", "a1111")
+    cfg = rig.load_rig()
+    entry = cfg.setdefault(kind, {})
+    for k in ("cwd", "command"):
+        if p.get(k) is not None:
+            entry[k] = p[k]
+    if p.get("startup_timeout"):
+        entry["startup_timeout"] = int(p["startup_timeout"])
+    rig.save_rig(cfg)
+    return {"ok": True, "rig": {k: v for k, v in cfg.items() if k != "_note"}}
+
+
+def act_backend_launch(p):
+    """Launch the campaign's backend now (saving any rig fields sent along)
+    and wait on the worker thread until its API answers."""
+    if p.get("cwd") is not None or p.get("command") is not None:
+        act_rig_save(p)
+    camp = runner.load_campaign(p.get("campaign", "still_hour"))
+    return run_job("backend-launch", rig.ensure_up, camp)
+
+
 def _choose_art(campaign, card, filename):
     """Point a card at an art file and recompose its face (synchronous, fast)."""
     camp = runner.load_campaign(campaign)
     out_dir = runner.out_dir_for(camp)
-    with open(os.path.join(out_dir, card, "chosen.txt"), "w") as f:
+    with open(os.path.join(out_dir, card, "chosen.txt"), "w", encoding="utf-8") as f:
         f.write(filename)
     index_path = os.path.join(out_dir, "index.json")
-    index = json.load(open(index_path)) if os.path.exists(index_path) else {}
+    index = json.load(open(index_path, encoding="utf-8")) if os.path.exists(index_path) else {}
     index[card] = os.path.relpath(os.path.join(out_dir, card, filename), ROOT)
-    with open(index_path, "w") as f:
+    with open(index_path, "w", encoding="utf-8") as f:
         json.dump(index, f, indent=2)
     subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py"),
                     "--only", card], check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
@@ -162,11 +205,11 @@ def act_place(p):
     original image — placement is data, so quality never degrades."""
     card = p["card"]
     placements_path = os.path.join(ROOT, "out", "still_hour", "placements.json")
-    placements = json.load(open(placements_path)) if os.path.exists(placements_path) else {}
+    placements = json.load(open(placements_path, encoding="utf-8")) if os.path.exists(placements_path) else {}
     placements[card] = {"scale": max(0.2, min(6.0, float(p.get("scale", 1.0)))),
                         "ox": float(p.get("ox", 0)), "oy": float(p.get("oy", 0))}
     os.makedirs(os.path.dirname(placements_path), exist_ok=True)
-    with open(placements_path, "w") as f:
+    with open(placements_path, "w", encoding="utf-8") as f:
         json.dump(placements, f, indent=2)
     subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py"),
                     "--only", card], check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
@@ -227,6 +270,7 @@ def act_auto(p):
     campaign = p.get("campaign", "still_hour")
     dry = bool(p.get("dry_run"))
     def chain():
+        rig.ensure_up(runner.load_campaign(campaign), dry_run=dry)
         runner.run_generate(campaign, dry_run=dry)
         runner.run_index(campaign)          # auto-picks lowest seed unless curated
         subprocess.run([sys.executable,
@@ -250,7 +294,7 @@ def _apply_local_and_rebuild(campaign):
         back = os.path.join(faces_dir, face_id + "-back.png")
         if os.path.exists(back):
             urls[face_id]["back"] = "file:///" + back.replace(os.sep, "/").lstrip("/")
-    with open(os.path.join(ROOT, "pipeline", "art_urls.json"), "w") as f:
+    with open(os.path.join(ROOT, "pipeline", "art_urls.json"), "w", encoding="utf-8") as f:
         json.dump(urls, f, indent=2)
     log("art_urls.json: {} card(s), local file:/// mode".format(len(urls)))
     for script in ("build_cards.py", "bundle_mod.py", "package_download.py"):
@@ -280,7 +324,7 @@ def act_export_tts(p):
             back = os.path.join(faces_dir, face_id + "-back.png")
             if os.path.exists(back):
                 urls[face_id]["back"] = "file:///" + back.replace(os.sep, "/").lstrip("/")
-        with open(os.path.join(ROOT, "pipeline", "art_urls.json"), "w") as f:
+        with open(os.path.join(ROOT, "pipeline", "art_urls.json"), "w", encoding="utf-8") as f:
             json.dump(urls, f, indent=2)
         log("art_urls.json: {} card(s), local file:/// mode".format(len(urls)))
         for script in ("build_cards.py", "bundle_mod.py", "package_download.py"):
@@ -309,7 +353,7 @@ def act_apply(p):
         if os.path.exists(back):
             urls[face_id]["back"] = (base + "/" + face_id + "-back.png") if mode == "hosted" \
                 else "file:///" + back.replace(os.sep, "/").lstrip("/")
-    with open(os.path.join(ROOT, "pipeline", "art_urls.json"), "w") as f:
+    with open(os.path.join(ROOT, "pipeline", "art_urls.json"), "w", encoding="utf-8") as f:
         json.dump(urls, f, indent=2)
     log("art_urls.json: {} card(s), mode={}".format(len(urls), mode))
 
@@ -332,7 +376,7 @@ def status(campaign="still_hour"):
     report = {}
     rp = os.path.join(out_dir, "report.json")
     if os.path.exists(rp):
-        r = json.load(open(rp))
+        r = json.load(open(rp, encoding="utf-8"))
         report = {"generated": len(r["generated"]), "failed": len(r["failed"]),
                   "warnings": r["warnings"], "dry_run": r.get("dry_run")}
     gallery = []
@@ -343,7 +387,7 @@ def status(campaign="still_hour"):
                 continue
             pngs = sorted(f for f in os.listdir(cdir) if f.endswith(".png"))
             chosen_path = os.path.join(cdir, "chosen.txt")
-            chosen = open(chosen_path).read().strip() if os.path.exists(chosen_path) \
+            chosen = open(chosen_path, encoding="utf-8").read().strip() if os.path.exists(chosen_path) \
                 else (pngs[0] if pngs else None)
             face = os.path.exists(os.path.join(ROOT, "art", "faces", cid + ".png"))
             gallery.append({"id": cid, "variants": pngs, "chosen": chosen, "face": face})
@@ -354,12 +398,12 @@ def status(campaign="still_hour"):
     for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json"):
         p = os.path.join(ROOT, "pipeline", spec_file)
         if os.path.exists(p):
-            for c in json.load(open(p)):
+            for c in json.load(open(p, encoding="utf-8")):
                 specs[c["id"]] = c["type"]
     spoilers = set()
     enc_spec = os.path.join(ROOT, "pipeline", "stillhour_encounter_spec.json")
     if os.path.exists(enc_spec):
-        spoilers = {c["id"] for c in json.load(open(enc_spec))}
+        spoilers = {c["id"] for c in json.load(open(enc_spec, encoding="utf-8"))}
     boxes = {cid: rp.art_box(t) for cid, t in specs.items()}
     placements = rp.load_placements()
     for g in gallery:
@@ -382,12 +426,12 @@ def status(campaign="still_hour"):
         path = os.path.join(ROOT, "pipeline", spec_file)
         if not os.path.exists(path):
             continue
-        for c in json.load(open(path)):
+        for c in json.load(open(path, encoding="utf-8")):
             cdir = os.path.join(out_dir, c["id"])
             variants = sorted(f for f in os.listdir(cdir) if f.endswith(".png")) \
                 if os.path.isdir(cdir) else []
             chosen_path = os.path.join(cdir, "chosen.txt")
-            chosen = open(chosen_path).read().strip() if os.path.exists(chosen_path) \
+            chosen = open(chosen_path, encoding="utf-8").read().strip() if os.path.exists(chosen_path) \
                 else (variants[0] if variants else None)
             catalog.append({
                 "id": c["id"], "name": c["name"], "type": c["type"],
@@ -409,6 +453,7 @@ def status(campaign="still_hour"):
                              for f in os.listdir(faces_dir_abs)), default=0))
     return {"busy": _busy.is_set(), "campaign": campaign, "campaigns": campaigns,
             "backend": camp.get("backend"), "report": report, "gallery": gallery,
+            "rig": {k: v for k, v in rig.load_rig().items() if k != "_note"},
             "cards": catalog, "faces_ver": faces_ver,
             "se": {"config": se_bridge.load_config(),
                    "bundle_exists": os.path.exists(
@@ -420,6 +465,7 @@ def status(campaign="still_hour"):
 
 ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "index": act_index, "backend_check": act_backend_check,
+           "rig_save": act_rig_save, "backend_launch": act_backend_launch,
            "choose": act_choose, "se_save_config": act_se_save_config,
            "se_bundle": act_se_bundle, "se_launch": act_se_launch,
            "render_placeholders": act_render_placeholders, "apply": act_apply,
@@ -616,7 +662,18 @@ drag to position, scroll to size. Encounter cards stay hidden behind the
 
 <section id=illustrate><div class=panel>
 <div class=row>
-<button class=btn onclick="post('backend_check')">Check backend</button>
+<b>Backend</b> <span id=rig_kind class=stat></span>
+<label>folder</label><input type=text id=rig_cwd size=22 placeholder="C:\SD\SDXL" onchange=rigSave()>
+<label>start with</label><input type=text id=rig_cmd size=18 onchange=rigSave()>
+<button class="btn primary" onclick=rigLaunch()>&#9655; Launch backend</button>
+<button class=btn onclick="post('backend_check')">Check</button>
+</div>
+<p class=hint style="margin:2px 0 10px">The Studio starts your image backend itself and waits for its
+API &mdash; and every generate job below does the same automatically if it&rsquo;s not already running.
+A1111 note: <code>webui.bat --api</code> guarantees the API; if you rely on custom
+<code>COMMANDLINE_ARGS</code>, point this at <code>webui-user.bat</code> and add <code>--api</code> there.</p>
+<hr>
+<div class=row>
 <button class=btn onclick="post('seeds',{dry_run:dry()})">Step 0 · Seeds</button>
 <button class=btn onclick="post('generate',{starter:true,dry_run:dry()})">Starter batch</button>
 <button class=btn onclick="post('generate',{dry_run:dry()})">Full batch</button>
@@ -698,6 +755,10 @@ function tab(t){cur=t;for(const x of ['cards','illustrate','frame','apply']){
 document.getElementById(x).classList.toggle('on',x===t);
 document.getElementById('tab-'+x).classList.toggle('on',x===t);}}
 function dry(){return document.getElementById('dryrun').checked}
+function rigVals(){return {cwd:document.getElementById('rig_cwd').value,
+command:document.getElementById('rig_cmd').value};}
+function rigSave(){post('rig_save',rigVals());}
+function rigLaunch(){post('backend_launch',rigVals());}
 function camp(){return document.getElementById('campaign').value||'still_hour'}
 async function post(action,params){params=params||{};params.campaign=camp();
 const r=await fetch('/api/'+action,{method:'POST',body:JSON.stringify(params)});
@@ -735,6 +796,10 @@ if(sel.options.length!==s.campaigns.length){sel.innerHTML='';
 for(const c of s.campaigns){const o=document.createElement('option');o.value=o.text=c;
 if(c===s.campaign)o.selected=true;sel.add(o);}}
 document.getElementById('busydot').className='dot'+(s.busy?' busy':'');
+const kind=s.backend||'a1111';document.getElementById('rig_kind').textContent=kind;
+const rg=(s.rig||{})[kind]||{};
+for(const [id,val] of [['rig_cwd',rg.cwd||''],['rig_cmd',rg.command||'']]){
+const el=document.getElementById(id);if(el&&document.activeElement!==el)el.value=val;}
 document.getElementById('busytext').textContent=s.busy?'working&hellip;'.replace('&hellip;','…'):'idle';
 renderCards(s);
 const rep=s.report.generated!==undefined?

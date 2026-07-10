@@ -14,7 +14,7 @@ class Ledger:
         self.path = path
         self.done = set()
         if os.path.exists(path):
-            self.done = set(json.load(open(path)))
+            self.done = set(json.load(open(path, encoding="utf-8")))
 
     @staticmethod
     def key(job_id, seed):

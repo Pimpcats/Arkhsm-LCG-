@@ -13,7 +13,7 @@ class CharacterResolver:
     def __init__(self, characters_path):
         self.characters = {}
         if os.path.exists(characters_path):
-            self.characters = json.load(open(characters_path))
+            self.characters = json.load(open(characters_path, encoding="utf-8"))
 
     def resolve(self, name):
         """Return the character record, or raise KeyError with a helpful message."""

@@ -55,7 +55,7 @@ check("negative = house negative + type negative",
       "watermark" in sample[2] and "people" in sample[2])
 gold = os.path.join(ROOT, "prompts.json")
 if os.path.exists(gold):
-    golden = json.load(open(gold))
+    golden = json.load(open(gold, encoding="utf-8"))
     ours = {cid: pos for cid, pos, _, _ in composed}
     diff = [k for k, v in golden.items() if " ".join(ours.get(k, "").split()) != " ".join(v.split())]
     check("golden fixtures (prompts.json) match", not diff)
@@ -89,12 +89,12 @@ check("text-only face skipped, never an error",
       "sthr-elias-back" in r2["skipped_text_only"])
 payloads = os.listdir(os.path.join(ROOT, "out", "still_hour", "payloads"))
 check("P0 dry-run payloads on disk (exact HTTP bodies)", len(payloads) >= 5)
-body = json.load(open(os.path.join(ROOT, "out", "still_hour", "payloads", sorted(payloads)[0])))
+body = json.load(open(os.path.join(ROOT, "out", "still_hour", "payloads", sorted(payloads)[0]), encoding="utf-8"))
 check("a1111 payload shape (prompt/steps/override_settings)",
       "prompt" in body and "steps" in body and "override_settings" in body)
 
 print("== P4: report ==")
-rep = json.load(open(os.path.join(ROOT, "out", "still_hour", "report.json")))
+rep = json.load(open(os.path.join(ROOT, "out", "still_hour", "report.json"), encoding="utf-8"))
 check("report.json has per-face status", len(rep["generated"]) > 0 and "dry_run" in rep)
 
 print("== P4b: contact sheets ==")
@@ -116,7 +116,7 @@ check("3 demo cards generated (variants expand per profile: 7 files)",
 check("demo house style composed (not still_hour's)",
       "gothic ink" in json.load(open(os.path.join(
           ROOT, "out", "demo", "payloads", sorted(os.listdir(
-              os.path.join(ROOT, "out", "demo", "payloads")))[0])))["prompt"])
+              os.path.join(ROOT, "out", "demo", "payloads")))[0]), encoding="utf-8"))["prompt"])
 
 print("== Comfy path: workflow injection (offline) ==")
 from cardforge.backends.comfy import ComfyBackend
@@ -127,7 +127,7 @@ imgs = cb.generate("POS", "NEG", {"comfy_workflow": "workflows/txt2img_scene.jso
                                   "steps": 30, "cfg": 5.0, "sampler": "dpmpp_2m_sde", "seed": 42},
                    "comfy_probe")
 graph = json.load(open(os.path.join(ROOT, "out", "still_hour", "payloads",
-                                    "comfy_probe.comfy.json")))["prompt"]
+                                    "comfy_probe.comfy.json"), encoding="utf-8"))["prompt"]
 inj = {n["_meta"]["title"]: n for n in graph.values() if "_meta" in n}
 check("comfy graph injected by _meta.title tags",
       inj["CF_POSITIVE"]["inputs"]["text"] == "POS"

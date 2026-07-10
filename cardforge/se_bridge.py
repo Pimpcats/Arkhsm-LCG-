@@ -62,30 +62,30 @@ def config_path():
 def load_config():
     if os.path.exists(config_path()):
         cfg = dict(DEFAULT_CONFIG)
-        cfg.update(json.load(open(config_path())))
+        cfg.update(json.load(open(config_path(), encoding="utf-8")))
         return cfg
     return dict(DEFAULT_CONFIG)
 
 
 def save_config(cfg):
     os.makedirs(se_dir(), exist_ok=True)
-    with open(config_path(), "w") as f:
+    with open(config_path(), "w", encoding="utf-8") as f:
         json.dump(cfg, f, indent=2)
 
 
 def _load_card_specs():
     here = os.path.join(runner.repo_root(), "pipeline")
-    cards = json.load(open(os.path.join(here, "stillhour_cards_spec.json")))
+    cards = json.load(open(os.path.join(here, "stillhour_cards_spec.json"), encoding="utf-8"))
     enc = os.path.join(here, "stillhour_encounter_spec.json")
     if os.path.exists(enc):
-        cards += json.load(open(enc))
+        cards += json.load(open(enc, encoding="utf-8"))
     return {c["id"]: c for c in cards}
 
 
 def _load_print_text():
     path = os.path.join(runner.repo_root(), "pipeline", "stillhour_print_text.json")
     if os.path.exists(path):
-        return {k: v for k, v in json.load(open(path)).items() if not k.startswith("_")}
+        return {k: v for k, v in json.load(open(path, encoding="utf-8")).items() if not k.startswith("_")}
     return {}
 
 
@@ -101,7 +101,7 @@ def build_jobs(campaign="still_hour"):
     manifest = runner.load_manifest(campaign)
     camp = runner.load_campaign(campaign)
     index_path = os.path.join(runner.out_dir_for(camp), "index.json")
-    index = json.load(open(index_path)) if os.path.exists(index_path) else {}
+    index = json.load(open(index_path, encoding="utf-8")) if os.path.exists(index_path) else {}
     jobs = []
     for m in manifest:
         is_back = m["id"].endswith("-back")
@@ -218,7 +218,7 @@ def write_bundle(campaign="still_hour"):
         if j["illustration"]:
             j["illustration"] = os.path.join(runner.repo_root(), j["illustration"])
     jobs_path = os.path.join(se_dir(), "frame_jobs.json")
-    with open(jobs_path, "w") as f:
+    with open(jobs_path, "w", encoding="utf-8") as f:
         json.dump(jobs, f, indent=2)
     script = SCRIPT_TEMPLATE % {
         "classmap": json.dumps(cfg["classmap"], indent=4),
@@ -228,10 +228,10 @@ def write_bundle(campaign="still_hour"):
         "jobs": json.dumps(jobs, indent=2),
     }
     script_path = os.path.join(se_dir(), "frame_cards.js")
-    with open(script_path, "w") as f:
+    with open(script_path, "w", encoding="utf-8") as f:
         f.write(script)
     readme_path = os.path.join(se_dir(), "README.md")
-    with open(readme_path, "w") as f:
+    with open(readme_path, "w", encoding="utf-8") as f:
         f.write(
             "# Strange Eons frame bundle (generated)\n\n"
             "1. Install Strange Eons 3 (strangeeons.cgjennings.ca; source\n"

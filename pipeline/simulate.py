@@ -514,9 +514,9 @@ def main():
     # Recollection Memory prices: Interlude.RECOLLECTION_COST must match the
     # card spec's memoryCost per id (one source of truth, two copies).
     spec = {c["id"]: c["memoryCost"]
-            for c in json.load(open(os.path.join(here, "stillhour_cards_spec.json")))
+            for c in json.load(open(os.path.join(here, "stillhour_cards_spec.json"), encoding="utf-8"))
             if "memoryCost" in c}
-    lua = open(os.path.join(here, "..", "src", "StillHour", "Interlude.ttslua")).read()
+    lua = open(os.path.join(here, "..", "src", "StillHour", "Interlude.ttslua"), encoding="utf-8").read()
     lua_costs = dict(re.findall(r'\["(sthr-[a-z]+)"\]\s*=\s*(\d+)', lua))
     lua_costs = {k: int(v) for k, v in lua_costs.items()}
     mismatches = sorted(set(spec) ^ set(lua_costs)) + sorted(

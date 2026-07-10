@@ -92,7 +92,7 @@ def seed_for(card_id):
 
 
 def load_spec(name):
-    return json.load(open(os.path.join(HERE, name)))
+    return json.load(open(os.path.join(HERE, name), encoding="utf-8"))
 
 
 def main():
@@ -121,13 +121,13 @@ def main():
         raise SystemExit("cards in the spec with NO SCENE (add them to SCENES): " + ", ".join(missing))
 
     out = os.path.join(HERE, "art_manifest.json")
-    json.dump(manifest, open(out, "w"), indent=2)
+    json.dump(manifest, open(out, "w", encoding="utf-8"), indent=2)
 
     # first-milestone subset (ART_PIPELINE_BRIEF Part D): the Elias slice + the boss
     starter_ids = {"sthr-elias", "sthr-elias-back", "sthr-lamp", "sthr-donebefore",
                    "sthr-eighthgrave", "sthr-appointed"}
     starter = [j for j in manifest if j["id"] in starter_ids]
-    json.dump(starter, open(os.path.join(HERE, "art_manifest_starter.json"), "w"), indent=2)
+    json.dump(starter, open(os.path.join(HERE, "art_manifest_starter.json"), "w", encoding="utf-8"), indent=2)
 
     art = [j for j in manifest if not j.get("no_art")]
     print(f"art_manifest.json: {len(manifest)} faces ({len(art)} illustrated, {len(manifest)-len(art)} text-only)")

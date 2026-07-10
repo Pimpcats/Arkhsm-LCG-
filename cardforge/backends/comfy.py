@@ -39,7 +39,7 @@ class ComfyBackend(Backend):
 
     def _load_graph(self, workflow_ref):
         path = os.path.join(self.workflows_dir, os.path.basename(workflow_ref))
-        return json.load(open(path))
+        return json.load(open(path, encoding="utf-8"))
 
     @staticmethod
     def _by_title(graph, title):

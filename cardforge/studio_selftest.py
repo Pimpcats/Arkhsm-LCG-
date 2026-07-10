@@ -92,7 +92,7 @@ size_before = os.path.getsize(os.path.join(faces_dir, "sthr-elias.png"))
 r = requests.post(BASE + "/api/place",
                   json={"card": "sthr-elias", "scale": 1.8, "ox": 30, "oy": -12}).json()
 check("drag/zoom placement saves and recomposes", r.get("composed"))
-placements = json.load(open(os.path.join(ROOT, "out", "still_hour", "placements.json")))
+placements = json.load(open(os.path.join(ROOT, "out", "still_hour", "placements.json"), encoding="utf-8"))
 check("placement stored as data (scale 1.8, pan 30/-12)",
       placements["sthr-elias"]["scale"] == 1.8 and placements["sthr-elias"]["ox"] == 30)
 check("recomposite actually changed the face",
@@ -112,10 +112,10 @@ check("SE config saves", r.get("ok"))
 r = requests.post(BASE + "/api/se_bundle", json={"campaign": "still_hour"}).json()
 check("bundle writes script + jobs (41 faces)", r.get("job_count") == 41
       and os.path.exists(r["script"]) and os.path.exists(r["jobs"]))
-script = open(r["script"]).read()
+script = open(r["script"], encoding="utf-8").read()
 check("jobs embedded in the SE script (no file IO in SE)",
       '"sthr-appointed"' in script and "createDefaultSheets" in script)
-jobs = json.load(open(r["jobs"]))
+jobs = json.load(open(r["jobs"], encoding="utf-8"))
 appointed = next(j for j in jobs if j["id"] == "sthr-appointed")
 elias_back = next(j for j in jobs if j["id"] == "sthr-elias-back")
 check("jobs carry the print layer (rules text, enemy stats, back text)",
@@ -124,8 +124,8 @@ check("jobs carry the print layer (rules text, enemy stats, back text)",
       and "Deck Size: 30" in elias_back["text"])
 check("owner classmap edit landed in the script", "arkham-asset-v3" in script)
 check("illustration paths flow from the index",
-      json.load(open(r["jobs"]))[0].get("illustration") is not None
-      or any(j.get("illustration") for j in json.load(open(r["jobs"]))))
+      json.load(open(r["jobs"], encoding="utf-8"))[0].get("illustration") is not None
+      or any(j.get("illustration") for j in json.load(open(r["jobs"], encoding="utf-8"))))
 r = requests.post(BASE + "/api/se_launch", json={}).json()
 check("launch runs the configured command", r.get("ok"))
 s = requests.get(BASE + "/api/status?campaign=still_hour").json()
@@ -164,11 +164,11 @@ check("coverage sees the exported faces", len(s["se"]["coverage"]["framed"]) == 
 r = requests.post(BASE + "/api/apply", json={"mode": "local"}).json()
 check("apply accepted ({} cards)".format(r.get("cards")), r.get("ok") and r.get("cards") == 2)
 check("rebuild completes", wait_idle(60))
-urls = json.load(open(os.path.join(ROOT, "pipeline", "art_urls.json")))
+urls = json.load(open(os.path.join(ROOT, "pipeline", "art_urls.json"), encoding="utf-8"))
 check("art_urls.json: face + back for elias, face for lamp",
       urls["sthr-elias"]["face"].startswith("file:///")
       and "back" in urls["sthr-elias"] and "sthr-lamp" in urls)
-mod = json.load(open(os.path.join(ROOT, "dist", "the_still_hour_mod.json")))
+mod = json.load(open(os.path.join(ROOT, "dist", "the_still_hour_mod.json"), encoding="utf-8"))
 bags = [o for o in mod["ObjectStates"] if o.get("ContainedObjects")]
 elias = next(c for b in bags for c in b["ContainedObjects"] if c["Nickname"] == "Elias Warde")
 lamp = next(c for b in bags for c in b["ContainedObjects"] if c["Nickname"] == "The Ambergrove Lamp")
@@ -202,7 +202,7 @@ r = requests.post(BASE + "/api/upload_art",
                         "data_b64": "data:image/png;base64," + _b64.b64encode(_stub).decode()}).json()
 check("manual upload becomes the chosen art and recomposes",
       r.get("file") == "upload_1.png"
-      and json.load(open(os.path.join(ROOT, "out", "still_hour", "index.json")))
+      and json.load(open(os.path.join(ROOT, "out", "still_hour", "index.json"), encoding="utf-8"))
       ["sthr-bell"].endswith("upload_1.png"))
 
 print("== SPOILER SHIELD + AUTO-BUILD ==")
@@ -214,7 +214,7 @@ check("spoiler shield present in the UI", "spoiler shield" in page and "Auto-bui
 r = requests.post(BASE + "/api/auto", json={"campaign": "still_hour", "dry_run": True}).json()
 check("auto-build accepted", r.get("started"))
 check("auto-build chain completes (generate->index->compose->apply->rebuild)", wait_idle(180))
-auto_urls = json.load(open(os.path.join(ROOT, "pipeline", "art_urls.json")))
+auto_urls = json.load(open(os.path.join(ROOT, "pipeline", "art_urls.json"), encoding="utf-8"))
 check("auto-build produced a fully-arted mod with zero curation",
       len(auto_urls) == 36 and all(v["face"].startswith("file:///") for v in auto_urls.values()))
 
@@ -222,10 +222,10 @@ print("== ONE-CLICK: Compose & Export to TTS ==")
 r = requests.post(BASE + "/api/export_tts", json={"campaign": "still_hour"}).json()
 check("export chain accepted", r.get("started"))
 check("export chain completes", wait_idle(120))
-urls = json.load(open(os.path.join(ROOT, "pipeline", "art_urls.json")))
+urls = json.load(open(os.path.join(ROOT, "pipeline", "art_urls.json"), encoding="utf-8"))
 check("all 36 cards exported with file:/// faces",
       len(urls) == 36 and all(v["face"].startswith("file:///") for v in urls.values()))
-mod = json.load(open(os.path.join(ROOT, "dist", "the_still_hour_mod.json")))
+mod = json.load(open(os.path.join(ROOT, "dist", "the_still_hour_mod.json"), encoding="utf-8"))
 bags = [o for o in mod["ObjectStates"] if o.get("ContainedObjects")]
 allcards = [c for b in bags for c in b["ContainedObjects"]]
 check("every card in the mod carries a composed face",
@@ -235,9 +235,77 @@ check("chosen art composited into the exported elias face",
       "sthr-elias" in urls and os.path.getsize(
           os.path.join(faces_dir, "sthr-elias.png")) > 8000)
 
+print("== BACKEND RIG: auto launch/load ==")
+from cardforge import rig
+rig_backup = open(rig.rig_path(), encoding="utf-8").read()
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+check("status carries the rig (a1111 folder pre-configured)",
+      s["rig"]["a1111"]["cwd"] == "C:/SD/SDXL"
+      and "--api" in s["rig"]["a1111"]["command"])
+check("rig controls in the UI", "Launch backend" in page and "rig_cwd" in page)
+r = requests.post(BASE + "/api/rig_save",
+                  json={"campaign": "still_hour", "cwd": "/tmp/xyz",
+                        "command": "run.bat --api"}).json()
+check("rig_save persists via the API",
+      r.get("ok") and json.load(open(rig.rig_path(), encoding="utf-8"))
+      ["a1111"]["cwd"] == "/tmp/xyz")
+check("rig_save keeps the config note",
+      "_note" in json.load(open(rig.rig_path(), encoding="utf-8")))
+# full auto-launch loop against a fake A1111 API (stdlib server, self-exits)
+fake = os.path.join(ROOT, "out", "fake_a1111.py")
+with open(fake, "w", encoding="utf-8") as f:
+    f.write("""import threading, os
+from http.server import BaseHTTPRequestHandler, HTTPServer
+threading.Timer(30, lambda: os._exit(0)).start()
+class H(BaseHTTPRequestHandler):
+    def do_GET(self):
+        b = b'[]'
+        self.send_response(200)
+        self.send_header('Content-Length', str(len(b)))
+        self.end_headers()
+        self.wfile.write(b)
+    def log_message(self, *a): pass
+HTTPServer(('127.0.0.1', 7899), H).serve_forever()
+""")
+cfg = rig.load_rig()
+cfg["a1111"] = {"cwd": ROOT, "command": '"{}" "{}"'.format(sys.executable, fake),
+                "startup_timeout": 20}
+rig.save_rig(cfg)
+rig.POLL_SECONDS = 1
+lines = []
+try:
+    ok = rig.ensure_up({"backend": "a1111", "base_url": "http://127.0.0.1:7899",
+                        "name": "still_hour", "output_dir": "out/still_hour"},
+                       on_log=lines.append)
+except RuntimeError as e:
+    ok, lines = False, lines + [str(e)]
+check("backend down -> rig launches it -> API answers -> proceed",
+      ok and any("up after" in l for l in lines))
+check("second ensure_up is a no-op (already reachable)",
+      rig.ensure_up({"backend": "a1111", "base_url": "http://127.0.0.1:7899",
+                     "name": "still_hour", "output_dir": "out/still_hour"},
+                    on_log=lines.append))
+with open(rig.rig_path(), "w", encoding="utf-8") as f:
+    f.write(rig_backup)
+
+print("== WINDOWS LOCALE: repo reads survive a non-UTF-8 default ==")
+import subprocess
+env = dict(os.environ, PYTHONUTF8="0", PYTHONCOERCECLOCALE="0", LC_ALL="C",
+           PYTHONPATH=ROOT)
+r = subprocess.run(
+    [sys.executable, "-c",
+     "from cardforge import se_bridge, studio;"
+     "assert len(se_bridge.build_jobs()) == 41;"
+     "s = studio.status('still_hour');"
+     "assert len(s['cards']) == 36 and s['campaigns']"],
+    env=env, cwd=ROOT, capture_output=True, text=True)
+check("status()+build_jobs OK under a cp1252-like locale (Windows default)",
+      r.returncode == 0)
+if r.returncode:
+    print(r.stderr[-600:])
+
 # leave the repo clean: drop the overlay and rebuild placeholders
 os.remove(os.path.join(ROOT, "pipeline", "art_urls.json"))
-import subprocess
 for scr in ("build_cards.py", "bundle_mod.py", "package_download.py"):
     subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", scr)],
                    check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
