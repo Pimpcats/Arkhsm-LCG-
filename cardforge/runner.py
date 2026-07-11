@@ -94,8 +94,11 @@ def out_dir_for(camp):
 
 # --------------------------------------------------------------------- run --
 
+GEN_PARAM_KEYS = ("steps", "cfg", "sampler", "width", "height")
+
+
 def run_generate(campaign_name, only=None, art_type=None, variants_override=None,
-                 dry_run=False, starter=False, seed_offset=0):
+                 dry_run=False, starter=False, seed_offset=0, param_overrides=None):
     camp = load_campaign(campaign_name)
     profiles = load_profiles()
     resolver = CharacterResolver(os.path.join(campaign_dir(campaign_name), "characters.json"))
@@ -136,6 +139,9 @@ def run_generate(campaign_name, only=None, art_type=None, variants_override=None
             positive = ov.get("positive") or positive
             negative = ov.get("negative") or negative
             print("PROMPT OVERRIDE  " + job["id"])
+        if param_overrides:
+            params.update({k: v for k, v in param_overrides.items()
+                           if k in GEN_PARAM_KEYS and v not in (None, "", 0)})
         n_variants = variants_override or params["variants"]
         for k in range(n_variants):
             # seeds are deterministic per card; a reroll passes seed_offset

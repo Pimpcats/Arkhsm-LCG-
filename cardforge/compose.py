@@ -20,6 +20,9 @@ def is_text_only(job):
 
 def effective_profile(job, campaign, profiles):
     prof = dict(profiles[job["art_type"]])
+    # campaign-wide generation settings (Studio's Advanced tab), then
+    # per-art-type overrides, then per-job — most specific wins
+    prof.update(campaign.get("overrides_all", {}))
     prof.update(campaign.get("overrides", {}).get(job["art_type"], {}))
     prof.update(job.get("overrides", {}))
     if prof.get("checkpoint", PLACEHOLDER_CHECKPOINT) == PLACEHOLDER_CHECKPOINT \

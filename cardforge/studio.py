@@ -104,11 +104,13 @@ def act_generate(p):
     if p.get("reroll"):
         import time as _t
         seed_offset = int(_t.time()) % 900000    # fresh seeds, still resumable
+    param_overrides = {k: p[k] for k in runner.GEN_PARAM_KEYS if p.get(k)}
     return run_job("generate", _backend_first(
         campaign, dry, runner.run_generate, campaign,
         only=set(p["only"].split()) if p.get("only") else None,
         variants_override=int(p["variants"]) if p.get("variants") else None,
-        dry_run=dry, starter=bool(p.get("starter")), seed_offset=seed_offset))
+        dry_run=dry, starter=bool(p.get("starter")), seed_offset=seed_offset,
+        param_overrides=param_overrides or None))
 
 
 def act_seeds(p):
@@ -209,6 +211,52 @@ def act_prompt_save(p):
         p.get("positive", ""), p.get("negative", ""))
     log("prompt override {} for {}".format("saved" if entry else "cleared", p["card"]))
     return {"ok": True, "override": entry}
+
+
+def act_gen_settings(p):
+    """Campaign-wide generation defaults (Advanced tab) — steps/cfg/sampler
+    applied to every art type via campaign.json 'overrides_all'."""
+    campaign = p.get("campaign", "still_hour")
+    path = os.path.join(runner.campaign_dir(campaign), "campaign.json")
+    camp = json.load(open(path, encoding="utf-8"))
+    ov = camp.get("overrides_all", {})
+    for k, cast in (("steps", int), ("cfg", float), ("sampler", str)):
+        v = p.get(k)
+        if v in (None, ""):
+            ov.pop(k, None)
+        else:
+            ov[k] = cast(v)
+    if ov:
+        camp["overrides_all"] = ov
+    else:
+        camp.pop("overrides_all", None)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(camp, f, indent=2)
+    log("generation defaults: {}".format(ov or "profile defaults"))
+    return {"ok": True, "overrides_all": ov}
+
+
+def act_lora_save(p):
+    """Per-character LoRA name / strength / trigger (Advanced tab) into
+    characters.json — refs and descriptions are preserved."""
+    campaign = p.get("campaign", "still_hour")
+    path = os.path.join(runner.campaign_dir(campaign), "characters.json")
+    chars = json.load(open(path, encoding="utf-8"))
+    for name, entry in (p.get("characters") or {}).items():
+        cur = chars.setdefault(name, {})
+        for k in ("lora", "trigger"):
+            if k in entry:
+                v = (entry[k] or "").strip()
+                if v:
+                    cur[k] = v
+                else:
+                    cur.pop(k, None)
+        if "weight" in entry and entry["weight"] not in (None, ""):
+            cur["weight"] = max(0.0, min(2.0, float(entry["weight"])))
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(chars, f, indent=2)
+    log("LoRA settings saved for {} character(s)".format(len(p.get("characters") or {})))
+    return {"ok": True}
 
 
 def act_style_save(p):
@@ -426,11 +474,7 @@ def _apply_local_and_rebuild(campaign):
         back = os.path.join(faces_dir, face_id + "-back.png")
         if os.path.exists(back):
             urls[face_id]["back"] = "file:///" + back.replace(os.sep, "/").lstrip("/")
-    for key, fname in (("_player_back", "player_back.png"),
-                       ("_encounter_back", "encounter_back.png")):
-        p = os.path.join(ROOT, "assets", "backs", fname)
-        if os.path.exists(p):
-            urls[key] = "file:///" + p.replace(os.sep, "/").lstrip("/")
+    _add_deck_backs(urls)
     with open(os.path.join(ROOT, "pipeline", "art_urls.json"), "w", encoding="utf-8") as f:
         json.dump(urls, f, indent=2)
     log("art_urls.json: {} card(s), local file:/// mode".format(len(urls)))
@@ -438,6 +482,17 @@ def _apply_local_and_rebuild(campaign):
         subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", script)],
                        check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
         log("rebuilt: pipeline/" + script)
+
+
+def _add_deck_backs(urls, hosted_base=None):
+    """Campaign-wide deck backs (assets/backs/*.png) ride along in every
+    art_urls.json write as _player_back / _encounter_back."""
+    for key, fname in (("_player_back", "player_back.png"),
+                       ("_encounter_back", "encounter_back.png")):
+        p = os.path.join(ROOT, "assets", "backs", fname)
+        if os.path.exists(p):
+            urls[key] = (hosted_base + "/" + fname) if hosted_base \
+                else "file:///" + p.replace(os.sep, "/").lstrip("/")
 
 
 def act_export_tts(p):
@@ -461,6 +516,7 @@ def act_export_tts(p):
             back = os.path.join(faces_dir, face_id + "-back.png")
             if os.path.exists(back):
                 urls[face_id]["back"] = "file:///" + back.replace(os.sep, "/").lstrip("/")
+        _add_deck_backs(urls)
         with open(os.path.join(ROOT, "pipeline", "art_urls.json"), "w", encoding="utf-8") as f:
             json.dump(urls, f, indent=2)
         log("art_urls.json: {} card(s), local file:/// mode".format(len(urls)))
@@ -490,6 +546,7 @@ def act_apply(p):
         if os.path.exists(back):
             urls[face_id]["back"] = (base + "/" + face_id + "-back.png") if mode == "hosted" \
                 else "file:///" + back.replace(os.sep, "/").lstrip("/")
+    _add_deck_backs(urls, hosted_base=base if mode == "hosted" else None)
     with open(os.path.join(ROOT, "pipeline", "art_urls.json"), "w", encoding="utf-8") as f:
         json.dump(urls, f, indent=2)
     log("art_urls.json: {} card(s), mode={}".format(len(urls), mode))
@@ -502,7 +559,8 @@ def act_apply(p):
             log("rebuilt: pipeline/" + script)
         log("mod rebuilt with {} real face(s) — load dist/the_still_hour_mod.json".format(len(urls)))
     run_job("apply-to-mod", rebuild)
-    return {"ok": True, "cards": len(urls)}
+    return {"ok": True,
+            "cards": len([k for k in urls if not k.startswith("_")])}
 
 
 # ------------------------------------------------------------------- status --
@@ -622,6 +680,11 @@ def status(campaign="still_hour"):
             "rig": {k: v for k, v in rig.load_rig().items() if k != "_note"},
             "vendor": installer.vendor_status(),
             "seeds": seeds, "cards": catalog, "faces_ver": faces_ver,
+            "gen": camp.get("overrides_all", {}),
+            "characters": {n: {"lora": (v or {}).get("lora", ""),
+                               "weight": (v or {}).get("weight", 0.8),
+                               "trigger": (v or {}).get("trigger", "")}
+                           for n, v in chars.items() if not n.startswith("_")},
             "se": {"config": se_bridge.load_config(),
                    "bundle_exists": os.path.exists(
                        os.path.join(se_bridge.se_dir(), "frame_cards.js")),
@@ -639,6 +702,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "install_se": act_install_se, "install_a1111": act_install_a1111,
            "prompt_get": act_prompt_get, "prompt_save": act_prompt_save,
            "style_save": act_style_save, "inpaint_frames": act_inpaint_frames,
+           "gen_settings": act_gen_settings, "lora_save": act_lora_save,
            "choose": act_choose, "se_save_config": act_se_save_config,
            "se_bundle": act_se_bundle, "se_launch": act_se_launch,
            "render_placeholders": act_render_placeholders, "apply": act_apply,
@@ -855,7 +919,45 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 <button id=tab-cards onclick="tab('cards')">3 &middot; Cards</button>
 <button id=tab-frame onclick="tab('frame')">4 &middot; Frame</button>
 <button id=tab-apply onclick="tab('apply')">5 &middot; Play in TTS</button>
+<button id=tab-advanced onclick="tab('advanced')">&#9881; Advanced</button>
 </nav><main>
+
+<section id=advanced><div class=panel>
+<h2>Generate any card <small>pick a card, tune the prompt and settings, generate</small></h2>
+<div class=row>
+<select id=adv_card onchange=advLoad() style="max-width:340px">
+<option value="">&mdash; pick a card &mdash;</option></select>
+<label>steps</label><input type=number id=adv_steps style="width:70px" placeholder="auto">
+<label>CFG</label><input type=number step=0.5 id=adv_cfg style="width:70px" placeholder="auto">
+<label>sampler</label><input type=text id=adv_sampler size=16 placeholder="profile default">
+<label>variants</label><input type=number id=adv_variants style="width:60px" value=2 min=1 max=8>
+<label><input type=checkbox id=adv_reroll checked> new seeds</label>
+</div>
+<label>prompt</label><textarea id=adv_pos rows=3 spellcheck=false></textarea>
+<label>negative prompt</label><textarea id=adv_neg rows=2 spellcheck=false></textarea>
+<div class=row style="margin-top:6px">
+<button class="btn primary" onclick=advGenerate()>Generate</button>
+<span id=adv_info class=hint></span>
+</div>
+<p class=hint>&#128274;-marked cards are encounter cards (spoilers) — they generate fine, and the
+shield still hides the result until you tap it. Prompt edits here are saved as that card&rsquo;s
+override, same as the Cards-tab editor.</p>
+<hr>
+<h2>Generation defaults <small>applied to EVERY batch, Auto-build, and seed run</small></h2>
+<div class=row>
+<label>steps</label><input type=number id=gen_steps style="width:70px" placeholder="profile">
+<label>CFG</label><input type=number step=0.5 id=gen_cfg style="width:70px" placeholder="profile">
+<label>sampler</label><input type=text id=gen_sampler size=18 placeholder="profile default">
+<button class=btn onclick=genSave()>Save defaults</button>
+<span class=hint>leave blank to use each art type&rsquo;s tuned profile</span>
+</div>
+<hr>
+<h2>Character LoRAs <small>consistency per investigator — strength 0&ndash;2, applied as &lt;lora:name:strength&gt;</small></h2>
+<div id=lora_rows></div>
+<div class=row style="margin-top:6px"><button class=btn onclick=loraSave()>Save LoRAs</button>
+<span class=hint>no LoRA yet? leave empty — the character renders from description + trigger words.
+Train LoRAs on the SAME checkpoint you generate with (Painter&rsquo;s).</span></div>
+</div></section>
 
 <section id=setup class=on><div class=panel>
 <h2>Make this folder self-contained <small>everything installs INTO the app folder and is found again wherever the folder moves</small></h2>
@@ -1056,7 +1158,7 @@ New variants land in the strip above and the gallery when the job finishes.</p>
 <script>
 let seq=0, cur='setup', ed=null, ST=null;
 window.revealed=window.revealed||new Set();
-function tab(t){cur=t;for(const x of ['setup','cards','illustrate','frame','apply']){
+function tab(t){cur=t;for(const x of ['setup','cards','illustrate','frame','apply','advanced']){
 document.getElementById(x).classList.toggle('on',x===t);
 document.getElementById('tab-'+x).classList.toggle('on',x===t);}
 if(t==='illustrate'&&!modelsLoadedOnce){modelsLoadedOnce=true;modelsLoad();}}
@@ -1082,6 +1184,38 @@ function modelSet(){const v=document.getElementById('model').value;
 if(v)post('model_set',{checkpoint:v});}
 function styleSave(){post('style_save',{style_positive:document.getElementById('style_pos').value,
 style_negative:document.getElementById('style_neg').value});}
+let ADV_COMPOSED=null;
+async function advLoad(){const card=document.getElementById('adv_card').value;
+ADV_COMPOSED=null;const info=document.getElementById('adv_info');
+if(!card){info.textContent='';return;}
+const j=await post('prompt_get',{card});
+if(!j.ok){info.textContent='this face is text-only (no illustration)';
+document.getElementById('adv_pos').value='';document.getElementById('adv_neg').value='';return;}
+ADV_COMPOSED={positive:j.positive,negative:j.negative};
+document.getElementById('adv_pos').value=(j.override&&j.override.positive)||j.positive;
+document.getElementById('adv_neg').value=(j.override&&j.override.negative)||j.negative;
+info.textContent='base seed '+j.seed+' · '+j.checkpoint;}
+async function advGenerate(){const card=document.getElementById('adv_card').value;
+if(!card){addlog('pick a card first');return;}
+const p=document.getElementById('adv_pos').value.trim(),
+n=document.getElementById('adv_neg').value.trim();
+await post('prompt_save',{card,
+positive:ADV_COMPOSED&&p===ADV_COMPOSED.positive.trim()?'':p,
+negative:ADV_COMPOSED&&n===ADV_COMPOSED.negative.trim()?'':n});
+await post('generate',{only:card,dry_run:dry(),
+variants:parseInt(document.getElementById('adv_variants').value)||2,
+reroll:document.getElementById('adv_reroll').checked,
+steps:document.getElementById('adv_steps').value,
+cfg:document.getElementById('adv_cfg').value,
+sampler:document.getElementById('adv_sampler').value});}
+function genSave(){post('gen_settings',{steps:document.getElementById('gen_steps').value,
+cfg:document.getElementById('gen_cfg').value,
+sampler:document.getElementById('gen_sampler').value});}
+function loraSave(){const chars={};
+for(const row of document.querySelectorAll('#lora_rows [data-char]')){
+const c=row.getAttribute('data-char');chars[c]=chars[c]||{};
+chars[c][row.getAttribute('data-field')]=row.value;}
+post('lora_save',{characters:chars});}
 let ZOOMFN=null;
 function zoomOpen(src,cap,actLabel,actFn){ZOOMFN=actFn||null;
 document.getElementById('zoom_img').src=src;
@@ -1217,8 +1351,27 @@ document.getElementById('modelinfo').innerHTML=s.checkpoint?
 ('current: <b>'+s.checkpoint+'</b>'+(s.checkpoint==='SET_ME.safetensors'?
 ' — load the list and pick your model':'')):'';
 for(const [id,val] of [['style_pos',(s.style||{}).positive||''],
-['style_neg',(s.style||{}).negative||'']]){
+['style_neg',(s.style||{}).negative||''],
+['gen_steps',(s.gen||{}).steps||''],['gen_cfg',(s.gen||{}).cfg||''],
+['gen_sampler',(s.gen||{}).sampler||'']]){
 const el=document.getElementById(id);if(el&&document.activeElement!==el)el.value=val;}
+const advSel=document.getElementById('adv_card');
+if(advSel&&advSel.options.length<=1){
+for(const grp of GROUP_ORDER){const cards=s.cards.filter(c=>c.group===grp);
+if(!cards.length)continue;
+const og=document.createElement('optgroup');og.label=grp;
+for(const c of cards){const o=document.createElement('option');
+o.value=c.id;o.text=(c.spoiler?'🔒 ':'')+c.name;og.appendChild(o);}
+advSel.appendChild(og);}}
+const lr=document.getElementById('lora_rows');
+if(lr&&!lr.contains(document.activeElement)){
+lr.innerHTML=Object.entries(s.characters||{}).map(([n,c])=>
+`<div class=row style="margin-bottom:4px">`+
+`<b style="min-width:90px;text-transform:capitalize">${n}</b>`+
+`<label>LoRA</label><input type=text size=22 data-char="${n}" data-field=lora value="${(c.lora||'').replace(/"/g,'&quot;')}" placeholder="none trained yet">`+
+`<label>strength</label><input type=number step=0.05 min=0 max=2 style="width:75px" data-char="${n}" data-field=weight value="${c.weight}">`+
+`<label>trigger</label><input type=text size=18 data-char="${n}" data-field=trigger value="${(c.trigger||'').replace(/"/g,'&quot;')}">`+
+`</div>`).join('');}
 const v=s.vendor||{};
 document.getElementById('vendor_a1111').innerHTML=v.a1111_installed?
 '&#10003; installed in vendor/a1111':'not installed (fine if you already run A1111 elsewhere)';

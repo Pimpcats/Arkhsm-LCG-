@@ -182,9 +182,9 @@ check("mod carries the real face URL for Elias (incl. unique back)",
 check("unframed cards keep placeholders",
       "placehold.co" in next(c for b in bags for c in b["ContainedObjects"]
                              if c["Nickname"] == "The Appointed")["CustomDeck"]["95040"]["FaceURL"])
-check("lamp face real, lamp back still shared player back",
+check("lamp face real, lamp back = the campaign player back",
       lamp["CustomDeck"]["95011"]["FaceURL"].startswith("file:///")
-      and "placehold.co" in lamp["CustomDeck"]["95011"]["BackURL"])
+      and lamp["CustomDeck"]["95011"]["BackURL"].endswith("player_back.png"))
 
 print("== CARDS CATALOG (the placement section) ==")
 s = requests.get(BASE + "/api/status?campaign=still_hour").json()
@@ -219,16 +219,23 @@ r = requests.post(BASE + "/api/auto", json={"campaign": "still_hour", "dry_run":
 check("auto-build accepted", r.get("started"))
 check("auto-build chain completes (generate->index->compose->apply->rebuild)", wait_idle(180))
 auto_urls = json.load(open(os.path.join(ROOT, "pipeline", "art_urls.json"), encoding="utf-8"))
+auto_cards = {k: v for k, v in auto_urls.items() if not k.startswith("_")}
 check("auto-build produced a fully-arted mod with zero curation",
-      len(auto_urls) == 36 and all(v["face"].startswith("file:///") for v in auto_urls.values()))
+      len(auto_cards) == 36 and all(v["face"].startswith("file:///")
+                                    for v in auto_cards.values()))
+check("campaign deck backs ride along in every apply",
+      auto_urls.get("_player_back", "").endswith("player_back.png")
+      and auto_urls.get("_encounter_back", "").endswith("encounter_back.png"))
 
 print("== ONE-CLICK: Compose & Export to TTS ==")
 r = requests.post(BASE + "/api/export_tts", json={"campaign": "still_hour"}).json()
 check("export chain accepted", r.get("started"))
 check("export chain completes", wait_idle(120))
 urls = json.load(open(os.path.join(ROOT, "pipeline", "art_urls.json"), encoding="utf-8"))
+url_cards = {k: v for k, v in urls.items() if not k.startswith("_")}
 check("all 36 cards exported with file:/// faces",
-      len(urls) == 36 and all(v["face"].startswith("file:///") for v in urls.values()))
+      len(url_cards) == 36 and all(v["face"].startswith("file:///")
+                                   for v in url_cards.values()))
 mod = json.load(open(os.path.join(ROOT, "dist", "the_still_hour_mod.json"), encoding="utf-8"))
 bags = [o for o in mod["ObjectStates"] if o.get("ContainedObjects")]
 allcards = [c for b in bags for c in b["ContainedObjects"]]
@@ -366,6 +373,47 @@ check("gallery flags dry-run stubs so the UI can hide them",
       and any(g["stubs"] for g in s["gallery"]))
 check("reroll + stub filtering in the UI",
       "Reroll" in page and "stubs" in page)
+
+print("== ADVANCED: any-card generation, defaults, LoRA strengths ==")
+chars_path2 = os.path.join(ROOT, "campaigns", "still_hour", "characters.json")
+chars_backup2 = open(chars_path2, encoding="utf-8").read()
+camp_backup3 = open(camp_path, encoding="utf-8").read()
+r = requests.post(BASE + "/api/gen_settings",
+                  json={"campaign": "still_hour", "steps": 7, "cfg": 3.5,
+                        "sampler": ""}).json()
+check("generation defaults save (overrides_all)",
+      r.get("ok") and r["overrides_all"] == {"steps": 7, "cfg": 3.5})
+for f in list(os.listdir(pdir)):
+    if f.startswith("sthr-bell"):
+        os.remove(os.path.join(pdir, f))
+requests.post(BASE + "/api/generate",
+              json={"campaign": "still_hour", "only": "sthr-bell",
+                    "variants": 1, "dry_run": True, "reroll": True,
+                    "cfg": 9.0}).json()
+wait_idle(30)
+pay = [json.load(open(os.path.join(pdir, f), encoding="utf-8"))
+       for f in os.listdir(pdir) if f.startswith("sthr-bell")]
+check("campaign defaults + one-off settings reach the payload "
+      "(steps=7 default, cfg=9 override)",
+      any(p["steps"] == 7 and p["cfg_scale"] == 9.0 for p in pay))
+r = requests.post(BASE + "/api/lora_save",
+                  json={"campaign": "still_hour",
+                        "characters": {"elias": {"lora": "elias_v1",
+                                                 "weight": 0.65}}}).json()
+chars_now = json.load(open(chars_path2, encoding="utf-8"))
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+check("LoRA name + strength persist and surface in status",
+      r.get("ok") and chars_now["elias"]["lora"] == "elias_v1"
+      and chars_now["elias"]["weight"] == 0.65
+      and s["characters"]["elias"]["weight"] == 0.65
+      and "description" in chars_now["elias"])
+check("advanced tab present (card picker, settings, LoRA rows)",
+      all(x in page for x in ("adv_card", "advGenerate", "gen_settings",
+                              "lora_rows", "Advanced")))
+with open(chars_path2, "w", encoding="utf-8") as f:
+    f.write(chars_backup2)
+with open(camp_path, "w", encoding="utf-8") as f:
+    f.write(camp_backup3)
 
 print("== SETUP: self-contained vendor installs (dry-run) ==")
 import shutil as _sh
