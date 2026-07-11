@@ -34,7 +34,10 @@
     "lora": null,
     "weight": 0.8,
     "trigger": "birdieokonkwo young woman drifter compass",
-    "refs": [],
+    "refs": [
+      "out/still_hour/seeds/birdie/7000.png",
+      "out/still_hour/seeds/birdie/7097.png"
+    ],
     "description": "young Black woman, early twenties, patched practical coat, alert scrappy expression, small brass compass on a cord"
   }
 }
