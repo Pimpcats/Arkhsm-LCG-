@@ -293,6 +293,38 @@ check("category chips filter both the Cards grid and the gallery",
       all(x in page for x in ("chips_cards", "chips_gal", "setGroup",
                               "renderGallery")))
 
+print("== SETUP: self-contained vendor installs (dry-run) ==")
+import shutil as _sh
+from cardforge import installer, se_bridge as _seb
+camp_backup2 = open(camp_path, encoding="utf-8").read()
+se_cfg_backup = json.dumps(_seb.load_config())
+_sh.rmtree(os.path.join(ROOT, "vendor"), ignore_errors=True)
+r = requests.post(BASE + "/api/install_checkpoint",
+                  json={"campaign": "still_hour", "dry_run": True}).json()
+check("checkpoint install job accepted", r.get("started"))
+check("checkpoint install completes", wait_idle(30))
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+check("stub checkpoint lands in vendor/models and campaign points at it",
+      s["vendor"]["models"] == ["paintersCheckpoint_v11_STUB.safetensors"]
+      and s["checkpoint"] == "paintersCheckpoint_v11_STUB.safetensors")
+check("a1111 launch gains --ckpt-dir vendor/models",
+      "--ckpt-dir" in installer.ckpt_dir_args()
+      and "vendor" in installer.ckpt_dir_args())
+r = requests.post(BASE + "/api/install_se", json={"dry_run": True}).json()
+check("SE install job accepted", r.get("started"))
+check("SE install completes", wait_idle(30))
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+check("SE lands under vendor/ and the launch command points at it",
+      s["vendor"]["se_installed"]
+      and "vendor" in _seb.load_config()["launch_command"])
+check("setup tab + per-tab steps in the UI",
+      all(x in page for x in ("Setup", "steps_setup", "steps_illustrate",
+                              "renderSteps", "vendor/models")))
+_sh.rmtree(os.path.join(ROOT, "vendor"), ignore_errors=True)
+with open(camp_path, "w", encoding="utf-8") as f:
+    f.write(camp_backup2)
+_seb.save_config(json.loads(se_cfg_backup))
+
 print("== LEDGER: dry rehearsals never block real runs ==")
 from cardforge.ledger import Ledger
 led = Ledger(os.path.join(ROOT, "state", "_test.ledger.json"))

@@ -7,3 +7,4 @@ se/
 assets/frames/*
 !assets/frames/README.md
 !assets/frames/templates/
+vendor/

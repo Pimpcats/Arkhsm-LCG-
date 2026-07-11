@@ -31,7 +31,7 @@ from urllib.parse import urlparse, parse_qs
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from cardforge import rig, runner, se_bridge  # noqa: E402
+from cardforge import installer, rig, runner, se_bridge  # noqa: E402
 
 PORT = 8570
 ROOT = runner.repo_root()
@@ -169,6 +169,20 @@ def act_model_set(p):
         json.dump(camp, f, indent=2)
     log("campaign checkpoint set: " + checkpoint)
     return {"ok": True, "checkpoint": checkpoint}
+
+
+def act_install_checkpoint(p):
+    """Setup: download the art model into vendor/models (self-contained)."""
+    return run_job("install-checkpoint", installer.install_checkpoint,
+                   p.get("campaign", "still_hour"),
+                   token=p.get("token") or None,
+                   dry_run=bool(p.get("dry_run")))
+
+
+def act_install_se(p):
+    """Setup: download Strange Eons into vendor/strange-eons (self-contained)."""
+    return run_job("install-strange-eons", installer.install_strange_eons,
+                   dry_run=bool(p.get("dry_run")))
 
 
 def act_seed_pick(p):
@@ -519,6 +533,7 @@ def status(campaign="still_hour"):
             "backend": camp.get("backend"), "checkpoint": camp.get("checkpoint"),
             "report": report, "gallery": gallery,
             "rig": {k: v for k, v in rig.load_rig().items() if k != "_note"},
+            "vendor": installer.vendor_status(),
             "seeds": seeds, "cards": catalog, "faces_ver": faces_ver,
             "se": {"config": se_bridge.load_config(),
                    "bundle_exists": os.path.exists(
@@ -533,6 +548,8 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "rig_save": act_rig_save, "backend_launch": act_backend_launch,
            "seed_pick": act_seed_pick,
            "models": act_models, "model_set": act_model_set,
+           "install_checkpoint": act_install_checkpoint,
+           "install_se": act_install_se,
            "choose": act_choose, "se_save_config": act_se_save_config,
            "se_bundle": act_se_bundle, "se_launch": act_se_launch,
            "render_placeholders": act_render_placeholders, "apply": act_apply,
@@ -676,6 +693,14 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 .card{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:8px}
 .card img{width:100%;border-radius:6px;cursor:pointer;margin-top:4px}
 .card img.chosen{outline:2px solid var(--accent)}
+.stepbox{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.step{display:flex;align-items:baseline;gap:10px;font-size:13.5px;color:var(--dim)}
+.step b{color:var(--ink);font-weight:600}
+.step .n{flex:none;width:22px;height:22px;border-radius:50%;display:inline-flex;
+align-items:center;justify-content:center;font-size:12px;border:1px solid var(--line);
+background:var(--surface2);transform:translateY(4px)}
+.step.done .n{background:var(--good);color:#08150c;border-color:transparent}
+.step.done{color:var(--dim);text-decoration:none}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}
 .chip{padding:6px 14px;border-radius:999px;border:1px solid var(--line);
 background:var(--surface2);color:var(--dim);cursor:pointer;font-size:13px;
@@ -727,11 +752,40 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 <button class="btn primary" onclick="post('auto',{dry_run:dry()})" title="generate &rarr; place &rarr; compose &rarr; TTS, hands-off">&#9889; Auto-build ALL &rarr; TTS</button>
 </header>
 <nav>
+<button id=tab-setup onclick="tab('setup')">Setup</button>
 <button id=tab-cards class=on onclick="tab('cards')">Cards</button>
 <button id=tab-illustrate onclick="tab('illustrate')">Illustrate</button>
 <button id=tab-frame onclick="tab('frame')">Frame &mdash; Strange Eons</button>
 <button id=tab-apply onclick="tab('apply')">Apply to Mod</button>
 </nav><main>
+
+<section id=setup><div class=panel>
+<h2>Make this folder self-contained <small>everything installs INTO the app folder and is found again wherever the folder moves</small></h2>
+<div id=steps_setup class=stepbox></div>
+<hr>
+<div class=row>
+<b style="min-width:180px">1 &middot; Art model</b>
+<input type=password id=civitai_token size=28 placeholder="Civitai API key (needed to download)">
+<button class="btn primary" onclick="post('install_checkpoint',{token:document.getElementById('civitai_token').value})">Install Painter&rsquo;s Checkpoint</button>
+<span id=vendor_model class=hint></span>
+</div>
+<p class=hint>Downloads Painter&rsquo;s Checkpoint v1.1 (SDXL) into <code>vendor/models/</code>, points the
+campaign at it, and launches A1111 with <code>--ckpt-dir vendor/models</code> so it&rsquo;s found wherever this
+folder lives. Get a free API key at civitai.com &rarr; account settings. Already have the file? Just drop
+the .safetensors into <code>vendor/models/</code> instead.</p>
+<hr>
+<div class=row>
+<b style="min-width:180px">2 &middot; Strange Eons</b>
+<button class="btn primary" onclick="post('install_se')">Download &amp; install into this folder</button>
+<span id=vendor_se class=hint></span>
+</div>
+<p class=hint>Fetches the latest official release into <code>vendor/strange-eons/</code> and points the Frame
+tab&rsquo;s launch command at it. Then two manual pieces it can&rsquo;t fetch for you (they live behind a blog
+and a Discord): the <b>Arkham plugin — use jaqenZann&rsquo;s external build</b> from the
+<a href="https://barnabyfiles.wordpress.com" target=_blank>Barnaby Files guide</a> (NOT the outdated in-app
+catalog plugin), and the <b>AH font pack</b> from the Mythos Busters Discord — install those inside Strange
+Eons once, and every exported card uses the exact official fonts.</p>
+</div></section>
 
 <section id=cards class=on>
 <div class=panel><div class=row>
@@ -742,11 +796,14 @@ drag to position, scroll to size. Encounter cards stay hidden behind the
 <label><input type=checkbox id=spoilshield checked onchange=refresh()> spoiler shield</label>
 <button class=btn onclick="post('render_placeholders')">Compose all faces</button>
 </div>
+<div id=steps_cards class=stepbox></div>
 <div id=chips_cards class=chips></div>
 <div id=cardgroups></div>
 </div></section>
 
 <section id=illustrate><div class=panel>
+<div id=steps_illustrate class=stepbox></div>
+<hr>
 <div class=row>
 <b>Backend</b> <span id=rig_kind class=stat></span>
 <label>folder</label><input type=text id=rig_cwd size=22 placeholder="C:\SD\SDXL" onchange=rigSave()>
@@ -788,6 +845,8 @@ A1111 note: <code>webui.bat --api</code> guarantees the API; if you rely on cust
 </div></section>
 
 <section id=frame><div class=panel>
+<div id=steps_frame class=stepbox></div>
+<hr>
 <p class=hint>Strange Eons produces the pixel-perfect final cards; this tab drives it.
 Tools: <a href="https://strangeeons.cgjennings.ca" target=_blank>Strange Eons 3</a> &middot;
 <a href="https://github.com/CGJennings/strange-eons" target=_blank>source</a>.
@@ -815,6 +874,8 @@ Barnaby Files guide; AH font pack via the Mythos Busters Discord.</p>
 </div></section>
 
 <section id=apply><div class=panel>
+<div id=steps_apply class=stepbox></div>
+<hr>
 <div class=row>
 <button class="btn primary" onclick="post('export_tts')">Compose cards &amp; Export to TTS</button>
 <span class=hint>compose faces with your placed art &rarr; local file:/// URLs &rarr; rebuild the mod</span>
@@ -861,7 +922,7 @@ Barnaby Files guide; AH font pack via the Mythos Busters Discord.</p>
 <script>
 let seq=0, cur='cards', ed=null, ST=null;
 window.revealed=window.revealed||new Set();
-function tab(t){cur=t;for(const x of ['cards','illustrate','frame','apply']){
+function tab(t){cur=t;for(const x of ['setup','cards','illustrate','frame','apply']){
 document.getElementById(x).classList.toggle('on',x===t);
 document.getElementById('tab-'+x).classList.toggle('on',x===t);}}
 function dry(){return document.getElementById('dryrun').checked}
@@ -953,7 +1014,41 @@ g.variants.map(v=>`<img loading=lazy class="${v===g.chosen?'chosen':''}" title="
 `src="/art?p=out/${s.campaign}/${g.id}/${v}" `+
 `onclick="zoomOpen(this.src,'${g.id} — ${v}','Use on this card',()=>post('choose',{card:'${g.id}',file:'${v}'}))">`).join('')+
 `</div>`;}).join('')||'<span class=hint>nothing in this category yet — run a batch, or upload art per card from the Cards tab</span>';}
-function renderAll(s){renderChips(s);renderCards(s);renderGallery(s);}
+function step(done,html){return `<div class="step${done?' done':''}">`+
+`<span class=n>${done?'&#10003;':''}</span><span>${html}</span></div>`;}
+function renderSteps(s){
+const v=s.vendor||{},cov=(s.se&&s.se.coverage)||{framed:[],total:0};
+const hasModel=(v.models||[]).length>0||(s.checkpoint&&s.checkpoint!=='SET_ME.safetensors');
+const seedsDone=Object.keys(s.seeds||{}).length>0;
+const picksDone=seedsDone&&Object.values(s.seeds).every(x=>x.picked);
+const gen=s.report&&s.report.generated>0&&!s.report.dry_run;
+const allFramed=cov.total>0&&cov.framed.length===cov.total;
+const el=(id,html)=>{const e=document.getElementById(id);if(e)e.innerHTML=html;};
+el('steps_setup',
+ step(hasModel,'<b>Install the art model</b> — one click below (needs a free Civitai API key), or drop your .safetensors into <code>vendor/models/</code>')+
+ step(v.se_installed,'<b>Install Strange Eons</b> into this folder — it renders the FINAL cards on real blank frames with the real fonts')+
+ step(false,'<b>Inside Strange Eons, once:</b> install jaqenZann&rsquo;s Arkham plugin + the AH font pack (links below) — this is what makes cards indistinguishable from official ones'));
+el('steps_cards',
+ step(true,'<b>Pick a category</b> below, click a card to open it')+
+ step(true,'<b>Drag</b> the art to position, <b>scroll</b> to size, <b>Save</b> — placement is kept and reused by the final Strange Eons render')+
+ step(true,'These in-app faces are a fast <b>preview</b>; the print-identical faces come from the Frame tab'));
+el('steps_illustrate',
+ step(hasModel,'<b>1.</b> Install the art model (Setup tab) — currently: <b>'+(s.checkpoint||'none')+'</b>')+
+ step(seedsDone,'<b>2.</b> Run <b>Step 0 · Seeds</b> (the backend launches itself; watch the Activity drawer)')+
+ step(picksDone,'<b>3.</b> Click each investigator&rsquo;s best portrait &rarr; <b>Make canonical</b>')+
+ step(gen,'<b>4.</b> Run <b>Starter batch</b> to check the look, then <b>&#9889; Auto-build ALL</b> (top right) &mdash; uncheck dry-run for real art')+
+ step(true,'<b>5.</b> Fine-tune any card&rsquo;s art in the Cards tab'));
+el('steps_frame',
+ step(v.se_installed,'<b>1.</b> Install Strange Eons (Setup tab) + the jaqenZann plugin and AH fonts inside it')+
+ step(!(s.se&&JSON.stringify(s.se.config.classmap).includes('TODO')),'<b>2.</b> Fill the class-map + setting keys once (open one card of each type in SE to read them)')+
+ step(s.se&&s.se.bundle_exists,'<b>3.</b> <b>Write frame bundle</b> — packs every card + your art + placements into an SE script')+
+ step(allFramed,'<b>4.</b> <b>Launch Strange Eons</b> &rarr; it exports every face; coverage below fills to '+cov.total)+
+ step(false,'<b>5.</b> Apply tab &rarr; the exported faces replace the previews in the mod'));
+el('steps_apply',
+ step(false,'<b>1.</b> <b>Compose cards &amp; Export to TTS</b> — writes local file:/// art and rebuilds the mod')+
+ step(false,'<b>2.</b> Copy <code>dist/the_still_hour_mod.json</code> to <code>Documents/My Games/Tabletop Simulator/Saves/</code>')+
+ step(false,'<b>3.</b> In TTS: Games &rarr; Save &amp; Load &rarr; THE STILL HOUR (Run Tests on the Control token should pass 23/23)'));}
+function renderAll(s){renderChips(s);renderCards(s);renderGallery(s);renderSteps(s);}
 async function refresh(){const r=await fetch('/api/status?campaign='+camp());const s=await r.json();
 ST=s.faces_ver;
 const sel=document.getElementById('campaign');
@@ -968,6 +1063,12 @@ const el=document.getElementById(id);if(el&&document.activeElement!==el)el.value
 document.getElementById('modelinfo').innerHTML=s.checkpoint?
 ('current: <b>'+s.checkpoint+'</b>'+(s.checkpoint==='SET_ME.safetensors'?
 ' — load the list and pick your model':'')):'';
+const v=s.vendor||{};
+document.getElementById('vendor_model').innerHTML=(v.models||[]).length?
+'&#10003; installed: '+v.models.join(', '):(v.has_token?'key saved — ready to install':'not installed yet');
+document.getElementById('vendor_se').innerHTML=v.se_installed?
+'&#10003; installed at '+v.se_path:((v.se_downloads||[]).length?
+'downloaded: '+v.se_downloads.join(', ')+' — finish the install':'not installed yet');
 document.getElementById('busytext').textContent=s.busy?'working&hellip;'.replace('&hellip;','…'):'idle';
 renderCards(s);
 const rep=s.report.generated!==undefined?
