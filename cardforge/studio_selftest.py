@@ -262,6 +262,34 @@ check("seed_pick rejects a bogus file",
 with open(chars_path, "w", encoding="utf-8") as f:
     f.write(chars_backup)
 
+print("== MODEL PICKER: choose the checkpoint from the app ==")
+camp_path = os.path.join(ROOT, "campaigns", "still_hour", "campaign.json")
+camp_backup = open(camp_path, encoding="utf-8").read()
+r = requests.post(BASE + "/api/models",
+                  json={"campaign": "still_hour", "dry_run": True}).json()
+check("models lists backend checkpoints (dry backend)",
+      r.get("ok") and r["models"] == ["dry-model-a.safetensors",
+                                      "dry-model-b.safetensors"])
+check("models reports the campaign's current checkpoint",
+      r.get("current") == json.load(open(camp_path, encoding="utf-8"))["checkpoint"])
+r = requests.post(BASE + "/api/model_set",
+                  json={"campaign": "still_hour",
+                        "checkpoint": "dry-model-b.safetensors"}).json()
+check("model_set writes campaign.json",
+      r.get("ok") and json.load(open(camp_path, encoding="utf-8"))
+      ["checkpoint"] == "dry-model-b.safetensors")
+check("model_set survives a status round-trip",
+      requests.get(BASE + "/api/status?campaign=still_hour").json()
+      ["checkpoint"] == "dry-model-b.safetensors")
+check("model_set rejects empty",
+      requests.post(BASE + "/api/model_set", json={"checkpoint": " "}).json()
+      .get("ok") is False)
+with open(camp_path, "w", encoding="utf-8") as f:
+    f.write(camp_backup)
+check("zoom lightbox + refresh button + model picker in the UI",
+      all(x in page for x in ("zoomOpen", "zoom_img", "modelsLoad",
+                              "refresh the gallery")))
+
 print("== LEDGER: dry rehearsals never block real runs ==")
 from cardforge.ledger import Ledger
 led = Ledger(os.path.join(ROOT, "state", "_test.ledger.json"))

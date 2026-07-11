@@ -37,8 +37,10 @@ One window, four tabs, the whole pipeline:
 - **Illustrate** — the backend rig (where A1111/ComfyUI live on this machine,
   from `rig.json`): **one-click Launch backend**, and every generate job
   auto-launches it and waits for its API if it isn't already running. Plus
-  Step-0 seeds, starter/full batches (dry-run toggle), live log, gallery with
-  click-to-curate variants, contact sheets.
+  Step-0 seeds with an in-app canonical-portrait picker, a **model picker**
+  (lists the backend's installed checkpoints, one click writes the campaign
+  config), starter/full batches (dry-run toggle), live log, auto-refreshing
+  gallery with zoom lightbox and click-to-curate variants, contact sheets.
 - **Frame — Strange Eons** — setup links (strangeeons.cgjennings.ca /
   github.com/CGJennings/strange-eons / Arkham plugin / fonts), the two owner
   config seams (class-map + setting keys), one-click frame-bundle generation
@@ -49,7 +51,7 @@ One window, four tabs, the whole pipeline:
   instant TTS testing, or a hosted base URL) and rebuilds cards → mod →
   download package.
 
-Acceptance: `python3 cardforge/studio_selftest.py` (68 checks, drives the live
+Acceptance: `python3 cardforge/studio_selftest.py` (74 checks, drives the live
 server end-to-end — including a real backend auto-launch loop against a fake
 A1111 API and a Windows-locale regression; JS is syntax-checked with node in
 CI passes). The CLI below remains for headless/scripted use.

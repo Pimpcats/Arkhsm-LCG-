@@ -144,6 +144,33 @@ def act_rig_save(p):
     return {"ok": True, "rig": {k: v for k, v in cfg.items() if k != "_note"}}
 
 
+def act_models(p):
+    """List checkpoints installed on the campaign's backend (model picker)."""
+    camp = runner.load_campaign(p.get("campaign", "still_hour"))
+    backend = runner.make_backend(camp, dry_run=bool(p.get("dry_run")))
+    try:
+        models = backend.list_models()
+    except Exception as e:  # noqa: BLE001 - backend down is a normal state
+        return {"ok": False, "models": [], "current": camp.get("checkpoint"),
+                "message": "couldn't list models — is the backend running? ({})".format(e)}
+    return {"ok": True, "models": models, "current": camp.get("checkpoint")}
+
+
+def act_model_set(p):
+    """Write the chosen checkpoint into campaigns/<name>/campaign.json."""
+    campaign = p.get("campaign", "still_hour")
+    checkpoint = (p.get("checkpoint") or "").strip()
+    if not checkpoint:
+        return {"ok": False, "message": "empty checkpoint"}
+    path = os.path.join(runner.campaign_dir(campaign), "campaign.json")
+    camp = json.load(open(path, encoding="utf-8"))
+    camp["checkpoint"] = checkpoint
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(camp, f, indent=2)
+    log("campaign checkpoint set: " + checkpoint)
+    return {"ok": True, "checkpoint": checkpoint}
+
+
 def act_seed_pick(p):
     """Mark a Step-0 seed portrait as a character's canonical look — stored
     as refs[0] in characters.json (the reference the LoRA/IPAdapter path and
@@ -489,7 +516,8 @@ def status(campaign="still_hour"):
         faces_ver = int(max((os.path.getmtime(os.path.join(faces_dir_abs, f))
                              for f in os.listdir(faces_dir_abs)), default=0))
     return {"busy": _busy.is_set(), "campaign": campaign, "campaigns": campaigns,
-            "backend": camp.get("backend"), "report": report, "gallery": gallery,
+            "backend": camp.get("backend"), "checkpoint": camp.get("checkpoint"),
+            "report": report, "gallery": gallery,
             "rig": {k: v for k, v in rig.load_rig().items() if k != "_note"},
             "seeds": seeds, "cards": catalog, "faces_ver": faces_ver,
             "se": {"config": se_bridge.load_config(),
@@ -504,6 +532,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "index": act_index, "backend_check": act_backend_check,
            "rig_save": act_rig_save, "backend_launch": act_backend_launch,
            "seed_pick": act_seed_pick,
+           "models": act_models, "model_set": act_model_set,
            "choose": act_choose, "se_save_config": act_se_save_config,
            "se_bundle": act_se_bundle, "se_launch": act_se_launch,
            "render_placeholders": act_render_placeholders, "apply": act_apply,
@@ -663,6 +692,11 @@ font-size:12px;color:var(--dim)}
 font:11.5px ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;color:#c9c5bb}
 #editor{display:none;position:fixed;inset:0;z-index:9;background:rgba(8,8,12,.72);
 backdrop-filter:blur(8px);animation:fade .2s ease}
+#zoom{display:none;position:fixed;inset:0;z-index:10;background:rgba(8,8,12,.8);
+backdrop-filter:blur(10px);animation:fade .2s ease;align-items:center;justify-content:center}
+#zoom_box{background:var(--surface);border:1px solid var(--line);border-radius:18px;
+box-shadow:var(--shadow);padding:14px;max-width:92vw}
+#zoom_img{display:block;max-width:88vw;max-height:78vh;border-radius:10px;margin:0 auto}
 #ed_sheet{background:var(--surface);border:1px solid var(--line);border-radius:18px;
 box-shadow:var(--shadow);max-width:900px;margin:3.5vh auto;padding:18px 20px;max-height:93vh;overflow:auto}
 #ed_stage{position:relative;margin:12px auto;overflow:hidden;border-radius:10px;
@@ -682,6 +716,7 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 <header><h1>CardForge Studio</h1><span class=sub>THE STILL HOUR · fan content</span>
 <span class=spacer></span>
 <span id=busy class=stat><span class=dot id=busydot></span><span id=busytext>idle</span></span>
+<button class=btn onclick=refresh() title="refresh the gallery and cards">&#8635;</button>
 <label>campaign</label><select id=campaign onchange=refresh()></select>
 <button class="btn primary" onclick="post('auto',{dry_run:dry()})" title="generate &rarr; place &rarr; compose &rarr; TTS, hands-off">&#9889; Auto-build ALL &rarr; TTS</button>
 </header>
@@ -711,6 +746,12 @@ drag to position, scroll to size. Encounter cards stay hidden behind the
 <label>start with</label><input type=text id=rig_cmd size=18 onchange=rigSave()>
 <button class="btn primary" onclick=rigLaunch()>&#9655; Launch backend</button>
 <button class=btn onclick="post('backend_check')">Check</button>
+</div>
+<div class=row>
+<label>model</label><select id=model onchange=modelSet() style="max-width:320px">
+<option value="">&mdash; load list from the backend &mdash;</option></select>
+<button class=btn onclick=modelsLoad() title="fetch the checkpoint list from the running backend">&#8635; Load models</button>
+<span id=modelinfo class=hint></span>
 </div>
 <p class=hint style="margin:2px 0 10px">The Studio starts your image backend itself and waits for its
 API &mdash; and every generate job below does the same automatically if it&rsquo;s not already running.
@@ -798,6 +839,14 @@ Barnaby Files guide; AH font pack via the Mythos Busters Discord.</p>
 <div id=ed_strip></div>
 </div></div>
 
+<div id=zoom onclick="if(event.target===this)zoomClose()">
+<div id=zoom_box><img id=zoom_img>
+<div class=row style="margin-top:10px">
+<span id=zoom_cap class=hint></span><span class=spacer></span>
+<button class="btn primary" id=zoom_act onclick=zoomDo()></button>
+<button class=btn onclick=zoomClose()>Close</button>
+</div></div></div>
+
 <div id=drawer><div class=bar onclick="this.parentNode.classList.toggle('open')">
 <span>&#9650;</span> Activity</div><div id=log></div></div>
 
@@ -812,14 +861,37 @@ function rigVals(){return {cwd:document.getElementById('rig_cwd').value,
 command:document.getElementById('rig_cmd').value};}
 function rigSave(){post('rig_save',rigVals());}
 function rigLaunch(){post('backend_launch',rigVals());}
+async function modelsLoad(){const j=await post('models');
+const sel=document.getElementById('model');sel.innerHTML='';
+for(const m of (j.models||[])){const o=document.createElement('option');
+o.value=o.text=m;if(j.current&&(m===j.current||m.startsWith(j.current)))o.selected=true;sel.add(o);}
+if(j.current&&![...sel.options].some(o=>o.selected)){
+const o=document.createElement('option');o.value=j.current;
+o.text=j.current+' (not on backend)';o.selected=true;sel.add(o);}}
+function modelSet(){const v=document.getElementById('model').value;
+if(v)post('model_set',{checkpoint:v});}
+let ZOOMFN=null;
+function zoomOpen(src,cap,actLabel,actFn){ZOOMFN=actFn||null;
+document.getElementById('zoom_img').src=src;
+document.getElementById('zoom_cap').textContent=cap||'';
+const b=document.getElementById('zoom_act');
+b.textContent=actLabel||'';b.style.display=actLabel?'':'none';
+document.getElementById('zoom').style.display='flex';}
+function zoomClose(){document.getElementById('zoom').style.display='none';ZOOMFN=null;}
+function zoomDo(){const f=ZOOMFN;zoomClose();if(f)f();}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')zoomClose();});
 function camp(){return document.getElementById('campaign').value||'still_hour'}
 async function post(action,params){params=params||{};params.campaign=camp();
 const r=await fetch('/api/'+action,{method:'POST',body:JSON.stringify(params)});
 const j=await r.json();if(j.message)addlog(j.message);refresh();return j;}
 function addlog(l){const el=document.getElementById('log');
 el.textContent+=l+'\n';el.scrollTop=el.scrollHeight;}
+let refreshQueued=false;
 async function poll(){try{const r=await fetch('/api/log?since='+seq);
-for(const e of await r.json()){addlog(e.line);seq=e.seq+1;}}catch(e){}
+const lines=await r.json();
+for(const e of lines){addlog(e.line);seq=e.seq+1;}
+if(lines.length&&!refreshQueued){refreshQueued=true;   // live gallery updates
+setTimeout(()=>{refreshQueued=false;refresh();},1500);}}catch(e){}
 setTimeout(poll,1200);}
 
 function cardTile(c){
@@ -853,6 +925,9 @@ const kind=s.backend||'a1111';document.getElementById('rig_kind').textContent=ki
 const rg=(s.rig||{})[kind]||{};
 for(const [id,val] of [['rig_cwd',rg.cwd||''],['rig_cmd',rg.command||'']]){
 const el=document.getElementById(id);if(el&&document.activeElement!==el)el.value=val;}
+document.getElementById('modelinfo').innerHTML=s.checkpoint?
+('current: <b>'+s.checkpoint+'</b>'+(s.checkpoint==='SET_ME.safetensors'?
+' — load the list and pick your model':'')):'';
 document.getElementById('busytext').textContent=s.busy?'working&hellip;'.replace('&hellip;','…'):'idle';
 renderCards(s);
 const rep=s.report.generated!==undefined?
@@ -869,8 +944,9 @@ const sd=s.seeds[ch];
 return `<div class=row style="align-items:center;margin-bottom:6px">`+
 `<b style="min-width:90px;text-transform:capitalize">${ch}</b>`+
 sd.files.map(f=>`<img loading=lazy class="seedthumb${f===sd.picked?' chosen':''}" `+
-`title="${f===sd.picked?'canonical portrait':'click to make canonical'}" `+
-`src="/art?p=${sd.dir}/${f}&ts=${ST}" onclick="post('seed_pick',{character:'${ch}',file:'${f}'})">`).join('')+
+`title="${f===sd.picked?'canonical portrait':'click to view large'}" `+
+`src="/art?p=${sd.dir}/${f}&ts=${ST}" `+
+`onclick="zoomOpen(this.src,'${ch} — ${f}','Make canonical',()=>post('seed_pick',{character:'${ch}',file:'${f}'}))">`).join('')+
 (sd.picked?`<span class=hint>&#10003; ${sd.picked}</span>`:`<span class=hint>none picked yet</span>`)+
 `</div>`;}).join('');
 const shield=document.getElementById('spoilshield').checked;
@@ -882,9 +958,11 @@ if(shield&&g.spoiler&&!window.revealed.has(g.id))
  `background:repeating-linear-gradient(45deg,#15151d,#15151d 8px,#1b1b25 8px,#1b1b25 16px)" `+
  `onclick="window.revealed.add('${g.id}');refresh()">tap to reveal</div></div>`;
 return `<div class=card style="width:150px"><div class=cid title="${g.id}">${g.id}</div>`+
-(g.face?`<img style="outline:2px solid var(--good)" title="composed card" src="/art?p=art/faces/${g.id}.png&ts=${ST}">`:'')+
-g.variants.map(v=>`<img loading=lazy class="${v===g.chosen?'chosen':''}" `+
-`src="/art?p=out/${s.campaign}/${g.id}/${v}" onclick="post('choose',{card:'${g.id}',file:'${v}'})">`).join('')+
+(g.face?`<img style="outline:2px solid var(--good)" title="composed card — click to view large" `+
+`src="/art?p=art/faces/${g.id}.png&ts=${ST}" onclick="zoomOpen(this.src,'${g.id} — composed face')">`:'')+
+g.variants.map(v=>`<img loading=lazy class="${v===g.chosen?'chosen':''}" title="click to view large" `+
+`src="/art?p=out/${s.campaign}/${g.id}/${v}" `+
+`onclick="zoomOpen(this.src,'${g.id} — ${v}','Use on this card',()=>post('choose',{card:'${g.id}',file:'${v}'}))">`).join('')+
 `</div>`;}).join('')||'<span class=hint>nothing generated yet — run a batch, or upload art per card from the Cards tab</span>';
 const se=s.se;document.getElementById('se_cmd').value=se.config.launch_command;
 document.getElementById('se_faces').value=se.config.faces_dir;
