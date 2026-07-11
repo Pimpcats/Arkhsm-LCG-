@@ -54,6 +54,41 @@ class A1111Backend(Backend):
         except Exception as e:  # noqa: BLE001 - report, don't crash the CLI
             return False, "unreachable at {} ({}). Start A1111 with --api.".format(self.base_url, e)
 
+    def inpaint(self, image_png, mask_png, positive, negative, params, job_key):
+        """img2img inpainting: regenerate ONLY the white mask regions of
+        image_png. Payload per the public sdapi docs (POST /sdapi/v1/img2img);
+        inpainting_fill=1 keeps the original pixels as the starting point so
+        the result blends with the surrounding frame texture."""
+        payload = {
+            "init_images": [base64.b64encode(image_png).decode()],
+            "mask": base64.b64encode(mask_png).decode(),
+            "prompt": positive,
+            "negative_prompt": negative,
+            "denoising_strength": params.get("denoise", 0.75),
+            "mask_blur": params.get("mask_blur", 8),
+            "inpainting_fill": 1,
+            "inpaint_full_res": False,
+            "inpainting_mask_invert": 0,
+            "steps": params.get("steps", 34),
+            "sampler_name": params.get("sampler", "DPM++ 2M Karras"),
+            "cfg_scale": params.get("cfg", 6.0),
+            "width": params["width"],
+            "height": params["height"],
+            "seed": params.get("seed", 11),
+            "n_iter": 1,
+            "override_settings": {"sd_model_checkpoint": params["checkpoint"]},
+        }
+        if self.dry_run:
+            slim = dict(payload,
+                        init_images=["<{} bytes>".format(len(image_png))],
+                        mask="<{} bytes>".format(len(mask_png)))
+            self._write_payload(job_key, slim)
+            return [STUB_PNG]
+        r = requests.post(self.base_url + "/sdapi/v1/img2img",
+                          json=payload, timeout=self.timeout)
+        r.raise_for_status()
+        return [base64.b64decode(b64.split(",", 1)[-1]) for b64 in r.json()["images"]]
+
     def list_models(self):
         if self.dry_run:
             return list(self.DRY_MODELS)

@@ -103,6 +103,7 @@ def act_generate(p):
     return run_job("generate", _backend_first(
         campaign, dry, runner.run_generate, campaign,
         only=set(p["only"].split()) if p.get("only") else None,
+        variants_override=int(p["variants"]) if p.get("variants") else None,
         dry_run=dry, starter=bool(p.get("starter"))))
 
 
@@ -169,6 +170,62 @@ def act_model_set(p):
         json.dump(camp, f, indent=2)
     log("campaign checkpoint set: " + checkpoint)
     return {"ok": True, "checkpoint": checkpoint}
+
+
+def act_prompt_get(p):
+    """The exact prompt a card would generate with: composed from character +
+    scene + type framing + house style, plus any saved override."""
+    campaign = p.get("campaign", "still_hour")
+    card = p["card"]
+    from cardforge.compose import compose, is_text_only
+    from cardforge.resolver import CharacterResolver
+    camp = runner.load_campaign(campaign)
+    job = next((j for j in runner.load_manifest(campaign) if j["id"] == card), None)
+    if job is None or is_text_only(job):
+        return {"ok": False, "message": "no illustrated face for " + card}
+    character = None
+    if job.get("character"):
+        character = CharacterResolver(os.path.join(
+            runner.campaign_dir(campaign), "characters.json")).resolve(job["character"])
+    positive, negative, params = compose(job, camp, runner.load_profiles(), character)
+    ov = runner.load_prompt_overrides(campaign).get(card) or {}
+    return {"ok": True, "positive": positive, "negative": negative,
+            "override": ov, "seed": params["seed"],
+            "checkpoint": params["checkpoint"]}
+
+
+def act_prompt_save(p):
+    """Save (or clear, when both boxes match the composed default/empty) a
+    per-card prompt override. Batch runs honor it too."""
+    entry = runner.save_prompt_override(
+        p.get("campaign", "still_hour"), p["card"],
+        p.get("positive", ""), p.get("negative", ""))
+    log("prompt override {} for {}".format("saved" if entry else "cleared", p["card"]))
+    return {"ok": True, "override": entry}
+
+
+def act_style_save(p):
+    """Edit the campaign house style (the ART_SPEC block every batch prompt
+    ends with) from the app."""
+    campaign = p.get("campaign", "still_hour")
+    path = os.path.join(runner.campaign_dir(campaign), "campaign.json")
+    camp = json.load(open(path, encoding="utf-8"))
+    for k in ("style_positive", "style_negative"):
+        if p.get(k) is not None:
+            camp[k] = p[k].strip()
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(camp, f, indent=2)
+    log("house style updated")
+    return {"ok": True}
+
+
+def act_inpaint_frames(p):
+    """Rebuild the blank frames: SD-inpaint the text regions of each template
+    into empty card material (the owner's select-and-generate-over idea)."""
+    from cardforge import inpaint
+    return run_job("inpaint-blank-frames", inpaint.rebuild_blank_frames,
+                   p.get("campaign", "still_hour"),
+                   dry_run=bool(p.get("dry_run")))
 
 
 def act_install_checkpoint(p):
@@ -356,6 +413,11 @@ def _apply_local_and_rebuild(campaign):
         back = os.path.join(faces_dir, face_id + "-back.png")
         if os.path.exists(back):
             urls[face_id]["back"] = "file:///" + back.replace(os.sep, "/").lstrip("/")
+    for key, fname in (("_player_back", "player_back.png"),
+                       ("_encounter_back", "encounter_back.png")):
+        p = os.path.join(ROOT, "assets", "backs", fname)
+        if os.path.exists(p):
+            urls[key] = "file:///" + p.replace(os.sep, "/").lstrip("/")
     with open(os.path.join(ROOT, "pipeline", "art_urls.json"), "w", encoding="utf-8") as f:
         json.dump(urls, f, indent=2)
     log("art_urls.json: {} card(s), local file:/// mode".format(len(urls)))
@@ -531,6 +593,8 @@ def status(campaign="still_hour"):
                              for f in os.listdir(faces_dir_abs)), default=0))
     return {"busy": _busy.is_set(), "campaign": campaign, "campaigns": campaigns,
             "backend": camp.get("backend"), "checkpoint": camp.get("checkpoint"),
+            "style": {"positive": camp.get("style_positive", ""),
+                      "negative": camp.get("style_negative", "")},
             "report": report, "gallery": gallery,
             "rig": {k: v for k, v in rig.load_rig().items() if k != "_note"},
             "vendor": installer.vendor_status(),
@@ -550,6 +614,8 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "models": act_models, "model_set": act_model_set,
            "install_checkpoint": act_install_checkpoint,
            "install_se": act_install_se,
+           "prompt_get": act_prompt_get, "prompt_save": act_prompt_save,
+           "style_save": act_style_save, "inpaint_frames": act_inpaint_frames,
            "choose": act_choose, "se_save_config": act_se_save_config,
            "se_bundle": act_se_bundle, "se_launch": act_se_launch,
            "render_placeholders": act_render_placeholders, "apply": act_apply,
@@ -795,6 +861,8 @@ drag to position, scroll to size. Encounter cards stay hidden behind the
 <span class=spacer></span>
 <label><input type=checkbox id=spoilshield checked onchange=refresh()> spoiler shield</label>
 <button class=btn onclick="post('render_placeholders')">Compose all faces</button>
+<button class=btn onclick="post('inpaint_frames',{dry_run:dry()})"
+title="Stable Diffusion regenerates each template's text regions into empty card material (select-and-generate-over); composed faces then sit on real texture instead of flat fills">&#10024; Rebuild blank frames</button>
 </div>
 <div id=steps_cards class=stepbox></div>
 <div id=chips_cards class=chips></div>
@@ -817,6 +885,13 @@ drag to position, scroll to size. Encounter cards stay hidden behind the
 <button class=btn onclick=modelsLoad() title="fetch the checkpoint list from the running backend">&#8635; Load models</button>
 <span id=modelinfo class=hint></span>
 </div>
+<details style="margin:6px 0">
+<summary style="cursor:pointer;color:var(--dim)">House style &mdash; the ART_SPEC block every batch prompt ends with</summary>
+<label>style (appended to every prompt)</label><textarea id=style_pos rows=2 spellcheck=false></textarea>
+<label>negative (start of every negative prompt)</label><textarea id=style_neg rows=2 spellcheck=false></textarea>
+<div class=row style="margin-top:6px"><button class=btn onclick=styleSave()>Save house style</button>
+<span class=hint>per-card prompts live in each card&rsquo;s editor (Cards tab)</span></div>
+</details>
 <p class=hint style="margin:2px 0 10px">The Studio starts your image backend itself and waits for its
 API &mdash; and every generate job below does the same automatically if it&rsquo;s not already running.
 A1111 note: <code>webui.bat --api</code> guarantees the API; if you rely on custom
@@ -906,6 +981,20 @@ Barnaby Files guide; AH font pack via the Mythos Busters Discord.</p>
 <input type=file id=ed_file accept="image/*" style="display:none" onchange=edUpload(this)>
 </div>
 <div id=ed_strip></div>
+<details id=ed_promptbox style="margin-top:12px">
+<summary style="cursor:pointer;color:var(--dim)">Prompt &mdash; generate art for THIS card (A1111-style boxes)</summary>
+<label>prompt</label><textarea id=ed_pos rows=3 spellcheck=false></textarea>
+<label>negative prompt</label><textarea id=ed_neg rows=2 spellcheck=false></textarea>
+<div class=row style="margin-top:6px">
+<button class="btn primary" onclick=edGenerate()>Generate 2 variants</button>
+<button class=btn onclick=edPromptSave()>Save prompt</button>
+<button class=btn onclick=edPromptReset()>Reset to composed</button>
+<span id=ed_prompt_info class=hint></span>
+</div>
+<p class=hint>Pre-filled with the composed prompt (character + scene + card-type framing + house style).
+Edit and Save &mdash; batch runs use your version too. Reset returns to the composed default.
+New variants land in the strip above and the gallery when the job finishes.</p>
+</details>
 </div></div>
 
 <div id=zoom onclick="if(event.target===this)zoomClose()">
@@ -939,6 +1028,8 @@ const o=document.createElement('option');o.value=j.current;
 o.text=j.current+' (not on backend)';o.selected=true;sel.add(o);}}
 function modelSet(){const v=document.getElementById('model').value;
 if(v)post('model_set',{checkpoint:v});}
+function styleSave(){post('style_save',{style_positive:document.getElementById('style_pos').value,
+style_negative:document.getElementById('style_neg').value});}
 let ZOOMFN=null;
 function zoomOpen(src,cap,actLabel,actFn){ZOOMFN=actFn||null;
 document.getElementById('zoom_img').src=src;
@@ -1063,6 +1154,9 @@ const el=document.getElementById(id);if(el&&document.activeElement!==el)el.value
 document.getElementById('modelinfo').innerHTML=s.checkpoint?
 ('current: <b>'+s.checkpoint+'</b>'+(s.checkpoint==='SET_ME.safetensors'?
 ' — load the list and pick your model':'')):'';
+for(const [id,val] of [['style_pos',(s.style||{}).positive||''],
+['style_neg',(s.style||{}).negative||'']]){
+const el=document.getElementById(id);if(el&&document.activeElement!==el)el.value=val;}
 const v=s.vendor||{};
 document.getElementById('vendor_model').innerHTML=(v.models||[]).length?
 '&#10003; installed: '+v.models.join(', '):(v.has_token?'key saved — ready to install':'not installed yet');
@@ -1123,8 +1217,33 @@ win.style.left=(x0*disp)+'px';win.style.top=(y0*disp)+'px';
 win.style.width=((x1-x0)*disp)+'px';win.style.height=((y1-y0)*disp)+'px';
 document.getElementById('ed_title').textContent=c.name;
 document.getElementById('ed_scale').value=ed.scale;
-edStrip();edLoadArt();
+edStrip();edLoadArt();edPromptLoad(c.id);
 document.getElementById('editor').style.display='block';}
+let ED_COMPOSED=null;
+async function edPromptLoad(card){ED_COMPOSED=null;
+const box=document.getElementById('ed_promptbox');
+const j=await post('prompt_get',{card});
+if(!j.ok){box.style.display='none';return;}
+box.style.display='block';
+ED_COMPOSED={positive:j.positive,negative:j.negative};
+document.getElementById('ed_pos').value=(j.override&&j.override.positive)||j.positive;
+document.getElementById('ed_neg').value=(j.override&&j.override.negative)||j.negative;
+document.getElementById('ed_prompt_info').textContent=
+(j.override&&(j.override.positive||j.override.negative)?'override active · ':'')+
+'seed '+j.seed+' · '+j.checkpoint;}
+function edPromptVals(){const p=document.getElementById('ed_pos').value.trim(),
+n=document.getElementById('ed_neg').value.trim();
+return{positive:ED_COMPOSED&&p===ED_COMPOSED.positive.trim()?'':p,
+negative:ED_COMPOSED&&n===ED_COMPOSED.negative.trim()?'':n};}
+async function edPromptSave(){const v=edPromptVals();
+await post('prompt_save',{card:ed.g.id,positive:v.positive,negative:v.negative});
+edPromptLoad(ed.g.id);}
+async function edPromptReset(){
+await post('prompt_save',{card:ed.g.id,positive:'',negative:''});
+edPromptLoad(ed.g.id);}
+async function edGenerate(){const v=edPromptVals();
+await post('prompt_save',{card:ed.g.id,positive:v.positive,negative:v.negative});
+await post('generate',{only:ed.g.id,variants:2,dry_run:dry()});}
 function edLoadArt(){const art=document.getElementById('ed_art');
 if(ed.g.chosen){art.style.display='block';
 art.onload=()=>{ed.natW=art.naturalWidth;ed.natH=art.naturalHeight;edPreview();};

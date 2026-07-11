@@ -7,4 +7,6 @@ se/
 assets/frames/*
 !assets/frames/README.md
 !assets/frames/templates/
+!assets/frames/psd/
 vendor/
+assets/fonts/ArnoPro*

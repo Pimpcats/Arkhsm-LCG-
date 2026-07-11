@@ -1,7 +1,7 @@
 {
   "backend": "a1111",
   "base_url": null,
-  "checkpoint": "paintersCheckpointOilPaint_v11.safetensors",
+  "checkpoint": "paintersCheckpoint_v11_STUB.safetensors",
   "output_dir": "out/still_hour",
   "style_positive": "cosmic horror illustration, painterly, muted desaturated palette, 1920s New England, starless folding sky, oil-paint texture, Arkham Horror card art",
   "style_negative": "text, watermark, signature, frame, border, ui, logo, deformed hands, extra fingers, modern clothing, bright saturated colors, cartoon, 3d render, cheerful, lens flare",

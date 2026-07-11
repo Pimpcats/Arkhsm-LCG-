@@ -112,9 +112,35 @@ RED = (168, 44, 38)
 BLUE = (52, 84, 148)
 
 
-def _font(size, bold=False, italic=False, glyph=False):
+# The official font stack (matches the SE plugin / Barnaby Files guide):
+# Teutonic for titles (OFL — shipped in-repo), Arno Pro for body text
+# (Adobe-licensed — NOT in git; drop your own ArnoPro*.otf files into
+# assets/fonts/ and they're picked up automatically), DejaVu as fallback.
+FONTS_DIR = os.path.join(ROOT, "assets", "fonts")
+TITLE_FONT = os.path.join(FONTS_DIR, "Teutonic.ttf")
+BODY_FONTS = {
+    (False, False): ["ArnoProRegular.otf", "ArnoPro-Regular.otf"],
+    (True, False): ["ArnoProBold.otf", "ArnoPro-Bold.otf"],
+    (False, True): ["ArnoProItalic.otf", "ArnoPro-Italic.otf"],
+    (True, True): ["ArnoProBoldItalic.otf", "ArnoPro-BoldItalic.otf"],
+}
+
+
+def _font(size, bold=False, italic=False, glyph=False, title=False):
     if glyph:
         return ImageFont.truetype(FONT_PATH, size)
+    if title and os.path.exists(TITLE_FONT):
+        try:
+            return ImageFont.truetype(TITLE_FONT, size)
+        except OSError:
+            pass
+    for n in BODY_FONTS[(bold, italic)]:
+        p = os.path.join(FONTS_DIR, n)
+        if os.path.exists(p):
+            try:
+                return ImageFont.truetype(p, size)
+            except OSError:
+                continue
     names = (["DejaVuSerif-BoldItalic.ttf"] if bold and italic else []) + \
             (["DejaVuSerif-Bold.ttf"] if bold else []) + \
             (["DejaVuSerif-Italic.ttf"] if italic else []) + \
@@ -378,8 +404,8 @@ def t_investigator_front(c, pt, dest, art_path=None, placement=None):
                 R["class_disc"][1] + 12, _font(26, bold=True), T.SCROLL_INK)
     # name + subtitle over the scroll
     T.rrect(d, R["name"], T.SCROLL, radius=14)
-    center_text(d, c["name"], (R["name"][0] + R["name"][2]) / 2, R["name"][1] + 6,
-                _font(24, bold=True), T.SCROLL_INK)
+    center_text(d, c["name"], (R["name"][0] + R["name"][2]) / 2, R["name"][1] + 4,
+                _font(28, bold=True, title=True), T.SCROLL_INK)
     T.rrect(d, R["subtitle"], T.PARCH_DARK, radius=10)
     center_text(d, c["subtitle"], (R["subtitle"][0] + R["subtitle"][2]) / 2,
                 R["subtitle"][1] + 3, _font(15, italic=True), T.INK)
@@ -418,8 +444,8 @@ def t_investigator_back(c, pt, dest, art_path=None):
     d = ImageDraw.Draw(img)
     R = T.INV_BACK
     T.rrect(d, R["name"], T.SCROLL, radius=14)
-    center_text(d, c["name"], (R["name"][0] + R["name"][2]) / 2, R["name"][1] + 6,
-                _font(24, bold=True), T.SCROLL_INK)
+    center_text(d, c["name"], (R["name"][0] + R["name"][2]) / 2, R["name"][1] + 4,
+                _font(28, bold=True, title=True), T.SCROLL_INK)
     T.rrect(d, R["subtitle"], T.PARCH_DARK, radius=10)
     center_text(d, c["subtitle"], (R["subtitle"][0] + R["subtitle"][2]) / 2,
                 R["subtitle"][1] + 3, _font(15, italic=True), T.INK)
@@ -459,8 +485,8 @@ def t_treachery(c, pt, dest, art_path=None, placement=None):
     center_text(d, c["type"].upper(), (R["type"][0] + R["type"][2]) / 2,
                 R["type"][1] + 5, _font(14, bold=True), T.SCROLL_INK)
     T.rrect(d, R["name"], T.PARCH_DARK, radius=8)
-    center_text(d, c["name"], (R["name"][0] + R["name"][2]) / 2, R["name"][1] + 5,
-                _font(18, bold=True), T.INK)
+    center_text(d, c["name"], (R["name"][0] + R["name"][2]) / 2, R["name"][1] + 3,
+                _font(22, bold=True, title=True), T.INK)
     panel = R["panel"]
     if c.get("weakness"):
         T.rrect(d, R["weakness_bar"], (86, 28, 26), radius=6)
@@ -485,8 +511,8 @@ def t_enemy(c, pt, dest, art_path=None, placement=None):
     d = ImageDraw.Draw(img)
     R = T.ENEMY
     T.rrect(d, R["name"], T.SCROLL, radius=10)
-    center_text(d, c["name"], (R["name"][0] + R["name"][2]) / 2, R["name"][1] + 6,
-                _font(19, bold=True), T.SCROLL_INK)
+    center_text(d, c["name"], (R["name"][0] + R["name"][2]) / 2, R["name"][1] + 4,
+                _font(23, bold=True, title=True), T.SCROLL_INK)
     # combat plates over the baked ones
     for key, val, color in (("fight", pt.get("fight", "-"), (140, 48, 42)),
                             ("health", pt.get("health") if pt.get("health") is not None else "—",

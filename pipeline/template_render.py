@@ -34,8 +34,22 @@ CLASS_COLORS = {
 }
 
 
+VENDOR_BLANKS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                             "vendor", "frames")
+
+# When an SD-inpainted blank frame exists (vendor/frames/blank_<layout>.png,
+# built by CardForge's "Rebuild blank frames"), it becomes the card base and
+# the flat cover fills are skipped — text is typeset straight onto the real
+# regenerated texture. Set per-render by open_template (renders are serial).
+BLANK_MODE = False
+
+
 def template_path(layout):
     return os.path.join(TPL_DIR, layout + ".png")
+
+
+def blank_path(layout):
+    return os.path.join(VENDOR_BLANKS, "blank_" + layout + ".png")
 
 
 def has_template(layout):
@@ -43,10 +57,22 @@ def has_template(layout):
 
 
 def open_template(layout):
+    global BLANK_MODE
+    if os.path.exists(blank_path(layout)):
+        BLANK_MODE = True
+        return Image.open(blank_path(layout)).convert("RGB")
+    BLANK_MODE = False
     return Image.open(template_path(layout)).convert("RGB")
 
 
+COVER_FILLS = None  # set after the palette below
+
+
 def rrect(d, box, fill, radius=8, outline=None):
+    # cover fills exist to hide the template's baked-in content; an inpainted
+    # blank has none, so skip them and keep its texture (badges still draw)
+    if BLANK_MODE and COVER_FILLS and fill in COVER_FILLS and outline is None:
+        return
     d.rounded_rectangle(list(box), radius=radius, fill=fill, outline=outline)
 
 
@@ -105,3 +131,55 @@ ENEMY = {
     "banner_strip": (110, 330, 309, 384),
     "art": (13, 388, 406, 578),
 }
+
+COVER_FILLS = {SCROLL, PARCH, PARCH_DARK}
+
+# layout -> (region map, landscape) — drives inpaint mask generation
+LAYOUT_REGIONS = {
+    "investigator_front": (INV_FRONT, True),
+    "investigator_back": (INV_BACK, True),
+    "treachery": (TREACHERY, False),
+    "treachery_weakness": (TREACHERY, False),
+    "enemy": (ENEMY, False),
+    "enemy_elite": (ENEMY, False),
+}
+
+# region fills for the local (no-GPU) blank fallback, keyed like the maps
+_BLANK_FILL_BY_KEY = {
+    "name": SCROLL, "type": SCROLL, "stats_strip": SCROLL,
+    "subtitle": PARCH_DARK, "traits": PARCH_DARK,
+    "weakness_bar": (86, 28, 26), "polaroid": (30, 27, 36),
+    "class_disc": SCROLL, "fight": SCROLL, "health": SCROLL, "evade": SCROLL,
+}
+
+
+def inpaint_regions(layout, w, h):
+    """(key, box) pairs an inpainted blank must regenerate: every mapped
+    region except the art window (art paste covers it fully), plus the
+    original illustrator credit in the footer."""
+    regions, landscape = LAYOUT_REGIONS[layout]
+    out = []
+    for key, val in regions.items():
+        if key in ("art", "stats", "hs_y"):
+            continue
+        out.append((key, val))
+    if landscape:
+        out.append(("credit", (int(w * 0.50), h - 28, int(w * 0.76), h - 8)))
+    else:
+        out.append(("credit", (8, h - 22, int(w * 0.42), h - 6)))
+    return out
+
+
+def make_local_blank(layout):
+    """The no-GPU fallback blank: the template with its content regions
+    covered by the sampled-palette fills (exactly what the renderer would
+    draw). SD inpainting replaces this with regenerated real texture."""
+    img = Image.open(template_path(layout)).convert("RGB")
+    d = ImageDraw.Draw(img)
+    for key, box in inpaint_regions(layout, img.width, img.height):
+        if key == "credit":
+            fill = img.getpixel((max(0, box[0] - 6), (box[1] + box[3]) // 2))
+        else:
+            fill = _BLANK_FILL_BY_KEY.get(key, PARCH)
+        d.rounded_rectangle(list(box), radius=8, fill=fill)
+    return img

@@ -153,12 +153,19 @@ def build_card(c):
     is_inv = c["type"] == "Investigator"
     is_encounter = bool(c.get("encounter"))
     deck_id = str(c["deck"])
+    # campaign-wide back art: art_urls.json may carry "_player_back" /
+    # "_encounter_back" (string URL or {"face": url}) — the owner's own backs
+    def deck_back(key, default):
+        v = ART_URLS.get(key)
+        if isinstance(v, dict):
+            v = v.get("face")
+        return v or default
     if is_inv:
         back = face_ph(c["name"] + " (Deckbuilding)", land=True)
     elif is_encounter:
-        back = ENCOUNTER_BACK
+        back = deck_back("_encounter_back", ENCOUNTER_BACK)
     else:
-        back = PLAYER_BACK
+        back = deck_back("_player_back", PLAYER_BACK)
     art = ART_URLS.get(c["id"], {})
     return {
         "Name": "Card", "Nickname": c["name"], "Description": c.get("subtitle", ""),
