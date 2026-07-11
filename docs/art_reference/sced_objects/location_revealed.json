@@ -1,0 +1,82 @@
+{
+  "SaveName": "",
+  "Date": "",
+  "VersionNumber": "",
+  "GameMode": "",
+  "GameType": "",
+  "GameComplexity": "",
+  "Tags": [],
+  "Gravity": 0.5,
+  "PlayArea": 0.5,
+  "Table": "",
+  "Sky": "",
+  "Note": "",
+  "TabStates": {},
+  "LuaScript": "",
+  "LuaScriptState": "",
+  "XmlUI": "",
+  "ObjectStates": [
+    {
+      "GUID": "23b896",
+      "Name": "Card",
+      "Transform": {
+        "posX": -30.24,
+        "posY": 1.53328967,
+        "posZ": 3.83003855,
+        "rotX": 0.003676954,
+        "rotY": 270.0,
+        "rotZ": 180.022,
+        "scaleX": 0.98,
+        "scaleY": 1.0,
+        "scaleZ": 0.98
+      },
+      "Nickname": "Miskatonic University",
+      "Description": "Arkham.",
+      "GMNotes": "{\n  \"id\": \"01129\",\n  \"type\": \"Location\",\n  \"traits\": \"Arkham.\",\n  \"cycle\": \"Core\",\n  \"locationFront\": {\n    \"icons\": \"Diamond\",\n    \"connections\": \"Tee|Plus|Circle|Square|FromRight\"\n  },\n  \"locationBack\": {\n    \"victory\": 1,\n    \"icons\": \"Diamond\",\n    \"connections\": \"Tee|Plus|Circle|Square|FromRight\",\n    \"uses\": [\n      {\n        \"countPerInvestigator\": 2,\n        \"type\": \"Clue\",\n        \"token\": \"clue\"\n      }\n    ]\n  }\n}",
+      "AltLookAngle": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "ColorDiffuse": {
+        "r": 0.713235259,
+        "g": 0.713235259,
+        "b": 0.713235259
+      },
+      "Tags": [
+        "Location",
+        "ScenarioCard"
+      ],
+      "LayoutGroupSortIndex": 0,
+      "Value": 0,
+      "Locked": false,
+      "Grid": true,
+      "Snap": true,
+      "IgnoreFoW": false,
+      "MeasureMovement": false,
+      "DragSelectable": true,
+      "Autoraise": true,
+      "Sticky": true,
+      "Tooltip": true,
+      "GridProjection": false,
+      "HideWhenFaceDown": true,
+      "Hands": true,
+      "CardID": 112900,
+      "SidewaysCard": false,
+      "CustomDeck": {
+        "1129": {
+          "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/12423702360779241744/AE927954BF806B09116745640249DC9D7D2F1402/",
+          "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/10909145057120250562/EF7756AB8B37DD855E9753892CCFD1A4651987FF/",
+          "NumWidth": 1,
+          "NumHeight": 1,
+          "BackIsHidden": true,
+          "UniqueBack": false,
+          "Type": 0
+        }
+      },
+      "LuaScript": "",
+      "LuaScriptState": "",
+      "XmlUI": ""
+    }
+  ]
+}

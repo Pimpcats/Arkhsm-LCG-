@@ -7,3 +7,8 @@ se/
 assets/frames/*
 !assets/frames/README.md
 !assets/frames/templates/
+!assets/frames/psd/
+vendor/
+assets/fonts/ArnoPro*
+assets/fonts/MinionPro*
+pipeline/art_urls.json

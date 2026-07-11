@@ -28,12 +28,18 @@
           "CardID": 9504000,
           "SidewaysCard": false,
           "Tags": [
-            "Enemy",
-            "EncounterCard"
+            "ScenarioCard"
           ],
           "LuaScript": "",
           "LuaScriptState": "",
-          "GMNotes": "{\"id\":\"sthr-appointed\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Monster.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1}",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-appointed\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Monster. Elite.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -54,7 +60,7 @@
           ],
           "CustomDeck": {
             "95040": {
-              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-appointed.png",
+              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Appointed",
               "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -72,11 +78,17 @@
           "CardID": 9504100,
           "SidewaysCard": false,
           "Tags": [
-            "Treachery",
-            "EncounterCard"
+            "ScenarioCard"
           ],
           "LuaScript": "",
           "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
           "GMNotes": "{\"id\":\"sthr-appointedwhisper\",\"type\":\"Treachery\",\"class\":\"Mythos\",\"traits\":\"\",\"cycle\":\"The Still Hour\",\"quantity\":2}",
           "Transform": {
             "posX": 0,
@@ -98,7 +110,7 @@
           ],
           "CustomDeck": {
             "95041": {
-              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-appointedwhisper.png",
+              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Appointed's+Whisper",
               "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -116,11 +128,17 @@
           "CardID": 9504200,
           "SidewaysCard": false,
           "Tags": [
-            "Treachery",
-            "EncounterCard"
+            "ScenarioCard"
           ],
           "LuaScript": "",
           "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
           "GMNotes": "{\"id\":\"sthr-crossing\",\"type\":\"Treachery\",\"class\":\"Mythos\",\"traits\":\"\",\"cycle\":\"The Still Hour\",\"quantity\":1}",
           "Transform": {
             "posX": 0,
@@ -142,7 +160,7 @@
           ],
           "CustomDeck": {
             "95042": {
-              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-crossing.png",
+              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Crossing",
               "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -160,12 +178,18 @@
           "CardID": 9504300,
           "SidewaysCard": false,
           "Tags": [
-            "Enemy",
-            "EncounterCard"
+            "ScenarioCard"
           ],
           "LuaScript": "",
           "LuaScriptState": "",
-          "GMNotes": "{\"id\":\"sthr-bellringer\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Monster. Named.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1,\"victory\":2}",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-bellringer\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Monster. Named. Elite.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1,\"victory\":2}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -186,7 +210,7 @@
           ],
           "CustomDeck": {
             "95043": {
-              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-bellringer.png",
+              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Bell-Ringer+Beneath",
               "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -204,12 +228,18 @@
           "CardID": 9504400,
           "SidewaysCard": false,
           "Tags": [
-            "Enemy",
-            "EncounterCard"
+            "ScenarioCard"
           ],
           "LuaScript": "",
           "LuaScriptState": "",
-          "GMNotes": "{\"id\":\"sthr-wearssheriff\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Humanoid. Monster. Named.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1,\"victory\":3}",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-wearssheriff\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Humanoid. Monster. Named. Elite.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1,\"victory\":3}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -230,7 +260,7 @@
           ],
           "CustomDeck": {
             "95044": {
-              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-wearssheriff.png",
+              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=What+Wears+the+Sheriff",
               "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -248,12 +278,18 @@
           "CardID": 9504500,
           "SidewaysCard": false,
           "Tags": [
-            "Enemy",
-            "EncounterCard"
+            "ScenarioCard"
           ],
           "LuaScript": "",
           "LuaScriptState": "",
-          "GMNotes": "{\"id\":\"sthr-onewhorides\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Humanoid. Named.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1,\"victory\":2}",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-onewhorides\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Humanoid. Named. Elite.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1,\"victory\":2}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -274,7 +310,7 @@
           ],
           "CustomDeck": {
             "95045": {
-              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-onewhorides.png",
+              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+One+Who+Rides+Forever",
               "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
               "NumWidth": 1,
               "NumHeight": 1,

@@ -1,0 +1,81 @@
+{
+  "SaveName": "",
+  "Date": "",
+  "VersionNumber": "",
+  "GameMode": "",
+  "GameType": "",
+  "GameComplexity": "",
+  "Tags": [],
+  "Gravity": 0.5,
+  "PlayArea": 0.5,
+  "Table": "",
+  "Sky": "",
+  "Note": "",
+  "TabStates": {},
+  "LuaScript": "",
+  "LuaScriptState": "",
+  "XmlUI": "",
+  "ObjectStates": [
+    {
+      "GUID": "ce4118",
+      "Name": "Card",
+      "Transform": {
+        "posX": -0.222031415,
+        "posY": 1.59660506,
+        "posZ": 5.26927471,
+        "rotX": -4.29947526E-08,
+        "rotY": 180.899658,
+        "rotZ": 2.12263789E-08,
+        "scaleX": 1.0,
+        "scaleY": 1.0,
+        "scaleZ": 1.0
+      },
+      "Nickname": "Arkham Nightlife",
+      "Description": "Agenda 1",
+      "GMNotes": "{\n  \"id\": \"11502\",\n  \"type\": \"Agenda\",\n  \"class\": \"Mythos\",\n  \"doomThreshold\": 7,\n  \"cycle\": \"The Drowned City\"\n}",
+      "AltLookAngle": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "ColorDiffuse": {
+        "r": 0.713235259,
+        "g": 0.713235259,
+        "b": 0.713235259
+      },
+      "Tags": [
+        "ScenarioCard"
+      ],
+      "LayoutGroupSortIndex": 0,
+      "Value": 0,
+      "Locked": false,
+      "Grid": true,
+      "Snap": true,
+      "IgnoreFoW": false,
+      "MeasureMovement": false,
+      "DragSelectable": true,
+      "Autoraise": true,
+      "Sticky": true,
+      "Tooltip": true,
+      "GridProjection": false,
+      "HideWhenFaceDown": false,
+      "Hands": true,
+      "CardID": 919901,
+      "SidewaysCard": true,
+      "CustomDeck": {
+        "9199": {
+          "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/17342530264458493993/E4030120AB11A08A48EFBB68E439C58B0379FCE3/",
+          "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/62595231163466130/1C82E4E7656361AFC59EFBFCDE3170B51DE36996/",
+          "NumWidth": 10,
+          "NumHeight": 6,
+          "BackIsHidden": true,
+          "UniqueBack": true,
+          "Type": 0
+        }
+      },
+      "LuaScript": "",
+      "LuaScriptState": "",
+      "XmlUI": ""
+    }
+  ]
+}

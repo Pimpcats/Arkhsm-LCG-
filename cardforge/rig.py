@@ -54,6 +54,9 @@ def launch(kind):
     if cwd and not os.path.isdir(cwd):
         return False, ("backend folder not found: {} — fix it in the "
                        "Illustrate tab (or rig.json)".format(cwd))
+    if kind == "a1111":
+        from . import installer
+        command += installer.ckpt_dir_args()   # self-contained vendor/models
     kw = {"cwd": cwd or None, "shell": True}
     if os.name == "nt":
         kw["creationflags"] = subprocess.CREATE_NEW_CONSOLE

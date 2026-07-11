@@ -289,6 +289,93 @@ with open(camp_path, "w", encoding="utf-8") as f:
 check("zoom lightbox + refresh button + model picker in the UI",
       all(x in page for x in ("zoomOpen", "zoom_img", "modelsLoad",
                               "refresh the gallery")))
+check("category chips filter both the Cards grid and the gallery",
+      all(x in page for x in ("chips_cards", "chips_gal", "setGroup",
+                              "renderGallery")))
+
+print("== PROMPT BOXES: per-card A1111-style prompts + house style ==")
+ov_path = os.path.join(ROOT, "campaigns", "still_hour", "prompt_overrides.json")
+if os.path.exists(ov_path):
+    os.remove(ov_path)
+r = requests.post(BASE + "/api/prompt_get",
+                  json={"campaign": "still_hour", "card": "sthr-appointed"}).json()
+check("prompt_get returns the composed prompt (scene + house style)",
+      r.get("ok") and "silhouette" in r["positive"].lower()
+      and "painterly" in r["positive"] and "watermark" in r["negative"])
+check("prompt_get refuses text-only faces",
+      requests.post(BASE + "/api/prompt_get",
+                    json={"card": "sthr-elias-back"}).json().get("ok") is False)
+r = requests.post(BASE + "/api/prompt_save",
+                  json={"campaign": "still_hour", "card": "sthr-appointed",
+                        "positive": "MY CUSTOM APPOINTED PROMPT",
+                        "negative": ""}).json()
+check("prompt override saves", r.get("ok")
+      and json.load(open(ov_path, encoding="utf-8"))
+      ["sthr-appointed"]["positive"] == "MY CUSTOM APPOINTED PROMPT")
+pdir = os.path.join(ROOT, "out", "still_hour", "payloads")
+# clean slate for this card: earlier sections already generated its seeds
+os.remove(os.path.join(ROOT, "state", "still_hour.ledger.json"))
+for f in list(os.listdir(pdir)):
+    if f.startswith("sthr-appointed"):
+        os.remove(os.path.join(pdir, f))
+requests.post(BASE + "/api/generate",
+              json={"campaign": "still_hour", "only": "sthr-appointed",
+                    "variants": 1, "dry_run": True})
+wait_idle(30)
+pl = [json.load(open(os.path.join(pdir, f), encoding="utf-8"))
+      for f in os.listdir(pdir) if f.startswith("sthr-appointed")]
+check("batch generation uses the override verbatim",
+      any(p.get("prompt") == "MY CUSTOM APPOINTED PROMPT" for p in pl))
+r = requests.post(BASE + "/api/prompt_save",
+                  json={"campaign": "still_hour", "card": "sthr-appointed",
+                        "positive": "", "negative": ""}).json()
+check("prompt override clears back to composed",
+      r.get("ok") and "sthr-appointed" not in
+      json.load(open(ov_path, encoding="utf-8")))
+style_backup = json.load(open(camp_path, encoding="utf-8"))["style_positive"]
+r = requests.post(BASE + "/api/style_save",
+                  json={"campaign": "still_hour",
+                        "style_positive": "TEST STYLE"}).json()
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+check("house style edits from the app and shows in status",
+      r.get("ok") and s["style"]["positive"] == "TEST STYLE")
+requests.post(BASE + "/api/style_save",
+              json={"campaign": "still_hour", "style_positive": style_backup})
+check("prompt boxes present in the UI",
+      all(x in page for x in ("ed_pos", "ed_neg", "edGenerate",
+                              "style_pos", "House style")))
+
+print("== SETUP: self-contained vendor installs (dry-run) ==")
+import shutil as _sh
+from cardforge import installer, se_bridge as _seb
+camp_backup2 = open(camp_path, encoding="utf-8").read()
+se_cfg_backup = json.dumps(_seb.load_config())
+_sh.rmtree(os.path.join(ROOT, "vendor"), ignore_errors=True)
+r = requests.post(BASE + "/api/install_checkpoint",
+                  json={"campaign": "still_hour", "dry_run": True}).json()
+check("checkpoint install job accepted", r.get("started"))
+check("checkpoint install completes", wait_idle(30))
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+check("stub checkpoint lands in vendor/models and campaign points at it",
+      s["vendor"]["models"] == ["paintersCheckpoint_v11_STUB.safetensors"]
+      and s["checkpoint"] == "paintersCheckpoint_v11_STUB.safetensors")
+check("a1111 launch gains --ckpt-dir vendor/models",
+      "--ckpt-dir" in installer.ckpt_dir_args()
+      and "vendor" in installer.ckpt_dir_args())
+r = requests.post(BASE + "/api/install_se", json={"dry_run": True}).json()
+check("SE install job accepted", r.get("started"))
+check("SE install completes", wait_idle(30))
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+check("SE lands under vendor/ and the launch command points at it",
+      s["vendor"]["se_installed"]
+      and "vendor" in _seb.load_config()["launch_command"])
+check("setup tab + per-tab steps in the UI",
+      all(x in page for x in ("Setup", "steps_setup", "steps_illustrate",
+                              "renderSteps", "vendor/models")))
+_sh.rmtree(os.path.join(ROOT, "vendor"), ignore_errors=True)
+with open(camp_path, "w", encoding="utf-8") as f:
+    f.write(camp_backup2)
+_seb.save_config(json.loads(se_cfg_backup))
 
 print("== LEDGER: dry rehearsals never block real runs ==")
 from cardforge.ledger import Ledger
@@ -353,6 +440,43 @@ check("second ensure_up is a no-op (already reachable)",
                     on_log=lines.append))
 with open(rig.rig_path(), "w", encoding="utf-8") as f:
     f.write(rig_backup)
+
+print("== INPAINT: blank frames from the region maps (dry-run) ==")
+sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+import template_render as T
+_sh.rmtree(os.path.join(ROOT, "vendor"), ignore_errors=True)
+r = requests.post(BASE + "/api/inpaint_frames",
+                  json={"campaign": "still_hour", "dry_run": True}).json()
+check("inpaint job accepted", r.get("started"))
+check("inpaint job completes", wait_idle(60))
+blanks = os.listdir(os.path.join(ROOT, "vendor", "frames"))
+check("all six layouts produce blank frames",
+      sorted(blanks) == ["blank_enemy.png", "blank_enemy_elite.png",
+                         "blank_investigator_back.png",
+                         "blank_investigator_front.png",
+                         "blank_treachery.png", "blank_treachery_weakness.png"])
+pay = json.load(open(os.path.join(ROOT, "out", "still_hour", "payloads",
+                                  "blank_enemy.a1111.json"), encoding="utf-8"))
+check("img2img payload carries mask + blend settings",
+      "bytes>" in pay["mask"] and pay["inpainting_fill"] == 1
+      and pay["denoising_strength"] > 0 and "no text" in pay["prompt"])
+r = requests.post(BASE + "/api/compose_one", json={"card": "sthr-elias"}).json()
+T.open_template("treachery")   # module state is per-process; probe directly
+check("faces recompose on the blank base (BLANK_MODE)",
+      r.get("composed") and T.BLANK_MODE is True)
+check("mask boxes exclude the art window",
+      all(k != "art" for k, _ in T.inpaint_regions("enemy", 419, 600)))
+check("Rebuild blank frames button in the UI", "inpaint_frames" in page)
+_sh.rmtree(os.path.join(ROOT, "vendor"), ignore_errors=True)
+requests.post(BASE + "/api/compose_one", json={"card": "sthr-elias"})
+
+print("== FONTS: official stack (Teutonic titles, Arno Pro body) ==")
+import render_placeholders as RP
+check("Teutonic vendored (OFL) and used for titles",
+      RP._font(20, title=True).getname()[0] == "Teutonic"
+      and os.path.exists(os.path.join(ROOT, "assets", "fonts", "Teutonic-OFL.txt")))
+check("Arno Pro picked up for body when present (never committed)",
+      RP._font(20).getname()[0] in ("Arno Pro", "DejaVu Serif"))
 
 print("== WINDOWS LOCALE: repo reads survive a non-UTF-8 default ==")
 import subprocess

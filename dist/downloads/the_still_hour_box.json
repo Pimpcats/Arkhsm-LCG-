@@ -6,6 +6,8 @@
       "Description": "Click Download inside the SCED mod to fetch the campaign.",
       "GUID": "f94cb9",
       "Tags": [
+        "CampaignBox",
+        "Reloadable",
         "StillHour"
       ],
       "ColorDiffuse": {
@@ -24,7 +26,7 @@
         "scaleY": 1,
         "scaleZ": 1
       },
-      "GMNotes": "{\"filename\":\"the_still_hour\"}",
+      "GMNotes": "{\"filename\":\"the_still_hour\",\"id\":\"CB-STHR\",\"type\":\"CampaignBox\"}",
       "LuaScript": "-- THE STILL HOUR — SCED download-box placeholder (P8).\n--\n-- This is the small object a user adds to their SCED game. The mod's Global\n-- provides GlobalApi.placeholderDownload(filename), which fetches\n-- {filename}.json from the SCED-downloads release and spawns its contents in\n-- place of this box (the standard SCED distribution pattern, SCED_BUILD_BRIEF §1).\n--\n-- The filename lives in this object's GMNotes: {\"filename\":\"the_still_hour\"}.\n--\n-- NOTE: verify GlobalApi.placeholderDownload's exact name/signature in your SCED\n-- fork before shipping — the fallback below keeps this usable/testable if it is\n-- absent (e.g. outside the mod).\n\nfunction onLoad()\n  self.createButton({\n    click_function = \"downloadStillHour\",\n    function_owner = self,\n    label = \"Download\\nTHE STILL HOUR\",\n    position = { 0, 0.2, 0 },\n    width = 1600, height = 600, font_size = 180,\n    color = { 0.13, 0.11, 0.18 }, font_color = { 0.95, 0.9, 0.7 },\n  })\nend\n\nfunction downloadStillHour()\n  local ok, gm = pcall(function() return JSON.decode(self.getGMNotes() or \"{}\") end)\n  local filename = (ok and gm and gm.filename) or \"the_still_hour\"\n  if GlobalApi and GlobalApi.placeholderDownload then\n    GlobalApi.placeholderDownload(filename)\n  else\n    broadcastToAll(\n      \"placeholderDownload is unavailable here — add this box inside the SCED mod. \"\n      .. \"Release filename: \" .. filename, { 1, 0.4, 0.4 })\n  end\nend\n",
       "LuaScriptState": ""
     }

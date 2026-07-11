@@ -41,6 +41,33 @@ def load_profiles():
                                        "art_profiles.json"), encoding="utf-8"))
 
 
+def load_prompt_overrides(name):
+    """Owner-authored per-card prompt overrides (Studio's card editor):
+    campaigns/<name>/prompt_overrides.json  {card_id: {positive, negative}}.
+    A non-empty field replaces the composed prompt verbatim."""
+    path = os.path.join(campaign_dir(name), "prompt_overrides.json")
+    if os.path.exists(path):
+        return json.load(open(path, encoding="utf-8"))
+    return {}
+
+
+def save_prompt_override(name, card_id, positive, negative):
+    path = os.path.join(campaign_dir(name), "prompt_overrides.json")
+    ov = load_prompt_overrides(name)
+    entry = {}
+    if (positive or "").strip():
+        entry["positive"] = positive.strip()
+    if (negative or "").strip():
+        entry["negative"] = negative.strip()
+    if entry:
+        ov[card_id] = entry
+    else:
+        ov.pop(card_id, None)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(ov, f, indent=2, ensure_ascii=False)
+    return entry or None
+
+
 def load_manifest(name, starter=False):
     fname = "manifest_starter.json" if starter else "manifest.json"
     path = os.path.join(campaign_dir(name), fname)
@@ -73,6 +100,7 @@ def run_generate(campaign_name, only=None, art_type=None, variants_override=None
     profiles = load_profiles()
     resolver = CharacterResolver(os.path.join(campaign_dir(campaign_name), "characters.json"))
     manifest = load_manifest(campaign_name, starter=starter)
+    prompt_overrides = load_prompt_overrides(campaign_name)
     backend = make_backend(camp, dry_run=dry_run)
     out_dir = out_dir_for(camp)
     ledger = Ledger(os.path.join(repo_root(), "state", campaign_name + ".ledger.json"))
@@ -103,6 +131,11 @@ def run_generate(campaign_name, only=None, art_type=None, variants_override=None
                     "without consistency (use the Comfy/IPAdapter path or train the LoRA)")
 
         positive, negative, params = compose(job, camp, profiles, character)
+        ov = prompt_overrides.get(job["id"])
+        if ov:
+            positive = ov.get("positive") or positive
+            negative = ov.get("negative") or negative
+            print("PROMPT OVERRIDE  " + job["id"])
         n_variants = variants_override or params["variants"]
         for k in range(n_variants):
             seed = job.get("seed", 1) + 1000 * k
@@ -148,9 +181,13 @@ def run_generate(campaign_name, only=None, art_type=None, variants_override=None
 
 
 def _write_report(out_dir, report):
+    # atomic: the Studio's status endpoint polls this file while we run
     os.makedirs(out_dir, exist_ok=True)
-    with open(os.path.join(out_dir, "report.json"), "w", encoding="utf-8") as f:
+    import tempfile
+    fd, tmp = tempfile.mkstemp(dir=out_dir)
+    with os.fdopen(fd, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)
+    os.replace(tmp, os.path.join(out_dir, "report.json"))
 
 
 # ------------------------------------------------------------------- seeds --

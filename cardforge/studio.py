@@ -31,7 +31,7 @@ from urllib.parse import urlparse, parse_qs
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from cardforge import rig, runner, se_bridge  # noqa: E402
+from cardforge import installer, rig, runner, se_bridge  # noqa: E402
 
 PORT = 8570
 ROOT = runner.repo_root()
@@ -103,6 +103,7 @@ def act_generate(p):
     return run_job("generate", _backend_first(
         campaign, dry, runner.run_generate, campaign,
         only=set(p["only"].split()) if p.get("only") else None,
+        variants_override=int(p["variants"]) if p.get("variants") else None,
         dry_run=dry, starter=bool(p.get("starter"))))
 
 
@@ -169,6 +170,76 @@ def act_model_set(p):
         json.dump(camp, f, indent=2)
     log("campaign checkpoint set: " + checkpoint)
     return {"ok": True, "checkpoint": checkpoint}
+
+
+def act_prompt_get(p):
+    """The exact prompt a card would generate with: composed from character +
+    scene + type framing + house style, plus any saved override."""
+    campaign = p.get("campaign", "still_hour")
+    card = p["card"]
+    from cardforge.compose import compose, is_text_only
+    from cardforge.resolver import CharacterResolver
+    camp = runner.load_campaign(campaign)
+    job = next((j for j in runner.load_manifest(campaign) if j["id"] == card), None)
+    if job is None or is_text_only(job):
+        return {"ok": False, "message": "no illustrated face for " + card}
+    character = None
+    if job.get("character"):
+        character = CharacterResolver(os.path.join(
+            runner.campaign_dir(campaign), "characters.json")).resolve(job["character"])
+    positive, negative, params = compose(job, camp, runner.load_profiles(), character)
+    ov = runner.load_prompt_overrides(campaign).get(card) or {}
+    return {"ok": True, "positive": positive, "negative": negative,
+            "override": ov, "seed": params["seed"],
+            "checkpoint": params["checkpoint"]}
+
+
+def act_prompt_save(p):
+    """Save (or clear, when both boxes match the composed default/empty) a
+    per-card prompt override. Batch runs honor it too."""
+    entry = runner.save_prompt_override(
+        p.get("campaign", "still_hour"), p["card"],
+        p.get("positive", ""), p.get("negative", ""))
+    log("prompt override {} for {}".format("saved" if entry else "cleared", p["card"]))
+    return {"ok": True, "override": entry}
+
+
+def act_style_save(p):
+    """Edit the campaign house style (the ART_SPEC block every batch prompt
+    ends with) from the app."""
+    campaign = p.get("campaign", "still_hour")
+    path = os.path.join(runner.campaign_dir(campaign), "campaign.json")
+    camp = json.load(open(path, encoding="utf-8"))
+    for k in ("style_positive", "style_negative"):
+        if p.get(k) is not None:
+            camp[k] = p[k].strip()
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(camp, f, indent=2)
+    log("house style updated")
+    return {"ok": True}
+
+
+def act_inpaint_frames(p):
+    """Rebuild the blank frames: SD-inpaint the text regions of each template
+    into empty card material (the owner's select-and-generate-over idea)."""
+    from cardforge import inpaint
+    return run_job("inpaint-blank-frames", inpaint.rebuild_blank_frames,
+                   p.get("campaign", "still_hour"),
+                   dry_run=bool(p.get("dry_run")))
+
+
+def act_install_checkpoint(p):
+    """Setup: download the art model into vendor/models (self-contained)."""
+    return run_job("install-checkpoint", installer.install_checkpoint,
+                   p.get("campaign", "still_hour"),
+                   token=p.get("token") or None,
+                   dry_run=bool(p.get("dry_run")))
+
+
+def act_install_se(p):
+    """Setup: download Strange Eons into vendor/strange-eons (self-contained)."""
+    return run_job("install-strange-eons", installer.install_strange_eons,
+                   dry_run=bool(p.get("dry_run")))
 
 
 def act_seed_pick(p):
@@ -342,6 +413,11 @@ def _apply_local_and_rebuild(campaign):
         back = os.path.join(faces_dir, face_id + "-back.png")
         if os.path.exists(back):
             urls[face_id]["back"] = "file:///" + back.replace(os.sep, "/").lstrip("/")
+    for key, fname in (("_player_back", "player_back.png"),
+                       ("_encounter_back", "encounter_back.png")):
+        p = os.path.join(ROOT, "assets", "backs", fname)
+        if os.path.exists(p):
+            urls[key] = "file:///" + p.replace(os.sep, "/").lstrip("/")
     with open(os.path.join(ROOT, "pipeline", "art_urls.json"), "w", encoding="utf-8") as f:
         json.dump(urls, f, indent=2)
     log("art_urls.json: {} card(s), local file:/// mode".format(len(urls)))
@@ -424,9 +500,12 @@ def status(campaign="still_hour"):
     report = {}
     rp = os.path.join(out_dir, "report.json")
     if os.path.exists(rp):
-        r = json.load(open(rp, encoding="utf-8"))
-        report = {"generated": len(r["generated"]), "failed": len(r["failed"]),
-                  "warnings": r["warnings"], "dry_run": r.get("dry_run")}
+        try:
+            r = json.load(open(rp, encoding="utf-8"))
+            report = {"generated": len(r["generated"]), "failed": len(r["failed"]),
+                      "warnings": r["warnings"], "dry_run": r.get("dry_run")}
+        except (ValueError, KeyError):
+            pass    # mid-write or partial — next poll gets the real one
     gallery = []
     if os.path.isdir(out_dir):
         for cid in sorted(os.listdir(out_dir)):
@@ -517,8 +596,11 @@ def status(campaign="still_hour"):
                              for f in os.listdir(faces_dir_abs)), default=0))
     return {"busy": _busy.is_set(), "campaign": campaign, "campaigns": campaigns,
             "backend": camp.get("backend"), "checkpoint": camp.get("checkpoint"),
+            "style": {"positive": camp.get("style_positive", ""),
+                      "negative": camp.get("style_negative", "")},
             "report": report, "gallery": gallery,
             "rig": {k: v for k, v in rig.load_rig().items() if k != "_note"},
+            "vendor": installer.vendor_status(),
             "seeds": seeds, "cards": catalog, "faces_ver": faces_ver,
             "se": {"config": se_bridge.load_config(),
                    "bundle_exists": os.path.exists(
@@ -533,6 +615,10 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "rig_save": act_rig_save, "backend_launch": act_backend_launch,
            "seed_pick": act_seed_pick,
            "models": act_models, "model_set": act_model_set,
+           "install_checkpoint": act_install_checkpoint,
+           "install_se": act_install_se,
+           "prompt_get": act_prompt_get, "prompt_save": act_prompt_save,
+           "style_save": act_style_save, "inpaint_frames": act_inpaint_frames,
            "choose": act_choose, "se_save_config": act_se_save_config,
            "se_bundle": act_se_bundle, "se_launch": act_se_launch,
            "render_placeholders": act_render_placeholders, "apply": act_apply,
@@ -554,6 +640,15 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
+        try:
+            self._do_get()
+        except Exception as e:  # noqa: BLE001 - a bad read must answer, not drop
+            try:
+                self._json({"error": str(e)}, 500)
+            except Exception:  # noqa: BLE001 - client already gone
+                pass
+
+    def _do_get(self):
         u = urlparse(self.path)
         q = {k: v[0] for k, v in parse_qs(u.query).items()}
         if u.path == "/":
@@ -676,6 +771,20 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 .card{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:8px}
 .card img{width:100%;border-radius:6px;cursor:pointer;margin-top:4px}
 .card img.chosen{outline:2px solid var(--accent)}
+.stepbox{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.step{display:flex;align-items:baseline;gap:10px;font-size:13.5px;color:var(--dim)}
+.step b{color:var(--ink);font-weight:600}
+.step .n{flex:none;width:22px;height:22px;border-radius:50%;display:inline-flex;
+align-items:center;justify-content:center;font-size:12px;border:1px solid var(--line);
+background:var(--surface2);transform:translateY(4px)}
+.step.done .n{background:var(--good);color:#08150c;border-color:transparent}
+.step.done{color:var(--dim);text-decoration:none}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}
+.chip{padding:6px 14px;border-radius:999px;border:1px solid var(--line);
+background:var(--surface2);color:var(--dim);cursor:pointer;font-size:13px;
+transition:all .15s}
+.chip:hover{color:var(--ink)}
+.chip.on{background:var(--accent);color:var(--accent-ink);border-color:transparent;font-weight:600}
 .seedthumb{width:96px;height:96px;object-fit:cover;border-radius:8px;cursor:pointer;
 outline:2px solid transparent;transition:outline-color .15s}
 .seedthumb:hover{outline-color:var(--dim)}
@@ -721,11 +830,40 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 <button class="btn primary" onclick="post('auto',{dry_run:dry()})" title="generate &rarr; place &rarr; compose &rarr; TTS, hands-off">&#9889; Auto-build ALL &rarr; TTS</button>
 </header>
 <nav>
+<button id=tab-setup onclick="tab('setup')">Setup</button>
 <button id=tab-cards class=on onclick="tab('cards')">Cards</button>
 <button id=tab-illustrate onclick="tab('illustrate')">Illustrate</button>
 <button id=tab-frame onclick="tab('frame')">Frame &mdash; Strange Eons</button>
 <button id=tab-apply onclick="tab('apply')">Apply to Mod</button>
 </nav><main>
+
+<section id=setup><div class=panel>
+<h2>Make this folder self-contained <small>everything installs INTO the app folder and is found again wherever the folder moves</small></h2>
+<div id=steps_setup class=stepbox></div>
+<hr>
+<div class=row>
+<b style="min-width:180px">1 &middot; Art model</b>
+<input type=password id=civitai_token size=28 placeholder="Civitai API key (needed to download)">
+<button class="btn primary" onclick="post('install_checkpoint',{token:document.getElementById('civitai_token').value})">Install Painter&rsquo;s Checkpoint</button>
+<span id=vendor_model class=hint></span>
+</div>
+<p class=hint>Downloads Painter&rsquo;s Checkpoint v1.1 (SDXL) into <code>vendor/models/</code>, points the
+campaign at it, and launches A1111 with <code>--ckpt-dir vendor/models</code> so it&rsquo;s found wherever this
+folder lives. Get a free API key at civitai.com &rarr; account settings. Already have the file? Just drop
+the .safetensors into <code>vendor/models/</code> instead.</p>
+<hr>
+<div class=row>
+<b style="min-width:180px">2 &middot; Strange Eons</b>
+<button class="btn primary" onclick="post('install_se')">Download &amp; install into this folder</button>
+<span id=vendor_se class=hint></span>
+</div>
+<p class=hint>Fetches the latest official release into <code>vendor/strange-eons/</code> and points the Frame
+tab&rsquo;s launch command at it. Then two manual pieces it can&rsquo;t fetch for you (they live behind a blog
+and a Discord): the <b>Arkham plugin — use jaqenZann&rsquo;s external build</b> from the
+<a href="https://barnabyfiles.wordpress.com" target=_blank>Barnaby Files guide</a> (NOT the outdated in-app
+catalog plugin), and the <b>AH font pack</b> from the Mythos Busters Discord — install those inside Strange
+Eons once, and every exported card uses the exact official fonts.</p>
+</div></section>
 
 <section id=cards class=on>
 <div class=panel><div class=row>
@@ -735,11 +873,17 @@ drag to position, scroll to size. Encounter cards stay hidden behind the
 <span class=spacer></span>
 <label><input type=checkbox id=spoilshield checked onchange=refresh()> spoiler shield</label>
 <button class=btn onclick="post('render_placeholders')">Compose all faces</button>
+<button class=btn onclick="post('inpaint_frames',{dry_run:dry()})"
+title="Stable Diffusion regenerates each template's text regions into empty card material (select-and-generate-over); composed faces then sit on real texture instead of flat fills">&#10024; Rebuild blank frames</button>
 </div>
+<div id=steps_cards class=stepbox></div>
+<div id=chips_cards class=chips></div>
 <div id=cardgroups></div>
 </div></section>
 
 <section id=illustrate><div class=panel>
+<div id=steps_illustrate class=stepbox></div>
+<hr>
 <div class=row>
 <b>Backend</b> <span id=rig_kind class=stat></span>
 <label>folder</label><input type=text id=rig_cwd size=22 placeholder="C:\SD\SDXL" onchange=rigSave()>
@@ -753,6 +897,13 @@ drag to position, scroll to size. Encounter cards stay hidden behind the
 <button class=btn onclick=modelsLoad() title="fetch the checkpoint list from the running backend">&#8635; Load models</button>
 <span id=modelinfo class=hint></span>
 </div>
+<details style="margin:6px 0">
+<summary style="cursor:pointer;color:var(--dim)">House style &mdash; the ART_SPEC block every batch prompt ends with</summary>
+<label>style (appended to every prompt)</label><textarea id=style_pos rows=2 spellcheck=false></textarea>
+<label>negative (start of every negative prompt)</label><textarea id=style_neg rows=2 spellcheck=false></textarea>
+<div class=row style="margin-top:6px"><button class=btn onclick=styleSave()>Save house style</button>
+<span class=hint>per-card prompts live in each card&rsquo;s editor (Cards tab)</span></div>
+</details>
 <p class=hint style="margin:2px 0 10px">The Studio starts your image backend itself and waits for its
 API &mdash; and every generate job below does the same automatically if it&rsquo;s not already running.
 A1111 note: <code>webui.bat --api</code> guarantees the API; if you rely on custom
@@ -776,10 +927,13 @@ A1111 note: <code>webui.bat --api</code> guarantees the API; if you rely on cust
 <span class=legend><i style="outline:2px solid var(--accent);outline-offset:-2px"></i> chosen art for this card</span>
 <span class=legend>grey tiles = dry-run stubs, replaced when you run for real</span>
 </div>
+<div id=chips_gal class=chips></div>
 <div id=gallery class=gal></div>
 </div></section>
 
 <section id=frame><div class=panel>
+<div id=steps_frame class=stepbox></div>
+<hr>
 <p class=hint>Strange Eons produces the pixel-perfect final cards; this tab drives it.
 Tools: <a href="https://strangeeons.cgjennings.ca" target=_blank>Strange Eons 3</a> &middot;
 <a href="https://github.com/CGJennings/strange-eons" target=_blank>source</a>.
@@ -807,6 +961,8 @@ Barnaby Files guide; AH font pack via the Mythos Busters Discord.</p>
 </div></section>
 
 <section id=apply><div class=panel>
+<div id=steps_apply class=stepbox></div>
+<hr>
 <div class=row>
 <button class="btn primary" onclick="post('export_tts')">Compose cards &amp; Export to TTS</button>
 <span class=hint>compose faces with your placed art &rarr; local file:/// URLs &rarr; rebuild the mod</span>
@@ -837,6 +993,20 @@ Barnaby Files guide; AH font pack via the Mythos Busters Discord.</p>
 <input type=file id=ed_file accept="image/*" style="display:none" onchange=edUpload(this)>
 </div>
 <div id=ed_strip></div>
+<details id=ed_promptbox style="margin-top:12px">
+<summary style="cursor:pointer;color:var(--dim)">Prompt &mdash; generate art for THIS card (A1111-style boxes)</summary>
+<label>prompt</label><textarea id=ed_pos rows=3 spellcheck=false></textarea>
+<label>negative prompt</label><textarea id=ed_neg rows=2 spellcheck=false></textarea>
+<div class=row style="margin-top:6px">
+<button class="btn primary" onclick=edGenerate()>Generate 2 variants</button>
+<button class=btn onclick=edPromptSave()>Save prompt</button>
+<button class=btn onclick=edPromptReset()>Reset to composed</button>
+<span id=ed_prompt_info class=hint></span>
+</div>
+<p class=hint>Pre-filled with the composed prompt (character + scene + card-type framing + house style).
+Edit and Save &mdash; batch runs use your version too. Reset returns to the composed default.
+New variants land in the strip above and the gallery when the job finishes.</p>
+</details>
 </div></div>
 
 <div id=zoom onclick="if(event.target===this)zoomClose()">
@@ -853,7 +1023,7 @@ Barnaby Files guide; AH font pack via the Mythos Busters Discord.</p>
 <script>
 let seq=0, cur='cards', ed=null, ST=null;
 window.revealed=window.revealed||new Set();
-function tab(t){cur=t;for(const x of ['cards','illustrate','frame','apply']){
+function tab(t){cur=t;for(const x of ['setup','cards','illustrate','frame','apply']){
 document.getElementById(x).classList.toggle('on',x===t);
 document.getElementById('tab-'+x).classList.toggle('on',x===t);}}
 function dry(){return document.getElementById('dryrun').checked}
@@ -870,6 +1040,8 @@ const o=document.createElement('option');o.value=j.current;
 o.text=j.current+' (not on backend)';o.selected=true;sel.add(o);}}
 function modelSet(){const v=document.getElementById('model').value;
 if(v)post('model_set',{checkpoint:v});}
+function styleSave(){post('style_save',{style_positive:document.getElementById('style_pos').value,
+style_negative:document.getElementById('style_neg').value});}
 let ZOOMFN=null;
 function zoomOpen(src,cap,actLabel,actFn){ZOOMFN=actFn||null;
 document.getElementById('zoom_img').src=src;
@@ -905,15 +1077,81 @@ const img=c.face?`<img loading=lazy class="${land?'land':''}" src="/art?p=art/fa
 return `<div class=tile onclick='editArt(${JSON.stringify(c).replaceAll("'","&#39;")})'>${img}`+
 `<div class=nm title="${c.name}">${c.name}</div><div class=tp>${c.type} &middot; ${c.class}</div></div>`;}
 
+let GROUP='All', LS=null;
+const GROUP_ORDER=['Investigators','Signatures & Weaknesses','Recollections',
+'Encounter — The Appointed','Encounter — The Named'];
+function setGroup(g){GROUP=g;if(LS)renderAll(LS);}
+function renderChips(s){
+const present=GROUP_ORDER.filter(g=>s.cards.some(c=>c.group===g));
+const html=['All'].concat(present).map(g=>
+`<button class="chip${g===GROUP?' on':''}" onclick="setGroup('${g.replace(/'/g,"\\'")}')">${g}</button>`).join('');
+for(const id of ['chips_cards','chips_gal']){
+const el=document.getElementById(id);if(el)el.innerHTML=html;}}
 function renderCards(s){
 const groups={};
-for(const c of s.cards)(groups[c.group]=groups[c.group]||[]).push(c);
-const order=['Investigators','Signatures & Weaknesses','Recollections',
-'Encounter — The Appointed','Encounter — The Named'];
-document.getElementById('cardgroups').innerHTML=order.filter(g=>groups[g]).map(g=>
+for(const c of s.cards)if(GROUP==='All'||c.group===GROUP)
+(groups[c.group]=groups[c.group]||[]).push(c);
+document.getElementById('cardgroups').innerHTML=GROUP_ORDER.filter(g=>groups[g]).map(g=>
 `<h2>${g}<small>${groups[g].length} card${groups[g].length>1?'s':''}</small></h2>`+
-`<div class=grid>${groups[g].map(cardTile).join('')}</div>`).join('');}
+`<div class=grid>${groups[g].map(cardTile).join('')}</div>`).join('')
+||'<span class=hint>no cards in this category</span>';}
 
+function renderGallery(s){
+const shield=document.getElementById('spoilshield').checked;
+const groupOf={};for(const c of s.cards)groupOf[c.id]=c.group;
+const nameOf={};for(const c of s.cards)nameOf[c.id]=c.name;
+const items=s.gallery.filter(g=>GROUP==='All'||groupOf[g.id]===GROUP)
+.slice().sort((a,b)=>GROUP_ORDER.indexOf(groupOf[a.id])-GROUP_ORDER.indexOf(groupOf[b.id])
+||a.id.localeCompare(b.id));
+document.getElementById('gallery').innerHTML=items.map(g=>{
+if(shield&&g.spoiler&&!window.revealed.has(g.id))
+ return `<div class=card style="width:150px"><div class=cid>&#128274; encounter card</div>`+
+ `<div class=veil style="height:110px;border-radius:6px;display:flex;align-items:center;`+
+ `justify-content:center;font-size:11px;color:var(--dim);cursor:pointer;`+
+ `background:repeating-linear-gradient(45deg,#15151d,#15151d 8px,#1b1b25 8px,#1b1b25 16px)" `+
+ `onclick="window.revealed.add('${g.id}');refresh()">tap to reveal</div></div>`;
+return `<div class=card style="width:150px"><div class=cid title="${g.id}">${nameOf[g.id]||g.id}</div>`+
+(g.face?`<img style="outline:2px solid var(--good)" title="composed card — click to view large" `+
+`src="/art?p=art/faces/${g.id}.png&ts=${ST}" onclick="zoomOpen(this.src,'${g.id} — composed face')">`:'')+
+g.variants.map(v=>`<img loading=lazy class="${v===g.chosen?'chosen':''}" title="click to view large" `+
+`src="/art?p=out/${s.campaign}/${g.id}/${v}" `+
+`onclick="zoomOpen(this.src,'${g.id} — ${v}','Use on this card',()=>post('choose',{card:'${g.id}',file:'${v}'}))">`).join('')+
+`</div>`;}).join('')||'<span class=hint>nothing in this category yet — run a batch, or upload art per card from the Cards tab</span>';}
+function step(done,html){return `<div class="step${done?' done':''}">`+
+`<span class=n>${done?'&#10003;':''}</span><span>${html}</span></div>`;}
+function renderSteps(s){
+const v=s.vendor||{},cov=(s.se&&s.se.coverage)||{framed:[],total:0};
+const hasModel=(v.models||[]).length>0||(s.checkpoint&&s.checkpoint!=='SET_ME.safetensors');
+const seedsDone=Object.keys(s.seeds||{}).length>0;
+const picksDone=seedsDone&&Object.values(s.seeds).every(x=>x.picked);
+const gen=s.report&&s.report.generated>0&&!s.report.dry_run;
+const allFramed=cov.total>0&&cov.framed.length===cov.total;
+const el=(id,html)=>{const e=document.getElementById(id);if(e)e.innerHTML=html;};
+el('steps_setup',
+ step(hasModel,'<b>Install the art model</b> — one click below (needs a free Civitai API key), or drop your .safetensors into <code>vendor/models/</code>')+
+ step(v.se_installed,'<b>Install Strange Eons</b> into this folder — it renders the FINAL cards on real blank frames with the real fonts')+
+ step(false,'<b>Inside Strange Eons, once:</b> install jaqenZann&rsquo;s Arkham plugin + the AH font pack (links below) — this is what makes cards indistinguishable from official ones'));
+el('steps_cards',
+ step(true,'<b>Pick a category</b> below, click a card to open it')+
+ step(true,'<b>Drag</b> the art to position, <b>scroll</b> to size, <b>Save</b> — placement is kept and reused by the final Strange Eons render')+
+ step(true,'These in-app faces are a fast <b>preview</b>; the print-identical faces come from the Frame tab'));
+el('steps_illustrate',
+ step(hasModel,'<b>1.</b> Install the art model (Setup tab) — currently: <b>'+(s.checkpoint||'none')+'</b>')+
+ step(seedsDone,'<b>2.</b> Run <b>Step 0 · Seeds</b> (the backend launches itself; watch the Activity drawer)')+
+ step(picksDone,'<b>3.</b> Click each investigator&rsquo;s best portrait &rarr; <b>Make canonical</b>')+
+ step(gen,'<b>4.</b> Run <b>Starter batch</b> to check the look, then <b>&#9889; Auto-build ALL</b> (top right) &mdash; uncheck dry-run for real art')+
+ step(true,'<b>5.</b> Fine-tune any card&rsquo;s art in the Cards tab'));
+el('steps_frame',
+ step(v.se_installed,'<b>1.</b> Install Strange Eons (Setup tab) + the jaqenZann plugin and AH fonts inside it')+
+ step(!(s.se&&JSON.stringify(s.se.config.classmap).includes('TODO')),'<b>2.</b> Fill the class-map + setting keys once (open one card of each type in SE to read them)')+
+ step(s.se&&s.se.bundle_exists,'<b>3.</b> <b>Write frame bundle</b> — packs every card + your art + placements into an SE script')+
+ step(allFramed,'<b>4.</b> <b>Launch Strange Eons</b> &rarr; it exports every face; coverage below fills to '+cov.total)+
+ step(false,'<b>5.</b> Apply tab &rarr; the exported faces replace the previews in the mod'));
+el('steps_apply',
+ step(false,'<b>1.</b> <b>Compose cards &amp; Export to TTS</b> — writes local file:/// art and rebuilds the mod')+
+ step(false,'<b>2.</b> Copy <code>dist/the_still_hour_mod.json</code> to <code>Documents/My Games/Tabletop Simulator/Saves/</code>')+
+ step(false,'<b>3.</b> In TTS: Games &rarr; Save &amp; Load &rarr; THE STILL HOUR (Run Tests on the Control token should pass 23/23)'));}
+function renderAll(s){renderChips(s);renderCards(s);renderGallery(s);renderSteps(s);}
 async function refresh(){const r=await fetch('/api/status?campaign='+camp());const s=await r.json();
 ST=s.faces_ver;
 const sel=document.getElementById('campaign');
@@ -928,6 +1166,15 @@ const el=document.getElementById(id);if(el&&document.activeElement!==el)el.value
 document.getElementById('modelinfo').innerHTML=s.checkpoint?
 ('current: <b>'+s.checkpoint+'</b>'+(s.checkpoint==='SET_ME.safetensors'?
 ' — load the list and pick your model':'')):'';
+for(const [id,val] of [['style_pos',(s.style||{}).positive||''],
+['style_neg',(s.style||{}).negative||'']]){
+const el=document.getElementById(id);if(el&&document.activeElement!==el)el.value=val;}
+const v=s.vendor||{};
+document.getElementById('vendor_model').innerHTML=(v.models||[]).length?
+'&#10003; installed: '+v.models.join(', '):(v.has_token?'key saved — ready to install':'not installed yet');
+document.getElementById('vendor_se').innerHTML=v.se_installed?
+'&#10003; installed at '+v.se_path:((v.se_downloads||[]).length?
+'downloaded: '+v.se_downloads.join(', ')+' — finish the install':'not installed yet');
 document.getElementById('busytext').textContent=s.busy?'working&hellip;'.replace('&hellip;','…'):'idle';
 renderCards(s);
 const rep=s.report.generated!==undefined?
@@ -937,6 +1184,7 @@ const rep=s.report.generated!==undefined?
 (s.report.warnings||[]).map(w=>`<div class=hint>&#9888; ${w}</div>`).join(''):
 '<span class=stat>no batch run yet</span>';
 document.getElementById('repline').innerHTML=rep;
+LS=s;renderChips(s);renderGallery(s);
 const seedChars=Object.keys(s.seeds||{});
 document.getElementById('seedblock').style.display=seedChars.length?'':'none';
 document.getElementById('seedrows').innerHTML=seedChars.map(ch=>{
@@ -949,21 +1197,6 @@ sd.files.map(f=>`<img loading=lazy class="seedthumb${f===sd.picked?' chosen':''}
 `onclick="zoomOpen(this.src,'${ch} — ${f}','Make canonical',()=>post('seed_pick',{character:'${ch}',file:'${f}'}))">`).join('')+
 (sd.picked?`<span class=hint>&#10003; ${sd.picked}</span>`:`<span class=hint>none picked yet</span>`)+
 `</div>`;}).join('');
-const shield=document.getElementById('spoilshield').checked;
-document.getElementById('gallery').innerHTML=s.gallery.map(g=>{
-if(shield&&g.spoiler&&!window.revealed.has(g.id))
- return `<div class=card style="width:150px"><div class=cid>&#128274; encounter card</div>`+
- `<div class=veil style="height:110px;border-radius:6px;display:flex;align-items:center;`+
- `justify-content:center;font-size:11px;color:var(--dim);cursor:pointer;`+
- `background:repeating-linear-gradient(45deg,#15151d,#15151d 8px,#1b1b25 8px,#1b1b25 16px)" `+
- `onclick="window.revealed.add('${g.id}');refresh()">tap to reveal</div></div>`;
-return `<div class=card style="width:150px"><div class=cid title="${g.id}">${g.id}</div>`+
-(g.face?`<img style="outline:2px solid var(--good)" title="composed card — click to view large" `+
-`src="/art?p=art/faces/${g.id}.png&ts=${ST}" onclick="zoomOpen(this.src,'${g.id} — composed face')">`:'')+
-g.variants.map(v=>`<img loading=lazy class="${v===g.chosen?'chosen':''}" title="click to view large" `+
-`src="/art?p=out/${s.campaign}/${g.id}/${v}" `+
-`onclick="zoomOpen(this.src,'${g.id} — ${v}','Use on this card',()=>post('choose',{card:'${g.id}',file:'${v}'}))">`).join('')+
-`</div>`;}).join('')||'<span class=hint>nothing generated yet — run a batch, or upload art per card from the Cards tab</span>';
 const se=s.se;document.getElementById('se_cmd').value=se.config.launch_command;
 document.getElementById('se_faces').value=se.config.faces_dir;
 document.getElementById('se_dpi').value=se.config.export_dpi;
@@ -996,8 +1229,33 @@ win.style.left=(x0*disp)+'px';win.style.top=(y0*disp)+'px';
 win.style.width=((x1-x0)*disp)+'px';win.style.height=((y1-y0)*disp)+'px';
 document.getElementById('ed_title').textContent=c.name;
 document.getElementById('ed_scale').value=ed.scale;
-edStrip();edLoadArt();
+edStrip();edLoadArt();edPromptLoad(c.id);
 document.getElementById('editor').style.display='block';}
+let ED_COMPOSED=null;
+async function edPromptLoad(card){ED_COMPOSED=null;
+const box=document.getElementById('ed_promptbox');
+const j=await post('prompt_get',{card});
+if(!j.ok){box.style.display='none';return;}
+box.style.display='block';
+ED_COMPOSED={positive:j.positive,negative:j.negative};
+document.getElementById('ed_pos').value=(j.override&&j.override.positive)||j.positive;
+document.getElementById('ed_neg').value=(j.override&&j.override.negative)||j.negative;
+document.getElementById('ed_prompt_info').textContent=
+(j.override&&(j.override.positive||j.override.negative)?'override active · ':'')+
+'seed '+j.seed+' · '+j.checkpoint;}
+function edPromptVals(){const p=document.getElementById('ed_pos').value.trim(),
+n=document.getElementById('ed_neg').value.trim();
+return{positive:ED_COMPOSED&&p===ED_COMPOSED.positive.trim()?'':p,
+negative:ED_COMPOSED&&n===ED_COMPOSED.negative.trim()?'':n};}
+async function edPromptSave(){const v=edPromptVals();
+await post('prompt_save',{card:ed.g.id,positive:v.positive,negative:v.negative});
+edPromptLoad(ed.g.id);}
+async function edPromptReset(){
+await post('prompt_save',{card:ed.g.id,positive:'',negative:''});
+edPromptLoad(ed.g.id);}
+async function edGenerate(){const v=edPromptVals();
+await post('prompt_save',{card:ed.g.id,positive:v.positive,negative:v.negative});
+await post('generate',{only:ed.g.id,variants:2,dry_run:dry()});}
 function edLoadArt(){const art=document.getElementById('ed_art');
 if(ed.g.chosen){art.style.display='block';
 art.onload=()=>{ed.natW=art.naturalWidth;ed.natH=art.naturalHeight;edPreview();};

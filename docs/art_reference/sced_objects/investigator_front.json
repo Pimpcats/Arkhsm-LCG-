@@ -1,0 +1,82 @@
+{
+  "SaveName": "",
+  "Date": "",
+  "VersionNumber": "",
+  "GameMode": "",
+  "GameType": "",
+  "GameComplexity": "",
+  "Tags": [],
+  "Gravity": 0.5,
+  "PlayArea": 0.5,
+  "Table": "",
+  "Sky": "",
+  "Note": "",
+  "TabStates": {},
+  "LuaScript": "",
+  "LuaScriptState": "",
+  "XmlUI": "",
+  "ObjectStates": [
+    {
+      "GUID": "6db592",
+      "Name": "Card",
+      "Transform": {
+        "posX": 34.4499969,
+        "posY": 1.49510384,
+        "posZ": 52.4999924,
+        "rotX": -1.03145581E-08,
+        "rotY": 180.0,
+        "rotZ": -8.146332E-08,
+        "scaleX": 1.15,
+        "scaleY": 1.0,
+        "scaleZ": 1.15
+      },
+      "Nickname": "Tommy Muldoon",
+      "Description": "The Officer",
+      "GMNotes": "{\n  \"id\": \"60151\",\n  \"type\": \"Investigator\",\n  \"class\": \"Guardian\",\n  \"traits\": \"Police.\",\n  \"willpowerIcons\": 3,\n  \"intellectIcons\": 3,\n  \"combatIcons\": 4,\n  \"agilityIcons\": 2,\n  \"elderSignEffect\": {\n    \"description\": \"+1. Place 1 ammo on an asset you control with uses (ammo).\",\n    \"modifier\": 1\n  },\n  \"health\": 9,\n  \"sanity\": 6,\n  \"cycle\": \"Starters 2026\",\n  \"starterDeck\": \"5958374\",\n  \"signatures\": [\n    {\n      \"60152\": 1,\n      \"60153\": 1\n    }\n  ]\n}",
+      "AltLookAngle": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "ColorDiffuse": {
+        "r": 0.713235259,
+        "g": 0.713235259,
+        "b": 0.713235259
+      },
+      "Tags": [
+        "Investigator",
+        "PlayerCard"
+      ],
+      "LayoutGroupSortIndex": 0,
+      "Value": 0,
+      "Locked": false,
+      "Grid": true,
+      "Snap": true,
+      "IgnoreFoW": false,
+      "MeasureMovement": false,
+      "DragSelectable": true,
+      "Autoraise": true,
+      "Sticky": true,
+      "Tooltip": true,
+      "GridProjection": false,
+      "HideWhenFaceDown": false,
+      "Hands": true,
+      "CardID": 6015100,
+      "SidewaysCard": true,
+      "CustomDeck": {
+        "60151": {
+          "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/16223694619719432075/48300085C99942048A4E796A31DD8EFE1C8D5099/",
+          "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/11909834655489181744/384E6584A9B402FBA3F9903A26F6C4496E752A88/",
+          "NumWidth": 1,
+          "NumHeight": 1,
+          "BackIsHidden": true,
+          "UniqueBack": true,
+          "Type": 0
+        }
+      },
+      "LuaScript": "",
+      "LuaScriptState": "",
+      "XmlUI": ""
+    }
+  ]
+}

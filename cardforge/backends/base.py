@@ -41,6 +41,11 @@ class Backend:
         """Return (ok, message) — reachability + config sanity."""
         raise NotImplementedError
 
+    def inpaint(self, image_png, mask_png, positive, negative, params, job_key):
+        """Regenerate only the masked regions of an image (blank frames)."""
+        raise NotImplementedError(
+            self.name + " has no inpaint path yet — use the a1111 backend")
+
     DRY_MODELS = ["dry-model-a.safetensors", "dry-model-b.safetensors"]
 
     def list_models(self):

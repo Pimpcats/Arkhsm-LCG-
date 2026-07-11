@@ -75,10 +75,14 @@ def main():
         "Nickname": "THE STILL HOUR — Download Box",
         "Description": "Click Download inside the SCED mod to fetch the campaign.",
         "GUID": guid("sthr-download-box"),
-        "Tags": ["StillHour"],
+        # real campaign-box tagging + GMNotes shape: docs/art_reference/
+        # sced_objects/campaign_box_memory_bag.json ("Reloadable" lets SCED
+        # re-fetch the download; "filename" is the placeholderDownload key)
+        "Tags": ["CampaignBox", "Reloadable", "StillHour"],
         "ColorDiffuse": {"r": 0.13, "g": 0.11, "b": 0.18},
         "Transform": transform(0),
-        "GMNotes": json.dumps({"filename": FILENAME}, separators=(",", ":")),
+        "GMNotes": json.dumps({"filename": FILENAME, "id": "CB-STHR",
+                               "type": "CampaignBox"}, separators=(",", ":")),
         "LuaScript": box_lua,
         "LuaScriptState": "",
     }
