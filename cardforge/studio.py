@@ -100,11 +100,15 @@ def _backend_first(_campaign, _dry, fn, *args, **kw):
 def act_generate(p):
     campaign = p.get("campaign", "still_hour")
     dry = bool(p.get("dry_run"))
+    seed_offset = 0
+    if p.get("reroll"):
+        import time as _t
+        seed_offset = int(_t.time()) % 900000    # fresh seeds, still resumable
     return run_job("generate", _backend_first(
         campaign, dry, runner.run_generate, campaign,
         only=set(p["only"].split()) if p.get("only") else None,
         variants_override=int(p["variants"]) if p.get("variants") else None,
-        dry_run=dry, starter=bool(p.get("starter"))))
+        dry_run=dry, starter=bool(p.get("starter")), seed_offset=seed_offset))
 
 
 def act_seeds(p):
@@ -151,10 +155,13 @@ def act_models(p):
     backend = runner.make_backend(camp, dry_run=bool(p.get("dry_run")))
     try:
         models = backend.list_models()
+        active = backend.current_model() if hasattr(backend, "current_model") else None
     except Exception as e:  # noqa: BLE001 - backend down is a normal state
         return {"ok": False, "models": [], "current": camp.get("checkpoint"),
+                "active": None,
                 "message": "couldn't list models — is the backend running? ({})".format(e)}
-    return {"ok": True, "models": models, "current": camp.get("checkpoint")}
+    return {"ok": True, "models": models, "active": active,
+            "current": camp.get("checkpoint")}
 
 
 def act_model_set(p):
@@ -225,6 +232,12 @@ def act_inpaint_frames(p):
     from cardforge import inpaint
     return run_job("inpaint-blank-frames", inpaint.rebuild_blank_frames,
                    p.get("campaign", "still_hour"),
+                   dry_run=bool(p.get("dry_run")))
+
+
+def act_install_a1111(p):
+    """Setup: self-contained Stable Diffusion into vendor/a1111."""
+    return run_job("install-a1111", installer.install_a1111,
                    dry_run=bool(p.get("dry_run")))
 
 
@@ -513,11 +526,16 @@ def status(campaign="still_hour"):
             if not os.path.isdir(cdir) or cid in ("payloads", "seeds"):
                 continue
             pngs = sorted(f for f in os.listdir(cdir) if f.endswith(".png"))
+            # dry-run stubs are 1x1 markers (~100 bytes) — flag them so the
+            # UI can hide the confusing grey tiles once real art exists
+            stubs = [f for f in pngs
+                     if os.path.getsize(os.path.join(cdir, f)) < 2048]
             chosen_path = os.path.join(cdir, "chosen.txt")
             chosen = open(chosen_path, encoding="utf-8").read().strip() if os.path.exists(chosen_path) \
                 else (pngs[0] if pngs else None)
             face = os.path.exists(os.path.join(ROOT, "art", "faces", cid + ".png"))
-            gallery.append({"id": cid, "variants": pngs, "chosen": chosen, "face": face})
+            gallery.append({"id": cid, "variants": pngs, "stubs": stubs,
+                            "chosen": chosen, "face": face})
     # Step-0 seed portraits: candidates per character + the picked canonical
     seeds = {}
     chars_path = os.path.join(runner.campaign_dir(campaign), "characters.json")
@@ -573,6 +591,8 @@ def status(campaign="still_hour"):
             cdir = os.path.join(out_dir, c["id"])
             variants = sorted(f for f in os.listdir(cdir) if f.endswith(".png")) \
                 if os.path.isdir(cdir) else []
+            vstubs = [f for f in variants
+                      if os.path.getsize(os.path.join(cdir, f)) < 2048]
             chosen_path = os.path.join(cdir, "chosen.txt")
             chosen = open(chosen_path, encoding="utf-8").read().strip() if os.path.exists(chosen_path) \
                 else (variants[0] if variants else None)
@@ -581,7 +601,7 @@ def status(campaign="still_hour"):
                 "class": c.get("class", ""), "group": group_for(c),
                 "face": os.path.exists(os.path.join(ROOT, "art", "faces", c["id"] + ".png")),
                 "spoiler": bool(c.get("encounter")),
-                "variants": variants, "chosen": chosen,
+                "variants": variants, "stubs": vstubs, "chosen": chosen,
             })
     for c in catalog:
         if c["id"] in boxes:
@@ -616,7 +636,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "seed_pick": act_seed_pick,
            "models": act_models, "model_set": act_model_set,
            "install_checkpoint": act_install_checkpoint,
-           "install_se": act_install_se,
+           "install_se": act_install_se, "install_a1111": act_install_a1111,
            "prompt_get": act_prompt_get, "prompt_save": act_prompt_save,
            "style_save": act_style_save, "inpaint_frames": act_inpaint_frames,
            "choose": act_choose, "se_save_config": act_se_save_config,
@@ -830,19 +850,29 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 <button class="btn primary" onclick="post('auto',{dry_run:dry()})" title="generate &rarr; place &rarr; compose &rarr; TTS, hands-off">&#9889; Auto-build ALL &rarr; TTS</button>
 </header>
 <nav>
-<button id=tab-setup onclick="tab('setup')">Setup</button>
-<button id=tab-cards class=on onclick="tab('cards')">Cards</button>
-<button id=tab-illustrate onclick="tab('illustrate')">Illustrate</button>
-<button id=tab-frame onclick="tab('frame')">Frame &mdash; Strange Eons</button>
-<button id=tab-apply onclick="tab('apply')">Apply to Mod</button>
+<button id=tab-setup class=on onclick="tab('setup')">1 &middot; Setup</button>
+<button id=tab-illustrate onclick="tab('illustrate')">2 &middot; Illustrate</button>
+<button id=tab-cards onclick="tab('cards')">3 &middot; Cards</button>
+<button id=tab-frame onclick="tab('frame')">4 &middot; Frame</button>
+<button id=tab-apply onclick="tab('apply')">5 &middot; Play in TTS</button>
 </nav><main>
 
-<section id=setup><div class=panel>
+<section id=setup class=on><div class=panel>
 <h2>Make this folder self-contained <small>everything installs INTO the app folder and is found again wherever the folder moves</small></h2>
 <div id=steps_setup class=stepbox></div>
 <hr>
 <div class=row>
-<b style="min-width:180px">1 &middot; Art model</b>
+<b style="min-width:180px">1 &middot; Stable Diffusion</b>
+<button class="btn primary" onclick="post('install_a1111')">Install A1111 into this folder</button>
+<span id=vendor_a1111 class=hint></span>
+</div>
+<p class=hint>Downloads the official standalone package (bundled Python) into <code>vendor/a1111/</code>
+with the API already switched on, and points the launcher at it. Already run A1111 elsewhere
+(e.g. <code>C:\SD\SDXL</code>)? Skip this — the Illustrate tab&rsquo;s Backend row keeps using yours.
+First launch self-installs its dependencies (one-time, several GB).</p>
+<hr>
+<div class=row>
+<b style="min-width:180px">2 &middot; Art model</b>
 <input type=password id=civitai_token size=28 placeholder="Civitai API key (needed to download)">
 <button class="btn primary" onclick="post('install_checkpoint',{token:document.getElementById('civitai_token').value})">Install Painter&rsquo;s Checkpoint</button>
 <span id=vendor_model class=hint></span>
@@ -853,7 +883,7 @@ folder lives. Get a free API key at civitai.com &rarr; account settings. Already
 the .safetensors into <code>vendor/models/</code> instead.</p>
 <hr>
 <div class=row>
-<b style="min-width:180px">2 &middot; Strange Eons</b>
+<b style="min-width:180px">3 &middot; Strange Eons</b>
 <button class="btn primary" onclick="post('install_se')">Download &amp; install into this folder</button>
 <span id=vendor_se class=hint></span>
 </div>
@@ -865,7 +895,7 @@ catalog plugin), and the <b>AH font pack</b> from the Mythos Busters Discord —
 Eons once, and every exported card uses the exact official fonts.</p>
 </div></section>
 
-<section id=cards class=on>
+<section id=cards>
 <div class=panel><div class=row>
 <span class=hint>Every card in the campaign, on its real frame. Click a card to place its art —
 drag to position, scroll to size. Encounter cards stay hidden behind the
@@ -891,12 +921,14 @@ title="Stable Diffusion regenerates each template's text regions into empty card
 <button class="btn primary" onclick=rigLaunch()>&#9655; Launch backend</button>
 <button class=btn onclick="post('backend_check')">Check</button>
 </div>
-<div class=row>
-<label>model</label><select id=model onchange=modelSet() style="max-width:320px">
-<option value="">&mdash; load list from the backend &mdash;</option></select>
-<button class=btn onclick=modelsLoad() title="fetch the checkpoint list from the running backend">&#8635; Load models</button>
+<div class=row style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px 14px">
+<b>Checkpoint</b>
+<select id=model onchange=modelSet() style="max-width:340px">
+<option value="">&mdash; start the backend, then &#8635; &mdash;</option></select>
+<button class=btn onclick=modelsLoad() title="ask the running backend which checkpoints it has">&#8635; Refresh</button>
 <span id=modelinfo class=hint></span>
 </div>
+<p id=model_active class=hint style="margin:4px 0 8px"></p>
 <details style="margin:6px 0">
 <summary style="cursor:pointer;color:var(--dim)">House style &mdash; the ART_SPEC block every batch prompt ends with</summary>
 <label>style (appended to every prompt)</label><textarea id=style_pos rows=2 spellcheck=false></textarea>
@@ -914,7 +946,7 @@ A1111 note: <code>webui.bat --api</code> guarantees the API; if you rely on cust
 <button class=btn onclick="post('generate',{starter:true,dry_run:dry()})">Starter batch</button>
 <button class=btn onclick="post('generate',{dry_run:dry()})">Full batch</button>
 <button class=btn onclick="post('contact')">Contact sheets</button>
-<label><input type=checkbox id=dryrun checked> dry-run (no GPU)</label>
+<label title="rehearsal mode: writes tiny grey stub images instead of using the GPU"><input type=checkbox id=dryrun> dry-run (test without GPU)</label>
 </div>
 <div id=repline class=row></div>
 <div id=seedblock style="display:none">
@@ -925,7 +957,7 @@ A1111 note: <code>webui.bat --api</code> guarantees the API; if you rely on cust
 <div style="margin:2px 0 8px">
 <span class=legend><i style="outline:2px solid var(--good);outline-offset:-2px"></i> composed card face</span>
 <span class=legend><i style="outline:2px solid var(--accent);outline-offset:-2px"></i> chosen art for this card</span>
-<span class=legend>grey tiles = dry-run stubs, replaced when you run for real</span>
+<span class=legend>dry-run stubs are hidden automatically</span>
 </div>
 <div id=chips_gal class=chips></div>
 <div id=gallery class=gal></div>
@@ -999,6 +1031,7 @@ Barnaby Files guide; AH font pack via the Mythos Busters Discord.</p>
 <label>negative prompt</label><textarea id=ed_neg rows=2 spellcheck=false></textarea>
 <div class=row style="margin-top:6px">
 <button class="btn primary" onclick=edGenerate()>Generate 2 variants</button>
+<button class=btn onclick=edReroll() title="same prompt, brand-new seeds — different images every click">&#127922; Reroll (new seeds)</button>
 <button class=btn onclick=edPromptSave()>Save prompt</button>
 <button class=btn onclick=edPromptReset()>Reset to composed</button>
 <span id=ed_prompt_info class=hint></span>
@@ -1021,11 +1054,12 @@ New variants land in the strip above and the gallery when the job finishes.</p>
 <span>&#9650;</span> Activity</div><div id=log></div></div>
 
 <script>
-let seq=0, cur='cards', ed=null, ST=null;
+let seq=0, cur='setup', ed=null, ST=null;
 window.revealed=window.revealed||new Set();
 function tab(t){cur=t;for(const x of ['setup','cards','illustrate','frame','apply']){
 document.getElementById(x).classList.toggle('on',x===t);
-document.getElementById('tab-'+x).classList.toggle('on',x===t);}}
+document.getElementById('tab-'+x).classList.toggle('on',x===t);}
+if(t==='illustrate'&&!modelsLoadedOnce){modelsLoadedOnce=true;modelsLoad();}}
 function dry(){return document.getElementById('dryrun').checked}
 function rigVals(){return {cwd:document.getElementById('rig_cwd').value,
 command:document.getElementById('rig_cmd').value};}
@@ -1037,7 +1071,13 @@ for(const m of (j.models||[])){const o=document.createElement('option');
 o.value=o.text=m;if(j.current&&(m===j.current||m.startsWith(j.current)))o.selected=true;sel.add(o);}
 if(j.current&&![...sel.options].some(o=>o.selected)){
 const o=document.createElement('option');o.value=j.current;
-o.text=j.current+' (not on backend)';o.selected=true;sel.add(o);}}
+o.text=j.current+' (not on backend!)';o.selected=true;sel.add(o);}
+const el=document.getElementById('model_active');
+if(!j.ok){el.innerHTML='&#9888; backend not reachable — Launch it above, then hit &#8635;';}
+else{const match=j.active&&j.current&&(j.active===j.current||j.active.startsWith(j.current)||j.current.startsWith(j.active.split(' ')[0]));
+el.innerHTML='backend has loaded: <b>'+(j.active||'?')+'</b> &middot; every generation forces: <b>'+(j.current||'?')+'</b>'+
+(match?' &#10003;':' — generations will switch it to yours automatically');}}
+let modelsLoadedOnce=false;
 function modelSet(){const v=document.getElementById('model').value;
 if(v)post('model_set',{checkpoint:v});}
 function styleSave(){post('style_save',{style_positive:document.getElementById('style_pos').value,
@@ -1096,27 +1136,35 @@ document.getElementById('cardgroups').innerHTML=GROUP_ORDER.filter(g=>groups[g])
 `<div class=grid>${groups[g].map(cardTile).join('')}</div>`).join('')
 ||'<span class=hint>no cards in this category</span>';}
 
-function renderGallery(s){
+function galleryTile(g,s,nameOf){
 const shield=document.getElementById('spoilshield').checked;
-const groupOf={};for(const c of s.cards)groupOf[c.id]=c.group;
-const nameOf={};for(const c of s.cards)nameOf[c.id]=c.name;
-const items=s.gallery.filter(g=>GROUP==='All'||groupOf[g.id]===GROUP)
-.slice().sort((a,b)=>GROUP_ORDER.indexOf(groupOf[a.id])-GROUP_ORDER.indexOf(groupOf[b.id])
-||a.id.localeCompare(b.id));
-document.getElementById('gallery').innerHTML=items.map(g=>{
 if(shield&&g.spoiler&&!window.revealed.has(g.id))
  return `<div class=card style="width:150px"><div class=cid>&#128274; encounter card</div>`+
  `<div class=veil style="height:110px;border-radius:6px;display:flex;align-items:center;`+
  `justify-content:center;font-size:11px;color:var(--dim);cursor:pointer;`+
  `background:repeating-linear-gradient(45deg,#15151d,#15151d 8px,#1b1b25 8px,#1b1b25 16px)" `+
  `onclick="window.revealed.add('${g.id}');refresh()">tap to reveal</div></div>`;
+const real=g.variants.filter(v=>!(g.stubs||[]).includes(v));
 return `<div class=card style="width:150px"><div class=cid title="${g.id}">${nameOf[g.id]||g.id}</div>`+
 (g.face?`<img style="outline:2px solid var(--good)" title="composed card — click to view large" `+
 `src="/art?p=art/faces/${g.id}.png&ts=${ST}" onclick="zoomOpen(this.src,'${g.id} — composed face')">`:'')+
-g.variants.map(v=>`<img loading=lazy class="${v===g.chosen?'chosen':''}" title="click to view large" `+
+real.map(v=>`<img loading=lazy class="${v===g.chosen?'chosen':''}" title="click to view large" `+
 `src="/art?p=out/${s.campaign}/${g.id}/${v}" `+
 `onclick="zoomOpen(this.src,'${g.id} — ${v}','Use on this card',()=>post('choose',{card:'${g.id}',file:'${v}'}))">`).join('')+
-`</div>`;}).join('')||'<span class=hint>nothing in this category yet — run a batch, or upload art per card from the Cards tab</span>';}
+(!real.length?`<div class=hint style="font-size:11px">no real art yet`+
+((g.stubs||[]).length?' (dry-run stubs hidden)':'')+`</div>`:'')+
+`</div>`;}
+function renderGallery(s){
+const groupOf={};for(const c of s.cards)groupOf[c.id]=c.group;
+const nameOf={};for(const c of s.cards)nameOf[c.id]=c.name;
+const groups={};
+for(const g of s.gallery){const grp=groupOf[g.id]||'Other';
+if(GROUP==='All'||grp===GROUP)(groups[grp]=groups[grp]||[]).push(g);}
+document.getElementById('gallery').innerHTML=
+GROUP_ORDER.concat(['Other']).filter(x=>groups[x]).map(x=>
+`<div style="width:100%"><h2>${x}<small>${groups[x].length}</small></h2></div>`+
+groups[x].sort((a,b)=>a.id.localeCompare(b.id)).map(g=>galleryTile(g,s,nameOf)).join('')).join('')
+||'<span class=hint>nothing in this category yet — run Step 0 &middot; Seeds, then a batch</span>';}
 function step(done,html){return `<div class="step${done?' done':''}">`+
 `<span class=n>${done?'&#10003;':''}</span><span>${html}</span></div>`;}
 function renderSteps(s){
@@ -1128,19 +1176,21 @@ const gen=s.report&&s.report.generated>0&&!s.report.dry_run;
 const allFramed=cov.total>0&&cov.framed.length===cov.total;
 const el=(id,html)=>{const e=document.getElementById(id);if(e)e.innerHTML=html;};
 el('steps_setup',
- step(hasModel,'<b>Install the art model</b> — one click below (needs a free Civitai API key), or drop your .safetensors into <code>vendor/models/</code>')+
- step(v.se_installed,'<b>Install Strange Eons</b> into this folder — it renders the FINAL cards on real blank frames with the real fonts')+
- step(false,'<b>Inside Strange Eons, once:</b> install jaqenZann&rsquo;s Arkham plugin + the AH font pack (links below) — this is what makes cards indistinguishable from official ones'));
+ step(v.a1111_installed,'<b>1.</b> Install Stable Diffusion (A1111) into this folder — skip if you already run it elsewhere')+
+ step(hasModel,'<b>2.</b> Install the art model (needs a free Civitai API key), or drop your .safetensors into <code>vendor/models/</code>')+
+ step(v.se_installed,'<b>3.</b> Install Strange Eons — it renders the FINAL cards with the real fonts')+
+ step(false,'<b>4.</b> Inside Strange Eons, once: jaqenZann&rsquo;s Arkham plugin + AH font pack (links below)')+
+ step(false,'Then work the tabs left to right: <b>2 &middot; Illustrate</b> &rarr; <b>3 &middot; Cards</b> &rarr; <b>5 &middot; Play in TTS</b>'));
 el('steps_cards',
  step(true,'<b>Pick a category</b> below, click a card to open it')+
  step(true,'<b>Drag</b> the art to position, <b>scroll</b> to size, <b>Save</b> — placement is kept and reused by the final Strange Eons render')+
  step(true,'These in-app faces are a fast <b>preview</b>; the print-identical faces come from the Frame tab'));
 el('steps_illustrate',
- step(hasModel,'<b>1.</b> Install the art model (Setup tab) — currently: <b>'+(s.checkpoint||'none')+'</b>')+
- step(seedsDone,'<b>2.</b> Run <b>Step 0 · Seeds</b> (the backend launches itself; watch the Activity drawer)')+
+ step(false,'<b>1.</b> <b>&#9655; Launch backend</b>, wait for the drawer to say it&rsquo;s up, then hit <b>&#8635;</b> on the Checkpoint row and pick <b>Painter&rsquo;s</b> — the line below tells you what the backend actually has loaded')+
+ step(seedsDone,'<b>2.</b> <b>Step 0 · Seeds</b> — 4 portrait candidates per investigator appear below')+
  step(picksDone,'<b>3.</b> Click each investigator&rsquo;s best portrait &rarr; <b>Make canonical</b>')+
- step(gen,'<b>4.</b> Run <b>Starter batch</b> to check the look, then <b>&#9889; Auto-build ALL</b> (top right) &mdash; uncheck dry-run for real art')+
- step(true,'<b>5.</b> Fine-tune any card&rsquo;s art in the Cards tab'));
+ step(gen,'<b>4.</b> <b>Starter batch</b> to check the look &rarr; then <b>&#9889; Auto-build ALL</b> (top right) does every card')+
+ step(true,'<b>5.</b> Don&rsquo;t like a result? Open the card in <b>3 &middot; Cards</b> &rarr; &#127922; Reroll gives new takes'));
 el('steps_frame',
  step(v.se_installed,'<b>1.</b> Install Strange Eons (Setup tab) + the jaqenZann plugin and AH fonts inside it')+
  step(!(s.se&&JSON.stringify(s.se.config.classmap).includes('TODO')),'<b>2.</b> Fill the class-map + setting keys once (open one card of each type in SE to read them)')+
@@ -1170,6 +1220,8 @@ for(const [id,val] of [['style_pos',(s.style||{}).positive||''],
 ['style_neg',(s.style||{}).negative||'']]){
 const el=document.getElementById(id);if(el&&document.activeElement!==el)el.value=val;}
 const v=s.vendor||{};
+document.getElementById('vendor_a1111').innerHTML=v.a1111_installed?
+'&#10003; installed in vendor/a1111':'not installed (fine if you already run A1111 elsewhere)';
 document.getElementById('vendor_model').innerHTML=(v.models||[]).length?
 '&#10003; installed: '+v.models.join(', '):(v.has_token?'key saved — ready to install':'not installed yet');
 document.getElementById('vendor_se').innerHTML=v.se_installed?
@@ -1253,19 +1305,21 @@ edPromptLoad(ed.g.id);}
 async function edPromptReset(){
 await post('prompt_save',{card:ed.g.id,positive:'',negative:''});
 edPromptLoad(ed.g.id);}
-async function edGenerate(){const v=edPromptVals();
+async function edGenerate(reroll){const v=edPromptVals();
 await post('prompt_save',{card:ed.g.id,positive:v.positive,negative:v.negative});
-await post('generate',{only:ed.g.id,variants:2,dry_run:dry()});}
+await post('generate',{only:ed.g.id,variants:2,dry_run:dry(),reroll:!!reroll});}
+function edReroll(){edGenerate(true);}
 function edLoadArt(){const art=document.getElementById('ed_art');
 if(ed.g.chosen){art.style.display='block';
 art.onload=()=>{ed.natW=art.naturalWidth;ed.natH=art.naturalHeight;edPreview();};
 art.src='/art?p=out/'+camp()+'/'+ed.g.id+'/'+ed.g.chosen+'&ts='+Date.now();}
 else{art.style.display='none';}}
 function edStrip(){const el=document.getElementById('ed_strip');
-el.innerHTML=(ed.g.variants||[]).map(v=>
+const real=(ed.g.variants||[]).filter(v=>!(ed.g.stubs||[]).includes(v));
+el.innerHTML=real.map(v=>
 `<img class="${v===ed.g.chosen?'on':''}" src="/art?p=out/${camp()}/${ed.g.id}/${v}" `+
 `onclick="edUse('${v}')">`).join('')||
-'<span class=hint>no art yet for this card — upload an image above, or run a batch</span>';}
+'<span class=hint>no real art yet — hit Generate below, or upload an image above</span>';}
 async function edUse(v){await post('choose',{card:ed.g.id,file:v});
 ed.g.chosen=v;ed.scale=1;ed.ox=0;ed.oy=0;
 document.getElementById('ed_scale').value=1;

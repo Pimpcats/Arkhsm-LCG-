@@ -97,3 +97,12 @@ class A1111Backend(Backend):
         # 'title' ("file.safetensors [hash]") is what override_settings matches
         # most precisely; A1111 also accepts the bare filename.
         return [m.get("title") or m.get("model_name", "?") for m in r.json()]
+
+    def current_model(self):
+        """The checkpoint the backend has LOADED right now (ground truth for
+        'is Painter's actually selected?')."""
+        if self.dry_run:
+            return self.DRY_MODELS[0]
+        r = requests.get(self.base_url + "/sdapi/v1/options", timeout=15)
+        r.raise_for_status()
+        return r.json().get("sd_model_checkpoint")
