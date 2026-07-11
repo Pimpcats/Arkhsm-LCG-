@@ -1273,6 +1273,12 @@ b.textContent=actLabel||'';b.style.display=actLabel?'':'none';
 document.getElementById('zoom').style.display='flex';}
 function zoomClose(){document.getElementById('zoom').style.display='none';ZOOMFN=null;}
 function zoomDo(){const f=ZOOMFN;zoomClose();if(f)f();}
+function openEditor(id){const c=((LS&&LS.cards)||[]).find(x=>x.id===id);
+if(!c){addlog('open the Cards tab for '+id);return;}
+tab('cards');editArt(c);}
+async function useAndEdit(id,v){await post('choose',{card:id,file:v});
+const c=((LS&&LS.cards)||[]).find(x=>x.id===id);
+if(c){tab('cards');editArt(Object.assign({},c,{chosen:v,face:true}));}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')zoomClose();});
 function camp(){return document.getElementById('campaign').value||'still_hour'}
 async function post(action,params){params=params||{};params.campaign=camp();
@@ -1328,11 +1334,12 @@ if(shield&&g.spoiler&&!window.revealed.has(g.id))
  `onclick="window.revealed.add('${g.id}');refresh()">tap to reveal</div></div>`;
 const real=g.variants.filter(v=>!(g.stubs||[]).includes(v));
 return `<div class=card style="width:150px"><div class=cid title="${g.id}">${nameOf[g.id]||g.id}</div>`+
-(g.face?`<img style="outline:2px solid var(--good)" title="composed card — click to view large" `+
-`src="/art?p=art/faces/${g.id}.png&ts=${ST}" onclick="zoomOpen(this.src,'${g.id} — composed face')">`:'')+
+(g.face?`<img style="outline:2px solid var(--good)" title="composed card — click to adjust art placement" `+
+`src="/art?p=art/faces/${g.id}.png&ts=${ST}" `+
+`onclick="zoomOpen(this.src,'${g.id} — composed face','Move / resize art',()=>openEditor('${g.id}'))">`:'')+
 real.map(v=>`<img loading=lazy class="${v===g.chosen?'chosen':''}" title="click to view large" `+
 `src="/art?p=out/${s.campaign}/${g.id}/${v}" `+
-`onclick="zoomOpen(this.src,'${g.id} — ${v}','Use on this card',()=>post('choose',{card:'${g.id}',file:'${v}'}))">`).join('')+
+`onclick="zoomOpen(this.src,'${g.id} — ${v}','Use on this card &amp; place it',()=>useAndEdit('${g.id}','${v}'))">`).join('')+
 (!real.length?`<div class=hint style="font-size:11px">no real art yet`+
 ((g.stubs||[]).length?' (dry-run stubs hidden)':'')+`</div>`:'')+
 `</div>`;}

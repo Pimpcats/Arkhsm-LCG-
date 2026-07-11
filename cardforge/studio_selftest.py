@@ -373,6 +373,9 @@ check("gallery flags dry-run stubs so the UI can hide them",
       and any(g["stubs"] for g in s["gallery"]))
 check("reroll + stub filtering in the UI",
       "Reroll" in page and "stubs" in page)
+check("choosing art from the gallery opens the drag/resize editor",
+      "useAndEdit" in page and "openEditor" in page
+      and "Move / resize art" in page)
 
 print("== ADVANCED: any-card generation, defaults, LoRA strengths ==")
 chars_path2 = os.path.join(ROOT, "campaigns", "still_hour", "characters.json")
