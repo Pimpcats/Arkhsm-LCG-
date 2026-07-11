@@ -56,8 +56,15 @@ def load_placements():
 
 # Art-window geometry per layout, shared with the Studio's placement editor.
 def art_box(card_type):
-    """(card_w, card_h, x0, y0, x1, y1) — the drag/scale target. Template mode
-    (official frames present) uses the templates' art windows."""
+    """(card_w, card_h, x0, y0, x1, y1) — the drag/scale target. PSD blanks
+    (true frames, native res) outrank the scanned templates."""
+    psd_map = {"Investigator": ("character_card_front", 1048, 738),
+               "Enemy": ("scenario_enemy", 733, 1050),
+               "Treachery": ("scenario_treachery", 733, 1050)}
+    if card_type in psd_map:
+        layout, w, h = psd_map[card_type]
+        if has_psd(layout):
+            return (w, h) + PSD_ART[layout]
     if T.has_template("investigator_front"):
         if card_type == "Investigator":
             return (750, 523) + T.INV_FRONT["art"]
@@ -594,6 +601,174 @@ def t_enemy(c, pt, dest, art_path=None, placement=None):
     img.save(dest)
 
 
+# ------------------------------------------------------------- PSD templates --
+# The community AHTCG PSD pack (assets/frames/psd/, extracted by
+# tools/extract_psd_blanks.py) provides TRUE blank frames with transparent
+# art windows + text regions auto-measured from the PSDs' own type layers.
+# When present, these outrank every other card base: art composites UNDER
+# the frame, text is typeset straight onto real card material.
+
+PSD_DIR = os.path.join(ROOT, "assets", "frames", "psd")
+PSD_INK = (30, 25, 20)
+PSD_ART = {
+    "character_card_front": (0, 100, 572, 738),
+    "scenario_enemy": (0, 520, 733, 1050),
+    "scenario_treachery": (0, 0, 733, 615),
+}
+_PSD_CACHE = {}
+
+
+def has_psd(layout):
+    return (os.path.exists(os.path.join(PSD_DIR, layout + ".png"))
+            and os.path.exists(os.path.join(PSD_DIR, layout + "_regions.json")))
+
+
+def psd_assets(layout):
+    if layout not in _PSD_CACHE:
+        frame = Image.open(os.path.join(PSD_DIR, layout + ".png")).convert("RGBA")
+        regions = json.load(open(os.path.join(PSD_DIR, layout + "_regions.json"),
+                                 encoding="utf-8"))
+        _PSD_CACHE[layout] = (frame, regions)
+    frame, regions = _PSD_CACHE[layout]
+    return frame.copy(), regions
+
+
+def _psd_compose(layout, art_path, placement, label="place art"):
+    frame, regions = psd_assets(layout)
+    artbox = PSD_ART[layout]
+    if frame.getchannel("A").getextrema()[0] < 250:
+        # windowed frame: art underneath, ornate borders mask it perfectly
+        img = Image.new("RGB", frame.size, (24, 22, 28))
+        if art_path:
+            paste_cover(img, art_path, artbox, placement)
+        img.paste(frame, (0, 0), frame)
+    else:
+        # opaque frame (char front): art into its rectangle on top
+        img = frame.convert("RGB")
+        if art_path:
+            paste_cover(img, art_path, artbox, placement)
+        else:
+            T.blank_art_window(ImageDraw.Draw(img), artbox, label)
+    return img, regions
+
+
+def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
+              grow=1.5, min_size=13, max_w_factor=1.45, max_size=None):
+    """Center text on a region bbox, auto-sized. Region bboxes come from the
+    template's example text, so start from the box height and shrink to fit;
+    modest overflow past the example's width is allowed (names vary)."""
+    if not text:
+        return
+    bw = box[2] - box[0]
+    size = max(int((box[3] - box[1]) * grow), min_size)
+    if max_size:
+        size = min(size, max_size)
+    while size > min_size:
+        f = _font(size, bold=bold, italic=italic, title=title)
+        if d.textlength(text, font=f) <= bw * max_w_factor:
+            break
+        size -= 1
+    f = _font(size, bold=bold, italic=italic, title=title)
+    w = d.textlength(text, font=f)
+    bb = f.getbbox(text)
+    d.text(((box[0] + box[2]) / 2 - w / 2,
+            (box[1] + box[3]) / 2 - (bb[1] + bb[3]) / 2), text, font=f, fill=fill)
+
+
+def _box_block(d, text, box, fill=PSD_INK, start=30, min_size=15,
+               italic=False, leading=1.18):
+    """Wrapped [markup] text fitted into a box (shrinks until it fits)."""
+    if not text:
+        return box[1]
+    bw = box[2] - box[0]
+    size = start
+    for size in range(start, min_size - 1, -1):
+        if len(wrap_runs(d, text, size, bw)) * int(size * leading) <= box[3] - box[1]:
+            break
+    return draw_wrapped(d, text, box[0], box[1], size, bw, fill,
+                        italic=italic, leading=leading)
+
+
+def p_investigator_front(c, pt, dest, art_path=None, placement=None):
+    img, R = _psd_compose("character_card_front", art_path, placement,
+                          label="investigator art")
+    d = ImageDraw.Draw(img)
+    _box_text(d, c["name"], R["Character Name"], title=True)
+    _box_text(d, c.get("subtitle", ""), R["Archetype"], italic=True)
+    for key, stat in (("Willpower", "wil"), ("Intellect", "int"),
+                      ("Combat", "com"), ("Agility", "agi")):
+        _box_text(d, str(c[stat]), R[key], bold=True, grow=1.2)
+    _box_text(d, c.get("traits", ""), R["Keywords"], bold=True, italic=True,
+              max_size=26)
+    a = R["Ability Text"]
+    _box_block(d, pt.get("text", ""), (a[0], a[1], a[2], a[3] + 40))
+    fl = R["Flavor Text"]
+    _box_block(d, pt.get("flavor", ""), (fl[0], fl[1], fl[2], fl[3] + 30),
+               fill=(84, 66, 50), italic=True, start=24)
+    _box_text(d, str(c["health"]), R["Health"], fill=(255, 246, 240),
+              bold=True, grow=0.85)
+    _box_text(d, str(c["sanity"]), R["Sanity"], fill=(240, 246, 255),
+              bold=True, grow=0.85)
+    # class disc over the template's custom faction icon
+    cc = CLASS_COLORS.get(c.get("class", "Neutral"), (94, 94, 102))
+    d.ellipse([16, 10, 86, 80], fill=cc, outline=(20, 16, 12), width=3)
+    _box_text(d, c.get("class", "?")[0], (16, 10, 86, 80),
+              fill=(245, 240, 230), bold=True, grow=0.8)
+    _box_text(d, "Illus. pending", R["Artist Credit"], fill=(70, 58, 46))
+    _box_text(d, "THE STILL HOUR — fan content", R["Copyright"], fill=(70, 58, 46))
+    img.save(dest)
+
+
+def p_enemy(c, pt, dest, art_path=None, placement=None):
+    img, R = _psd_compose("scenario_enemy", art_path, placement)
+    d = ImageDraw.Draw(img)
+    _box_text(d, c["name"], R["Title"], title=True)
+    for key, val in (("Combat Value", pt.get("fight")),
+                     ("Health Value", pt.get("health")),
+                     ("Evade Value", pt.get("evade"))):
+        _box_text(d, "\u2014" if val in (None, "", "None") else str(val),
+                  R[key], bold=True, grow=1.0)
+    traits = c.get("traits", "") + ("  Elite." if c.get("elite")
+                                    and "Elite" not in c.get("traits", "") else "")
+    _box_text(d, traits, R["Keywords"], bold=True, italic=True, max_size=30)
+    e2, e1 = R["Effect Text 2"], R["Effect Text"]
+    _box_block(d, pt.get("text", ""), (40, e2[1], 693, e1[3] + 70), start=27)
+    if c.get("victory"):
+        _box_text(d, "Victory {}.".format(c["victory"]), R["Victory Points"],
+                  bold=True)
+    # damage / horror counts beside the baked heart & brain chits
+    for val, x, fill in ((pt.get("damage"), 300, (255, 235, 232)),
+                         (pt.get("horror"), 484, (232, 240, 255))):
+        if val:
+            d.text((x, 560), str(val), font=_font(40, bold=True), fill=fill,
+                   stroke_width=3, stroke_fill=(20, 16, 14))
+    _box_text(d, "Illus. pending — fan content", R["Illustrator Credit"],
+              fill=(70, 58, 46))
+    img.save(dest)
+
+
+def p_treachery(c, pt, dest, art_path=None, placement=None):
+    img, R = _psd_compose("scenario_treachery", art_path, placement)
+    d = ImageDraw.Draw(img)
+    _box_text(d, c["name"], R["Title"], title=True)
+    if c.get("weakness"):
+        _box_text(d, "—  W E A K N E S S  —", (233, 662, 501, 680),
+                  fill=(92, 40, 104), bold=True)
+        _box_text(d, c.get("traits", ""), (233, 684, 501, 708),
+                  bold=True, italic=True)
+    else:
+        _box_text(d, c.get("traits", ""), R["Keywords"], bold=True, italic=True,
+                  max_size=30)
+    e2 = R["Effect Text 2"]
+    _box_block(d, pt.get("text", ""), (52, e2[1], 681, 878), start=27)
+    p = R["Plot Text"]
+    _box_block(d, pt.get("flavor", ""), (p[0], p[1], p[2], 992),
+               fill=(84, 66, 50), italic=True, start=24)
+    _box_text(d, "Illus. pending — fan content", R["Illustrator Credit"],
+              fill=(70, 58, 46))
+    img.save(dest)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", nargs="*", help="render only these card ids")
@@ -628,16 +803,22 @@ def main():
         dest = os.path.join(FACES_DIR, c["id"] + ".png")
         back_dest = os.path.join(FACES_DIR, c["id"] + "-back.png")
         if c["type"] == "Investigator":
-            if use_tpl:
+            if has_psd("character_card_front"):
+                p_investigator_front(c, pt, dest, art_path=art, placement=place)
+                (t_investigator_back if use_tpl else render_investigator_back)(
+                    c, pt, back_dest, **({"art_path": art} if use_tpl else {}))
+            elif use_tpl:
                 t_investigator_front(c, pt, dest, art_path=art, placement=place)
                 t_investigator_back(c, pt, back_dest, art_path=art)
             else:
                 render_investigator_front(c, pt, dest, art_path=art, placement=place)
                 render_investigator_back(c, pt, back_dest)
         elif c["type"] == "Enemy":
-            (t_enemy if use_tpl else render_enemy)(c, pt, dest, art_path=art, placement=place)
+            (p_enemy if has_psd("scenario_enemy") else
+             (t_enemy if use_tpl else render_enemy))(c, pt, dest, art_path=art, placement=place)
         elif c["type"] == "Treachery":
-            (t_treachery if use_tpl else render_treachery)(c, pt, dest, art_path=art, placement=place)
+            (p_treachery if has_psd("scenario_treachery") else
+             (t_treachery if use_tpl else render_treachery))(c, pt, dest, art_path=art, placement=place)
         else:
             render_player_card(c, pt, dest, art_path=art, placement=place)
     n = len([f for f in os.listdir(FACES_DIR) if f.endswith(".png")])

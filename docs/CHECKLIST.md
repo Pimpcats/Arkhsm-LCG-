@@ -43,8 +43,12 @@
 - ✅ True blank frames extracted from the PSD template pack (all 10 layouts)
   with auto-measured text regions — committed in assets/frames/psd/
 - ✅ Inpaint fallback ("select & generate over") for the 6 scanned layouts
-- 🔶 Renderer v2: typeset cards onto the PSD blanks using the extracted
-  region maps — THE remaining build for seamless in-app cards (next up)
+- ✅ Renderer v2 (investigators, enemies, treacheries): cards typeset
+  directly onto the true PSD blanks at native res — art under the frame,
+  auto-measured text regions, official fonts
+- 🔶 Renderer v2 for assets/events/skills — blocked on finding the player
+  asset/event/skill PSDs (the pack you sent covers scenario cards +
+  investigator front only; the same BGG/Discord source likely has them)
 - 🔶 Strange Eons path (pixel-perfect benchmark): app generates the script;
   you still install SE (one click) + jaqenZann plugin + verify the two
   config seams once

@@ -21,6 +21,7 @@ import os
 import re
 import sys
 
+from PIL import Image
 from psd_tools import PSDImage
 
 OUT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -41,6 +42,9 @@ def layout_name(fname):
 def is_content(layer, parents):
     if layer.kind == "type":
         return True
+    # NOTE: char front's 'Backgrounds' smartobject IS the whole frame
+    # (scroll, plates, parchment, backdrop in one) — it must stay. Only the
+    # 'Character Art' group is example content there.
     return any(p.name.lower() in ART_GROUPS for p in parents)
 
 
@@ -73,7 +77,25 @@ def extract(psd_path):
             p = getattr(p, "parent", None)
         return layer.is_visible() and not is_content(layer, parents)
 
-    img = psd.composite(layer_filter=keep).convert("RGB")
+    # RGBA: transparent regions ARE the art windows — the renderer lays card
+    # art underneath and composites this frame on top
+    img = psd.composite(layer_filter=keep)
+    if img.convert("RGBA").getchannel("A").getextrema() == (255, 255):
+        # CMYK docs composite onto an opaque canvas; recover alpha by
+        # compositing on white AND black and diffing (a = 255 - (w - b))
+        import numpy as np
+        w = np.asarray(psd.composite(layer_filter=keep, color=1.0)
+                       .convert("RGB"), dtype=np.int16)
+        b = np.asarray(psd.composite(layer_filter=keep, color=0.0)
+                       .convert("RGB"), dtype=np.int16)
+        alpha = (255 - (w - b).mean(axis=2)).clip(0, 255).astype(np.uint8)
+        rgb = b.astype(np.float32)
+        a = np.maximum(alpha, 1).astype(np.float32)[..., None]
+        rgb = (rgb * 255.0 / a).clip(0, 255).astype(np.uint8)
+        out = np.dstack([rgb, alpha])
+        img = Image.fromarray(out, "RGBA")
+    else:
+        img = img.convert("RGBA")
     os.makedirs(OUT_DIR, exist_ok=True)
     img.save(os.path.join(OUT_DIR, name + ".png"))
     with open(os.path.join(OUT_DIR, name + "_regions.json"), "w",
