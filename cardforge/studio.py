@@ -283,6 +283,36 @@ def act_inpaint_frames(p):
                    dry_run=bool(p.get("dry_run")))
 
 
+def act_install_fonts(p):
+    """Setup: fetch Arkhamic (OFL Teutonic extension) into assets/fonts."""
+    return run_job("install-fonts", installer.install_fonts,
+                   dry_run=bool(p.get("dry_run")))
+
+
+def act_font_set(p):
+    """Manual per-card font override (title/body) from the card editor;
+    recomposes the face immediately."""
+    sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+    import render_placeholders as rp
+    card = p["card"]
+    ov = rp.load_font_overrides()
+    entry = {}
+    for k in ("title", "body"):
+        v = os.path.basename((p.get(k) or "").strip())
+        if v:
+            entry[k] = v
+    if entry:
+        ov[card] = entry
+    else:
+        ov.pop(card, None)
+    with open(rp.FONT_OVERRIDES_PATH, "w", encoding="utf-8") as f:
+        json.dump(ov, f, indent=2)
+    subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py"),
+                    "--only", card], check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+    log("fonts for {}: {}".format(card, entry or "default stack"))
+    return {"ok": True, "fonts": entry}
+
+
 def act_install_a1111(p):
     """Setup: self-contained Stable Diffusion into vendor/a1111."""
     return run_job("install-a1111", installer.install_a1111,
@@ -661,10 +691,12 @@ def status(campaign="still_hour"):
                 "spoiler": bool(c.get("encounter")),
                 "variants": variants, "stubs": vstubs, "chosen": chosen,
             })
+    font_overrides = rp.load_font_overrides()
     for c in catalog:
         if c["id"] in boxes:
             c["artbox"] = boxes[c["id"]]
             c["placement"] = placements.get(c["id"], {"scale": 1.0, "ox": 0, "oy": 0})
+        c["fonts"] = font_overrides.get(c["id"], {})
     campaigns = sorted(d for d in os.listdir(os.path.join(ROOT, "campaigns"))
                        if os.path.isdir(os.path.join(ROOT, "campaigns", d)))
     faces_dir_abs = os.path.join(ROOT, "art", "faces")
@@ -681,6 +713,7 @@ def status(campaign="still_hour"):
             "vendor": installer.vendor_status(),
             "seeds": seeds, "cards": catalog, "faces_ver": faces_ver,
             "gen": camp.get("overrides_all", {}),
+            "fonts": rp.list_fonts(),
             "characters": {n: {"lora": (v or {}).get("lora", ""),
                                "weight": (v or {}).get("weight", 0.8),
                                "trigger": (v or {}).get("trigger", "")}
@@ -700,6 +733,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "models": act_models, "model_set": act_model_set,
            "install_checkpoint": act_install_checkpoint,
            "install_se": act_install_se, "install_a1111": act_install_a1111,
+           "install_fonts": act_install_fonts, "font_set": act_font_set,
            "prompt_get": act_prompt_get, "prompt_save": act_prompt_save,
            "style_save": act_style_save, "inpaint_frames": act_inpaint_frames,
            "gen_settings": act_gen_settings, "lora_save": act_lora_save,
@@ -985,6 +1019,14 @@ folder lives. Get a free API key at civitai.com &rarr; account settings. Already
 the .safetensors into <code>vendor/models/</code> instead.</p>
 <hr>
 <div class=row>
+<b style="min-width:180px">2b &middot; Title font</b>
+<button class=btn onclick="post('install_fonts')">Install Arkhamic</button>
+<span class=hint>the community&rsquo;s OFL extension of Teutonic (the official title face) — from
+<a href="https://github.com/javnik36/arkhamic" target=_blank>javnik36/arkhamic</a>; the renderer
+prefers it automatically once installed</span>
+</div>
+<hr>
+<div class=row>
 <b style="min-width:180px">3 &middot; Strange Eons</b>
 <button class="btn primary" onclick="post('install_se')">Download &amp; install into this folder</button>
 <span id=vendor_se class=hint></span>
@@ -1127,6 +1169,12 @@ Barnaby Files guide; AH font pack via the Mythos Busters Discord.</p>
 <input type=file id=ed_file accept="image/*" style="display:none" onchange=edUpload(this)>
 </div>
 <div id=ed_strip></div>
+<div class=row style="margin-top:10px">
+<label>title font</label><select id=ed_font_title onchange=edFontSet()></select>
+<label>body font</label><select id=ed_font_body onchange=edFontSet()></select>
+<span class=hint>manual per-card override &mdash; &ldquo;default&rdquo; follows the official stack
+(Arkhamic/Teutonic titles, Arno/Minion body); recomposes instantly</span>
+</div>
 <details id=ed_promptbox style="margin-top:12px">
 <summary style="cursor:pointer;color:var(--dim)">Prompt &mdash; generate art for THIS card (A1111-style boxes)</summary>
 <label>prompt</label><textarea id=ed_pos rows=3 spellcheck=false></textarea>
@@ -1434,8 +1482,19 @@ win.style.left=(x0*disp)+'px';win.style.top=(y0*disp)+'px';
 win.style.width=((x1-x0)*disp)+'px';win.style.height=((y1-y0)*disp)+'px';
 document.getElementById('ed_title').textContent=c.name;
 document.getElementById('ed_scale').value=ed.scale;
+for(const [id,cur] of [['ed_font_title',(c.fonts||{}).title||''],
+['ed_font_body',(c.fonts||{}).body||'']]){
+const sel=document.getElementById(id);sel.innerHTML='';
+const d=document.createElement('option');d.value='';d.text='default';sel.add(d);
+for(const f of (LS&&LS.fonts)||[]){const o=document.createElement('option');
+o.value=o.text=f;if(f===cur)o.selected=true;sel.add(o);}}
 edStrip();edLoadArt();edPromptLoad(c.id);
 document.getElementById('editor').style.display='block';}
+async function edFontSet(){
+await post('font_set',{card:ed.g.id,
+title:document.getElementById('ed_font_title').value,
+body:document.getElementById('ed_font_body').value});
+edFaceRefresh();}
 let ED_COMPOSED=null;
 async function edPromptLoad(card){ED_COMPOSED=null;
 const box=document.getElementById('ed_promptbox');

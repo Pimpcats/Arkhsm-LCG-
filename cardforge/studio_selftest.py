@@ -559,10 +559,35 @@ requests.post(BASE + "/api/compose_one", json={"card": "sthr-elias"})
 print("== FONTS: official stack (Teutonic titles, Arno Pro body) ==")
 import render_placeholders as RP
 check("Teutonic vendored (OFL) and used for titles",
-      RP._font(20, title=True).getname()[0] == "Teutonic"
+      RP._font(20, title=True).getname()[0] in ("Teutonic", "Arkhamic")
       and os.path.exists(os.path.join(ROOT, "assets", "fonts", "Teutonic-OFL.txt")))
 check("Arno Pro picked up for body when present (never committed)",
       RP._font(20).getname()[0] in ("Arno Pro", "DejaVu Serif"))
+check("font list serves text fonts, not the icon font",
+      "Teutonic.ttf" in requests.get(BASE + "/api/status").json()["fonts"]
+      and all("ArkhamFontWithCodex" not in f
+              for f in requests.get(BASE + "/api/status").json()["fonts"]))
+r = requests.post(BASE + "/api/font_set",
+                  json={"card": "sthr-bell", "title": "Teutonic.ttf",
+                        "body": ""}).json()
+fo = json.load(open(RP.FONT_OVERRIDES_PATH, encoding="utf-8"))
+check("per-card font override saves and recomposes",
+      r.get("ok") and fo["sthr-bell"] == {"title": "Teutonic.ttf"}
+      and requests.get(BASE + "/api/status").json()
+      and os.path.exists(os.path.join(ROOT, "art", "faces", "sthr-bell.png")))
+r = requests.post(BASE + "/api/font_set",
+                  json={"card": "sthr-bell", "title": "", "body": ""}).json()
+check("font override clears back to the default stack",
+      r.get("ok") and "sthr-bell" not in
+      json.load(open(RP.FONT_OVERRIDES_PATH, encoding="utf-8")))
+r = requests.post(BASE + "/api/install_fonts", json={"dry_run": True}).json()
+check("Arkhamic install job accepted", r.get("started"))
+check("Arkhamic install completes", wait_idle(30))
+arkhamic_stub = os.path.join(ROOT, "assets", "fonts", "Arkhamic.ttf")
+check("Arkhamic lands in assets/fonts", os.path.exists(arkhamic_stub))
+os.remove(arkhamic_stub)
+check("font dropdowns in the card editor",
+      "ed_font_title" in page and "edFontSet" in page)
 
 print("== WINDOWS LOCALE: repo reads survive a non-UTF-8 default ==")
 import subprocess

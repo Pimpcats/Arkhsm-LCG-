@@ -173,6 +173,55 @@ def ckpt_dir_args():
     return ' --ckpt-dir "{}"'.format(mdir) if has_model else ""
 
 
+# -------------------------------------------------------------------- fonts --
+
+ARKHAMIC_RELEASES_API = "https://api.github.com/repos/javnik36/arkhamic/releases"
+
+
+def install_fonts(dry_run=False, log=print):
+    """Fetch Arkhamic — the community's OFL-licensed extension of Teutonic
+    (the FFG title face) from github.com/javnik36/arkhamic — into
+    assets/fonts/. The renderer prefers it over plain Teutonic once present."""
+    dest = os.path.join(runner.repo_root(), "assets", "fonts")
+    os.makedirs(dest, exist_ok=True)
+    if dry_run:
+        with open(os.path.join(dest, "Arkhamic.ttf"), "wb") as f:
+            f.write(b"stub-font")
+        log("dry-run: wrote stub Arkhamic.ttf")
+        return {"installed": ["Arkhamic.ttf"]}
+    import requests
+    log("querying GitHub for Arkhamic releases…")
+    rels = requests.get(ARKHAMIC_RELEASES_API + "?per_page=5", timeout=30).json()
+    got = []
+    for rel in rels if isinstance(rels, list) else []:
+        for a in rel.get("assets", []):
+            name = a["name"]
+            if name.lower().endswith((".ttf", ".otf")):
+                _download(a["browser_download_url"],
+                          os.path.join(dest, name), log=log)
+                got.append(name)
+            elif name.lower().endswith(".zip"):
+                import io as _io
+                import zipfile
+                r = requests.get(a["browser_download_url"], timeout=120)
+                r.raise_for_status()
+                with zipfile.ZipFile(_io.BytesIO(r.content)) as z:
+                    for zn in z.namelist():
+                        if zn.lower().endswith((".ttf", ".otf")):
+                            base = os.path.basename(zn)
+                            with open(os.path.join(dest, base), "wb") as f:
+                                f.write(z.read(zn))
+                            got.append(base)
+        if got:
+            break
+    if not got:
+        raise RuntimeError(
+            "no font assets in the Arkhamic releases — download the .ttf "
+            "from github.com/javnik36/arkhamic manually into assets/fonts/")
+    log("installed: " + ", ".join(got) + " (title text now uses Arkhamic)")
+    return {"installed": got}
+
+
 # -------------------------------------------------------------------- a1111 --
 
 A1111_RELEASES_API = ("https://api.github.com/repos/AUTOMATIC1111/"

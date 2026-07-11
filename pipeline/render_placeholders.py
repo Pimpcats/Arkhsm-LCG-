@@ -117,7 +117,32 @@ BLUE = (52, 84, 148)
 # (Adobe-licensed — NOT in git; drop your own ArnoPro*.otf files into
 # assets/fonts/ and they're picked up automatically), DejaVu as fallback.
 FONTS_DIR = os.path.join(ROOT, "assets", "fonts")
+# Arkhamic (the community's OFL extension of Teutonic — same face, more
+# glyphs) is preferred when installed; plain Teutonic ships in-repo.
+TITLE_FONT_CANDIDATES = ["Arkhamic.ttf", "Arkhamic-Regular.ttf", "Teutonic.ttf"]
 TITLE_FONT = os.path.join(FONTS_DIR, "Teutonic.ttf")
+
+# Per-card manual font override (Studio card editor): campaigns/still_hour/
+# font_overrides.json {card_id: {"title": file, "body": file}} — files are
+# names inside assets/fonts/. Set per card by the render loop (serial).
+FONT_OVERRIDE = {}
+FONT_OVERRIDES_PATH = os.path.join(ROOT, "campaigns", "still_hour",
+                                   "font_overrides.json")
+
+
+def load_font_overrides():
+    if os.path.exists(FONT_OVERRIDES_PATH):
+        return json.load(open(FONT_OVERRIDES_PATH, encoding="utf-8"))
+    return {}
+
+
+def list_fonts():
+    """Installable font files the owner can pick from in the Studio."""
+    if not os.path.isdir(FONTS_DIR):
+        return []
+    return sorted(f for f in os.listdir(FONTS_DIR)
+                  if f.lower().endswith((".ttf", ".otf"))
+                  and "ArkhamFontWithCodex" not in f)   # icon font, not text
 BODY_FONTS = {
     (False, False): ["ArnoProRegular.otf", "ArnoPro-Regular.otf",
                      "MinionProMedium.ttf", "Minion_Pro_Medium.ttf"],
@@ -133,11 +158,20 @@ BODY_FONTS = {
 def _font(size, bold=False, italic=False, glyph=False, title=False):
     if glyph:
         return ImageFont.truetype(FONT_PATH, size)
-    if title and os.path.exists(TITLE_FONT):
+    ov = FONT_OVERRIDE.get("title" if title else "body")
+    if ov:
         try:
-            return ImageFont.truetype(TITLE_FONT, size)
+            return ImageFont.truetype(os.path.join(FONTS_DIR, os.path.basename(ov)), size)
         except OSError:
             pass
+    if title:
+        for n in TITLE_FONT_CANDIDATES:
+            p = os.path.join(FONTS_DIR, n)
+            if os.path.exists(p):
+                try:
+                    return ImageFont.truetype(p, size)
+                except OSError:
+                    continue
     for n in BODY_FONTS[(bold, italic)]:
         p = os.path.join(FONTS_DIR, n)
         if os.path.exists(p):
@@ -581,7 +615,10 @@ def main():
     os.makedirs(FACES_DIR, exist_ok=True)
     missing_text = []
     composed = 0
+    font_overrides = load_font_overrides()
+    global FONT_OVERRIDE
     for c in cards:
+        FONT_OVERRIDE = font_overrides.get(c["id"], {})
         pt = print_text.get(c["id"], {})
         if not pt.get("text"):
             missing_text.append(c["id"])
