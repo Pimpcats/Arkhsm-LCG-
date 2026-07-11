@@ -119,10 +119,14 @@ BLUE = (52, 84, 148)
 FONTS_DIR = os.path.join(ROOT, "assets", "fonts")
 TITLE_FONT = os.path.join(FONTS_DIR, "Teutonic.ttf")
 BODY_FONTS = {
-    (False, False): ["ArnoProRegular.otf", "ArnoPro-Regular.otf"],
-    (True, False): ["ArnoProBold.otf", "ArnoPro-Bold.otf"],
-    (False, True): ["ArnoProItalic.otf", "ArnoPro-Italic.otf"],
-    (True, True): ["ArnoProBoldItalic.otf", "ArnoPro-BoldItalic.otf"],
+    (False, False): ["ArnoProRegular.otf", "ArnoPro-Regular.otf",
+                     "MinionProMedium.ttf", "Minion_Pro_Medium.ttf"],
+    (True, False): ["ArnoProBold.otf", "ArnoPro-Bold.otf",
+                    "MinionProBold.ttf"],
+    (False, True): ["ArnoProItalic.otf", "ArnoPro-Italic.otf",
+                    "MinionProItalic.ttf"],
+    (True, True): ["ArnoProBoldItalic.otf", "ArnoPro-BoldItalic.otf",
+                   "MinionProBoldItalic.ttf"],
 }
 
 

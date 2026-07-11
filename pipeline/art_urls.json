@@ -1,0 +1,115 @@
+{
+  "sthr-elias": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-elias.png",
+    "back": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-elias-back.png"
+  },
+  "sthr-lamp": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-lamp.png"
+  },
+  "sthr-donebefore": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-donebefore.png"
+  },
+  "sthr-eighthgrave": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-eighthgrave.png"
+  },
+  "sthr-ayako": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-ayako.png",
+    "back": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-ayako-back.png"
+  },
+  "sthr-lexicon": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-lexicon.png"
+  },
+  "sthr-itmeanswait": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-itmeanswait.png"
+  },
+  "sthr-untranslatable": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-untranslatable.png"
+  },
+  "sthr-cass": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-cass.png",
+    "back": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-cass-back.png"
+  },
+  "sthr-markeddeck": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-markeddeck.png"
+  },
+  "sthr-seenthishand": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-seenthishand.png"
+  },
+  "sthr-housewins": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-housewins.png"
+  },
+  "sthr-seraphine": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-seraphine.png",
+    "back": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-seraphine-back.png"
+  },
+  "sthr-bell": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-bell.png"
+  },
+  "sthr-rememberending": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-rememberending.png"
+  },
+  "sthr-debtofhours": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-debtofhours.png"
+  },
+  "sthr-birdie": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-birdie.png",
+    "back": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-birdie-back.png"
+  },
+  "sthr-compass": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-compass.png"
+  },
+  "sthr-igetout": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-igetout.png"
+  },
+  "sthr-nobodybelieves": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-nobodybelieves.png"
+  },
+  "sthr-foreknowledge": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-foreknowledge.png"
+  },
+  "sthr-dejavu": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-dejavu.png"
+  },
+  "sthr-musclememory": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-musclememory.png"
+  },
+  "sthr-rehearsedescape": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-rehearsedescape.png"
+  },
+  "sthr-longwayround": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-longwayround.png"
+  },
+  "sthr-borrowedtime": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-borrowedtime.png"
+  },
+  "sthr-thistimeforsure": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-thistimeforsure.png"
+  },
+  "sthr-anchorpoint": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-anchorpoint.png"
+  },
+  "sthr-cassandrasnotebook": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-cassandrasnotebook.png"
+  },
+  "sthr-hourlearnedname": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-hourlearnedname.png"
+  },
+  "sthr-appointed": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-appointed.png"
+  },
+  "sthr-appointedwhisper": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-appointedwhisper.png"
+  },
+  "sthr-crossing": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-crossing.png"
+  },
+  "sthr-bellringer": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-bellringer.png"
+  },
+  "sthr-wearssheriff": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-wearssheriff.png"
+  },
+  "sthr-onewhorides": {
+    "face": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-onewhorides.png"
+  }
+}

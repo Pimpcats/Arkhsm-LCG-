@@ -60,7 +60,7 @@
           ],
           "CustomDeck": {
             "95040": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Appointed",
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-appointed.png",
               "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -110,7 +110,7 @@
           ],
           "CustomDeck": {
             "95041": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Appointed's+Whisper",
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-appointedwhisper.png",
               "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -160,7 +160,7 @@
           ],
           "CustomDeck": {
             "95042": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Crossing",
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-crossing.png",
               "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -210,7 +210,7 @@
           ],
           "CustomDeck": {
             "95043": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Bell-Ringer+Beneath",
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-bellringer.png",
               "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -260,7 +260,7 @@
           ],
           "CustomDeck": {
             "95044": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=What+Wears+the+Sheriff",
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-wearssheriff.png",
               "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -310,7 +310,7 @@
           ],
           "CustomDeck": {
             "95045": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+One+Who+Rides+Forever",
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-onewhorides.png",
               "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
               "NumWidth": 1,
               "NumHeight": 1,
