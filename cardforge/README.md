@@ -28,7 +28,7 @@ card frames → local URLs → rebuilt mod, with zero curation, so building the
 campaign doesn't spoil playing it. The **spoiler shield** (on by default) blurs
 encounter cards in the gallery; player cards stay visible and drag-adjustable.
 
-One window, five tabs, the whole pipeline — each tab opens with numbered
+One window, five tabs in workflow order (Setup -> Illustrate -> Cards -> Frame -> Play) — each tab opens with numbered
 steps that check themselves off:
 - **Setup** — makes the folder self-contained: one-click install of the art
   checkpoint (Civitai) into `vendor/models/` (A1111 gets `--ckpt-dir` at
@@ -56,7 +56,7 @@ steps that check themselves off:
   instant TTS testing, or a hosted base URL) and rebuilds cards → mod →
   download package.
 
-Acceptance: `python3 cardforge/studio_selftest.py` (99 checks, drives the live
+Acceptance: `python3 cardforge/studio_selftest.py` (107 checks, drives the live
 server end-to-end — including a real backend auto-launch loop against a fake
 A1111 API and a Windows-locale regression; JS is syntax-checked with node in
 CI passes). The CLI below remains for headless/scripted use.

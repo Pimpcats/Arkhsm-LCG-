@@ -71,6 +71,7 @@ def vendor_status():
     return {
         "models": models,
         "models_dir": "vendor/models",
+        "a1111_installed": a1111_installed(),
         "se_installed": bool(se_exe),
         "se_path": os.path.relpath(se_exe, runner.repo_root()) if se_exe else None,
         "se_downloads": sorted(os.listdir(vendor_dir("strange-eons")))
@@ -170,6 +171,82 @@ def ckpt_dir_args():
     has_model = os.path.isdir(mdir) and any(
         f.endswith((".safetensors", ".ckpt")) for f in os.listdir(mdir))
     return ' --ckpt-dir "{}"'.format(mdir) if has_model else ""
+
+
+# -------------------------------------------------------------------- a1111 --
+
+A1111_RELEASES_API = ("https://api.github.com/repos/AUTOMATIC1111/"
+                      "stable-diffusion-webui/releases")
+
+
+def a1111_dir():
+    return vendor_dir("a1111")
+
+
+def a1111_installed():
+    d = a1111_dir()
+    return os.path.isdir(d) and (
+        os.path.exists(os.path.join(d, "run.bat"))
+        or os.path.exists(os.path.join(d, "webui", "webui.py"))
+        or os.path.exists(os.path.join(d, "webui.py")))
+
+
+def install_a1111(dry_run=False, log=print):
+    """Self-contained Stable Diffusion: download AUTOMATIC1111's standalone
+    Windows package (sd.webui.zip — bundled Python, no system installs) into
+    vendor/a1111/, force --api on, and point the rig at it. First launch
+    still downloads its own torch etc. into the same folder (one-time,
+    several GB — its console shows progress)."""
+    from . import rig
+    dest_dir = a1111_dir()
+    os.makedirs(dest_dir, exist_ok=True)
+
+    if dry_run:
+        os.makedirs(os.path.join(dest_dir, "webui"), exist_ok=True)
+        for f in ("run.bat", os.path.join("webui", "webui.py")):
+            with open(os.path.join(dest_dir, f), "w", encoding="utf-8") as fh:
+                fh.write("rem stub\n")
+        log("dry-run: wrote stub A1111 install")
+    else:
+        import requests, zipfile  # noqa: E401
+        log("querying GitHub for the A1111 standalone package…")
+        rels = requests.get(A1111_RELEASES_API + "?per_page=15", timeout=30).json()
+        asset = None
+        for rel in rels:
+            for a in rel.get("assets", []):
+                if a["name"].startswith("sd.webui") and a["name"].endswith(".zip"):
+                    asset = a
+                    break
+            if asset:
+                break
+        if not asset:
+            raise RuntimeError(
+                "no sd.webui*.zip asset found in recent releases — install "
+                "A1111 manually into vendor/a1111/ (git clone "
+                "AUTOMATIC1111/stable-diffusion-webui) or keep using your "
+                "existing install via the rig")
+        pkg = os.path.join(dest_dir, asset["name"])
+        log("downloading {} ({:.0f} MB)…".format(asset["name"],
+                                                 asset.get("size", 0) / 1e6))
+        _download(asset["browser_download_url"], pkg, log=log)
+        log("extracting…")
+        with zipfile.ZipFile(pkg) as z:
+            z.extractall(dest_dir)
+        os.remove(pkg)
+
+    # force the API on (and keep any future owner args alongside)
+    user_bat = os.path.join(dest_dir, "webui", "webui-user.bat")
+    os.makedirs(os.path.dirname(user_bat), exist_ok=True)
+    with open(user_bat, "w", encoding="utf-8") as f:
+        f.write("@echo off\nset COMMANDLINE_ARGS=--api\ncall webui.bat\n")
+    # point the rig at the vendored install
+    cfg = rig.load_rig()
+    cfg["a1111"]["cwd"] = dest_dir
+    cfg["a1111"]["command"] = "run.bat"
+    rig.save_rig(cfg)
+    log("rig -> vendor/a1111 (run.bat, API on). First real launch installs "
+        "its own dependencies — give it time and watch its console window.")
+    return {"installed": True, "dir": dest_dir}
 
 
 # -------------------------------------------------------------- strange eons --

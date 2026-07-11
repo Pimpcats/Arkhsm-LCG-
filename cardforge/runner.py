@@ -95,7 +95,7 @@ def out_dir_for(camp):
 # --------------------------------------------------------------------- run --
 
 def run_generate(campaign_name, only=None, art_type=None, variants_override=None,
-                 dry_run=False, starter=False):
+                 dry_run=False, starter=False, seed_offset=0):
     camp = load_campaign(campaign_name)
     profiles = load_profiles()
     resolver = CharacterResolver(os.path.join(campaign_dir(campaign_name), "characters.json"))
@@ -138,7 +138,9 @@ def run_generate(campaign_name, only=None, art_type=None, variants_override=None
             print("PROMPT OVERRIDE  " + job["id"])
         n_variants = variants_override or params["variants"]
         for k in range(n_variants):
-            seed = job.get("seed", 1) + 1000 * k
+            # seeds are deterministic per card; a reroll passes seed_offset
+            # so fresh variants generate instead of resuming the old ones
+            seed = job.get("seed", 1) + int(seed_offset) + 1000 * k
             if ledger.is_done(job["id"], seed, dry_run):
                 report["skipped_ledger"].append(Ledger.key(job["id"], seed))
                 continue

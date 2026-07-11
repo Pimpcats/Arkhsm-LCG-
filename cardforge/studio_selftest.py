@@ -52,8 +52,12 @@ threading.Thread(target=server.serve_forever, daemon=True).start()
 print("== app boots, tabs render ==")
 page = requests.get(BASE + "/").text
 check("single page serves", "CardForge Studio" in page)
-check("all three tabs present",
-      all(t in page for t in ("Illustrate", "Frame &mdash; Strange Eons", "Apply to Mod")))
+check("workflow tabs present in flow order",
+      all(t in page for t in ("1 &middot; Setup", "2 &middot; Illustrate",
+                              "3 &middot; Cards", "4 &middot; Frame",
+                              "5 &middot; Play in TTS"))
+      and page.index("1 &middot; Setup") < page.index("2 &middot; Illustrate")
+      < page.index("3 &middot; Cards"))
 check("Strange Eons links wired in",
       "strangeeons.cgjennings.ca" in page and "github.com/CGJennings/strange-eons" in page)
 
@@ -284,6 +288,10 @@ check("model_set survives a status round-trip",
 check("model_set rejects empty",
       requests.post(BASE + "/api/model_set", json={"checkpoint": " "}).json()
       .get("ok") is False)
+check("models reports the backend's ACTIVE checkpoint (dry)",
+      requests.post(BASE + "/api/models",
+                    json={"campaign": "still_hour", "dry_run": True}).json()
+      .get("active") == "dry-model-a.safetensors")
 with open(camp_path, "w", encoding="utf-8") as f:
     f.write(camp_backup)
 check("zoom lightbox + refresh button + model picker in the UI",
@@ -344,6 +352,20 @@ requests.post(BASE + "/api/style_save",
 check("prompt boxes present in the UI",
       all(x in page for x in ("ed_pos", "ed_neg", "edGenerate",
                               "style_pos", "House style")))
+requests.post(BASE + "/api/generate",
+              json={"campaign": "still_hour", "only": "sthr-appointed",
+                    "variants": 1, "dry_run": True, "reroll": True})
+wait_idle(30)
+seeds_seen = {json.load(open(os.path.join(pdir, f), encoding="utf-8"))["seed"]
+              for f in os.listdir(pdir) if f.startswith("sthr-appointed")}
+check("reroll generates with a fresh seed (not the fixed one)",
+      len(seeds_seen) > 1)
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+check("gallery flags dry-run stubs so the UI can hide them",
+      all("stubs" in g for g in s["gallery"])
+      and any(g["stubs"] for g in s["gallery"]))
+check("reroll + stub filtering in the UI",
+      "Reroll" in page and "stubs" in page)
 
 print("== SETUP: self-contained vendor installs (dry-run) ==")
 import shutil as _sh
@@ -362,6 +384,22 @@ check("stub checkpoint lands in vendor/models and campaign points at it",
 check("a1111 launch gains --ckpt-dir vendor/models",
       "--ckpt-dir" in installer.ckpt_dir_args()
       and "vendor" in installer.ckpt_dir_args())
+from cardforge import rig as _rig
+rig_backup_setup = open(_rig.rig_path(), encoding="utf-8").read()
+r = requests.post(BASE + "/api/install_a1111", json={"dry_run": True}).json()
+check("A1111 install job accepted", r.get("started"))
+check("A1111 install completes", wait_idle(30))
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+rig_after = json.load(open(_rig.rig_path(), encoding="utf-8"))
+check("A1111 lands in vendor/ and the rig points at it",
+      s["vendor"]["a1111_installed"]
+      and rig_after["a1111"]["cwd"].endswith(os.path.join("vendor", "a1111"))
+      and rig_after["a1111"]["command"] == "run.bat")
+check("vendored webui-user.bat forces --api",
+      "--api" in open(os.path.join(ROOT, "vendor", "a1111", "webui",
+                                   "webui-user.bat"), encoding="utf-8").read())
+with open(_rig.rig_path(), "w", encoding="utf-8") as f:
+    f.write(rig_backup_setup)
 r = requests.post(BASE + "/api/install_se", json={"dry_run": True}).json()
 check("SE install job accepted", r.get("started"))
 check("SE install completes", wait_idle(30))
