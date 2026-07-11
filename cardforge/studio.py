@@ -500,9 +500,12 @@ def status(campaign="still_hour"):
     report = {}
     rp = os.path.join(out_dir, "report.json")
     if os.path.exists(rp):
-        r = json.load(open(rp, encoding="utf-8"))
-        report = {"generated": len(r["generated"]), "failed": len(r["failed"]),
-                  "warnings": r["warnings"], "dry_run": r.get("dry_run")}
+        try:
+            r = json.load(open(rp, encoding="utf-8"))
+            report = {"generated": len(r["generated"]), "failed": len(r["failed"]),
+                      "warnings": r["warnings"], "dry_run": r.get("dry_run")}
+        except (ValueError, KeyError):
+            pass    # mid-write or partial — next poll gets the real one
     gallery = []
     if os.path.isdir(out_dir):
         for cid in sorted(os.listdir(out_dir)):
@@ -637,6 +640,15 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
+        try:
+            self._do_get()
+        except Exception as e:  # noqa: BLE001 - a bad read must answer, not drop
+            try:
+                self._json({"error": str(e)}, 500)
+            except Exception:  # noqa: BLE001 - client already gone
+                pass
+
+    def _do_get(self):
         u = urlparse(self.path)
         q = {k: v[0] for k, v in parse_qs(u.query).items()}
         if u.path == "/":

@@ -181,9 +181,13 @@ def run_generate(campaign_name, only=None, art_type=None, variants_override=None
 
 
 def _write_report(out_dir, report):
+    # atomic: the Studio's status endpoint polls this file while we run
     os.makedirs(out_dir, exist_ok=True)
-    with open(os.path.join(out_dir, "report.json"), "w", encoding="utf-8") as f:
+    import tempfile
+    fd, tmp = tempfile.mkstemp(dir=out_dir)
+    with os.fdopen(fd, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)
+    os.replace(tmp, os.path.join(out_dir, "report.json"))
 
 
 # ------------------------------------------------------------------- seeds --

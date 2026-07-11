@@ -11,3 +11,4 @@ assets/frames/*
 vendor/
 assets/fonts/ArnoPro*
 assets/fonts/MinionPro*
+pipeline/art_urls.json
