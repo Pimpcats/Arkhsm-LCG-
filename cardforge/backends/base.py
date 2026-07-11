@@ -41,6 +41,12 @@ class Backend:
         """Return (ok, message) — reachability + config sanity."""
         raise NotImplementedError
 
+    DRY_MODELS = ["dry-model-a.safetensors", "dry-model-b.safetensors"]
+
+    def list_models(self):
+        """Checkpoint names installed on the backend (for the model picker)."""
+        raise NotImplementedError
+
     def _write_payload(self, job_key, payload):
         os.makedirs(self.payload_dir, exist_ok=True)
         path = os.path.join(self.payload_dir, "{}.{}.json".format(job_key, self.name))

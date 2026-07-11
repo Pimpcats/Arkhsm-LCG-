@@ -100,3 +100,12 @@ class ComfyBackend(Backend):
             return True, "reachable ({})".format(self.base_url)
         except Exception as e:  # noqa: BLE001
             return False, "unreachable at {} ({})".format(self.base_url, e)
+
+    def list_models(self):
+        if self.dry_run:
+            return list(self.DRY_MODELS)
+        r = requests.get(self.base_url + "/object_info/CheckpointLoaderSimple",
+                         timeout=15)
+        r.raise_for_status()
+        names = r.json()["CheckpointLoaderSimple"]["input"]["required"]["ckpt_name"][0]
+        return list(names)

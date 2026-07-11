@@ -53,3 +53,12 @@ class A1111Backend(Backend):
             return True, "reachable; {} model(s): {}".format(len(models), ", ".join(models[:5]))
         except Exception as e:  # noqa: BLE001 - report, don't crash the CLI
             return False, "unreachable at {} ({}). Start A1111 with --api.".format(self.base_url, e)
+
+    def list_models(self):
+        if self.dry_run:
+            return list(self.DRY_MODELS)
+        r = requests.get(self.base_url + "/sdapi/v1/sd-models", timeout=15)
+        r.raise_for_status()
+        # 'title' ("file.safetensors [hash]") is what override_settings matches
+        # most precisely; A1111 also accepts the bare filename.
+        return [m.get("title") or m.get("model_name", "?") for m in r.json()]
