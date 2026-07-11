@@ -53,7 +53,14 @@
               ],
               "LuaScript": "",
               "LuaScriptState": "",
-              "GMNotes": "{\"id\":\"sthr-elias\",\"type\":\"Investigator\",\"class\":\"Guardian\",\"traits\":\"Believer. Warden.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":2,\"combatIcons\":4,\"agilityIcons\":3,\"health\":9,\"sanity\":5,\"signatures\":[{\"sthr-lamp\":1,\"sthr-donebefore\":1,\"sthr-eighthgrave\":1}],\"elderSignEffect\":{\"description\":\"+1. If there are 3 or more Memory on Elias, this token is +3 instead, and heal 1 damage from Elias.\"}}",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": false,
+              "GMNotes": "{\"id\":\"sthr-elias\",\"type\":\"Investigator\",\"class\":\"Guardian\",\"traits\":\"Believer. Warden.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":2,\"combatIcons\":4,\"agilityIcons\":3,\"health\":9,\"sanity\":5,\"signatures\":[{\"sthr-lamp\":1,\"sthr-donebefore\":1,\"sthr-eighthgrave\":1}],\"elderSignEffect\":{\"description\":\"+1. If there are 3 or more Memory on Elias, this token is +3 instead, and heal 1 damage from Elias.\",\"modifier\":1}}",
               "Transform": {
                 "posX": 0,
                 "posY": 1.5,
@@ -74,8 +81,8 @@
               ],
               "CustomDeck": {
                 "95010": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-elias.png",
-                  "BackURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-elias-back.png",
+                  "FaceURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Elias+Warde",
+                  "BackURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Elias+Warde+(Deckbuilding)",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "Type": 0,
@@ -97,6 +104,13 @@
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-lamp\",\"type\":\"Asset\",\"class\":\"Guardian\",\"traits\":\"Item. Tool.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"slot\":\"Hand\"}",
               "Transform": {
                 "posX": 0,
@@ -118,7 +132,7 @@
               ],
               "CustomDeck": {
                 "95011": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-lamp.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Ambergrove+Lamp",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -136,11 +150,17 @@
               "CardID": 9501200,
               "SidewaysCard": false,
               "Tags": [
-                "Skill",
                 "PlayerCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-donebefore\",\"type\":\"Skill\",\"class\":\"Guardian\",\"traits\":\"Innate. Recollection.\",\"cycle\":\"The Still Hour\",\"level\":0,\"wildIcons\":1}",
               "Transform": {
                 "posX": 0,
@@ -162,7 +182,7 @@
               ],
               "CustomDeck": {
                 "95012": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-donebefore.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=I've+Done+This+Before",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -180,11 +200,17 @@
               "CardID": 9501300,
               "SidewaysCard": false,
               "Tags": [
-                "Treachery",
                 "PlayerCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-eighthgrave\",\"type\":\"Treachery\",\"class\":\"Neutral\",\"traits\":\"Curse. Memory.\",\"cycle\":\"The Still Hour\",\"weakness\":true}",
               "Transform": {
                 "posX": 0,
@@ -206,7 +232,7 @@
               ],
               "CustomDeck": {
                 "95013": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-eighthgrave.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Eighth+Grave",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -229,7 +255,14 @@
               ],
               "LuaScript": "",
               "LuaScriptState": "",
-              "GMNotes": "{\"id\":\"sthr-ayako\",\"type\":\"Investigator\",\"class\":\"Seeker\",\"traits\":\"Scholar. Chronicler.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":5,\"combatIcons\":1,\"agilityIcons\":3,\"health\":5,\"sanity\":8,\"signatures\":[{\"sthr-lexicon\":1,\"sthr-itmeanswait\":1,\"sthr-untranslatable\":1}],\"elderSignEffect\":{\"description\":\"+2. Draw 1 card. If it is a Recollection, it costs 2 less to play this turn.\"}}",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": false,
+              "GMNotes": "{\"id\":\"sthr-ayako\",\"type\":\"Investigator\",\"class\":\"Seeker\",\"traits\":\"Scholar. Chronicler.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":5,\"combatIcons\":1,\"agilityIcons\":3,\"health\":5,\"sanity\":8,\"signatures\":[{\"sthr-lexicon\":1,\"sthr-itmeanswait\":1,\"sthr-untranslatable\":1}],\"elderSignEffect\":{\"description\":\"+2. Draw 1 card. If it is a Recollection, it costs 2 less to play this turn.\",\"modifier\":2}}",
               "Transform": {
                 "posX": 0,
                 "posY": 1.5,
@@ -250,8 +283,8 @@
               ],
               "CustomDeck": {
                 "95014": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-ayako.png",
-                  "BackURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-ayako-back.png",
+                  "FaceURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Dr.+Ayako+Sōma",
+                  "BackURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Dr.+Ayako+Sōma+(Deckbuilding)",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "Type": 0,
@@ -273,6 +306,13 @@
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-lexicon\",\"type\":\"Asset\",\"class\":\"Seeker\",\"traits\":\"Item. Tome.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"slot\":\"Hand\",\"uses\":[{\"count\":0,\"type\":\"Secret\",\"token\":\"secret\"}]}",
               "Transform": {
                 "posX": 0,
@@ -294,7 +334,7 @@
               ],
               "CustomDeck": {
                 "95015": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-lexicon.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Lexicon+of+the+Hour",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -312,11 +352,17 @@
               "CardID": 9501600,
               "SidewaysCard": false,
               "Tags": [
-                "Event",
                 "PlayerCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-itmeanswait\",\"type\":\"Event\",\"class\":\"Seeker\",\"traits\":\"Insight.\",\"cycle\":\"The Still Hour\",\"cost\":0}",
               "Transform": {
                 "posX": 0,
@@ -338,7 +384,7 @@
               ],
               "CustomDeck": {
                 "95016": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-itmeanswait.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=It+Means+'Wait'",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -356,11 +402,17 @@
               "CardID": 9501700,
               "SidewaysCard": false,
               "Tags": [
-                "Treachery",
                 "PlayerCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-untranslatable\",\"type\":\"Treachery\",\"class\":\"Neutral\",\"traits\":\"Madness.\",\"cycle\":\"The Still Hour\",\"weakness\":true}",
               "Transform": {
                 "posX": 0,
@@ -382,7 +434,7 @@
               ],
               "CustomDeck": {
                 "95017": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-untranslatable.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Untranslatable",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -405,7 +457,14 @@
               ],
               "LuaScript": "",
               "LuaScriptState": "",
-              "GMNotes": "{\"id\":\"sthr-cass\",\"type\":\"Investigator\",\"class\":\"Rogue\",\"traits\":\"Criminal. Drifter.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":2,\"intellectIcons\":3,\"combatIcons\":3,\"agilityIcons\":5,\"health\":7,\"sanity\":6,\"signatures\":[{\"sthr-markeddeck\":1,\"sthr-seenthishand\":1,\"sthr-housewins\":1}],\"elderSignEffect\":{\"description\":\"+1. Gain 1 resource for each Memory on Cass (maximum +3 resources).\"}}",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": false,
+              "GMNotes": "{\"id\":\"sthr-cass\",\"type\":\"Investigator\",\"class\":\"Rogue\",\"traits\":\"Criminal. Drifter.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":2,\"intellectIcons\":3,\"combatIcons\":3,\"agilityIcons\":5,\"health\":7,\"sanity\":6,\"signatures\":[{\"sthr-markeddeck\":1,\"sthr-seenthishand\":1,\"sthr-housewins\":1}],\"elderSignEffect\":{\"description\":\"+1. Gain 1 resource for each Memory on Cass (maximum +3 resources).\",\"modifier\":1}}",
               "Transform": {
                 "posX": 0,
                 "posY": 1.5,
@@ -426,8 +485,8 @@
               ],
               "CustomDeck": {
                 "95018": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-cass.png",
-                  "BackURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-cass-back.png",
+                  "FaceURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Cass+Lindqvist",
+                  "BackURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Cass+Lindqvist+(Deckbuilding)",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "Type": 0,
@@ -449,6 +508,13 @@
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-markeddeck\",\"type\":\"Asset\",\"class\":\"Rogue\",\"traits\":\"Item. Illicit.\",\"cycle\":\"The Still Hour\",\"cost\":1,\"level\":0,\"slot\":\"Hand\"}",
               "Transform": {
                 "posX": 0,
@@ -470,7 +536,7 @@
               ],
               "CustomDeck": {
                 "95019": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-markeddeck.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Marked+Deck",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -488,11 +554,17 @@
               "CardID": 9502000,
               "SidewaysCard": false,
               "Tags": [
-                "Event",
                 "PlayerCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-seenthishand\",\"type\":\"Event\",\"class\":\"Rogue\",\"traits\":\"Fortune. Insight.\",\"cycle\":\"The Still Hour\",\"cost\":1}",
               "Transform": {
                 "posX": 0,
@@ -514,7 +586,7 @@
               ],
               "CustomDeck": {
                 "95020": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-seenthishand.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Seen+This+Hand+Before",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -532,11 +604,17 @@
               "CardID": 9502100,
               "SidewaysCard": false,
               "Tags": [
-                "Enemy",
                 "PlayerCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-housewins\",\"type\":\"Enemy\",\"class\":\"Neutral\",\"traits\":\"Humanoid. Criminal.\",\"cycle\":\"The Still Hour\",\"weakness\":true}",
               "Transform": {
                 "posX": 0,
@@ -558,7 +636,7 @@
               ],
               "CustomDeck": {
                 "95021": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-housewins.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+House+Always+Wins",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -581,6 +659,13 @@
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": false,
               "GMNotes": "{\"id\":\"sthr-seraphine\",\"type\":\"Investigator\",\"class\":\"Mystic\",\"traits\":\"Sorcerer. Cursed.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":5,\"intellectIcons\":3,\"combatIcons\":2,\"agilityIcons\":2,\"health\":6,\"sanity\":8,\"signatures\":[{\"sthr-bell\":1,\"sthr-rememberending\":1,\"sthr-debtofhours\":1}],\"elderSignEffect\":{\"description\":\"+X, where X = current Dissonance (maximum +5). After this skill test, reduce Dissonance by the amount this token added.\"}}",
               "Transform": {
                 "posX": 0,
@@ -602,8 +687,8 @@
               ],
               "CustomDeck": {
                 "95022": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-seraphine.png",
-                  "BackURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-seraphine-back.png",
+                  "FaceURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Seraphine+Vale",
+                  "BackURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Seraphine+Vale+(Deckbuilding)",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "Type": 0,
@@ -625,6 +710,13 @@
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-bell\",\"type\":\"Asset\",\"class\":\"Mystic\",\"traits\":\"Relic.\",\"cycle\":\"The Still Hour\",\"cost\":3,\"level\":0,\"slot\":\"Accessory\",\"uses\":[{\"count\":3,\"type\":\"Charge\",\"token\":\"resource\"}]}",
               "Transform": {
                 "posX": 0,
@@ -646,7 +738,7 @@
               ],
               "CustomDeck": {
                 "95023": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-bell.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Bell+of+Ambergrove",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -664,11 +756,17 @@
               "CardID": 9502400,
               "SidewaysCard": false,
               "Tags": [
-                "Event",
                 "PlayerCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-rememberending\",\"type\":\"Event\",\"class\":\"Mystic\",\"traits\":\"Spell. Insight.\",\"cycle\":\"The Still Hour\",\"cost\":2}",
               "Transform": {
                 "posX": 0,
@@ -690,7 +788,7 @@
               ],
               "CustomDeck": {
                 "95024": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-rememberending.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=I+Remember+the+Ending",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -708,11 +806,17 @@
               "CardID": 9502500,
               "SidewaysCard": false,
               "Tags": [
-                "Treachery",
                 "PlayerCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-debtofhours\",\"type\":\"Treachery\",\"class\":\"Neutral\",\"traits\":\"Curse.\",\"cycle\":\"The Still Hour\",\"weakness\":true}",
               "Transform": {
                 "posX": 0,
@@ -734,7 +838,7 @@
               ],
               "CustomDeck": {
                 "95025": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-debtofhours.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Debt+of+Hours",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -757,7 +861,14 @@
               ],
               "LuaScript": "",
               "LuaScriptState": "",
-              "GMNotes": "{\"id\":\"sthr-birdie\",\"type\":\"Investigator\",\"class\":\"Survivor\",\"traits\":\"Drifter. Wayward.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":3,\"combatIcons\":2,\"agilityIcons\":4,\"health\":6,\"sanity\":7,\"signatures\":[{\"sthr-compass\":1,\"sthr-igetout\":1,\"sthr-nobodybelieves\":1}],\"elderSignEffect\":{\"description\":\"+1. If you have already failed a skill test this round, this token is +3 instead.\"}}",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": false,
+              "GMNotes": "{\"id\":\"sthr-birdie\",\"type\":\"Investigator\",\"class\":\"Survivor\",\"traits\":\"Drifter. Wayward.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":3,\"combatIcons\":2,\"agilityIcons\":4,\"health\":6,\"sanity\":7,\"signatures\":[{\"sthr-compass\":1,\"sthr-igetout\":1,\"sthr-nobodybelieves\":1}],\"elderSignEffect\":{\"description\":\"+1. If you have already failed a skill test this round, this token is +3 instead.\",\"modifier\":1}}",
               "Transform": {
                 "posX": 0,
                 "posY": 1.5,
@@ -778,8 +889,8 @@
               ],
               "CustomDeck": {
                 "95026": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-birdie.png",
-                  "BackURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-birdie-back.png",
+                  "FaceURL": "https://placehold.co/750x523/141428/e8b24a/png?text=\"Birdie\"+Okonkwo",
+                  "BackURL": "https://placehold.co/750x523/141428/e8b24a/png?text=\"Birdie\"+Okonkwo+(Deckbuilding)",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "Type": 0,
@@ -801,6 +912,13 @@
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-compass\",\"type\":\"Asset\",\"class\":\"Survivor\",\"traits\":\"Item. Charm.\",\"cycle\":\"The Still Hour\",\"cost\":1,\"level\":0,\"slot\":\"Accessory\"}",
               "Transform": {
                 "posX": 0,
@@ -822,7 +940,7 @@
               ],
               "CustomDeck": {
                 "95027": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-compass.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Lucky+Compass",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -840,11 +958,17 @@
               "CardID": 9502800,
               "SidewaysCard": false,
               "Tags": [
-                "Event",
                 "PlayerCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-igetout\",\"type\":\"Event\",\"class\":\"Survivor\",\"traits\":\"Gambit.\",\"cycle\":\"The Still Hour\",\"cost\":0}",
               "Transform": {
                 "posX": 0,
@@ -866,7 +990,7 @@
               ],
               "CustomDeck": {
                 "95028": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-igetout.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=I+Get+Out",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -884,11 +1008,17 @@
               "CardID": 9502900,
               "SidewaysCard": false,
               "Tags": [
-                "Treachery",
                 "PlayerCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-nobodybelieves\",\"type\":\"Treachery\",\"class\":\"Neutral\",\"traits\":\"Madness.\",\"cycle\":\"The Still Hour\",\"weakness\":true}",
               "Transform": {
                 "posX": 0,
@@ -910,7 +1040,7 @@
               ],
               "CustomDeck": {
                 "95029": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-nobodybelieves.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Nobody+Believes+Her",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -928,11 +1058,17 @@
               "CardID": 9503000,
               "SidewaysCard": false,
               "Tags": [
-                "Skill",
                 "PlayerCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-foreknowledge\",\"type\":\"Skill\",\"class\":\"Neutral\",\"traits\":\"Innate. Recollection.\",\"cycle\":\"The Still Hour\",\"level\":0,\"wildIcons\":1,\"memoryCost\":3}",
               "Transform": {
                 "posX": 0,
@@ -954,7 +1090,7 @@
               ],
               "CustomDeck": {
                 "95030": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-foreknowledge.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Foreknowledge",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -972,11 +1108,17 @@
               "CardID": 9503100,
               "SidewaysCard": false,
               "Tags": [
-                "Event",
                 "PlayerCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-dejavu\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Insight. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":1,\"level\":0,\"memoryCost\":4}",
               "Transform": {
                 "posX": 0,
@@ -998,7 +1140,7 @@
               ],
               "CustomDeck": {
                 "95031": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-dejavu.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Déjà+Vu",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -1016,11 +1158,17 @@
               "CardID": 9503200,
               "SidewaysCard": false,
               "Tags": [
-                "Skill",
                 "PlayerCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-musclememory\",\"type\":\"Skill\",\"class\":\"Neutral\",\"traits\":\"Innate. Recollection.\",\"cycle\":\"The Still Hour\",\"level\":0,\"wildIcons\":1,\"memoryCost\":3}",
               "Transform": {
                 "posX": 0,
@@ -1042,7 +1190,7 @@
               ],
               "CustomDeck": {
                 "95032": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-musclememory.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Muscle+Memory",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -1060,11 +1208,17 @@
               "CardID": 9503300,
               "SidewaysCard": false,
               "Tags": [
-                "Event",
                 "PlayerCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-rehearsedescape\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Trick. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":0,\"level\":0,\"memoryCost\":3}",
               "Transform": {
                 "posX": 0,
@@ -1086,7 +1240,7 @@
               ],
               "CustomDeck": {
                 "95033": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-rehearsedescape.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Rehearsed+Escape",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -1104,11 +1258,17 @@
               "CardID": 9503400,
               "SidewaysCard": false,
               "Tags": [
-                "Event",
                 "PlayerCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-longwayround\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Trick. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":1,\"level\":0,\"memoryCost\":2}",
               "Transform": {
                 "posX": 0,
@@ -1130,7 +1290,7 @@
               ],
               "CustomDeck": {
                 "95034": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-longwayround.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Long+Way+Round",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -1153,6 +1313,13 @@
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-borrowedtime\",\"type\":\"Asset\",\"class\":\"Neutral\",\"traits\":\"Item. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"uses\":[{\"count\":3,\"type\":\"Memory\",\"token\":\"resource\"}],\"memoryCost\":4}",
               "Transform": {
                 "posX": 0,
@@ -1174,7 +1341,7 @@
               ],
               "CustomDeck": {
                 "95035": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-borrowedtime.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Borrowed+Time",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -1192,11 +1359,17 @@
               "CardID": 9503600,
               "SidewaysCard": false,
               "Tags": [
-                "Event",
                 "PlayerCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-thistimeforsure\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Insight. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"memoryCost\":4}",
               "Transform": {
                 "posX": 0,
@@ -1218,7 +1391,7 @@
               ],
               "CustomDeck": {
                 "95036": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-thistimeforsure.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=This+Time+For+Sure",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -1241,6 +1414,13 @@
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-anchorpoint\",\"type\":\"Asset\",\"class\":\"Neutral\",\"traits\":\"Talent. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":0,\"level\":0,\"permanent\":true,\"memoryCost\":3}",
               "Transform": {
                 "posX": 0,
@@ -1262,7 +1442,7 @@
               ],
               "CustomDeck": {
                 "95037": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-anchorpoint.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Anchor+Point",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -1285,6 +1465,13 @@
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-cassandrasnotebook\",\"type\":\"Asset\",\"class\":\"Neutral\",\"traits\":\"Item. Tome. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"slot\":\"Hand\",\"memoryCost\":4}",
               "Transform": {
                 "posX": 0,
@@ -1306,7 +1493,7 @@
               ],
               "CustomDeck": {
                 "95038": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-cassandrasnotebook.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Cassandra's+Notebook",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -1324,11 +1511,17 @@
               "CardID": 9503900,
               "SidewaysCard": false,
               "Tags": [
-                "Event",
                 "PlayerCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-hourlearnedname\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Spell. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":3,\"level\":0,\"memoryCost\":5}",
               "Transform": {
                 "posX": 0,
@@ -1350,7 +1543,7 @@
               ],
               "CustomDeck": {
                 "95039": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-hourlearnedname.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Hour+I+Learned+Your+Name",
                   "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -1390,12 +1583,18 @@
               "CardID": 9504000,
               "SidewaysCard": false,
               "Tags": [
-                "Enemy",
-                "EncounterCard"
+                "ScenarioCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
-              "GMNotes": "{\"id\":\"sthr-appointed\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Monster.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1}",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-appointed\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Monster. Elite.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1}",
               "Transform": {
                 "posX": 0,
                 "posY": 1.5,
@@ -1416,7 +1615,7 @@
               ],
               "CustomDeck": {
                 "95040": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-appointed.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Appointed",
                   "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -1434,11 +1633,17 @@
               "CardID": 9504100,
               "SidewaysCard": false,
               "Tags": [
-                "Treachery",
-                "EncounterCard"
+                "ScenarioCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-appointedwhisper\",\"type\":\"Treachery\",\"class\":\"Mythos\",\"traits\":\"\",\"cycle\":\"The Still Hour\",\"quantity\":2}",
               "Transform": {
                 "posX": 0,
@@ -1460,7 +1665,7 @@
               ],
               "CustomDeck": {
                 "95041": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-appointedwhisper.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Appointed's+Whisper",
                   "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -1478,11 +1683,17 @@
               "CardID": 9504200,
               "SidewaysCard": false,
               "Tags": [
-                "Treachery",
-                "EncounterCard"
+                "ScenarioCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-crossing\",\"type\":\"Treachery\",\"class\":\"Mythos\",\"traits\":\"\",\"cycle\":\"The Still Hour\",\"quantity\":1}",
               "Transform": {
                 "posX": 0,
@@ -1504,7 +1715,7 @@
               ],
               "CustomDeck": {
                 "95042": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-crossing.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Crossing",
                   "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -1522,12 +1733,18 @@
               "CardID": 9504300,
               "SidewaysCard": false,
               "Tags": [
-                "Enemy",
-                "EncounterCard"
+                "ScenarioCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
-              "GMNotes": "{\"id\":\"sthr-bellringer\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Monster. Named.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1,\"victory\":2}",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-bellringer\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Monster. Named. Elite.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1,\"victory\":2}",
               "Transform": {
                 "posX": 0,
                 "posY": 1.5,
@@ -1548,7 +1765,7 @@
               ],
               "CustomDeck": {
                 "95043": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-bellringer.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Bell-Ringer+Beneath",
                   "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -1566,12 +1783,18 @@
               "CardID": 9504400,
               "SidewaysCard": false,
               "Tags": [
-                "Enemy",
-                "EncounterCard"
+                "ScenarioCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
-              "GMNotes": "{\"id\":\"sthr-wearssheriff\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Humanoid. Monster. Named.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1,\"victory\":3}",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-wearssheriff\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Humanoid. Monster. Named. Elite.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1,\"victory\":3}",
               "Transform": {
                 "posX": 0,
                 "posY": 1.5,
@@ -1592,7 +1815,7 @@
               ],
               "CustomDeck": {
                 "95044": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-wearssheriff.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=What+Wears+the+Sheriff",
                   "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -1610,12 +1833,18 @@
               "CardID": 9504500,
               "SidewaysCard": false,
               "Tags": [
-                "Enemy",
-                "EncounterCard"
+                "ScenarioCard"
               ],
               "LuaScript": "",
               "LuaScriptState": "",
-              "GMNotes": "{\"id\":\"sthr-onewhorides\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Humanoid. Named.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1,\"victory\":2}",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-onewhorides\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Humanoid. Named. Elite.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1,\"victory\":2}",
               "Transform": {
                 "posX": 0,
                 "posY": 1.5,
@@ -1636,7 +1865,7 @@
               ],
               "CustomDeck": {
                 "95045": {
-                  "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-onewhorides.png",
+                  "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+One+Who+Rides+Forever",
                   "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
                   "NumWidth": 1,
                   "NumHeight": 1,

@@ -24,6 +24,7 @@ generator produces a stable diff instead of churning random GUIDs every build.
 """
 import argparse
 import hashlib
+import re
 import json
 import os
 
@@ -67,12 +68,18 @@ def build_gmnotes(c):
     m = {"id": c["id"], "type": t, "class": c["class"], "traits": c["traits"],
          "cycle": "The Still Hour"}
     if t == "Investigator":
+        # real-SCED shape (docs/art_reference/sced_objects/investigator_front.json):
+        # statline as *Icons keys, elderSignEffect {description, modifier}
+        elder = {"description": c["elderSign"]}
+        mod = re.match(r"\+(\d+)", c["elderSign"])
+        if mod:
+            elder["modifier"] = int(mod.group(1))
         m.update({
             "willpowerIcons": c["wil"], "intellectIcons": c["int"],
             "combatIcons": c["com"], "agilityIcons": c["agi"],
             "health": c["health"], "sanity": c["sanity"],
             "signatures": c["signatures"],
-            "elderSignEffect": {"description": c["elderSign"]},
+            "elderSignEffect": elder,
         })
     else:
         if "cost" in c:
@@ -124,11 +131,28 @@ def _load_art_urls():
 ART_URLS = _load_art_urls()
 
 
+def tags_for(c):
+    """Real-SCED tagging (see docs/art_reference/sced_objects/): a type tag is
+    added only where SCED scripting needs it (Investigator, Asset slots,
+    Location connections); everything else carries just its deck tag."""
+    t = c["type"]
+    if t == "Investigator":
+        return ["Investigator", "PlayerCard"]
+    if c.get("encounter"):
+        return [t, "ScenarioCard"] if t == "Location" else ["ScenarioCard"]
+    if t == "Asset":
+        return ["Asset", "PlayerCard"]
+    return ["PlayerCard"]
+
+
+# SCED's standard card tint (matches every vendored example object)
+COLOR_DIFFUSE = {"r": 0.713235259, "g": 0.713235259, "b": 0.713235259}
+
+
 def build_card(c):
     is_inv = c["type"] == "Investigator"
     is_encounter = bool(c.get("encounter"))
     deck_id = str(c["deck"])
-    tag = "EncounterCard" if is_encounter else "PlayerCard"
     if is_inv:
         back = face_ph(c["name"] + " (Deckbuilding)", land=True)
     elif is_encounter:
@@ -139,7 +163,9 @@ def build_card(c):
     return {
         "Name": "Card", "Nickname": c["name"], "Description": c.get("subtitle", ""),
         "GUID": guid(c["id"]), "CardID": int(deck_id + "00"), "SidewaysCard": is_inv,
-        "Tags": [c["type"], tag], "LuaScript": "", "LuaScriptState": "",
+        "Tags": tags_for(c), "LuaScript": "", "LuaScriptState": "",
+        "ColorDiffuse": dict(COLOR_DIFFUSE), "Hands": True,
+        "HideWhenFaceDown": not is_inv,
         "GMNotes": build_gmnotes(c), "Transform": transform(),
         "CustomUIAssets": [ARKHAM_ICONS],
         "CustomDeck": {deck_id: {

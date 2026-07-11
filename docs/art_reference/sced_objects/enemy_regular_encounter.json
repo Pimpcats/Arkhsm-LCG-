@@ -1,0 +1,81 @@
+{
+  "SaveName": "",
+  "Date": "",
+  "VersionNumber": "",
+  "GameMode": "",
+  "GameType": "",
+  "GameComplexity": "",
+  "Tags": [],
+  "Gravity": 0.5,
+  "PlayArea": 0.5,
+  "Table": "",
+  "Sky": "",
+  "Note": "",
+  "TabStates": {},
+  "LuaScript": "",
+  "LuaScriptState": "",
+  "XmlUI": "",
+  "ObjectStates": [
+    {
+      "GUID": "a2cf85",
+      "Name": "Card",
+      "Transform": {
+        "posX": 0.80804497,
+        "posY": 1.59660506,
+        "posZ": 6.385548,
+        "rotX": -2.03031636E-08,
+        "rotY": 270.0,
+        "rotZ": 3.46549789E-09,
+        "scaleX": 1.0,
+        "scaleY": 1.0,
+        "scaleZ": 1.0
+      },
+      "Nickname": "Swarm of Rats",
+      "Description": "Creature.",
+      "GMNotes": "{\n  \"id\": \"01159\",\n  \"type\": \"Enemy\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Creature.\",\n  \"cycle\": \"Core\"\n}",
+      "AltLookAngle": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "ColorDiffuse": {
+        "r": 0.713235259,
+        "g": 0.713235259,
+        "b": 0.713235259
+      },
+      "Tags": [
+        "ScenarioCard"
+      ],
+      "LayoutGroupSortIndex": 0,
+      "Value": 0,
+      "Locked": false,
+      "Grid": true,
+      "Snap": true,
+      "IgnoreFoW": false,
+      "MeasureMovement": false,
+      "DragSelectable": true,
+      "Autoraise": true,
+      "Sticky": true,
+      "Tooltip": true,
+      "GridProjection": false,
+      "HideWhenFaceDown": true,
+      "Hands": true,
+      "CardID": 10002,
+      "SidewaysCard": false,
+      "CustomDeck": {
+        "100": {
+          "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/13243700374285212184/EA0A1926B70F720CDBC4EDC375FE76BD22E17389/",
+          "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+          "NumWidth": 7,
+          "NumHeight": 4,
+          "BackIsHidden": true,
+          "UniqueBack": false,
+          "Type": 0
+        }
+      },
+      "LuaScript": "",
+      "LuaScriptState": "",
+      "XmlUI": ""
+    }
+  ]
+}
