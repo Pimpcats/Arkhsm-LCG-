@@ -77,8 +77,8 @@
           ],
           "CustomDeck": {
             "95010": {
-              "FaceURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Elias+Warde",
-              "BackURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Elias+Warde+(Deckbuilding)",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-elias.png",
+              "BackURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-elias-back.png",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -128,7 +128,7 @@
           ],
           "CustomDeck": {
             "95011": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Ambergrove+Lamp",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-lamp.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -178,7 +178,7 @@
           ],
           "CustomDeck": {
             "95012": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=I've+Done+This+Before",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-donebefore.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -228,7 +228,7 @@
           ],
           "CustomDeck": {
             "95013": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Eighth+Grave",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-eighthgrave.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -279,8 +279,8 @@
           ],
           "CustomDeck": {
             "95014": {
-              "FaceURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Dr.+Ayako+Sōma",
-              "BackURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Dr.+Ayako+Sōma+(Deckbuilding)",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-ayako.png",
+              "BackURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-ayako-back.png",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -330,7 +330,7 @@
           ],
           "CustomDeck": {
             "95015": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Lexicon+of+the+Hour",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-lexicon.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -380,7 +380,7 @@
           ],
           "CustomDeck": {
             "95016": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=It+Means+'Wait'",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-itmeanswait.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -430,7 +430,7 @@
           ],
           "CustomDeck": {
             "95017": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Untranslatable",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-untranslatable.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -481,8 +481,8 @@
           ],
           "CustomDeck": {
             "95018": {
-              "FaceURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Cass+Lindqvist",
-              "BackURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Cass+Lindqvist+(Deckbuilding)",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-cass.png",
+              "BackURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-cass-back.png",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -532,7 +532,7 @@
           ],
           "CustomDeck": {
             "95019": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Marked+Deck",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-markeddeck.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -582,7 +582,7 @@
           ],
           "CustomDeck": {
             "95020": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Seen+This+Hand+Before",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-seenthishand.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -632,7 +632,7 @@
           ],
           "CustomDeck": {
             "95021": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+House+Always+Wins",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-housewins.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -683,8 +683,8 @@
           ],
           "CustomDeck": {
             "95022": {
-              "FaceURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Seraphine+Vale",
-              "BackURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Seraphine+Vale+(Deckbuilding)",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-seraphine.png",
+              "BackURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-seraphine-back.png",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -734,7 +734,7 @@
           ],
           "CustomDeck": {
             "95023": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Bell+of+Ambergrove",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-bell.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -784,7 +784,7 @@
           ],
           "CustomDeck": {
             "95024": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=I+Remember+the+Ending",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-rememberending.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -834,7 +834,7 @@
           ],
           "CustomDeck": {
             "95025": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Debt+of+Hours",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-debtofhours.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -885,8 +885,8 @@
           ],
           "CustomDeck": {
             "95026": {
-              "FaceURL": "https://placehold.co/750x523/141428/e8b24a/png?text=\"Birdie\"+Okonkwo",
-              "BackURL": "https://placehold.co/750x523/141428/e8b24a/png?text=\"Birdie\"+Okonkwo+(Deckbuilding)",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-birdie.png",
+              "BackURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-birdie-back.png",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -936,7 +936,7 @@
           ],
           "CustomDeck": {
             "95027": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Lucky+Compass",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-compass.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -986,7 +986,7 @@
           ],
           "CustomDeck": {
             "95028": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=I+Get+Out",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-igetout.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1036,7 +1036,7 @@
           ],
           "CustomDeck": {
             "95029": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Nobody+Believes+Her",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-nobodybelieves.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1086,7 +1086,7 @@
           ],
           "CustomDeck": {
             "95030": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Foreknowledge",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-foreknowledge.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1136,7 +1136,7 @@
           ],
           "CustomDeck": {
             "95031": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Déjà+Vu",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-dejavu.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1186,7 +1186,7 @@
           ],
           "CustomDeck": {
             "95032": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Muscle+Memory",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-musclememory.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1236,7 +1236,7 @@
           ],
           "CustomDeck": {
             "95033": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Rehearsed+Escape",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-rehearsedescape.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1286,7 +1286,7 @@
           ],
           "CustomDeck": {
             "95034": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Long+Way+Round",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-longwayround.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1337,7 +1337,7 @@
           ],
           "CustomDeck": {
             "95035": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Borrowed+Time",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-borrowedtime.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1387,7 +1387,7 @@
           ],
           "CustomDeck": {
             "95036": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=This+Time+For+Sure",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-thistimeforsure.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1438,7 +1438,7 @@
           ],
           "CustomDeck": {
             "95037": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Anchor+Point",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-anchorpoint.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1489,7 +1489,7 @@
           ],
           "CustomDeck": {
             "95038": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=Cassandra's+Notebook",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-cassandrasnotebook.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1539,7 +1539,7 @@
           ],
           "CustomDeck": {
             "95039": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Hour+I+Learned+Your+Name",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-hourlearnedname.png",
               "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1611,7 +1611,7 @@
           ],
           "CustomDeck": {
             "95040": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Appointed",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-appointed.png",
               "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1661,7 +1661,7 @@
           ],
           "CustomDeck": {
             "95041": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Appointed's+Whisper",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-appointedwhisper.png",
               "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1711,7 +1711,7 @@
           ],
           "CustomDeck": {
             "95042": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Crossing",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-crossing.png",
               "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1761,7 +1761,7 @@
           ],
           "CustomDeck": {
             "95043": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Bell-Ringer+Beneath",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-bellringer.png",
               "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1811,7 +1811,7 @@
           ],
           "CustomDeck": {
             "95044": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=What+Wears+the+Sheriff",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-wearssheriff.png",
               "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1861,7 +1861,7 @@
           ],
           "CustomDeck": {
             "95045": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+One+Who+Rides+Forever",
+              "FaceURL": "file:///C:/Users/squarestudio/Documents/GitHub/Arkhsm-LCG-/art/faces/sthr-onewhorides.png",
               "BackURL": "https://placehold.co/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)",
               "NumWidth": 1,
               "NumHeight": 1,
