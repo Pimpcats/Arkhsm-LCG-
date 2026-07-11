@@ -106,7 +106,7 @@ def run_generate(campaign_name, only=None, art_type=None, variants_override=None
         n_variants = variants_override or params["variants"]
         for k in range(n_variants):
             seed = job.get("seed", 1) + 1000 * k
-            if ledger.is_done(job["id"], seed):
+            if ledger.is_done(job["id"], seed, dry_run):
                 report["skipped_ledger"].append(Ledger.key(job["id"], seed))
                 continue
             if shutil.disk_usage(out_dir if os.path.exists(out_dir) else repo_root()).free < MIN_FREE_BYTES:
@@ -125,7 +125,7 @@ def run_generate(campaign_name, only=None, art_type=None, variants_override=None
                     dest = os.path.join(dest_dir, "{}.png".format(seed))
                     with open(dest, "wb") as f:
                         f.write(images[0])
-                    ledger.mark(job["id"], seed)
+                    ledger.mark(job["id"], seed, dry_run)
                     report["generated"].append({"id": job["id"], "seed": seed,
                                                 "path": os.path.relpath(dest, repo_root()),
                                                 "art_type": job["art_type"]})

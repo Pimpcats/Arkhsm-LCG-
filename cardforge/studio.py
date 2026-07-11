@@ -144,6 +144,27 @@ def act_rig_save(p):
     return {"ok": True, "rig": {k: v for k, v in cfg.items() if k != "_note"}}
 
 
+def act_seed_pick(p):
+    """Mark a Step-0 seed portrait as a character's canonical look — stored
+    as refs[0] in characters.json (the reference the LoRA/IPAdapter path and
+    the owner's LoRA training start from)."""
+    campaign = p.get("campaign", "still_hour")
+    ch, fname = p["character"], p["file"]
+    camp = runner.load_campaign(campaign)
+    seed_path = os.path.join(runner.out_dir_for(camp), "seeds", ch, fname)
+    if not os.path.exists(seed_path):
+        return {"ok": False, "message": "no such seed image: {}/{}".format(ch, fname)}
+    rel = os.path.relpath(seed_path, ROOT).replace(os.sep, "/")
+    chars_path = os.path.join(runner.campaign_dir(campaign), "characters.json")
+    chars = json.load(open(chars_path, encoding="utf-8"))
+    entry = chars.setdefault(ch, {})
+    entry["refs"] = [rel] + [r for r in entry.get("refs", []) if r != rel]
+    with open(chars_path, "w", encoding="utf-8") as f:
+        json.dump(chars, f, indent=2)
+    log("canonical portrait for {}: {}".format(ch, fname))
+    return {"ok": True, "picked": fname}
+
+
 def act_backend_launch(p):
     """Launch the campaign's backend now (saving any rig fields sent along)
     and wait on the worker thread until its API answers."""
@@ -391,6 +412,22 @@ def status(campaign="still_hour"):
                 else (pngs[0] if pngs else None)
             face = os.path.exists(os.path.join(ROOT, "art", "faces", cid + ".png"))
             gallery.append({"id": cid, "variants": pngs, "chosen": chosen, "face": face})
+    # Step-0 seed portraits: candidates per character + the picked canonical
+    seeds = {}
+    chars_path = os.path.join(runner.campaign_dir(campaign), "characters.json")
+    chars = json.load(open(chars_path, encoding="utf-8")) \
+        if os.path.exists(chars_path) else {}
+    seeds_dir = os.path.join(out_dir, "seeds")
+    if os.path.isdir(seeds_dir):
+        for ch in sorted(os.listdir(seeds_dir)):
+            chdir = os.path.join(seeds_dir, ch)
+            if not os.path.isdir(chdir):
+                continue
+            files = sorted(f for f in os.listdir(chdir) if f.endswith(".png"))
+            refs = (chars.get(ch) or {}).get("refs") or []
+            picked = os.path.basename(refs[0]) if refs else None
+            seeds[ch] = {"files": files, "picked": picked,
+                         "dir": os.path.relpath(chdir, ROOT).replace(os.sep, "/")}
     # art-window geometry + placements for the drag editor
     sys.path.insert(0, os.path.join(ROOT, "pipeline"))
     import render_placeholders as rp
@@ -454,7 +491,7 @@ def status(campaign="still_hour"):
     return {"busy": _busy.is_set(), "campaign": campaign, "campaigns": campaigns,
             "backend": camp.get("backend"), "report": report, "gallery": gallery,
             "rig": {k: v for k, v in rig.load_rig().items() if k != "_note"},
-            "cards": catalog, "faces_ver": faces_ver,
+            "seeds": seeds, "cards": catalog, "faces_ver": faces_ver,
             "se": {"config": se_bridge.load_config(),
                    "bundle_exists": os.path.exists(
                        os.path.join(se_bridge.se_dir(), "frame_cards.js")),
@@ -466,6 +503,7 @@ def status(campaign="still_hour"):
 ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "index": act_index, "backend_check": act_backend_check,
            "rig_save": act_rig_save, "backend_launch": act_backend_launch,
+           "seed_pick": act_seed_pick,
            "choose": act_choose, "se_save_config": act_se_save_config,
            "se_bundle": act_se_bundle, "se_launch": act_se_launch,
            "render_placeholders": act_render_placeholders, "apply": act_apply,
@@ -609,6 +647,12 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 .card{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:8px}
 .card img{width:100%;border-radius:6px;cursor:pointer;margin-top:4px}
 .card img.chosen{outline:2px solid var(--accent)}
+.seedthumb{width:96px;height:96px;object-fit:cover;border-radius:8px;cursor:pointer;
+outline:2px solid transparent;transition:outline-color .15s}
+.seedthumb:hover{outline-color:var(--dim)}
+.seedthumb.chosen{outline:2px solid var(--accent)}
+.legend{display:inline-flex;align-items:center;gap:6px;margin-right:14px;color:var(--dim);font-size:12px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
 .card .cid{font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #drawer{position:fixed;left:0;right:0;bottom:0;z-index:6;background:rgba(16,16,22,.92);
 backdrop-filter:blur(16px);border-top:1px solid var(--line);transition:height .25s ease;height:34px;overflow:hidden}
@@ -681,7 +725,16 @@ A1111 note: <code>webui.bat --api</code> guarantees the API; if you rely on cust
 <label><input type=checkbox id=dryrun checked> dry-run (no GPU)</label>
 </div>
 <div id=repline class=row></div>
+<div id=seedblock style="display:none">
+<h2>Seed portraits <small>Step-0 output &mdash; click each investigator&rsquo;s canonical look; it becomes their reference for every card they appear on</small></h2>
+<div id=seedrows></div>
+</div>
 <h2>Generated art <small>click a variant to slot it into its card</small></h2>
+<div style="margin:2px 0 8px">
+<span class=legend><i style="outline:2px solid var(--good);outline-offset:-2px"></i> composed card face</span>
+<span class=legend><i style="outline:2px solid var(--accent);outline-offset:-2px"></i> chosen art for this card</span>
+<span class=legend>grey tiles = dry-run stubs, replaced when you run for real</span>
+</div>
 <div id=gallery class=gal></div>
 </div></section>
 
@@ -809,6 +862,17 @@ const rep=s.report.generated!==undefined?
 (s.report.warnings||[]).map(w=>`<div class=hint>&#9888; ${w}</div>`).join(''):
 '<span class=stat>no batch run yet</span>';
 document.getElementById('repline').innerHTML=rep;
+const seedChars=Object.keys(s.seeds||{});
+document.getElementById('seedblock').style.display=seedChars.length?'':'none';
+document.getElementById('seedrows').innerHTML=seedChars.map(ch=>{
+const sd=s.seeds[ch];
+return `<div class=row style="align-items:center;margin-bottom:6px">`+
+`<b style="min-width:90px;text-transform:capitalize">${ch}</b>`+
+sd.files.map(f=>`<img loading=lazy class="seedthumb${f===sd.picked?' chosen':''}" `+
+`title="${f===sd.picked?'canonical portrait':'click to make canonical'}" `+
+`src="/art?p=${sd.dir}/${f}&ts=${ST}" onclick="post('seed_pick',{character:'${ch}',file:'${f}'})">`).join('')+
+(sd.picked?`<span class=hint>&#10003; ${sd.picked}</span>`:`<span class=hint>none picked yet</span>`)+
+`</div>`;}).join('');
 const shield=document.getElementById('spoilshield').checked;
 document.getElementById('gallery').innerHTML=s.gallery.map(g=>{
 if(shield&&g.spoiler&&!window.revealed.has(g.id))

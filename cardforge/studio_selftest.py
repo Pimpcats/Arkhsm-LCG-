@@ -235,6 +235,44 @@ check("chosen art composited into the exported elias face",
       "sthr-elias" in urls and os.path.getsize(
           os.path.join(faces_dir, "sthr-elias.png")) > 8000)
 
+print("== SEED PICKER: Step-0 portraits in the app ==")
+chars_path = os.path.join(ROOT, "campaigns", "still_hour", "characters.json")
+chars_backup = open(chars_path, encoding="utf-8").read()
+r = requests.post(BASE + "/api/seeds",
+                  json={"campaign": "still_hour", "dry_run": True, "variants": 4}).json()
+check("seeds job accepted", r.get("started"))
+check("seeds job completes", wait_idle(60))
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+check("seed candidates surface in status (5 chars x 4)",
+      len(s["seeds"]) == 5 and all(len(v["files"]) == 4 for v in s["seeds"].values()))
+check("seed picker rendered in the UI", "seedblock" in page and "seed_pick" in page)
+pick = s["seeds"]["elias"]["files"][2]
+r = requests.post(BASE + "/api/seed_pick",
+                  json={"campaign": "still_hour", "character": "elias",
+                        "file": pick}).json()
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+check("picking a seed stores it as the character's canonical ref",
+      r.get("ok") and s["seeds"]["elias"]["picked"] == pick
+      and json.load(open(chars_path, encoding="utf-8"))
+      ["elias"]["refs"][0].endswith(pick))
+check("seed_pick rejects a bogus file",
+      requests.post(BASE + "/api/seed_pick",
+                    json={"character": "elias", "file": "nope.png"}).json()
+      .get("ok") is False)
+with open(chars_path, "w", encoding="utf-8") as f:
+    f.write(chars_backup)
+
+print("== LEDGER: dry rehearsals never block real runs ==")
+from cardforge.ledger import Ledger
+led = Ledger(os.path.join(ROOT, "state", "_test.ledger.json"))
+led.mark("card-x", 7, dry=True)
+check("dry mark resumes dry runs but not real ones",
+      led.is_done("card-x", 7, dry=True) and not led.is_done("card-x", 7))
+led.mark("card-x", 7)
+check("real mark satisfies both modes",
+      led.is_done("card-x", 7) and led.is_done("card-x", 7, dry=True))
+os.remove(os.path.join(ROOT, "state", "_test.ledger.json"))
+
 print("== BACKEND RIG: auto launch/load ==")
 from cardforge import rig
 rig_backup = open(rig.rig_path(), encoding="utf-8").read()
