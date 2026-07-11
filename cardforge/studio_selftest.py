@@ -289,6 +289,9 @@ with open(camp_path, "w", encoding="utf-8") as f:
 check("zoom lightbox + refresh button + model picker in the UI",
       all(x in page for x in ("zoomOpen", "zoom_img", "modelsLoad",
                               "refresh the gallery")))
+check("category chips filter both the Cards grid and the gallery",
+      all(x in page for x in ("chips_cards", "chips_gal", "setGroup",
+                              "renderGallery")))
 
 print("== LEDGER: dry rehearsals never block real runs ==")
 from cardforge.ledger import Ledger

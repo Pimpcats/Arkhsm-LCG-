@@ -676,6 +676,12 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 .card{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:8px}
 .card img{width:100%;border-radius:6px;cursor:pointer;margin-top:4px}
 .card img.chosen{outline:2px solid var(--accent)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}
+.chip{padding:6px 14px;border-radius:999px;border:1px solid var(--line);
+background:var(--surface2);color:var(--dim);cursor:pointer;font-size:13px;
+transition:all .15s}
+.chip:hover{color:var(--ink)}
+.chip.on{background:var(--accent);color:var(--accent-ink);border-color:transparent;font-weight:600}
 .seedthumb{width:96px;height:96px;object-fit:cover;border-radius:8px;cursor:pointer;
 outline:2px solid transparent;transition:outline-color .15s}
 .seedthumb:hover{outline-color:var(--dim)}
@@ -736,6 +742,7 @@ drag to position, scroll to size. Encounter cards stay hidden behind the
 <label><input type=checkbox id=spoilshield checked onchange=refresh()> spoiler shield</label>
 <button class=btn onclick="post('render_placeholders')">Compose all faces</button>
 </div>
+<div id=chips_cards class=chips></div>
 <div id=cardgroups></div>
 </div></section>
 
@@ -776,6 +783,7 @@ A1111 note: <code>webui.bat --api</code> guarantees the API; if you rely on cust
 <span class=legend><i style="outline:2px solid var(--accent);outline-offset:-2px"></i> chosen art for this card</span>
 <span class=legend>grey tiles = dry-run stubs, replaced when you run for real</span>
 </div>
+<div id=chips_gal class=chips></div>
 <div id=gallery class=gal></div>
 </div></section>
 
@@ -905,15 +913,47 @@ const img=c.face?`<img loading=lazy class="${land?'land':''}" src="/art?p=art/fa
 return `<div class=tile onclick='editArt(${JSON.stringify(c).replaceAll("'","&#39;")})'>${img}`+
 `<div class=nm title="${c.name}">${c.name}</div><div class=tp>${c.type} &middot; ${c.class}</div></div>`;}
 
+let GROUP='All', LS=null;
+const GROUP_ORDER=['Investigators','Signatures & Weaknesses','Recollections',
+'Encounter — The Appointed','Encounter — The Named'];
+function setGroup(g){GROUP=g;if(LS)renderAll(LS);}
+function renderChips(s){
+const present=GROUP_ORDER.filter(g=>s.cards.some(c=>c.group===g));
+const html=['All'].concat(present).map(g=>
+`<button class="chip${g===GROUP?' on':''}" onclick="setGroup('${g.replace(/'/g,"\\'")}')">${g}</button>`).join('');
+for(const id of ['chips_cards','chips_gal']){
+const el=document.getElementById(id);if(el)el.innerHTML=html;}}
 function renderCards(s){
 const groups={};
-for(const c of s.cards)(groups[c.group]=groups[c.group]||[]).push(c);
-const order=['Investigators','Signatures & Weaknesses','Recollections',
-'Encounter — The Appointed','Encounter — The Named'];
-document.getElementById('cardgroups').innerHTML=order.filter(g=>groups[g]).map(g=>
+for(const c of s.cards)if(GROUP==='All'||c.group===GROUP)
+(groups[c.group]=groups[c.group]||[]).push(c);
+document.getElementById('cardgroups').innerHTML=GROUP_ORDER.filter(g=>groups[g]).map(g=>
 `<h2>${g}<small>${groups[g].length} card${groups[g].length>1?'s':''}</small></h2>`+
-`<div class=grid>${groups[g].map(cardTile).join('')}</div>`).join('');}
+`<div class=grid>${groups[g].map(cardTile).join('')}</div>`).join('')
+||'<span class=hint>no cards in this category</span>';}
 
+function renderGallery(s){
+const shield=document.getElementById('spoilshield').checked;
+const groupOf={};for(const c of s.cards)groupOf[c.id]=c.group;
+const nameOf={};for(const c of s.cards)nameOf[c.id]=c.name;
+const items=s.gallery.filter(g=>GROUP==='All'||groupOf[g.id]===GROUP)
+.slice().sort((a,b)=>GROUP_ORDER.indexOf(groupOf[a.id])-GROUP_ORDER.indexOf(groupOf[b.id])
+||a.id.localeCompare(b.id));
+document.getElementById('gallery').innerHTML=items.map(g=>{
+if(shield&&g.spoiler&&!window.revealed.has(g.id))
+ return `<div class=card style="width:150px"><div class=cid>&#128274; encounter card</div>`+
+ `<div class=veil style="height:110px;border-radius:6px;display:flex;align-items:center;`+
+ `justify-content:center;font-size:11px;color:var(--dim);cursor:pointer;`+
+ `background:repeating-linear-gradient(45deg,#15151d,#15151d 8px,#1b1b25 8px,#1b1b25 16px)" `+
+ `onclick="window.revealed.add('${g.id}');refresh()">tap to reveal</div></div>`;
+return `<div class=card style="width:150px"><div class=cid title="${g.id}">${nameOf[g.id]||g.id}</div>`+
+(g.face?`<img style="outline:2px solid var(--good)" title="composed card — click to view large" `+
+`src="/art?p=art/faces/${g.id}.png&ts=${ST}" onclick="zoomOpen(this.src,'${g.id} — composed face')">`:'')+
+g.variants.map(v=>`<img loading=lazy class="${v===g.chosen?'chosen':''}" title="click to view large" `+
+`src="/art?p=out/${s.campaign}/${g.id}/${v}" `+
+`onclick="zoomOpen(this.src,'${g.id} — ${v}','Use on this card',()=>post('choose',{card:'${g.id}',file:'${v}'}))">`).join('')+
+`</div>`;}).join('')||'<span class=hint>nothing in this category yet — run a batch, or upload art per card from the Cards tab</span>';}
+function renderAll(s){renderChips(s);renderCards(s);renderGallery(s);}
 async function refresh(){const r=await fetch('/api/status?campaign='+camp());const s=await r.json();
 ST=s.faces_ver;
 const sel=document.getElementById('campaign');
@@ -937,6 +977,7 @@ const rep=s.report.generated!==undefined?
 (s.report.warnings||[]).map(w=>`<div class=hint>&#9888; ${w}</div>`).join(''):
 '<span class=stat>no batch run yet</span>';
 document.getElementById('repline').innerHTML=rep;
+LS=s;renderChips(s);renderGallery(s);
 const seedChars=Object.keys(s.seeds||{});
 document.getElementById('seedblock').style.display=seedChars.length?'':'none';
 document.getElementById('seedrows').innerHTML=seedChars.map(ch=>{
@@ -949,21 +990,6 @@ sd.files.map(f=>`<img loading=lazy class="seedthumb${f===sd.picked?' chosen':''}
 `onclick="zoomOpen(this.src,'${ch} — ${f}','Make canonical',()=>post('seed_pick',{character:'${ch}',file:'${f}'}))">`).join('')+
 (sd.picked?`<span class=hint>&#10003; ${sd.picked}</span>`:`<span class=hint>none picked yet</span>`)+
 `</div>`;}).join('');
-const shield=document.getElementById('spoilshield').checked;
-document.getElementById('gallery').innerHTML=s.gallery.map(g=>{
-if(shield&&g.spoiler&&!window.revealed.has(g.id))
- return `<div class=card style="width:150px"><div class=cid>&#128274; encounter card</div>`+
- `<div class=veil style="height:110px;border-radius:6px;display:flex;align-items:center;`+
- `justify-content:center;font-size:11px;color:var(--dim);cursor:pointer;`+
- `background:repeating-linear-gradient(45deg,#15151d,#15151d 8px,#1b1b25 8px,#1b1b25 16px)" `+
- `onclick="window.revealed.add('${g.id}');refresh()">tap to reveal</div></div>`;
-return `<div class=card style="width:150px"><div class=cid title="${g.id}">${g.id}</div>`+
-(g.face?`<img style="outline:2px solid var(--good)" title="composed card — click to view large" `+
-`src="/art?p=art/faces/${g.id}.png&ts=${ST}" onclick="zoomOpen(this.src,'${g.id} — composed face')">`:'')+
-g.variants.map(v=>`<img loading=lazy class="${v===g.chosen?'chosen':''}" title="click to view large" `+
-`src="/art?p=out/${s.campaign}/${g.id}/${v}" `+
-`onclick="zoomOpen(this.src,'${g.id} — ${v}','Use on this card',()=>post('choose',{card:'${g.id}',file:'${v}'}))">`).join('')+
-`</div>`;}).join('')||'<span class=hint>nothing generated yet — run a batch, or upload art per card from the Cards tab</span>';
 const se=s.se;document.getElementById('se_cmd').value=se.config.launch_command;
 document.getElementById('se_faces').value=se.config.faces_dir;
 document.getElementById('se_dpi').value=se.config.export_dpi;
