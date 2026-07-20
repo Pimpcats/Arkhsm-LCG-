@@ -192,6 +192,9 @@ FONTS_DIR = os.path.join(ROOT, "assets", "fonts")
 # Arkhamic (the community's OFL extension of Teutonic — same face, more
 # glyphs) is preferred when installed; plain Teutonic ships in-repo.
 TITLE_FONT_CANDIDATES = ["Arkhamic.ttf", "Arkhamic-Regular.ttf", "Teutonic.ttf"]
+# Bolton is the official cards' big stat-numeral face (enemy fight/health/
+# evade, investigator skill values, health/sanity chits)
+STAT_FONT_CANDIDATES = ["BoltonBold.ttf", "Bolton.ttf"]
 TITLE_FONT = os.path.join(FONTS_DIR, "Teutonic.ttf")
 
 # Per-card manual font override (Studio card editor): campaigns/still_hour/
@@ -227,9 +230,19 @@ BODY_FONTS = {
 }
 
 
-def _font(size, bold=False, italic=False, glyph=False, title=False):
+def _font(size, bold=False, italic=False, glyph=False, title=False,
+          stat=False):
     if glyph:
         return ImageFont.truetype(FONT_PATH, size)
+    if stat:
+        for n in STAT_FONT_CANDIDATES:
+            p = os.path.join(FONTS_DIR, n)
+            if os.path.exists(p):
+                try:
+                    return ImageFont.truetype(p, size)
+                except OSError:
+                    continue
+        bold = True                       # graceful fallback: bold body
     ov = FONT_OVERRIDE.get("title" if title else "body")
     if ov:
         try:
@@ -719,7 +732,7 @@ def _psd_compose(layout, art_path, placement, label="place art"):
 
 def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
               grow=1.5, min_size=13, max_w_factor=1.45, max_size=None,
-              align="center"):
+              align="center", stat=False):
     """Center text on a region bbox, auto-sized. Region bboxes come from the
     template's example text, so start from the box height and shrink to fit;
     modest overflow past the example's width is allowed (names vary)."""
@@ -730,11 +743,11 @@ def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
     if max_size:
         size = min(size, max_size)
     while size > min_size:
-        f = _font(size, bold=bold, italic=italic, title=title)
+        f = _font(size, bold=bold, italic=italic, title=title, stat=stat)
         if d.textlength(text, font=f) <= bw * max_w_factor:
             break
         size -= 1
-    f = _font(size, bold=bold, italic=italic, title=title)
+    f = _font(size, bold=bold, italic=italic, title=title, stat=stat)
     w = d.textlength(text, font=f)
     bb = f.getbbox(text)
     if align == "left":
@@ -769,7 +782,7 @@ def p_investigator_front(c, pt, dest, art_path=None, placement=None):
     _box_text(d, c.get("subtitle", ""), R["Archetype"], italic=True)
     for key, stat in (("Willpower", "wil"), ("Intellect", "int"),
                       ("Combat", "com"), ("Agility", "agi")):
-        _box_text(d, str(c[stat]), R[key], bold=True, grow=1.2)
+        _box_text(d, str(c[stat]), R[key], stat=True, grow=1.2)
     _box_text(d, c.get("traits", ""), R["Keywords"], bold=True, italic=True,
               max_size=26)
     a = R["Ability Text"]
@@ -778,9 +791,9 @@ def p_investigator_front(c, pt, dest, art_path=None, placement=None):
     _box_block(d, pt.get("flavor", ""), (fl[0], fl[1], fl[2], fl[3] + 30),
                fill=(84, 66, 50), italic=True, start=24)
     _box_text(d, str(c["health"]), R["Health"], fill=(255, 246, 240),
-              bold=True, grow=0.85)
+              stat=True, grow=0.85)
     _box_text(d, str(c["sanity"]), R["Sanity"], fill=(240, 246, 255),
-              bold=True, grow=0.85)
+              stat=True, grow=0.85)
     # class disc over the template's custom faction icon
     cc = CLASS_COLORS.get(c.get("class", "Neutral"), (94, 94, 102))
     d.ellipse([16, 10, 86, 80], fill=cc, outline=(20, 16, 12), width=3)
@@ -798,8 +811,9 @@ def p_enemy(c, pt, dest, art_path=None, placement=None):
     for key, val in (("Combat Value", pt.get("fight")),
                      ("Health Value", pt.get("health")),
                      ("Evade Value", pt.get("evade"))):
-        _box_text(d, "\u2014" if val in (None, "", "None") else str(val),
-                  R[key], bold=True, grow=1.0)
+        blank = val in (None, "", "None")
+        _box_text(d, "\u2014" if blank else str(val),
+                  R[key], stat=not blank, bold=blank, grow=1.0)
     traits = c.get("traits", "") + ("  Elite." if c.get("elite")
                                     and "Elite" not in c.get("traits", "") else "")
     _box_text(d, traits, R["Keywords"], bold=True, italic=True, max_size=30)
@@ -812,7 +826,7 @@ def p_enemy(c, pt, dest, art_path=None, placement=None):
     for val, x, fill in ((pt.get("damage"), 300, (255, 235, 232)),
                          (pt.get("horror"), 484, (232, 240, 255))):
         if val:
-            d.text((x, 560), str(val), font=_font(40, bold=True), fill=fill,
+            d.text((x, 560), str(val), font=_font(40, stat=True), fill=fill,
                    stroke_width=3, stroke_fill=(20, 16, 14))
     _box_text(d, "Illus. pending — fan content", R["Illustrator Credit"],
               fill=(70, 58, 46))
@@ -936,10 +950,10 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
 
     if kind in ("Asset", "Event") and c.get("cost") is not None:
         _box_text(d, str(c["cost"]), se_reg(kind, "Cost"),
-                  fill=(238, 232, 216), bold=True, grow=0.95)
+                  fill=(238, 232, 216), title=True, grow=0.95)
     if c.get("level"):
         _box_text(d, str(c["level"]), se_reg(kind, "Level"),
-                  fill=(238, 232, 216), bold=True, grow=0.9)
+                  fill=(238, 232, 216), stat=True, grow=0.9)
 
     _box_text(d, c["name"], se_reg(kind, "Name", letter), title=True, grow=1.15)
     if c.get("subtitle"):
@@ -968,10 +982,10 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
     if kind == "Asset":
         if c.get("health") is not None:
             _box_text(d, str(c["health"]), se_reg(kind, "Stamina"),
-                      fill=(250, 244, 238), bold=True, grow=0.9)
+                      fill=(250, 244, 238), stat=True, grow=0.9)
         if c.get("sanity") is not None:
             _box_text(d, str(c["sanity"]), se_reg(kind, "Sanity"),
-                      fill=(240, 246, 255), bold=True, grow=0.9)
+                      fill=(240, 246, 255), stat=True, grow=0.9)
 
     _box_text(d, "Illus. pending — fan content", se_reg(kind, "Artist"),
               fill=(225, 218, 202), grow=1.0)
@@ -1038,7 +1052,7 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
     for key, stat in (("Willpower", "wil"), ("Intellect", "int"),
                       ("Combat", "com"), ("Agility", "agi")):
         _box_text(d, str(c[stat]), se_reg("Investigator", key),
-                  bold=True, grow=1.0)
+                  stat=True, grow=1.0)
     _se_body(d, c, pt, "Investigator", text_start=20, extra_bottom=0)
     # SanityBase is corrupt inside the plugin zip; the Horror pip is the
     # same blue brain chit, so it stands in at chit size
@@ -1052,7 +1066,7 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
         grown = (cx - 34, cy - 34, cx + 34, cy + 34)
         _paste_region(img, _se_img("overlays", base) or _se_img("overlays", alt),
                       grown)
-        _box_text(d, str(val), box, fill=fill, bold=True, grow=0.9)
+        _box_text(d, str(val), box, fill=fill, stat=True, grow=0.9)
     _box_text(d, "Illus. pending", se_reg("Investigator", "Artist"),
               fill=(70, 58, 46), max_size=18, align="left")
     _box_text(d, "THE STILL HOUR", se_reg("Investigator", "Copyright"),
@@ -1085,8 +1099,9 @@ def s_enemy(c, pt, dest, art_path=None, placement=None):
                   italic=True, max_size=26, max_w_factor=1.0)
     for key, val in (("Attack", pt.get("fight")), ("Health", pt.get("health")),
                      ("Evade", pt.get("evade"))):
-        _box_text(d, "—" if val in (None, "", "None") else str(val),
-                  se_reg("Enemy", key), bold=True, grow=1.0,
+        blank = val in (None, "", "None")     # Bolton has no em dash
+        _box_text(d, "—" if blank else str(val),
+                  se_reg("Enemy", key), stat=not blank, bold=blank, grow=1.0,
                   fill=(238, 232, 216))
     _se_body(d, c, pt, "Enemy", extra_bottom=0, text_start=22)
     for kind_key, count, ov in (("Damage", pt.get("damage"), "AHLCG-Damage"),

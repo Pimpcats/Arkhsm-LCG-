@@ -40,11 +40,12 @@
   Eons, Arkhamic font — fully portable folder
 - ✅ Per-card font picker (title/body) + official font stack
 - ✅ Deck backs (your eclipse + lighthouse art) on every export
-- ✅ 136-check selftest, Windows-safe (UTF-8 + race fixes)
+- ✅ 138-check selftest, Windows-safe (UTF-8 + race fixes)
 
 ## Card look ("identical to official")
 
-- ✅ Fonts: Arkhamic/Teutonic titles, Arno/Minion body, icon font — wired
+- ✅ Fonts: Arkhamic titles + cost (vendored), Bolton stat numerals
+  (vendored), Arno/Minion body, icon font — the full official stack wired
 - ✅ True blank frames extracted from the PSD template pack (all 10 layouts)
   with auto-measured text regions — committed in assets/frames/psd/
 - ✅ Inpaint fallback ("select & generate over") for the 6 scanned layouts
@@ -70,7 +71,7 @@
 - 🔶 Real art run: Launch backend → ↻ pick Painter's → Seeds → pick 5
   canonical portraits → Starter batch → ⚡ Auto-build (dry-run now defaults
   off; delete state/still_hour.ledger.json once if old stubs linger)
-- ⬜ Setup tab: Install Arkhamic (one click)
+- ✅ Arkhamic now ships in the repo (Setup installer kept as refresher)
 - ⬜ Train the 5 investigator LoRAs on Painter's, enter them in Advanced →
   Character LoRAs (skippable for a first playthrough; faces just vary more)
 - ⬜ Hunt Arno Pro Bold/Italic/BoldItalic (Discord) → drop in assets/fonts/

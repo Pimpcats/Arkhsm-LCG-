@@ -618,6 +618,12 @@ check("Teutonic vendored (OFL) and used for titles",
       and os.path.exists(os.path.join(ROOT, "assets", "fonts", "Teutonic-OFL.txt")))
 check("Arno Pro picked up for body when present (never committed)",
       RP._font(20).getname()[0] in ("Arno Pro", "DejaVu Serif"))
+check("Arkhamic vendored and preferred for titles (official title face)",
+      os.path.exists(os.path.join(ROOT, "assets", "fonts", "Arkhamic.ttf"))
+      and RP._font(20, title=True).getname()[0] == "Arkhamic")
+check("Bolton drives the big stat numerals (official stat face)",
+      os.path.exists(os.path.join(ROOT, "assets", "fonts", "BoltonBold.ttf"))
+      and RP._font(20, stat=True).getname()[0].startswith("Bolton"))
 check("font list serves text fonts, not the icon font",
       "Teutonic.ttf" in requests.get(BASE + "/api/status").json()["fonts"]
       and all("ArkhamFontWithCodex" not in f
@@ -635,12 +641,19 @@ r = requests.post(BASE + "/api/font_set",
 check("font override clears back to the default stack",
       r.get("ok") and "sthr-bell" not in
       json.load(open(RP.FONT_OVERRIDES_PATH, encoding="utf-8")))
+# the real Arkhamic is vendored now — protect it from the dry-run stub
+arkhamic_path = os.path.join(ROOT, "assets", "fonts", "Arkhamic.ttf")
+arkhamic_real = open(arkhamic_path, "rb").read() \
+    if os.path.exists(arkhamic_path) else None
 r = requests.post(BASE + "/api/install_fonts", json={"dry_run": True}).json()
 check("Arkhamic install job accepted", r.get("started"))
 check("Arkhamic install completes", wait_idle(30))
-arkhamic_stub = os.path.join(ROOT, "assets", "fonts", "Arkhamic.ttf")
-check("Arkhamic lands in assets/fonts", os.path.exists(arkhamic_stub))
-os.remove(arkhamic_stub)
+check("Arkhamic lands in assets/fonts", os.path.exists(arkhamic_path))
+if arkhamic_real is not None:
+    with open(arkhamic_path, "wb") as f:
+        f.write(arkhamic_real)
+else:
+    os.remove(arkhamic_path)
 check("font dropdowns in the card editor",
       "ed_font_title" in page and "edFontSet" in page)
 
