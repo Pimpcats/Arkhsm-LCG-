@@ -36,9 +36,15 @@ steps that check themselves off:
   from the folder's own location, so the folder can move machines.
 - **Cards** — the placement section: every card in the campaign, grouped by deck
   (Investigators / Signatures & Weaknesses / Recollections / Encounter sets),
-  each shown on its real frame. Click a card → the placement editor opens: pick
-  a generated variant or **upload any image**, drag to position, scroll to size,
-  Save recomposes losslessly. Spoiler shield keeps encounter cards hidden.
+  each shown on its real frame. Click a card → an **expanded in-place editor**
+  (not a popup) opens: pick a generated variant, **upload any image** or
+  **remove it**, drag to position, size **width and height independently**,
+  and edit the card itself — click any text box or stat right on the card to
+  jump to its field, type your own rules/flavor text, step fight/evade/cost
+  numbers with +/− buttons, and add or subtract damage ❤️ / horror 🧠 pips by
+  clicking. Works for every card type; Save recomposes losslessly and empty
+  fields fall back to the authored card. Spoiler shield keeps encounter cards
+  hidden.
 - **Illustrate** — the backend rig (where A1111/ComfyUI live on this machine,
   from `rig.json`): **one-click Launch backend**, and every generate job
   auto-launches it and waits for its API if it isn't already running. Plus
@@ -56,7 +62,7 @@ steps that check themselves off:
   instant TTS testing, or a hosted base URL) and rebuilds cards → mod →
   download package.
 
-Acceptance: `python3 cardforge/studio_selftest.py` (128 checks, drives the live
+Acceptance: `python3 cardforge/studio_selftest.py` (135 checks, drives the live
 server end-to-end — including a real backend auto-launch loop against a fake
 A1111 API and a Windows-locale regression; JS is syntax-checked with node in
 CI passes). The CLI below remains for headless/scripted use.

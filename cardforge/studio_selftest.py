@@ -209,6 +209,58 @@ check("manual upload becomes the chosen art and recomposes",
       and json.load(open(os.path.join(ROOT, "out", "still_hour", "index.json"), encoding="utf-8"))
       ["sthr-bell"].endswith("upload_1.png"))
 
+print("== CONTENT EDITOR: in-place text / stat / pip editing ==")
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+appt = next(c for c in s["cards"] if c["id"] == "sthr-appointed")
+check("catalog ships editable content + clickable field regions",
+      appt["content"]["name"] == "The Appointed" and appt["content"]["fight"] == 4
+      and appt["content"]["damage"] == 2
+      and {"name", "text", "fight", "damage", "horror"} <= set(appt["regions"]))
+ov_path = os.path.join(ROOT, "campaigns", "still_hour", "card_overrides.json")
+ov_backup = open(ov_path, encoding="utf-8").read() if os.path.exists(ov_path) else None
+r = requests.post(BASE + "/api/card_save",
+                  json={"card": "sthr-appointed", "fight": "7", "damage": "4",
+                        "text": "Owner-typed rules text."}).json()
+check("card_save stores overrides and recomposes the face", r.get("ok")
+      and r["overrides"]["fight"] == 7 and r["overrides"]["damage"] == 4)
+ov = json.load(open(ov_path, encoding="utf-8"))
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+appt = next(c for c in s["cards"] if c["id"] == "sthr-appointed")
+check("edits round-trip: overrides file + live catalog + overridden list",
+      ov["sthr-appointed"]["fight"] == 7
+      and appt["content"]["fight"] == 7 and appt["content"]["damage"] == 4
+      and appt["content"]["text"] == "Owner-typed rules text."
+      and set(appt["overridden"]) == {"fight", "damage", "text"})
+r = requests.post(BASE + "/api/card_save",
+                  json={"card": "sthr-appointed",
+                        "fight": "", "damage": "", "text": ""}).json()
+ov = json.load(open(ov_path, encoding="utf-8"))
+check("empty fields clear back to the authored card",
+      r.get("ok") and "sthr-appointed" not in ov)
+r = requests.post(BASE + "/api/place",
+                  json={"card": "sthr-bell", "scale": 1.4, "ox": 0, "oy": 0,
+                        "scale_y": 2.0}).json()
+placements = json.load(open(os.path.join(ROOT, "out", "still_hour",
+                                         "placements.json"), encoding="utf-8"))
+check("independent width/height art fit persists (scale_y)",
+      r.get("composed") and placements["sthr-bell"]["scale_y"] == 2.0)
+r = requests.post(BASE + "/api/art_remove", json={"card": "sthr-bell"}).json()
+idx = json.load(open(os.path.join(ROOT, "out", "still_hour", "index.json"),
+                     encoding="utf-8"))
+check("Remove image strips the art and re-renders the bare frame",
+      r.get("ok") and "sthr-bell" not in idx
+      and not os.path.exists(os.path.join(ROOT, "out", "still_hour",
+                                          "sthr-bell", "chosen.txt")))
+check("expanded editor UI: content panel, pip steppers, size + remove controls",
+      all(t in page for t in ("cc_stats", "ccSave", "Remove image",
+                              "ed_scaley", "All cards", "ed_stage")))
+if ov_backup is None:
+    if os.path.exists(ov_path):
+        os.remove(ov_path)
+else:
+    with open(ov_path, "w", encoding="utf-8") as f:
+        f.write(ov_backup)
+
 print("== SPOILER SHIELD + AUTO-BUILD ==")
 s = requests.get(BASE + "/api/status?campaign=still_hour").json()
 check("encounter cards flagged as spoilers",

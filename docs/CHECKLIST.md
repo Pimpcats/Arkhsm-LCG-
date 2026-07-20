@@ -31,11 +31,16 @@
 - ✅ LoRA table (name / strength / trigger per investigator)
 - ✅ Seed-portrait picker; categorized gallery + Cards grid; zoom lightbox;
   spoiler shield; drag-to-place editor (lossless); stub hiding
+- ✅ Expanded in-place card editor: click a card → full-width editor (no
+  popup); click any text box / stat ON the card to jump to its field; type
+  your own rules & flavor text; +/− steppers for fight/evade/cost/health;
+  damage ❤️ and horror 🧠 pips added/removed by clicking; Upload image with
+  independent width & height fit sliders + Remove image — every card type
 - ✅ Setup installs INTO the folder: A1111, Painter's Checkpoint, Strange
   Eons, Arkhamic font — fully portable folder
 - ✅ Per-card font picker (title/body) + official font stack
 - ✅ Deck backs (your eclipse + lighthouse art) on every export
-- ✅ 119-check selftest, Windows-safe (UTF-8 + race fixes)
+- ✅ 135-check selftest, Windows-safe (UTF-8 + race fixes)
 
 ## Card look ("identical to official")
 

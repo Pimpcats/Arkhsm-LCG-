@@ -283,6 +283,59 @@ def act_inpaint_frames(p):
                    dry_run=bool(p.get("dry_run")))
 
 
+def act_card_save(p):
+    """Persist owner content edits (name/text/stats/pips) for one card into
+    campaigns/still_hour/card_overrides.json, then recompose its face.
+    Empty string clears a field back to the authored value."""
+    sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+    import render_placeholders as rp
+    card = p["card"]
+    ov = rp.load_card_overrides()
+    entry = ov.get(card, {})
+    for k in rp.OV_SPEC_KEYS + rp.OV_PT_KEYS:
+        if k not in p:
+            continue
+        v = p[k]
+        if v in ("", None):
+            entry.pop(k, None)
+        else:
+            if isinstance(v, str) and v.lstrip("-").isdigit():
+                v = int(v)
+            entry[k] = v
+    if entry:
+        ov[card] = entry
+    else:
+        ov.pop(card, None)
+    with open(rp.CARD_OVERRIDES_PATH, "w", encoding="utf-8") as f:
+        json.dump(ov, f, indent=2, ensure_ascii=False)
+    subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py"),
+                    "--only", card], check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+    log("card content saved: {} ({} field(s) overridden)".format(card, len(entry)))
+    return {"ok": True, "overrides": entry}
+
+
+def act_art_remove(p):
+    """Remove a card's chosen art: back to the bare template."""
+    campaign = p.get("campaign", "still_hour")
+    card = p["card"]
+    camp = runner.load_campaign(campaign)
+    out_dir = runner.out_dir_for(camp)
+    chosen = os.path.join(out_dir, card, "chosen.txt")
+    if os.path.exists(chosen):
+        os.remove(chosen)
+    index_path = os.path.join(out_dir, "index.json")
+    if os.path.exists(index_path):
+        index = json.load(open(index_path, encoding="utf-8"))
+        if card in index:
+            del index[card]
+            with open(index_path, "w", encoding="utf-8") as f:
+                json.dump(index, f, indent=2)
+    subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py"),
+                    "--only", card], check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+    log("art removed from " + card)
+    return {"ok": True}
+
+
 def act_tts_spawn(p):
     """Drop a finished card onto the RUNNING Tabletop Simulator table
     (External Editor API, localhost:39999 — any TTS game, any SCED version)."""
@@ -452,7 +505,10 @@ def act_place(p):
     placements_path = os.path.join(ROOT, "out", "still_hour", "placements.json")
     placements = json.load(open(placements_path, encoding="utf-8")) if os.path.exists(placements_path) else {}
     placements[card] = {"scale": max(0.2, min(6.0, float(p.get("scale", 1.0)))),
+                        "scale_y": max(0.2, min(6.0, float(p["scale_y"])))
+                        if p.get("scale_y") else None,
                         "ox": float(p.get("ox", 0)), "oy": float(p.get("oy", 0))}
+    placements[card] = {k: v for k, v in placements[card].items() if v is not None}
     os.makedirs(os.path.dirname(placements_path), exist_ok=True)
     with open(placements_path, "w", encoding="utf-8") as f:
         json.dump(placements, f, indent=2)
@@ -727,11 +783,37 @@ def status(campaign="still_hour"):
                 "variants": variants, "stubs": vstubs, "chosen": chosen,
             })
     font_overrides = rp.load_font_overrides()
+    card_overrides = rp.load_card_overrides()
+    print_text = se_bridge._load_print_text()
+    spec_by_id = {}
+    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json"):
+        p2 = os.path.join(ROOT, "pipeline", spec_file)
+        if os.path.exists(p2):
+            for sc in json.load(open(p2, encoding="utf-8")):
+                spec_by_id[sc["id"]] = sc
     for c in catalog:
         if c["id"] in boxes:
             c["artbox"] = boxes[c["id"]]
             c["placement"] = placements.get(c["id"], {"scale": 1.0, "ox": 0, "oy": 0})
         c["fonts"] = font_overrides.get(c["id"], {})
+        mc, mpt = rp.apply_card_overrides(
+            spec_by_id.get(c["id"], {}), print_text.get(c["id"], {}),
+            card_overrides.get(c["id"]))
+        health = mpt.get("health") if c["type"] == "Enemy" else mc.get("health")
+        c["content"] = {
+            "name": mc.get("name", ""), "subtitle": mc.get("subtitle", ""),
+            "traits": mc.get("traits", ""), "cost": mc.get("cost"),
+            "level": mc.get("level"), "victory": mc.get("victory"),
+            "wil": mc.get("wil"), "int": mc.get("int"),
+            "com": mc.get("com"), "agi": mc.get("agi"),
+            "health": health, "sanity": mc.get("sanity"),
+            "slot": mc.get("slot", ""),
+            "text": mpt.get("text", ""), "flavor": mpt.get("flavor", ""),
+            "fight": mpt.get("fight"), "evade": mpt.get("evade"),
+            "damage": mpt.get("damage") or 0, "horror": mpt.get("horror") or 0,
+        }
+        c["regions"] = rp.content_regions(c["type"])
+        c["overridden"] = sorted(card_overrides.get(c["id"], {}).keys())
     campaigns = sorted(d for d in os.listdir(os.path.join(ROOT, "campaigns"))
                        if os.path.isdir(os.path.join(ROOT, "campaigns", d)))
     faces_dir_abs = os.path.join(ROOT, "art", "faces")
@@ -770,6 +852,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "install_se": act_install_se, "install_a1111": act_install_a1111,
            "install_fonts": act_install_fonts, "font_set": act_font_set,
            "tts_spawn": act_tts_spawn, "plugin_update": act_plugin_update,
+           "card_save": act_card_save, "art_remove": act_art_remove,
            "prompt_get": act_prompt_get, "prompt_save": act_prompt_save,
            "style_save": act_style_save, "inpaint_frames": act_inpaint_frames,
            "gen_settings": act_gen_settings, "lora_save": act_lora_save,
@@ -953,16 +1036,15 @@ backdrop-filter:blur(16px);border-top:1px solid var(--line);transition:height .2
 font-size:12px;color:var(--dim)}
 #log{padding:0 26px 12px;height:176px;overflow-y:auto;
 font:11.5px ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;color:#c9c5bb}
-#editor{display:none;position:fixed;inset:0;z-index:9;background:rgba(8,8,12,.72);
-backdrop-filter:blur(8px);animation:fade .2s ease}
+#editor{display:none;animation:fade .2s ease}
 #zoom{display:none;position:fixed;inset:0;z-index:10;background:rgba(8,8,12,.8);
 backdrop-filter:blur(10px);animation:fade .2s ease;align-items:center;justify-content:center}
 #zoom_box{background:var(--surface);border:1px solid var(--line);border-radius:18px;
 box-shadow:var(--shadow);padding:14px;max-width:92vw}
 #zoom_img{display:block;max-width:88vw;max-height:78vh;border-radius:10px;margin:0 auto}
-#ed_sheet{background:var(--surface);border:1px solid var(--line);border-radius:18px;
-box-shadow:var(--shadow);max-width:900px;margin:3.5vh auto;padding:18px 20px;max-height:93vh;overflow:auto}
-#ed_stage{position:relative;margin:12px auto;overflow:hidden;border-radius:10px;
+#ed_sheet{background:var(--surface2);border:1px solid var(--line);border-radius:18px;
+box-shadow:var(--shadow);margin:14px 0;padding:18px 20px}
+#ed_stage{position:relative;margin:12px auto;overflow:hidden;border-radius:10px;cursor:pointer;
 border:1px solid var(--line)}
 #ed_face{display:block;user-select:none;pointer-events:none}
 #ed_win{position:absolute;overflow:hidden;cursor:grab;outline:2px dashed var(--accent);
@@ -1099,6 +1181,62 @@ title="Stable Diffusion regenerates each template's text regions into empty card
 <div id=steps_cards class=stepbox></div>
 <div id=chips_cards class=chips></div>
 <div id=cardgroups></div>
+<div id=editor>
+<div id=ed_sheet>
+<div class=row><button class=btn onclick=edClose()>&#8592; All cards</button>
+<b id=ed_title style="font-size:15px"></b>
+<span class=hint>drag art to position &middot; scroll to size &middot; click values ON the card to edit them</span>
+<span class=spacer></span>
+<label>width</label><input type=range id=ed_scale min=0.5 max=3 step=0.02 style="width:120px" oninput=edPreview()>
+<label>height</label><input type=range id=ed_scaley min=0.5 max=3 step=0.02 style="width:120px" oninput=edPreview()>
+<button class="btn primary" onclick=edSave()>Save</button>
+<button class=btn onclick="post('tts_spawn',{card:ed.g.id})"
+title="drop this card onto the table of your RUNNING Tabletop Simulator — appears instantly, any game/mod">&#9654; Drop into TTS</button>
+<button class=btn onclick=edClose()>Done</button></div>
+<div id=ed_stage>
+<img id=ed_face><div id=ed_win><img id=ed_art draggable=false></div>
+</div>
+<div class=row><span class=hint>art for this card — pick one, or bring your own:</span>
+<button class=btn style="font-size:12px;padding:5px 12px" onclick="document.getElementById('ed_file').click()">Upload image&hellip;</button>
+<button class=btn style="font-size:12px;padding:5px 12px" onclick=edArtRemove()>Remove image</button>
+<input type=file id=ed_file accept="image/*" style="display:none" onchange=edUpload(this)>
+</div>
+<div id=ed_strip></div>
+<div class=row style="margin-top:10px">
+<label>title font</label><select id=ed_font_title onchange=edFontSet()></select>
+<label>body font</label><select id=ed_font_body onchange=edFontSet()></select>
+<span class=hint>manual per-card override &mdash; &ldquo;default&rdquo; follows the official stack
+(Arkhamic/Teutonic titles, Arno/Minion body); recomposes instantly</span>
+</div>
+<div style="margin-top:14px"><h2>Card content <small>type directly — blank returns a field to the authored version; saves affect THIS card only</small></h2>
+<div class=row>
+<label>name</label><input id=cc_name size=20>
+<label>subtitle</label><input id=cc_subtitle size=16>
+<label>traits</label><input id=cc_traits size=18>
+</div>
+<div class=row id=cc_stats></div>
+<label>rules text</label><textarea id=cc_text rows=5 spellcheck=false></textarea>
+<label>flavor</label><textarea id=cc_flavor rows=2 spellcheck=false></textarea>
+<div class=row style="margin-top:6px">
+<button class="btn primary" onclick=ccSave()>Save content</button>
+<span id=cc_info class=hint></span>
+</div></div>
+<details id=ed_promptbox style="margin-top:12px">
+<summary style="cursor:pointer;color:var(--dim)">Prompt &mdash; generate art for THIS card (A1111-style boxes)</summary>
+<label>prompt</label><textarea id=ed_pos rows=3 spellcheck=false></textarea>
+<label>negative prompt</label><textarea id=ed_neg rows=2 spellcheck=false></textarea>
+<div class=row style="margin-top:6px">
+<button class="btn primary" onclick=edGenerate()>Generate 2 variants</button>
+<button class=btn onclick=edReroll() title="same prompt, brand-new seeds — different images every click">&#127922; Reroll (new seeds)</button>
+<button class=btn onclick=edPromptSave()>Save prompt</button>
+<button class=btn onclick=edPromptReset()>Reset to composed</button>
+<span id=ed_prompt_info class=hint></span>
+</div>
+<p class=hint>Pre-filled with the composed prompt (character + scene + card-type framing + house style).
+Edit and Save &mdash; batch runs use your version too. Reset returns to the composed default.
+New variants land in the strip above and the gallery when the job finishes.</p>
+</details>
+</div></div>
 </div></section>
 
 <section id=illustrate><div class=panel>
@@ -1198,47 +1336,6 @@ Barnaby Files guide; AH font pack via the Mythos Busters Discord.</p>
 </div>
 </div></section>
 </main>
-
-<div id=editor onclick="if(event.target===this)edClose()">
-<div id=ed_sheet>
-<div class=row><b id=ed_title style="font-size:15px"></b>
-<span class=hint>drag to position &middot; scroll or slider to size &middot; always recomposited from the original, full quality</span>
-<span class=spacer></span>
-<label>size</label><input type=range id=ed_scale min=0.5 max=3 step=0.02 style="width:150px" oninput=edPreview()>
-<button class="btn primary" onclick=edSave()>Save</button>
-<button class=btn onclick="post('tts_spawn',{card:ed.g.id})"
-title="drop this card onto the table of your RUNNING Tabletop Simulator — appears instantly, any game/mod">&#9654; Drop into TTS</button>
-<button class=btn onclick=edClose()>Done</button></div>
-<div id=ed_stage>
-<img id=ed_face><div id=ed_win><img id=ed_art draggable=false></div>
-</div>
-<div class=row><span class=hint>art for this card — pick one, or bring your own:</span>
-<button class=btn style="font-size:12px;padding:5px 12px" onclick="document.getElementById('ed_file').click()">Upload image&hellip;</button>
-<input type=file id=ed_file accept="image/*" style="display:none" onchange=edUpload(this)>
-</div>
-<div id=ed_strip></div>
-<div class=row style="margin-top:10px">
-<label>title font</label><select id=ed_font_title onchange=edFontSet()></select>
-<label>body font</label><select id=ed_font_body onchange=edFontSet()></select>
-<span class=hint>manual per-card override &mdash; &ldquo;default&rdquo; follows the official stack
-(Arkhamic/Teutonic titles, Arno/Minion body); recomposes instantly</span>
-</div>
-<details id=ed_promptbox style="margin-top:12px">
-<summary style="cursor:pointer;color:var(--dim)">Prompt &mdash; generate art for THIS card (A1111-style boxes)</summary>
-<label>prompt</label><textarea id=ed_pos rows=3 spellcheck=false></textarea>
-<label>negative prompt</label><textarea id=ed_neg rows=2 spellcheck=false></textarea>
-<div class=row style="margin-top:6px">
-<button class="btn primary" onclick=edGenerate()>Generate 2 variants</button>
-<button class=btn onclick=edReroll() title="same prompt, brand-new seeds — different images every click">&#127922; Reroll (new seeds)</button>
-<button class=btn onclick=edPromptSave()>Save prompt</button>
-<button class=btn onclick=edPromptReset()>Reset to composed</button>
-<span id=ed_prompt_info class=hint></span>
-</div>
-<p class=hint>Pre-filled with the composed prompt (character + scene + card-type framing + house style).
-Edit and Save &mdash; batch runs use your version too. Reset returns to the composed default.
-New variants land in the strip above and the gallery when the job finishes.</p>
-</details>
-</div></div>
 
 <div id=zoom onclick="if(event.target===this)zoomClose()">
 <div id=zoom_box><img id=zoom_img>
@@ -1543,8 +1640,57 @@ const sel=document.getElementById(id);sel.innerHTML='';
 const d=document.createElement('option');d.value='';d.text='default';sel.add(d);
 for(const f of (LS&&LS.fonts)||[]){const o=document.createElement('option');
 o.value=o.text=f;if(f===cur)o.selected=true;sel.add(o);}}
+document.getElementById('ed_scale').value=ed.scale;
+document.getElementById('ed_scaley').value=(c.placement||{}).scale_y||ed.scale;
+ccFill(c);
 edStrip();edLoadArt();edPromptLoad(c.id);
-document.getElementById('editor').style.display='block';}
+document.getElementById('chips_cards').style.display='none';
+document.getElementById('cardgroups').style.display='none';
+document.getElementById('editor').style.display='block';
+window.scrollTo({top:0});}
+let CC_NUM=[];
+function ccPips(f,v){const el=document.getElementById('ccp_'+f);if(!el)return;
+const n=parseInt(v)||0;
+el.textContent=(f==='damage'?'\u2764\ufe0f':'\ud83e\udde0').repeat(Math.max(0,Math.min(n,8)));}
+function ccStep(f,d){const el=document.getElementById('cc_'+f);
+let v=parseInt(el.value);if(isNaN(v))v=0;v=Math.max(0,v+d);el.value=v;ccPips(f,v);}
+function ccNum(f,label,pips){
+return `<span style="display:inline-flex;align-items:center;gap:4px;margin-right:10px">`+
+`<label>${label}</label>`+
+`<button class=btn style="padding:2px 9px" onclick="ccStep('${f}',-1)">&minus;</button>`+
+`<input id=cc_${f} style="width:44px;text-align:center" oninput="ccPips('${f}',this.value)">`+
+`<button class=btn style="padding:2px 9px" onclick="ccStep('${f}',1)">+</button>`+
+(pips?`<span id=ccp_${f} style="font-size:15px;letter-spacing:1px"></span>`:'')+
+`</span>`;}
+function ccFill(c){const ct=c.content||{};
+document.getElementById('cc_name').value=ct.name||'';
+document.getElementById('cc_subtitle').value=ct.subtitle||'';
+document.getElementById('cc_traits').value=ct.traits||'';
+document.getElementById('cc_text').value=ct.text||'';
+document.getElementById('cc_flavor').value=ct.flavor||'';
+const t=c.type;let defs=[];
+if(t==='Investigator')defs=[['wil','[wil]'],['int','[int]'],['com','[com]'],['agi','[agi]'],['health','health'],['sanity','sanity']];
+else if(t==='Enemy')defs=[['fight','fight'],['health','health'],['evade','evade'],['damage','damage',1],['horror','horror',1]];
+else if(t==='Asset')defs=[['cost','cost'],['level','level'],['health','health'],['sanity','sanity'],['victory','victory']];
+else if(t==='Event')defs=[['cost','cost'],['level','level'],['victory','victory']];
+else defs=[['level','level'],['victory','victory']];
+CC_NUM=defs.map(d=>d[0]);
+document.getElementById('cc_stats').innerHTML=defs.map(d=>ccNum(d[0],d[1],d[2])).join('');
+for(const f of CC_NUM){const el=document.getElementById('cc_'+f);
+el.value=(ct[f]===null||ct[f]===undefined)?'':ct[f];ccPips(f,el.value);}
+document.getElementById('cc_info').textContent=
+(c.overridden&&c.overridden.length)?('edited: '+c.overridden.join(', ')):'';}
+async function ccSave(){const p={card:ed.g.id,
+name:document.getElementById('cc_name').value,
+subtitle:document.getElementById('cc_subtitle').value,
+traits:document.getElementById('cc_traits').value,
+text:document.getElementById('cc_text').value,
+flavor:document.getElementById('cc_flavor').value};
+for(const f of CC_NUM)p[f]=document.getElementById('cc_'+f).value;
+const j=await post('card_save',p);
+if(j.ok){document.getElementById('cc_info').textContent='saved \u2713';edFaceRefresh();}}
+async function edArtRemove(){await post('art_remove',{card:ed.g.id});
+ed.g.chosen=null;edStrip();edLoadArt();edFaceRefresh();}
 async function edFontSet(){
 await post('font_set',{card:ed.g.id,
 title:document.getElementById('ed_font_title').value,
@@ -1602,12 +1748,14 @@ function edFaceRefresh(){document.getElementById('ed_face').src=
 '/art?p=art/faces/'+ed.g.id+'.png&ts='+Date.now();}
 function edPreview(){if(!ed||!ed.natW)return;
 ed.scale=parseFloat(document.getElementById('ed_scale').value);
+ed.scaleY=parseFloat(document.getElementById('ed_scaley').value)||ed.scale;
 const[cw,ch,x0,y0,x1,y1]=ed.g.artbox;const bw=x1-x0,bh=y1-y0;
-const cover=Math.max(bw/ed.natW,bh/ed.natH)*ed.scale*ed.disp;
+const base=Math.max(bw/ed.natW,bh/ed.natH)*ed.disp;
+const w=ed.natW*base*ed.scale, h=ed.natH*base*ed.scaleY;
 const art=document.getElementById('ed_art');
-art.style.width=(ed.natW*cover)+'px';
-art.style.left=(-((ed.natW*cover)-(bw*ed.disp))/2+ed.ox*ed.disp)+'px';
-art.style.top =(-((ed.natH*cover)-(bh*ed.disp))/2+ed.oy*ed.disp)+'px';}
+art.style.width=w+'px';art.style.height=h+'px';
+art.style.left=(-(w-(bw*ed.disp))/2+ed.ox*ed.disp)+'px';
+art.style.top =(-(h-(bh*ed.disp))/2+ed.oy*ed.disp)+'px';}
 (function(){const win=document.getElementById('ed_win');let drag=null;
 win.addEventListener('mousedown',e=>{if(!ed)return;
 drag={x:e.clientX,y:e.clientY,ox:ed.ox,oy:ed.oy};win.style.cursor='grabbing';e.preventDefault();});
@@ -1616,10 +1764,28 @@ ed.ox=drag.ox+(e.clientX-drag.x)/ed.disp;ed.oy=drag.oy+(e.clientY-drag.y)/ed.dis
 window.addEventListener('mouseup',()=>{drag=null;win.style.cursor='grab';});
 win.addEventListener('wheel',e=>{e.preventDefault();const s=document.getElementById('ed_scale');
 s.value=Math.max(0.5,Math.min(3,parseFloat(s.value)-e.deltaY*0.0012));edPreview();});})();
+document.getElementById('ed_stage').addEventListener('click',e=>{
+if(!ed||!ed.g.regions)return;
+if(e.target.id==='ed_win'||e.target.id==='ed_art')return;
+const r=document.getElementById('ed_stage').getBoundingClientRect();
+const x=(e.clientX-r.left)/ed.disp, y=(e.clientY-r.top)/ed.disp;
+for(const f in ed.g.regions){const b=ed.g.regions[f];
+if(x>=b[0]&&x<=b[2]&&y>=b[1]&&y<=b[3]){
+const el=document.getElementById('cc_'+f);if(!el)continue;
+el.focus();if(el.select)el.select();
+el.style.outline='2px solid var(--accent)';
+setTimeout(()=>{el.style.outline='';},900);
+el.scrollIntoView({block:'center',behavior:'smooth'});
+return;}}});
 async function edSave(){if(!ed)return;
-await post('place',{card:ed.g.id,scale:ed.scale,ox:ed.ox,oy:ed.oy});
+const body={card:ed.g.id,scale:ed.scale,ox:ed.ox,oy:ed.oy};
+if(ed.scaleY&&Math.abs(ed.scaleY-ed.scale)>0.001)body.scale_y=ed.scaleY;
+await post('place',body);
 edFaceRefresh();addlog(ed.g.id+' recomposed');}
-function edClose(){document.getElementById('editor').style.display='none';ed=null;refresh();}
+function edClose(){document.getElementById('editor').style.display='none';
+document.getElementById('chips_cards').style.display='';
+document.getElementById('cardgroups').style.display='';
+ed=null;refresh();}
 function seSave(){post('se_save_config',{launch_command:document.getElementById('se_cmd').value,
 faces_dir:document.getElementById('se_faces').value,export_dpi:document.getElementById('se_dpi').value,
 classmap:document.getElementById('se_classmap').value,keys:document.getElementById('se_keys').value});}

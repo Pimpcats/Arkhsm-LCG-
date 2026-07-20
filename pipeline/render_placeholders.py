@@ -42,6 +42,39 @@ def load_art_index():
 
 
 PLACEMENTS_PATH = os.path.join(ROOT, "out", "still_hour", "placements.json")
+CARD_OVERRIDES_PATH = os.path.join(ROOT, "campaigns", "still_hour",
+                                   "card_overrides.json")
+
+# owner-editable fields, routed to the spec dict vs the print layer
+OV_SPEC_KEYS = ("name", "subtitle", "traits", "cost", "level", "victory",
+                "wil", "int", "com", "agi", "slot", "health", "sanity")
+OV_PT_KEYS = ("text", "flavor", "back_text", "fight", "evade",
+              "damage", "horror")
+
+
+def load_card_overrides():
+    """Per-card content edits from the Studio's card editor: name, rules
+    text, combat values, damage/horror pips… merged over spec + print layer
+    at render time (and by the SE bundle)."""
+    if os.path.exists(CARD_OVERRIDES_PATH):
+        return json.load(open(CARD_OVERRIDES_PATH, encoding="utf-8"))
+    return {}
+
+
+def apply_card_overrides(c, pt, ov):
+    if not ov:
+        return c, pt
+    c = dict(c)
+    pt = dict(pt)
+    for k in OV_SPEC_KEYS:
+        if k in ov and not (k in ("health", "sanity") and c.get("type") == "Enemy"):
+            c[k] = ov[k]
+    for k in OV_PT_KEYS:
+        if k in ov:
+            pt[k] = ov[k]
+    if c.get("type") == "Enemy" and "health" in ov:
+        pt["health"] = ov["health"]
+    return c, pt
 
 
 def load_placements():
@@ -110,8 +143,10 @@ def paste_cover(img, art_path, box, placement=None):
         return False
     p = placement or {}
     bw, bh = box[2] - box[0], box[3] - box[1]
-    scale = max(bw / art.width, bh / art.height) * float(p.get("scale", 1.0))
-    art = art.resize((max(1, round(art.width * scale)), max(1, round(art.height * scale))),
+    base = max(bw / art.width, bh / art.height)
+    sx = base * float(p.get("scale", 1.0))
+    sy = base * float(p.get("scale_y") or p.get("scale", 1.0))
+    art = art.resize((max(1, round(art.width * sx)), max(1, round(art.height * sy))),
                      Image.LANCZOS)
     # center, then pan by the stored offsets (window pixels)
     px = (art.width - bw) / 2 - float(p.get("ox", 0))
@@ -1071,6 +1106,40 @@ def s_treachery(c, pt, dest, art_path=None, placement=None):
     img.save(dest)
 
 
+def content_regions(card_type):
+    """logical field -> face-coordinate box, for click-to-edit in the app."""
+    if not has_se_frames():
+        return {}
+    def r(kind, key, letter=""):
+        b = se_reg(kind, key, letter)
+        return list(b) if b else None
+    out = {}
+    if card_type == "Investigator":
+        out = {"name": r("Investigator", "Name"),
+               "text": r("Investigator", "Body"),
+               "wil": r("Investigator", "Willpower"),
+               "int": r("Investigator", "Intellect"),
+               "com": r("Investigator", "Combat"),
+               "agi": r("Investigator", "Agility"),
+               "health": r("Investigator", "Stamina"),
+               "sanity": r("Investigator", "Sanity")}
+    elif card_type == "Enemy":
+        out = {"name": r("Enemy", "Name"), "text": r("Enemy", "Body"),
+               "fight": r("Enemy", "Attack"), "health": r("Enemy", "Health"),
+               "evade": r("Enemy", "Evade"),
+               "damage": r("Enemy", "Damage1"), "horror": r("Enemy", "Horror1")}
+    elif card_type == "Treachery":
+        out = {"name": r("Treachery", "Name"), "text": r("Treachery", "Body")}
+    elif card_type in ("Asset", "Event", "Skill"):
+        out = {"name": r(card_type, "Name", "N"), "text": r(card_type, "Body")}
+        if card_type in ("Asset", "Event"):
+            out["cost"] = r(card_type, "Cost")
+        if card_type == "Asset":
+            out["health"] = r(card_type, "Stamina")
+            out["sanity"] = r(card_type, "Sanity")
+    return {k: v for k, v in out.items() if v}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", nargs="*", help="render only these card ids")
@@ -1094,9 +1163,11 @@ def main():
     composed = 0
     font_overrides = load_font_overrides()
     global FONT_OVERRIDE
+    card_overrides = load_card_overrides()
     for c in cards:
         FONT_OVERRIDE = font_overrides.get(c["id"], {})
         pt = print_text.get(c["id"], {})
+        c, pt = apply_card_overrides(c, pt, card_overrides.get(c["id"]))
         if not pt.get("text"):
             missing_text.append(c["id"])
         art = art_index.get(c["id"])

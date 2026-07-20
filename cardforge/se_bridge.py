@@ -106,6 +106,9 @@ def build_jobs(campaign="still_hour"):
     frame time."""
     specs = _load_card_specs()
     print_text = _load_print_text()
+    ov_path = os.path.join(runner.repo_root(), "campaigns", campaign,
+                           "card_overrides.json")
+    overrides = json.load(open(ov_path, encoding="utf-8"))         if os.path.exists(ov_path) else {}
     manifest = runner.load_manifest(campaign)
     camp = runner.load_campaign(campaign)
     index_path = os.path.join(runner.out_dir_for(camp), "index.json")
@@ -114,8 +117,16 @@ def build_jobs(campaign="still_hour"):
     for m in manifest:
         is_back = m["id"].endswith("-back")
         base_id = m["id"][:-5] if is_back else m["id"]
-        spec = specs.get(base_id, {})
-        pt = print_text.get(base_id, {})
+        spec = dict(specs.get(base_id, {}))
+        pt = dict(print_text.get(base_id, {}))
+        # owner content edits (Studio card editor) ride into the SE jobs too
+        for k, v in (overrides.get(base_id) or {}).items():
+            if k in ("text", "flavor", "back_text", "fight", "evade",
+                     "damage", "horror") or (k == "health"
+                                             and spec.get("type") == "Enemy"):
+                pt[k] = v
+            else:
+                spec[k] = v
         job = {
             "id": m["id"],
             "frame": m.get("frame") or m.get("art_type"),
