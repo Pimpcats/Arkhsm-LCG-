@@ -234,6 +234,13 @@ def _font(size, bold=False, italic=False, glyph=False, title=False,
           stat=False):
     if glyph:
         return ImageFont.truetype(FONT_PATH, size)
+    # manual override (per-card editor or global default): one file per role
+    ov = FONT_OVERRIDE.get("stat" if stat else "title" if title else "body")
+    if ov:
+        try:
+            return ImageFont.truetype(os.path.join(FONTS_DIR, os.path.basename(ov)), size)
+        except OSError:
+            pass
     if stat:
         for n in STAT_FONT_CANDIDATES:
             p = os.path.join(FONTS_DIR, n)
@@ -243,12 +250,6 @@ def _font(size, bold=False, italic=False, glyph=False, title=False,
                 except OSError:
                     continue
         bold = True                       # graceful fallback: bold body
-    ov = FONT_OVERRIDE.get("title" if title else "body")
-    if ov:
-        try:
-            return ImageFont.truetype(os.path.join(FONTS_DIR, os.path.basename(ov)), size)
-        except OSError:
-            pass
     if title:
         for n in TITLE_FONT_CANDIDATES:
             p = os.path.join(FONTS_DIR, n)
@@ -1192,8 +1193,9 @@ def main():
     font_overrides = load_font_overrides()
     global FONT_OVERRIDE
     card_overrides = load_card_overrides()
+    font_default = font_overrides.get("_default", {})
     for c in cards:
-        FONT_OVERRIDE = font_overrides.get(c["id"], {})
+        FONT_OVERRIDE = dict(font_default, **font_overrides.get(c["id"], {}))
         pt = print_text.get(c["id"], {})
         c, pt = apply_card_overrides(c, pt, card_overrides.get(c["id"]))
         if not pt.get("text"):

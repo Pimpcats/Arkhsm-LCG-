@@ -656,6 +656,48 @@ else:
     os.remove(arkhamic_path)
 check("font dropdowns in the card editor",
       "ed_font_title" in page and "edFontSet" in page)
+check("all three font roles overridable per card (title / stat / body)",
+      "ed_font_title" in page and "ed_font_stat" in page
+      and "ed_font_body" in page and "edFontUpload" in page)
+# global default: one pick changes every card, per-card still wins
+r = requests.post(BASE + "/api/font_set",
+                  json={"card": "_default", "title": "Teutonic.ttf",
+                        "stat": "Bolton.ttf"}).json()
+fo = json.load(open(RP.FONT_OVERRIDES_PATH, encoding="utf-8"))
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+check("default fonts apply to EVERY card (global override)",
+      r.get("ok") and fo["_default"]["title"] == "Teutonic.ttf"
+      and s["default_fonts"]["stat"] == "Bolton.ttf")
+requests.post(BASE + "/api/font_set",
+              json={"card": "sthr-bell", "title": "Arkhamic.ttf"})
+fo = json.load(open(RP.FONT_OVERRIDES_PATH, encoding="utf-8"))
+merged = dict(fo.get("_default", {}), **fo.get("sthr-bell", {}))
+check("a card's own font override beats the global default",
+      merged["title"] == "Arkhamic.ttf" and merged["stat"] == "Bolton.ttf")
+requests.post(BASE + "/api/font_set", json={"card": "sthr-bell"})
+requests.post(BASE + "/api/font_set", json={"card": "_default"})
+check("clearing the default returns every card to the official stack",
+      "_default" not in json.load(open(RP.FONT_OVERRIDES_PATH, encoding="utf-8")))
+check("Default fonts panel + upload controls in the UI",
+      "Default fonts" in page and "dfSet" in page
+      and "Upload font" in page and "upload_font" in page)
+# bring-your-own-font upload lands in assets/fonts and validates
+import base64 as _b64f
+good = _b64f.b64encode(open(os.path.join(ROOT, "assets", "fonts",
+                                         "Bolton.ttf"), "rb").read()).decode()
+r = requests.post(BASE + "/api/upload_font",
+                  json={"name": "SelftestByo.ttf",
+                        "data_b64": "data:font/ttf;base64," + good}).json()
+check("upload your own font -> appears in the font list",
+      r.get("ok") and "SelftestByo.ttf" in r["fonts"]
+      and os.path.exists(os.path.join(ROOT, "assets", "fonts", "SelftestByo.ttf")))
+os.remove(os.path.join(ROOT, "assets", "fonts", "SelftestByo.ttf"))
+r = requests.post(BASE + "/api/upload_font",
+                  json={"name": "NotAFont.ttf",
+                        "data_b64": "data:," + _b64f.b64encode(b"nope").decode()}).json()
+check("a non-font upload is rejected, not saved",
+      r.get("ok") is False
+      and not os.path.exists(os.path.join(ROOT, "assets", "fonts", "NotAFont.ttf")))
 
 print("== TTS LIVE LINK + PLUGIN REFRESH ==")
 import socket as _sock

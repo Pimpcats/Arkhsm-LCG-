@@ -378,14 +378,15 @@ def act_install_fonts(p):
 
 
 def act_font_set(p):
-    """Manual per-card font override (title/body) from the card editor;
-    recomposes the face immediately."""
+    """Manual font override (title/stat/body) from the card editor. card can be
+    a card id (that card only) or "_default" — the default font for EVERY card,
+    which the per-card override still beats. Recomposes the affected faces."""
     sys.path.insert(0, os.path.join(ROOT, "pipeline"))
     import render_placeholders as rp
     card = p["card"]
     ov = rp.load_font_overrides()
     entry = {}
-    for k in ("title", "body"):
+    for k in ("title", "stat", "body"):
         v = os.path.basename((p.get(k) or "").strip())
         if v:
             entry[k] = v
@@ -395,10 +396,40 @@ def act_font_set(p):
         ov.pop(card, None)
     with open(rp.FONT_OVERRIDES_PATH, "w", encoding="utf-8") as f:
         json.dump(ov, f, indent=2)
-    subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py"),
-                    "--only", card], check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
-    log("fonts for {}: {}".format(card, entry or "default stack"))
+    cmd = [sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py")]
+    if card != "_default":                 # _default touches every card
+        cmd += ["--only", card]
+    subprocess.run(cmd, check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+    where = "every card" if card == "_default" else card
+    log("fonts for {}: {}".format(where, entry or "default stack"))
     return {"ok": True, "fonts": entry}
+
+
+def act_upload_font(p):
+    """Bring your own font: save an uploaded .ttf/.otf into assets/fonts/ so it
+    appears in every font dropdown. Data comes as a data: URL from the browser."""
+    import base64
+    name = os.path.basename((p.get("name") or "").strip()) or "custom.ttf"
+    if not name.lower().endswith((".ttf", ".otf")):
+        return {"ok": False, "message": "font must be a .ttf or .otf file"}
+    data = p.get("data_b64", "")
+    if "," in data:
+        data = data.split(",", 1)[1]
+    raw = base64.b64decode(data)
+    dest = os.path.join(ROOT, "assets", "fonts", name)
+    with open(dest, "wb") as f:
+        f.write(raw)
+    # verify it actually loads as a font before advertising it
+    sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+    import render_placeholders as rp
+    try:
+        from PIL import ImageFont
+        ImageFont.truetype(dest, 20)
+    except OSError:
+        os.remove(dest)
+        return {"ok": False, "message": name + " is not a usable font file"}
+    log("font uploaded: " + name)
+    return {"ok": True, "file": name, "fonts": rp.list_fonts()}
 
 
 def act_install_a1111(p):
@@ -831,6 +862,7 @@ def status(campaign="still_hour"):
             "seeds": seeds, "cards": catalog, "faces_ver": faces_ver,
             "gen": camp.get("overrides_all", {}),
             "fonts": rp.list_fonts(),
+            "default_fonts": font_overrides.get("_default", {}),
             "characters": {n: {"lora": (v or {}).get("lora", ""),
                                "weight": (v or {}).get("weight", 0.8),
                                "trigger": (v or {}).get("trigger", "")}
@@ -851,6 +883,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "install_checkpoint": act_install_checkpoint,
            "install_se": act_install_se, "install_a1111": act_install_a1111,
            "install_fonts": act_install_fonts, "font_set": act_font_set,
+           "upload_font": act_upload_font,
            "tts_spawn": act_tts_spawn, "plugin_update": act_plugin_update,
            "card_save": act_card_save, "art_remove": act_art_remove,
            "prompt_get": act_prompt_get, "prompt_save": act_prompt_save,
@@ -1179,6 +1212,18 @@ drag to position, scroll to size. Encounter cards stay hidden behind the
 title="Stable Diffusion regenerates each template's text regions into empty card material (select-and-generate-over); composed faces then sit on real texture instead of flat fills">&#10024; Rebuild blank frames</button>
 </div>
 <div id=steps_cards class=stepbox></div>
+<div class=panel id=defaultfonts style="margin-bottom:10px">
+<div class=row>
+<b>Default fonts</b> <span class=hint>&mdash; applied to <b>every</b> card. Ships as the official stack; pick your own here to change all cards at once (a single card&rsquo;s own override still wins).</span>
+</div>
+<div class=row style="margin-top:8px">
+<label>title / cost</label><select id=df_title onchange=dfSet()></select>
+<label>stat numerals</label><select id=df_stat onchange=dfSet()></select>
+<label>body text</label><select id=df_body onchange=dfSet()></select>
+<button class=btn style="font-size:12px;padding:5px 12px" onclick="document.getElementById('df_fontfile').click()">Upload font&hellip;</button>
+<input type=file id=df_fontfile accept=".ttf,.otf" style="display:none" onchange=dfFontUpload(this)>
+<span id=df_info class=hint></span>
+</div></div>
 <div id=chips_cards class=chips></div>
 <div id=cardgroups></div>
 <div id=editor>
@@ -1204,9 +1249,12 @@ title="drop this card onto the table of your RUNNING Tabletop Simulator — appe
 <div id=ed_strip></div>
 <div class=row style="margin-top:10px">
 <label>title font</label><select id=ed_font_title onchange=edFontSet()></select>
+<label>stat font</label><select id=ed_font_stat onchange=edFontSet()></select>
 <label>body font</label><select id=ed_font_body onchange=edFontSet()></select>
-<span class=hint>manual per-card override &mdash; &ldquo;default&rdquo; follows the official stack
-(Arkhamic/Teutonic titles, Arno/Minion body); recomposes instantly</span>
+<button class=btn style="font-size:12px;padding:5px 12px" onclick="document.getElementById('ed_fontfile').click()">Upload font&hellip;</button>
+<input type=file id=ed_fontfile accept=".ttf,.otf" style="display:none" onchange=edFontUpload(this)>
+<span class=hint>per-card override &mdash; &ldquo;default&rdquo; follows the official stack
+(Arkhamic titles/cost, Bolton stats, Arno/Minion body); recomposes instantly</span>
 </div>
 <div style="margin-top:14px"><h2>Card content <small>type directly — blank returns a field to the authored version; saves affect THIS card only</small></h2>
 <div class=row>
@@ -1590,6 +1638,7 @@ const rep=s.report.generated!==undefined?
 '<span class=stat>no batch run yet</span>';
 document.getElementById('repline').innerHTML=rep;
 LS=s;renderChips(s);renderGallery(s);
+if(!['df_title','df_stat','df_body'].includes((document.activeElement||{}).id))dfFill();
 const seedChars=Object.keys(s.seeds||{});
 document.getElementById('seedblock').style.display=seedChars.length?'':'none';
 document.getElementById('seedrows').innerHTML=seedChars.map(ch=>{
@@ -1635,11 +1684,9 @@ win.style.width=((x1-x0)*disp)+'px';win.style.height=((y1-y0)*disp)+'px';
 document.getElementById('ed_title').textContent=c.name;
 document.getElementById('ed_scale').value=ed.scale;
 for(const [id,cur] of [['ed_font_title',(c.fonts||{}).title||''],
+['ed_font_stat',(c.fonts||{}).stat||''],
 ['ed_font_body',(c.fonts||{}).body||'']]){
-const sel=document.getElementById(id);sel.innerHTML='';
-const d=document.createElement('option');d.value='';d.text='default';sel.add(d);
-for(const f of (LS&&LS.fonts)||[]){const o=document.createElement('option');
-o.value=o.text=f;if(f===cur)o.selected=true;sel.add(o);}}
+fillFontSel(id,cur);}
 document.getElementById('ed_scale').value=ed.scale;
 document.getElementById('ed_scaley').value=(c.placement||{}).scale_y||ed.scale;
 ccFill(c);
@@ -1691,11 +1738,47 @@ const j=await post('card_save',p);
 if(j.ok){document.getElementById('cc_info').textContent='saved \u2713';edFaceRefresh();}}
 async function edArtRemove(){await post('art_remove',{card:ed.g.id});
 ed.g.chosen=null;edStrip();edLoadArt();edFaceRefresh();}
+function fillFontSel(id,cur){const sel=document.getElementById(id);if(!sel)return;
+sel.innerHTML='';
+const d=document.createElement('option');d.value='';d.text='default';sel.add(d);
+for(const f of (LS&&LS.fonts)||[]){const o=document.createElement('option');
+o.value=o.text=f;if(f===cur)o.selected=true;sel.add(o);}}
 async function edFontSet(){
 await post('font_set',{card:ed.g.id,
 title:document.getElementById('ed_font_title').value,
+stat:document.getElementById('ed_font_stat').value,
 body:document.getElementById('ed_font_body').value});
 edFaceRefresh();}
+async function edFontUpload(input){const f=input.files[0];if(!f)return;
+const rd=new FileReader();
+rd.onload=async()=>{const j=await post('upload_font',{name:f.name,data_b64:rd.result});
+if(j.ok){LS.fonts=j.fonts;
+fillFontSel('ed_font_title',(ed.g.fonts||{}).title||'');
+fillFontSel('ed_font_stat',(ed.g.fonts||{}).stat||'');
+document.getElementById('ed_font_body').innerHTML='';
+fillFontSel('ed_font_body',(ed.g.fonts||{}).body||'');
+document.getElementById('ed_font_title').value=j.file;edFontSet();
+addlog('font added: '+j.file);}
+else addlog('font upload failed: '+(j.message||''));};
+rd.readAsDataURL(f);input.value='';}
+function dfFill(){const df=(LS&&LS.default_fonts)||{};
+for(const [id,key] of [['df_title','title'],['df_stat','stat'],['df_body','body']])
+fillFontSel(id,df[key]||'');
+const on=Object.keys(df).length;
+document.getElementById('df_info').textContent=on?('active on every card: '+
+Object.entries(df).map(([k,v])=>k+' '+v).join(', ')):'official stack (default)';}
+async function dfSet(){const j=await post('font_set',{card:'_default',
+title:document.getElementById('df_title').value,
+stat:document.getElementById('df_stat').value,
+body:document.getElementById('df_body').value});
+if(j.ok){LS.default_fonts=j.fonts;dfFill();refresh();addlog('default fonts set for every card');}}
+async function dfFontUpload(input){const f=input.files[0];if(!f)return;
+const rd=new FileReader();
+rd.onload=async()=>{const j=await post('upload_font',{name:f.name,data_b64:rd.result});
+if(j.ok){LS.fonts=j.fonts;dfFill();document.getElementById('df_title').value=j.file;dfSet();
+addlog('font added: '+j.file);}
+else addlog('font upload failed: '+(j.message||''));};
+rd.readAsDataURL(f);input.value='';}
 let ED_COMPOSED=null;
 async function edPromptLoad(card){ED_COMPOSED=null;
 const box=document.getElementById('ed_promptbox');

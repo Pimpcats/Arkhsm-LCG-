@@ -19,10 +19,20 @@ dropdowns).
 
 Resolution order at render time, per text run:
 
-1. the card's manual override (editor dropdowns), if set
-2. titles + cost: Arkhamic → Teutonic; stat numerals: Bolton Bold → Bolton →
-   bold body; body: Arno Pro (exact weight/style) → Minion Pro → DejaVu
-3. icons: always the Arkham icon font via `[wil]`-style markup
+1. the card's own manual override (editor dropdowns), if set
+2. the campaign **default font** override (`_default` in `font_overrides.json`,
+   set from the Cards tab's "Default fonts" panel), if set — applies to every
+   card at once; a single card's own override beats it
+3. the baked-in official stack — titles + cost: Arkhamic → Teutonic; stat
+   numerals: Bolton Bold → Bolton → bold body; body: Arno Pro (exact
+   weight/style) → Minion Pro → DejaVu
+4. icons: always the Arkham icon font via `[wil]`-style markup
+
+**Bring your own font:** the "Upload font…" button (per-card editor *and* the
+Default fonts panel) drops a `.ttf`/`.otf` straight into this folder, validates
+it loads, and adds it to every font dropdown. Three roles are independently
+overridable: **title** (titles + cost), **stat** (the big numerals), **body**
+(rules/traits/flavor).
 
 Missing pieces worth hunting (Mythos Busters Discord / your own licenses):
 Arno Pro **Bold**, **Italic**, **Bold Italic** — used for keywords ("Forced —",

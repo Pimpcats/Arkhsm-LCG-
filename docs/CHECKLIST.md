@@ -38,9 +38,13 @@
   independent width & height fit sliders + Remove image — every card type
 - ✅ Setup installs INTO the folder: A1111, Painter's Checkpoint, Strange
   Eons, Arkhamic font — fully portable folder
-- ✅ Per-card font picker (title/body) + official font stack
+- ✅ Font control: official stack is the baked-in default for every card
+  (Arkhamic titles/cost, Bolton stats, Arno/Minion body). "Default fonts"
+  panel swaps title/stat/body across ALL cards from a dropdown; per-card
+  override still wins; "Upload font…" brings your own .ttf/.otf into the
+  dropdowns
 - ✅ Deck backs (your eclipse + lighthouse art) on every export
-- ✅ 138-check selftest, Windows-safe (UTF-8 + race fixes)
+- ✅ 145-check selftest, Windows-safe (UTF-8 + race fixes)
 
 ## Card look ("identical to official")
 
