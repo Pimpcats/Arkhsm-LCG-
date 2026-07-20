@@ -43,9 +43,12 @@
 - ✅ True blank frames extracted from the PSD template pack (all 10 layouts)
   with auto-measured text regions — committed in assets/frames/psd/
 - ✅ Inpaint fallback ("select & generate over") for the 6 scanned layouts
-- ✅ Renderer v2 (investigators, enemies, treacheries): cards typeset
-  directly onto the true PSD blanks at native res — art under the frame,
-  auto-measured text regions, official fonts
+- ✅ OWNER DECISION: plugin templates for EVERYTHING. Investigators
+  (per-class fronts AND backs), enemies, treacheries (+weakness variants),
+  assets, events, skills all render on the SE plugin's authentic frames
+  with its exact regions — real stat plates, cost circles, commit boxes,
+  slot icons, damage/horror pips, stamina/sanity chits. PSD blanks kept
+  as fallback only.
 - ✅ Renderer v3 for assets/events/skills: the SE plugin's own per-class
   frames + exact region maps (586 regions extracted from the .seext) —
   cost circles, commit-icon boxes, slot icons, class frames, all authentic

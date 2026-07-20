@@ -58,6 +58,16 @@ def load_placements():
 def art_box(card_type):
     """(card_w, card_h, x0, y0, x1, y1) — the drag/scale target. PSD blanks
     (true frames, native res) outrank the scanned templates."""
+    if has_se_frames():
+        se_map = {"Investigator": ("Investigator",
+                                   "TransparentPortrait-portrait-clip", 1050, 750),
+                  "Enemy": ("Enemy", "Portrait-portrait-clip", 750, 1050),
+                  "Treachery": ("Treachery", "Portrait-portrait-clip", 750, 1050)}
+        if card_type in se_map:
+            kind, key, w, h = se_map[card_type]
+            box = se_reg(kind, key)
+            if box:
+                return (w, h) + box
     psd_map = {"Investigator": ("character_card_front", 1048, 738),
                "Enemy": ("scenario_enemy", 733, 1050),
                "Treachery": ("scenario_treachery", 733, 1050)}
@@ -660,7 +670,8 @@ def _psd_compose(layout, art_path, placement, label="place art"):
 
 
 def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
-              grow=1.5, min_size=13, max_w_factor=1.45, max_size=None):
+              grow=1.5, min_size=13, max_w_factor=1.45, max_size=None,
+              align="center"):
     """Center text on a region bbox, auto-sized. Region bboxes come from the
     template's example text, so start from the box height and shrink to fit;
     modest overflow past the example's width is allowed (names vary)."""
@@ -678,8 +689,14 @@ def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
     f = _font(size, bold=bold, italic=italic, title=title)
     w = d.textlength(text, font=f)
     bb = f.getbbox(text)
-    d.text(((box[0] + box[2]) / 2 - w / 2,
-            (box[1] + box[3]) / 2 - (bb[1] + bb[3]) / 2), text, font=f, fill=fill)
+    if align == "left":
+        x = box[0]
+    elif align == "right":
+        x = box[2] - w
+    else:
+        x = (box[0] + box[2]) / 2 - w / 2
+    d.text((x, (box[1] + box[3]) / 2 - (bb[1] + bb[3]) / 2),
+           text, font=f, fill=fill)
 
 
 def _box_block(d, text, box, fill=PSD_INK, start=30, min_size=15,
@@ -807,21 +824,22 @@ def _se_regions():
 
 
 def se_reg(kind, key, letter=""):
-    """Region lookup at render scale: the card type's own settings first
-    (class-letter variant preferred), then the shared Game regions."""
-    r = _se_regions()
-    grp = r.get("AHLCG-" + kind, {})
+    """Region lookup at render scale. Keys are globally unique in the plugin
+    (each settings file prefixes its own), so resolve against a flat index:
+    most specific candidate first, shared Game regions as the last resort."""
+    if "flat" not in _SE_CACHE:
+        flat = {}
+        for grp in _se_regions().values():
+            flat.update(grp)
+        _SE_CACHE["flat"] = flat
+    flat = _SE_CACHE["flat"]
     for k in ("AHLCG-{}-{}{}".format(kind, key, letter),
-              "AHLCG-{}-{}".format(kind, key)):
-        if k in grp:
-            x, y, w, h = grp[k]
-            return (x * SE_SCALE, y * SE_SCALE,
+              "AHLCG-{}-{}".format(kind, key),
+              "AHLCG-" + key):
+        if k in flat:
+            x, y, w, h = flat[k]
+            return (max(0, x) * SE_SCALE, max(0, y) * SE_SCALE,
                     (x + w) * SE_SCALE, (y + h) * SE_SCALE)
-    g = r.get("AHLCG-Game", {})
-    if "AHLCG-" + key in g:
-        x, y, w, h = g["AHLCG-" + key]
-        return (x * SE_SCALE, y * SE_SCALE,
-                (x + w) * SE_SCALE, (y + h) * SE_SCALE)
     return None
 
 
@@ -914,6 +932,145 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
     img.save(dest)
 
 
+def _se_frame_compose(tpl_name, kind, clip_key, art_path, placement,
+                      landscape=False):
+    """Template + art: windowed frames get art UNDER, opaque ones get art
+    pasted into the clip rect. Returns (img, draw)."""
+    frame = _se_img("templates", tpl_name)
+    W = (525 if landscape else 375) * SE_SCALE
+    H = (375 if landscape else 525) * SE_SCALE
+    frame2 = frame.resize((W, H), Image.LANCZOS)
+    clip = se_reg(kind, clip_key)
+    windowed = frame.getchannel("A").getextrema()[0] < 250
+    if windowed:
+        img = Image.new("RGB", (W, H), (24, 22, 28))
+        if art_path:
+            paste_cover(img, art_path, clip, placement)
+        img.paste(frame2, (0, 0), frame2)
+    else:
+        img = frame2.convert("RGB")
+        if art_path and clip:
+            paste_cover(img, art_path, clip, placement)
+    return img, ImageDraw.Draw(img)
+
+
+def _se_body(d, c, pt, kind, letter="", extra_bottom=26, text_start=25):
+    """Traits + rules + flavor (+ Victory) stacked in the Body region."""
+    b = se_reg(kind, "Body", letter)
+    y = b[1]
+    if c.get("traits"):
+        traits = c["traits"] + ("  Elite." if c.get("elite")
+                                and "Elite" not in c["traits"] else "")
+        _box_text(d, traits, (b[0], y, b[2], y + 28),
+                  bold=True, italic=True, max_size=23)
+        y += 34
+    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3] + extra_bottom),
+                   start=text_start)
+    if pt.get("flavor") and y + 34 < b[3] + extra_bottom:
+        y = _box_block(d, pt.get("flavor", ""),
+                       (b[0], y + 6, b[2], b[3] + extra_bottom + 16),
+                       fill=(84, 66, 50), italic=True, start=20)
+    if c.get("victory"):
+        _box_text(d, "Victory {}.".format(c["victory"]),
+                  (b[0], min(y + 6, b[3]), b[2], min(y + 34, b[3] + 30)),
+                  bold=True, max_size=22)
+    return y
+
+
+def s_investigator_front(c, pt, dest, art_path=None, placement=None):
+    letter = CLASS_LETTER.get(c.get("class"), "N")
+    img, d = _se_frame_compose("AHLCG-Investigator-" + letter, "Investigator",
+                               "TransparentPortrait-portrait-clip",
+                               art_path, placement, landscape=True)
+    _box_text(d, c["name"], se_reg("Investigator", "Name"), title=True, grow=1.15)
+    if c.get("subtitle"):
+        _box_text(d, c["subtitle"],
+                  se_reg("Investigator", "SubtitleText", letter), italic=True,
+                  max_size=26, max_w_factor=1.0)
+    for key, stat in (("Willpower", "wil"), ("Intellect", "int"),
+                      ("Combat", "com"), ("Agility", "agi")):
+        _box_text(d, str(c[stat]), se_reg("Investigator", key),
+                  bold=True, grow=1.0)
+    _se_body(d, c, pt, "Investigator", text_start=20, extra_bottom=0)
+    # SanityBase is corrupt inside the plugin zip; the Horror pip is the
+    # same blue brain chit, so it stands in at chit size
+    for base, alt, key, val, fill in (
+            ("AHLCG-StaminaBase", "AHLCG-Damage", "Stamina", c["health"],
+             (250, 244, 238)),
+            ("AHLCG-SanityBase", "AHLCG-Horror", "Sanity", c["sanity"],
+             (240, 246, 255))):
+        box = se_reg("Investigator", key)
+        cx, cy = (box[0] + box[2]) // 2, (box[1] + box[3]) // 2
+        grown = (cx - 34, cy - 34, cx + 34, cy + 34)
+        _paste_region(img, _se_img("overlays", base) or _se_img("overlays", alt),
+                      grown)
+        _box_text(d, str(val), box, fill=fill, bold=True, grow=0.9)
+    _box_text(d, "Illus. pending", se_reg("Investigator", "Artist"),
+              fill=(70, 58, 46), max_size=18, align="left")
+    _box_text(d, "THE STILL HOUR", se_reg("Investigator", "Copyright"),
+              fill=(70, 58, 46), max_size=18, align="right")
+    img.save(dest)
+
+
+def s_investigator_back(c, pt, dest, art_path=None):
+    letter = CLASS_LETTER.get(c.get("class"), "N")
+    img, d = _se_frame_compose("AHLCG-InvestigatorBack-" + letter,
+                               "InvestigatorBack", "Portrait-portrait-clip",
+                               art_path, None, landscape=True)
+    _box_text(d, c["name"], se_reg("InvestigatorBack", "Name"),
+              title=True, grow=1.1)
+    if c.get("subtitle"):
+        _box_text(d, c["subtitle"],
+                  se_reg("InvestigatorBack", "SubtitleText", letter), italic=True)
+    b = se_reg("InvestigatorBack", "Body")
+    _box_block(d, pt.get("back_text", ""), b, start=22)
+    img.save(dest)
+
+
+def s_enemy(c, pt, dest, art_path=None, placement=None):
+    tpl = "AHLCG-WeaknessEnemy" if c.get("weakness") else "AHLCG-Enemy"
+    img, d = _se_frame_compose(tpl, "Enemy", "Portrait-portrait-clip",
+                               art_path, placement)
+    _box_text(d, c["name"], se_reg("Enemy", "Name"), title=True, grow=1.15)
+    if c.get("subtitle"):
+        _box_text(d, c["subtitle"], se_reg("Enemy", "SubtitleText"),
+                  italic=True, max_size=26, max_w_factor=1.0)
+    for key, val in (("Attack", pt.get("fight")), ("Health", pt.get("health")),
+                     ("Evade", pt.get("evade"))):
+        _box_text(d, "—" if val in (None, "", "None") else str(val),
+                  se_reg("Enemy", key), bold=True, grow=1.0,
+                  fill=(238, 232, 216))
+    _se_body(d, c, pt, "Enemy", extra_bottom=0, text_start=22)
+    for kind_key, count, ov in (("Damage", pt.get("damage"), "AHLCG-Damage"),
+                                ("Horror", pt.get("horror"), "AHLCG-Horror")):
+        for i in range(int(count or 0)):
+            if i >= 5:
+                break
+            _paste_region(img, _se_img("overlays", ov),
+                          se_reg("Enemy", "{}{}".format(kind_key, i + 1)))
+    _box_text(d, "Illus. pending — fan content", se_reg("Enemy", "Artist"),
+              fill=(225, 218, 202), grow=1.0)
+    img.save(dest)
+
+
+def s_treachery(c, pt, dest, art_path=None, placement=None):
+    weak = bool(c.get("weakness"))
+    kind = "WeaknessTreachery" if weak else "Treachery"
+    tpl = "AHLCG-" + kind
+    img, d = _se_frame_compose(tpl, kind, "Portrait-portrait-clip",
+                               art_path, placement)
+    name_reg = se_reg(kind, "Name") or se_reg("Treachery", "Name")
+    _box_text(d, c["name"], name_reg, title=True, grow=1.15)
+    if weak:
+        _box_text(d, "Weakness", se_reg(kind, "Subtype"), italic=True,
+                  max_size=20)
+    _se_body(d, c, pt, kind if se_reg(kind, "Body") else "Treachery")
+    _box_text(d, "Illus. pending — fan content",
+              se_reg(kind, "Artist") or se_reg("Treachery", "Artist"),
+              fill=(225, 218, 202), grow=1.0)
+    img.save(dest)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", nargs="*", help="render only these card ids")
@@ -948,7 +1105,10 @@ def main():
         dest = os.path.join(FACES_DIR, c["id"] + ".png")
         back_dest = os.path.join(FACES_DIR, c["id"] + "-back.png")
         if c["type"] == "Investigator":
-            if has_psd("character_card_front"):
+            if has_se_frames():
+                s_investigator_front(c, pt, dest, art_path=art, placement=place)
+                s_investigator_back(c, pt, back_dest, art_path=art)
+            elif has_psd("character_card_front"):
                 p_investigator_front(c, pt, dest, art_path=art, placement=place)
                 (t_investigator_back if use_tpl else render_investigator_back)(
                     c, pt, back_dest, **({"art_path": art} if use_tpl else {}))
@@ -959,10 +1119,12 @@ def main():
                 render_investigator_front(c, pt, dest, art_path=art, placement=place)
                 render_investigator_back(c, pt, back_dest)
         elif c["type"] == "Enemy":
-            (p_enemy if has_psd("scenario_enemy") else
+            (s_enemy if has_se_frames() else
+             p_enemy if has_psd("scenario_enemy") else
              (t_enemy if use_tpl else render_enemy))(c, pt, dest, art_path=art, placement=place)
         elif c["type"] == "Treachery":
-            (p_treachery if has_psd("scenario_treachery") else
+            (s_treachery if has_se_frames() else
+             p_treachery if has_psd("scenario_treachery") else
              (t_treachery if use_tpl else render_treachery))(c, pt, dest, art_path=art, placement=place)
         elif c["type"] in ("Asset", "Event", "Skill") and has_se_frames():
             s_player_card(c["type"], c, pt, dest, art_path=art, placement=place)

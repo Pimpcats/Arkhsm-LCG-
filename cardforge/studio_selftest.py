@@ -152,8 +152,8 @@ s = requests.get(BASE + "/api/status?campaign=still_hour").json()
 check("all 41 faces covered by glyph placeholders",
       len(s["se"]["coverage"]["framed"]) == 41 and not s["se"]["coverage"]["missing"])
 from PIL import Image
-check("rendered investigator uses the PSD blank at native res",
-      Image.open(os.path.join(faces_dir, "sthr-elias.png")).size == (1048, 738))
+check("rendered investigator uses the SE plugin per-class frame at 2x",
+      Image.open(os.path.join(faces_dir, "sthr-elias.png")).size == (1050, 750))
 
 print("== APPLY: framed faces -> art_urls.json -> rebuilt mod ==")
 # reset to just three faces so the apply-count assertions below stay exact

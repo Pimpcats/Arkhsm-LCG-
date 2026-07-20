@@ -39,9 +39,17 @@ TEMPLATES = [
     "AHLCG-Skill-G", "AHLCG-Skill-K", "AHLCG-Skill-R", "AHLCG-Skill-M",
     "AHLCG-Skill-V", "AHLCG-Skill-N", "AHLCG-Skill-W",
     "AHLCG-PlayerBack", "AHLCG-EncounterBack",
+    "AHLCG-Investigator-G", "AHLCG-Investigator-K", "AHLCG-Investigator-M",
+    "AHLCG-Investigator-N", "AHLCG-Investigator-R", "AHLCG-Investigator-V",
+    "AHLCG-InvestigatorBack-G", "AHLCG-InvestigatorBack-K",
+    "AHLCG-InvestigatorBack-M", "AHLCG-InvestigatorBack-N",
+    "AHLCG-InvestigatorBack-R", "AHLCG-InvestigatorBack-V",
+    "AHLCG-Enemy", "AHLCG-Treachery", "AHLCG-WeaknessTreachery",
+    "AHLCG-WeaknessEnemy",
 ]
 OVERLAY_PREFIXES = ("AHLCG-SkillBox-", "AHLCG-SkillIcon-", "AHLCG-NoLevel",
-                    "AHLCG-Slot-")
+                    "AHLCG-Slot-", "AHLCG-Damage", "AHLCG-Horror",
+                    "AHLCG-StaminaBase", "AHLCG-SanityBase")
 ICON_PREFIXES = ("AHLCG-Slot", "AHLCG-Level")
 
 REGION_RE = re.compile(r"^\s*([A-Za-z0-9#_.-]+)-region\s*=\s*"
@@ -75,7 +83,11 @@ def main(seext):
             sub = "icons"
         else:
             continue
-        img = Image.open(BytesIO(z.read(n))).convert("RGBA")
+        try:
+            img = Image.open(BytesIO(z.read(n))).convert("RGBA")
+        except Exception as e:
+            print("  skip {} ({})".format(base, e))
+            continue
         img.save(os.path.join(OUT, sub, os.path.splitext(base)[0] + ".png"))
         grabbed += 1
     print("overlays/icons:", grabbed)
