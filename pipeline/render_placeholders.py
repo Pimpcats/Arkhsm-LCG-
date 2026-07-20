@@ -219,14 +219,20 @@ def list_fonts():
                   if f.lower().endswith((".ttf", ".otf"))
                   and "ArkhamFontWithCodex" not in f)   # icon font, not text
 BODY_FONTS = {
-    (False, False): ["ArnoProRegular.otf", "ArnoPro-Regular.otf",
-                     "MinionProMedium.ttf", "Minion_Pro_Medium.ttf"],
-    (True, False): ["ArnoProBold.otf", "ArnoPro-Bold.otf",
-                    "MinionProBold.ttf"],
-    (False, True): ["ArnoProItalic.otf", "ArnoPro-Italic.otf",
-                    "MinionProItalic.ttf"],
-    (True, True): ["ArnoProBoldItalic.otf", "ArnoPro-BoldItalic.otf",
-                   "MinionProBoldItalic.ttf"],
+    # Nimbus Roman No9 L (from the element kit) is the DEFAULT body font — a
+    # complete family (regular/italic/bold/bold-italic), freely redistributable,
+    # committed in-repo, so every card renders body text in one consistent serif
+    # with real bold + italic (no DejaVu last resort). Arno/Minion remain listed
+    # so the owner can still pick their licensed copies from the font dropdown.
+    (False, False): ["NimbusRomNo9L-Reg.otf", "ArnoProRegular.otf",
+                     "ArnoPro-Regular.otf", "MinionProMedium.ttf",
+                     "Minion_Pro_Medium.ttf"],
+    (True, False): ["NimbusRomNo9L-Med.otf", "ArnoProBold.otf",
+                    "ArnoPro-Bold.otf", "MinionProBold.ttf"],
+    (False, True): ["NimbusRomNo9L-RegIta.otf", "ArnoProItalic.otf",
+                    "ArnoPro-Italic.otf", "MinionProItalic.ttf"],
+    (True, True): ["NimbusRomNo9L-MedIta.otf", "ArnoProBoldItalic.otf",
+                   "ArnoPro-BoldItalic.otf", "MinionProBoldItalic.ttf"],
 }
 
 

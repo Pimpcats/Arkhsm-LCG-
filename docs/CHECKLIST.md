@@ -44,12 +44,13 @@
   override still wins; "Upload font…" brings your own .ttf/.otf into the
   dropdowns
 - ✅ Deck backs (your eclipse + lighthouse art) on every export
-- ✅ 145-check selftest, Windows-safe (UTF-8 + race fixes)
+- ✅ 146-check selftest, Windows-safe (UTF-8 + race fixes)
 
 ## Card look ("identical to official")
 
 - ✅ Fonts: Arkhamic titles + cost (vendored), Bolton stat numerals
-  (vendored), Arno/Minion body, icon font — the full official stack wired
+  (vendored), Nimbus Roman No9 L body — full family, the committed default
+  (vendored), icon font — the whole stack ships in-repo, nothing to install
 - ✅ True blank frames extracted from the PSD template pack (all 10 layouts)
   with auto-measured text regions — committed in assets/frames/psd/
 - ✅ Inpaint fallback ("select & generate over") for the 6 scanned layouts
@@ -78,7 +79,9 @@
 - ✅ Arkhamic now ships in the repo (Setup installer kept as refresher)
 - ⬜ Train the 5 investigator LoRAs on Painter's, enter them in Advanced →
   Character LoRAs (skippable for a first playthrough; faces just vary more)
-- ⬜ Hunt Arno Pro Bold/Italic/BoldItalic (Discord) → drop in assets/fonts/
+- ✅ Body font solved: Nimbus Roman No9 L (full family from the kit) is the
+  committed default — real bold + italic, no DejaVu fallback. Arno Pro
+  optional via dropdown if you want the exact FFG body face.
 - ⬜ Load the mod in TTS and actually play loop 1 (Run Tests should say 23/23)
 - ⬜ Strange Eons one-time setup, when you want print-identical cards
 - ⬜ Send: an Act card WITH a clue threshold + a scenario reference card

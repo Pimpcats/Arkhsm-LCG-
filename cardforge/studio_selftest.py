@@ -616,8 +616,16 @@ import render_placeholders as RP
 check("Teutonic vendored (OFL) and used for titles",
       RP._font(20, title=True).getname()[0] in ("Teutonic", "Arkhamic")
       and os.path.exists(os.path.join(ROOT, "assets", "fonts", "Teutonic-OFL.txt")))
-check("Arno Pro picked up for body when present (never committed)",
-      RP._font(20).getname()[0] in ("Arno Pro", "DejaVu Serif"))
+check("body font resolves (Nimbus default, or Arno if the owner dropped it in)",
+      RP._font(20).getname()[0] in ("Nimbus Roman No9 L", "Arno Pro", "DejaVu Serif"))
+check("Nimbus Roman is the committed default body family (all 4 styles)",
+      all(os.path.exists(os.path.join(ROOT, "assets", "fonts", n)) for n in
+          ("NimbusRomNo9L-Reg.otf", "NimbusRomNo9L-RegIta.otf",
+           "NimbusRomNo9L-Med.otf", "NimbusRomNo9L-MedIta.otf"))
+      and RP._font(20).getname() == ("Nimbus Roman No9 L", "Regular")
+      and RP._font(20, italic=True).getname()[1].endswith("Italic")
+      and RP._font(20, bold=True).getname()[1] == "Bold"
+      and RP._font(20, bold=True, italic=True).getname()[1] == "Bold Italic")
 check("Arkhamic vendored and preferred for titles (official title face)",
       os.path.exists(os.path.join(ROOT, "assets", "fonts", "Arkhamic.ttf"))
       and RP._font(20, title=True).getname()[0] == "Arkhamic")
