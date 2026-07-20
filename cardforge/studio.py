@@ -283,6 +283,41 @@ def act_inpaint_frames(p):
                    dry_run=bool(p.get("dry_run")))
 
 
+def act_tts_spawn(p):
+    """Drop a finished card onto the RUNNING Tabletop Simulator table
+    (External Editor API, localhost:39999 — any TTS game, any SCED version)."""
+    from cardforge import tts_link
+    try:
+        name = tts_link.spawn_card(p["card"], p.get("campaign", "still_hour"))
+    except OSError as e:
+        return {"ok": False,
+                "message": "TTS not reachable ({}) — is Tabletop Simulator "
+                           "open with a game loaded?".format(e)}
+    log("dropped into TTS: " + name)
+    return {"ok": True, "message": name + " dropped onto the TTS table"}
+
+
+def act_plugin_update(p):
+    """Re-extract frames/regions from assets/plugins/*.seext — drop a newer
+    Arkham plugin build in that folder and every template refreshes."""
+    plug_dir = os.path.join(ROOT, "assets", "plugins")
+    seexts = sorted((f for f in os.listdir(plug_dir) if f.endswith(".seext")),
+                    key=lambda f: os.path.getmtime(os.path.join(plug_dir, f)))
+    if not seexts:
+        return {"ok": False, "message": "no .seext in assets/plugins/"}
+    newest = os.path.join(plug_dir, seexts[-1])
+    def refresh():
+        subprocess.run([sys.executable,
+                        os.path.join(ROOT, "tools", "extract_se_plugin.py"),
+                        newest], check=True, cwd=ROOT)
+        log("plugin assets refreshed from " + os.path.basename(newest))
+        subprocess.run([sys.executable,
+                        os.path.join(ROOT, "pipeline", "render_placeholders.py")],
+                       check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+        log("all faces recomposed on the refreshed templates")
+    return run_job("plugin-update", refresh)
+
+
 def act_install_fonts(p):
     """Setup: fetch Arkhamic (OFL Teutonic extension) into assets/fonts."""
     return run_job("install-fonts", installer.install_fonts,
@@ -734,6 +769,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "install_checkpoint": act_install_checkpoint,
            "install_se": act_install_se, "install_a1111": act_install_a1111,
            "install_fonts": act_install_fonts, "font_set": act_font_set,
+           "tts_spawn": act_tts_spawn, "plugin_update": act_plugin_update,
            "prompt_get": act_prompt_get, "prompt_save": act_prompt_save,
            "style_save": act_style_save, "inpaint_frames": act_inpaint_frames,
            "gen_settings": act_gen_settings, "lora_save": act_lora_save,
@@ -971,6 +1007,8 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 <label>negative prompt</label><textarea id=adv_neg rows=2 spellcheck=false></textarea>
 <div class=row style="margin-top:6px">
 <button class="btn primary" onclick=advGenerate()>Generate</button>
+<button class=btn onclick="const c=document.getElementById('adv_card').value;if(c)post('tts_spawn',{card:c})"
+title="drop the selected card onto the live TTS table">&#9654; Drop into TTS</button>
 <span id=adv_info class=hint></span>
 </div>
 <p class=hint>&#128274;-marked cards are encounter cards (spoilers) — they generate fine, and the
@@ -1024,6 +1062,14 @@ the .safetensors into <code>vendor/models/</code> instead.</p>
 <span class=hint>the community&rsquo;s OFL extension of Teutonic (the official title face) — from
 <a href="https://github.com/javnik36/arkhamic" target=_blank>javnik36/arkhamic</a>; the renderer
 prefers it automatically once installed</span>
+</div>
+<hr>
+<div class=row>
+<b style="min-width:180px">2c &middot; Arkham plugin</b>
+<button class=btn onclick="post('plugin_update')">Refresh templates from plugin</button>
+<span class=hint>drop any newer <code>ArkhamHorrorLCG.seext</code> into <code>assets/plugins/</code>
+first — frames, regions and overlays re-extract from the newest file and every card recomposes;
+new plugin versions keep working without code changes</span>
 </div>
 <hr>
 <div class=row>
@@ -1160,6 +1206,8 @@ Barnaby Files guide; AH font pack via the Mythos Busters Discord.</p>
 <span class=spacer></span>
 <label>size</label><input type=range id=ed_scale min=0.5 max=3 step=0.02 style="width:150px" oninput=edPreview()>
 <button class="btn primary" onclick=edSave()>Save</button>
+<button class=btn onclick="post('tts_spawn',{card:ed.g.id})"
+title="drop this card onto the table of your RUNNING Tabletop Simulator — appears instantly, any game/mod">&#9654; Drop into TTS</button>
 <button class=btn onclick=edClose()>Done</button></div>
 <div id=ed_stage>
 <img id=ed_face><div id=ed_win><img id=ed_art draggable=false></div>

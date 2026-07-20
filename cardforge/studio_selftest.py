@@ -592,6 +592,53 @@ os.remove(arkhamic_stub)
 check("font dropdowns in the card editor",
       "ed_font_title" in page and "edFontSet" in page)
 
+print("== TTS LIVE LINK + PLUGIN REFRESH ==")
+import socket as _sock
+_captured = []
+def _fake_tts():
+    srv = _sock.socket()
+    srv.setsockopt(_sock.SOL_SOCKET, _sock.SO_REUSEADDR, 1)
+    srv.bind(("127.0.0.1", 39999)); srv.listen(1)
+    conn, _ = srv.accept()
+    data = b""
+    conn.settimeout(3)
+    try:
+        while True:
+            chunk = conn.recv(65536)
+            if not chunk:
+                break
+            data += chunk
+    except OSError:
+        pass
+    _captured.append(data)
+    conn.close(); srv.close()
+_t = threading.Thread(target=_fake_tts, daemon=True); _t.start()
+time.sleep(0.3)
+r = requests.post(BASE + "/api/tts_spawn", json={"card": "sthr-elias"}).json()
+_t.join(timeout=5)
+msg = json.loads(_captured[0].decode()) if _captured else {}
+check("one-click drop sends spawnObjectJSON to the live TTS socket",
+      r.get("ok") and msg.get("messageID") == 3
+      and "spawnObjectJSON" in msg.get("script", "")
+      and "Elias Warde" in msg["script"])
+check("card sent with the CURRENT composed face (file:/// URL)",
+      'file:///' in msg.get("script", "") and "sthr-elias.png" in msg["script"])
+r = requests.post(BASE + "/api/tts_spawn", json={"card": "sthr-elias"}).json()
+check("graceful message when TTS is not running",
+      r.get("ok") is False and "Tabletop Simulator" in r.get("message", ""))
+r = requests.post(BASE + "/api/plugin_update", json={}).json()
+check("plugin refresh job accepted", r.get("started"))
+check("plugin refresh completes (re-extract + recompose)", wait_idle(180))
+check("templates present after refresh",
+      os.path.exists(os.path.join(ROOT, "assets", "frames", "se",
+                                  "templates", "AHLCG-Investigator-G.png")))
+from PIL import Image as _I2
+ay = _I2.open(os.path.join(faces_dir, "sthr-ayako.png")).convert("RGB")
+check("no black placeholder box on art-less investigators",
+      ay.getpixel((100, 300)) not in ((34, 31, 42), (24, 22, 28)))
+check("TTS drop buttons in the UI", page.count("Drop into TTS") >= 2
+      and "plugin_update" in page)
+
 print("== WINDOWS LOCALE: repo reads survive a non-UTF-8 default ==")
 import subprocess
 env = dict(os.environ, PYTHONUTF8="0", PYTHONCOERCECLOCALE="0", LC_ALL="C",
