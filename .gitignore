@@ -8,6 +8,7 @@ assets/frames/*
 !assets/frames/README.md
 !assets/frames/templates/
 !assets/frames/psd/
+!assets/frames/se/
 vendor/
 assets/fonts/ArnoPro*
 assets/fonts/MinionPro*

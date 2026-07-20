@@ -1,0 +1,3582 @@
+{
+ "AHLCG-Act": {
+  "AHLCG-Act-Artist": [
+   11,
+   361,
+   129,
+   10
+  ],
+  "AHLCG-Act-Body": [
+   10,
+   100,
+   262,
+   235
+  ],
+  "AHLCG-Act-Clues": [
+   240,
+   290,
+   49,
+   50
+  ],
+  "AHLCG-Act-CluesPerInv": [
+   234,
+   290,
+   49,
+   49
+  ],
+  "AHLCG-Act-CluesPerInvIcon": [
+   261,
+   289,
+   29,
+   49
+  ],
+  "AHLCG-Act-Collection-portrait-clip": [
+   270,
+   358,
+   13,
+   13
+  ],
+  "AHLCG-Act-CollectionNumber": [
+   266,
+   361,
+   37,
+   10
+  ],
+  "AHLCG-Act-Copyright": [
+   125,
+   361,
+   80,
+   10
+  ],
+  "AHLCG-Act-DefaultCollection-portrait-clip": [
+   270,
+   358,
+   13,
+   13
+  ],
+  "AHLCG-Act-DefaultEncounter-portrait-clip": [
+   120,
+   23,
+   32,
+   32
+  ],
+  "AHLCG-Act-DefaultPortrait-portrait-clip": [
+   220,
+   0,
+   305,
+   375
+  ],
+  "AHLCG-Act-DefaultReturnEncounter-portrait-clip": [
+   118,
+   22,
+   35,
+   35
+  ],
+  "AHLCG-Act-Encounter-portrait-clip": [
+   120,
+   23,
+   32,
+   32
+  ],
+  "AHLCG-Act-EncounterNumber": [
+   195,
+   361,
+   55,
+   10
+  ],
+  "AHLCG-Act-Name": [
+   9,
+   55,
+   250,
+   44
+  ],
+  "AHLCG-Act-Portrait-portrait-clip": [
+   220,
+   0,
+   305,
+   375
+  ],
+  "AHLCG-Act-ReturnEncounter-portrait-clip": [
+   118,
+   22,
+   35,
+   35
+  ],
+  "AHLCG-Act-ScenarioIndex": [
+   67,
+   7,
+   134,
+   21
+  ],
+  "AHLCG-ActBack-BackScenarioIndex": [
+   22,
+   33,
+   45,
+   16
+  ],
+  "AHLCG-ActBack-Body": [
+   110,
+   39,
+   370,
+   316
+  ],
+  "AHLCG-ActBack-Encounter-portrait-clip": [
+   27,
+   57,
+   36,
+   36
+  ],
+  "AHLCG-ActBack-Name": [
+   22,
+   110,
+   47,
+   226
+  ],
+  "AHLCG-ActBack-ReturnEncounter-portrait-clip": [
+   20,
+   50,
+   49,
+   48
+  ],
+  "AHLCG-ActBack-Story": [
+   126,
+   39,
+   355,
+   316
+  ]
+ },
+ "AHLCG-Agenda": {
+  "AHLCG-Agenda-Artist": [
+   220,
+   363,
+   120,
+   10
+  ],
+  "AHLCG-Agenda-Body": [
+   250,
+   100,
+   264,
+   237
+  ],
+  "AHLCG-Agenda-Collection-portrait-clip": [
+   476,
+   358,
+   13,
+   13
+  ],
+  "AHLCG-Agenda-CollectionNumber": [
+   472,
+   361,
+   37,
+   10
+  ],
+  "AHLCG-Agenda-Copyright": [
+   322,
+   363,
+   80,
+   10
+  ],
+  "AHLCG-Agenda-DefaultCollection-portrait-clip": [
+   476,
+   358,
+   13,
+   13
+  ],
+  "AHLCG-Agenda-DefaultEncounter-portrait-clip": [
+   366,
+   23,
+   32,
+   32
+  ],
+  "AHLCG-Agenda-DefaultPortrait-portrait-clip": [
+   0,
+   0,
+   305,
+   375
+  ],
+  "AHLCG-Agenda-DefaultReturnEncounter-portrait-clip": [
+   364,
+   22,
+   35,
+   35
+  ],
+  "AHLCG-Agenda-Doom": [
+   233,
+   291,
+   50,
+   49
+  ],
+  "AHLCG-Agenda-DoomPerInv": [
+   228,
+   291,
+   50,
+   49
+  ],
+  "AHLCG-Agenda-DoomPerInvIcon": [
+   256,
+   290,
+   29,
+   49
+  ],
+  "AHLCG-Agenda-Encounter-portrait-clip": [
+   366,
+   23,
+   32,
+   32
+  ],
+  "AHLCG-Agenda-EncounterNumber": [
+   401,
+   361,
+   55,
+   10
+  ],
+  "AHLCG-Agenda-Name": [
+   255,
+   55,
+   250,
+   44
+  ],
+  "AHLCG-Agenda-Portrait-portrait-clip": [
+   0,
+   0,
+   305,
+   375
+  ],
+  "AHLCG-Agenda-ReturnEncounter-portrait-clip": [
+   364,
+   22,
+   35,
+   35
+  ],
+  "AHLCG-Agenda-ScenarioIndex": [
+   314,
+   8,
+   134,
+   21
+  ],
+  "AHLCG-AgendaBack-BackScenarioIndex": [
+   24,
+   32,
+   41,
+   16
+  ],
+  "AHLCG-AgendaBack-Body": [
+   110,
+   39,
+   370,
+   316
+  ],
+  "AHLCG-AgendaBack-Encounter-portrait-clip": [
+   27,
+   57,
+   36,
+   36
+  ],
+  "AHLCG-AgendaBack-Name": [
+   22,
+   110,
+   47,
+   226
+  ],
+  "AHLCG-AgendaBack-ReturnEncounter-portrait-clip": [
+   20,
+   50,
+   49,
+   48
+  ],
+  "AHLCG-AgendaBack-Story": [
+   126,
+   39,
+   355,
+   316
+  ]
+ },
+ "AHLCG-AgendaFrontPortrait": {
+  "AHLCG-AgendaFrontPortrait-Artist": [
+   14,
+   361,
+   129,
+   10
+  ],
+  "AHLCG-AgendaFrontPortrait-Body": [
+   19,
+   263,
+   490,
+   83
+  ],
+  "AHLCG-AgendaFrontPortrait-Collection-portrait-clip": [
+   471,
+   358,
+   13,
+   13
+  ],
+  "AHLCG-AgendaFrontPortrait-CollectionNumber": [
+   472,
+   361,
+   37,
+   10
+  ],
+  "AHLCG-AgendaFrontPortrait-Copyright": [
+   208,
+   361,
+   80,
+   10
+  ],
+  "AHLCG-AgendaFrontPortrait-DefaultCollection-portrait-clip": [
+   471,
+   358,
+   13,
+   13
+  ],
+  "AHLCG-AgendaFrontPortrait-DefaultEncounter-portrait-clip": [
+   35,
+   213,
+   36,
+   36
+  ],
+  "AHLCG-AgendaFrontPortrait-DefaultPortrait-portrait-clip": [
+   0,
+   0,
+   525,
+   375
+  ],
+  "AHLCG-AgendaFrontPortrait-DefaultReturnEncounter-portrait-clip": [
+   34,
+   212,
+   35,
+   35
+  ],
+  "AHLCG-AgendaFrontPortrait-Doom": [
+   452,
+   201,
+   50,
+   49
+  ],
+  "AHLCG-AgendaFrontPortrait-DoomPerInv": [
+   446,
+   199,
+   50,
+   49
+  ],
+  "AHLCG-AgendaFrontPortrait-DoomPerInvIcon": [
+   473,
+   198,
+   29,
+   49
+  ],
+  "AHLCG-AgendaFrontPortrait-Encounter-portrait-clip": [
+   36,
+   214,
+   40,
+   40
+  ],
+  "AHLCG-AgendaFrontPortrait-EncounterNumber": [
+   401,
+   363,
+   55,
+   10
+  ],
+  "AHLCG-AgendaFrontPortrait-Name": [
+   87,
+   227,
+   330,
+   22
+  ],
+  "AHLCG-AgendaFrontPortrait-Portrait-portrait-clip": [
+   0,
+   0,
+   525,
+   375
+  ],
+  "AHLCG-AgendaFrontPortrait-ReturnEncounter-portrait-clip": [
+   34,
+   212,
+   35,
+   35
+  ],
+  "AHLCG-AgendaFrontPortrait-ScenarioIndex": [
+   314,
+   7,
+   134,
+   21
+  ]
+ },
+ "AHLCG-AgendaPortrait": {
+  "AHLCG-AgendaPortrait-Artist": [
+   14,
+   361,
+   129,
+   10
+  ],
+  "AHLCG-AgendaPortrait-BackPortrait-portrait-clip": [
+   0,
+   0,
+   525,
+   375
+  ],
+  "AHLCG-AgendaPortrait-Body": [
+   19,
+   283,
+   493,
+   64
+  ],
+  "AHLCG-AgendaPortrait-Collection-portrait-clip": [
+   471,
+   358,
+   13,
+   13
+  ],
+  "AHLCG-AgendaPortrait-CollectionNumber": [
+   472,
+   361,
+   37,
+   10
+  ],
+  "AHLCG-AgendaPortrait-Copyright": [
+   208,
+   361,
+   80,
+   10
+  ],
+  "AHLCG-AgendaPortrait-DefaultCollection-portrait-clip": [
+   471,
+   358,
+   13,
+   13
+  ],
+  "AHLCG-AgendaPortrait-DefaultEncounter-portrait-clip": [
+   33,
+   235,
+   38,
+   38
+  ],
+  "AHLCG-AgendaPortrait-DefaultReturnEncounter-portrait-clip": [
+   29,
+   231,
+   45,
+   45
+  ],
+  "AHLCG-AgendaPortrait-Encounter-portrait-clip": [
+   33,
+   235,
+   38,
+   38
+  ],
+  "AHLCG-AgendaPortrait-EncounterNumber": [
+   402,
+   361,
+   55,
+   10
+  ],
+  "AHLCG-AgendaPortrait-Name": [
+   87,
+   249,
+   330,
+   28
+  ],
+  "AHLCG-AgendaPortrait-ReturnEncounter-portrait-clip": [
+   29,
+   231,
+   45,
+   45
+  ]
+ },
+ "AHLCG-Asset": {
+  "AHLCG-Asset-BackPortrait-portrait-clip": [
+   10,
+   40,
+   358,
+   258
+  ],
+  "AHLCG-Asset-BasicWeaknessIcon": [
+   329,
+   11,
+   30,
+   30
+  ],
+  "AHLCG-Asset-Body": [
+   20,
+   320,
+   336,
+   140
+  ],
+  "AHLCG-Asset-ClassSymbol1": [
+   229,
+   2,
+   52,
+   52
+  ],
+  "AHLCG-Asset-ClassSymbol2": [
+   274,
+   2,
+   52,
+   52
+  ],
+  "AHLCG-Asset-ClassSymbol3": [
+   319,
+   2,
+   52,
+   52
+  ],
+  "AHLCG-Asset-Collection-portrait-clip": [
+   320,
+   508,
+   13,
+   13
+  ],
+  "AHLCG-Asset-DefaultCollection-portrait-clip": [
+   320,
+   508,
+   13,
+   13
+  ],
+  "AHLCG-Asset-Label": [
+   20,
+   62,
+   38,
+   14
+  ],
+  "AHLCG-Asset-NameD": [
+   73,
+   14,
+   228,
+   29
+  ],
+  "AHLCG-Asset-NameG": [
+   68,
+   14,
+   238,
+   29
+  ],
+  "AHLCG-Asset-NameK": [
+   68,
+   14,
+   238,
+   29
+  ],
+  "AHLCG-Asset-NameM": [
+   68,
+   14,
+   238,
+   29
+  ],
+  "AHLCG-Asset-NameN": [
+   68,
+   14,
+   238,
+   29
+  ],
+  "AHLCG-Asset-NameP": [
+   68,
+   14,
+   238,
+   29
+  ],
+  "AHLCG-Asset-NameR": [
+   68,
+   14,
+   238,
+   29
+  ],
+  "AHLCG-Asset-NameT": [
+   68,
+   14,
+   238,
+   29
+  ],
+  "AHLCG-Asset-NameV": [
+   68,
+   14,
+   238,
+   29
+  ],
+  "AHLCG-Asset-NameW": [
+   68,
+   14,
+   238,
+   29
+  ],
+  "AHLCG-Asset-Portrait-portrait-clip": [
+   10,
+   40,
+   358,
+   258
+  ],
+  "AHLCG-Asset-SubtitleD": [
+   81,
+   42,
+   214,
+   20
+  ],
+  "AHLCG-Asset-SubtitleG": [
+   80,
+   42,
+   213,
+   22
+  ],
+  "AHLCG-Asset-SubtitleK": [
+   79,
+   40,
+   214,
+   22
+  ],
+  "AHLCG-Asset-SubtitleM": [
+   70,
+   34,
+   234,
+   32
+  ],
+  "AHLCG-Asset-SubtitleN": [
+   80,
+   41,
+   215,
+   22
+  ],
+  "AHLCG-Asset-SubtitleP": [
+   87,
+   40,
+   219,
+   31
+  ],
+  "AHLCG-Asset-SubtitleR": [
+   81,
+   41,
+   211,
+   22
+  ],
+  "AHLCG-Asset-SubtitleT": [
+   81,
+   37,
+   214,
+   22
+  ],
+  "AHLCG-Asset-SubtitleTextD": [
+   69,
+   41,
+   238,
+   22
+  ],
+  "AHLCG-Asset-SubtitleTextG": [
+   68,
+   43,
+   238,
+   22
+  ],
+  "AHLCG-Asset-SubtitleTextK": [
+   68,
+   41,
+   238,
+   22
+  ],
+  "AHLCG-Asset-SubtitleTextM": [
+   68,
+   42,
+   238,
+   22
+  ],
+  "AHLCG-Asset-SubtitleTextN": [
+   69,
+   42,
+   238,
+   22
+  ],
+  "AHLCG-Asset-SubtitleTextP": [
+   69,
+   42,
+   238,
+   22
+  ],
+  "AHLCG-Asset-SubtitleTextR": [
+   68,
+   41,
+   238,
+   22
+  ],
+  "AHLCG-Asset-SubtitleTextT": [
+   69,
+   38,
+   238,
+   22
+  ],
+  "AHLCG-Asset-SubtitleTextV": [
+   68,
+   44,
+   238,
+   22
+  ],
+  "AHLCG-Asset-SubtitleTextW": [
+   72,
+   43,
+   236,
+   22
+  ],
+  "AHLCG-Asset-SubtitleV": [
+   79,
+   42,
+   214,
+   22
+  ],
+  "AHLCG-Asset-SubtitleW": [
+   65,
+   43,
+   248,
+   23
+  ],
+  "AHLCG-Asset-Subtype": [
+   86,
+   301,
+   203,
+   15
+  ]
+ },
+ "AHLCG-AssetStory": {
+  "AHLCG-AssetStory-BackPortrait-portrait-clip": [
+   10,
+   40,
+   358,
+   258
+  ],
+  "AHLCG-AssetStory-Body": [
+   20,
+   320,
+   336,
+   140
+  ],
+  "AHLCG-AssetStory-Collection-portrait-clip": [
+   320,
+   508,
+   13,
+   13
+  ],
+  "AHLCG-AssetStory-DefaultCollection-portrait-clip": [
+   320,
+   508,
+   13,
+   13
+  ],
+  "AHLCG-AssetStory-DefaultEncounter-portrait-clip": [
+   329,
+   10,
+   30,
+   30
+  ],
+  "AHLCG-AssetStory-DefaultReturnEncounter-portrait-clip": [
+   327,
+   8,
+   32,
+   32
+  ],
+  "AHLCG-AssetStory-Encounter-portrait-clip": [
+   329,
+   10,
+   30,
+   30
+  ],
+  "AHLCG-AssetStory-Label": [
+   20,
+   62,
+   38,
+   14
+  ],
+  "AHLCG-AssetStory-Name": [
+   68,
+   14,
+   238,
+   29
+  ],
+  "AHLCG-AssetStory-Portrait-portrait-clip": [
+   10,
+   40,
+   358,
+   258
+  ],
+  "AHLCG-AssetStory-ReturnEncounter-portrait-clip": [
+   327,
+   8,
+   32,
+   32
+  ],
+  "AHLCG-AssetStory-SubtitleN": [
+   68,
+   41,
+   240,
+   22
+  ],
+  "AHLCG-AssetStory-SubtitleTextN": [
+   68,
+   42,
+   240,
+   22
+  ],
+  "AHLCG-AssetStory-SubtitleTextW": [
+   69,
+   43,
+   240,
+   22
+  ],
+  "AHLCG-AssetStory-SubtitleW": [
+   65,
+   43,
+   248,
+   23
+  ],
+  "AHLCG-AssetStory-Subtype": [
+   86,
+   301,
+   203,
+   15
+  ]
+ },
+ "AHLCG-BackPortrait": {
+  "AHLCG-BackPortrait-BackPortrait-portrait-clip": [
+   0,
+   0,
+   375,
+   525
+  ]
+ },
+ "AHLCG-BoxCover": {
+  "AHLCG-BoxCover-Name": [
+   425,
+   1110,
+   767,
+   53
+  ],
+  "AHLCG-BoxCover-Portrait-portrait-clip": [
+   420,
+   733,
+   781,
+   347
+  ],
+  "AHLCG-BoxCover-PortraitBottom-portrait-clip": [
+   1630,
+   420,
+   785,
+   785
+  ],
+  "AHLCG-BoxCover-Tint": [
+   420,
+   420,
+   781,
+   783
+  ]
+ },
+ "AHLCG-Chaos": {
+  "AHLCG-Chaos-Body": [
+   95,
+   156,
+   240,
+   305
+  ],
+  "AHLCG-Chaos-BodyIcon": [
+   44,
+   148,
+   47,
+   47
+  ],
+  "AHLCG-Chaos-Collection-portrait-clip": [
+   320,
+   509,
+   13,
+   13
+  ],
+  "AHLCG-Chaos-CollectionNumber": [
+   333,
+   512,
+   21,
+   10
+  ],
+  "AHLCG-Chaos-Copyright": [
+   19,
+   512,
+   102,
+   10
+  ],
+  "AHLCG-Chaos-DefaultCollection-portrait-clip": [
+   320,
+   509,
+   13,
+   13
+  ],
+  "AHLCG-Chaos-Encounter-portrait-clip": [
+   171,
+   57,
+   32,
+   32
+  ],
+  "AHLCG-Chaos-EncounterNumber": [
+   276,
+   512,
+   45,
+   10
+  ],
+  "AHLCG-Chaos-Header": [
+   35,
+   135,
+   300,
+   305
+  ],
+  "AHLCG-Chaos-Name": [
+   28,
+   90,
+   319,
+   75
+  ],
+  "AHLCG-Chaos-ReturnEncounter-portrait-clip": [
+   169,
+   54,
+   35,
+   35
+  ],
+  "AHLCG-Chaos-TrackerBox": [
+   32,
+   371,
+   306,
+   92
+  ],
+  "AHLCG-Chaos-TrackerName": [
+   44,
+   375,
+   280,
+   20
+  ],
+  "AHLCG-ChaosStory-Collection-portrait-clip": [
+   320,
+   509,
+   13,
+   13
+  ],
+  "AHLCG-ChaosStory-DefaultCollection-portrait-clip": [
+   320,
+   509,
+   13,
+   13
+  ],
+  "AHLCG-ChaosStory-Encounter-portrait-clip": [
+   173,
+   59,
+   28,
+   28
+  ],
+  "AHLCG-ChaosStory-ReturnEncounter-portrait-clip": [
+   169,
+   54,
+   35,
+   35
+  ],
+  "AHLCG-Difficulty": [
+   129,
+   127,
+   114,
+   14
+  ],
+  "AHLCG-StoryChaos-Collection-portrait-clip": [
+   320,
+   509,
+   13,
+   13
+  ],
+  "AHLCG-StoryChaos-DefaultCollection-portrait-clip": [
+   320,
+   509,
+   13,
+   13
+  ],
+  "AHLCG-StoryChaos-Encounter-portrait-clip": [
+   173,
+   59,
+   28,
+   28
+  ],
+  "AHLCG-StoryChaos-ReturnEncounter-portrait-clip": [
+   169,
+   54,
+   35,
+   35
+  ]
+ },
+ "AHLCG-Concealed": {
+  "AHLCG-Concealed-DecoyName": [
+   51,
+   212,
+   146,
+   63
+  ],
+  "AHLCG-Concealed-Name": [
+   31,
+   256,
+   186,
+   65
+  ],
+  "AHLCG-Concealed-Portrait-portrait-clip": [
+   0,
+   10,
+   244,
+   244
+  ]
+ },
+ "AHLCG-Customizable": {
+  "AHLCG-Customizable-Body": [
+   32,
+   99,
+   316,
+   387
+  ],
+  "AHLCG-Customizable-Collection-portrait-clip": [
+   277,
+   492,
+   13,
+   13
+  ],
+  "AHLCG-Customizable-Copyright": [
+   225,
+   495,
+   116,
+   10
+  ],
+  "AHLCG-Customizable-DefaultCollection-portrait-clip": [
+   277,
+   492,
+   13,
+   13
+  ],
+  "AHLCG-Customizable-Label": [
+   155,
+   509,
+   65,
+   14
+  ],
+  "AHLCG-Customizable-Name": [
+   34,
+   33,
+   310,
+   34
+  ]
+ },
+ "AHLCG-Divider": {
+  "AHLCG-Divider-Encounter-portrait-clip": [
+   476,
+   13,
+   38,
+   38
+  ],
+  "AHLCG-Divider-Name": [
+   123,
+   20,
+   286,
+   25
+  ],
+  "AHLCG-Divider-ReturnEncounter-portrait-clip": [
+   474,
+   10,
+   43,
+   43
+  ],
+  "AHLCG-Divider-ReturnWatermark-portrait-clip": [
+   87,
+   53,
+   366,
+   366
+  ],
+  "AHLCG-Divider-Watermark-portrait-clip": [
+   87,
+   53,
+   366,
+   366
+  ],
+  "AHLCG-DividerBack-Name": [
+   28,
+   90,
+   307,
+   30
+  ]
+ },
+ "AHLCG-Enemy": {
+  "AHLCG-Enemy-Attack": [
+   106,
+   51,
+   26,
+   27
+  ],
+  "AHLCG-Enemy-AttackPerInv": [
+   102,
+   51,
+   24,
+   27
+  ],
+  "AHLCG-Enemy-AttackPerInvIcon": [
+   121,
+   56,
+   14,
+   14
+  ],
+  "AHLCG-Enemy-BackPortrait-portrait-clip": [
+   0,
+   241,
+   375,
+   284
+  ],
+  "AHLCG-Enemy-Body": [
+   20,
+   104,
+   338,
+   165
+  ],
+  "AHLCG-Enemy-Collection-portrait-clip": [
+   320,
+   510,
+   13,
+   13
+  ],
+  "AHLCG-Enemy-Damage1": [
+   132,
+   284,
+   19,
+   23
+  ],
+  "AHLCG-Enemy-Damage2": [
+   109,
+   277,
+   19,
+   23
+  ],
+  "AHLCG-Enemy-Damage3": [
+   86,
+   268,
+   19,
+   23
+  ],
+  "AHLCG-Enemy-Damage4": [
+   65,
+   256,
+   19,
+   23
+  ],
+  "AHLCG-Enemy-Damage5": [
+   45,
+   242,
+   19,
+   23
+  ],
+  "AHLCG-Enemy-DefaultCollection-portrait-clip": [
+   320,
+   510,
+   13,
+   13
+  ],
+  "AHLCG-Enemy-DefaultEncounter-portrait-clip": [
+   174,
+   274,
+   28,
+   28
+  ],
+  "AHLCG-Enemy-DefaultReturnEncounter-portrait-clip": [
+   169,
+   270,
+   37,
+   33
+  ],
+  "AHLCG-Enemy-Encounter-portrait-clip": [
+   174,
+   274,
+   28,
+   28
+  ],
+  "AHLCG-Enemy-Evade": [
+   246,
+   51,
+   26,
+   27
+  ],
+  "AHLCG-Enemy-EvadePerInv": [
+   242,
+   51,
+   24,
+   27
+  ],
+  "AHLCG-Enemy-EvadePerInvIcon": [
+   261,
+   56,
+   14,
+   14
+  ],
+  "AHLCG-Enemy-Health": [
+   168,
+   45,
+   40,
+   35
+  ],
+  "AHLCG-Enemy-HealthPerInv": [
+   169,
+   45,
+   27,
+   35
+  ],
+  "AHLCG-Enemy-HealthPerInvIcon": [
+   190,
+   52,
+   17,
+   17
+  ],
+  "AHLCG-Enemy-Horror1": [
+   221,
+   284,
+   27,
+   24
+  ],
+  "AHLCG-Enemy-Horror2": [
+   244,
+   277,
+   27,
+   24
+  ],
+  "AHLCG-Enemy-Horror3": [
+   267,
+   268,
+   27,
+   24
+  ],
+  "AHLCG-Enemy-Horror4": [
+   288,
+   255,
+   27,
+   24
+  ],
+  "AHLCG-Enemy-Horror5": [
+   308,
+   241,
+   27,
+   24
+  ],
+  "AHLCG-Enemy-Label": [
+   157,
+   308,
+   61,
+   14
+  ],
+  "AHLCG-Enemy-Name": [
+   62,
+   5,
+   252,
+   27
+  ],
+  "AHLCG-Enemy-Portrait-portrait-clip": [
+   0,
+   241,
+   375,
+   284
+  ],
+  "AHLCG-Enemy-ReturnEncounter-portrait-clip": [
+   169,
+   270,
+   37,
+   33
+  ],
+  "AHLCG-Enemy-SubtitleText": [
+   40,
+   32,
+   293,
+   20
+  ]
+ },
+ "AHLCG-EnemyLocation": {
+  "AHLCG-BaseIcon": [
+   9,
+   1,
+   47,
+   46
+  ],
+  "AHLCG-Connection1Icon": [
+   67,
+   467,
+   35,
+   35
+  ],
+  "AHLCG-Connection2Icon": [
+   108,
+   459,
+   35,
+   35
+  ],
+  "AHLCG-Connection3Icon": [
+   150,
+   456,
+   34,
+   34
+  ],
+  "AHLCG-Connection4Icon": [
+   191,
+   456,
+   34,
+   34
+  ],
+  "AHLCG-Connection5Icon": [
+   232,
+   459,
+   35,
+   35
+  ],
+  "AHLCG-Connection6Icon": [
+   273,
+   467,
+   35,
+   35
+  ],
+  "AHLCG-EnemyLocation-Attack": [
+   100,
+   51,
+   26,
+   27
+  ],
+  "AHLCG-EnemyLocation-AttackPerInv": [
+   96,
+   51,
+   24,
+   27
+  ],
+  "AHLCG-EnemyLocation-AttackPerInvIcon": [
+   115,
+   56,
+   14,
+   14
+  ],
+  "AHLCG-EnemyLocation-BackPortrait-portrait-clip": [
+   0,
+   42,
+   375,
+   275
+  ],
+  "AHLCG-EnemyLocation-Body": [
+   20,
+   358,
+   336,
+   143
+  ],
+  "AHLCG-EnemyLocation-Clues": [
+   318,
+   310,
+   49,
+   50
+  ],
+  "AHLCG-EnemyLocation-CluesPerInv": [
+   311,
+   310,
+   49,
+   49
+  ],
+  "AHLCG-EnemyLocation-CluesPerInvIcon": [
+   338,
+   310,
+   29,
+   49
+  ],
+  "AHLCG-EnemyLocation-Collection-portrait-clip": [
+   320,
+   510,
+   13,
+   13
+  ],
+  "AHLCG-EnemyLocation-Copyright": [
+   143,
+   513,
+   86,
+   10
+  ],
+  "AHLCG-EnemyLocation-Damage1": [
+   93,
+   335,
+   19,
+   23
+  ],
+  "AHLCG-EnemyLocation-Damage2": [
+   73,
+   341,
+   19,
+   23
+  ],
+  "AHLCG-EnemyLocation-Damage3": [
+   53,
+   347,
+   19,
+   23
+  ],
+  "AHLCG-EnemyLocation-Damage4": [
+   33,
+   355,
+   19,
+   23
+  ],
+  "AHLCG-EnemyLocation-Damage5": [
+   13,
+   365,
+   19,
+   23
+  ],
+  "AHLCG-EnemyLocation-DefaultCollection-portrait-clip": [
+   320,
+   510,
+   13,
+   13
+  ],
+  "AHLCG-EnemyLocation-DefaultEncounter-portrait-clip": [
+   174,
+   304,
+   28,
+   28
+  ],
+  "AHLCG-EnemyLocation-Encounter-portrait-clip": [
+   174,
+   304,
+   28,
+   28
+  ],
+  "AHLCG-EnemyLocation-EncounterOverlay": [
+   163,
+   234,
+   50,
+   50
+  ],
+  "AHLCG-EnemyLocation-Evade": [
+   246,
+   51,
+   26,
+   27
+  ],
+  "AHLCG-EnemyLocation-EvadePerInv": [
+   242,
+   51,
+   24,
+   27
+  ],
+  "AHLCG-EnemyLocation-EvadePerInvIcon": [
+   261,
+   56,
+   14,
+   14
+  ],
+  "AHLCG-EnemyLocation-Health": [
+   168,
+   45,
+   40,
+   35
+  ],
+  "AHLCG-EnemyLocation-HealthPerInv": [
+   169,
+   45,
+   27,
+   35
+  ],
+  "AHLCG-EnemyLocation-HealthPerInvIcon": [
+   190,
+   52,
+   17,
+   17
+  ],
+  "AHLCG-EnemyLocation-Horror1": [
+   253,
+   335,
+   27,
+   24
+  ],
+  "AHLCG-EnemyLocation-Horror2": [
+   275,
+   341,
+   27,
+   24
+  ],
+  "AHLCG-EnemyLocation-Horror3": [
+   297,
+   347,
+   27,
+   24
+  ],
+  "AHLCG-EnemyLocation-Horror4": [
+   319,
+   355,
+   27,
+   24
+  ],
+  "AHLCG-EnemyLocation-Horror5": [
+   342,
+   365,
+   27,
+   24
+  ],
+  "AHLCG-EnemyLocation-Label": [
+   157,
+   308,
+   61,
+   14
+  ],
+  "AHLCG-EnemyLocation-Name": [
+   65,
+   4,
+   242,
+   29
+  ],
+  "AHLCG-EnemyLocation-Portrait-portrait-clip": [
+   0,
+   42,
+   375,
+   325
+  ],
+  "AHLCG-EnemyLocation-ReturnEncounter-portrait-clip": [
+   170,
+   391,
+   37,
+   34
+  ],
+  "AHLCG-EnemyLocation-Shroud": [
+   0,
+   310,
+   49,
+   50
+  ],
+  "AHLCG-EnemyLocation-ShroudPerInv": [
+   0,
+   310,
+   49,
+   49
+  ],
+  "AHLCG-EnemyLocation-ShroudPerInvIcon": [
+   27,
+   310,
+   29,
+   49
+  ],
+  "AHLCG-EnemyLocation-SubtitleText": [
+   95,
+   36,
+   191,
+   21
+  ],
+  "AHLCG-EnemyLocation-Victory": [
+   262,
+   458,
+   104,
+   42
+  ],
+  "AHLCG-EnemyLocationBack-BackPortrait-portrait-clip": [
+   0,
+   42,
+   375,
+   275
+  ],
+  "AHLCG-EnemyLocationBack-Body": [
+   20,
+   300,
+   336,
+   143
+  ],
+  "AHLCG-EnemyLocationBack-Collection-portrait-clip": [
+   320,
+   510,
+   13,
+   13
+  ],
+  "AHLCG-EnemyLocationBack-Copyright": [
+   128,
+   513,
+   86,
+   10
+  ],
+  "AHLCG-EnemyLocationBack-DefaultCollection-portrait-clip": [
+   320,
+   510,
+   13,
+   13
+  ],
+  "AHLCG-EnemyLocationBack-Encounter-portrait-clip": [
+   174,
+   245,
+   28,
+   28
+  ],
+  "AHLCG-EnemyLocationBack-EncounterOverlay": [
+   163,
+   234,
+   50,
+   50
+  ],
+  "AHLCG-EnemyLocationBack-Label": [
+   138,
+   278,
+   100,
+   14
+  ],
+  "AHLCG-EnemyLocationBack-Name": [
+   65,
+   4,
+   242,
+   29
+  ],
+  "AHLCG-EnemyLocationBack-ReturnEncounter-portrait-clip": [
+   170,
+   241,
+   37,
+   34
+  ],
+  "AHLCG-EnemyLocationBack-SubtitleText": [
+   95,
+   36,
+   191,
+   21
+  ],
+  "AHLCG-EnemyLocationIcon": [
+   14,
+   6,
+   36,
+   35
+  ]
+ },
+ "AHLCG-Event": {
+  "AHLCG-Event-BasicWeaknessEvent": [
+   162,
+   247,
+   54,
+   53
+  ],
+  "AHLCG-Event-BasicWeaknessIcon": [
+   173,
+   258,
+   30,
+   30
+  ],
+  "AHLCG-Event-Body": [
+   44,
+   338,
+   288,
+   158
+  ],
+  "AHLCG-Event-ClassSymbol21": [
+   144,
+   256,
+   49,
+   49
+  ],
+  "AHLCG-Event-ClassSymbol22": [
+   187,
+   256,
+   49,
+   49
+  ],
+  "AHLCG-Event-ClassSymbol31": [
+   123,
+   256,
+   49,
+   49
+  ],
+  "AHLCG-Event-ClassSymbol32": [
+   166,
+   256,
+   49,
+   49
+  ],
+  "AHLCG-Event-ClassSymbol33": [
+   209,
+   256,
+   49,
+   49
+  ],
+  "AHLCG-Event-Collection-portrait-clip": [
+   319,
+   508,
+   13,
+   13
+  ],
+  "AHLCG-Event-DefaultCollection-portrait-clip": [
+   320,
+   508,
+   13,
+   13
+  ],
+  "AHLCG-Event-Encounter-overlay": [
+   163,
+   256,
+   49,
+   51
+  ],
+  "AHLCG-Event-Encounter-portrait-clip": [
+   174,
+   266,
+   28,
+   28
+  ],
+  "AHLCG-Event-Label": [
+   21,
+   62,
+   36,
+   14
+  ],
+  "AHLCG-Event-Level": [
+   14,
+   35,
+   49,
+   23
+  ],
+  "AHLCG-Event-Name": [
+   40,
+   304,
+   297,
+   29
+  ],
+  "AHLCG-Event-Portrait-portrait-clip": [
+   0,
+   0,
+   375,
+   288
+  ],
+  "AHLCG-Event-ReturnEncounter-portrait-clip": [
+   174,
+   266,
+   28,
+   28
+  ],
+  "AHLCG-Event-Subtype": [
+   86,
+   333,
+   203,
+   15
+  ],
+  "AHLCG-Event-WeaknessBody": [
+   44,
+   352,
+   288,
+   143
+  ]
+ },
+ "AHLCG-Game": {
+  "AHLCG-Artist": [
+   14,
+   512,
+   121,
+   10
+  ],
+  "AHLCG-Clues": [
+   239,
+   296,
+   51,
+   48
+  ],
+  "AHLCG-CollectionNumber": [
+   318,
+   512,
+   37,
+   10
+  ],
+  "AHLCG-Copyright": [
+   137,
+   512,
+   101,
+   10
+  ],
+  "AHLCG-Cost": [
+   18,
+   11,
+   40,
+   38
+  ],
+  "AHLCG-EncounterNumber": [
+   247,
+   512,
+   55,
+   10
+  ],
+  "AHLCG-Level": [
+   14,
+   36,
+   48,
+   23
+  ],
+  "AHLCG-NoLevel": [
+   8,
+   5,
+   60,
+   58
+  ],
+  "AHLCG-Sanity": [
+   197,
+   471,
+   43,
+   36
+  ],
+  "AHLCG-SanityPerInvIcon": [
+   215,
+   456,
+   29,
+   49
+  ],
+  "AHLCG-Skill1": [
+   0,
+   80,
+   54,
+   44
+  ],
+  "AHLCG-Skill2": [
+   0,
+   122,
+   54,
+   44
+  ],
+  "AHLCG-Skill3": [
+   0,
+   164,
+   54,
+   44
+  ],
+  "AHLCG-Skill4": [
+   0,
+   206,
+   54,
+   44
+  ],
+  "AHLCG-Skill5": [
+   0,
+   248,
+   54,
+   44
+  ],
+  "AHLCG-Skill6": [
+   0,
+   290,
+   54,
+   44
+  ],
+  "AHLCG-SkillIcon1": [
+   13,
+   87,
+   25,
+   26
+  ],
+  "AHLCG-SkillIcon2": [
+   13,
+   129,
+   25,
+   26
+  ],
+  "AHLCG-SkillIcon3": [
+   13,
+   171,
+   25,
+   26
+  ],
+  "AHLCG-SkillIcon4": [
+   13,
+   213,
+   25,
+   26
+  ],
+  "AHLCG-SkillIcon5": [
+   13,
+   255,
+   25,
+   26
+  ],
+  "AHLCG-SkillIcon6": [
+   13,
+   297,
+   25,
+   26
+  ],
+  "AHLCG-Slot": [
+   309,
+   454,
+   51,
+   52
+  ],
+  "AHLCG-Slot2": [
+   255,
+   454,
+   51,
+   52
+  ],
+  "AHLCG-Stamina": [
+   148,
+   467,
+   31,
+   39
+  ],
+  "AHLCG-StaminaPerInvIcon": [
+   158,
+   456,
+   29,
+   49
+  ]
+ },
+ "AHLCG-Guide75": {
+  "AHLCG-Guide75-Body": [
+   65,
+   65,
+   995,
+   995
+  ],
+  "AHLCG-Guide75-BodyLeftEmpty": [
+   80,
+   65,
+   475,
+   995
+  ],
+  "AHLCG-Guide75-BodyLeftTitle": [
+   80,
+   378,
+   475,
+   687
+  ],
+  "AHLCG-Guide75-BodyName": [
+   56,
+   83,
+   268,
+   390
+  ],
+  "AHLCG-Guide75-BodyResolution": [
+   56,
+   98,
+   268,
+   375
+  ],
+  "AHLCG-Guide75-BodyRightEmpty": [
+   580,
+   65,
+   475,
+   995
+  ],
+  "AHLCG-Guide75-BodyRightTitle": [
+   580,
+   378,
+   475,
+   687
+  ],
+  "AHLCG-Guide75-Label": [
+   470,
+   243,
+   184,
+   28
+  ],
+  "AHLCG-Guide75-Name": [
+   340,
+   283,
+   445,
+   42
+  ],
+  "AHLCG-Guide75-PageEven": [
+   548,
+   1075,
+   30,
+   32
+  ],
+  "AHLCG-Guide75-PageOdd": [
+   546,
+   1075,
+   30,
+   32
+  ],
+  "AHLCG-Guide75-Portrait1-portrait-clip": [
+   65,
+   65,
+   995,
+   995
+  ],
+  "AHLCG-Guide75-Portrait2-portrait-clip": [
+   65,
+   65,
+   995,
+   995
+  ]
+ },
+ "AHLCG-GuideA4": {
+  "AHLCG-GuideA4-Body": [
+   70,
+   65,
+   1094,
+   1624
+  ],
+  "AHLCG-GuideA4-BodyLeftEmpty": [
+   70,
+   65,
+   537,
+   1624
+  ],
+  "AHLCG-GuideA4-BodyLeftTitle": [
+   70,
+   417,
+   537,
+   1277
+  ],
+  "AHLCG-GuideA4-BodyName": [
+   56,
+   83,
+   268,
+   390
+  ],
+  "AHLCG-GuideA4-BodyResolution": [
+   56,
+   98,
+   268,
+   375
+  ],
+  "AHLCG-GuideA4-BodyRightEmpty": [
+   630,
+   65,
+   537,
+   1624
+  ],
+  "AHLCG-GuideA4-BodyRightTitle": [
+   630,
+   417,
+   537,
+   1277
+  ],
+  "AHLCG-GuideA4-Label": [
+   415,
+   268,
+   408,
+   36
+  ],
+  "AHLCG-GuideA4-Name": [
+   375,
+   312,
+   490,
+   46
+  ],
+  "AHLCG-GuideA4-PageEven": [
+   606,
+   1704,
+   30,
+   32
+  ],
+  "AHLCG-GuideA4-PageOdd": [
+   604,
+   1704,
+   30,
+   32
+  ],
+  "AHLCG-GuideA4-Portrait1-portrait-clip": [
+   65,
+   65,
+   1110,
+   1624
+  ],
+  "AHLCG-GuideA4-Portrait2-portrait-clip": [
+   65,
+   65,
+   1110,
+   1624
+  ]
+ },
+ "AHLCG-GuideLetter": {
+  "AHLCG-GuideLetter-Body": [
+   70,
+   80,
+   1129,
+   1520
+  ],
+  "AHLCG-GuideLetter-BodyLeftEmpty": [
+   82,
+   80,
+   537,
+   1520
+  ],
+  "AHLCG-GuideLetter-BodyLeftTitle": [
+   82,
+   417,
+   537,
+   1173
+  ],
+  "AHLCG-GuideLetter-BodyName": [
+   73,
+   83,
+   268,
+   390
+  ],
+  "AHLCG-GuideLetter-BodyResolution": [
+   73,
+   98,
+   268,
+   375
+  ],
+  "AHLCG-GuideLetter-BodyRightEmpty": [
+   653,
+   80,
+   537,
+   1520
+  ],
+  "AHLCG-GuideLetter-BodyRightTitle": [
+   653,
+   417,
+   537,
+   1173
+  ],
+  "AHLCG-GuideLetter-Label": [
+   447,
+   316,
+   382,
+   37
+  ],
+  "AHLCG-GuideLetter-Name": [
+   392,
+   276,
+   490,
+   46
+  ],
+  "AHLCG-GuideLetter-PageEven": [
+   623,
+   1600,
+   30,
+   32
+  ],
+  "AHLCG-GuideLetter-PageOdd": [
+   621,
+   1600,
+   30,
+   32
+  ],
+  "AHLCG-GuideLetter-Portrait1-portrait-clip": [
+   65,
+   65,
+   1110,
+   1520
+  ],
+  "AHLCG-GuideLetter-Portrait2-portrait-clip": [
+   65,
+   65,
+   1110,
+   1520
+  ]
+ },
+ "AHLCG-Investigator": {
+  "AHLCG-Agility": [
+   473,
+   19,
+   16,
+   22
+  ],
+  "AHLCG-Combat": [
+   412,
+   19,
+   16,
+   22
+  ],
+  "AHLCG-Intellect": [
+   351,
+   19,
+   16,
+   22
+  ],
+  "AHLCG-Investigator-Artist": [
+   288,
+   363,
+   102,
+   10
+  ],
+  "AHLCG-Investigator-Body": [
+   307,
+   80,
+   200,
+   218
+  ],
+  "AHLCG-Investigator-Collection-portrait-clip": [
+   476,
+   360,
+   13,
+   13
+  ],
+  "AHLCG-Investigator-CollectionNumber": [
+   472,
+   363,
+   37,
+   10
+  ],
+  "AHLCG-Investigator-Copyright": [
+   376,
+   363,
+   80,
+   10
+  ],
+  "AHLCG-Investigator-DefaultCollection-portrait-clip": [
+   476,
+   360,
+   13,
+   13
+  ],
+  "AHLCG-Investigator-DefaultEncounter-portrait-clip": [
+   16,
+   17,
+   28,
+   28
+  ],
+  "AHLCG-Investigator-DefaultReturnEncounter-portrait-clip": [
+   16,
+   17,
+   33,
+   33
+  ],
+  "AHLCG-Investigator-Encounter-portrait-clip": [
+   16,
+   17,
+   28,
+   28
+  ],
+  "AHLCG-Investigator-EncounterNumber": [
+   422,
+   363,
+   37,
+   10
+  ],
+  "AHLCG-Investigator-Name": [
+   48,
+   11,
+   212,
+   27
+  ],
+  "AHLCG-Investigator-ReturnEncounter-portrait-clip": [
+   16,
+   17,
+   33,
+   33
+  ],
+  "AHLCG-Investigator-Sanity": [
+   414,
+   310,
+   43,
+   35
+  ],
+  "AHLCG-Investigator-Stamina": [
+   366,
+   306,
+   31,
+   40
+  ],
+  "AHLCG-Investigator-SubtitleTextG": [
+   72,
+   39,
+   175,
+   20
+  ],
+  "AHLCG-Investigator-SubtitleTextGP": [
+   72,
+   39,
+   175,
+   20
+  ],
+  "AHLCG-Investigator-SubtitleTextK": [
+   72,
+   39,
+   175,
+   20
+  ],
+  "AHLCG-Investigator-SubtitleTextKP": [
+   72,
+   39,
+   175,
+   20
+  ],
+  "AHLCG-Investigator-SubtitleTextM": [
+   72,
+   40,
+   175,
+   20
+  ],
+  "AHLCG-Investigator-SubtitleTextMP": [
+   72,
+   40,
+   175,
+   20
+  ],
+  "AHLCG-Investigator-SubtitleTextN": [
+   72,
+   39,
+   175,
+   20
+  ],
+  "AHLCG-Investigator-SubtitleTextNP": [
+   72,
+   39,
+   175,
+   20
+  ],
+  "AHLCG-Investigator-SubtitleTextR": [
+   72,
+   39,
+   175,
+   20
+  ],
+  "AHLCG-Investigator-SubtitleTextRP": [
+   72,
+   38,
+   175,
+   20
+  ],
+  "AHLCG-Investigator-SubtitleTextS": [
+   72,
+   41,
+   175,
+   20
+  ],
+  "AHLCG-Investigator-SubtitleTextT": [
+   72,
+   39,
+   175,
+   20
+  ],
+  "AHLCG-Investigator-SubtitleTextV": [
+   72,
+   39,
+   175,
+   20
+  ],
+  "AHLCG-Investigator-SubtitleTextVP": [
+   72,
+   39,
+   175,
+   20
+  ],
+  "AHLCG-Investigator-SubtitleTextW": [
+   72,
+   39,
+   175,
+   20
+  ],
+  "AHLCG-Investigator-TransparentPortrait-portrait-clip": [
+   0,
+   60,
+   278,
+   315
+  ],
+  "AHLCG-InvestigatorBack-Body": [
+   30,
+   79,
+   470,
+   273
+  ],
+  "AHLCG-InvestigatorBack-DefaultEncounter-portrait-clip": [
+   231,
+   15,
+   28,
+   28
+  ],
+  "AHLCG-InvestigatorBack-DefaultReturnEncounter-portrait-clip": [
+   228,
+   9,
+   33,
+   33
+  ],
+  "AHLCG-InvestigatorBack-Encounter-portrait-clip": [
+   231,
+   13,
+   28,
+   28
+  ],
+  "AHLCG-InvestigatorBack-Name": [
+   248,
+   9,
+   246,
+   29
+  ],
+  "AHLCG-InvestigatorBack-Portrait-portrait-clip": [
+   1,
+   -2,
+   188,
+   206
+  ],
+  "AHLCG-InvestigatorBack-ReturnEncounter-portrait-clip": [
+   228,
+   11,
+   33,
+   33
+  ],
+  "AHLCG-InvestigatorBack-SubtitleTextG": [
+   298,
+   41,
+   159,
+   15
+  ],
+  "AHLCG-InvestigatorBack-SubtitleTextGP": [
+   298,
+   41,
+   159,
+   15
+  ],
+  "AHLCG-InvestigatorBack-SubtitleTextK": [
+   299,
+   41,
+   159,
+   15
+  ],
+  "AHLCG-InvestigatorBack-SubtitleTextKP": [
+   299,
+   41,
+   159,
+   15
+  ],
+  "AHLCG-InvestigatorBack-SubtitleTextM": [
+   296,
+   41,
+   159,
+   15
+  ],
+  "AHLCG-InvestigatorBack-SubtitleTextMP": [
+   296,
+   41,
+   159,
+   15
+  ],
+  "AHLCG-InvestigatorBack-SubtitleTextN": [
+   296,
+   41,
+   159,
+   15
+  ],
+  "AHLCG-InvestigatorBack-SubtitleTextNP": [
+   296,
+   41,
+   159,
+   15
+  ],
+  "AHLCG-InvestigatorBack-SubtitleTextR": [
+   298,
+   41,
+   159,
+   15
+  ],
+  "AHLCG-InvestigatorBack-SubtitleTextRP": [
+   298,
+   40,
+   159,
+   15
+  ],
+  "AHLCG-InvestigatorBack-SubtitleTextS": [
+   296,
+   43,
+   159,
+   15
+  ],
+  "AHLCG-InvestigatorBack-SubtitleTextT": [
+   298,
+   41,
+   159,
+   15
+  ],
+  "AHLCG-InvestigatorBack-SubtitleTextV": [
+   294,
+   41,
+   159,
+   15
+  ],
+  "AHLCG-InvestigatorBack-SubtitleTextVP": [
+   294,
+   41,
+   159,
+   15
+  ],
+  "AHLCG-InvestigatorBack-SubtitleTextW": [
+   298,
+   41,
+   159,
+   15
+  ],
+  "AHLCG-Willpower": [
+   291,
+   19,
+   16,
+   22
+  ]
+ },
+ "AHLCG-Key": {
+  "AHLCG-Key-Artist": [
+   14,
+   516,
+   121,
+   10
+  ],
+  "AHLCG-Key-Body": [
+   14,
+   312,
+   348,
+   140
+  ],
+  "AHLCG-Key-Collection-portrait-clip": [
+   320,
+   512,
+   13,
+   13
+  ],
+  "AHLCG-Key-CollectionNumber": [
+   318,
+   516,
+   37,
+   10
+  ],
+  "AHLCG-Key-Copyright": [
+   124,
+   516,
+   86,
+   10
+  ],
+  "AHLCG-Key-DefaultCollection-portrait-clip": [
+   320,
+   512,
+   13,
+   13
+  ],
+  "AHLCG-Key-DefaultEncounter-portrait-clip": [
+   330,
+   11,
+   30,
+   30
+  ],
+  "AHLCG-Key-DefaultReturnEncounter-portrait-clip": [
+   328,
+   9,
+   32,
+   32
+  ],
+  "AHLCG-Key-Encounter-portrait-clip": [
+   330,
+   11,
+   30,
+   30
+  ],
+  "AHLCG-Key-EncounterNumber": [
+   247,
+   516,
+   55,
+   10
+  ],
+  "AHLCG-Key-Label": [
+   326,
+   51,
+   38,
+   14
+  ],
+  "AHLCG-Key-Name": [
+   65,
+   461,
+   238,
+   29
+  ],
+  "AHLCG-Key-Portrait-portrait-clip": [
+   10,
+   40,
+   358,
+   258
+  ],
+  "AHLCG-Key-ReturnEncounter-portrait-clip": [
+   328,
+   9,
+   32,
+   32
+  ],
+  "AHLCG-Key-SubtitleText": [
+   80,
+   492,
+   213,
+   22
+  ],
+  "AHLCG-Key-Subtype": [
+   83,
+   301,
+   203,
+   15
+  ],
+  "AHLCG-KeyBack-BackPortrait-portrait-clip": [
+   10,
+   40,
+   358,
+   258
+  ],
+  "AHLCG-KeyBack-Label": [
+   326,
+   51,
+   38,
+   14
+  ],
+  "AHLCG-KeyBack-Name": [
+   65,
+   461,
+   238,
+   29
+  ],
+  "AHLCG-KeyBack-SubtitleText": [
+   80,
+   492,
+   213,
+   22
+  ],
+  "AHLCG-KeyBack-Subtype": [
+   83,
+   301,
+   203,
+   15
+  ]
+ },
+ "AHLCG-Location": {
+  "AHLCG-BaseIcon": [
+   9,
+   1,
+   47,
+   46
+  ],
+  "AHLCG-Connection1Icon": [
+   67,
+   467,
+   35,
+   35
+  ],
+  "AHLCG-Connection2Icon": [
+   108,
+   459,
+   35,
+   35
+  ],
+  "AHLCG-Connection3Icon": [
+   150,
+   456,
+   34,
+   34
+  ],
+  "AHLCG-Connection4Icon": [
+   191,
+   456,
+   34,
+   34
+  ],
+  "AHLCG-Connection5Icon": [
+   232,
+   459,
+   35,
+   35
+  ],
+  "AHLCG-Connection6Icon": [
+   273,
+   467,
+   35,
+   35
+  ],
+  "AHLCG-Location-BackPortrait-portrait-clip": [
+   0,
+   42,
+   375,
+   275
+  ],
+  "AHLCG-Location-Body": [
+   20,
+   300,
+   336,
+   143
+  ],
+  "AHLCG-Location-Clues": [
+   318,
+   251,
+   49,
+   50
+  ],
+  "AHLCG-Location-CluesPerInv": [
+   311,
+   251,
+   49,
+   49
+  ],
+  "AHLCG-Location-CluesPerInvIcon": [
+   338,
+   250,
+   29,
+   49
+  ],
+  "AHLCG-Location-Collection-portrait-clip": [
+   320,
+   510,
+   13,
+   13
+  ],
+  "AHLCG-Location-Copyright": [
+   143,
+   513,
+   86,
+   10
+  ],
+  "AHLCG-Location-DefaultCollection-portrait-clip": [
+   320,
+   510,
+   13,
+   13
+  ],
+  "AHLCG-Location-Encounter-portrait-clip": [
+   174,
+   245,
+   28,
+   28
+  ],
+  "AHLCG-Location-EncounterOverlay": [
+   163,
+   234,
+   50,
+   50
+  ],
+  "AHLCG-Location-Label": [
+   138,
+   278,
+   100,
+   14
+  ],
+  "AHLCG-Location-Name": [
+   65,
+   4,
+   242,
+   29
+  ],
+  "AHLCG-Location-Portrait-portrait-clip": [
+   0,
+   42,
+   375,
+   275
+  ],
+  "AHLCG-Location-ReturnEncounter-portrait-clip": [
+   170,
+   241,
+   37,
+   34
+  ],
+  "AHLCG-Location-Shroud": [
+   11,
+   251,
+   49,
+   50
+  ],
+  "AHLCG-Location-ShroudPerInv": [
+   4,
+   251,
+   49,
+   49
+  ],
+  "AHLCG-Location-ShroudPerInvIcon": [
+   31,
+   250,
+   29,
+   49
+  ],
+  "AHLCG-Location-SubtitleText": [
+   95,
+   36,
+   191,
+   21
+  ],
+  "AHLCG-Location-Victory": [
+   262,
+   418,
+   104,
+   42
+  ],
+  "AHLCG-LocationBack-BackPortrait-portrait-clip": [
+   0,
+   42,
+   375,
+   275
+  ],
+  "AHLCG-LocationBack-Body": [
+   20,
+   300,
+   336,
+   143
+  ],
+  "AHLCG-LocationBack-Collection-portrait-clip": [
+   320,
+   510,
+   13,
+   13
+  ],
+  "AHLCG-LocationBack-Copyright": [
+   128,
+   513,
+   86,
+   10
+  ],
+  "AHLCG-LocationBack-DefaultCollection-portrait-clip": [
+   320,
+   510,
+   13,
+   13
+  ],
+  "AHLCG-LocationBack-Encounter-portrait-clip": [
+   174,
+   245,
+   28,
+   28
+  ],
+  "AHLCG-LocationBack-EncounterOverlay": [
+   163,
+   234,
+   50,
+   50
+  ],
+  "AHLCG-LocationBack-Label": [
+   138,
+   278,
+   100,
+   14
+  ],
+  "AHLCG-LocationBack-Name": [
+   65,
+   4,
+   242,
+   29
+  ],
+  "AHLCG-LocationBack-ReturnEncounter-portrait-clip": [
+   170,
+   241,
+   37,
+   34
+  ],
+  "AHLCG-LocationBack-SubtitleText": [
+   95,
+   36,
+   191,
+   21
+  ],
+  "AHLCG-LocationIcon": [
+   14,
+   6,
+   36,
+   35
+  ]
+ },
+ "AHLCG-MiniInvestigator": {
+  "AHLCG-MiniInvestigator-Artist": [
+   0,
+   363,
+   244,
+   10
+  ],
+  "AHLCG-MiniInvestigator-GreyscalePortrait-portrait-clip": [
+   0,
+   0,
+   244,
+   375
+  ],
+  "AHLCG-MiniInvestigator-Portrait-portrait-clip": [
+   0,
+   0,
+   244,
+   375
+  ]
+ },
+ "AHLCG-PackCover": {
+  "AHLCG-PackCover-Name": [
+   428,
+   1347,
+   716,
+   94
+  ],
+  "AHLCG-PackCover-Portrait-portrait-clip": [
+   410,
+   666,
+   750,
+   650
+  ],
+  "AHLCG-PackCover-Tint": [
+   0,
+   0,
+   2399,
+   1799
+  ]
+ },
+ "AHLCG-Scenario": {
+  "AHLCG-Scenario-BackPortrait-portrait-clip": [
+   0,
+   0,
+   375,
+   525
+  ],
+  "AHLCG-Scenario-Body": [
+   60,
+   52,
+   260,
+   423
+  ],
+  "AHLCG-Scenario-BodyName": [
+   60,
+   89,
+   260,
+   388
+  ],
+  "AHLCG-Scenario-BodyResolution": [
+   60,
+   102,
+   260,
+   373
+  ],
+  "AHLCG-Scenario-Collection-portrait-clip": [
+   277,
+   492,
+   13,
+   13
+  ],
+  "AHLCG-Scenario-DefaultCollection-portrait-clip": [
+   277,
+   492,
+   13,
+   13
+  ],
+  "AHLCG-Scenario-DefaultEncounter-portrait-clip": [
+   308,
+   27,
+   36,
+   36
+  ],
+  "AHLCG-Scenario-DefaultReturnEncounter-portrait-clip": [
+   301,
+   20,
+   49,
+   48
+  ],
+  "AHLCG-Scenario-Encounter-portrait-clip": [
+   308,
+   27,
+   36,
+   36
+  ],
+  "AHLCG-Scenario-Header": [
+   105,
+   53,
+   170,
+   35
+  ],
+  "AHLCG-Scenario-Name": [
+   51,
+   43,
+   270,
+   43
+  ],
+  "AHLCG-Scenario-PageEven": [
+   179,
+   479,
+   20,
+   32
+  ],
+  "AHLCG-Scenario-PageOdd": [
+   179,
+   479,
+   20,
+   32
+  ],
+  "AHLCG-Scenario-Portrait-portrait-clip": [
+   0,
+   0,
+   375,
+   525
+  ],
+  "AHLCG-Scenario-ReturnEncounter-portrait-clip": [
+   302,
+   23,
+   49,
+   48
+  ],
+  "AHLCG-ScenarioBack-Name": [
+   51,
+   50,
+   270,
+   29
+  ]
+ },
+ "AHLCG-Skill": {
+  "AHLCG-Skill-BasicWeaknessIcon": [
+   324,
+   13,
+   30,
+   30
+  ],
+  "AHLCG-Skill-BasicWeaknessSkill": [
+   312,
+   3,
+   54,
+   53
+  ],
+  "AHLCG-Skill-Body": [
+   37,
+   351,
+   301,
+   145
+  ],
+  "AHLCG-Skill-Collection-portrait-clip": [
+   319,
+   508,
+   13,
+   13
+  ],
+  "AHLCG-Skill-DefaultCollection-portrait-clip": [
+   319,
+   508,
+   13,
+   13
+  ],
+  "AHLCG-Skill-Encounter-overlay": [
+   311,
+   3,
+   55,
+   55
+  ],
+  "AHLCG-Skill-Encounter-portrait-clip": [
+   324,
+   12,
+   30,
+   30
+  ],
+  "AHLCG-Skill-Label": [
+   21,
+   62,
+   38,
+   14
+  ],
+  "AHLCG-Skill-Level": [
+   14,
+   35,
+   49,
+   23
+  ],
+  "AHLCG-Skill-Name": [
+   73,
+   16,
+   294,
+   29
+  ],
+  "AHLCG-Skill-NoLevel": [
+   9,
+   24,
+   58,
+   38
+  ],
+  "AHLCG-Skill-Portrait-portrait-clip": [
+   14,
+   40,
+   348,
+   298
+  ],
+  "AHLCG-Skill-ReturnEncounter-portrait-clip": [
+   324,
+   12,
+   30,
+   30
+  ],
+  "AHLCG-Skill-StoryWeakness": [
+   9,
+   7,
+   58,
+   52
+  ],
+  "AHLCG-Skill-StoryWeakness-Inner": [
+   11,
+   9,
+   54,
+   48
+  ],
+  "AHLCG-Skill-Subtype": [
+   86,
+   348,
+   203,
+   15
+  ],
+  "AHLCG-Skill-WeaknessBody": [
+   37,
+   365,
+   301,
+   131
+  ]
+ },
+ "AHLCG-Story": {
+  "AHLCG-Story-Body": [
+   36,
+   107,
+   305,
+   385
+  ],
+  "AHLCG-Story-Collection-portrait-clip": [
+   277,
+   492,
+   13,
+   13
+  ],
+  "AHLCG-Story-CollectionNumber": [
+   269,
+   495,
+   37,
+   10
+  ],
+  "AHLCG-Story-Copyright": [
+   70,
+   495,
+   86,
+   10
+  ],
+  "AHLCG-Story-DefaultCollection-portrait-clip": [
+   277,
+   492,
+   13,
+   13
+  ],
+  "AHLCG-Story-DefaultEncounter-portrait-clip": [
+   308,
+   27,
+   36,
+   36
+  ],
+  "AHLCG-Story-DefaultReturnEncounter-portrait-clip": [
+   301,
+   20,
+   49,
+   48
+  ],
+  "AHLCG-Story-Encounter-portrait-clip": [
+   308,
+   27,
+   36,
+   36
+  ],
+  "AHLCG-Story-EncounterNumber": [
+   204,
+   495,
+   55,
+   10
+  ],
+  "AHLCG-Story-Label": [
+   138,
+   508,
+   100,
+   14
+  ],
+  "AHLCG-Story-Name": [
+   38,
+   24,
+   254,
+   44
+  ],
+  "AHLCG-Story-ReturnEncounter-portrait-clip": [
+   302,
+   23,
+   49,
+   48
+  ],
+  "AHLCG-Story-Story": [
+   51,
+   107,
+   290,
+   385
+  ],
+  "AHLCG-Story-TrackerBox": [
+   34,
+   393,
+   306,
+   90
+  ],
+  "AHLCG-Story-TrackerName": [
+   46,
+   397,
+   280,
+   20
+  ],
+  "AHLCG-StoryChaos-Body": [
+   36,
+   130,
+   305,
+   338
+  ],
+  "AHLCG-StoryChaos-Header": [
+   35,
+   135,
+   300,
+   305
+  ],
+  "AHLCG-StoryChaos-Story": [
+   51,
+   130,
+   290,
+   338
+  ],
+  "AHLCG-StoryChaosFull-Body": [
+   36,
+   72,
+   305,
+   396
+  ],
+  "AHLCG-StoryChaosFull-Story": [
+   51,
+   72,
+   290,
+   396
+  ]
+ },
+ "AHLCG-Treachery": {
+  "AHLCG-Treachery-BackPortrait-portrait-clip": [
+   17,
+   0,
+   344,
+   298
+  ],
+  "AHLCG-Treachery-Body": [
+   30,
+   340,
+   318,
+   160
+  ],
+  "AHLCG-Treachery-Collection-portrait-clip": [
+   320,
+   510,
+   13,
+   13
+  ],
+  "AHLCG-Treachery-DefaultCollection-portrait-clip": [
+   320,
+   510,
+   13,
+   13
+  ],
+  "AHLCG-Treachery-Encounter-portrait-clip": [
+   175,
+   254,
+   28,
+   28
+  ],
+  "AHLCG-Treachery-Label": [
+   137,
+   286,
+   104,
+   14
+  ],
+  "AHLCG-Treachery-Name": [
+   39,
+   307,
+   299,
+   29
+  ],
+  "AHLCG-Treachery-Portrait-portrait-clip": [
+   17,
+   0,
+   344,
+   298
+  ],
+  "AHLCG-Treachery-ReturnEncounter-portrait-clip": [
+   171,
+   250,
+   36,
+   33
+  ]
+ },
+ "AHLCG-TreacheryLocation": {
+  "AHLCG-TreacheryLocation-BackPortrait-portrait-clip": [
+   17,
+   0,
+   344,
+   298
+  ],
+  "AHLCG-TreacheryLocation-Body": [
+   30,
+   340,
+   318,
+   160
+  ],
+  "AHLCG-TreacheryLocation-Clues": [
+   313,
+   271,
+   49,
+   50
+  ],
+  "AHLCG-TreacheryLocation-CluesPerInv": [
+   306,
+   271,
+   49,
+   49
+  ],
+  "AHLCG-TreacheryLocation-CluesPerInvIcon": [
+   333,
+   270,
+   29,
+   49
+  ],
+  "AHLCG-TreacheryLocation-Collection-portrait-clip": [
+   320,
+   510,
+   13,
+   13
+  ],
+  "AHLCG-TreacheryLocation-DefaultCollection-portrait-clip": [
+   320,
+   510,
+   13,
+   13
+  ],
+  "AHLCG-TreacheryLocation-Encounter-portrait-clip": [
+   175,
+   254,
+   28,
+   28
+  ],
+  "AHLCG-TreacheryLocation-Label": [
+   137,
+   286,
+   104,
+   14
+  ],
+  "AHLCG-TreacheryLocation-Name": [
+   39,
+   307,
+   299,
+   29
+  ],
+  "AHLCG-TreacheryLocation-Portrait-portrait-clip": [
+   17,
+   0,
+   344,
+   298
+  ],
+  "AHLCG-TreacheryLocation-ReturnEncounter-portrait-clip": [
+   171,
+   250,
+   36,
+   33
+  ],
+  "AHLCG-TreacheryLocation-Shroud": [
+   14,
+   271,
+   49,
+   50
+  ],
+  "AHLCG-TreacheryLocation-ShroudPerInv": [
+   8,
+   271,
+   49,
+   49
+  ],
+  "AHLCG-TreacheryLocation-ShroudPerInvIcon": [
+   35,
+   270,
+   29,
+   49
+  ]
+ },
+ "AHLCG-Ultimatum": {
+  "AHLCG-Ultimatum-Artist": [
+   132,
+   1400,
+   200,
+   12
+  ],
+  "AHLCG-Ultimatum-Body": [
+   134,
+   1060,
+   750,
+   320
+  ],
+  "AHLCG-Ultimatum-Collection-portrait-clip": [
+   750,
+   1400,
+   13,
+   13
+  ],
+  "AHLCG-Ultimatum-CollectionNumber": [
+   800,
+   1400,
+   45,
+   12
+  ],
+  "AHLCG-Ultimatum-Copyright": [
+   434,
+   1400,
+   150,
+   12
+  ],
+  "AHLCG-Ultimatum-DefaultCollection-portrait-clip": [
+   750,
+   1400,
+   13,
+   13
+  ],
+  "AHLCG-Ultimatum-Encounter-portrait-clip": [
+   480,
+   862,
+   65,
+   65
+  ],
+  "AHLCG-Ultimatum-EncounterNumber": [
+   800,
+   1400,
+   45,
+   12
+  ],
+  "AHLCG-Ultimatum-Name": [
+   150,
+   134,
+   742,
+   60
+  ],
+  "AHLCG-Ultimatum-NameWithSubtitle": [
+   190,
+   104,
+   642,
+   60
+  ],
+  "AHLCG-Ultimatum-Portrait-portrait-clip": [
+   0,
+   230,
+   1100,
+   1024
+  ],
+  "AHLCG-Ultimatum-ReturnEncounter-portrait-clip": [
+   480,
+   862,
+   65,
+   65
+  ],
+  "AHLCG-Ultimatum-Subtitle": [
+   190,
+   210,
+   642,
+   30
+  ],
+  "AHLCG-Ultimatum-Text": [
+   100,
+   156,
+   800,
+   305
+  ],
+  "AHLCG-Ultimatum-Trait": [
+   350,
+   980,
+   325,
+   50
+  ]
+ },
+ "AHLCG-WeaknessEnemy": {
+  "AHLCG-WeaknessEnemy-BasicWeaknessEnemy": [
+   155,
+   264,
+   64,
+   40
+  ],
+  "AHLCG-WeaknessEnemy-BasicWeaknessIcon": [
+   173,
+   274,
+   28,
+   28
+  ],
+  "AHLCG-WeaknessEnemy-Collection-portrait-clip": [
+   320,
+   510,
+   13,
+   13
+  ],
+  "AHLCG-WeaknessEnemy-DefaultCollection-portrait-clip": [
+   320,
+   510,
+   13,
+   13
+  ],
+  "AHLCG-WeaknessEnemy-DefaultEncounter-portrait-clip": [
+   173,
+   274,
+   28,
+   28
+  ],
+  "AHLCG-WeaknessEnemy-DefaultReturnEncounter-portrait-clip": [
+   168,
+   270,
+   37,
+   33
+  ],
+  "AHLCG-WeaknessEnemy-Encounter-portrait-clip": [
+   173,
+   274,
+   28,
+   28
+  ],
+  "AHLCG-WeaknessEnemy-Label": [
+   158,
+   305,
+   58,
+   15
+  ],
+  "AHLCG-WeaknessEnemy-PersonalWeaknessEnemy": [
+   155,
+   264,
+   64,
+   40
+  ],
+  "AHLCG-WeaknessEnemy-Portrait-portrait-clip": [
+   0,
+   241,
+   375,
+   284
+  ],
+  "AHLCG-WeaknessEnemy-ReturnEncounter-portrait-clip": [
+   168,
+   270,
+   37,
+   33
+  ],
+  "AHLCG-WeaknessEnemy-Subtype": [
+   40,
+   31,
+   293,
+   20
+  ]
+ },
+ "AHLCG-WeaknessTreachery": {
+  "AHLCG-WeaknessTreachery-BackPortrait-portrait-clip": [
+   17,
+   0,
+   344,
+   298
+  ],
+  "AHLCG-WeaknessTreachery-BasicWeakness": [
+   156,
+   243,
+   66,
+   41
+  ],
+  "AHLCG-WeaknessTreachery-BasicWeaknessIcon": [
+   175,
+   253,
+   28,
+   28
+  ],
+  "AHLCG-WeaknessTreachery-Body": [
+   29,
+   357,
+   318,
+   145
+  ],
+  "AHLCG-WeaknessTreachery-Collection-portrait-clip": [
+   319,
+   510,
+   13,
+   13
+  ],
+  "AHLCG-WeaknessTreachery-DefaultCollection-portrait-clip": [
+   319,
+   510,
+   13,
+   13
+  ],
+  "AHLCG-WeaknessTreachery-Encounter-portrait-clip": [
+   175,
+   254,
+   28,
+   28
+  ],
+  "AHLCG-WeaknessTreachery-Portrait-portrait-clip": [
+   17,
+   0,
+   344,
+   298
+  ],
+  "AHLCG-WeaknessTreachery-ReturnEncounter-portrait-clip": [
+   171,
+   250,
+   36,
+   33
+  ],
+  "AHLCG-WeaknessTreachery-Subtype": [
+   88,
+   335,
+   200,
+   17
+  ]
+ }
+}

@@ -65,6 +65,13 @@ def art_box(card_type):
         layout, w, h = psd_map[card_type]
         if has_psd(layout):
             return (w, h) + PSD_ART[layout]
+    if card_type in ("Asset", "Event", "Skill") and has_se_frames():
+        r = _se_regions()
+        clip = (r.get("AHLCG-" + card_type, {})
+                .get("AHLCG-{}-Portrait-portrait-clip".format(card_type)))
+        if clip:
+            x, y, w, h = clip
+            return (750, 1050, x * 2, y * 2, (x + w) * 2, (y + h) * 2)
     if T.has_template("investigator_front"):
         if card_type == "Investigator":
             return (750, 523) + T.INV_FRONT["art"]
@@ -769,6 +776,144 @@ def p_treachery(c, pt, dest, art_path=None, placement=None):
     img.save(dest)
 
 
+# ---------------------------------------------------------- SE plugin frames --
+# Authentic per-class Asset/Event/Skill frames + exact element regions from
+# the Arkham SE plugin (assets/frames/se/, extracted by
+# tools/extract_se_plugin.py from assets/plugins/ArkhamHorrorLCG.seext).
+# Region coordinates are the plugin's own (375x525 base), rendered at 2x.
+
+SE_FRAMES_DIR = os.path.join(ROOT, "assets", "frames", "se")
+SE_SCALE = 2
+_SE_CACHE = {}
+
+CLASS_LETTER = {"Guardian": "G", "Seeker": "K", "Rogue": "R", "Mystic": "M",
+                "Survivor": "V", "Neutral": "N"}
+SKILL_ICON_LETTER = {"wil": "W", "int": "I", "com": "C", "agi": "A", "wild": "D"}
+SLOT_OVERLAY = {"Ally": "Slot-Ally", "Hand": "Slot-1 Hand",
+                "Hand x2": "Slot-2 Hands", "Arcane": "Slot-1 Arcane",
+                "Arcane x2": "Slot-2 Arcane", "Accessory": "Slot-Accessory",
+                "Body": "Slot-Body", "Tarot": "Slot-Tarot"}
+
+
+def has_se_frames():
+    return os.path.exists(os.path.join(SE_FRAMES_DIR, "regions.json"))
+
+
+def _se_regions():
+    if "regions" not in _SE_CACHE:
+        _SE_CACHE["regions"] = json.load(
+            open(os.path.join(SE_FRAMES_DIR, "regions.json"), encoding="utf-8"))
+    return _SE_CACHE["regions"]
+
+
+def se_reg(kind, key, letter=""):
+    """Region lookup at render scale: the card type's own settings first
+    (class-letter variant preferred), then the shared Game regions."""
+    r = _se_regions()
+    grp = r.get("AHLCG-" + kind, {})
+    for k in ("AHLCG-{}-{}{}".format(kind, key, letter),
+              "AHLCG-{}-{}".format(kind, key)):
+        if k in grp:
+            x, y, w, h = grp[k]
+            return (x * SE_SCALE, y * SE_SCALE,
+                    (x + w) * SE_SCALE, (y + h) * SE_SCALE)
+    g = r.get("AHLCG-Game", {})
+    if "AHLCG-" + key in g:
+        x, y, w, h = g["AHLCG-" + key]
+        return (x * SE_SCALE, y * SE_SCALE,
+                (x + w) * SE_SCALE, (y + h) * SE_SCALE)
+    return None
+
+
+def _se_img(sub, name):
+    key = sub + "/" + name
+    if key not in _SE_CACHE:
+        p = os.path.join(SE_FRAMES_DIR, sub, name + ".png")
+        _SE_CACHE[key] = Image.open(p).convert("RGBA") if os.path.exists(p) else None
+    return _SE_CACHE[key]
+
+
+def _paste_region(img, overlay, box):
+    if overlay is None or box is None:
+        return
+    w, h = box[2] - box[0], box[3] - box[1]
+    ov = overlay.resize((w, h), Image.LANCZOS)
+    img.paste(ov, (box[0], box[1]), ov)
+
+
+def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
+    """Asset / Event / Skill on the plugin's authentic per-class frame."""
+    letter = "W" if c.get("weakness") else CLASS_LETTER.get(c.get("class"), "N")
+    frame = _se_img("templates", "AHLCG-{}-{}".format(kind, letter)) \
+        or _se_img("templates", "AHLCG-{}-N".format(kind))
+    W, H = 375 * SE_SCALE, 525 * SE_SCALE
+    frame2 = frame.resize((W, H), Image.LANCZOS)
+    img = Image.new("RGB", (W, H), (24, 22, 28))
+    clip = se_reg(kind, "Portrait-portrait-clip")
+    if art_path:
+        paste_cover(img, art_path, clip, placement)
+    img.paste(frame2, (0, 0), frame2)
+    d = ImageDraw.Draw(img)
+
+    # commit-icon column (skill boxes + stat icons)
+    icons = []
+    for stat in ("wil", "int", "com", "agi", "wild"):
+        icons += [stat] * int(c.get(stat + "Icons", 0) or 0)
+    box_ov = _se_img("overlays", "AHLCG-SkillBox-" + letter)
+    for i, stat in enumerate(icons[:6]):
+        _paste_region(img, box_ov, se_reg(kind, "Skill{}".format(i + 1)))
+        gl = SKILL_ICON_LETTER[stat]
+        icon = (_se_img("overlays", "AHLCG-SkillIcon-" + gl + "W")
+                if letter == "W" else None) \
+            or _se_img("overlays", "AHLCG-SkillIcon-" + gl)
+        _paste_region(img, icon, se_reg(kind, "SkillIcon{}".format(i + 1)))
+
+    if kind in ("Asset", "Event") and c.get("cost") is not None:
+        _box_text(d, str(c["cost"]), se_reg(kind, "Cost"),
+                  fill=(238, 232, 216), bold=True, grow=0.95)
+    if c.get("level"):
+        _box_text(d, str(c["level"]), se_reg(kind, "Level"),
+                  fill=(238, 232, 216), bold=True, grow=0.9)
+
+    _box_text(d, c["name"], se_reg(kind, "Name", letter), title=True, grow=1.15)
+    if c.get("subtitle"):
+        _box_text(d, c["subtitle"],
+                  se_reg(kind, "SubtitleText", letter)
+                  or se_reg(kind, "Subtitle", letter), italic=True)
+
+    # body: traits line, rules, flavor — stacked inside the Body region
+    b = se_reg(kind, "Body")
+    y = b[1]
+    if c.get("traits"):
+        _box_text(d, c["traits"], (b[0], y, b[2], y + 30),
+                  bold=True, italic=True, max_size=24)
+        y += 36
+    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3] + 24), start=25)
+    if pt.get("flavor") and y < b[3]:
+        _box_block(d, pt.get("flavor", ""), (b[0], y + 8, b[2], b[3] + 40),
+                   fill=(84, 66, 50), italic=True, start=21)
+    if c.get("victory"):
+        _box_text(d, "Victory {}.".format(c["victory"]),
+                  (b[0], b[3] + 24, b[2], b[3] + 52), bold=True, max_size=22)
+
+    if kind == "Asset" and c.get("slot") in SLOT_OVERLAY:
+        _paste_region(img, _se_img("overlays", "AHLCG-" + SLOT_OVERLAY[c["slot"]]),
+                      se_reg(kind, "Slot"))
+    if kind == "Asset":
+        if c.get("health") is not None:
+            _box_text(d, str(c["health"]), se_reg(kind, "Stamina"),
+                      fill=(250, 244, 238), bold=True, grow=0.9)
+        if c.get("sanity") is not None:
+            _box_text(d, str(c["sanity"]), se_reg(kind, "Sanity"),
+                      fill=(240, 246, 255), bold=True, grow=0.9)
+
+    _box_text(d, "Illus. pending — fan content", se_reg(kind, "Artist"),
+              fill=(225, 218, 202), grow=1.0)
+    _box_text(d, "THE STILL HOUR", se_reg(kind, "Copyright"),
+              fill=(225, 218, 202), grow=1.0)
+    img.save(dest)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", nargs="*", help="render only these card ids")
@@ -819,6 +964,8 @@ def main():
         elif c["type"] == "Treachery":
             (p_treachery if has_psd("scenario_treachery") else
              (t_treachery if use_tpl else render_treachery))(c, pt, dest, art_path=art, placement=place)
+        elif c["type"] in ("Asset", "Event", "Skill") and has_se_frames():
+            s_player_card(c["type"], c, pt, dest, art_path=art, placement=place)
         else:
             render_player_card(c, pt, dest, art_path=art, placement=place)
     n = len([f for f in os.listdir(FACES_DIR) if f.endswith(".png")])

@@ -30,23 +30,31 @@ DEFAULT_CONFIG = {
     "faces_dir": "art/faces",
     # frame type -> Arkham plugin class-map key (owner: Toolbox > New Component,
     # or inspect the plugin's classmap; see the generated script header).
+    # REAL keys, read from the plugin's own classmap
+    # (assets/plugins/ArkhamHorrorLCG.seext -> ArkhamHorrorLCG.classmap)
     "classmap": {
-        "investigator_portrait": "TODO:arkham-investigator-classmap-key",
-        "asset": "TODO:arkham-asset-classmap-key",
-        "event": "TODO:arkham-event-classmap-key",
-        "skill": "TODO:arkham-skill-classmap-key",
-        "treachery": "TODO:arkham-treachery-classmap-key",
-        "enemy": "TODO:arkham-enemy-classmap-key",
-        "location": "TODO:arkham-location-classmap-key",
-        "agenda": "TODO:arkham-agenda-classmap-key",
+        "investigator_portrait": "@AHLCG-Investigator",
+        "asset": "@AHLCG-Asset",
+        "event": "@AHLCG-Event",
+        "skill": "@AHLCG-Skill",
+        "treachery": "@AHLCG-TreacheryEncounter",
+        "treachery_weakness": "@AHLCG-TreacheryWeakness",
+        "enemy": "@AHLCG-EnemyEncounter",
+        "enemy_weakness": "@AHLCG-EnemyWeakness",
+        "location": "@AHLCG-Location",
+        "agenda": "@AHLCG-AgendaStandard",
+        "act": "@AHLCG-Act",
+        "minicard": "@AHLCG-MiniInvestigator",
     },
     # component setting keys (owner: open one card of each type in SE and
     # inspect its keys; these defaults follow common plugin conventions).
+    # setting names per the plugin's DIY scripts ($-prefixed there)
     "keys": {
-        "title": "name", "subtitle": "subtitle", "traits": "traits",
-        "text": "rules", "cost": "cost", "willpower": "willpower",
-        "intellect": "intellect", "combat": "combat", "agility": "agility",
-        "health": "health", "sanity": "sanity",
+        "title": "Name", "subtitle": "Subtitle", "traits": "Traits",
+        "text": "Rules", "flavor": "Flavor", "cost": "ResourceCost",
+        "level": "Level", "slot": "Slot", "willpower": "Willpower",
+        "intellect": "Intellect", "combat": "Combat", "agility": "Agility",
+        "health": "Stamina", "sanity": "Sanity", "victory": "Victory",
     },
 }
 

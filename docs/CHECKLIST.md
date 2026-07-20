@@ -46,9 +46,13 @@
 - ✅ Renderer v2 (investigators, enemies, treacheries): cards typeset
   directly onto the true PSD blanks at native res — art under the frame,
   auto-measured text regions, official fonts
-- 🔶 Renderer v2 for assets/events/skills — blocked on finding the player
-  asset/event/skill PSDs (the pack you sent covers scenario cards +
-  investigator front only; the same BGG/Discord source likely has them)
+- ✅ Renderer v3 for assets/events/skills: the SE plugin's own per-class
+  frames + exact region maps (586 regions extracted from the .seext) —
+  cost circles, commit-icon boxes, slot icons, class frames, all authentic
+- 🔶 Headless Strange Eons in-container: Java 21 + Xvfb ready, real
+  classmap/keys filled from the plugin — still needs the SE jar (approve
+  the CGJennings/strange-eons repo request, or upload the 'other
+  platforms' .tar.gz / a fully-downloaded .deb)
 - 🔶 Strange Eons path (pixel-perfect benchmark): app generates the script;
   you still install SE (one click) + jaqenZann plugin + verify the two
   config seams once
