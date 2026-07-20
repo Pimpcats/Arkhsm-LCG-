@@ -132,6 +132,19 @@ def art_box(card_type):
     return (419, 600, 54, 52, 407, 240)          # Asset / Event / Skill
 
 
+def frame_underlay(frame):
+    """Fill for the art window when a card has no art yet: the frame's own
+    average tone, lightened — never a black placeholder box. The template
+    reads as an empty space waiting for art, per class palette."""
+    small = frame.convert("RGBA").resize((40, 56))
+    px = [p for p in small.getdata() if p[3] > 200]
+    if not px:
+        return (206, 198, 184)
+    n = len(px)
+    return tuple(min(255, int((sum(p[i] for p in px) / n) * 0.82 + 255 * 0.18))
+                 for i in range(3))
+
+
 def paste_cover(img, art_path, box, placement=None):
     """Paste an illustration into an art window. Baseline = cover-crop (fills
     the window); `placement` scales/pans on top of that. Always resamples from
@@ -690,7 +703,7 @@ def _psd_compose(layout, art_path, placement, label="place art"):
     artbox = PSD_ART[layout]
     if frame.getchannel("A").getextrema()[0] < 250:
         # windowed frame: art underneath, ornate borders mask it perfectly
-        img = Image.new("RGB", frame.size, (24, 22, 28))
+        img = Image.new("RGB", frame.size, frame_underlay(frame))
         if art_path:
             paste_cover(img, art_path, artbox, placement)
         img.paste(frame, (0, 0), frame)
@@ -901,7 +914,7 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
         or _se_img("templates", "AHLCG-{}-N".format(kind))
     W, H = 375 * SE_SCALE, 525 * SE_SCALE
     frame2 = frame.resize((W, H), Image.LANCZOS)
-    img = Image.new("RGB", (W, H), (24, 22, 28))
+    img = Image.new("RGB", (W, H), frame_underlay(frame))
     clip = se_reg(kind, "Portrait-portrait-clip")
     if art_path:
         paste_cover(img, art_path, clip, placement)
@@ -978,7 +991,7 @@ def _se_frame_compose(tpl_name, kind, clip_key, art_path, placement,
     clip = se_reg(kind, clip_key)
     windowed = frame.getchannel("A").getextrema()[0] < 250
     if windowed:
-        img = Image.new("RGB", (W, H), (24, 22, 28))
+        img = Image.new("RGB", (W, H), frame_underlay(frame))
         if art_path:
             paste_cover(img, art_path, clip, placement)
         img.paste(frame2, (0, 0), frame2)

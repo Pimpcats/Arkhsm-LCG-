@@ -688,6 +688,15 @@ from PIL import Image as _I2
 ay = _I2.open(os.path.join(faces_dir, "sthr-ayako.png")).convert("RGB")
 check("no black placeholder box on art-less investigators",
       ay.getpixel((100, 300)) not in ((34, 31, 42), (24, 22, 28)))
+
+
+def _window_not_black(face, xy):
+    px = _I2.open(os.path.join(faces_dir, face)).convert("RGB").getpixel(xy)
+    return sum(px) > 120          # frame-toned fill, never a near-black slab
+check("no black box in any art-less window (enemy / treachery / asset)",
+      _window_not_black("sthr-appointed.png", (375, 250))
+      and _window_not_black("sthr-bell.png", (375, 250))
+      and _window_not_black("sthr-lamp.png", (375, 300)))
 check("TTS drop buttons in the UI", page.count("Drop into TTS") >= 2
       and "plugin_update" in page)
 

@@ -40,7 +40,7 @@
   Eons, Arkhamic font — fully portable folder
 - ✅ Per-card font picker (title/body) + official font stack
 - ✅ Deck backs (your eclipse + lighthouse art) on every export
-- ✅ 135-check selftest, Windows-safe (UTF-8 + race fixes)
+- ✅ 136-check selftest, Windows-safe (UTF-8 + race fixes)
 
 ## Card look ("identical to official")
 
