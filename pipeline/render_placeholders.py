@@ -1252,26 +1252,32 @@ def _scenario_body(d, kind, c, pt, traits=False, top=None):
 
 
 def s_location(c, pt, dest, art_path=None, placement=None):
-    """A location — front (unrevealed) or back (revealed), with shroud + clues
-    printed on the frame (shroud is print-only; it isn't a TTS data field)."""
+    """A location, calibrated to the official layout (ref: Abyssal Trench / Sea
+    Floor): name, art, a stat band of shroud (left) / "LOCATION" label (centre) /
+    per-investigator clues (right), trait + rules + flavour, and a bottom row of
+    coloured connection symbols. Shroud is print-only (not a TTS data field)."""
     back = bool(c.get("revealed"))
     kind = "LocationBack" if back else "Location"
     img, d = _se_frame_compose("AHLCG-" + kind, kind, "Portrait-portrait-clip",
                                art_path, placement)
     _box_text(d, c["name"], se_reg(kind, "Name"), title=True, grow=1.15)
-    if c.get("traits"):
-        _box_text(d, c["traits"], se_reg(kind, "SubtitleText"),
-                  bold=True, italic=True, max_size=22)
+    # a location may have a subtitle banner under the title (e.g. "Feeding
+    # Grounds") — distinct from its trait line
+    if c.get("subtitle"):
+        _box_text(d, c["subtitle"], se_reg(kind, "SubtitleText"),
+                  italic=True, max_size=22)
+    # the "LOCATION" type label in the centre of the stat band
+    _box_text(d, "LOCATION", se_reg(kind, "Label"), bold=True, max_size=17,
+              fill=(74, 60, 46))
     if not back:
         if c.get("shroud") not in (None, ""):
             _box_text(d, str(c["shroud"]), se_reg("Location", "Shroud"),
                       stat=True, grow=1.0, fill=(238, 232, 216))
         if c.get("clues") not in (None, ""):
-            # per-investigator clues use the left-shifted slot + a marker icon,
-            # so the number stays readable beside the per-investigator symbol
+            # per-investigator clues: number in the left-shifted slot + marker
             per_inv = bool(c.get("clues_per_investigator"))
-            clue_reg = se_reg("Location", "CluesPerInv" if per_inv else "Clues")
-            _box_text(d, str(c["clues"]), clue_reg,
+            _box_text(d, str(c["clues"]),
+                      se_reg("Location", "CluesPerInv" if per_inv else "Clues"),
                       stat=True, grow=1.0, fill=(238, 232, 216))
             if per_inv:
                 _paste_icon_fit(img, _se_img("icons", "AHLCG-PerInvestigator"),
@@ -1279,30 +1285,34 @@ def s_location(c, pt, dest, art_path=None, placement=None):
         if c.get("victory"):
             _box_text(d, "Victory {}.".format(c["victory"]),
                       se_reg("Location", "Victory"), bold=True, max_size=20)
-    # the location's own connection symbol (in this location's colour) + the
-    # symbols it connects to (each in the connected location's colour)
-    own_color = parse_color(c.get("color"))
-    base_sym = loc_symbol_img(c.get("icons"))
-    if base_sym:
-        _paste_icon_fit(img, _tint_icon(base_sym, own_color),
-                        se_reg(kind, "BaseIcon") or se_reg("Location", "BaseIcon"))
+    # bottom row: the symbols of the locations this one connects to, each in the
+    # connected location's colour (official uses colour to match the map)
     conns = c.get("connections") or []
     if isinstance(conns, str):
         conns = [x for x in conns.split("|") if x]
     for i, con in enumerate(conns[:6]):
         sym = con.get("symbol") if isinstance(con, dict) else con
-        col = parse_color(con.get("color")) if isinstance(con, dict) else own_color
+        col = (parse_color(con.get("color")) if isinstance(con, dict)
+               else parse_color(c.get("color")))
         im = loc_symbol_img(sym)
         if im:
             _paste_icon_fit(img, _tint_icon(im, col),
                             se_reg("Location", "Connection{}Icon".format(i + 1)))
-    # keep the front's rules text clear of the shroud/clue circles
-    clues = se_reg("Location", "Clues")
-    top = (clues[3] + 16) if (clues and not back) else None
-    _scenario_body(d, kind, c, pt, top=top)
+    # body: trait line, rules, flavour — below the stat band
+    b = se_reg(kind, "Body")
+    y = b[1]
+    if c.get("traits"):
+        _box_text(d, c["traits"], (b[0], y, b[2], y + 26),
+                  bold=True, italic=True, max_size=20)
+        y += 30
+    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3]), start=22)
+    if pt.get("flavor") and y + 24 < b[3]:
+        _box_block(d, pt.get("flavor", ""), (b[0], y + 4, b[2], b[3]),
+                   fill=(84, 66, 50), italic=True, start=19)
     _box_text(d, "Illus. pending — fan content", se_reg(kind, "Copyright"),
-              fill=(225, 218, 202), grow=1.0)
+              fill=(120, 100, 80), max_size=14)
     img.save(dest)
+
 
 
 def s_agenda(c, pt, dest, art_path=None, placement=None):

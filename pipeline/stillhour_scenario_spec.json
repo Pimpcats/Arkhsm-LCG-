@@ -43,7 +43,9 @@
       }
     ],
     "clues_per_investigator": true,
-    "color": "red"
+    "color": "red",
+    "subtitle": "The Keeper's Vigil",
+    "victory": 1
   },
   {
     "id": "sthr-loc-square",
