@@ -56,10 +56,17 @@ Real location `GMNotes` (Miskatonic University): `icons:"Diamond"`,
 | **Victory** | on the revealed back, bottom | field exists, not shown on back yet | ⬜ region `Victory` |
 
 New editable location fields now driving the icons: `icons` (own symbol name),
-`connections[]` (connected symbols), `clues_per_investigator` (bool). Symbol
+`connections[]` (connected symbols, each optionally `{symbol,color}`),
+`clues_per_investigator` (bool), and **`color`** (the location's colour). Symbol
 names map to the plugin assets (Circle/Square/Triangle/Diamond/Moon/Star/Heart/
-Hourglass/Cross/Quote/Slash/DoubleSlash/Spade/Clover/T). A connection-symbol
-**picker** in the editor is the remaining UI piece.
+Hourglass/Cross/Quote/Slash/DoubleSlash/Spade/Clover/T).
+
+**Colour**: the plugin ships gold-monochrome symbols; official locations tint
+each location a colour and colour its connection symbols to match the map. We
+now **tint** the own symbol to `color` and each connection to its target's
+colour (named palette + hex). Exact colours to be matched from the reference
+images. A connection-symbol + colour **picker** in the editor is the remaining
+UI piece.
 
 New data fields a location needs (to drive the above): `icons` (own symbol),
 `connections[]` (symbols it links to), `clues_per_investigator` (bool),

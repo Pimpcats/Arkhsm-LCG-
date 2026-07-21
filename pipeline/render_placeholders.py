@@ -974,6 +974,43 @@ def loc_symbol_img(name):
     return _se_img("icons", "AHLCG-Loc" + key) if key else None
 
 
+# named location colours (the official system tints each location a colour so
+# connected symbols visually match across the map); hex also accepted
+LOC_COLORS = {"red": (176, 58, 46), "orange": (202, 111, 30),
+              "yellow": (198, 160, 34), "green": (58, 130, 76),
+              "teal": (37, 128, 122), "blue": (44, 90, 160),
+              "purple": (110, 62, 148), "pink": (185, 78, 130),
+              "brown": (120, 80, 52), "grey": (110, 106, 112),
+              "gray": (110, 106, 112), "gold": (176, 150, 74)}
+
+
+def parse_color(c, default=(176, 150, 74)):
+    if not c:
+        return default
+    if isinstance(c, (list, tuple)) and len(c) >= 3:
+        return tuple(int(x) for x in c[:3])
+    s = str(c).strip().lower()
+    if s in LOC_COLORS:
+        return LOC_COLORS[s]
+    if s.startswith("#") and len(s) == 7:
+        try:
+            return tuple(int(s[i:i + 2], 16) for i in (1, 3, 5))
+        except ValueError:
+            pass
+    return default
+
+
+def _tint_icon(overlay, color):
+    """Recolour a monochrome plugin symbol to `color`, keeping its shape (alpha)
+    and edge softness — this is how a location's symbols get their colour."""
+    if overlay is None:
+        return overlay
+    a = overlay.convert("RGBA").getchannel("A")
+    solid = Image.new("RGBA", overlay.size, color + (255,))
+    solid.putalpha(a)
+    return solid
+
+
 def _paste_icon_fit(img, overlay, box):
     """Paste an icon centered in a box, preserving its aspect (symbols are not
     always square, and the region boxes aren't either)."""
@@ -1242,18 +1279,23 @@ def s_location(c, pt, dest, art_path=None, placement=None):
         if c.get("victory"):
             _box_text(d, "Victory {}.".format(c["victory"]),
                       se_reg("Location", "Victory"), bold=True, max_size=20)
-    # the location's own connection symbol + the symbols it connects to
+    # the location's own connection symbol (in this location's colour) + the
+    # symbols it connects to (each in the connected location's colour)
+    own_color = parse_color(c.get("color"))
     base_sym = loc_symbol_img(c.get("icons"))
     if base_sym:
-        _paste_icon_fit(img, base_sym, se_reg(kind, "BaseIcon")
-                        or se_reg("Location", "BaseIcon"))
+        _paste_icon_fit(img, _tint_icon(base_sym, own_color),
+                        se_reg(kind, "BaseIcon") or se_reg("Location", "BaseIcon"))
     conns = c.get("connections") or []
     if isinstance(conns, str):
         conns = [x for x in conns.split("|") if x]
-    for i, sym in enumerate(conns[:6]):
+    for i, con in enumerate(conns[:6]):
+        sym = con.get("symbol") if isinstance(con, dict) else con
+        col = parse_color(con.get("color")) if isinstance(con, dict) else own_color
         im = loc_symbol_img(sym)
         if im:
-            _paste_icon_fit(img, im, se_reg("Location", "Connection{}Icon".format(i + 1)))
+            _paste_icon_fit(img, _tint_icon(im, col),
+                            se_reg("Location", "Connection{}Icon".format(i + 1)))
     # keep the front's rules text clear of the shroud/clue circles
     clues = se_reg("Location", "Clues")
     top = (clues[3] + 16) if (clues and not back) else None

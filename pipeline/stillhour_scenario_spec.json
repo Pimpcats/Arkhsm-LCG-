@@ -10,7 +10,8 @@
     "connections": [
       "Circle"
     ],
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "color": "orange"
   },
   {
     "id": "sthr-loc-windingstair",
@@ -24,7 +25,8 @@
       "Diamond",
       "Moon"
     ],
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "color": "purple"
   },
   {
     "id": "sthr-loc-keepersquarters",
@@ -35,9 +37,13 @@
     "clues": 2,
     "icons": "Moon",
     "connections": [
-      "Circle"
+      {
+        "symbol": "Circle",
+        "color": "purple"
+      }
     ],
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "color": "red"
   },
   {
     "id": "sthr-loc-square",
@@ -48,12 +54,25 @@
     "clues": 2,
     "icons": "Star",
     "connections": [
-      "Diamond",
-      "Circle",
-      "Moon",
-      "Square"
+      {
+        "symbol": "Diamond",
+        "color": "orange"
+      },
+      {
+        "symbol": "Circle",
+        "color": "purple"
+      },
+      {
+        "symbol": "Moon",
+        "color": "red"
+      },
+      {
+        "symbol": "Square",
+        "color": "green"
+      }
     ],
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "color": "teal"
   },
   {
     "id": "sthr-agenda-hour1",
