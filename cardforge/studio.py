@@ -42,6 +42,24 @@ os.environ.setdefault("PYTHONUTF8", "1")
 _log = []                 # (seq, line)
 _log_lock = threading.Lock()
 _busy = threading.Event()
+# serialize read-modify-write of the shared override JSONs + their recompose,
+# so two concurrent saves can't lose an update or read a half-written file
+_state_lock = threading.RLock()
+
+
+def _write_json_atomic(path, obj):
+    """Write JSON so a concurrent reader (incl. the render subprocess) never
+    sees a truncated file: write a temp beside it, then atomic os.replace."""
+    import tempfile
+    d = os.path.dirname(path)
+    fd, tmp = tempfile.mkstemp(dir=d, suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(obj, f, indent=2, ensure_ascii=False)
+        os.replace(tmp, path)
+    finally:
+        if os.path.exists(tmp):
+            os.remove(tmp)
 
 
 def log(line):
@@ -289,27 +307,46 @@ def act_card_save(p):
     Empty string clears a field back to the authored value."""
     sys.path.insert(0, os.path.join(ROOT, "pipeline"))
     import render_placeholders as rp
-    card = p["card"]
-    ov = rp.load_card_overrides()
-    entry = ov.get(card, {})
-    for k in rp.OV_SPEC_KEYS + rp.OV_PT_KEYS:
-        if k not in p:
-            continue
-        v = p[k]
+    card = os.path.basename(str(p.get("card", "")).strip())
+    if not card:
+        return {"ok": False, "message": "no card given"}
+
+    def clean(k, v):
+        """Type each field to what the renderer expects, so no editor input can
+        crash the recompose: pips are bounded ints, stat plates are ints or a
+        short token like 'X', text is length-capped."""
         if v in ("", None):
-            entry.pop(k, None)
+            return None                             # clears the field
+        if k in rp.OV_PIP_KEYS:
+            s = str(v).strip()
+            if not s.lstrip("-").isdigit():
+                return None                         # junk -> clear to authored
+            return rp.pip_count(s)                  # else 0..MAX_PIPS int
+        if k in rp.OV_NUMERIC_KEYS:
+            s = str(v).strip()
+            if s.lstrip("-").isdigit():
+                return int(s)
+            return s[:3] if s else None             # allow "X"/"—", never junk
+        return str(v)[:1200]                        # text: cap, never int-cast
+
+    with _state_lock:
+        ov = rp.load_card_overrides()
+        entry = dict(ov.get(card, {}))
+        for k in rp.OV_SPEC_KEYS + rp.OV_PT_KEYS:
+            if k not in p:
+                continue
+            cv = clean(k, p[k])
+            if cv is None:
+                entry.pop(k, None)
+            else:
+                entry[k] = cv
+        if entry:
+            ov[card] = entry
         else:
-            if isinstance(v, str) and v.lstrip("-").isdigit():
-                v = int(v)
-            entry[k] = v
-    if entry:
-        ov[card] = entry
-    else:
-        ov.pop(card, None)
-    with open(rp.CARD_OVERRIDES_PATH, "w", encoding="utf-8") as f:
-        json.dump(ov, f, indent=2, ensure_ascii=False)
-    subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py"),
-                    "--only", card], check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+            ov.pop(card, None)
+        _write_json_atomic(rp.CARD_OVERRIDES_PATH, ov)
+        subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py"),
+                        "--only", card], check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
     log("card content saved: {} ({} field(s) overridden)".format(card, len(entry)))
     return {"ok": True, "overrides": entry}
 
@@ -383,23 +420,23 @@ def act_font_set(p):
     which the per-card override still beats. Recomposes the affected faces."""
     sys.path.insert(0, os.path.join(ROOT, "pipeline"))
     import render_placeholders as rp
-    card = p["card"]
-    ov = rp.load_font_overrides()
+    card = os.path.basename(str(p.get("card", "")).strip()) or "_default"
     entry = {}
     for k in ("title", "stat", "body"):
         v = os.path.basename((p.get(k) or "").strip())
         if v:
             entry[k] = v
-    if entry:
-        ov[card] = entry
-    else:
-        ov.pop(card, None)
-    with open(rp.FONT_OVERRIDES_PATH, "w", encoding="utf-8") as f:
-        json.dump(ov, f, indent=2)
-    cmd = [sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py")]
-    if card != "_default":                 # _default touches every card
-        cmd += ["--only", card]
-    subprocess.run(cmd, check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+    with _state_lock:
+        ov = rp.load_font_overrides()
+        if entry:
+            ov[card] = entry
+        else:
+            ov.pop(card, None)
+        _write_json_atomic(rp.FONT_OVERRIDES_PATH, ov)
+        cmd = [sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py")]
+        if card != "_default":                 # _default touches every card
+            cmd += ["--only", card]
+        subprocess.run(cmd, check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
     where = "every card" if card == "_default" else card
     log("fonts for {}: {}".format(where, entry or "default stack"))
     return {"ok": True, "fonts": entry}
@@ -727,8 +764,8 @@ def status(campaign="still_hour"):
             r = json.load(open(rp, encoding="utf-8"))
             report = {"generated": len(r["generated"]), "failed": len(r["failed"]),
                       "warnings": r["warnings"], "dry_run": r.get("dry_run")}
-        except (ValueError, KeyError):
-            pass    # mid-write or partial — next poll gets the real one
+        except (ValueError, KeyError, TypeError):
+            report = {}    # mid-write / partial / garbage — next poll recovers
     gallery = []
     if os.path.isdir(out_dir):
         for cid in sorted(os.listdir(out_dir)):
@@ -955,8 +992,17 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"error": "unknown path"}, 404)
             return
         action = u.path[len("/api/"):]
-        length = int(self.headers.get("Content-Length", 0))
-        params = json.loads(self.rfile.read(length) or b"{}")
+        try:
+            length = int(self.headers.get("Content-Length", 0))
+        except (TypeError, ValueError):
+            length = 0
+        try:
+            params = json.loads(self.rfile.read(length) or b"{}")
+            if not isinstance(params, dict):
+                raise ValueError("body must be a JSON object")
+        except ValueError as e:
+            self._json({"ok": False, "message": "bad request body: " + str(e)}, 400)
+            return
         fn = ACTIONS.get(action)
         if not fn:
             self._json({"error": "unknown action " + action}, 404)
@@ -1232,8 +1278,8 @@ title="Stable Diffusion regenerates each template's text regions into empty card
 <b id=ed_title style="font-size:15px"></b>
 <span class=hint>drag art to position &middot; scroll to size &middot; click values ON the card to edit them</span>
 <span class=spacer></span>
-<label>width</label><input type=range id=ed_scale min=0.5 max=3 step=0.02 style="width:120px" oninput=edPreview()>
-<label>height</label><input type=range id=ed_scaley min=0.5 max=3 step=0.02 style="width:120px" oninput=edPreview()>
+<label>width</label><input type=range id=ed_scale min=0.5 max=6 step=0.02 style="width:120px" oninput=edPreview()>
+<label>height</label><input type=range id=ed_scaley min=0.5 max=6 step=0.02 style="width:120px" oninput=edPreview()>
 <button class="btn primary" onclick=edSave()>Save</button>
 <button class=btn onclick="post('tts_spawn',{card:ed.g.id})"
 title="drop this card onto the table of your RUNNING Tabletop Simulator — appears instantly, any game/mod">&#9654; Drop into TTS</button>
@@ -1698,9 +1744,10 @@ window.scrollTo({top:0});}
 let CC_NUM=[];
 function ccPips(f,v){const el=document.getElementById('ccp_'+f);if(!el)return;
 const n=parseInt(v)||0;
-el.textContent=(f==='damage'?'\u2764\ufe0f':'\ud83e\udde0').repeat(Math.max(0,Math.min(n,8)));}
+el.textContent=(f==='damage'?'\u2764\ufe0f':'\ud83e\udde0').repeat(Math.max(0,Math.min(n,5)));}
 function ccStep(f,d){const el=document.getElementById('cc_'+f);
-let v=parseInt(el.value);if(isNaN(v))v=0;v=Math.max(0,v+d);el.value=v;ccPips(f,v);}
+const cap=(f==='damage'||f==='horror')?5:99;
+let v=parseInt(el.value);if(isNaN(v))v=0;v=Math.max(0,Math.min(cap,v+d));el.value=v;ccPips(f,v);}
 function ccNum(f,label,pips){
 return `<span style="display:inline-flex;align-items:center;gap:4px;margin-right:10px">`+
 `<label>${label}</label>`+
@@ -1846,7 +1893,7 @@ window.addEventListener('mousemove',e=>{if(!drag||!ed)return;
 ed.ox=drag.ox+(e.clientX-drag.x)/ed.disp;ed.oy=drag.oy+(e.clientY-drag.y)/ed.disp;edPreview();});
 window.addEventListener('mouseup',()=>{drag=null;win.style.cursor='grab';});
 win.addEventListener('wheel',e=>{e.preventDefault();const s=document.getElementById('ed_scale');
-s.value=Math.max(0.5,Math.min(3,parseFloat(s.value)-e.deltaY*0.0012));edPreview();});})();
+s.value=Math.max(0.5,Math.min(6,parseFloat(s.value)-e.deltaY*0.0012));edPreview();});})();
 document.getElementById('ed_stage').addEventListener('click',e=>{
 if(!ed||!ed.g.regions)return;
 if(e.target.id==='ed_win'||e.target.id==='ed_art')return;

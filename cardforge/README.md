@@ -62,7 +62,7 @@ steps that check themselves off:
   instant TTS testing, or a hosted base URL) and rebuilds cards → mod →
   download package.
 
-Acceptance: `python3 cardforge/studio_selftest.py` (146 checks, drives the live
+Acceptance: `python3 cardforge/studio_selftest.py` (151 checks, drives the live
 server end-to-end — including a real backend auto-launch loop against a fake
 A1111 API and a Windows-locale regression; JS is syntax-checked with node in
 CI passes). The CLI below remains for headless/scripted use.

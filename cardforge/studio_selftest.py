@@ -254,6 +254,37 @@ check("Remove image strips the art and re-renders the bare frame",
 check("expanded editor UI: content panel, pip steppers, size + remove controls",
       all(t in page for t in ("cc_stats", "ccSave", "Remove image",
                               "ed_scaley", "All cards", "ed_stage")))
+
+# --- robustness: adversarial editor input must never crash the recompose ---
+import http.client as _hc
+r = requests.post(BASE + "/api/card_save",
+                  json={"card": "sthr-appointed", "name": "100",
+                        "traits": "42"}).json()
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+appt = next(c for c in s["cards"] if c["id"] == "sthr-appointed")
+check("all-digit name/traits stay TEXT and recompose (no int-cast crash)",
+      r.get("ok") and r["overrides"]["name"] == "100"
+      and appt["content"]["name"] == "100")
+r = requests.post(BASE + "/api/card_save",
+                  json={"card": "sthr-appointed", "damage": "abc",
+                        "horror": "999", "fight": "3.5"}).json()
+check("junk pip / out-of-range / float stats are sanitized, not crashed",
+      r.get("ok") and "damage" not in r["overrides"]        # 'abc' dropped
+      and r["overrides"]["horror"] == 5                      # 999 clamped to MAX_PIPS
+      and r["overrides"]["fight"] == "3.5")                  # kept as short token
+r = requests.post(BASE + "/api/card_save",
+                  json={"card": "sthr-appointed", "text": "z " * 5000}).json()
+check("a huge rules string is length-capped, render survives", r.get("ok"))
+requests.post(BASE + "/api/card_save", json={"card": "sthr-appointed"})  # clear
+# malformed POST body -> 400, not a 500 / dropped connection
+conn = _hc.HTTPConnection("127.0.0.1", 8571, timeout=10)
+conn.request("POST", "/api/card_save", body=b"{bad json,,,",
+             headers={"Content-Type": "application/json"})
+resp = conn.getresponse(); resp.read()
+check("malformed JSON body answers 400 (no thread crash)", resp.status == 400)
+check("server still healthy after the abuse",
+      requests.get(BASE + "/api/status").status_code == 200)
+
 if ov_backup is None:
     if os.path.exists(ov_path):
         os.remove(ov_path)

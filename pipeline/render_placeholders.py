@@ -50,14 +50,35 @@ OV_SPEC_KEYS = ("name", "subtitle", "traits", "cost", "level", "victory",
                 "wil", "int", "com", "agi", "slot", "health", "sanity")
 OV_PT_KEYS = ("text", "flavor", "back_text", "fight", "evade",
               "damage", "horror")
+# fields that are only ever str()-formatted onto the card (an "X" cost or "—"
+# is legal, so these aren't forced to int)…
+OV_NUMERIC_KEYS = ("cost", "level", "victory", "wil", "int", "com", "agi",
+                   "health", "sanity", "fight", "evade")
+# …vs pip counts, which feed range() in the renderers and MUST be small ints
+OV_PIP_KEYS = ("damage", "horror")
+MAX_PIPS = 5                       # the plugin frames carry Damage1..5/Horror1..5
+
+
+def pip_count(v):
+    """A damage/horror count is always a bounded int, no matter what junk a
+    stale override or a hand-edited file holds — never let it reach range()
+    as a string, None, or an absurd value."""
+    try:
+        return max(0, min(MAX_PIPS, int(v or 0)))
+    except (TypeError, ValueError):
+        return 0
 
 
 def load_card_overrides():
     """Per-card content edits from the Studio's card editor: name, rules
     text, combat values, damage/horror pips… merged over spec + print layer
-    at render time (and by the SE bundle)."""
+    at render time (and by the SE bundle). Tolerant of a transient partial
+    read (concurrent write) — a bad parse yields no overrides, not a crash."""
     if os.path.exists(CARD_OVERRIDES_PATH):
-        return json.load(open(CARD_OVERRIDES_PATH, encoding="utf-8"))
+        try:
+            return json.load(open(CARD_OVERRIDES_PATH, encoding="utf-8"))
+        except ValueError:
+            return {}
     return {}
 
 
@@ -207,7 +228,10 @@ FONT_OVERRIDES_PATH = os.path.join(ROOT, "campaigns", "still_hour",
 
 def load_font_overrides():
     if os.path.exists(FONT_OVERRIDES_PATH):
-        return json.load(open(FONT_OVERRIDES_PATH, encoding="utf-8"))
+        try:
+            return json.load(open(FONT_OVERRIDES_PATH, encoding="utf-8"))
+        except ValueError:
+            return {}
     return {}
 
 
@@ -343,10 +367,11 @@ def stat_plate(draw, x, y, value, color, size=44):
 
 
 def pips(draw, x, y, n, color, r=9):
-    for k in range(n or 0):
+    n = pip_count(n)
+    for k in range(n):
         cx = x + k * (2 * r + 6)
         draw.ellipse([cx, y, cx + 2 * r, y + 2 * r], fill=color, outline=(15, 15, 15))
-    return x + (n or 0) * (2 * r + 6)
+    return x + n * (2 * r + 6)
 
 
 def footer(draw, w, h, card_id):
@@ -445,9 +470,9 @@ def render_enemy(c, pt, dest, art_path=None, placement=None):
                     _font(15, bold=True), PANEL_INK)
     # ENEMY banner + damage/horror pips
     banner(d, 358, w, "ENEMY", (30, 28, 36), height=28, size=15)
-    px = w / 2 - ((pt.get("damage", 0) + pt.get("horror", 0)) * 24 + 12) / 2
-    px = pips(d, px, 392, pt.get("damage", 0), RED)
-    pips(d, px + 12, 392, pt.get("horror", 0), BLUE)
+    px = w / 2 - ((pip_count(pt.get("damage")) + pip_count(pt.get("horror"))) * 24 + 12) / 2
+    px = pips(d, px, 392, pt.get("damage"), RED)
+    pips(d, px + 12, 392, pt.get("horror"), BLUE)
     # art window at the bottom (official enemy layout)
     abox = (12, 420, w - 12, h - 30)
     d.rectangle(list(abox), fill=(34, 31, 42))
@@ -1113,9 +1138,7 @@ def s_enemy(c, pt, dest, art_path=None, placement=None):
     _se_body(d, c, pt, "Enemy", extra_bottom=0, text_start=22)
     for kind_key, count, ov in (("Damage", pt.get("damage"), "AHLCG-Damage"),
                                 ("Horror", pt.get("horror"), "AHLCG-Horror")):
-        for i in range(int(count or 0)):
-            if i >= 5:
-                break
+        for i in range(pip_count(count)):
             _paste_region(img, _se_img("overlays", ov),
                           se_reg("Enemy", "{}{}".format(kind_key, i + 1)))
     _box_text(d, "Illus. pending — fan content", se_reg("Enemy", "Artist"),
