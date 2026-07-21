@@ -321,6 +321,22 @@ wait_idle()
 check("scenario faces render on the real plugin frames (portrait + landscape)",
       _Iscn.open(os.path.join(faces_dir, "sthr-loc-keepersquarters.png")).size == (750, 1050)
       and _Iscn.open(os.path.join(faces_dir, "sthr-agenda-hour1.png")).size == (1050, 750))
+# HARD RULE (docs/design/FIDELITY_AUDIT.md): every card type must match the
+# official printed aspect — portrait 0.714, landscape 1.400 (agenda/act).
+_ASPECT = {"sthr-elias": 1.400, "sthr-appointed": 0.714, "sthr-lamp": 0.714,
+           "sthr-loc-keepersquarters": 0.714, "sthr-scenario-lighthouse": 0.714,
+           "sthr-story-firstdark": 0.714, "sthr-agenda-hour1": 1.400,
+           "sthr-act-ninthdeath": 1.400}
+for _cid in _ASPECT:
+    requests.post(BASE + "/api/compose_one", json={"card": _cid})
+wait_idle()
+_bad = []
+for _cid, _want in _ASPECT.items():
+    _im = _Iscn.open(os.path.join(faces_dir, _cid + ".png"))
+    if abs(_im.width / _im.height - _want) > 0.01:
+        _bad.append("%s=%.3f(want %.3f)" % (_cid, _im.width / _im.height, _want))
+check("HARD RULE: all card types match the official card aspect ratio"
+      + (" — OFF: " + ", ".join(_bad) if _bad else ""), not _bad)
 if sov_bak is None:
     if os.path.exists(sov):
         os.remove(sov)

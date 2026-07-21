@@ -47,7 +47,7 @@
   override still wins; "Upload font…" brings your own .ttf/.otf into the
   dropdowns
 - ✅ Deck backs (your eclipse + lighthouse art) on every export
-- ✅ 156-check selftest + adversarial stress suite, Windows-safe (UTF-8 + race fixes)
+- ✅ 157-check selftest + adversarial stress suite, Windows-safe (UTF-8 + race fixes)
 
 ## Card look ("identical to official")
 

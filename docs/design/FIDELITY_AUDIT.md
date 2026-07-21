@@ -1,5 +1,34 @@
 # Scenario-card fidelity audit — vs. the official reference (The Drowned City)
 
+## THE HARD RULE
+
+**Everything this app produces is checked against the official Arkham campaign
+reference before it ships. Templates, proportions, fonts, iconography, element
+placement — all of it must match the official cards.**
+
+The *only* permitted deviation is genuinely **new custom content** — a card,
+mechanic, or element that does not exist in official Arkham. Custom content
+still uses the official *template* (frame, fonts, layout); only its content is
+new. If something would change the shape/form of a standard card type, it is a
+bug, not a style choice. Arkham's card templates rarely change between sets;
+when they do it's a deliberate FFG update, and we track to the current one.
+
+Enforcement: `cardforge/studio_selftest.py` asserts every rendered card type
+matches the official **aspect ratio** (see below); this audit is the living
+element checklist each type is measured against; and every new card type gets a
+side-by-side against the official reference before it's called done.
+
+### Verified card aspects (true printed card = our target)
+
+Standard card 63.5×88.9mm → portrait **0.714**; rotated (agenda/act) →
+landscape **1.400**. Our renders: portrait 750×1050 = 0.714 ✓, landscape
+1050×750 = 1.400 ✓ — both match the real card (the supplied PSDs read 0.698 /
+1.432, marginally off from true due to trim/bleed; we track the true card).
+NOTE: newer sets (incl. The Drowned City) may use a **portrait agenda/act**
+variant — the plugin ships it (`AgendaPortrait`); match per the reference.
+
+---
+
 Goal: our scenario cards must look **exactly** like official Arkham cards.
 The *frames* are authentic (extracted from the maintained SE plugin), but we
 are not yet populating several elements that official cards always show. Each
@@ -38,8 +67,10 @@ index.
 | Element | Official shows | We render | Fix |
 |---|---|---|---|
 | **Doom / clue threshold** | number beside the doom pip / clue+per-inv icon | plain number | regions `Doom`/`DoomPerInvIcon`, `Clues`/`CluesPerInvIcon` |
-| **Agenda "a" / Act "1" index** | the big stage number in the corner | not shown | region `ScenarioIndex` **[need ref]** for exact glyph |
-| **Encounter-set icon** | the set's symbol | not shown | our campaign has no set icon yet — design choice |
+| **"Agenda #a" / "Act 1" header** | stage header across the top | **not shown** | region `ScenarioIndex` / header band |
+| **Footer** | illustrator credit · © FFG · collection number · encounter-set symbol · card number | **not shown** | regions `Artist`/`Copyright`/`CollectionNumber`/`EncounterNumber` |
+| **Body flow** | text flows down the card from the header | clustered top-right, big empty parchment | widen/retop the Body region to the frame's text area |
+| **Orientation** | landscape (or portrait in newer sets) | landscape 1.400 ✓ (confirm vs Drowned City ref) | `AgendaPortrait` template available if needed |
 
 ## Scenario reference
 
