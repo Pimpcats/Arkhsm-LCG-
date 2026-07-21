@@ -46,6 +46,12 @@ TEMPLATES = [
     "AHLCG-InvestigatorBack-R", "AHLCG-InvestigatorBack-V",
     "AHLCG-Enemy", "AHLCG-Treachery", "AHLCG-WeaknessTreachery",
     "AHLCG-WeaknessEnemy",
+    # scenario side — locations, the agenda/act clocks, scenario reference, story
+    "AHLCG-Location", "AHLCG-LocationBack",
+    "AHLCG-EnemyLocation", "AHLCG-TreacheryLocation",
+    "AHLCG-Agenda", "AHLCG-AgendaBack",
+    "AHLCG-Act", "AHLCG-ActBack",
+    "AHLCG-Scenario", "AHLCG-Story",
 ]
 OVERLAY_PREFIXES = ("AHLCG-SkillBox-", "AHLCG-SkillIcon-", "AHLCG-NoLevel",
                     "AHLCG-Slot-", "AHLCG-Damage", "AHLCG-Horror",

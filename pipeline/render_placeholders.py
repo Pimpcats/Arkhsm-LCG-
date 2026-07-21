@@ -47,13 +47,15 @@ CARD_OVERRIDES_PATH = os.path.join(ROOT, "campaigns", "still_hour",
 
 # owner-editable fields, routed to the spec dict vs the print layer
 OV_SPEC_KEYS = ("name", "subtitle", "traits", "cost", "level", "victory",
-                "wil", "int", "com", "agi", "slot", "health", "sanity")
+                "wil", "int", "com", "agi", "slot", "health", "sanity",
+                "shroud", "clues", "doom")
 OV_PT_KEYS = ("text", "flavor", "back_text", "fight", "evade",
               "damage", "horror")
 # fields that are only ever str()-formatted onto the card (an "X" cost or "—"
 # is legal, so these aren't forced to int)…
 OV_NUMERIC_KEYS = ("cost", "level", "victory", "wil", "int", "com", "agi",
-                   "health", "sanity", "fight", "evade")
+                   "health", "sanity", "fight", "evade",
+                   "shroud", "clues", "doom")
 # …vs pip counts, which feed range() in the renderers and MUST be small ints
 OV_PIP_KEYS = ("damage", "horror")
 MAX_PIPS = 5                       # the plugin frames carry Damage1..5/Horror1..5
@@ -116,7 +118,12 @@ def art_box(card_type):
         se_map = {"Investigator": ("Investigator",
                                    "TransparentPortrait-portrait-clip", 1050, 750),
                   "Enemy": ("Enemy", "Portrait-portrait-clip", 750, 1050),
-                  "Treachery": ("Treachery", "Portrait-portrait-clip", 750, 1050)}
+                  "Treachery": ("Treachery", "Portrait-portrait-clip", 750, 1050),
+                  "Location": ("Location", "Portrait-portrait-clip", 750, 1050),
+                  "Scenario": ("Scenario", "Portrait-portrait-clip", 750, 1050),
+                  "Story": ("Story", "Portrait-portrait-clip", 750, 1050),
+                  "Agenda": ("Agenda", "Portrait-portrait-clip", 1050, 750),
+                  "Act": ("Act", "Portrait-portrait-clip", 1050, 750)}
         if card_type in se_map:
             kind, key, w, h = se_map[card_type]
             box = se_reg(kind, key)
@@ -1164,6 +1171,105 @@ def s_treachery(c, pt, dest, art_path=None, placement=None):
     img.save(dest)
 
 
+def _scenario_body(d, kind, c, pt, traits=False, top=None):
+    """Rules/flavor block for a scenario-side card, inside its Body region."""
+    b = se_reg(kind, "Body")
+    if not b:
+        return
+    y = top if top is not None else b[1]
+    b = (b[0], y, b[2], b[3])
+    if traits and c.get("traits"):
+        _box_text(d, c["traits"], (b[0], y, b[2], y + 28),
+                  bold=True, italic=True, max_size=22)
+        y += 34
+    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3]), start=24)
+    if pt.get("flavor") and y + 30 < b[3]:
+        _box_block(d, pt.get("flavor", ""), (b[0], y + 6, b[2], b[3]),
+                   fill=(84, 66, 50), italic=True, start=20)
+
+
+def s_location(c, pt, dest, art_path=None, placement=None):
+    """A location — front (unrevealed) or back (revealed), with shroud + clues
+    printed on the frame (shroud is print-only; it isn't a TTS data field)."""
+    back = bool(c.get("revealed"))
+    kind = "LocationBack" if back else "Location"
+    img, d = _se_frame_compose("AHLCG-" + kind, kind, "Portrait-portrait-clip",
+                               art_path, placement)
+    _box_text(d, c["name"], se_reg(kind, "Name"), title=True, grow=1.15)
+    if c.get("traits"):
+        _box_text(d, c["traits"], se_reg(kind, "SubtitleText"),
+                  bold=True, italic=True, max_size=22)
+    if not back:
+        if c.get("shroud") not in (None, ""):
+            _box_text(d, str(c["shroud"]), se_reg("Location", "Shroud"),
+                      stat=True, grow=1.0, fill=(238, 232, 216))
+        if c.get("clues") not in (None, ""):
+            _box_text(d, str(c["clues"]), se_reg("Location", "Clues"),
+                      stat=True, grow=1.0, fill=(238, 232, 216))
+        if c.get("victory"):
+            _box_text(d, "Victory {}.".format(c["victory"]),
+                      se_reg("Location", "Victory"), bold=True, max_size=20)
+    # keep the front's rules text clear of the shroud/clue circles
+    clues = se_reg("Location", "Clues")
+    top = (clues[3] + 16) if (clues and not back) else None
+    _scenario_body(d, kind, c, pt, top=top)
+    _box_text(d, "Illus. pending — fan content", se_reg(kind, "Copyright"),
+              fill=(225, 218, 202), grow=1.0)
+    img.save(dest)
+
+
+def s_agenda(c, pt, dest, art_path=None, placement=None):
+    """Agenda (the doom clock) — landscape, doom threshold on the frame."""
+    img, d = _se_frame_compose("AHLCG-Agenda", "Agenda", "Portrait-portrait-clip",
+                               art_path, placement, landscape=True)
+    _box_text(d, c["name"], se_reg("Agenda", "Name"), title=True, grow=1.15)
+    if c.get("doom") not in (None, ""):
+        _box_text(d, str(c["doom"]), se_reg("Agenda", "Doom"),
+                  stat=True, grow=1.0, fill=(238, 232, 216))
+    _scenario_body(d, "Agenda", c, pt)
+    _box_text(d, "Illus. pending — fan content", se_reg("Agenda", "Copyright"),
+              fill=(225, 218, 202), grow=1.0)
+    img.save(dest)
+
+
+def s_act(c, pt, dest, art_path=None, placement=None):
+    """Act (the objective clock) — landscape, clue threshold on the frame."""
+    img, d = _se_frame_compose("AHLCG-Act", "Act", "Portrait-portrait-clip",
+                               art_path, placement, landscape=True)
+    _box_text(d, c["name"], se_reg("Act", "Name"), title=True, grow=1.15)
+    if c.get("clues") not in (None, ""):
+        _box_text(d, str(c["clues"]), se_reg("Act", "Clues"),
+                  stat=True, grow=1.0, fill=(238, 232, 216))
+    _scenario_body(d, "Act", c, pt)
+    _box_text(d, "Illus. pending — fan content", se_reg("Act", "Copyright"),
+              fill=(225, 218, 202), grow=1.0)
+    img.save(dest)
+
+
+def s_scenario_ref(c, pt, dest, art_path=None, placement=None):
+    """Scenario reference card — name header + setup/resolution body."""
+    img, d = _se_frame_compose("AHLCG-Scenario", "Scenario",
+                               "Portrait-portrait-clip", art_path, placement)
+    name_reg = se_reg("Scenario", "Name") or se_reg("Scenario", "Header")
+    _box_text(d, c["name"], name_reg, title=True, grow=1.15)
+    _scenario_body(d, "Scenario", c, pt, top=(name_reg[3] + 16) if name_reg else None)
+    img.save(dest)
+
+
+def s_story(c, pt, dest, art_path=None, placement=None):
+    """Story card — name + narrative body."""
+    img, d = _se_frame_compose("AHLCG-Story", "Story", "Portrait-portrait-clip",
+                               art_path, placement)
+    _box_text(d, c["name"], se_reg("Story", "Name"), title=True, grow=1.15)
+    _scenario_body(d, "Story", c, pt, traits=True)
+    img.save(dest)
+
+
+SCENARIO_RENDERERS = {"Location": s_location, "Agenda": s_agenda,
+                      "Act": s_act, "Scenario": s_scenario_ref,
+                      "Story": s_story}
+
+
 def content_regions(card_type):
     """logical field -> face-coordinate box, for click-to-edit in the app."""
     if not has_se_frames():
@@ -1195,6 +1301,17 @@ def content_regions(card_type):
         if card_type == "Asset":
             out["health"] = r(card_type, "Stamina")
             out["sanity"] = r(card_type, "Sanity")
+    elif card_type == "Location":
+        out = {"name": r("Location", "Name"), "text": r("Location", "Body"),
+               "shroud": r("Location", "Shroud"), "clues": r("Location", "Clues")}
+    elif card_type == "Agenda":
+        out = {"name": r("Agenda", "Name"), "text": r("Agenda", "Body"),
+               "doom": r("Agenda", "Doom")}
+    elif card_type == "Act":
+        out = {"name": r("Act", "Name"), "text": r("Act", "Body"),
+               "clues": r("Act", "Clues")}
+    elif card_type in ("Scenario", "Story"):
+        out = {"name": r(card_type, "Name"), "text": r(card_type, "Body")}
     return {k: v for k, v in out.items() if v}
 
 
@@ -1206,9 +1323,10 @@ def main():
     args = ap.parse_args()
     use_tpl = (not args.no_template) and T.has_template("investigator_front")
     cards = json.load(open(os.path.join(HERE, "stillhour_cards_spec.json"), encoding="utf-8"))
-    enc = os.path.join(HERE, "stillhour_encounter_spec.json")
-    if os.path.exists(enc):
-        cards += json.load(open(enc, encoding="utf-8"))
+    for extra in ("stillhour_encounter_spec.json", "stillhour_scenario_spec.json"):
+        p = os.path.join(HERE, extra)
+        if os.path.exists(p):
+            cards += json.load(open(p, encoding="utf-8"))
     if args.only:
         cards = [c for c in cards if c["id"] in set(args.only)]
     print_text = {k: v for k, v in
@@ -1258,6 +1376,8 @@ def main():
              (t_treachery if use_tpl else render_treachery))(c, pt, dest, art_path=art, placement=place)
         elif c["type"] in ("Asset", "Event", "Skill") and has_se_frames():
             s_player_card(c["type"], c, pt, dest, art_path=art, placement=place)
+        elif c["type"] in SCENARIO_RENDERERS and has_se_frames():
+            SCENARIO_RENDERERS[c["type"]](c, pt, dest, art_path=art, placement=place)
         else:
             render_player_card(c, pt, dest, art_path=art, placement=place)
     n = len([f for f in os.listdir(FACES_DIR) if f.endswith(".png")])

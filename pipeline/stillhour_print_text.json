@@ -179,5 +179,34 @@
     "horror": 2,
     "text": "Prey — the investigator with the most Memory on their cards.\nSpawns at the Wheel. Cannot be damaged while ready (evade it first; it only comes apart mid-turn, between rotations).",
     "flavor": "Round and round. It has always been riding. It will always be riding."
+  },
+  "sthr-loc-lanternroom": {
+    "text": "The lamp must be lit here before the stair will hold your weight.\n[action] Investigate. If you succeed, you may light the Lantern (flip this location's investigators to the revealed side).",
+    "flavor": "The light remembers a path the dark has forgotten."
+  },
+  "sthr-loc-keepersquarters": {
+    "text": "Forced — When you enter the Keeper's Quarters: read the top card of the encounter deck.\nSearch here (2 clues) for the keeper's logbook.",
+    "flavor": "Eight names in his own hand. The ninth is blank, and wet."
+  },
+  "sthr-loc-square": {
+    "text": "The Square is always the loop's start location. Investigators begin here each loop.",
+    "flavor": "You wake with the taste of salt and the certainty you have done this before."
+  },
+  "sthr-agenda-hour1": {
+    "text": "The night is young and already wrong.\nWhen Doom reaches 3: advance. Set the Hourglass to Hour II."
+  },
+  "sthr-act-ninthdeath": {
+    "text": "Objective — Recover the keeper's logbook from the Keeper's Quarters (2 clues), then read the ninth death.",
+    "flavor": "You have died in this night more times than anyone."
+  },
+  "sthr-scenario-lighthouse": {
+    "text": "Setup — Place The Lantern Room, The Winding Stair, and The Keeper's Quarters in a row. Investigators begin at The Square. Encounter deck: shared spine + the Lighthouse node set. Set the Appointed aside at Unseen."
+  },
+  "sthr-story-firstdark": {
+    "text": "You wake at First Dark with the taste of salt and the certainty you have done this before. The others feel it too. No one in Ambergrove will believe you."
+  },
+  "sthr-loc-windingstair": {
+    "text": "[action] Test [agility] (2) to climb. If you fail, take 1 damage.",
+    "flavor": "The steps do not always number the same."
   }
 }

@@ -14,9 +14,12 @@
   passes its 23 in-TTS tests)
 - ✅ Generated objects byte-aligned with real SCED (your 22 exported examples,
   vendored in docs/art_reference/sced_objects/)
-- ⬜ Content data pass: ~64 more faces (9 Occultation Hour agendas, encounter
-  spine, ~25 locations, node sets) — specs exist in the design docs, cards not
-  yet in the pipeline
+- 🔶 Content data pass: scenario CARD TYPES now render + edit (Location,
+  Agenda, Act, Scenario reference, Story — all on the plugin's authentic
+  frames, with shroud/clues/doom editable); the ~64 faces themselves
+  (9 Hour agendas, ~25 locations, node sets) still to be entered/arted
+- ✅ Scenario requirements captured: docs/design/SCENARIO_SCHEMA.md +
+  campaigns/still_hour/scenario_manifest.json (what each scenario needs)
 - ⬜ Table presence (schemas all in hand from your examples): investigator
   minicards, campaign guide as PDF object, interactive campaign-log token,
   scenario/campaign boxes with Place/Recall
@@ -44,7 +47,7 @@
   override still wins; "Upload font…" brings your own .ttf/.otf into the
   dropdowns
 - ✅ Deck backs (your eclipse + lighthouse art) on every export
-- ✅ 151-check selftest + adversarial stress suite, Windows-safe (UTF-8 + race fixes)
+- ✅ 156-check selftest + adversarial stress suite, Windows-safe (UTF-8 + race fixes)
 
 ## Card look ("identical to official")
 

@@ -84,9 +84,10 @@ def save_config(cfg):
 def _load_card_specs():
     here = os.path.join(runner.repo_root(), "pipeline")
     cards = json.load(open(os.path.join(here, "stillhour_cards_spec.json"), encoding="utf-8"))
-    enc = os.path.join(here, "stillhour_encounter_spec.json")
-    if os.path.exists(enc):
-        cards += json.load(open(enc, encoding="utf-8"))
+    for extra in ("stillhour_encounter_spec.json", "stillhour_scenario_spec.json"):
+        p = os.path.join(here, extra)
+        if os.path.exists(p):
+            cards += json.load(open(p, encoding="utf-8"))
     return {c["id"]: c for c in cards}
 
 

@@ -803,7 +803,7 @@ def status(campaign="still_hour"):
     sys.path.insert(0, os.path.join(ROOT, "pipeline"))
     import render_placeholders as rp
     specs = {}
-    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json"):
+    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json", "stillhour_scenario_spec.json"):
         p = os.path.join(ROOT, "pipeline", spec_file)
         if os.path.exists(p):
             for c in json.load(open(p, encoding="utf-8")):
@@ -821,6 +821,8 @@ def status(campaign="still_hour"):
         g["spoiler"] = g["id"] in spoilers
     # full card catalog, grouped by deck (the Cards tab)
     def group_for(c):
+        if c["type"] in ("Location", "Agenda", "Act", "Scenario", "Story"):
+            return "Scenario cards"
         if c.get("encounter"):
             return "Encounter — The Named" if "Named" in c.get("traits", "") \
                 else "Encounter — The Appointed"
@@ -830,7 +832,7 @@ def status(campaign="still_hour"):
             return "Recollections"
         return "Signatures & Weaknesses"
     catalog = []
-    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json"):
+    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json", "stillhour_scenario_spec.json"):
         path = os.path.join(ROOT, "pipeline", spec_file)
         if not os.path.exists(path):
             continue
@@ -854,7 +856,7 @@ def status(campaign="still_hour"):
     card_overrides = rp.load_card_overrides()
     print_text = se_bridge._load_print_text()
     spec_by_id = {}
-    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json"):
+    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json", "stillhour_scenario_spec.json"):
         p2 = os.path.join(ROOT, "pipeline", spec_file)
         if os.path.exists(p2):
             for sc in json.load(open(p2, encoding="utf-8")):
@@ -879,6 +881,8 @@ def status(campaign="still_hour"):
             "text": mpt.get("text", ""), "flavor": mpt.get("flavor", ""),
             "fight": mpt.get("fight"), "evade": mpt.get("evade"),
             "damage": mpt.get("damage") or 0, "horror": mpt.get("horror") or 0,
+            "shroud": mc.get("shroud"), "clues": mc.get("clues"),
+            "doom": mc.get("doom"),
         }
         c["regions"] = rp.content_regions(c["type"])
         c["overridden"] = sorted(card_overrides.get(c["id"], {}).keys())
@@ -1545,7 +1549,7 @@ return `<div class=tile onclick='editArt(${JSON.stringify(c).replaceAll("'","&#3
 `<div class=nm title="${c.name}">${c.name}</div><div class=tp>${c.type} &middot; ${c.class}</div></div>`;}
 
 let GROUP='All', LS=null;
-const GROUP_ORDER=['Investigators','Signatures & Weaknesses','Recollections',
+const GROUP_ORDER=['Investigators','Signatures & Weaknesses','Recollections','Scenario cards',
 'Encounter — The Appointed','Encounter — The Named'];
 function setGroup(g){GROUP=g;if(LS)renderAll(LS);}
 function renderChips(s){
@@ -1767,6 +1771,10 @@ if(t==='Investigator')defs=[['wil','[wil]'],['int','[int]'],['com','[com]'],['ag
 else if(t==='Enemy')defs=[['fight','fight'],['health','health'],['evade','evade'],['damage','damage',1],['horror','horror',1]];
 else if(t==='Asset')defs=[['cost','cost'],['level','level'],['health','health'],['sanity','sanity'],['victory','victory']];
 else if(t==='Event')defs=[['cost','cost'],['level','level'],['victory','victory']];
+else if(t==='Location')defs=[['shroud','shroud'],['clues','clues'],['victory','victory']];
+else if(t==='Agenda')defs=[['doom','doom']];
+else if(t==='Act')defs=[['clues','clues']];
+else if(t==='Scenario'||t==='Story'||t==='Treachery'||t==='Skill')defs=[];
 else defs=[['level','level'],['victory','victory']];
 CC_NUM=defs.map(d=>d[0]);
 document.getElementById('cc_stats').innerHTML=defs.map(d=>ccNum(d[0],d[1],d[2])).join('');

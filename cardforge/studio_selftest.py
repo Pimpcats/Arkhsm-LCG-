@@ -188,11 +188,12 @@ check("lamp face real, lamp back = the campaign player back",
 
 print("== CARDS CATALOG (the placement section) ==")
 s = requests.get(BASE + "/api/status?campaign=still_hour").json()
-check("catalog lists all 36 cards with art boxes",
-      len(s["cards"]) == 36 and all("artbox" in c for c in s["cards"]))
+check("catalog lists all 44 cards with art boxes",
+      len(s["cards"]) == 44 and all("artbox" in c for c in s["cards"]))
 groups = {c["group"] for c in s["cards"]}
-check("five deck groups", groups == {"Investigators", "Signatures & Weaknesses",
-      "Recollections", "Encounter — The Appointed", "Encounter — The Named"})
+check("six deck groups (incl. Scenario cards)",
+      groups == {"Investigators", "Signatures & Weaknesses", "Recollections",
+                 "Scenario cards", "Encounter — The Appointed", "Encounter — The Named"})
 check("group names byte-match the page's order list (em dashes)",
       all(g in page for g in groups))
 check("faces_ver present for image cache-busting", isinstance(s["faces_ver"], int))
@@ -291,6 +292,40 @@ if ov_backup is None:
 else:
     with open(ov_path, "w", encoding="utf-8") as f:
         f.write(ov_backup)
+
+print("== SCENARIO CARD TYPES (Location / Agenda / Act / Scenario / Story) ==")
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+by_type = {c["type"]: c for c in s["cards"]}
+check("every scenario card type is in the catalog + editable",
+      all(t in by_type for t in ("Location", "Agenda", "Act", "Scenario", "Story")))
+loc = next(c for c in s["cards"] if c["id"] == "sthr-loc-keepersquarters")
+check("location exposes shroud + clues content and clickable regions",
+      loc["content"]["shroud"] == 2 and loc["content"]["clues"] == 2
+      and {"shroud", "clues", "name", "text"} <= set(loc["regions"]))
+ag = next(c for c in s["cards"] if c["type"] == "Agenda")
+check("agenda exposes a doom value + region",
+      ag["content"]["doom"] is not None and "doom" in ag["regions"])
+sov = os.path.join(ROOT, "campaigns", "still_hour", "card_overrides.json")
+sov_bak = open(sov, encoding="utf-8").read() if os.path.exists(sov) else None
+r = requests.post(BASE + "/api/card_save",
+                  json={"card": "sthr-loc-keepersquarters",
+                        "shroud": "5", "clues": "4"}).json()
+check("editing a location's shroud/clues round-trips + recomposes",
+      r.get("ok") and r["overrides"]["shroud"] == 5 and r["overrides"]["clues"] == 4)
+requests.post(BASE + "/api/card_save", json={"card": "sthr-loc-keepersquarters"})
+from PIL import Image as _Iscn
+# APPLY wiped art/faces earlier; compose the two on demand to check the frames
+requests.post(BASE + "/api/compose_one", json={"card": "sthr-loc-keepersquarters"})
+requests.post(BASE + "/api/compose_one", json={"card": "sthr-agenda-hour1"})
+wait_idle()
+check("scenario faces render on the real plugin frames (portrait + landscape)",
+      _Iscn.open(os.path.join(faces_dir, "sthr-loc-keepersquarters.png")).size == (750, 1050)
+      and _Iscn.open(os.path.join(faces_dir, "sthr-agenda-hour1.png")).size == (1050, 750))
+if sov_bak is None:
+    if os.path.exists(sov):
+        os.remove(sov)
+else:
+    open(sov, "w", encoding="utf-8").write(sov_bak)
 
 print("== SPOILER SHIELD + AUTO-BUILD ==")
 s = requests.get(BASE + "/api/status?campaign=still_hour").json()
@@ -803,7 +838,7 @@ r = subprocess.run(
      "from cardforge import se_bridge, studio;"
      "assert len(se_bridge.build_jobs()) == 41;"
      "s = studio.status('still_hour');"
-     "assert len(s['cards']) == 36 and s['campaigns']"],
+     "assert len(s['cards']) == 44 and s['campaigns']"],
     env=env, cwd=ROOT, capture_output=True, text=True)
 check("status()+build_jobs OK under a cp1252-like locale (Windows default)",
       r.returncode == 0)
