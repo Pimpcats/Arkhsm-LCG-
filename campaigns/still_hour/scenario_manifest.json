@@ -1,0 +1,154 @@
+{
+  "_schema": "docs/design/SCENARIO_SCHEMA.md",
+  "_note": "The Still Hour captured against the scenario requirements schema. Values from docs/design/THE_STILL_HOUR_campaign_guide_v0_5.md + THE_STILL_HOUR_encounter_v0_4.md. status: authored=built card exists; needs_art=spec exists, art pending; todo=not yet in the pipeline. This is what the editor fills in scenario-to-scenario.",
+  "campaign": {
+    "id": "still_hour",
+    "name": "The Still Hour",
+    "box_id": "CB-STHR",
+    "structure": "loop-horror: Prologue -> 6 repeating Districts (Act I surface / Act II deep) -> Finale",
+    "investigators": ["sthr-elias", "sthr-ayako", "sthr-cass", "sthr-seraphine", "sthr-birdie"],
+    "encounter_sets": {
+      "occultation_skips": {"name": "The Occultation (Skip treacheries)", "source": "encounter v0.4 §2",
+        "cards": [{"name": "LOST HOUR", "type": "Treachery", "qty": 3}, {"name": "SLIPPAGE", "type": "Treachery", "keywords": ["Surge"], "qty": 2}]},
+      "echoes": {"name": "Echoes of Ambergrove (Echo enemies)", "source": "encounter v0.4 §3",
+        "cards": [{"name": "THE WAITING CONGREGATION", "type": "Enemy", "traits": "Echo. Humanoid.", "qty": 2}, {"name": "THE DROWNED CHOIR", "type": "Enemy", "traits": "Echo. Monster.", "qty": 2}, {"name": "FAMILIAR FACE", "type": "Enemy", "traits": "Echo. Humanoid.", "qty": 1}, {"name": "THE LAMPLIGHTER'S ECHO", "type": "Enemy", "traits": "Echo. Humanoid.", "qty": 1}]},
+      "static": {"name": "Static (reality-glitch treacheries)", "source": "encounter v0.4 §4",
+        "cards": [{"name": "WRONG TURN", "type": "Treachery", "qty": 2}, {"name": "REWIND", "type": "Treachery", "keywords": ["Peril"], "qty": 2}, {"name": "DEAD AIR", "type": "Treachery", "qty": 2}, {"name": "THE LOOP NOTICES YOU", "type": "Treachery", "qty": 2}]},
+      "weight_of_years": {"name": "The Weight of Years (aging treacheries)", "source": "encounter v0.4 §6",
+        "cards": [{"name": "A YEAR IN A NIGHT", "type": "Treachery", "keywords": ["Peril"], "qty": 2}, {"name": "WHAT YOU'VE FORGOTTEN", "type": "Treachery", "qty": 2}, {"name": "OLD BONES", "type": "Treachery", "keywords": ["Peril"], "qty": 1}]},
+      "appointed": {"name": "The Appointed (boss set, set aside)", "source": "encounter v0.4 §5",
+        "cards": [{"id": "sthr-appointed", "name": "THE APPOINTED", "type": "Enemy", "traits": "Monster.", "elite": true, "unique": true, "qty": 1, "status": "authored"}, {"name": "THE CROSSING", "type": "Treachery", "qty": 1}, {"name": "THE APPOINTED'S WHISPER", "type": "Treachery", "keywords": ["Peril"], "qty": 2, "act_gate": "II"}]},
+      "named": {"name": "The Named of Ambergrove (Victory elites)", "source": "encounter v0.4 §5b",
+        "cards": [{"id": "sthr-bellringer", "name": "THE BELL-RINGER BENEATH", "type": "Enemy", "traits": "Monster.", "elite": true, "named": true, "district": "district_church", "qty": 1, "status": "authored"}, {"id": "sthr-wearssheriff", "name": "WHAT WEARS THE SHERIFF", "type": "Enemy", "traits": "Humanoid. Monster.", "elite": true, "named": true, "victory": 3, "district": "district_square", "qty": 1, "status": "authored"}, {"id": "sthr-onewhorides", "name": "THE ONE WHO RIDES FOREVER", "type": "Enemy", "traits": "Humanoid.", "elite": true, "named": true, "district": "district_fairground", "qty": 1, "status": "authored"}]}
+    },
+    "shared_spine": ["occultation_skips", "echoes", "static", "weight_of_years"],
+    "clocks": [
+      {"id": "occultation", "name": "The Occultation", "kind": "agenda-like (the Hour clock, ordered I->IX, never shuffled)", "template": "Agenda", "status": "todo",
+       "stages": [{"name": "Hour I"}, {"name": "Hour II"}, {"name": "Hour III"}, {"name": "Hour IV"}, {"name": "Hour V"}, {"name": "Hour VI"}, {"name": "Hour VII", "text": "The Guest Approaches"}, {"name": "Hour VIII"}, {"name": "Hour IX", "text": "The Appointed Hour"}]}
+    ],
+    "knowledge_track": {"source": "campaign guide §7", "status": "todo", "note": "You Are Unstuck (Prologue) + one fact per district; drives Act I->II and clock edits"},
+    "resolutions": [
+      {"id": "R1..R6", "source": "campaign guide §9", "note": "finale resolution table, checked top-to-bottom; R6 = The Loop Wins"}
+    ],
+    "campaign_log": {"template": "Custom_Token", "status": "todo"},
+    "campaign_guide": {"template": "Custom_PDF", "status": "todo"}
+  },
+  "scenarios": [
+    {
+      "id": "prologue", "name": "The First Hour", "order": 0,
+      "reference": {"status": "todo"},
+      "stacks": {
+        "locations": {"template": "Location", "status": "todo", "cards": [
+          {"name": "The Square", "starting": true}, {"name": "The Long Pier"}, {"name": "The Almanac Steps"}]},
+        "encounter": {"sets": ["occultation_skips", "echoes", "static", "weight_of_years"], "aside": [], "note": "shared spine only — no Whispers, no Appointed"}
+      },
+      "setup": {"starting_location": "The Square", "chaos_bag": "Calm band", "hourglass": "Hour I", "dissonance": 0},
+      "grants": ["You Are Unstuck (Act I begins)"]
+    },
+    {
+      "id": "district_lighthouse", "name": "The Lighthouse", "order": 1,
+      "reference": {"status": "todo"},
+      "stacks": {
+        "locations": {"template": "Location", "status": "todo", "cards": [
+          {"name": "The Lantern Room", "shroud": 3, "clues": 2},
+          {"name": "The Winding Stair", "shroud": 2, "clues": 1},
+          {"name": "The Keeper's Quarters", "shroud": 2, "clues": 2}]},
+        "act_deck": {"template": "Act", "status": "todo", "cards": [
+          {"name": "surface objective", "act": "I"}, {"name": "the ninth death", "act": "II", "clues_at": "The Keeper's Quarters"}]},
+        "encounter": {"sets": ["#spine", "node_lighthouse"], "aside": ["appointed"]},
+        "node_set": {"id": "node_lighthouse", "size": "2-4", "status": "todo", "note": "ships with the node objective"}
+      },
+      "setup": {"starting_location": "The Square"},
+      "grants": ["Knowledge: The Ninth Death"]
+    },
+    {
+      "id": "district_church", "name": "The Drowned Church", "order": 2,
+      "reference": {"status": "todo"},
+      "stacks": {
+        "locations": {"template": "Location", "status": "todo", "cards": [
+          {"name": "The Nave", "shroud": 2, "clues": 3},
+          {"name": "The Belfry", "shroud": 3, "clues": 2},
+          {"name": "The Flooded Crypt", "shroud": 4, "clues": 3, "sealed_until_fact": true},
+          {"name": "The Vestry", "shroud": 2, "clues": 2}]},
+        "act_deck": {"template": "Act", "status": "todo", "cards": [
+          {"name": "surface objective", "act": "I"}, {"name": "the hour was wrong", "act": "II", "clues_at": "The Flooded Crypt"}]},
+        "encounter": {"sets": ["#spine", "node_church"], "aside": ["appointed"]},
+        "node_set": {"id": "node_church", "size": "2-4", "status": "todo"},
+        "enemies_named": {"template": "Enemy", "cards": [{"ref": "sthr-bellringer", "act": "II"}]}
+      },
+      "grants": ["Knowledge: The Toll / The Hour Was Wrong"]
+    },
+    {
+      "id": "district_road", "name": "The Sunken Road", "order": 3,
+      "reference": {"status": "todo"},
+      "stacks": {
+        "locations": {"template": "Location", "status": "todo", "cards": [
+          {"name": "The Milestones", "shroud": 1, "clues": 2},
+          {"name": "The Low Bridge", "shroud": 3, "clues": 2},
+          {"name": "The Turning", "shroud": 2, "clues": 3}]},
+        "act_deck": {"template": "Act", "status": "todo", "cards": [
+          {"name": "surface objective", "act": "I"}, {"name": "who walks beside you", "act": "II", "at": "The Turning"}]},
+        "encounter": {"sets": ["#spine", "node_road"], "aside": ["appointed"]},
+        "node_set": {"id": "node_road", "size": "2-4", "status": "todo"}
+      },
+      "grants": ["Knowledge: Who Walks Beside You"]
+    },
+    {
+      "id": "district_square", "name": "The Square (Town Hall)", "order": 4,
+      "reference": {"status": "todo"},
+      "stacks": {
+        "locations": {"template": "Location", "status": "todo", "cards": [
+          {"name": "The Town Hall Steps", "shroud": 2, "clues": 2},
+          {"name": "The Records Office", "shroud": 3, "clues": 3},
+          {"name": "The Well", "shroud": 2, "clues": 2}]},
+        "act_deck": {"template": "Act", "status": "todo", "cards": [
+          {"name": "surface objective", "act": "I"}, {"name": "the vote that never ends", "act": "II", "clues_at": "The Records Office"}]},
+        "encounter": {"sets": ["#spine", "node_square"], "aside": ["appointed"]},
+        "node_set": {"id": "node_square", "size": "2-4", "status": "todo"},
+        "enemies_named": {"template": "Enemy", "cards": [{"ref": "sthr-wearssheriff", "act": "II"}]}
+      },
+      "setup": {"note": "The Square is always the loop's start location"},
+      "grants": ["Knowledge: The Vote That Never Ends"]
+    },
+    {
+      "id": "district_fairground", "name": "The Fairground", "order": 5,
+      "reference": {"status": "todo"},
+      "stacks": {
+        "locations": {"template": "Location", "status": "todo", "cards": [
+          {"name": "The Wheel", "shroud": 3, "clues": 2},
+          {"name": "The Hall of Mirrors", "shroud": 2, "clues": 3},
+          {"name": "The Ticket Booth", "shroud": 2, "clues": 2}]},
+        "act_deck": {"template": "Act", "status": "todo", "cards": [
+          {"name": "surface objective", "act": "I"}, {"name": "the ticket-taker's bargain", "act": "II", "at": "The Ticket Booth"}]},
+        "encounter": {"sets": ["#spine", "node_fairground"], "aside": ["appointed"]},
+        "node_set": {"id": "node_fairground", "size": "2-4", "status": "todo"},
+        "enemies_named": {"template": "Enemy", "cards": [{"ref": "sthr-onewhorides", "act": "II"}]}
+      },
+      "grants": ["Knowledge: The Ticket-Taker's Bargain"]
+    },
+    {
+      "id": "district_almanac", "name": "The Almanac House", "order": 6,
+      "reference": {"status": "todo"},
+      "stacks": {
+        "locations": {"template": "Location", "status": "todo", "cards": [
+          {"name": "The Reading Room", "shroud": 2, "clues": 2},
+          {"name": "The Press", "shroud": 3, "clues": 3},
+          {"name": "The Sealed Study", "shroud": 4, "clues": 3, "opens_with_fact": true}]},
+        "act_deck": {"template": "Act", "status": "todo", "cards": [
+          {"name": "surface objective", "act": "I"}, {"name": "the appointed's name", "act": "II", "at": "The Sealed Study", "requires": ["What the Almanac Hid", "The Vote That Never Ends"]}]},
+        "encounter": {"sets": ["#spine", "node_almanac"], "aside": ["appointed"]},
+        "node_set": {"id": "node_almanac", "size": "2-4", "status": "todo"}
+      },
+      "grants": ["Knowledge: The Appointed's Name (finale input)"]
+    },
+    {
+      "id": "finale", "name": "The Last Hour", "order": 7,
+      "reference": {"status": "todo"},
+      "stacks": {
+        "encounter": {"sets": ["#spine"], "aside": ["appointed"], "note": "Appointed's Approach advances immediately to Arrived"},
+        "resolutions": {"ref": "campaign.resolutions"}
+      },
+      "setup": {"note": "Dissonance does not reset; contest = 4 x investigators before Hour IX", "chaos_bag": "per campaign log"}
+    }
+  ]
+}
