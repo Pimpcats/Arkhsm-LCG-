@@ -47,13 +47,19 @@ Real location `GMNotes` (Miskatonic University): `icons:"Diamond"`,
 `connections:"Tee|Plus|Circle|Square|FromRight"`, clues via
 `uses[{countPerInvestigator:2, type:"Clue"}]`, `victory` on the back.
 
-| Element | Official shows | We render | Fix asset |
+| Element | Official shows | We render | Status |
 |---|---|---|---|
-| **Connection symbols** | the location's own symbol (e.g. ◆) + a row of the symbols it connects to, along the bottom | **nothing** | plugin `AHLCG-LocDiamond/Circle/Square/Triangle/Cross/Heart/Moon/Star/Hourglass/Quote` (+Alt) → regions `BaseIcon`, `Connection1Icon`…`Connection6Icon` |
-| **Shroud** | shroud value on the shroud icon/base | a plain number | plugin `AHLCG-LocationBase`; region `Shroud` (+ `ShroudPerInvIcon`) |
-| **Clues** | value **per investigator** with the per-investigator marker | a plain number, no per-inv marker | plugin `AHLCG-PerInvestigator`; regions `Clues`/`CluesPerInv`/`CluesPerInvIcon` |
-| **Front vs back text** | unrevealed = flavor only; revealed = full rules + clues + victory | we put full rules on the front | data model: split front/back text |
-| **Victory** | on the revealed back, bottom | field exists, not shown on back yet | region `Victory` |
+| **Connection symbols** | the location's own symbol (e.g. ◆) + a row of the symbols it connects to, along the bottom | **now rendered** — own symbol at `BaseIcon`, connected symbols at `Connection1..6` from the plugin's `AHLCG-Loc*` icons (16 symbols mapped) | ✅ **wired** (placement to fine-tune vs ref) |
+| **Clues per investigator** | value + per-investigator marker | **now rendered** — number in the per-inv slot + `AHLCG-PerInvestigator` marker | ✅ **wired** (icon size/pos to fine-tune) |
+| **Shroud** | shroud value | plain number in the shroud slot | ✅ number; icon baked in frame |
+| **Front vs back text** | unrevealed = flavor only; revealed = full rules + clues + victory | we put full rules on the front | ⬜ data model: split front/back text |
+| **Victory** | on the revealed back, bottom | field exists, not shown on back yet | ⬜ region `Victory` |
+
+New editable location fields now driving the icons: `icons` (own symbol name),
+`connections[]` (connected symbols), `clues_per_investigator` (bool). Symbol
+names map to the plugin assets (Circle/Square/Triangle/Diamond/Moon/Star/Heart/
+Hourglass/Cross/Quote/Slash/DoubleSlash/Spade/Clover/T). A connection-symbol
+**picker** in the editor is the remaining UI piece.
 
 New data fields a location needs (to drive the above): `icons` (own symbol),
 `connections[]` (symbols it links to), `clues_per_investigator` (bool),

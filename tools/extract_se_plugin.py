@@ -56,7 +56,9 @@ TEMPLATES = [
 OVERLAY_PREFIXES = ("AHLCG-SkillBox-", "AHLCG-SkillIcon-", "AHLCG-NoLevel",
                     "AHLCG-Slot-", "AHLCG-Damage", "AHLCG-Horror",
                     "AHLCG-StaminaBase", "AHLCG-SanityBase")
-ICON_PREFIXES = ("AHLCG-Slot", "AHLCG-Level")
+ICON_PREFIXES = ("AHLCG-Slot", "AHLCG-Level",
+                 # location connection symbols + per-investigator marker + base
+                 "AHLCG-Loc", "AHLCG-PerInvestigator")
 
 REGION_RE = re.compile(r"^\s*([A-Za-z0-9#_.-]+)-region\s*=\s*"
                        r"(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)")

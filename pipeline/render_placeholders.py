@@ -960,6 +960,32 @@ def _paste_region(img, overlay, box):
     img.paste(ov, (box[0], box[1]), ov)
 
 
+# Arkham location connection symbols -> the plugin's own icon assets
+LOC_SYMBOL = {"circle": "Circle", "square": "Square", "triangle": "Triangle",
+              "diamond": "Diamond", "moon": "Moon", "star": "Star",
+              "heart": "Heart", "hourglass": "Hourglass", "cross": "Cross",
+              "quote": "Quote", "slash": "Slash", "doubleslash": "DoubleSlash",
+              "spade": "Spade", "clover": "Clover", "t": "T", "tee": "T",
+              "plus": "Cross"}
+
+
+def loc_symbol_img(name):
+    key = LOC_SYMBOL.get(str(name or "").strip().lower().replace(" ", ""))
+    return _se_img("icons", "AHLCG-Loc" + key) if key else None
+
+
+def _paste_icon_fit(img, overlay, box):
+    """Paste an icon centered in a box, preserving its aspect (symbols are not
+    always square, and the region boxes aren't either)."""
+    if overlay is None or box is None:
+        return
+    bw, bh = box[2] - box[0], box[3] - box[1]
+    s = min(bw / overlay.width, bh / overlay.height)
+    w, h = max(1, round(overlay.width * s)), max(1, round(overlay.height * s))
+    ov = overlay.resize((w, h), Image.LANCZOS)
+    img.paste(ov, (box[0] + (bw - w) // 2, box[1] + (bh - h) // 2), ov)
+
+
 def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
     """Asset / Event / Skill on the plugin's authentic per-class frame."""
     letter = "W" if c.get("weakness") else CLASS_LETTER.get(c.get("class"), "N")
@@ -1204,11 +1230,30 @@ def s_location(c, pt, dest, art_path=None, placement=None):
             _box_text(d, str(c["shroud"]), se_reg("Location", "Shroud"),
                       stat=True, grow=1.0, fill=(238, 232, 216))
         if c.get("clues") not in (None, ""):
-            _box_text(d, str(c["clues"]), se_reg("Location", "Clues"),
+            # per-investigator clues use the left-shifted slot + a marker icon,
+            # so the number stays readable beside the per-investigator symbol
+            per_inv = bool(c.get("clues_per_investigator"))
+            clue_reg = se_reg("Location", "CluesPerInv" if per_inv else "Clues")
+            _box_text(d, str(c["clues"]), clue_reg,
                       stat=True, grow=1.0, fill=(238, 232, 216))
+            if per_inv:
+                _paste_icon_fit(img, _se_img("icons", "AHLCG-PerInvestigator"),
+                                se_reg("Location", "CluesPerInvIcon"))
         if c.get("victory"):
             _box_text(d, "Victory {}.".format(c["victory"]),
                       se_reg("Location", "Victory"), bold=True, max_size=20)
+    # the location's own connection symbol + the symbols it connects to
+    base_sym = loc_symbol_img(c.get("icons"))
+    if base_sym:
+        _paste_icon_fit(img, base_sym, se_reg(kind, "BaseIcon")
+                        or se_reg("Location", "BaseIcon"))
+    conns = c.get("connections") or []
+    if isinstance(conns, str):
+        conns = [x for x in conns.split("|") if x]
+    for i, sym in enumerate(conns[:6]):
+        im = loc_symbol_img(sym)
+        if im:
+            _paste_icon_fit(img, im, se_reg("Location", "Connection{}Icon".format(i + 1)))
     # keep the front's rules text clear of the shroud/clue circles
     clues = se_reg("Location", "Clues")
     top = (clues[3] + 16) if (clues and not back) else None

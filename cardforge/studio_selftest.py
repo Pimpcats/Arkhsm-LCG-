@@ -305,6 +305,16 @@ check("location exposes shroud + clues content and clickable regions",
 ag = next(c for c in s["cards"] if c["type"] == "Agenda")
 check("agenda exposes a doom value + region",
       ag["content"]["doom"] is not None and "doom" in ag["regions"])
+# location connection symbols + per-investigator clues actually composite on
+import render_placeholders as _rp
+_sq = os.path.join(faces_dir, "sthr-loc-square.png")
+requests.post(BASE + "/api/compose_one", json={"card": "sthr-loc-square"})
+wait_idle()
+_before = os.path.getsize(_sq)
+check("location renders connection symbols + per-inv clues (plugin assets)",
+      _rp.loc_symbol_img("Diamond") is not None
+      and _rp._se_img("icons", "AHLCG-PerInvestigator") is not None
+      and os.path.exists(_sq) and _before > 8000)
 sov = os.path.join(ROOT, "campaigns", "still_hour", "card_overrides.json")
 sov_bak = open(sov, encoding="utf-8").read() if os.path.exists(sov) else None
 r = requests.post(BASE + "/api/card_save",

@@ -1,15 +1,81 @@
 [
-  {"id": "sthr-loc-lanternroom", "type": "Location", "name": "The Lantern Room",
-   "traits": "Ambergrove. Lighthouse.", "shroud": 3, "clues": 2},
-  {"id": "sthr-loc-windingstair", "type": "Location", "name": "The Winding Stair",
-   "traits": "Ambergrove. Lighthouse.", "shroud": 2, "clues": 1},
-  {"id": "sthr-loc-keepersquarters", "type": "Location", "name": "The Keeper's Quarters",
-   "traits": "Ambergrove. Lighthouse.", "shroud": 2, "clues": 2},
-  {"id": "sthr-loc-square", "type": "Location", "name": "The Square",
-   "traits": "Ambergrove. Central.", "shroud": 2, "clues": 2},
-  {"id": "sthr-agenda-hour1", "type": "Agenda", "name": "Hour I", "doom": 3},
-  {"id": "sthr-act-ninthdeath", "type": "Act", "name": "The Ninth Death", "clues": 2},
-  {"id": "sthr-scenario-lighthouse", "type": "Scenario", "name": "The Lighthouse"},
-  {"id": "sthr-story-firstdark", "type": "Story", "name": "First Dark",
-   "traits": "Interlude."}
+  {
+    "id": "sthr-loc-lanternroom",
+    "type": "Location",
+    "name": "The Lantern Room",
+    "traits": "Ambergrove. Lighthouse.",
+    "shroud": 3,
+    "clues": 2,
+    "icons": "Diamond",
+    "connections": [
+      "Circle"
+    ],
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-loc-windingstair",
+    "type": "Location",
+    "name": "The Winding Stair",
+    "traits": "Ambergrove. Lighthouse.",
+    "shroud": 2,
+    "clues": 1,
+    "icons": "Circle",
+    "connections": [
+      "Diamond",
+      "Moon"
+    ],
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-loc-keepersquarters",
+    "type": "Location",
+    "name": "The Keeper's Quarters",
+    "traits": "Ambergrove. Lighthouse.",
+    "shroud": 2,
+    "clues": 2,
+    "icons": "Moon",
+    "connections": [
+      "Circle"
+    ],
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-loc-square",
+    "type": "Location",
+    "name": "The Square",
+    "traits": "Ambergrove. Central.",
+    "shroud": 2,
+    "clues": 2,
+    "icons": "Star",
+    "connections": [
+      "Diamond",
+      "Circle",
+      "Moon",
+      "Square"
+    ],
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-agenda-hour1",
+    "type": "Agenda",
+    "name": "Hour I",
+    "doom": 3
+  },
+  {
+    "id": "sthr-act-ninthdeath",
+    "type": "Act",
+    "name": "The Ninth Death",
+    "clues": 2
+  },
+  {
+    "id": "sthr-scenario-lighthouse",
+    "type": "Scenario",
+    "name": "The Lighthouse"
+  },
+  {
+    "id": "sthr-story-firstdark",
+    "type": "Story",
+    "name": "First Dark",
+    "traits": "Interlude."
+  }
 ]
