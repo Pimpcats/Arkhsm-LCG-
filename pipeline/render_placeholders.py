@@ -1713,21 +1713,31 @@ def s_scenario_ref(c, pt, dest, art_path=None, placement=None):
     icon = se_reg("Chaos", "BodyIcon")
     icx = (icon[0] + icon[2]) // 2          # token-column centre x
     isize = 80
+    tw = body[2] - body[0]
     y = body[1]
     tokens = c.get("tokens") or []
     if tokens:
         for t in tokens:
             tok = str(t.get("token", "")).lower().replace(" ", "")
             text = str(t.get("text", ""))
-            y_text = _box_block(d, text, (body[0], y + 4, body[2], body[3]),
-                                start=27, min_size=20)
-            rowh = max(isize, y_text - y)
+            # size the text to the row, then measure its height so the token and
+            # the text share one horizontal centreline
+            size = 27
+            for size in range(27, 19, -1):
+                lines = wrap_runs(d, text, size, tw)
+                if len(lines) * int(size * 1.22) <= isize + 40:
+                    break
+            lh = int(size * 1.22)
+            th = len(lines) * lh
+            rowh = max(isize, th)
+            cy = y + rowh // 2                     # shared centreline
+            draw_wrapped(d, text, body[0], cy - th // 2, size, tw, PSD_INK,
+                         leading=1.22)
             ov = CHAOS_OVERLAY.get(tok)
             if ov and _se_img("overlays", ov):
-                iy = y + (rowh - isize) // 2
                 _paste_icon_fit(img, _se_img("overlays", ov),
-                                (icx - isize // 2, iy, icx + isize // 2,
-                                 iy + isize))
+                                (icx - isize // 2, cy - isize // 2,
+                                 icx + isize // 2, cy + isize // 2))
             y += rowh + 22
     else:
         _box_block(d, pt.get("text", ""), (body[0], y, body[2], body[3]),
