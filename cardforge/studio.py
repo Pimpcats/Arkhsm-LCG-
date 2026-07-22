@@ -1048,6 +1048,21 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Content-Length", str(len(data)))
             self.end_headers()
             self.wfile.write(data)
+        elif u.path == "/font":
+            # serve a font file from assets/fonts (for the symbol palette's
+            # @font-face so buttons show the real Arkham glyphs)
+            name = os.path.basename(q.get("f", ""))
+            path = os.path.join(ROOT, "assets", "fonts", name)
+            if not name.lower().endswith((".ttf", ".otf")) \
+                    or not os.path.exists(path):
+                self._json({"error": "not found"}, 404)
+                return
+            data = open(path, "rb").read()
+            self.send_response(200)
+            self.send_header("Content-Type", "font/ttf")
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
         else:
             self._json({"error": "unknown path"}, 404)
 
@@ -1181,6 +1196,13 @@ font-size:12px;color:var(--dim)}
 #log{padding:0 26px 12px;height:176px;overflow-y:auto;
 font:11.5px ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;color:#c9c5bb}
 #editor{display:none;animation:fade .2s ease}
+@font-face{font-family:'ArkhamGlyph';src:url('/font?f=ArkhamFontWithCodex.ttf')}
+.symbtn{display:inline-flex;flex-direction:column;align-items:center;gap:1px;
+cursor:pointer;background:var(--surface2);border:1px solid var(--line);
+border-radius:7px;padding:4px 7px;min-width:44px}
+.symbtn:hover{border-color:var(--accent)}
+.symbtn .gly{font-family:'ArkhamGlyph';font-size:20px;line-height:1;color:#e9e2d0}
+.symbtn small{font-size:9px;color:var(--dim);letter-spacing:.2px}
 #zoom{display:none;position:fixed;inset:0;z-index:10;background:rgba(8,8,12,.8);
 backdrop-filter:blur(10px);animation:fade .2s ease;align-items:center;justify-content:center}
 #zoom_box{background:var(--surface);border:1px solid var(--line);border-radius:18px;
@@ -1386,8 +1408,10 @@ title="drop this card onto the table of your RUNNING Tabletop Simulator — appe
 <label>traits</label><input id=cc_traits size=18 onfocus="tyBind('traits')">
 </div>
 <div class=row id=cc_stats></div>
-<label>rules text</label><textarea id=cc_text rows=5 spellcheck=false onfocus="tyBind('text')"></textarea>
-<label>flavor</label><textarea id=cc_flavor rows=2 spellcheck=false onfocus="tyBind('flavor')"></textarea>
+<div class=row id=ed_symbols style="margin:2px 0 4px;gap:5px;flex-wrap:wrap;align-items:center">
+<span class=hint>insert symbol&nbsp;&mdash;&nbsp;click into rules/flavor first:</span></div>
+<label>rules text</label><textarea id=cc_text rows=5 spellcheck=false onfocus="tyBind('text');glyphTarget('cc_text')"></textarea>
+<label>flavor</label><textarea id=cc_flavor rows=2 spellcheck=false onfocus="tyBind('flavor');glyphTarget('cc_flavor')"></textarea>
 <div class=row style="margin-top:6px">
 <button class="btn primary" onclick=ccSave()>Save content</button>
 <span id=cc_info class=hint></span>
@@ -1909,6 +1933,27 @@ document.getElementById('ty_size').value=1;
 document.getElementById('ty_pct').textContent='100%';
 document.getElementById('ty_bold').checked=false;
 document.getElementById('ty_italic').checked=false;tySet();}
+// ---- symbol palette: insert Arkham glyph tokens into the text areas ----
+// token, glyph letter (ArkhamFontWithCodex maps A-V to symbols), caption
+const SYMS=[['[action]','E','action'],['[fast]','F','fast'],['[reaction]','G','reaction'],
+['[wil]','A','will'],['[int]','B','intel'],['[com]','C','combat'],['[agi]','D','agility'],
+['[wild]','U','wild'],['[perinv]','T','per inv'],['[unique]','S','unique'],
+['[skull]','M','skull'],['[cultist]','N','cultist'],['[tablet]','R','tablet'],
+['[elderthing]','H','elder thing'],['[elder]','Q','elder sign'],['[autofail]','O','auto-fail'],
+['[codex]','V','codex']];
+let GLYPH_TARGET='cc_text';
+function glyphTarget(id){GLYPH_TARGET=id;}
+function symInit(){const el=document.getElementById('ed_symbols');if(!el||el.dataset.built)return;
+for(const [tok,gly,cap] of SYMS){const b=document.createElement('button');
+b.type='button';b.className='symbtn';b.title=tok;
+b.innerHTML='<span class=gly>'+gly+'</span><small>'+cap+'</small>';
+b.onclick=()=>symInsert(tok);el.appendChild(b);}
+el.dataset.built='1';}
+function symInsert(tok){const el=document.getElementById(GLYPH_TARGET)||document.getElementById('cc_text');
+if(!el)return;const s=el.selectionStart==null?el.value.length:el.selectionStart;
+const e=el.selectionEnd==null?el.value.length:el.selectionEnd;
+el.value=el.value.slice(0,s)+tok+el.value.slice(e);
+const pos=s+tok.length;el.focus();el.setSelectionRange(pos,pos);}
 async function edFontUpload(input){const f=input.files[0];if(!f)return;
 const rd=new FileReader();
 rd.onload=async()=>{const j=await post('upload_font',{name:f.name,data_b64:rd.result});
@@ -2034,7 +2079,7 @@ faces_dir:document.getElementById('se_faces').value,export_dpi:document.getEleme
 classmap:document.getElementById('se_classmap').value,keys:document.getElementById('se_keys').value});}
 function applyArt(){post('apply',{mode:document.getElementById('applymode').value,
 base_url:document.getElementById('baseurl').value});}
-refresh();poll();setInterval(refresh,4000);
+symInit();refresh();poll();setInterval(refresh,4000);
 </script></body></html>"""
 
 

@@ -810,6 +810,22 @@ check("resetting a text area clears it back to the default stack",
 check("typography panel (font/size/bold/italic per area) in the UI",
       "ed_typebar" in page and "tyBind" in page and "ty_bold" in page
       and "ty_italic" in page and "ty_size" in page)
+# symbol palette: insert Arkham glyph tokens into the text areas
+check("symbol palette + insert wiring in the UI",
+      "ed_symbols" in page and "symInsert" in page and "symInit" in page
+      and "[action]" in page and "[fast]" in page and "[wil]" in page)
+check("glyph font served for the palette (@font-face)",
+      "@font-face" in page and "ArkhamGlyph" in page)
+rf = requests.get(BASE + "/font?f=ArkhamFontWithCodex.ttf")
+check("/font route serves the Arkham glyph font",
+      rf.status_code == 200 and len(rf.content) > 1000)
+check("/font route rejects non-font paths",
+      requests.get(BASE + "/font?f=../studio.py").status_code == 404)
+# the renderer turns [token] markup into glyph runs (sized with the text)
+import cardforge.glyphs as _gly
+_runs = _gly.glyphify("[fast] Test [wil] (3). [elder]")
+check("markup splits into glyph runs the renderer draws at text size",
+      any(g for g, _ in _runs) and _gly.MARKUP["[action]"] == "E")
 # bring-your-own-font upload lands in assets/fonts and validates
 import base64 as _b64f
 good = _b64f.b64encode(open(os.path.join(ROOT, "assets", "fonts",
