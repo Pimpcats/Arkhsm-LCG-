@@ -80,18 +80,42 @@
     "id": "sthr-agenda-hour1",
     "type": "Agenda",
     "name": "Hour I",
-    "doom": 3
+    "doom": 3,
+    "index": "a",
+    "number": "1/9"
   },
   {
     "id": "sthr-act-ninthdeath",
     "type": "Act",
     "name": "The Ninth Death",
-    "clues": 2
+    "clues": 2,
+    "index": "1",
+    "number": "2/9"
   },
   {
     "id": "sthr-scenario-lighthouse",
     "type": "Scenario",
-    "name": "The Lighthouse"
+    "name": "The Lighthouse",
+    "difficulty": "EASY / STANDARD",
+    "number": "1/9",
+    "tokens": [
+      {
+        "token": "skull",
+        "text": "-X. X is the number of Echo enemies in play (to a maximum of 3)."
+      },
+      {
+        "token": "cultist",
+        "text": "-2. If the Appointed is Emerging or Arrived, -4 instead."
+      },
+      {
+        "token": "tablet",
+        "text": "-3. Raise Dissonance by 1."
+      },
+      {
+        "token": "elderthing",
+        "text": "-3. Take 1 horror."
+      }
+    ]
   },
   {
     "id": "sthr-story-firstdark",

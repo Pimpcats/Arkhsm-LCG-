@@ -1205,6 +1205,8 @@ def s_enemy(c, pt, dest, art_path=None, placement=None):
         _box_text(d, "—" if blank else str(val),
                   se_reg("Enemy", key), stat=not blank, bold=blank, grow=1.0,
                   fill=(238, 232, 216))
+    _box_text(d, "ENEMY", se_reg("Enemy", "Label"), bold=True, max_size=15,
+              fill=(74, 60, 46))
     _se_body(d, c, pt, "Enemy", extra_bottom=0, text_start=22)
     for kind_key, count, ov in (("Damage", pt.get("damage"), "AHLCG-Damage"),
                                 ("Horror", pt.get("horror"), "AHLCG-Horror")):
@@ -1227,6 +1229,8 @@ def s_treachery(c, pt, dest, art_path=None, placement=None):
     if weak:
         _box_text(d, "Weakness", se_reg(kind, "Subtype"), italic=True,
                   max_size=20)
+    _box_text(d, "TREACHERY", se_reg(kind, "Label") or se_reg("Treachery", "Label"),
+              bold=True, max_size=15, fill=(74, 60, 46))
     _se_body(d, c, pt, kind if se_reg(kind, "Body") else "Treachery")
     _box_text(d, "Illus. pending — fan content",
               se_reg(kind, "Artist") or se_reg("Treachery", "Artist"),
@@ -1315,41 +1319,82 @@ def s_location(c, pt, dest, art_path=None, placement=None):
 
 
 
+def _scenario_footer(d, kind, c):
+    """Illustrator (left) / (c) (centre) / card number (right), in the frame's
+    tiny footer band - the official credit line."""
+    a = se_reg(kind, "Artist")
+    if a:
+        _box_text(d, "Illus. pending - fan content", a, fill=(110, 92, 72),
+                  max_size=13, align="left")
+    cp = se_reg(kind, "Copyright")
+    if cp:
+        _box_text(d, "\u00a9 THE STILL HOUR", cp, fill=(110, 92, 72), max_size=13)
+    num = c.get("number")
+    if num:
+        en = se_reg(kind, "EncounterNumber")
+        if en:
+            _box_text(d, str(num), en, fill=(110, 92, 72), max_size=13,
+                      align="right")
+
+
 def s_agenda(c, pt, dest, art_path=None, placement=None):
-    """Agenda (the doom clock) — landscape, doom threshold on the frame."""
+    """Agenda (the doom clock) - landscape, art LEFT + text RIGHT, "Agenda N"
+    header top-right, doom on the frame, credit footer."""
     img, d = _se_frame_compose("AHLCG-Agenda", "Agenda", "Portrait-portrait-clip",
                                art_path, placement, landscape=True)
+    hdr = ("Agenda " + str(c.get("index", ""))).strip()
+    _box_text(d, hdr, se_reg("Agenda", "ScenarioIndex"), bold=True, max_size=15,
+              fill=(74, 60, 46), align="right")
     _box_text(d, c["name"], se_reg("Agenda", "Name"), title=True, grow=1.15)
     if c.get("doom") not in (None, ""):
         _box_text(d, str(c["doom"]), se_reg("Agenda", "Doom"),
                   stat=True, grow=1.0, fill=(238, 232, 216))
     _scenario_body(d, "Agenda", c, pt)
-    _box_text(d, "Illus. pending — fan content", se_reg("Agenda", "Copyright"),
-              fill=(225, 218, 202), grow=1.0)
+    _scenario_footer(d, "Agenda", c)
     img.save(dest)
 
 
 def s_act(c, pt, dest, art_path=None, placement=None):
-    """Act (the objective clock) — landscape, clue threshold on the frame."""
+    """Act (the objective clock) - landscape, art RIGHT + text LEFT, "Act N"
+    header top-left, clue threshold on the frame, credit footer."""
     img, d = _se_frame_compose("AHLCG-Act", "Act", "Portrait-portrait-clip",
                                art_path, placement, landscape=True)
+    hdr = ("Act " + str(c.get("index", ""))).strip()
+    _box_text(d, hdr, se_reg("Act", "ScenarioIndex"), bold=True, max_size=15,
+              fill=(74, 60, 46), align="left")
     _box_text(d, c["name"], se_reg("Act", "Name"), title=True, grow=1.15)
     if c.get("clues") not in (None, ""):
         _box_text(d, str(c["clues"]), se_reg("Act", "Clues"),
                   stat=True, grow=1.0, fill=(238, 232, 216))
     _scenario_body(d, "Act", c, pt)
-    _box_text(d, "Illus. pending — fan content", se_reg("Act", "Copyright"),
-              fill=(225, 218, 202), grow=1.0)
+    _scenario_footer(d, "Act", c)
     img.save(dest)
 
 
 def s_scenario_ref(c, pt, dest, art_path=None, placement=None):
-    """Scenario reference card — name header + setup/resolution body."""
+    """Scenario reference - title, difficulty subtitle (EASY/STANDARD front,
+    HARD/EXPERT back), and the chaos-token modifier rows."""
     img, d = _se_frame_compose("AHLCG-Scenario", "Scenario",
                                "Portrait-portrait-clip", art_path, placement)
-    name_reg = se_reg("Scenario", "Name") or se_reg("Scenario", "Header")
-    _box_text(d, c["name"], name_reg, title=True, grow=1.15)
-    _scenario_body(d, "Scenario", c, pt, top=(name_reg[3] + 16) if name_reg else None)
+    name_reg = se_reg("Scenario", "Name")
+    _box_text(d, c["name"], name_reg, title=True, grow=1.05)
+    diff = c.get("difficulty") or (
+        "HARD / EXPERT" if c.get("revealed") else "EASY / STANDARD")
+    y0 = (name_reg[3] if name_reg else 120)
+    _box_text(d, diff, (name_reg[0], y0 + 2, name_reg[2], y0 + 34),
+              bold=True, max_size=20, fill=(74, 60, 46))
+    b = se_reg("Scenario", "Body")
+    y = y0 + 48
+    tokens = c.get("tokens") or []
+    if tokens:
+        for t in tokens:
+            tok = str(t.get("token", "")).lower().replace(" ", "")
+            mark = ("[" + tok + "] " if tok else "") + str(t.get("text", ""))
+            y = _box_block(d, mark, (b[0], y, b[2], b[3]), start=21)
+            y += 16
+    else:
+        _scenario_body(d, "Scenario", c, pt, top=y)
+    _scenario_footer(d, "Scenario", c)
     img.save(dest)
 
 
