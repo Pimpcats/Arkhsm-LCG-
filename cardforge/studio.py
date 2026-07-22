@@ -442,6 +442,61 @@ def act_font_set(p):
     return {"ok": True, "fonts": entry}
 
 
+TYPE_FIELDS = ("name", "subtitle", "traits", "text", "flavor", "victory")
+
+
+def act_type_set(p):
+    """Per-text-area typography override (font / size / bold / italic) for one
+    editable area of a card. card can be a card id or "_default" (applies to
+    every card; the per-card override still wins). Stored under the card's
+    "fields" map in font_overrides.json; recomposes the affected faces."""
+    sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+    import render_placeholders as rp
+    card = os.path.basename(str(p.get("card", "")).strip()) or "_default"
+    field = str(p.get("field", "")).strip()
+    if field not in TYPE_FIELDS:
+        return {"ok": False, "message": "unknown text area: " + field}
+    style = {}
+    font = os.path.basename((p.get("font") or "").strip())
+    if font:
+        style["font"] = font
+    try:
+        size = float(p.get("size") or 1.0)
+    except (TypeError, ValueError):
+        size = 1.0
+    size = max(0.5, min(2.0, size))
+    if abs(size - 1.0) > 0.001:
+        style["size"] = round(size, 3)
+    if bool(p.get("bold")):
+        style["bold"] = True
+    if bool(p.get("italic")):
+        style["italic"] = True
+    with _state_lock:
+        ov = rp.load_font_overrides()
+        entry = dict(ov.get(card, {}))
+        fields = dict(entry.get("fields", {}))
+        if style:
+            fields[field] = style
+        else:
+            fields.pop(field, None)          # reset this area to its default
+        if fields:
+            entry["fields"] = fields
+        else:
+            entry.pop("fields", None)
+        if entry:
+            ov[card] = entry
+        else:
+            ov.pop(card, None)
+        _write_json_atomic(rp.FONT_OVERRIDES_PATH, ov)
+        cmd = [sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py")]
+        if card != "_default":
+            cmd += ["--only", card]
+        subprocess.run(cmd, check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+    where = "every card" if card == "_default" else card
+    log("text style [{}] on {}: {}".format(field, where, style or "reset"))
+    return {"ok": True, "field": field, "style": style}
+
+
 def act_upload_font(p):
     """Bring your own font: save an uploaded .ttf/.otf into assets/fonts/ so it
     appears in every font dropdown. Data comes as a data: URL from the browser."""
@@ -886,6 +941,11 @@ def status(campaign="still_hour"):
         }
         c["regions"] = rp.content_regions(c["type"])
         c["overridden"] = sorted(card_overrides.get(c["id"], {}).keys())
+        # per-text-area typography: global defaults with this card's on top
+        _fd = font_overrides.get("_default", {}).get("fields", {})
+        _fc = font_overrides.get(c["id"], {}).get("fields", {})
+        c["type_styles"] = {k: dict(_fd.get(k, {}), **_fc.get(k, {}))
+                            for k in set(_fd) | set(_fc)}
     campaigns = sorted(d for d in os.listdir(os.path.join(ROOT, "campaigns"))
                        if os.path.isdir(os.path.join(ROOT, "campaigns", d)))
     faces_dir_abs = os.path.join(ROOT, "art", "faces")
@@ -904,6 +964,7 @@ def status(campaign="still_hour"):
             "gen": camp.get("overrides_all", {}),
             "fonts": rp.list_fonts(),
             "default_fonts": font_overrides.get("_default", {}),
+            "default_type_styles": font_overrides.get("_default", {}).get("fields", {}),
             "characters": {n: {"lora": (v or {}).get("lora", ""),
                                "weight": (v or {}).get("weight", 0.8),
                                "trigger": (v or {}).get("trigger", "")}
@@ -924,7 +985,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "install_checkpoint": act_install_checkpoint,
            "install_se": act_install_se, "install_a1111": act_install_a1111,
            "install_fonts": act_install_fonts, "font_set": act_font_set,
-           "upload_font": act_upload_font,
+           "type_set": act_type_set, "upload_font": act_upload_font,
            "tts_spawn": act_tts_spawn, "plugin_update": act_plugin_update,
            "card_save": act_card_save, "art_remove": act_art_remove,
            "prompt_get": act_prompt_get, "prompt_save": act_prompt_save,
@@ -1306,15 +1367,27 @@ title="drop this card onto the table of your RUNNING Tabletop Simulator — appe
 <span class=hint>per-card override &mdash; &ldquo;default&rdquo; follows the official stack
 (Arkhamic titles/cost, Bolton stats, Arno/Minion body); recomposes instantly</span>
 </div>
+<div id=ed_typebar class=row style="margin-top:8px;padding:8px 10px;background:rgba(120,150,190,.10);border:1px solid rgba(120,150,190,.28);border-radius:8px;align-items:center">
+<b style="font-size:12px">Text style</b>
+<span class=hint>for area:</span><b id=ty_field style="color:var(--accent)">click an area on the card, or a field below</b>
+<span class=spacer></span>
+<label>font</label><select id=ty_font onchange=tySet() style="max-width:200px"></select>
+<label>size</label><input type=range id=ty_size min=0.6 max=1.8 step=0.02 value=1 style="width:110px" oninput="ty_pct.textContent=Math.round(this.value*100)+'%'" onchange=tySet()>
+<span id=ty_pct class=stat>100%</span>
+<label style="cursor:pointer"><input type=checkbox id=ty_bold onchange=tySet()> <b>B</b></label>
+<label style="cursor:pointer"><input type=checkbox id=ty_italic onchange=tySet()> <i>I</i></label>
+<label style="cursor:pointer" title="apply this text style to EVERY card, not just this one"><input type=checkbox id=ty_all onchange=tySet()> all cards</label>
+<button class=btn style="font-size:11px;padding:4px 10px" onclick=tyReset()>Reset area</button>
+</div>
 <div style="margin-top:14px"><h2>Card content <small>type directly — blank returns a field to the authored version; saves affect THIS card only</small></h2>
 <div class=row>
-<label>name</label><input id=cc_name size=20>
-<label>subtitle</label><input id=cc_subtitle size=16>
-<label>traits</label><input id=cc_traits size=18>
+<label>name</label><input id=cc_name size=20 onfocus="tyBind('name')">
+<label>subtitle</label><input id=cc_subtitle size=16 onfocus="tyBind('subtitle')">
+<label>traits</label><input id=cc_traits size=18 onfocus="tyBind('traits')">
 </div>
 <div class=row id=cc_stats></div>
-<label>rules text</label><textarea id=cc_text rows=5 spellcheck=false></textarea>
-<label>flavor</label><textarea id=cc_flavor rows=2 spellcheck=false></textarea>
+<label>rules text</label><textarea id=cc_text rows=5 spellcheck=false onfocus="tyBind('text')"></textarea>
+<label>flavor</label><textarea id=cc_flavor rows=2 spellcheck=false onfocus="tyBind('flavor')"></textarea>
 <div class=row style="margin-top:6px">
 <button class="btn primary" onclick=ccSave()>Save content</button>
 <span id=cc_info class=hint></span>
@@ -1740,6 +1813,7 @@ fillFontSel(id,cur);}
 document.getElementById('ed_scale').value=ed.scale;
 document.getElementById('ed_scaley').value=(c.placement||{}).scale_y||ed.scale;
 ccFill(c);
+document.getElementById('ty_all').checked=false;tyBind('name');
 edStrip();edLoadArt();edPromptLoad(c.id);
 document.getElementById('chips_cards').style.display='none';
 document.getElementById('cardgroups').style.display='none';
@@ -1804,6 +1878,37 @@ title:document.getElementById('ed_font_title').value,
 stat:document.getElementById('ed_font_stat').value,
 body:document.getElementById('ed_font_body').value});
 edFaceRefresh();}
+// ---- per-text-area typography (font / size / bold / italic per field) ----
+let TY_FIELD=null;
+const TY_LABEL={name:'name / title',subtitle:'subtitle',traits:'traits',
+text:'rules text',flavor:'flavor',victory:'victory'};
+function tyBind(field){if(!ed)return;TY_FIELD=field;
+document.getElementById('ty_field').textContent=TY_LABEL[field]||field;
+const st=((ed.g.type_styles||{})[field])||{};
+fillFontSel('ty_font',st.font||'');
+const sz=st.size||1;document.getElementById('ty_size').value=sz;
+document.getElementById('ty_pct').textContent=Math.round(sz*100)+'%';
+document.getElementById('ty_bold').checked=!!st.bold;
+document.getElementById('ty_italic').checked=!!st.italic;}
+async function tySet(){if(!ed||!TY_FIELD)return;
+const all=document.getElementById('ty_all').checked;
+const body={card:all?'_default':ed.g.id,field:TY_FIELD,
+font:document.getElementById('ty_font').value,
+size:parseFloat(document.getElementById('ty_size').value)||1,
+bold:document.getElementById('ty_bold').checked,
+italic:document.getElementById('ty_italic').checked};
+const j=await post('type_set',body);
+if(j.ok){if(!all){ed.g.type_styles=ed.g.type_styles||{};
+if(j.style&&Object.keys(j.style).length)ed.g.type_styles[TY_FIELD]=j.style;
+else delete ed.g.type_styles[TY_FIELD];}
+edFaceRefresh();addlog('text style ['+TY_FIELD+']'+(all?' (all cards)':'')+' updated');
+if(all)setTimeout(refresh,600);}}
+function tyReset(){if(!TY_FIELD)return;
+document.getElementById('ty_font').value='';
+document.getElementById('ty_size').value=1;
+document.getElementById('ty_pct').textContent='100%';
+document.getElementById('ty_bold').checked=false;
+document.getElementById('ty_italic').checked=false;tySet();}
 async function edFontUpload(input){const f=input.files[0];if(!f)return;
 const rd=new FileReader();
 rd.onload=async()=>{const j=await post('upload_font',{name:f.name,data_b64:rd.result});

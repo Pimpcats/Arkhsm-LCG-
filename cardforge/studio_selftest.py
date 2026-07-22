@@ -781,6 +781,35 @@ check("clearing the default returns every card to the official stack",
 check("Default fonts panel + upload controls in the UI",
       "Default fonts" in page and "dfSet" in page
       and "Upload font" in page and "upload_font" in page)
+# per-text-area typography: font / size / bold / italic for one area of a card
+r = requests.post(BASE + "/api/type_set",
+                  json={"card": "sthr-bell", "field": "text",
+                        "size": 1.3, "bold": True}).json()
+fo = json.load(open(RP.FONT_OVERRIDES_PATH, encoding="utf-8"))
+check("per-area text style saves (size + bold) under the card's fields",
+      r.get("ok") and fo["sthr-bell"]["fields"]["text"]["size"] == 1.3
+      and fo["sthr-bell"]["fields"]["text"]["bold"] is True)
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+bell = next(c for c in s["cards"] if c["id"] == "sthr-bell")
+check("status exposes per-card type_styles for the editor",
+      bell.get("type_styles", {}).get("text", {}).get("size") == 1.3)
+r = requests.post(BASE + "/api/type_set",
+                  json={"card": "_default", "field": "name",
+                        "italic": True}).json()
+check("a text area can be styled across EVERY card (_default)",
+      r.get("ok") and json.load(open(RP.FONT_OVERRIDES_PATH, encoding="utf-8"))
+      ["_default"]["fields"]["name"]["italic"] is True)
+check("unknown text area is rejected",
+      requests.post(BASE + "/api/type_set",
+                    json={"card": "sthr-bell", "field": "bogus"}).json()
+      .get("ok") is False)
+requests.post(BASE + "/api/type_set", json={"card": "sthr-bell", "field": "text"})
+requests.post(BASE + "/api/type_set", json={"card": "_default", "field": "name"})
+check("resetting a text area clears it back to the default stack",
+      "sthr-bell" not in json.load(open(RP.FONT_OVERRIDES_PATH, encoding="utf-8")))
+check("typography panel (font/size/bold/italic per area) in the UI",
+      "ed_typebar" in page and "tyBind" in page and "ty_bold" in page
+      and "ty_italic" in page and "ty_size" in page)
 # bring-your-own-font upload lands in assets/fonts and validates
 import base64 as _b64f
 good = _b64f.b64encode(open(os.path.join(ROOT, "assets", "fonts",

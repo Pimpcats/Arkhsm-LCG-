@@ -274,9 +274,16 @@ BODY_FONTS = {
 
 
 def _font(size, bold=False, italic=False, glyph=False, title=False,
-          stat=False):
+          stat=False, font_file=None):
     if glyph:
         return ImageFont.truetype(FONT_PATH, size)
+    # per-field override (a specific font file chosen for one text area) wins
+    if font_file:
+        try:
+            return ImageFont.truetype(
+                os.path.join(FONTS_DIR, os.path.basename(font_file)), size)
+        except OSError:
+            pass
     # manual override (per-card editor or global default): one file per role
     ov = FONT_OVERRIDE.get("stat" if stat else "title" if title else "body")
     if ov:
@@ -320,9 +327,10 @@ def _font(size, bold=False, italic=False, glyph=False, title=False,
     return ImageFont.load_default()
 
 
-def wrap_runs(draw, text, size, max_width, italic=False):
+def wrap_runs(draw, text, size, max_width, italic=False, bold=False,
+              font_file=None):
     """Wrap [markup] text into lines of (is_glyph, chunk) runs."""
-    tfont = _font(size, italic=italic)
+    tfont = _font(size, italic=italic, bold=bold, font_file=font_file)
     gfont = _font(size, glyph=True)
     lines = []
     for paragraph in text.split("\n"):
@@ -346,10 +354,12 @@ def wrap_runs(draw, text, size, max_width, italic=False):
     return lines
 
 
-def draw_wrapped(draw, text, x, y, size, max_width, fill, italic=False, leading=1.25):
-    tfont = _font(size, italic=italic)
+def draw_wrapped(draw, text, x, y, size, max_width, fill, italic=False,
+                 leading=1.25, bold=False, font_file=None):
+    tfont = _font(size, italic=italic, bold=bold, font_file=font_file)
     gfont = _font(size, glyph=True)
-    for line in wrap_runs(draw, text, size, max_width, italic=italic):
+    for line in wrap_runs(draw, text, size, max_width, italic=italic,
+                          bold=bold, font_file=font_file):
         cx = x
         for is_glyph, piece in line:
             font = gfont if is_glyph else tfont
@@ -775,15 +785,39 @@ def _psd_compose(layout, art_path, placement, label="place art"):
     return img, regions
 
 
+# per-text-area typography overrides, set per-card in the render loop:
+#   {field_key: {"font": file, "size": scale, "bold": bool, "italic": bool}}
+# empty means every field renders with the card/role defaults.
+FIELD_STYLE = {}
+
+
+def _field_style(key):
+    return FIELD_STYLE.get(key) if key else None
+
+
 def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
               grow=1.5, min_size=13, max_w_factor=None, max_size=None,
-              align="center", stat=False):
+              align="center", stat=False, key=None):
     """Center text on a region bbox, auto-sized. Region bboxes come from the
     template's example text, so start from the box height and shrink to fit.
     Titles must stay inside their region (they sit between the art and the
-    border); body/stat text is allowed a little overflow past the example."""
+    border); body/stat text is allowed a little overflow past the example.
+
+    `key` names the editable area (name/subtitle/traits/…); if the owner has set
+    a per-area typography override it applies here (font file, size scale,
+    bold/italic)."""
     if not text:
         return
+    st = _field_style(key)
+    font_file = None
+    size_scale = 1.0
+    if st:
+        font_file = st.get("font") or None
+        size_scale = float(st.get("size") or 1.0)
+        if "bold" in st:
+            bold = bool(st["bold"])
+        if "italic" in st:
+            italic = bool(st["italic"])
     if max_w_factor is None:
         max_w_factor = 1.02 if title else 1.45
     if title:
@@ -796,11 +830,15 @@ def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
     if max_size:
         size = min(size, max_size)
     while size > min_size:
-        f = _font(size, bold=bold, italic=italic, title=title, stat=stat)
+        f = _font(size, bold=bold, italic=italic, title=title, stat=stat,
+                  font_file=font_file)
         if d.textlength(text, font=f) <= bw * max_w_factor:
             break
         size -= 1
-    f = _font(size, bold=bold, italic=italic, title=title, stat=stat)
+    if size_scale != 1.0:
+        size = max(min_size, int(round(size * size_scale)))
+    f = _font(size, bold=bold, italic=italic, title=title, stat=stat,
+              font_file=font_file)
     w = d.textlength(text, font=f)
     bb = f.getbbox(text)
     if align == "left":
@@ -814,35 +852,50 @@ def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
 
 
 def _box_block(d, text, box, fill=PSD_INK, start=30, min_size=15,
-               italic=False, leading=1.18):
-    """Wrapped [markup] text fitted into a box (shrinks until it fits)."""
+               italic=False, leading=1.18, bold=False, key=None):
+    """Wrapped [markup] text fitted into a box (shrinks until it fits).
+
+    `key` names the editable area; a per-area typography override (font/size/
+    bold/italic) applies here just like on single-line fields."""
     if not text:
         return box[1]
+    st = _field_style(key)
+    font_file = None
+    if st:
+        font_file = st.get("font") or None
+        if "bold" in st:
+            bold = bool(st["bold"])
+        if "italic" in st:
+            italic = bool(st["italic"])
+        start = max(min_size, int(round(start * float(st.get("size") or 1.0))))
     bw = box[2] - box[0]
     size = start
     for size in range(start, min_size - 1, -1):
-        if len(wrap_runs(d, text, size, bw)) * int(size * leading) <= box[3] - box[1]:
+        n = len(wrap_runs(d, text, size, bw, italic=italic, bold=bold,
+                          font_file=font_file))
+        if n * int(size * leading) <= box[3] - box[1]:
             break
     return draw_wrapped(d, text, box[0], box[1], size, bw, fill,
-                        italic=italic, leading=leading)
+                        italic=italic, leading=leading, bold=bold,
+                        font_file=font_file)
 
 
 def p_investigator_front(c, pt, dest, art_path=None, placement=None):
     img, R = _psd_compose("character_card_front", art_path, placement,
                           label="investigator art")
     d = ImageDraw.Draw(img)
-    _box_text(d, c["name"], R["Character Name"], title=True)
-    _box_text(d, c.get("subtitle", ""), R["Archetype"], italic=True)
+    _box_text(d, c["name"], R["Character Name"], title=True, key="name")
+    _box_text(d, c.get("subtitle", ""), R["Archetype"], italic=True, key="subtitle")
     for key, stat in (("Willpower", "wil"), ("Intellect", "int"),
                       ("Combat", "com"), ("Agility", "agi")):
         _box_text(d, str(c[stat]), R[key], stat=True, grow=1.2)
     _box_text(d, c.get("traits", ""), R["Keywords"], bold=True, italic=True,
               max_size=26)
     a = R["Ability Text"]
-    _box_block(d, pt.get("text", ""), (a[0], a[1], a[2], a[3] + 40))
+    _box_block(d, pt.get("text", ""), (a[0], a[1], a[2], a[3] + 40), key="text")
     fl = R["Flavor Text"]
     _box_block(d, pt.get("flavor", ""), (fl[0], fl[1], fl[2], fl[3] + 30),
-               fill=(84, 66, 50), italic=True, start=24)
+               fill=(84, 66, 50), italic=True, start=24, key="flavor")
     _box_text(d, str(c["health"]), R["Health"], fill=(255, 246, 240),
               stat=True, grow=0.85)
     _box_text(d, str(c["sanity"]), R["Sanity"], fill=(240, 246, 255),
@@ -860,7 +913,7 @@ def p_investigator_front(c, pt, dest, art_path=None, placement=None):
 def p_enemy(c, pt, dest, art_path=None, placement=None):
     img, R = _psd_compose("scenario_enemy", art_path, placement)
     d = ImageDraw.Draw(img)
-    _box_text(d, c["name"], R["Title"], title=True)
+    _box_text(d, c["name"], R["Title"], title=True, key="name")
     for key, val in (("Combat Value", pt.get("fight")),
                      ("Health Value", pt.get("health")),
                      ("Evade Value", pt.get("evade"))):
@@ -871,10 +924,10 @@ def p_enemy(c, pt, dest, art_path=None, placement=None):
                                     and "Elite" not in c.get("traits", "") else "")
     _box_text(d, traits, R["Keywords"], bold=True, italic=True, max_size=30)
     e2, e1 = R["Effect Text 2"], R["Effect Text"]
-    _box_block(d, pt.get("text", ""), (40, e2[1], 693, e1[3] + 70), start=27)
+    _box_block(d, pt.get("text", ""), (40, e2[1], 693, e1[3] + 70), start=27, key="text")
     if c.get("victory"):
         _box_text(d, "Victory {}.".format(c["victory"]), R["Victory Points"],
-                  bold=True)
+                  bold=True, key="victory")
     # damage / horror counts beside the baked heart & brain chits
     for val, x, fill in ((pt.get("damage"), 300, (255, 235, 232)),
                          (pt.get("horror"), 484, (232, 240, 255))):
@@ -889,7 +942,7 @@ def p_enemy(c, pt, dest, art_path=None, placement=None):
 def p_treachery(c, pt, dest, art_path=None, placement=None):
     img, R = _psd_compose("scenario_treachery", art_path, placement)
     d = ImageDraw.Draw(img)
-    _box_text(d, c["name"], R["Title"], title=True)
+    _box_text(d, c["name"], R["Title"], title=True, key="name")
     if c.get("weakness"):
         _box_text(d, "—  W E A K N E S S  —", (233, 662, 501, 680),
                   fill=(92, 40, 104), bold=True)
@@ -899,10 +952,10 @@ def p_treachery(c, pt, dest, art_path=None, placement=None):
         _box_text(d, c.get("traits", ""), R["Keywords"], bold=True, italic=True,
                   max_size=30)
     e2 = R["Effect Text 2"]
-    _box_block(d, pt.get("text", ""), (52, e2[1], 681, 878), start=27)
+    _box_block(d, pt.get("text", ""), (52, e2[1], 681, 878), start=27, key="text")
     p = R["Plot Text"]
     _box_block(d, pt.get("flavor", ""), (p[0], p[1], p[2], 992),
-               fill=(84, 66, 50), italic=True, start=24)
+               fill=(84, 66, 50), italic=True, start=24, key="flavor")
     _box_text(d, "Illus. pending — fan content", R["Illustrator Credit"],
               fill=(70, 58, 46))
     img.save(dest)
@@ -1193,26 +1246,26 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
         _box_text(d, str(c["level"]), se_reg(kind, "Level"),
                   fill=(238, 232, 216), stat=True, grow=0.9)
 
-    _box_text(d, c["name"], se_reg(kind, "Name", letter), title=True, grow=1.15)
+    _box_text(d, c["name"], se_reg(kind, "Name", letter), title=True, grow=1.15, key="name")
     if c.get("subtitle"):
         _box_text(d, c["subtitle"],
                   se_reg(kind, "SubtitleText", letter)
-                  or se_reg(kind, "Subtitle", letter), italic=True)
+                  or se_reg(kind, "Subtitle", letter), italic=True, key="subtitle")
 
     # body: traits line, rules, flavor — stacked inside the Body region
     b = se_reg(kind, "Body")
     y = b[1]
     if c.get("traits"):
         _box_text(d, c["traits"], (b[0], y, b[2], y + 30),
-                  bold=True, italic=True, max_size=24)
+                  bold=True, italic=True, max_size=24, key="traits")
         y += 36
-    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3] + 24), start=25)
+    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3] + 24), start=25, key="text")
     if pt.get("flavor") and y < b[3]:
         _box_block(d, pt.get("flavor", ""), (b[0], y + 8, b[2], b[3] + 40),
-                   fill=(84, 66, 50), italic=True, start=21)
+                   fill=(84, 66, 50), italic=True, start=21, key="flavor")
     if c.get("victory"):
         _box_text(d, "Victory {}.".format(c["victory"]),
-                  (b[0], b[3] + 24, b[2], b[3] + 52), bold=True, max_size=22)
+                  (b[0], b[3] + 24, b[2], b[3] + 52), bold=True, max_size=22, key="victory")
 
     if kind == "Asset" and c.get("slot") in SLOT_OVERLAY:
         _paste_region(img, _se_img("overlays", "AHLCG-" + SLOT_OVERLAY[c["slot"]]),
@@ -1269,18 +1322,18 @@ def _se_body(d, c, pt, kind, letter="", extra_bottom=26, text_start=25):
         traits = c["traits"] + ("  Elite." if c.get("elite")
                                 and "Elite" not in c["traits"] else "")
         _box_text(d, traits, (b[0], y, b[2], y + 28),
-                  bold=True, italic=True, max_size=23)
+                  bold=True, italic=True, max_size=23, key="traits")
         y += 34
     y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3] + extra_bottom),
-                   start=text_start)
+                   start=text_start, key="text")
     if pt.get("flavor") and y + 34 < b[3] + extra_bottom:
         y = _box_block(d, pt.get("flavor", ""),
                        (b[0], y + 6, b[2], b[3] + extra_bottom + 16),
-                       fill=(84, 66, 50), italic=True, start=20)
+                       fill=(84, 66, 50), italic=True, start=20, key="flavor")
     if c.get("victory"):
         _box_text(d, "Victory {}.".format(c["victory"]),
                   (b[0], min(y + 6, b[3]), b[2], min(y + 34, b[3] + 30)),
-                  bold=True, max_size=22)
+                  bold=True, max_size=22, key="victory")
     return y
 
 
@@ -1291,11 +1344,11 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
                                art_path, placement, landscape=True,
                                underlay=INV_ART_UNDERLAY)
     _box_text(d, c["name"], se_reg("Investigator", "Name"), title=True, grow=1.15,
-              max_w_factor=1.0)
+              max_w_factor=1.0, key="name")
     if c.get("subtitle"):
         _box_text(d, c["subtitle"],
                   se_reg("Investigator", "SubtitleText", letter), italic=True,
-                  max_size=26, max_w_factor=1.0)
+                  max_size=26, max_w_factor=1.0, key="subtitle")
     for key, stat in (("Willpower", "wil"), ("Intellect", "int"),
                       ("Combat", "com"), ("Agility", "agi")):
         _box_text(d, str(c[stat]), se_reg("Investigator", key),
@@ -1328,13 +1381,13 @@ def s_investigator_back(c, pt, dest, art_path=None):
                                art_path, None, landscape=True,
                                underlay=INV_ART_UNDERLAY)
     _box_text(d, c["name"], se_reg("InvestigatorBack", "Name"),
-              title=True, grow=1.1, max_w_factor=1.0)
+              title=True, grow=1.1, max_w_factor=1.0, key="name")
     if c.get("subtitle"):
         _box_text(d, c["subtitle"],
                   se_reg("InvestigatorBack", "SubtitleText", letter), italic=True,
-                  max_w_factor=1.0)
+                  max_w_factor=1.0, key="subtitle")
     b = se_reg("InvestigatorBack", "Body")
-    _box_block(d, pt.get("back_text", ""), b, start=22)
+    _box_block(d, pt.get("back_text", ""), b, start=22, key="text")
     img.save(dest)
 
 
@@ -1342,10 +1395,10 @@ def s_enemy(c, pt, dest, art_path=None, placement=None):
     tpl = "AHLCG-WeaknessEnemy" if c.get("weakness") else "AHLCG-Enemy"
     img, d = _se_frame_compose(tpl, "Enemy", "Portrait-portrait-clip",
                                art_path, placement)
-    _box_text(d, c["name"], se_reg("Enemy", "Name"), title=True, grow=1.15)
+    _box_text(d, c["name"], se_reg("Enemy", "Name"), title=True, grow=1.15, key="name")
     if c.get("subtitle"):
         _box_text(d, c["subtitle"], se_reg("Enemy", "SubtitleText"),
-                  italic=True, max_size=26, max_w_factor=1.0)
+                  italic=True, max_size=26, max_w_factor=1.0, key="subtitle")
     for key, val in (("Attack", pt.get("fight")), ("Health", pt.get("health")),
                      ("Evade", pt.get("evade"))):
         blank = val in (None, "", "None")     # Bolton has no em dash
@@ -1372,7 +1425,7 @@ def s_treachery(c, pt, dest, art_path=None, placement=None):
     img, d = _se_frame_compose(tpl, kind, "Portrait-portrait-clip",
                                art_path, placement)
     name_reg = se_reg(kind, "Name") or se_reg("Treachery", "Name")
-    _box_text(d, c["name"], name_reg, title=True, grow=1.15)
+    _box_text(d, c["name"], name_reg, title=True, grow=1.15, key="name")
     if weak:
         _box_text(d, "Weakness", se_reg(kind, "Subtype"), italic=True,
                   max_size=20)
@@ -1394,12 +1447,12 @@ def _scenario_body(d, kind, c, pt, traits=False, top=None):
     b = (b[0], y, b[2], b[3])
     if traits and c.get("traits"):
         _box_text(d, c["traits"], (b[0], y, b[2], y + 28),
-                  bold=True, italic=True, max_size=22)
+                  bold=True, italic=True, max_size=22, key="traits")
         y += 34
-    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3]), start=24)
+    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3]), start=24, key="text")
     if pt.get("flavor") and y + 30 < b[3]:
         _box_block(d, pt.get("flavor", ""), (b[0], y + 6, b[2], b[3]),
-                   fill=(84, 66, 50), italic=True, start=20)
+                   fill=(84, 66, 50), italic=True, start=20, key="flavor")
 
 
 def s_location(c, pt, dest, art_path=None, placement=None):
@@ -1411,12 +1464,12 @@ def s_location(c, pt, dest, art_path=None, placement=None):
     kind = "LocationBack" if back else "Location"
     img, d = _se_frame_compose("AHLCG-" + kind, kind, "Portrait-portrait-clip",
                                art_path, placement)
-    _box_text(d, c["name"], se_reg(kind, "Name"), title=True, grow=1.15)
+    _box_text(d, c["name"], se_reg(kind, "Name"), title=True, grow=1.15, key="name")
     # a location may have a subtitle banner under the title (e.g. "Feeding
     # Grounds") — distinct from its trait line
     if c.get("subtitle"):
         _box_text(d, c["subtitle"], se_reg(kind, "SubtitleText"),
-                  italic=True, max_size=22)
+                  italic=True, max_size=22, key="subtitle")
     # the "LOCATION" type label in the centre of the stat band
     _box_text(d, "LOCATION", se_reg(kind, "Label"), bold=True, max_size=17,
               fill=(74, 60, 46))
@@ -1457,7 +1510,7 @@ def s_location(c, pt, dest, art_path=None, placement=None):
                           max_size=int(dia * 0.60), fill=CLUE_INK)
         if c.get("victory"):
             _box_text(d, "Victory {}.".format(c["victory"]),
-                      se_reg("Location", "Victory"), bold=True, max_size=20)
+                      se_reg("Location", "Victory"), bold=True, max_size=20, key="victory")
     # top-left corner: the location's OWN symbol, a disc in the location's colour
     # (this is how the map identifies each location; ref: Rainy London Streets)
     if c.get("icons"):
@@ -1486,12 +1539,12 @@ def s_location(c, pt, dest, art_path=None, placement=None):
     y = b[1]
     if c.get("traits"):
         _box_text(d, c["traits"], (b[0], y, b[2], y + 26),
-                  bold=True, italic=True, max_size=20)
+                  bold=True, italic=True, max_size=20, key="traits")
         y += 30
-    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3]), start=22)
+    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3]), start=22, key="text")
     if pt.get("flavor") and y + 24 < b[3]:
         _box_block(d, pt.get("flavor", ""), (b[0], y + 4, b[2], b[3]),
-                   fill=(84, 66, 50), italic=True, start=19)
+                   fill=(84, 66, 50), italic=True, start=19, key="flavor")
     _box_text(d, "Illus. pending — fan content", se_reg(kind, "Copyright"),
               fill=(120, 100, 80), max_size=14)
     img.save(dest)
@@ -1524,7 +1577,7 @@ def s_agenda(c, pt, dest, art_path=None, placement=None):
     hdr = ("Agenda " + str(c.get("index", ""))).strip()
     _box_text(d, hdr, se_reg("Agenda", "ScenarioIndex"), bold=True, max_size=15,
               fill=(74, 60, 46), align="right")
-    _box_text(d, c["name"], se_reg("Agenda", "Name"), title=True, grow=1.15)
+    _box_text(d, c["name"], se_reg("Agenda", "Name"), title=True, grow=1.15, key="name")
     if c.get("doom") not in (None, ""):
         _box_text(d, str(c["doom"]), se_reg("Agenda", "Doom"),
                   stat=True, grow=1.0, fill=(238, 232, 216))
@@ -1541,7 +1594,7 @@ def s_act(c, pt, dest, art_path=None, placement=None):
     hdr = ("Act " + str(c.get("index", ""))).strip()
     _box_text(d, hdr, se_reg("Act", "ScenarioIndex"), bold=True, max_size=15,
               fill=(74, 60, 46), align="left")
-    _box_text(d, c["name"], se_reg("Act", "Name"), title=True, grow=1.15)
+    _box_text(d, c["name"], se_reg("Act", "Name"), title=True, grow=1.15, key="name")
     if c.get("clues") not in (None, ""):
         _box_text(d, str(c["clues"]), se_reg("Act", "Clues"),
                   stat=True, grow=1.0, fill=(238, 232, 216))
@@ -1556,7 +1609,7 @@ def s_scenario_ref(c, pt, dest, art_path=None, placement=None):
     img, d = _se_frame_compose("AHLCG-Scenario", "Scenario",
                                "Portrait-portrait-clip", art_path, placement)
     name_reg = se_reg("Scenario", "Name")
-    _box_text(d, c["name"], name_reg, title=True, grow=1.05)
+    _box_text(d, c["name"], name_reg, title=True, grow=1.05, key="name")
     diff = c.get("difficulty") or (
         "HARD / EXPERT" if c.get("revealed") else "EASY / STANDARD")
     y0 = (name_reg[3] if name_reg else 120)
@@ -1581,7 +1634,7 @@ def s_story(c, pt, dest, art_path=None, placement=None):
     """Story card — name + narrative body."""
     img, d = _se_frame_compose("AHLCG-Story", "Story", "Portrait-portrait-clip",
                                art_path, placement)
-    _box_text(d, c["name"], se_reg("Story", "Name"), title=True, grow=1.15)
+    _box_text(d, c["name"], se_reg("Story", "Name"), title=True, grow=1.15, key="name")
     _scenario_body(d, "Story", c, pt, traits=True)
     img.save(dest)
 
@@ -1659,11 +1712,16 @@ def main():
     missing_text = []
     composed = 0
     font_overrides = load_font_overrides()
-    global FONT_OVERRIDE
+    global FONT_OVERRIDE, FIELD_STYLE
     card_overrides = load_card_overrides()
     font_default = font_overrides.get("_default", {})
+    fields_default = font_default.get("fields", {})
     for c in cards:
         FONT_OVERRIDE = dict(font_default, **font_overrides.get(c["id"], {}))
+        # per-area typography: card field styles layered over the global default
+        fields_card = font_overrides.get(c["id"], {}).get("fields", {})
+        FIELD_STYLE = {k: dict(fields_default.get(k, {}), **fields_card.get(k, {}))
+                       for k in set(fields_default) | set(fields_card)}
         pt = print_text.get(c["id"], {})
         c, pt = apply_card_overrides(c, pt, card_overrides.get(c["id"]))
         if not pt.get("text"):
