@@ -220,6 +220,12 @@ FONTS_DIR = os.path.join(ROOT, "assets", "fonts")
 # Arkhamic (the community's OFL extension of Teutonic — same face, more
 # glyphs) is preferred when installed; plain Teutonic ships in-repo.
 TITLE_FONT_CANDIDATES = ["Arkhamic.ttf", "Arkhamic-Regular.ttf", "Teutonic.ttf"]
+# an empty investigator art window uses one neutral manila tone for EVERY class
+# (else the Guardian's blue frame averages to a dark grey box, unlike the rest)
+INV_ART_UNDERLAY = (208, 196, 173)
+# the display title fonts don't carry macron vowels (Japanese romanisation etc.)
+TITLE_FOLD = str.maketrans({"ō": "o", "ū": "u", "ā": "a", "ī": "i", "ē": "e",
+                            "Ō": "O", "Ū": "U", "Ā": "A", "Ī": "I", "Ē": "E"})
 # Bolton is the official cards' big stat-numeral face (enemy fight/health/
 # evade, investigator skill values, health/sanity chits)
 STAT_FONT_CANDIDATES = ["BoltonBold.ttf", "Bolton.ttf"]
@@ -770,13 +776,21 @@ def _psd_compose(layout, art_path, placement, label="place art"):
 
 
 def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
-              grow=1.5, min_size=13, max_w_factor=1.45, max_size=None,
+              grow=1.5, min_size=13, max_w_factor=None, max_size=None,
               align="center", stat=False):
     """Center text on a region bbox, auto-sized. Region bboxes come from the
-    template's example text, so start from the box height and shrink to fit;
-    modest overflow past the example's width is allowed (names vary)."""
+    template's example text, so start from the box height and shrink to fit.
+    Titles must stay inside their region (they sit between the art and the
+    border); body/stat text is allowed a little overflow past the example."""
     if not text:
         return
+    if max_w_factor is None:
+        max_w_factor = 1.02 if title else 1.45
+    if title:
+        # the display title fonts (Arkhamic/Teutonic) lack macron vowels; fold
+        # them to their ASCII base so names like "Sōma" read as "Soma" instead
+        # of dropping the glyph
+        text = text.translate(TITLE_FOLD)
     bw = box[2] - box[0]
     size = max(int((box[3] - box[1]) * grow), min_size)
     if max_size:
@@ -1097,9 +1111,11 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
 
 
 def _se_frame_compose(tpl_name, kind, clip_key, art_path, placement,
-                      landscape=False):
+                      landscape=False, underlay=None):
     """Template + art: windowed frames get art UNDER, opaque ones get art
-    pasted into the clip rect. Returns (img, draw)."""
+    pasted into the clip rect. `underlay` overrides the empty-window fill (used
+    to keep the art window a consistent tone across classes). Returns (img,
+    draw)."""
     frame = _se_img("templates", tpl_name)
     W = (525 if landscape else 375) * SE_SCALE
     H = (375 if landscape else 525) * SE_SCALE
@@ -1107,7 +1123,7 @@ def _se_frame_compose(tpl_name, kind, clip_key, art_path, placement,
     clip = se_reg(kind, clip_key)
     windowed = frame.getchannel("A").getextrema()[0] < 250
     if windowed:
-        img = Image.new("RGB", (W, H), frame_underlay(frame))
+        img = Image.new("RGB", (W, H), underlay or frame_underlay(frame))
         if art_path:
             paste_cover(img, art_path, clip, placement)
         img.paste(frame2, (0, 0), frame2)
@@ -1115,6 +1131,11 @@ def _se_frame_compose(tpl_name, kind, clip_key, art_path, placement,
         img = frame2.convert("RGB")
         if art_path and clip:
             paste_cover(img, art_path, clip, placement)
+        elif underlay and clip:
+            # no art: neutral placeholder in the art window so every class reads
+            # the same (else e.g. the Guardian's dark-blue backdrop looks like a
+            # grey filler box next to the warmer classes)
+            ImageDraw.Draw(img).rectangle(list(clip), fill=underlay)
     return img, ImageDraw.Draw(img)
 
 
@@ -1145,8 +1166,10 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
     letter = CLASS_LETTER.get(c.get("class"), "N")
     img, d = _se_frame_compose("AHLCG-Investigator-" + letter, "Investigator",
                                "TransparentPortrait-portrait-clip",
-                               art_path, placement, landscape=True)
-    _box_text(d, c["name"], se_reg("Investigator", "Name"), title=True, grow=1.15)
+                               art_path, placement, landscape=True,
+                               underlay=INV_ART_UNDERLAY)
+    _box_text(d, c["name"], se_reg("Investigator", "Name"), title=True, grow=1.15,
+              max_w_factor=1.0)
     if c.get("subtitle"):
         _box_text(d, c["subtitle"],
                   se_reg("Investigator", "SubtitleText", letter), italic=True,
@@ -1180,12 +1203,14 @@ def s_investigator_back(c, pt, dest, art_path=None):
     letter = CLASS_LETTER.get(c.get("class"), "N")
     img, d = _se_frame_compose("AHLCG-InvestigatorBack-" + letter,
                                "InvestigatorBack", "Portrait-portrait-clip",
-                               art_path, None, landscape=True)
+                               art_path, None, landscape=True,
+                               underlay=INV_ART_UNDERLAY)
     _box_text(d, c["name"], se_reg("InvestigatorBack", "Name"),
-              title=True, grow=1.1)
+              title=True, grow=1.1, max_w_factor=1.0)
     if c.get("subtitle"):
         _box_text(d, c["subtitle"],
-                  se_reg("InvestigatorBack", "SubtitleText", letter), italic=True)
+                  se_reg("InvestigatorBack", "SubtitleText", letter), italic=True,
+                  max_w_factor=1.0)
     b = se_reg("InvestigatorBack", "Body")
     _box_block(d, pt.get("back_text", ""), b, start=22)
     img.save(dest)
@@ -1381,17 +1406,17 @@ def s_scenario_ref(c, pt, dest, art_path=None, placement=None):
     diff = c.get("difficulty") or (
         "HARD / EXPERT" if c.get("revealed") else "EASY / STANDARD")
     y0 = (name_reg[3] if name_reg else 120)
-    _box_text(d, diff, (name_reg[0], y0 + 2, name_reg[2], y0 + 34),
-              bold=True, max_size=20, fill=(74, 60, 46))
+    _box_text(d, diff, (name_reg[0], y0 + 2, name_reg[2], y0 + 40),
+              bold=True, max_size=26, fill=(74, 60, 46))
     b = se_reg("Scenario", "Body")
-    y = y0 + 48
+    y = y0 + 60
     tokens = c.get("tokens") or []
     if tokens:
         for t in tokens:
             tok = str(t.get("token", "")).lower().replace(" ", "")
-            mark = ("[" + tok + "] " if tok else "") + str(t.get("text", ""))
-            y = _box_block(d, mark, (b[0], y, b[2], b[3]), start=21)
-            y += 16
+            mark = ("[" + tok + "]  " if tok else "") + str(t.get("text", ""))
+            y = _box_block(d, mark, (b[0], y, b[2], b[3]), start=32, min_size=22)
+            y += 26
     else:
         _scenario_body(d, "Scenario", c, pt, top=y)
     _scenario_footer(d, "Scenario", c)
