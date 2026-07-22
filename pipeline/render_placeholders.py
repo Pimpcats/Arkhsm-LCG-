@@ -1523,6 +1523,36 @@ def s_treachery(c, pt, dest, art_path=None, placement=None):
     img.save(dest)
 
 
+# chaos-token medallion colours (official symbol palette, ref: The Thing in the
+# Depths). Each scenario-reference row shows the token in a coloured disc.
+CHAOS_COLORS = {
+    "skull": (120, 44, 40), "cultist": (44, 74, 128), "tablet": (40, 104, 96),
+    "elderthing": (196, 192, 196), "elder": (78, 120, 74),
+    "autofail": (34, 32, 36), "eldersign": (78, 120, 74),
+    "bless": (176, 146, 70), "curse": (92, 70, 120),
+}
+
+
+def _chaos_medallion(token, diam):
+    """A chaos-token disc: coloured circle with the token symbol in a
+    contrasting fill, for the scenario-reference rows."""
+    col = CHAOS_COLORS.get(token, (96, 84, 66))
+    disc = _disc(diam, col, rim=_shade(col, 0.55), rim_w=max(2, diam // 22),
+                 vignette=0.3)
+    letter = MARKUP.get("[" + token + "]")
+    if letter:
+        fill = DISC_DARK if _luma(col) > 150 else DISC_CREAM
+        f = _font(int(diam * 0.6), glyph=True)
+        gimg = Image.new("RGBA", (diam, diam), (0, 0, 0, 0))
+        gd = ImageDraw.Draw(gimg)
+        bb = gd.textbbox((0, 0), letter, font=f)
+        gw, gh = bb[2] - bb[0], bb[3] - bb[1]
+        gd.text(((diam - gw) / 2 - bb[0], (diam - gh) / 2 - bb[1]), letter,
+                font=f, fill=fill + (255,))
+        disc.alpha_composite(gimg)
+    return disc
+
+
 def _scenario_body(d, kind, c, pt, traits=False, top=None):
     """Rules/flavor block for a scenario-side card, inside its Body region."""
     b = se_reg(kind, "Body")
@@ -1701,14 +1731,23 @@ def s_scenario_ref(c, pt, dest, art_path=None, placement=None):
     _box_text(d, diff, (name_reg[0], y0 + 2, name_reg[2], y0 + 40),
               bold=True, max_size=26, fill=(74, 60, 46))
     b = se_reg("Scenario", "Body")
-    y = y0 + 60
+    y = y0 + 56
     tokens = c.get("tokens") or []
     if tokens:
+        med = 74                       # medallion diameter
+        gap = 20                       # gap medallion -> text
+        tx = b[0] + med + gap          # text left edge
         for t in tokens:
             tok = str(t.get("token", "")).lower().replace(" ", "")
-            mark = ("[" + tok + "]  " if tok else "") + str(t.get("text", ""))
-            y = _box_block(d, mark, (b[0], y, b[2], b[3]), start=32, min_size=22)
-            y += 26
+            text = str(t.get("text", ""))
+            # wrap the modifier text to the right of the medallion
+            y_text = _box_block(d, text, (tx, y + 4, b[2], b[3]),
+                                start=27, min_size=20)
+            rowh = max(med, y_text - y)
+            if tok:
+                _paste_disc(img, _chaos_medallion(tok, med),
+                            (b[0], y, b[0] + med, y + med))
+            y += rowh + 20
     else:
         _scenario_body(d, "Scenario", c, pt, top=y)
     _scenario_footer(d, "Scenario", c)
