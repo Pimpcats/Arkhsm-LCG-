@@ -52,10 +52,14 @@ TEMPLATES = [
     "AHLCG-Agenda", "AHLCG-AgendaBack",
     "AHLCG-Act", "AHLCG-ActBack",
     "AHLCG-Scenario", "AHLCG-Story",
+    # the scenario-reference / chaos card (chaos-token modifier rows)
+    "AHLCG-Chaos",
 ]
 OVERLAY_PREFIXES = ("AHLCG-SkillBox-", "AHLCG-SkillIcon-", "AHLCG-NoLevel",
                     "AHLCG-Slot-", "AHLCG-Damage", "AHLCG-Horror",
-                    "AHLCG-StaminaBase", "AHLCG-SanityBase")
+                    "AHLCG-StaminaBase", "AHLCG-SanityBase",
+                    # real chaos-bag token symbols for the reference card
+                    "AHLCG-Chaos")
 ICON_PREFIXES = ("AHLCG-Slot", "AHLCG-Level",
                  # location connection symbols + per-investigator marker + base
                  "AHLCG-Loc", "AHLCG-PerInvestigator")

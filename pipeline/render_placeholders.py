@@ -1523,36 +1523,6 @@ def s_treachery(c, pt, dest, art_path=None, placement=None):
     img.save(dest)
 
 
-# chaos-token medallion colours (official symbol palette, ref: The Thing in the
-# Depths). Each scenario-reference row shows the token in a coloured disc.
-CHAOS_COLORS = {
-    "skull": (120, 44, 40), "cultist": (44, 74, 128), "tablet": (40, 104, 96),
-    "elderthing": (196, 192, 196), "elder": (78, 120, 74),
-    "autofail": (34, 32, 36), "eldersign": (78, 120, 74),
-    "bless": (176, 146, 70), "curse": (92, 70, 120),
-}
-
-
-def _chaos_medallion(token, diam):
-    """A chaos-token disc: coloured circle with the token symbol in a
-    contrasting fill, for the scenario-reference rows."""
-    col = CHAOS_COLORS.get(token, (96, 84, 66))
-    disc = _disc(diam, col, rim=_shade(col, 0.55), rim_w=max(2, diam // 22),
-                 vignette=0.3)
-    letter = MARKUP.get("[" + token + "]")
-    if letter:
-        fill = DISC_DARK if _luma(col) > 150 else DISC_CREAM
-        f = _font(int(diam * 0.6), glyph=True)
-        gimg = Image.new("RGBA", (diam, diam), (0, 0, 0, 0))
-        gd = ImageDraw.Draw(gimg)
-        bb = gd.textbbox((0, 0), letter, font=f)
-        gw, gh = bb[2] - bb[0], bb[3] - bb[1]
-        gd.text(((diam - gw) / 2 - bb[0], (diam - gh) / 2 - bb[1]), letter,
-                font=f, fill=fill + (255,))
-        disc.alpha_composite(gimg)
-    return disc
-
-
 def _scenario_body(d, kind, c, pt, traits=False, top=None):
     """Rules/flavor block for a scenario-side card, inside its Body region."""
     b = se_reg(kind, "Body")
@@ -1718,39 +1688,52 @@ def s_act(c, pt, dest, art_path=None, placement=None):
     img.save(dest)
 
 
+# real chaos-bag token symbols (SE plugin overlays) for the reference card
+CHAOS_OVERLAY = {"skull": "AHLCG-ChaosSkull", "cultist": "AHLCG-ChaosCultist",
+                 "tablet": "AHLCG-ChaosTablet",
+                 "elderthing": "AHLCG-ChaosElderThing"}
+
+
 def s_scenario_ref(c, pt, dest, art_path=None, placement=None):
-    """Scenario reference - title, difficulty subtitle (EASY/STANDARD front,
-    HARD/EXPERT back), and the chaos-token modifier rows."""
-    img, d = _se_frame_compose("AHLCG-Scenario", "Scenario",
-                               "Portrait-portrait-clip", art_path, placement)
-    name_reg = se_reg("Scenario", "Name")
-    _box_text(d, c["name"], name_reg, title=True, grow=1.05, key="name")
+    """Scenario reference — on the authentic scenario-reference (Chaos) template:
+    title, difficulty (EASY/STANDARD front, HARD/EXPERT back), and rows of the
+    real chaos-bag token symbols with their modifier text."""
+    img, d = _se_frame_compose("AHLCG-Chaos", "Chaos",
+                               "Encounter-portrait-clip", None, None)
+    nreg = se_reg("Chaos", "Name")
+    # the Name region is tall; keep the title in its upper part and capped so it
+    # doesn't swallow the difficulty line below it
+    _box_text(d, c["name"], (nreg[0], nreg[1], nreg[2], nreg[1] + 74),
+              title=True, grow=1.0, max_size=46, key="name")
     diff = c.get("difficulty") or (
         "HARD / EXPERT" if c.get("revealed") else "EASY / STANDARD")
-    y0 = (name_reg[3] if name_reg else 120)
-    _box_text(d, diff, (name_reg[0], y0 + 2, name_reg[2], y0 + 40),
-              bold=True, max_size=26, fill=(74, 60, 46))
-    b = se_reg("Scenario", "Body")
-    y = y0 + 56
+    _box_text(d, diff, se_reg("Chaos", "Difficulty"), bold=True, max_size=20,
+              fill=(74, 60, 46))
+    body = se_reg("Chaos", "Body")
+    icon = se_reg("Chaos", "BodyIcon")
+    icx = (icon[0] + icon[2]) // 2          # token-column centre x
+    isize = 80
+    y = body[1]
     tokens = c.get("tokens") or []
     if tokens:
-        med = 74                       # medallion diameter
-        gap = 20                       # gap medallion -> text
-        tx = b[0] + med + gap          # text left edge
         for t in tokens:
             tok = str(t.get("token", "")).lower().replace(" ", "")
             text = str(t.get("text", ""))
-            # wrap the modifier text to the right of the medallion
-            y_text = _box_block(d, text, (tx, y + 4, b[2], b[3]),
+            y_text = _box_block(d, text, (body[0], y + 4, body[2], body[3]),
                                 start=27, min_size=20)
-            rowh = max(med, y_text - y)
-            if tok:
-                _paste_disc(img, _chaos_medallion(tok, med),
-                            (b[0], y, b[0] + med, y + med))
-            y += rowh + 20
+            rowh = max(isize, y_text - y)
+            ov = CHAOS_OVERLAY.get(tok)
+            if ov and _se_img("overlays", ov):
+                iy = y + (rowh - isize) // 2
+                _paste_icon_fit(img, _se_img("overlays", ov),
+                                (icx - isize // 2, iy, icx + isize // 2,
+                                 iy + isize))
+            y += rowh + 22
     else:
-        _scenario_body(d, "Scenario", c, pt, top=y)
-    _scenario_footer(d, "Scenario", c)
+        _box_block(d, pt.get("text", ""), (body[0], y, body[2], body[3]),
+                   start=27, key="text")
+    _box_text(d, "Illus. pending — fan content", se_reg("Chaos", "Copyright"),
+              fill=(120, 100, 80), max_size=14)
     img.save(dest)
 
 
