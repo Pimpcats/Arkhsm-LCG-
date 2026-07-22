@@ -1483,19 +1483,19 @@ def s_location(c, pt, dest, art_path=None, placement=None):
     if not back:
         if c.get("shroud") not in (None, ""):
             sh = se_reg("Location", "Shroud")
-            dia = int((sh[2] - sh[0]) * 0.92)  # sit inside the frame's well ring
+            dia = int((sh[2] - sh[0]) * 1.02)  # fill the frame's well exactly
             _paste_disc(img, _disc(dia, SHROUD_DISC,
                                    rim=_shade(SHROUD_DISC, 0.4),
                                    rim_w=max(2, dia // 22)), sh)
-            # real number is ~0.62 of the disc height
+            # number sized to sit inside the disc's inner boundary
             _box_text(d, str(c["shroud"]), sh, stat=True, grow=1.0,
-                      max_size=int(dia * 0.62), fill=SHROUD_NUM)
+                      max_size=int(dia * 0.52), fill=SHROUD_NUM)
         if c.get("clues") not in (None, ""):
             base = se_reg("Location", "Clues")
             per_inv = bool(c.get("clues_per_investigator"))
             cx = (base[0] + base[2]) // 2
             cy = (base[1] + base[3]) // 2
-            dia = int((base[2] - base[0]) * 0.92)
+            dia = int((base[2] - base[0]) * 1.02)  # fill the frame's well exactly
             _paste_disc(img, _disc(dia, CLUE_DISC, rim=_shade(CLUE_DISC, 0.55),
                                    rim_w=max(2, dia // 24)), base)
             if per_inv:
