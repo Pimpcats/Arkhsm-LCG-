@@ -966,6 +966,31 @@ def _se_img(sub, name):
     return _SE_CACHE[key]
 
 
+VITALS_DIR = os.path.join(ROOT, "assets", "stat", "vitals")
+
+
+def _vital_chit(kind, value):
+    """Health-heart / sanity-brain chit for an investigator (official stat
+    elements kit). Returns (image, number_baked_in). Values 5-9 ship
+    pre-numbered; anything else uses the empty chit + an overlaid numeral."""
+    key = "vitals/" + kind
+    try:
+        v = int(value)
+    except (TypeError, ValueError):
+        v = None
+    if v is not None and 5 <= v <= 9:
+        p = os.path.join(VITALS_DIR, "{}_{}.png".format(kind, v))
+        k = key + str(v)
+        if k not in _SE_CACHE:
+            _SE_CACHE[k] = Image.open(p).convert("RGBA") if os.path.exists(p) else None
+        if _SE_CACHE[k] is not None:
+            return _SE_CACHE[k], True
+    p = os.path.join(VITALS_DIR, kind + ".png")
+    if key not in _SE_CACHE:
+        _SE_CACHE[key] = Image.open(p).convert("RGBA") if os.path.exists(p) else None
+    return _SE_CACHE[key], False
+
+
 def _paste_region(img, overlay, box):
     if overlay is None or box is None:
         return
@@ -1179,19 +1204,19 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
         _box_text(d, str(c[stat]), se_reg("Investigator", key),
                   stat=True, grow=1.0)
     _se_body(d, c, pt, "Investigator", text_start=20, extra_bottom=0)
-    # SanityBase is corrupt inside the plugin zip; the Horror pip is the
-    # same blue brain chit, so it stands in at chit size
-    for base, alt, key, val, fill in (
-            ("AHLCG-StaminaBase", "AHLCG-Damage", "Stamina", c["health"],
-             (250, 244, 238)),
-            ("AHLCG-SanityBase", "AHLCG-Horror", "Sanity", c["sanity"],
-             (240, 246, 255))):
+    # health (red heart) + sanity (blue brain) chits from the official stat kit
+    # — the plugin's own SanityBase is corrupt, so these are the clean source
+    for kind, key, val in (("health_heart", "Stamina", c["health"]),
+                           ("sanity_brain", "Sanity", c["sanity"])):
         box = se_reg("Investigator", key)
         cx, cy = (box[0] + box[2]) // 2, (box[1] + box[3]) // 2
-        grown = (cx - 34, cy - 34, cx + 34, cy + 34)
-        _paste_region(img, _se_img("overlays", base) or _se_img("overlays", alt),
-                      grown)
-        _box_text(d, str(val), box, fill=fill, stat=True, grow=0.9)
+        chit, numbered = _vital_chit(kind, val)
+        if chit is not None:
+            _paste_icon_fit(img, chit, (cx - 46, cy - 50, cx + 46, cy + 50))
+            if not numbered:
+                _box_text(d, str(val), box, fill=(255, 255, 255), stat=True, grow=0.9)
+        else:
+            _box_text(d, str(val), box, fill=(240, 240, 240), stat=True, grow=0.9)
     _box_text(d, "Illus. pending", se_reg("Investigator", "Artist"),
               fill=(70, 58, 46), max_size=18, align="left")
     _box_text(d, "THE STILL HOUR", se_reg("Investigator", "Copyright"),
