@@ -58,6 +58,10 @@ OV_NUMERIC_KEYS = ("cost", "level", "victory", "wil", "int", "com", "agi",
                    "shroud", "clues", "doom")
 # …vs pip counts, which feed range() in the renderers and MUST be small ints
 OV_PIP_KEYS = ("damage", "horror")
+# location "element" fields — the own symbol, its colour, whether clues are per
+# investigator, and the connection list — all editable from the Studio so any
+# spot on a location can be swapped without touching JSON
+OV_LOC_KEYS = ("icons", "color", "clues_per_investigator", "connections")
 MAX_PIPS = 5                       # the plugin frames carry Damage1..5/Horror1..5
 
 
@@ -91,6 +95,9 @@ def apply_card_overrides(c, pt, ov):
     pt = dict(pt)
     for k in OV_SPEC_KEYS:
         if k in ov and not (k in ("health", "sanity") and c.get("type") == "Enemy"):
+            c[k] = ov[k]
+    for k in OV_LOC_KEYS:
+        if k in ov:
             c[k] = ov[k]
     for k in OV_PT_KEYS:
         if k in ov:

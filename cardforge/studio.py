@@ -329,6 +329,22 @@ def act_card_save(p):
             return s[:3] if s else None             # allow "X"/"—", never junk
         return str(v)[:1200]                        # text: cap, never int-cast
 
+    def clean_connections(v):
+        """A connection list -> [{symbol, color}], each a short string; caps at
+        6 (the frame's Connection1..6). Junk entries are dropped, never crash."""
+        out = []
+        if isinstance(v, list):
+            for it in v[:6]:
+                if isinstance(it, dict):
+                    sym = str(it.get("symbol", "")).strip()[:16]
+                    col = str(it.get("color", "")).strip()[:16]
+                else:
+                    sym, col = str(it).strip()[:16], ""
+                if sym:
+                    out.append({"symbol": sym, "color": col} if col
+                               else {"symbol": sym})
+        return out
+
     with _state_lock:
         ov = rp.load_card_overrides()
         entry = dict(ov.get(card, {}))
@@ -340,6 +356,27 @@ def act_card_save(p):
                 entry.pop(k, None)
             else:
                 entry[k] = cv
+        # location element swaps: own symbol, colour, per-investigator, links
+        if "icons" in p:
+            iv = str(p["icons"]).strip()[:16]
+            if iv:
+                entry["icons"] = iv
+            else:
+                entry.pop("icons", None)
+        if "color" in p:
+            cv = str(p["color"]).strip()[:16]
+            if cv:
+                entry["color"] = cv
+            else:
+                entry.pop("color", None)
+        if "clues_per_investigator" in p:
+            entry["clues_per_investigator"] = bool(p["clues_per_investigator"])
+        if "connections" in p:
+            conns = clean_connections(p["connections"])
+            if conns:
+                entry["connections"] = conns
+            else:
+                entry.pop("connections", None)
         if entry:
             ov[card] = entry
         else:
