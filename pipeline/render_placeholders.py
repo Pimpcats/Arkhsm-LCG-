@@ -1384,8 +1384,11 @@ def _se_frame_compose(tpl_name, kind, clip_key, art_path, placement,
     return img, ImageDraw.Draw(img)
 
 
-def _se_body(d, c, pt, kind, letter="", extra_bottom=26, text_start=25):
-    """Traits + rules + flavor (+ Victory) stacked in the Body region."""
+def _se_body(d, c, pt, kind, letter="", extra_bottom=26, text_start=25,
+             victory=True):
+    """Traits + rules + flavor (+ Victory) stacked in the Body region. Pass
+    victory=False when the card places its Victory line at a fixed spot (enemies
+    print it centred just above the damage/horror row, not after the text)."""
     b = se_reg(kind, "Body", letter)
     y = b[1]
     if c.get("traits"):
@@ -1400,7 +1403,7 @@ def _se_body(d, c, pt, kind, letter="", extra_bottom=26, text_start=25):
         y = _box_block(d, pt.get("flavor", ""),
                        (b[0], y + 6, b[2], b[3] + extra_bottom + 16),
                        fill=(84, 66, 50), italic=True, start=20, key="flavor")
-    if c.get("victory"):
+    if victory and c.get("victory"):
         _box_text(d, "Victory {}.".format(c["victory"]),
                   (b[0], min(y + 6, b[3]), b[2], min(y + 34, b[3] + 30)),
                   bold=True, max_size=22, key="victory")
@@ -1481,7 +1484,15 @@ def s_enemy(c, pt, dest, art_path=None, placement=None):
                   fill=(238, 232, 216))
     _box_text(d, "ENEMY", se_reg("Enemy", "Label"), bold=True, max_size=15,
               fill=(74, 60, 46))
-    _se_body(d, c, pt, "Enemy", extra_bottom=0, text_start=22)
+    _se_body(d, c, pt, "Enemy", extra_bottom=0, text_start=22, victory=False)
+    # Victory centred just above the damage/horror row (above the centre chevron)
+    if c.get("victory"):
+        dmg = se_reg("Enemy", "Damage1")
+        hor = se_reg("Enemy", "Horror1")
+        if dmg and hor:
+            _box_text(d, "Victory {}.".format(c["victory"]),
+                      (dmg[0] - 66, dmg[1] - 42, hor[2] + 66, dmg[1] - 6),
+                      bold=True, max_size=21, key="victory")
     for kind_key, count, ov in (("Damage", pt.get("damage"), "AHLCG-Damage"),
                                 ("Horror", pt.get("horror"), "AHLCG-Horror")):
         for i in range(pip_count(count)):
