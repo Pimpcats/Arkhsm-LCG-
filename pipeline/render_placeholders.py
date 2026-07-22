@@ -1130,8 +1130,8 @@ def _paste_disc(img, disc, center_box):
 def _conn_disc(symbol_name, color, diam):
     """A connection well: a solid disc in the connecting location's colour with
     its symbol in a contrasting fill (cream on dark, dark on light)."""
-    disc = _disc(diam, color, rim=_shade(color, 0.55),
-                 rim_w=max(2, diam // 20), vignette=0.35)
+    disc = _disc(diam, color, rim=_shade(color, 0.6),
+                 rim_w=max(2, diam // 30), vignette=0.32)
     sym = loc_symbol_img(symbol_name)
     if sym:
         fill = DISC_DARK if _luma(color) > 140 else DISC_CREAM
@@ -1464,8 +1464,8 @@ def s_location(c, pt, dest, art_path=None, placement=None):
                else parse_color(c.get("color")))
         box = se_reg("Location", "Connection{}Icon".format(i + 1))
         if box and sym:
-            # fill the well ring, leaving only a thin margin (ref: Scarlet Keys)
-            disc_box = _expand_box(box, 0.92)
+            # fill the well ring (ref: Scarlet Keys disc ≈ 0.085 of card width)
+            disc_box = _expand_box(box, 1.0)
             _paste_disc(img, _conn_disc(sym, col, disc_box[2] - disc_box[0]),
                         box)
     # body: trait line, rules, flavour — below the stat band
