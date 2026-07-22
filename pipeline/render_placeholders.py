@@ -1115,7 +1115,7 @@ DISC_DARK = (44, 36, 28)
 # official location stat discs (ref: Scarlet Keys / Rainy London Streets):
 #   shroud = dark navy disc, WHITE number
 #   clue   = cream/tan disc, dark navy number + small per-investigator hat
-SHROUD_DISC = (12, 14, 48)
+SHROUD_DISC = (10, 10, 12)
 SHROUD_NUM = (244, 242, 236)
 CLUE_DISC = (214, 202, 170)
 CLUE_INK = (20, 24, 52)
