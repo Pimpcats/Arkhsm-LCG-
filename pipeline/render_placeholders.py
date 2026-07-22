@@ -887,6 +887,69 @@ def _box_block(d, text, box, fill=PSD_INK, start=30, min_size=15,
                         font_file=font_file)
 
 
+def _flow_around(d, text, box, obstacle, start=22, min_size=13, fill=PSD_INK,
+                 leading=1.24, gap=18, italic=False):
+    """Wrapped [markup] text that flows to the RIGHT of an obstacle (the
+    portrait) while beside it, then full width once past its bottom — so the
+    story text never runs over the investigator-back portrait. Shrinks to fit."""
+    if not text:
+        return box[1]
+    left, top, right, bottom = box
+    ob_r = obstacle[2] + gap
+    ob_b = obstacle[3]
+
+    def avail(y):
+        lx = ob_r if y < ob_b else left
+        return lx, right - lx
+
+    def layout(size):
+        tfont = _font(size, italic=italic)
+        gfont = _font(size, glyph=True)
+        lh = int(size * leading)
+        y = top
+        placed = []
+        fits = True
+        for para in text.split("\n"):
+            words = []
+            for is_g, chunk in glyphify(para):
+                if is_g:
+                    words.append((True, chunk))
+                else:
+                    words += [(False, w) for w in chunk.split(" ") if w != ""]
+            lx, aw = avail(y)
+            line, lw = [], 0.0
+            for is_g, w in words:
+                font = gfont if is_g else tfont
+                piece = w if is_g else w + " "
+                pl = d.textlength(piece, font=font)
+                if line and lw + pl > aw:
+                    placed.append((y, lx, line))
+                    y += lh
+                    if y + lh > bottom:
+                        fits = False
+                    lx, aw = avail(y)
+                    line, lw = [], 0.0
+                line.append((is_g, piece, font))
+                lw += pl
+            placed.append((y, lx, line))
+            y += lh
+            if y + lh > bottom and para != text.split("\n")[-1]:
+                fits = False
+        return placed, y, fits
+
+    placed, endy = None, top
+    for size in range(start, min_size - 1, -1):
+        placed, endy, fits = layout(size)
+        if fits:
+            break
+    for ly, lx, line in placed:
+        cx = lx
+        for is_g, piece, font in line:
+            d.text((cx, ly), piece, font=font, fill=fill)
+            cx += d.textlength(piece, font=font)
+    return endy
+
+
 def p_investigator_front(c, pt, dest, art_path=None, placement=None):
     img, R = _psd_compose("character_card_front", art_path, placement,
                           label="investigator art")
@@ -1394,7 +1457,11 @@ def s_investigator_back(c, pt, dest, art_path=None):
                   se_reg("InvestigatorBack", "SubtitleText", letter), italic=True,
                   max_w_factor=1.0, key="subtitle")
     b = se_reg("InvestigatorBack", "Body")
-    _box_block(d, pt.get("back_text", ""), b, start=22, key="text")
+    portrait = se_reg("InvestigatorBack", "Portrait-portrait-clip")
+    if b and portrait:
+        _flow_around(d, pt.get("back_text", ""), b, portrait, start=22)
+    else:
+        _box_block(d, pt.get("back_text", ""), b, start=22, key="text")
     img.save(dest)
 
 
