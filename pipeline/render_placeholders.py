@@ -1409,10 +1409,11 @@ def _se_body(d, c, pt, kind, letter="", extra_bottom=26, text_start=25):
 
 def s_investigator_front(c, pt, dest, art_path=None, placement=None):
     letter = CLASS_LETTER.get(c.get("class"), "N")
+    # no underlay: when there's no art the frame's own class-coloured background
+    # (e.g. Guardian blue) shows through the portrait window — never a filler box
     img, d = _se_frame_compose("AHLCG-Investigator-" + letter, "Investigator",
                                "TransparentPortrait-portrait-clip",
-                               art_path, placement, landscape=True,
-                               underlay=INV_ART_UNDERLAY)
+                               art_path, placement, landscape=True)
     _box_text(d, c["name"], se_reg("Investigator", "Name"), title=True, grow=1.15,
               max_w_factor=1.0, key="name")
     if c.get("subtitle"):
@@ -1448,8 +1449,7 @@ def s_investigator_back(c, pt, dest, art_path=None):
     letter = CLASS_LETTER.get(c.get("class"), "N")
     img, d = _se_frame_compose("AHLCG-InvestigatorBack-" + letter,
                                "InvestigatorBack", "Portrait-portrait-clip",
-                               art_path, None, landscape=True,
-                               underlay=INV_ART_UNDERLAY)
+                               art_path, None, landscape=True)
     _box_text(d, c["name"], se_reg("InvestigatorBack", "Name"),
               title=True, grow=1.1, max_w_factor=1.0, key="name")
     if c.get("subtitle"):
