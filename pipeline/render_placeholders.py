@@ -1134,7 +1134,7 @@ def _conn_disc(symbol_name, color, diam):
     if sym:
         fill = DISC_DARK if _luma(color) > 140 else DISC_CREAM
         sym = _tint_icon(sym, fill)
-        target = int(diam * 0.56)
+        target = int(diam * 0.54)
         s = min(target / sym.width, target / sym.height)
         w, h = max(1, round(sym.width * s)), max(1, round(sym.height * s))
         sym = sym.resize((w, h), Image.LANCZOS)
@@ -1443,6 +1443,14 @@ def s_location(c, pt, dest, art_path=None, placement=None):
         if c.get("victory"):
             _box_text(d, "Victory {}.".format(c["victory"]),
                       se_reg("Location", "Victory"), bold=True, max_size=20)
+    # top-left corner: the location's OWN symbol, a disc in the location's colour
+    # (this is how the map identifies each location; ref: Rainy London Streets)
+    if c.get("icons"):
+        bi = se_reg(kind, "BaseIcon")
+        if bi:
+            odia = int(min(bi[2] - bi[0], bi[3] - bi[1]) * 0.82)
+            _paste_disc(img, _conn_disc(c["icons"], parse_color(c.get("color")),
+                                        odia), bi)
     # bottom row: the symbols of the locations this one connects to, each in the
     # connected location's colour (official uses colour to match the map)
     conns = c.get("connections") or []
@@ -1454,9 +1462,8 @@ def s_location(c, pt, dest, art_path=None, placement=None):
                else parse_color(c.get("color")))
         box = se_reg("Location", "Connection{}Icon".format(i + 1))
         if box and sym:
-            # fill the frame's connection well with a solid coloured disc; sit
-            # just inside the well ring (real connection disc ≈ 0.6× the shroud)
-            disc_box = _expand_box(box, 0.98)
+            # fill the well ring, leaving only a thin margin (ref: Scarlet Keys)
+            disc_box = _expand_box(box, 0.92)
             _paste_disc(img, _conn_disc(sym, col, disc_box[2] - disc_box[0]),
                         box)
     # body: trait line, rules, flavour — below the stat band
