@@ -1059,8 +1059,10 @@ def _tint_icon(overlay, color):
 # calibrated from the real Crystalline Cavern circle cutouts.
 DISC_CREAM = (238, 230, 205)
 DISC_DARK = (44, 36, 28)
-SHROUD_DISC = (8, 8, 14)
-CLUE_DISC = (206, 186, 146)
+# shroud + clue discs: dark navy with white numbers (ref: Scarlet Keys)
+SHROUD_DISC = (10, 12, 46)
+CLUE_DISC = (10, 12, 46)
+DISC_NUM = (244, 242, 236)
 
 
 def _luma(color):
@@ -1420,11 +1422,11 @@ def s_location(c, pt, dest, art_path=None, placement=None):
             sh = se_reg("Location", "Shroud")
             dia = int((sh[2] - sh[0]) * 0.92)  # sit inside the frame's well ring
             _paste_disc(img, _disc(dia, SHROUD_DISC,
-                                   rim=_shade(SHROUD_DISC, 1.4),
+                                   rim=_shade(SHROUD_DISC, 1.8),
                                    rim_w=max(2, dia // 22)), sh)
             # real number is ~0.60 of the disc height
             _box_text(d, str(c["shroud"]), sh, stat=True, grow=1.0,
-                      max_size=int(dia * 0.60), fill=(244, 240, 230))
+                      max_size=int(dia * 0.60), fill=DISC_NUM)
         if c.get("clues") not in (None, ""):
             # per-investigator clues: number in the left-shifted slot + marker
             per_inv = bool(c.get("clues_per_investigator"))
@@ -1432,13 +1434,13 @@ def s_location(c, pt, dest, art_path=None, placement=None):
             base = se_reg("Location", "Clues")
             dia = int((base[2] - base[0]) * 0.92)
             _paste_disc(img, _disc(dia, CLUE_DISC,
-                                   rim=_shade(CLUE_DISC, 0.6),
+                                   rim=_shade(CLUE_DISC, 1.8),
                                    rim_w=max(2, dia // 22)), base)
             _box_text(d, str(c["clues"]), cl, stat=True, grow=1.0,
-                      max_size=int(dia * 0.60), fill=DISC_DARK)
+                      max_size=int(dia * 0.60), fill=DISC_NUM)
             if per_inv:
                 _paste_icon_fit(img, _tint_icon(
-                    _se_img("icons", "AHLCG-PerInvestigator"), DISC_DARK),
+                    _se_img("icons", "AHLCG-PerInvestigator"), DISC_NUM),
                     se_reg("Location", "CluesPerInvIcon"))
         if c.get("victory"):
             _box_text(d, "Victory {}.".format(c["victory"]),
