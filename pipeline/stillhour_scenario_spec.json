@@ -122,5 +122,15 @@
     "type": "Story",
     "name": "First Dark",
     "traits": "Interlude."
+  },
+  {
+    "deck": 95041,
+    "id": "sthr-appointed-approach",
+    "type": "Story",
+    "name": "The Appointed’s Approach",
+    "class": "Mythos",
+    "traits": "",
+    "encounter": true,
+    "quantity": 1
   }
 ]

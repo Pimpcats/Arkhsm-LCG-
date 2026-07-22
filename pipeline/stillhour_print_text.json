@@ -142,7 +142,7 @@
     "evade": null,
     "damage": 2,
     "horror": 2,
-    "text": "Prey — the investigator with the most Memory. The Appointed cannot be attacked, cannot be evaded, and cannot be defeated.\nIt occupies an Approach stage (Unseen → Sensed → Emerging → Arrived) and manifests at the location farthest from the investigators while Sensed or later.\n[action] Hold Back: Test [wil] or [com] (4). If you succeed, push the Appointed back one Approach stage and rewind the Hourglass by 1 Hour.\nWhile Sensed: it does not move or attack. Forced — At the end of the round, each investigator at its location takes 1 horror.\nWhile Emerging: it gains Hunter. Forced — When it engages an investigator: that investigator takes 1 horror.\nWhile Arrived: it gains Hunter. Forced — When it attacks: it deals 2 damage and 2 horror, then raise Dissonance by 1.\nForced — When the Appointed would be defeated or leave play by any effect: instead, it does not.",
+    "text": "Prey — the investigator with the most Memory. The Appointed cannot be attacked, cannot be evaded, and cannot be defeated.\n[action] Hold Back: Test [wil] or [com] (4). If you succeed, push the Appointed back one Approach stage and rewind the Hourglass by 1 Hour.\nForced — When the Appointed would be defeated or leave play by any effect: instead, it does not.\nIts Approach stages are detailed on “The Appointed’s Approach.”",
     "flavor": "It is not late. It was never late. You are simply early, every time."
   },
   "sthr-appointedwhisper": {
@@ -208,5 +208,9 @@
   "sthr-loc-windingstair": {
     "text": "[action] Test [agility] (2) to climb. If you fail, take 1 damage.",
     "flavor": "The steps do not always number the same."
+  },
+  "sthr-appointed-approach": {
+    "text": "The Appointed occupies an Approach stage (Unseen → Sensed → Emerging → Arrived) and manifests at the location farthest from the investigators while Sensed or later.\nWhile Sensed: it does not move or attack. Forced — At the end of the round, each investigator at its location takes 1 horror.\nWhile Emerging: it gains Hunter. Forced — When it engages an investigator: that investigator takes 1 horror.\nWhile Arrived: it gains Hunter. Forced — When it attacks: it deals 2 damage and 2 horror, then raise Dissonance by 1.",
+    "flavor": "It is not late. It was never late. You are simply early, every time."
   }
 }
