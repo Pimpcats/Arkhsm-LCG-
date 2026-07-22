@@ -1050,6 +1050,76 @@ def _tint_icon(overlay, color):
     return solid
 
 
+# official location discs: the shroud is a black disc (white number), clues a
+# tan disc (dark number), and each connection is a solid disc in the connecting
+# location's colour with a contrasting (cream/dark) symbol punched into it —
+# calibrated from the real Crystalline Cavern circle cutouts.
+DISC_CREAM = (238, 230, 205)
+DISC_DARK = (44, 36, 28)
+SHROUD_DISC = (8, 8, 14)
+CLUE_DISC = (206, 186, 146)
+
+
+def _luma(color):
+    return 0.299 * color[0] + 0.587 * color[1] + 0.114 * color[2]
+
+
+def _shade(color, factor):
+    """Scale toward black (factor<1) or white (factor>1), clamped."""
+    if factor <= 1:
+        return tuple(max(0, int(round(v * factor))) for v in color[:3])
+    return tuple(min(255, int(round(v + (255 - v) * (factor - 1))))
+                 for v in color[:3])
+
+
+def _disc(diam, fill, rim=None, rim_w=0):
+    """A smooth filled circle (optional darker rim), supersampled for clean
+    anti-aliased edges."""
+    ss = 4
+    D = max(1, diam) * ss
+    im = Image.new("RGBA", (D, D), (0, 0, 0, 0))
+    dd = ImageDraw.Draw(im)
+    if rim and rim_w > 0:
+        dd.ellipse([0, 0, D - 1, D - 1], fill=tuple(rim) + (255,))
+        p = rim_w * ss
+        dd.ellipse([p, p, D - 1 - p, D - 1 - p], fill=tuple(fill) + (255,))
+    else:
+        dd.ellipse([0, 0, D - 1, D - 1], fill=tuple(fill) + (255,))
+    return im.resize((max(1, diam), max(1, diam)), Image.LANCZOS)
+
+
+def _expand_box(box, scale):
+    cx, cy = (box[0] + box[2]) / 2.0, (box[1] + box[3]) / 2.0
+    hw = (box[2] - box[0]) * scale / 2.0
+    hh = (box[3] - box[1]) * scale / 2.0
+    return (int(round(cx - hw)), int(round(cy - hh)),
+            int(round(cx + hw)), int(round(cy + hh)))
+
+
+def _paste_disc(img, disc, center_box):
+    """Centre a disc image on the centre of a region box."""
+    cx = (center_box[0] + center_box[2]) // 2
+    cy = (center_box[1] + center_box[3]) // 2
+    img.paste(disc, (cx - disc.width // 2, cy - disc.height // 2), disc)
+
+
+def _conn_disc(symbol_name, color, diam):
+    """A connection well: a solid disc in the connecting location's colour with
+    its symbol in a contrasting fill (cream on dark, dark on light)."""
+    disc = _disc(diam, color, rim=_shade(color, 0.55),
+                 rim_w=max(2, diam // 20))
+    sym = loc_symbol_img(symbol_name)
+    if sym:
+        fill = DISC_DARK if _luma(color) > 140 else DISC_CREAM
+        sym = _tint_icon(sym, fill)
+        target = int(diam * 0.56)
+        s = min(target / sym.width, target / sym.height)
+        w, h = max(1, round(sym.width * s)), max(1, round(sym.height * s))
+        sym = sym.resize((w, h), Image.LANCZOS)
+        disc.alpha_composite(sym, ((diam - w) // 2, (diam - h) // 2))
+    return disc
+
+
 def _paste_icon_fit(img, overlay, box):
     """Paste an icon centered in a box, preserving its aspect (symbols are not
     always square, and the region boxes aren't either)."""
@@ -1325,17 +1395,27 @@ def s_location(c, pt, dest, art_path=None, placement=None):
               fill=(74, 60, 46))
     if not back:
         if c.get("shroud") not in (None, ""):
-            _box_text(d, str(c["shroud"]), se_reg("Location", "Shroud"),
-                      stat=True, grow=1.0, fill=(238, 232, 216))
+            sh = se_reg("Location", "Shroud")
+            _paste_disc(img, _disc(sh[2] - sh[0], SHROUD_DISC,
+                                   rim=_shade(SHROUD_DISC, 1.4),
+                                   rim_w=max(2, (sh[2] - sh[0]) // 22)), sh)
+            _box_text(d, str(c["shroud"]), sh, stat=True, grow=1.0,
+                      fill=(244, 240, 230))
         if c.get("clues") not in (None, ""):
             # per-investigator clues: number in the left-shifted slot + marker
             per_inv = bool(c.get("clues_per_investigator"))
-            _box_text(d, str(c["clues"]),
-                      se_reg("Location", "CluesPerInv" if per_inv else "Clues"),
-                      stat=True, grow=1.0, fill=(238, 232, 216))
+            cl = se_reg("Location", "CluesPerInv" if per_inv else "Clues")
+            base = se_reg("Location", "Clues")
+            _paste_disc(img, _disc(base[2] - base[0], CLUE_DISC,
+                                   rim=_shade(CLUE_DISC, 0.6),
+                                   rim_w=max(2, (base[2] - base[0]) // 22)),
+                        base)
+            _box_text(d, str(c["clues"]), cl, stat=True, grow=1.0,
+                      fill=DISC_DARK)
             if per_inv:
-                _paste_icon_fit(img, _se_img("icons", "AHLCG-PerInvestigator"),
-                                se_reg("Location", "CluesPerInvIcon"))
+                _paste_icon_fit(img, _tint_icon(
+                    _se_img("icons", "AHLCG-PerInvestigator"), DISC_DARK),
+                    se_reg("Location", "CluesPerInvIcon"))
         if c.get("victory"):
             _box_text(d, "Victory {}.".format(c["victory"]),
                       se_reg("Location", "Victory"), bold=True, max_size=20)
@@ -1348,10 +1428,12 @@ def s_location(c, pt, dest, art_path=None, placement=None):
         sym = con.get("symbol") if isinstance(con, dict) else con
         col = (parse_color(con.get("color")) if isinstance(con, dict)
                else parse_color(c.get("color")))
-        im = loc_symbol_img(sym)
-        if im:
-            _paste_icon_fit(img, _tint_icon(im, col),
-                            se_reg("Location", "Connection{}Icon".format(i + 1)))
+        box = se_reg("Location", "Connection{}Icon".format(i + 1))
+        if box and sym:
+            # fill the frame's connection well with a solid coloured disc
+            disc_box = _expand_box(box, 1.30)
+            _paste_disc(img, _conn_disc(sym, col, disc_box[2] - disc_box[0]),
+                        box)
     # body: trait line, rules, flavour — below the stat band
     b = se_reg(kind, "Body")
     y = b[1]
