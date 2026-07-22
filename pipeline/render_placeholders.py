@@ -1059,10 +1059,13 @@ def _tint_icon(overlay, color):
 # calibrated from the real Crystalline Cavern circle cutouts.
 DISC_CREAM = (238, 230, 205)
 DISC_DARK = (44, 36, 28)
-# shroud + clue discs: dark navy with white numbers (ref: Scarlet Keys)
-SHROUD_DISC = (10, 12, 46)
-CLUE_DISC = (10, 12, 46)
-DISC_NUM = (244, 242, 236)
+# official location stat discs (ref: Scarlet Keys / Rainy London Streets):
+#   shroud = dark navy disc, WHITE number
+#   clue   = cream/tan disc, dark navy number + small per-investigator hat
+SHROUD_DISC = (12, 14, 48)
+SHROUD_NUM = (244, 242, 236)
+CLUE_DISC = (214, 202, 170)
+CLUE_INK = (20, 24, 52)
 
 
 def _luma(color):
@@ -1422,26 +1425,36 @@ def s_location(c, pt, dest, art_path=None, placement=None):
             sh = se_reg("Location", "Shroud")
             dia = int((sh[2] - sh[0]) * 0.92)  # sit inside the frame's well ring
             _paste_disc(img, _disc(dia, SHROUD_DISC,
-                                   rim=_shade(SHROUD_DISC, 1.8),
+                                   rim=_shade(SHROUD_DISC, 0.4),
                                    rim_w=max(2, dia // 22)), sh)
-            # real number is ~0.60 of the disc height
+            # real number is ~0.62 of the disc height
             _box_text(d, str(c["shroud"]), sh, stat=True, grow=1.0,
-                      max_size=int(dia * 0.60), fill=DISC_NUM)
+                      max_size=int(dia * 0.62), fill=SHROUD_NUM)
         if c.get("clues") not in (None, ""):
-            # per-investigator clues: number in the left-shifted slot + marker
-            per_inv = bool(c.get("clues_per_investigator"))
-            cl = se_reg("Location", "CluesPerInv" if per_inv else "Clues")
             base = se_reg("Location", "Clues")
+            per_inv = bool(c.get("clues_per_investigator"))
+            cx = (base[0] + base[2]) // 2
+            cy = (base[1] + base[3]) // 2
             dia = int((base[2] - base[0]) * 0.92)
-            _paste_disc(img, _disc(dia, CLUE_DISC,
-                                   rim=_shade(CLUE_DISC, 1.8),
-                                   rim_w=max(2, dia // 22)), base)
-            _box_text(d, str(c["clues"]), cl, stat=True, grow=1.0,
-                      max_size=int(dia * 0.60), fill=DISC_NUM)
+            _paste_disc(img, _disc(dia, CLUE_DISC, rim=_shade(CLUE_DISC, 0.55),
+                                   rim_w=max(2, dia // 24)), base)
             if per_inv:
-                _paste_icon_fit(img, _tint_icon(
-                    _se_img("icons", "AHLCG-PerInvestigator"), DISC_NUM),
-                    se_reg("Location", "CluesPerInvIcon"))
+                # number left of centre + a small per-investigator hat to its
+                # upper-right, both inside the disc (ref: Rainy London Streets)
+                nx = cx - int(dia * 0.14)
+                _box_text(d, str(c["clues"]),
+                          (nx - dia, cy - dia, nx + dia, cy + dia),
+                          stat=True, grow=1.0, max_size=int(dia * 0.56),
+                          fill=CLUE_INK)
+                hat = _tint_icon(_se_img("icons", "AHLCG-PerInvestigator"),
+                                 CLUE_INK)
+                hcx, hcy = cx + int(dia * 0.24), cy - int(dia * 0.02)
+                hw, hh = int(dia * 0.22), int(dia * 0.18)
+                _paste_icon_fit(img, hat, (hcx - hw, hcy - hh,
+                                           hcx + hw, hcy + hh))
+            else:
+                _box_text(d, str(c["clues"]), base, stat=True, grow=1.0,
+                          max_size=int(dia * 0.60), fill=CLUE_INK)
         if c.get("victory"):
             _box_text(d, "Victory {}.".format(c["victory"]),
                       se_reg("Location", "Victory"), bold=True, max_size=20)
