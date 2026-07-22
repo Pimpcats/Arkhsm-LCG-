@@ -1015,12 +1015,15 @@ def loc_symbol_img(name):
 
 # named location colours (the official system tints each location a colour so
 # connected symbols visually match across the map); hex also accepted
-LOC_COLORS = {"red": (176, 58, 46), "orange": (202, 111, 30),
-              "yellow": (198, 160, 34), "green": (58, 130, 76),
-              "teal": (37, 128, 122), "blue": (44, 90, 160),
-              "purple": (110, 62, 148), "pink": (185, 78, 130),
-              "brown": (120, 80, 52), "grey": (110, 106, 112),
-              "gray": (110, 106, 112), "gold": (176, 150, 74)}
+# deep, muted official palette — calibrated against the real Crystalline Cavern
+# discs (red≈(156,0,12), purple/aubergine≈(56,0,36), teal≈near-black). Arkham's
+# location colours are richer and darker than a "web bright" palette.
+LOC_COLORS = {"red": (150, 14, 18), "orange": (184, 84, 24),
+              "yellow": (190, 148, 40), "green": (44, 102, 60),
+              "teal": (26, 96, 94), "blue": (32, 72, 132),
+              "purple": (92, 36, 110), "pink": (168, 56, 110),
+              "brown": (108, 72, 46), "grey": (98, 94, 100),
+              "gray": (98, 94, 100), "gold": (170, 142, 70)}
 
 
 def parse_color(c, default=(176, 150, 74)):
@@ -1072,9 +1075,10 @@ def _shade(color, factor):
                  for v in color[:3])
 
 
-def _disc(diam, fill, rim=None, rim_w=0):
+def _disc(diam, fill, rim=None, rim_w=0, vignette=0.0):
     """A smooth filled circle (optional darker rim), supersampled for clean
-    anti-aliased edges."""
+    anti-aliased edges. `vignette` (0..1) darkens toward the edge so the disc
+    reads as a printed token rather than a flat digital fill."""
     ss = 4
     D = max(1, diam) * ss
     im = Image.new("RGBA", (D, D), (0, 0, 0, 0))
@@ -1085,6 +1089,24 @@ def _disc(diam, fill, rim=None, rim_w=0):
         dd.ellipse([p, p, D - 1 - p, D - 1 - p], fill=tuple(fill) + (255,))
     else:
         dd.ellipse([0, 0, D - 1, D - 1], fill=tuple(fill) + (255,))
+    if vignette > 0:
+        # smooth radial shade: transparent centre -> darker edge (computed at
+        # low res, scaled up), so the disc reads as a printed token
+        g = 64
+        grad = Image.new("L", (g, g), 0)
+        gp = grad.load()
+        c = (g - 1) / 2.0
+        for y in range(g):
+            for x in range(g):
+                r = ((x - c) ** 2 + (y - c) ** 2) ** 0.5 / c
+                gp[x, y] = int(round(vignette * 255 * min(1.0, r) ** 2.2))
+        shade_a = grad.resize((D, D), Image.BILINEAR)
+        disc_a = im.getchannel("A")
+        # apply darkening only where the disc is opaque
+        shade = Image.new("RGBA", (D, D), (0, 0, 0, 0))
+        shade.putalpha(Image.composite(shade_a, Image.new("L", (D, D), 0),
+                                       disc_a))
+        im = Image.alpha_composite(im, shade)
     return im.resize((max(1, diam), max(1, diam)), Image.LANCZOS)
 
 
@@ -1107,7 +1129,7 @@ def _conn_disc(symbol_name, color, diam):
     """A connection well: a solid disc in the connecting location's colour with
     its symbol in a contrasting fill (cream on dark, dark on light)."""
     disc = _disc(diam, color, rim=_shade(color, 0.55),
-                 rim_w=max(2, diam // 20))
+                 rim_w=max(2, diam // 20), vignette=0.35)
     sym = loc_symbol_img(symbol_name)
     if sym:
         fill = DISC_DARK if _luma(color) > 140 else DISC_CREAM
@@ -1396,22 +1418,24 @@ def s_location(c, pt, dest, art_path=None, placement=None):
     if not back:
         if c.get("shroud") not in (None, ""):
             sh = se_reg("Location", "Shroud")
-            _paste_disc(img, _disc(sh[2] - sh[0], SHROUD_DISC,
+            dia = int((sh[2] - sh[0]) * 0.92)  # sit inside the frame's well ring
+            _paste_disc(img, _disc(dia, SHROUD_DISC,
                                    rim=_shade(SHROUD_DISC, 1.4),
-                                   rim_w=max(2, (sh[2] - sh[0]) // 22)), sh)
+                                   rim_w=max(2, dia // 22)), sh)
+            # real number is ~0.60 of the disc height
             _box_text(d, str(c["shroud"]), sh, stat=True, grow=1.0,
-                      fill=(244, 240, 230))
+                      max_size=int(dia * 0.60), fill=(244, 240, 230))
         if c.get("clues") not in (None, ""):
             # per-investigator clues: number in the left-shifted slot + marker
             per_inv = bool(c.get("clues_per_investigator"))
             cl = se_reg("Location", "CluesPerInv" if per_inv else "Clues")
             base = se_reg("Location", "Clues")
-            _paste_disc(img, _disc(base[2] - base[0], CLUE_DISC,
+            dia = int((base[2] - base[0]) * 0.92)
+            _paste_disc(img, _disc(dia, CLUE_DISC,
                                    rim=_shade(CLUE_DISC, 0.6),
-                                   rim_w=max(2, (base[2] - base[0]) // 22)),
-                        base)
+                                   rim_w=max(2, dia // 22)), base)
             _box_text(d, str(c["clues"]), cl, stat=True, grow=1.0,
-                      fill=DISC_DARK)
+                      max_size=int(dia * 0.60), fill=DISC_DARK)
             if per_inv:
                 _paste_icon_fit(img, _tint_icon(
                     _se_img("icons", "AHLCG-PerInvestigator"), DISC_DARK),
@@ -1430,8 +1454,9 @@ def s_location(c, pt, dest, art_path=None, placement=None):
                else parse_color(c.get("color")))
         box = se_reg("Location", "Connection{}Icon".format(i + 1))
         if box and sym:
-            # fill the frame's connection well with a solid coloured disc
-            disc_box = _expand_box(box, 1.30)
+            # fill the frame's connection well with a solid coloured disc; sit
+            # just inside the well ring (real connection disc ≈ 0.6× the shroud)
+            disc_box = _expand_box(box, 0.98)
             _paste_disc(img, _conn_disc(sym, col, disc_box[2] - disc_box[0]),
                         box)
     # body: trait line, rules, flavour — below the stat band
