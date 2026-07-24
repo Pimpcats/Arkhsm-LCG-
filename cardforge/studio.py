@@ -435,6 +435,8 @@ def act_scenario_save(p):
         for st, ids in stacks.items():
             if st in SCENARIO_STACKS and isinstance(ids, list):
                 cs[st] = [os.path.basename(str(i))[:64] for i in ids][:60]
+        if stacks.get("_locked"):
+            cs["_locked"] = True
         if cs:
             clean[str(sid)[:64]] = cs
     with _state_lock:
@@ -998,8 +1000,23 @@ def _scenario_board():
     try:
         m = json.load(open(mpath, encoding="utf-8"))
         for sc in m.get("scenarios", []):
+            stacks = sc.get("stacks", {}) or {}
+            req = {}
+            loc = (stacks.get("locations", {}) or {}).get("cards", [])
+            if loc:
+                req["locations"] = [c.get("name", "?") for c in loc]
+            act = (stacks.get("act_deck", {}) or {}).get("cards", [])
+            if act:
+                req["act_deck"] = [c.get("name", "?") for c in act]
+            enc = (stacks.get("encounter", {}) or {})
+            sets = enc.get("sets", [])
+            if sets:
+                req["encounter"] = [str(x) for x in sets]
+            aside = enc.get("aside", [])
+            if aside:
+                req["setup_aside"] = [str(x) for x in aside]
             scen.append({"id": sc.get("id"), "name": sc.get("name"),
-                         "order": sc.get("order", 99)})
+                         "order": sc.get("order", 99), "req": req})
         scen.sort(key=lambda x: x["order"])
     except (ValueError, OSError):
         pass
@@ -1446,6 +1463,15 @@ transition:transform .16s ease,box-shadow .16s ease}
 .dcard.justdropped{animation:settle .28s ease}
 @keyframes settle{0%{transform:translateY(-10px) scale(1.12)}70%{transform:translateY(2px) scale(.98)}100%{transform:none}}
 #scen_pool{border:1px solid var(--line);border-radius:12px;padding:8px;margin-bottom:10px;background:var(--surface2)}
+.reqchip{display:inline-block;font-size:10px;color:var(--dim);border:1px dashed rgba(255,255,255,.22);
+border-radius:5px;padding:1px 6px;margin:1px;letter-spacing:.2px}
+.reqchip.met{color:#7fbf7f;border-style:solid;border-color:rgba(127,191,127,.4);text-decoration:line-through}
+.scenbox.locked{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.scenbox.locked .stack{border-style:solid;opacity:.85}
+.lockbtn{width:100%;margin-top:4px}
+#camp_bar{display:flex;gap:10px;align-items:center;border:1px solid var(--line);
+border-radius:12px;padding:10px 14px;margin-bottom:10px;background:var(--surface2)}
+#camp_bar .slot{border:1px dashed rgba(255,255,255,.2);border-radius:8px;padding:4px 10px;font-size:12px;color:var(--dim)}
 .hint{color:var(--dim);font-size:12px}
 hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 </style></head><body>
@@ -1461,8 +1487,8 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 <button id=tab-illustrate onclick="tab('illustrate')">2 &middot; Illustrate</button>
 <button id=tab-cards onclick="tab('cards')">3 &middot; Cards</button>
 <button id=tab-frame onclick="tab('frame')">4 &middot; Frame</button>
-<button id=tab-apply onclick="tab('apply')">5 &middot; Play in TTS</button>
-<button id=tab-scenarios onclick="tab('scenarios');scenBuild()">6 &middot; Scenarios</button>
+<button id=tab-scenarios onclick="tab('scenarios');scenBuild()">5 &middot; Scenarios</button>
+<button id=tab-apply onclick="tab('apply')">6 &middot; Play in TTS</button>
 <button id=tab-advanced onclick="tab('advanced')">&#9881; Advanced</button>
 </nav><main>
 
@@ -1473,6 +1499,14 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 <button class=btn onclick="document.getElementById('feed_file').click()" title="pour a written campaign (JSON) into the editor: existing cards become overrides, new cards are created, the board pre-fills">&#128229; Import campaign JSON&hellip;</button>
 <input type=file id=feed_file accept=".json,application/json" style="display:none" onchange=feedImport(this)>
 <span id=feed_info class=hint></span></div>
+<div id=camp_bar>
+<b>Campaign box</b><span id=camp_progress class=stat>0/0 locked</span>
+<span class=slot>&#128214; Campaign guide &mdash; PDF slot (Phase 3)</span>
+<span class=slot>&#128221; Campaign log / notes &mdash; coming next</span>
+<span class=spacer></span>
+<button class="btn primary" id=camp_spawn disabled onclick="addlog('Phase 3: the compiler builds the scripted campaign box next')"
+title="enabled once every scenario box is locked in — compiles the whole campaign into a scripted TTS box">&#128230; Spawn campaign box &rarr; TTS</button>
+</div>
 <div id=scen_pool><small class=hint>UNASSIGNED CARDS &mdash; drag onto the board</small><div id=scen_pool_cards></div></div>
 <div id=scen_board></div>
 </div></section>
@@ -2381,6 +2415,7 @@ let SCEN_DRAG=null;
 function scenAssignments(){const A={};
 for(const box of document.querySelectorAll('.scenbox'))
 {const sid=box.dataset.sid;A[sid]={};
+if(box.classList.contains('locked'))A[sid]._locked=true;
 for(const st of box.querySelectorAll('.stack')){
 const ids=[...st.querySelectorAll('.dcard')].map(d=>d.dataset.cid);
 if(ids.length)A[sid][st.dataset.stack]=ids;}}
@@ -2405,14 +2440,30 @@ const STACK_LABEL={locations:'Locations',act_deck:'Act deck',agenda_deck:'Agenda
 encounter:'Encounter sets',named:'Named enemies',reference:'Scenario reference',setup_aside:'Set aside'};
 function scenBuild(){const S=(LS&&LS.scenarios)||{scenarios:[],stacks:[],assignments:{}};
 const board=document.getElementById('scen_board');board.innerHTML='';
-const assigned=new Set();
-for(const sc of S.scenarios){const box=document.createElement('div');box.className='scenbox';box.dataset.sid=sc.id;
-box.innerHTML=`<h3>${sc.name||sc.id}</h3>`;
+const assigned=new Set();let locked=0;
+const nameOf=cid=>{const c=((LS&&LS.cards)||[]).find(x=>x.id===cid);return c?String(c.name).toLowerCase():'';};
+for(const sc of S.scenarios){const A=S.assignments[sc.id]||{};
+const isLocked=!!A._locked;if(isLocked)locked++;
+const box=document.createElement('div');box.className='scenbox'+(isLocked?' locked':'');box.dataset.sid=sc.id;
+box.innerHTML=`<h3>${isLocked?'&#128274; ':''}${sc.name||sc.id}</h3>`;
 for(const st of S.stacks){const div=document.createElement('div');div.className='stack';div.dataset.stack=st;
-div.innerHTML=`<small>${STACK_LABEL[st]||st}</small>`;
-for(const cid of ((S.assignments[sc.id]||{})[st]||[])){div.appendChild(dcardEl(cid));assigned.add(cid);}
-stackDropify(div);box.appendChild(div);}
+const inStack=(A[st]||[]);
+const names=inStack.map(nameOf);
+// soft requirements: the manifest's template for this stack, struck through once met
+const reqs=((sc.req||{})[st]||[]).map(r=>
+`<span class="reqchip ${names.some(n=>n&&n.includes(String(r).toLowerCase().slice(0,12)))?'met':''}">${r}</span>`).join('');
+div.innerHTML=`<small>${STACK_LABEL[st]||st}</small>${reqs}`;
+for(const cid of inStack){div.appendChild(dcardEl(cid));assigned.add(cid);}
+if(!isLocked)stackDropify(div);
+box.appendChild(div);}
+const lb=document.createElement('button');lb.className='btn lockbtn'+(isLocked?'':' primary');
+lb.innerHTML=isLocked?'&#128275; Unlock scenario':'&#128274; Lock in as finished';
+lb.onclick=()=>{box.classList.toggle('locked');scenSave().then(()=>{refresh().then(scenBuild);});};
+box.appendChild(lb);
 board.appendChild(box);}
+const total=S.scenarios.length;
+document.getElementById('camp_progress').textContent=locked+'/'+total+' locked';
+document.getElementById('camp_spawn').disabled=!(total&&locked===total);
 const pool=document.getElementById('scen_pool_cards');pool.innerHTML='';
 for(const c of ((LS&&LS.cards)||[]))if(!assigned.has(c.id))pool.appendChild(dcardEl(c.id));
 stackDropify(document.getElementById('scen_pool'));}
