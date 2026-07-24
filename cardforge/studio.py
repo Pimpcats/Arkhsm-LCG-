@@ -377,6 +377,19 @@ def act_card_save(p):
                 entry["connections"] = conns
             else:
                 entry.pop("connections", None)
+        if "tokens" in p:
+            toks = []
+            if isinstance(p["tokens"], list):
+                for t in p["tokens"][:8]:
+                    if isinstance(t, dict):
+                        tok = str(t.get("token", "")).strip().lower()[:16]
+                        txt = str(t.get("text", ""))[:400]
+                        if tok or txt:
+                            toks.append({"token": tok, "text": txt})
+            if toks:
+                entry["tokens"] = toks
+            else:
+                entry.pop("tokens", None)
         if entry:
             ov[card] = entry
         else:
@@ -386,6 +399,136 @@ def act_card_save(p):
                         "--only", card], check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
     log("card content saved: {} ({} field(s) overridden)".format(card, len(entry)))
     return {"ok": True, "overrides": entry}
+
+
+
+
+SCENARIO_STACKS = ("locations", "act_deck", "agenda_deck", "encounter",
+                   "named", "reference", "setup_aside")
+ASSIGNMENTS_PATH = os.path.join(ROOT, "campaigns", "still_hour",
+                                "scenario_assignments.json")
+IMPORTED_SPEC_PATH = os.path.join(ROOT, "pipeline",
+                                  "stillhour_imported_spec.json")
+
+
+def load_assignments():
+    if os.path.exists(ASSIGNMENTS_PATH):
+        try:
+            return json.load(open(ASSIGNMENTS_PATH, encoding="utf-8"))
+        except ValueError:
+            return {}
+    return {}
+
+
+def act_scenario_save(p):
+    """Persist the deck-builder board: which card ids sit in which stack of
+    which scenario. Body: {assignments: {scenario_id: {stack: [ids]}}} replaces
+    the whole board (the UI always sends its full state)."""
+    a = p.get("assignments")
+    if not isinstance(a, dict):
+        return {"ok": False, "message": "assignments must be an object"}
+    clean = {}
+    for sid, stacks in a.items():
+        if not isinstance(stacks, dict):
+            continue
+        cs = {}
+        for st, ids in stacks.items():
+            if st in SCENARIO_STACKS and isinstance(ids, list):
+                cs[st] = [os.path.basename(str(i))[:64] for i in ids][:60]
+        if cs:
+            clean[str(sid)[:64]] = cs
+    with _state_lock:
+        _write_json_atomic(ASSIGNMENTS_PATH, clean)
+    log("scenario board saved ({} scenario(s))".format(len(clean)))
+    return {"ok": True, "assignments": clean}
+
+
+def act_campaign_import(p):
+    """Campaign feed: pour a written campaign (JSON) into the same data the
+    manual editor edits. Existing card ids become editor overrides; unknown ids
+    become new cards in the imported spec; scenario assignments merge into the
+    deck-builder board. Everything remains hand-editable afterwards."""
+    sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+    import render_placeholders as rp
+    data = p.get("data")
+    if isinstance(data, str):
+        try:
+            data = json.loads(data)
+        except ValueError as e:
+            return {"ok": False, "message": "bad JSON: {}".format(e)}
+    if not isinstance(data, dict):
+        return {"ok": False, "message": "campaign must be a JSON object"}
+    cards = data.get("cards") or []
+    known = set()
+    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json",
+                      "stillhour_scenario_spec.json", "stillhour_imported_spec.json"):
+        fp = os.path.join(ROOT, "pipeline", spec_file)
+        if os.path.exists(fp):
+            try:
+                known |= {c.get("id") for c in json.load(open(fp, encoding="utf-8"))}
+            except ValueError:
+                pass
+    SPEC_FIELDS = ("id", "type", "class", "name", "subtitle", "traits", "cost",
+                   "level", "victory", "wil", "int", "com", "agi", "slot",
+                   "health", "sanity", "shroud", "clues", "doom", "icons",
+                   "color", "clues_per_investigator", "connections", "tokens",
+                   "difficulty", "index", "number", "weakness", "elite",
+                   "unique", "encounter", "quantity", "deck")
+    OVERRIDE_FIELDS = ("name", "subtitle", "traits", "cost", "level", "victory",
+                       "wil", "int", "com", "agi", "slot", "health", "sanity",
+                       "shroud", "clues", "doom", "text", "flavor", "back_text",
+                       "fight", "evade", "damage", "horror", "icons", "color",
+                       "clues_per_investigator", "connections", "tokens")
+    created, updated, skipped = [], [], []
+    with _state_lock:
+        imported = []
+        if os.path.exists(IMPORTED_SPEC_PATH):
+            try:
+                imported = json.load(open(IMPORTED_SPEC_PATH, encoding="utf-8"))
+            except ValueError:
+                imported = []
+        ov = rp.load_card_overrides()
+        for c in cards:
+            if not isinstance(c, dict) or not c.get("id"):
+                skipped.append(str(c)[:40])
+                continue
+            cid = os.path.basename(str(c["id"]))[:64]
+            entry = dict(ov.get(cid, {}))
+            for k in OVERRIDE_FIELDS:
+                if k in c and c[k] not in (None, ""):
+                    entry[k] = c[k]
+            if entry:
+                ov[cid] = entry
+            if cid in known:
+                updated.append(cid)
+            else:
+                spec = {k: c[k] for k in SPEC_FIELDS if k in c}
+                spec["id"] = cid
+                spec.setdefault("type", "Asset")
+                spec.setdefault("name", cid)
+                imported = [x for x in imported if x.get("id") != cid] + [spec]
+                created.append(cid)
+        _write_json_atomic(IMPORTED_SPEC_PATH, imported)
+        _write_json_atomic(rp.CARD_OVERRIDES_PATH, ov)
+        assign = data.get("assignments") or data.get("scenarios_board")
+        if isinstance(assign, dict):
+            cur = load_assignments()
+            for sid, stacks in assign.items():
+                if isinstance(stacks, dict):
+                    dst = cur.setdefault(str(sid)[:64], {})
+                    for st, ids in stacks.items():
+                        if st in SCENARIO_STACKS and isinstance(ids, list):
+                            dst[st] = [os.path.basename(str(i))[:64]
+                                       for i in ids][:60]
+            _write_json_atomic(ASSIGNMENTS_PATH, cur)
+        subprocess.run([sys.executable,
+                        os.path.join(ROOT, "pipeline", "render_placeholders.py")],
+                       check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+    log("campaign imported: {} new, {} updated, {} skipped".format(
+        len(created), len(updated), len(skipped)))
+    return {"ok": True, "created": created, "updated": updated,
+            "skipped": skipped}
+
 
 
 def act_art_remove(p):
@@ -479,7 +622,7 @@ def act_font_set(p):
     return {"ok": True, "fonts": entry}
 
 
-TYPE_FIELDS = ("name", "subtitle", "traits", "text", "flavor", "victory")
+TYPE_FIELDS = ("name", "subtitle", "traits", "text", "flavor", "victory", "stats")
 
 
 def act_type_set(p):
@@ -846,6 +989,24 @@ def act_apply(p):
 
 # ------------------------------------------------------------------- status --
 
+def _scenario_board():
+    """The deck-builder board: scenario list from the manifest + saved
+    card-to-stack assignments."""
+    mpath = os.path.join(ROOT, "campaigns", "still_hour",
+                         "scenario_manifest.json")
+    scen = []
+    try:
+        m = json.load(open(mpath, encoding="utf-8"))
+        for sc in m.get("scenarios", []):
+            scen.append({"id": sc.get("id"), "name": sc.get("name"),
+                         "order": sc.get("order", 99)})
+        scen.sort(key=lambda x: x["order"])
+    except (ValueError, OSError):
+        pass
+    return {"scenarios": scen, "stacks": list(SCENARIO_STACKS),
+            "assignments": load_assignments()}
+
+
 def status(campaign="still_hour"):
     camp = runner.load_campaign(campaign)
     out_dir = runner.out_dir_for(camp)
@@ -895,7 +1056,7 @@ def status(campaign="still_hour"):
     sys.path.insert(0, os.path.join(ROOT, "pipeline"))
     import render_placeholders as rp
     specs = {}
-    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json", "stillhour_scenario_spec.json"):
+    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json", "stillhour_scenario_spec.json", "stillhour_imported_spec.json"):
         p = os.path.join(ROOT, "pipeline", spec_file)
         if os.path.exists(p):
             for c in json.load(open(p, encoding="utf-8")):
@@ -924,7 +1085,7 @@ def status(campaign="still_hour"):
             return "Recollections"
         return "Signatures & Weaknesses"
     catalog = []
-    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json", "stillhour_scenario_spec.json"):
+    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json", "stillhour_scenario_spec.json", "stillhour_imported_spec.json"):
         path = os.path.join(ROOT, "pipeline", spec_file)
         if not os.path.exists(path):
             continue
@@ -948,7 +1109,7 @@ def status(campaign="still_hour"):
     card_overrides = rp.load_card_overrides()
     print_text = se_bridge._load_print_text()
     spec_by_id = {}
-    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json", "stillhour_scenario_spec.json"):
+    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json", "stillhour_scenario_spec.json", "stillhour_imported_spec.json"):
         p2 = os.path.join(ROOT, "pipeline", spec_file)
         if os.path.exists(p2):
             for sc in json.load(open(p2, encoding="utf-8")):
@@ -975,6 +1136,11 @@ def status(campaign="still_hour"):
             "damage": mpt.get("damage") or 0, "horror": mpt.get("horror") or 0,
             "shroud": mc.get("shroud"), "clues": mc.get("clues"),
             "doom": mc.get("doom"),
+            "back_text": mpt.get("back_text", ""),
+            "tokens": mc.get("tokens") or [],
+            "icons": mc.get("icons", ""), "color": mc.get("color", ""),
+            "clues_per_investigator": bool(mc.get("clues_per_investigator")),
+            "connections": mc.get("connections") or [],
         }
         c["regions"] = rp.content_regions(c["type"])
         c["overridden"] = sorted(card_overrides.get(c["id"], {}).keys())
@@ -1006,6 +1172,7 @@ def status(campaign="still_hour"):
                                "weight": (v or {}).get("weight", 0.8),
                                "trigger": (v or {}).get("trigger", "")}
                            for n, v in chars.items() if not n.startswith("_")},
+            "scenarios": _scenario_board(),
             "se": {"config": se_bridge.load_config(),
                    "bundle_exists": os.path.exists(
                        os.path.join(se_bridge.se_dir(), "frame_cards.js")),
@@ -1025,6 +1192,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "type_set": act_type_set, "upload_font": act_upload_font,
            "tts_spawn": act_tts_spawn, "plugin_update": act_plugin_update,
            "card_save": act_card_save, "art_remove": act_art_remove,
+           "scenario_save": act_scenario_save, "campaign_import": act_campaign_import,
            "prompt_get": act_prompt_get, "prompt_save": act_prompt_save,
            "style_save": act_style_save, "inpaint_frames": act_inpaint_frames,
            "gen_settings": act_gen_settings, "lora_save": act_lora_save,
@@ -1235,6 +1403,8 @@ font-size:12px;color:var(--dim)}
 #log{padding:0 26px 12px;height:176px;overflow-y:auto;
 font:11.5px ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;color:#c9c5bb}
 #editor{display:none;animation:fade .2s ease}
+#ed_toolbar{position:sticky;top:0;z-index:6;background:var(--surface);
+padding:8px 10px;margin:-6px -10px 6px;border-bottom:1px solid var(--line);border-radius:0 0 10px 10px}
 @font-face{font-family:'ArkhamGlyph';src:url('/font?f=ArkhamFontWithCodex.ttf')}
 .symbtn{display:inline-flex;flex-direction:column;align-items:center;gap:1px;
 cursor:pointer;background:var(--surface2);border:1px solid var(--line);
@@ -1260,6 +1430,22 @@ outline-offset:-2px;border-radius:2px}
 transition:all .15s}
 #ed_strip img:hover{transform:translateY(-2px)}
 #ed_strip img.on{border-color:var(--accent)}
+/* --- scenario deck-builder board --- */
+#scen_board{display:flex;gap:14px;overflow-x:auto;padding:6px 2px 18px;align-items:flex-start}
+.scenbox{min-width:250px;max-width:250px;background:var(--surface2);border:1px solid var(--line);
+border-radius:12px;padding:10px}
+.scenbox h3{margin:0 0 8px;font-size:14px}
+.stack{margin-bottom:8px;border:1px dashed rgba(255,255,255,.14);border-radius:9px;padding:6px;min-height:34px;transition:border-color .15s,background .15s}
+.stack.over{border-color:var(--accent);background:rgba(232,178,74,.08)}
+.stack small{display:block;color:var(--dim);margin-bottom:4px;letter-spacing:.3px;text-transform:uppercase;font-size:10px}
+.dcard{display:inline-block;width:52px;margin:2px;cursor:grab;position:relative;
+transition:transform .16s ease,box-shadow .16s ease}
+.dcard img{width:100%;border-radius:4px;display:block;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.dcard:hover{transform:translateY(-6px) scale(1.5) rotate(.5deg);z-index:5;box-shadow:0 8px 18px rgba(0,0,0,.6)}
+.dcard.dragging{opacity:.45;transform:scale(.95) rotate(-3deg)}
+.dcard.justdropped{animation:settle .28s ease}
+@keyframes settle{0%{transform:translateY(-10px) scale(1.12)}70%{transform:translateY(2px) scale(.98)}100%{transform:none}}
+#scen_pool{border:1px solid var(--line);border-radius:12px;padding:8px;margin-bottom:10px;background:var(--surface2)}
 .hint{color:var(--dim);font-size:12px}
 hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 </style></head><body>
@@ -1276,9 +1462,20 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 <button id=tab-cards onclick="tab('cards')">3 &middot; Cards</button>
 <button id=tab-frame onclick="tab('frame')">4 &middot; Frame</button>
 <button id=tab-apply onclick="tab('apply')">5 &middot; Play in TTS</button>
+<button id=tab-scenarios onclick="tab('scenarios');scenBuild()">6 &middot; Scenarios</button>
 <button id=tab-advanced onclick="tab('advanced')">&#9881; Advanced</button>
 </nav><main>
 
+<section id=scenarios><div class=panel>
+<div class=row><b>Scenario builder</b>
+<span class=hint>drag cards from the pool into each scenario&rsquo;s stacks &mdash; the board saves itself and feeds the TTS compiler</span>
+<span class=spacer></span>
+<button class=btn onclick="document.getElementById('feed_file').click()" title="pour a written campaign (JSON) into the editor: existing cards become overrides, new cards are created, the board pre-fills">&#128229; Import campaign JSON&hellip;</button>
+<input type=file id=feed_file accept=".json,application/json" style="display:none" onchange=feedImport(this)>
+<span id=feed_info class=hint></span></div>
+<div id=scen_pool><small class=hint>UNASSIGNED CARDS &mdash; drag onto the board</small><div id=scen_pool_cards></div></div>
+<div id=scen_board></div>
+</div></section>
 <section id=advanced><div class=panel>
 <h2>Generate any card <small>pick a card, tune the prompt and settings, generate</small></h2>
 <div class=row>
@@ -1384,10 +1581,8 @@ drag to position, scroll to size. Encounter cards stay hidden behind the
 title="Stable Diffusion regenerates each template's text regions into empty card material (select-and-generate-over); composed faces then sit on real texture instead of flat fills">&#10024; Rebuild blank frames</button>
 </div>
 <div id=steps_cards class=stepbox></div>
-<div class=panel id=defaultfonts style="margin-bottom:10px">
-<div class=row>
-<b>Default fonts</b> <span class=hint>&mdash; applied to <b>every</b> card. Ships as the official stack; pick your own here to change all cards at once (a single card&rsquo;s own override still wins).</span>
-</div>
+<details class=panel id=defaultfonts style="margin-bottom:10px;padding:10px 16px">
+<summary style="cursor:pointer"><b>Default fonts</b> <span class=hint>&mdash; applied to <b>every</b> card; click to open. A single card&rsquo;s own override still wins.</span></summary>
 <div class=row style="margin-top:8px">
 <label>title / cost</label><select id=df_title onchange=dfSet()></select>
 <label>stat numerals</label><select id=df_stat onchange=dfSet()></select>
@@ -1395,12 +1590,12 @@ title="Stable Diffusion regenerates each template's text regions into empty card
 <button class=btn style="font-size:12px;padding:5px 12px" onclick="document.getElementById('df_fontfile').click()">Upload font&hellip;</button>
 <input type=file id=df_fontfile accept=".ttf,.otf" style="display:none" onchange=dfFontUpload(this)>
 <span id=df_info class=hint></span>
-</div></div>
+</div></details>
 <div id=chips_cards class=chips></div>
 <div id=cardgroups></div>
 <div id=editor>
 <div id=ed_sheet>
-<div class=row><button class=btn onclick=edClose()>&#8592; All cards</button>
+<div class="row" id=ed_toolbar><button class=btn onclick=edClose()>&#8592; All cards</button>
 <b id=ed_title style="font-size:15px"></b>
 <span class=hint>drag art to position &middot; scroll to size &middot; click values ON the card to edit them</span>
 <span class=spacer></span>
@@ -1437,6 +1632,7 @@ title="drop this card onto the table of your RUNNING Tabletop Simulator — appe
 <span id=ty_pct class=stat>100%</span>
 <label style="cursor:pointer"><input type=checkbox id=ty_bold onchange=tySet()> <b>B</b></label>
 <label style="cursor:pointer"><input type=checkbox id=ty_italic onchange=tySet()> <i>I</i></label>
+<button class=btn style="font-size:11px;padding:4px 10px" onclick="tyBind('stats')" title="style ALL stat numerals on this card (cost, skills, shroud, doom...)">stat numbers</button>
 <label style="cursor:pointer" title="apply this text style to EVERY card, not just this one"><input type=checkbox id=ty_all onchange=tySet()> all cards</label>
 <button class=btn style="font-size:11px;padding:4px 10px" onclick=tyReset()>Reset area</button>
 </div>
@@ -1447,6 +1643,24 @@ title="drop this card onto the table of your RUNNING Tabletop Simulator — appe
 <label>traits</label><input id=cc_traits size=18 onfocus="tyBind('traits')">
 </div>
 <div class=row id=cc_stats></div>
+<div id=cc_loc style="display:none;margin:6px 0;padding:10px;border:1px solid var(--line);border-radius:8px">
+<b style="font-size:12px">Location elements</b> <span class=hint>own symbol &middot; colour &middot; per-investigator clues &middot; connections (all render instantly on save)</span>
+<div class=row style="margin-top:6px">
+<label>own symbol</label><select id=le_icon></select>
+<label>colour</label><input type=color id=le_color value="#25807a" style="width:44px;height:28px;padding:1px;border-radius:6px;border:1px solid var(--line);background:none">
+<label style="cursor:pointer"><input type=checkbox id=le_perinv> clues per investigator</label>
+</div>
+<div id=le_conns></div>
+<button class=btn style="font-size:11px;padding:4px 10px" onclick=leAddConn()>+ connection</button>
+</div>
+<div id=cc_tokens style="display:none;margin:6px 0;padding:10px;border:1px solid var(--line);border-radius:8px">
+<b style="font-size:12px">Chaos-token rows</b> <span class=hint>the scenario reference table &mdash; token + its modifier text</span>
+<div id=tok_rows></div>
+<button class=btn style="font-size:11px;padding:4px 10px" onclick=tokAdd()>+ token row</button>
+</div>
+<div id=cc_back_wrap style="display:none">
+<label>back / deck-building text</label><textarea id=cc_back rows=4 spellcheck=false onfocus="glyphTarget('cc_back')"></textarea>
+</div>
 <div class=row id=ed_symbols style="margin:2px 0 4px;gap:5px;flex-wrap:wrap;align-items:center">
 <span class=hint>insert symbol&nbsp;&mdash;&nbsp;click into rules/flavor first:</span></div>
 <label>rules text</label><textarea id=cc_text rows=5 spellcheck=false onfocus="tyBind('text');glyphTarget('cc_text')"></textarea>
@@ -1585,7 +1799,7 @@ Barnaby Files guide; AH font pack via the Mythos Busters Discord.</p>
 <script>
 let seq=0, cur='setup', ed=null, ST=null;
 window.revealed=window.revealed||new Set();
-function tab(t){cur=t;for(const x of ['setup','cards','illustrate','frame','apply','advanced']){
+function tab(t){cur=t;for(const x of ['setup','cards','illustrate','frame','apply','scenarios','advanced']){
 document.getElementById(x).classList.toggle('on',x===t);
 document.getElementById('tab-'+x).classList.toggle('on',x===t);}
 if(t==='illustrate'&&!modelsLoadedOnce){modelsLoadedOnce=true;modelsLoad();}}
@@ -1918,7 +2132,44 @@ document.getElementById('cc_stats').innerHTML=defs.map(d=>ccNum(d[0],d[1],d[2]))
 for(const f of CC_NUM){const el=document.getElementById('cc_'+f);
 el.value=(ct[f]===null||ct[f]===undefined)?'':ct[f];ccPips(f,el.value);}
 document.getElementById('cc_info').textContent=
-(c.overridden&&c.overridden.length)?('edited: '+c.overridden.join(', ')):'';}
+(c.overridden&&c.overridden.length)?('edited: '+c.overridden.join(', ')):'';
+// per-type panels: location elements / chaos-token rows / investigator back
+document.getElementById('cc_loc').style.display=(t==='Location')?'block':'none';
+document.getElementById('cc_tokens').style.display=(t==='Scenario')?'block':'none';
+document.getElementById('cc_back_wrap').style.display=(t==='Investigator')?'block':'none';
+if(t==='Location'){
+  const SYMS_L=['circle','square','triangle','diamond','moon','star','heart','hourglass','cross','quote','slash','doubleslash','spade','clover','t'];
+  const sel=document.getElementById('le_icon');sel.innerHTML='<option value="">—</option>';
+  for(const n of SYMS_L){const o=document.createElement('option');o.value=o.text=n;sel.add(o);}
+  sel.value=String(ct.icons||'').toLowerCase();
+  const N2H={red:'#960e12',orange:'#b85418',yellow:'#be9428',green:'#2c663c',teal:'#1a605e',blue:'#204884',purple:'#5c246e',pink:'#a83870',brown:'#6c482e',grey:'#625e64',gray:'#625e64',gold:'#aa8e46'};
+  const col=N2H[String(ct.color||'').toLowerCase()]||String(ct.color||'');
+  document.getElementById('le_color').value=/^#[0-9a-fA-F]{6}$/.test(col)?col:'#25807a';
+  document.getElementById('le_perinv').checked=!!ct.clues_per_investigator;
+LE_CONNS=(ct.connections||[]).map(x=>{const o=typeof x==='string'?{symbol:x,color:''}:{symbol:x.symbol||'',color:x.color||''};
+o.symbol=String(o.symbol).toLowerCase();o.color=N2H[String(o.color).toLowerCase()]||o.color;return o;});
+
+  leDraw();}
+if(t==='Scenario'){TOK_ROWS=(ct.tokens||[]).map(x=>({token:x.token||'',text:x.text||''}));tokDraw();}
+if(t==='Investigator')document.getElementById('cc_back').value=ct.back_text||'';}
+let LE_CONNS=[],TOK_ROWS=[];
+function leDraw(){const SY=['circle','square','triangle','diamond','moon','star','heart','hourglass','cross','quote','slash','doubleslash','spade','clover','t'];
+document.getElementById('le_conns').innerHTML=LE_CONNS.map((c,i)=>
+`<div class=row style="margin-top:4px"><label>#${i+1}</label>`+
+`<select onchange="LE_CONNS[${i}].symbol=this.value">`+
+['<option value="">—</option>',...SY.map(n=>`<option ${c.symbol===n?'selected':''}>${n}</option>`)].join('')+
+`</select><input type=color value="${/^#[0-9a-fA-F]{6}$/.test(c.color)?c.color:'#b09b4a'}" `+
+`onchange="LE_CONNS[${i}].color=this.value" style="width:40px;height:26px;padding:1px;border-radius:6px;border:1px solid var(--line);background:none">`+
+`<button class=btn style="font-size:11px;padding:3px 9px" onclick="LE_CONNS.splice(${i},1);leDraw()">&times;</button></div>`).join('');}
+function leAddConn(){if(LE_CONNS.length<6){LE_CONNS.push({symbol:'circle',color:'#b09b4a'});leDraw();}}
+function tokDraw(){const TOKS=['skull','cultist','tablet','elderthing'];
+document.getElementById('tok_rows').innerHTML=TOK_ROWS.map((t,i)=>
+`<div class=row style="margin-top:4px"><select onchange="TOK_ROWS[${i}].token=this.value">`+
+TOKS.map(n=>`<option ${t.token===n?'selected':''}>${n}</option>`).join('')+
+`</select><input type=text size=46 value="${(t.text||'').replace(/"/g,'&quot;')}" `+
+`onchange="TOK_ROWS[${i}].text=this.value">`+
+`<button class=btn style="font-size:11px;padding:3px 9px" onclick="TOK_ROWS.splice(${i},1);tokDraw()">&times;</button></div>`).join('');}
+function tokAdd(){if(TOK_ROWS.length<8){TOK_ROWS.push({token:'skull',text:'-1.'});tokDraw();}}
 async function ccSave(){const p={card:ed.g.id,
 name:document.getElementById('cc_name').value,
 subtitle:document.getElementById('cc_subtitle').value,
@@ -1926,6 +2177,13 @@ traits:document.getElementById('cc_traits').value,
 text:document.getElementById('cc_text').value,
 flavor:document.getElementById('cc_flavor').value};
 for(const f of CC_NUM)p[f]=document.getElementById('cc_'+f).value;
+const t=ed.g.type;
+if(t==='Location'){p.icons=document.getElementById('le_icon').value;
+p.color=document.getElementById('le_color').value;
+p.clues_per_investigator=document.getElementById('le_perinv').checked;
+p.connections=LE_CONNS.filter(c=>c.symbol);}
+if(t==='Scenario')p.tokens=TOK_ROWS.filter(r=>r.token||r.text);
+if(t==='Investigator')p.back_text=document.getElementById('cc_back').value;
 const j=await post('card_save',p);
 if(j.ok){document.getElementById('cc_info').textContent='saved \u2713';edFaceRefresh();}}
 async function edArtRemove(){await post('art_remove',{card:ed.g.id});
@@ -1944,7 +2202,7 @@ edFaceRefresh();}
 // ---- per-text-area typography (font / size / bold / italic per field) ----
 let TY_FIELD=null;
 const TY_LABEL={name:'name / title',subtitle:'subtitle',traits:'traits',
-text:'rules text',flavor:'flavor',victory:'victory'};
+text:'rules text',flavor:'flavor',victory:'victory',stats:'stat numbers'};
 function tyBind(field){if(!ed)return;TY_FIELD=field;
 document.getElementById('ty_field').textContent=TY_LABEL[field]||field;
 const st=((ed.g.type_styles||{})[field])||{};
@@ -2118,6 +2376,55 @@ faces_dir:document.getElementById('se_faces').value,export_dpi:document.getEleme
 classmap:document.getElementById('se_classmap').value,keys:document.getElementById('se_keys').value});}
 function applyArt(){post('apply',{mode:document.getElementById('applymode').value,
 base_url:document.getElementById('baseurl').value});}
+// ---------------- scenario deck-builder ----------------
+let SCEN_DRAG=null;
+function scenAssignments(){const A={};
+for(const box of document.querySelectorAll('.scenbox'))
+{const sid=box.dataset.sid;A[sid]={};
+for(const st of box.querySelectorAll('.stack')){
+const ids=[...st.querySelectorAll('.dcard')].map(d=>d.dataset.cid);
+if(ids.length)A[sid][st.dataset.stack]=ids;}}
+return A;}
+async function scenSave(){await post('scenario_save',{assignments:scenAssignments()});}
+function dcardEl(cid){const c=((LS&&LS.cards)||[]).find(x=>x.id===cid);
+const d=document.createElement('div');d.className='dcard';d.dataset.cid=cid;d.draggable=true;
+d.title=(c?c.name:cid);
+d.innerHTML=`<img src="/art?p=art/faces/${cid}.png&ts=${(LS&&LS.faces_ver)||0}" loading=lazy>`;
+d.addEventListener('dragstart',e=>{SCEN_DRAG=d;d.classList.add('dragging');e.dataTransfer.setData('text',cid);});
+d.addEventListener('dragend',()=>{d.classList.remove('dragging');SCEN_DRAG=null;});
+return d;}
+function stackDropify(el){
+el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('over');});
+el.addEventListener('dragleave',()=>el.classList.remove('over'));
+el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('over');
+if(!SCEN_DRAG)return;el.appendChild(SCEN_DRAG);
+SCEN_DRAG.classList.add('justdropped');
+setTimeout(()=>SCEN_DRAG&&SCEN_DRAG.classList.remove('justdropped'),300);
+scenSave();});}
+const STACK_LABEL={locations:'Locations',act_deck:'Act deck',agenda_deck:'Agenda deck',
+encounter:'Encounter sets',named:'Named enemies',reference:'Scenario reference',setup_aside:'Set aside'};
+function scenBuild(){const S=(LS&&LS.scenarios)||{scenarios:[],stacks:[],assignments:{}};
+const board=document.getElementById('scen_board');board.innerHTML='';
+const assigned=new Set();
+for(const sc of S.scenarios){const box=document.createElement('div');box.className='scenbox';box.dataset.sid=sc.id;
+box.innerHTML=`<h3>${sc.name||sc.id}</h3>`;
+for(const st of S.stacks){const div=document.createElement('div');div.className='stack';div.dataset.stack=st;
+div.innerHTML=`<small>${STACK_LABEL[st]||st}</small>`;
+for(const cid of ((S.assignments[sc.id]||{})[st]||[])){div.appendChild(dcardEl(cid));assigned.add(cid);}
+stackDropify(div);box.appendChild(div);}
+board.appendChild(box);}
+const pool=document.getElementById('scen_pool_cards');pool.innerHTML='';
+for(const c of ((LS&&LS.cards)||[]))if(!assigned.has(c.id))pool.appendChild(dcardEl(c.id));
+stackDropify(document.getElementById('scen_pool'));}
+async function feedImport(input){const f=input.files[0];if(!f)return;
+const info=document.getElementById('feed_info');info.textContent='importing\u2026';
+const rd=new FileReader();
+rd.onload=async()=>{const j=await post('campaign_import',{data:rd.result});
+if(j.ok){info.textContent=`imported \u2713 ${j.created.length} new, ${j.updated.length} updated`;
+addlog('campaign feed: '+j.created.length+' new, '+j.updated.length+' updated, '+j.skipped.length+' skipped');
+await refresh();scenBuild();}
+else{info.textContent='import failed: '+(j.message||'');}};
+rd.readAsText(f);input.value='';}
 symInit();refresh();poll();setInterval(refresh,4000);
 </script></body></html>"""
 

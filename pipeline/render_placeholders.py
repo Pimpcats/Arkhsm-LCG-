@@ -108,6 +108,8 @@ def apply_card_overrides(c, pt, ov):
     for k in OV_LOC_KEYS:
         if k in ov:
             c[k] = ov[k]
+    if "tokens" in ov:
+        c["tokens"] = ov["tokens"]
     for k in OV_PT_KEYS:
         if k in ov:
             pt[k] = ov[k]
@@ -824,6 +826,8 @@ def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
     bold/italic)."""
     if not text:
         return
+    if stat and key is None:
+        key = "stats"
     st = _field_style(key)
     font_file = None
     size_scale = 1.0
@@ -1821,7 +1825,8 @@ def main():
     args = ap.parse_args()
     use_tpl = (not args.no_template) and T.has_template("investigator_front")
     cards = json.load(open(os.path.join(HERE, "stillhour_cards_spec.json"), encoding="utf-8"))
-    for extra in ("stillhour_encounter_spec.json", "stillhour_scenario_spec.json"):
+    for extra in ("stillhour_encounter_spec.json", "stillhour_scenario_spec.json",
+                  "stillhour_imported_spec.json"):
         p = os.path.join(HERE, extra)
         if os.path.exists(p):
             cards += json.load(open(p, encoding="utf-8"))
