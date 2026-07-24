@@ -36,15 +36,44 @@ def wait_idle(timeout=30):
     return False
 
 
-# fresh slate
-shutil.rmtree(os.path.join(ROOT, "out", "still_hour"), ignore_errors=True)
+# fresh slate — but NEVER destroy the owner's real work: everything the test
+# wipes is moved aside first and restored on exit (success, failure, or crash),
+# so chosen art, placements and composed faces survive a selftest run.
+import atexit
+
+_BACKUPS = []
+
+
+def _sideline(path):
+    if os.path.exists(path):
+        bak = path + ".pretest-backup"
+        shutil.rmtree(bak, ignore_errors=True)
+        if os.path.isfile(bak):
+            os.remove(bak)
+        os.rename(path, bak)
+        _BACKUPS.append((path, bak))
+
+
+def _restore_owner_state():
+    for path, bak in _BACKUPS:
+        if os.path.exists(bak):
+            if os.path.isdir(path):
+                shutil.rmtree(path, ignore_errors=True)
+            elif os.path.isfile(path):
+                os.remove(path)
+            os.rename(bak, path)
+    if _BACKUPS:
+        print("owner state restored ({} path(s))".format(len(_BACKUPS)))
+
+
+atexit.register(_restore_owner_state)
+
+_sideline(os.path.join(ROOT, "out", "still_hour"))
 for f in ("state/still_hour.ledger.json", "pipeline/art_urls.json"):
-    p = os.path.join(ROOT, f)
-    if os.path.exists(p):
-        os.remove(p)
+    _sideline(os.path.join(ROOT, f))
 shutil.rmtree(se_bridge.se_dir(), ignore_errors=True)
 faces_dir = os.path.join(ROOT, "art", "faces")
-shutil.rmtree(faces_dir, ignore_errors=True)
+_sideline(faces_dir)
 
 server = ThreadingHTTPServer(("127.0.0.1", 8571), studio.Handler)
 threading.Thread(target=server.serve_forever, daemon=True).start()

@@ -1138,7 +1138,9 @@ class Handler(BaseHTTPRequestHandler):
 
 PAGE = r"""<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CardForge Studio</title><style>
+<title>CardForge Studio</title>
+<link rel=icon href="data:,">
+<style>
 :root{--bg:#0e0e13;--surface:#17171f;--surface2:#1e1e28;--line:rgba(255,255,255,.08);
 --ink:#f2efe6;--dim:#9a97a3;--accent:#d9a648;--accent-ink:#1a1408;--good:#5fc47e;--bad:#e0716a;
 --r:14px;--shadow:0 8px 30px rgba(0,0,0,.45)}
