@@ -65,6 +65,12 @@ OV_LOC_KEYS = ("icons", "color", "clues_per_investigator", "connections")
 
 # owner watermark, printed in the official footer text/format on every card
 WATERMARK = "Pimpcats ACE"
+
+
+def _wm(art_path):
+    """The watermark prints only on illustrated cards; blank templates stay
+    clean (an empty string makes _box_text a no-op)."""
+    return WATERMARK if art_path else ""
 MAX_PIPS = 5                       # the plugin frames carry Damage1..5/Horror1..5
 
 
@@ -978,8 +984,8 @@ def p_investigator_front(c, pt, dest, art_path=None, placement=None):
     d.ellipse([16, 10, 86, 80], fill=cc, outline=(20, 16, 12), width=3)
     _box_text(d, c.get("class", "?")[0], (16, 10, 86, 80),
               fill=(245, 240, 230), bold=True, grow=0.8)
-    _box_text(d, WATERMARK, R["Artist Credit"], fill=(70, 58, 46))
-    _box_text(d, "\u00a9 " + WATERMARK, R["Copyright"], fill=(70, 58, 46))
+    _box_text(d, _wm(art_path), R["Artist Credit"], fill=(70, 58, 46))
+    _box_text(d, ("\u00a9 " + WATERMARK) if art_path else "", R["Copyright"], fill=(70, 58, 46))
     img.save(dest)
 
 
@@ -1007,7 +1013,7 @@ def p_enemy(c, pt, dest, art_path=None, placement=None):
         if val:
             d.text((x, 560), str(val), font=_font(40, stat=True), fill=fill,
                    stroke_width=3, stroke_fill=(20, 16, 14))
-    _box_text(d, WATERMARK, R["Illustrator Credit"],
+    _box_text(d, _wm(art_path), R["Illustrator Credit"],
               fill=(70, 58, 46))
     img.save(dest)
 
@@ -1029,7 +1035,7 @@ def p_treachery(c, pt, dest, art_path=None, placement=None):
     p = R["Plot Text"]
     _box_block(d, pt.get("flavor", ""), (p[0], p[1], p[2], 992),
                fill=(84, 66, 50), italic=True, start=24, key="flavor")
-    _box_text(d, WATERMARK, R["Illustrator Credit"],
+    _box_text(d, _wm(art_path), R["Illustrator Credit"],
               fill=(70, 58, 46))
     img.save(dest)
 
@@ -1351,7 +1357,7 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
             _box_text(d, str(c["sanity"]), se_reg(kind, "Sanity"),
                       fill=(240, 246, 255), stat=True, grow=0.9)
 
-    _box_text(d, WATERMARK, se_reg(kind, "Artist"),
+    _box_text(d, _wm(art_path), se_reg(kind, "Artist"),
               fill=(225, 218, 202), grow=1.0)
     _box_text(d, "THE STILL HOUR", se_reg(kind, "Copyright"),
               fill=(225, 218, 202), grow=1.0)
@@ -1444,7 +1450,7 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
                 _box_text(d, str(val), box, fill=(255, 255, 255), stat=True, grow=0.9)
         else:
             _box_text(d, str(val), box, fill=(240, 240, 240), stat=True, grow=0.9)
-    _box_text(d, WATERMARK, se_reg("Investigator", "Artist"),
+    _box_text(d, _wm(art_path), se_reg("Investigator", "Artist"),
               fill=(70, 58, 46), max_size=18, align="left")
     _box_text(d, "THE STILL HOUR", se_reg("Investigator", "Copyright"),
               fill=(70, 58, 46), max_size=18, align="right")
@@ -1501,7 +1507,7 @@ def s_enemy(c, pt, dest, art_path=None, placement=None):
         for i in range(pip_count(count)):
             _paste_region(img, _se_img("overlays", ov),
                           se_reg("Enemy", "{}{}".format(kind_key, i + 1)))
-    _box_text(d, WATERMARK, se_reg("Enemy", "Artist"),
+    _box_text(d, _wm(art_path), se_reg("Enemy", "Artist"),
               fill=(225, 218, 202), grow=1.0)
     img.save(dest)
 
@@ -1520,7 +1526,7 @@ def s_treachery(c, pt, dest, art_path=None, placement=None):
     _box_text(d, "TREACHERY", se_reg(kind, "Label") or se_reg("Treachery", "Label"),
               bold=True, max_size=15, fill=(74, 60, 46))
     _se_body(d, c, pt, kind if se_reg(kind, "Body") else "Treachery")
-    _box_text(d, WATERMARK,
+    _box_text(d, _wm(art_path),
               se_reg(kind, "Artist") or se_reg("Treachery", "Artist"),
               fill=(225, 218, 202), grow=1.0)
     img.save(dest)
@@ -1633,22 +1639,22 @@ def s_location(c, pt, dest, art_path=None, placement=None):
     if pt.get("flavor") and y + 24 < b[3]:
         _box_block(d, pt.get("flavor", ""), (b[0], y + 4, b[2], b[3]),
                    fill=(84, 66, 50), italic=True, start=19, key="flavor")
-    _box_text(d, WATERMARK, se_reg(kind, "Copyright"),
+    _box_text(d, _wm(art_path), se_reg(kind, "Copyright"),
               fill=(120, 100, 80), max_size=14)
     img.save(dest)
 
 
 
-def _scenario_footer(d, kind, c):
+def _scenario_footer(d, kind, c, art_path=None):
     """Illustrator (left) / (c) (centre) / card number (right), in the frame's
     tiny footer band - the official credit line."""
     a = se_reg(kind, "Artist")
     if a:
-        _box_text(d, WATERMARK, a, fill=(110, 92, 72),
+        _box_text(d, _wm(art_path), a, fill=(110, 92, 72),
                   max_size=13, align="left")
     cp = se_reg(kind, "Copyright")
     if cp:
-        _box_text(d, "\u00a9 " + WATERMARK, cp, fill=(110, 92, 72), max_size=13)
+        _box_text(d, ("\u00a9 " + WATERMARK) if art_path else "", cp, fill=(110, 92, 72), max_size=13)
     num = c.get("number")
     if num:
         en = se_reg(kind, "EncounterNumber")
@@ -1670,7 +1676,7 @@ def s_agenda(c, pt, dest, art_path=None, placement=None):
         _box_text(d, str(c["doom"]), se_reg("Agenda", "Doom"),
                   stat=True, grow=1.0, fill=(238, 232, 216))
     _scenario_body(d, "Agenda", c, pt)
-    _scenario_footer(d, "Agenda", c)
+    _scenario_footer(d, "Agenda", c, art_path)
     img.save(dest)
 
 
@@ -1687,7 +1693,7 @@ def s_act(c, pt, dest, art_path=None, placement=None):
         _box_text(d, str(c["clues"]), se_reg("Act", "Clues"),
                   stat=True, grow=1.0, fill=(238, 232, 216))
     _scenario_body(d, "Act", c, pt)
-    _scenario_footer(d, "Act", c)
+    _scenario_footer(d, "Act", c, art_path)
     img.save(dest)
 
 
@@ -1745,8 +1751,6 @@ def s_scenario_ref(c, pt, dest, art_path=None, placement=None):
     else:
         _box_block(d, pt.get("text", ""), (body[0], y, body[2], body[3]),
                    start=27, key="text")
-    _box_text(d, WATERMARK, se_reg("Chaos", "Copyright"),
-              fill=(120, 100, 80), max_size=14)
     img.save(dest)
 
 
