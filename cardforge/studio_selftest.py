@@ -217,8 +217,8 @@ check("lamp face real, lamp back = the campaign player back",
 
 print("== CARDS CATALOG (the placement section) ==")
 s = requests.get(BASE + "/api/status?campaign=still_hour").json()
-check("catalog lists all 45 cards with art boxes",
-      len(s["cards"]) == 45 and all("artbox" in c for c in s["cards"]))
+check("catalog lists the full card set with art boxes (45 authored + imports)",
+      len(s["cards"]) >= 45 and all("artbox" in c for c in s["cards"]))
 groups = {c["group"] for c in s["cards"]}
 check("six deck groups (incl. Scenario cards)",
       groups == {"Investigators", "Signatures & Weaknesses", "Recollections",
@@ -938,7 +938,7 @@ r = subprocess.run(
      "from cardforge import se_bridge, studio;"
      "assert len(se_bridge.build_jobs()) == 41;"
      "s = studio.status('still_hour');"
-     "assert len(s['cards']) == 45 and s['campaigns']"],
+     "assert len(s['cards']) >= 45 and s['campaigns']"],
     env=env, cwd=ROOT, capture_output=True, text=True)
 check("status()+build_jobs OK under a cp1252-like locale (Windows default)",
       r.returncode == 0)
