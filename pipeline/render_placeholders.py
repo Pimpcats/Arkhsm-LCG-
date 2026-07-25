@@ -238,7 +238,10 @@ BLUE = (52, 84, 148)
 FONTS_DIR = os.path.join(ROOT, "assets", "fonts")
 # Arkhamic (the community's OFL extension of Teutonic — same face, more
 # glyphs) is preferred when installed; plain Teutonic ships in-repo.
-TITLE_FONT_CANDIDATES = ["Arkhamic.ttf", "Arkhamic-Regular.ttf", "Teutonic.ttf"]
+# newest Arkhamic first — drop a newer Arkhamic_vX.Y.ttf in assets/fonts
+# and it is preferred automatically; Teutonic is the last-resort base face
+TITLE_FONT_CANDIDATES = ["Arkhamic_v2.2.ttf", "Arkhamic.ttf",
+                         "Arkhamic-Regular.ttf", "Teutonic.ttf"]
 # an empty investigator art window uses one neutral manila tone for EVERY class
 # (else the Guardian's blue frame averages to a dark grey box, unlike the rest)
 INV_ART_UNDERLAY = (208, 196, 173)
