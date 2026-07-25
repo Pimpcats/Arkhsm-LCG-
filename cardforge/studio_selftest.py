@@ -949,8 +949,15 @@ check("no black box in any art-less window (enemy / treachery / asset)",
       _window_not_black("sthr-appointed.png", (375, 250))
       and _window_not_black("sthr-bell.png", (375, 250))
       and _window_not_black("sthr-lamp.png", (375, 300)))
-check("TTS drop buttons in the UI", page.count("Drop into TTS") >= 2
-      and "plugin_update" in page)
+check("TTS drop buttons in the UI", page.count("Drop into TTS") >= 2)
+# Setup no longer asks for Strange Eons or a plugin extraction: the frames ship
+# with the app and the renderer needs no SE. Their authors are credited instead.
+check("Setup drops the SE / plugin install steps",
+      "post('install_se')" not in page and "post('plugin_update')" not in page)
+check("Strange Eons + plugin authors credited",
+      "Thanks to" in page and "Jennings" in page and "jaqenZann" in page)
+check("plugin re-extract still available as a maintenance route",
+      "plugin_update" in studio.ACTIONS)
 
 print("== WINDOWS LOCALE: repo reads survive a non-UTF-8 default ==")
 import subprocess
