@@ -1,5 +1,18 @@
 # Campaign feed — pour a written campaign into the editor
 
+## Two ways to use it
+
+**Add to the campaign you have open** — open `5 · Scenarios` and hit
+*Import campaign JSON…*. Cards whose ids already exist become edits; new ids
+become new cards.
+
+**Start a brand-new campaign** — click **+ New** beside the campaign selector
+in the header, name it, then import into it. The new campaign gets its own
+folder under `campaigns/<id>/`, its own cards, its own scenario board and its
+own output, and inherits the locked house style. Nothing touches your other
+campaigns.
+
+
 `6 · Scenarios → Import campaign JSON…` (or `POST /api/campaign_import` with
 `{data: <json>}`). The feed pre-fills exactly the data the manual editor
 edits — nothing is locked afterwards; every imported value can still be

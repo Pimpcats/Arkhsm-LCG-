@@ -909,6 +909,33 @@ check("an unknown backend is rejected",
                     json={"backend": "nope"}).json().get("ok") is False)
 requests.post(BASE + "/api/backend_set", json={"backend": "a1111"})
 check("backend picker present in the UI", "backend_set" in page)
+# a written campaign must be importable into its OWN space, not merged into
+# whatever campaign happens to be open
+import shutil as _sh
+_r = requests.post(BASE + "/api/campaign_new", json={"name": "Selftest Camp"}).json()
+_cid = _r.get("id")
+check("a new campaign can be created from the app",
+      _r.get("ok") and os.path.isdir(os.path.join(ROOT, "campaigns", _cid)))
+check("creating the same campaign twice is refused",
+      requests.post(BASE + "/api/campaign_new",
+                    json={"name": "Selftest Camp"}).json().get("ok") is False)
+_feed = json.dumps({"cards": [{"id": "st-x1", "type": "Location",
+                               "name": "Test Place", "shroud": 1}]})
+_r = requests.post(BASE + "/api/campaign_import",
+                   json={"data": _feed, "campaign": _cid}).json()
+check("a campaign feed imports into the chosen campaign",
+      _r.get("ok") and "st-x1" in _r.get("created", []))
+check("the import did not touch another campaign",
+      "st-x1" not in open(os.path.join(
+          ROOT, "campaigns", "still_hour", "card_overrides.json"),
+          encoding="utf-8").read())
+_sh.rmtree(os.path.join(ROOT, "campaigns", _cid), ignore_errors=True)
+_sh.rmtree(os.path.join(ROOT, "out", _cid), ignore_errors=True)
+for _f in (os.path.join(ROOT, "pipeline", _cid + "_imported_spec.json"),
+           os.path.join(ROOT, "art", "faces", "st-x1.png")):
+    if os.path.exists(_f):
+        os.remove(_f)
+check("New campaign button present in the UI", "campNew" in page)
 # a FRESH CLONE ships no composed faces (art/ is gitignored) — the app must
 # render them itself or it opens completely empty with nothing to click
 import shutil as _sh

@@ -511,6 +511,58 @@ def act_scenario_save(p):
     return {"ok": True, "assignments": clean}
 
 
+
+
+def act_campaign_new(p):
+    """Create a brand-new campaign folder so a written campaign can be imported
+    into its own space instead of merging into The Still Hour.
+
+    Seeds campaign.json (inheriting the current house style + backend), an
+    empty scenario manifest and the override files the editor writes to."""
+    name = str(p.get("name") or "").strip()
+    cid = "".join(ch if ch.isalnum() else "_" for ch in name.lower()).strip("_")
+    cid = "_".join(x for x in cid.split("_") if x)[:40]
+    if not cid:
+        return {"ok": False, "message": "give the campaign a name"}
+    dest = os.path.join(ROOT, "campaigns", cid)
+    if os.path.exists(dest):
+        return {"ok": False, "message": "a campaign called '{}' already exists"
+                                        .format(cid)}
+    src = os.path.join(ROOT, "campaigns", "still_hour", "campaign.json")
+    base = {}
+    if os.path.exists(src):
+        try:
+            base = json.load(open(src, encoding="utf-8"))
+        except ValueError:
+            base = {}
+    os.makedirs(dest)
+    camp = {
+        "backend": base.get("backend", "a1111"),
+        "base_url": base.get("base_url"),
+        "checkpoint": base.get("checkpoint", "SET_ME.safetensors"),
+        "output_dir": "out/" + cid,
+        "name": name,
+        # inherit the locked house style so a new campaign looks like the rest
+        "style_positive": base.get("style_positive", ""),
+        "style_negative": base.get("style_negative", ""),
+        "style_lora": base.get("style_lora", ""),
+        "style_lora_weight": base.get("style_lora_weight", 0.8),
+        "style_trigger": base.get("style_trigger", ""),
+    }
+    _write_json_atomic(os.path.join(dest, "campaign.json"), camp)
+    _write_json_atomic(os.path.join(dest, "card_overrides.json"), {})
+    _write_json_atomic(os.path.join(dest, "font_overrides.json"), {})
+    _write_json_atomic(os.path.join(dest, "scenario_assignments.json"), {})
+    _write_json_atomic(os.path.join(dest, "characters.json"), {})
+    _write_json_atomic(os.path.join(dest, "scenario_manifest.json"),
+                       {"campaign": {"id": cid, "name": name},
+                        "scenarios": []})
+    os.makedirs(os.path.join(ROOT, "out", cid), exist_ok=True)
+    log("campaign created: {} ({})".format(name, cid))
+    return {"ok": True, "id": cid, "name": name}
+
+
+
 def act_campaign_import(p):
     """Campaign feed: pour a written campaign (JSON) into the same data the
     manual editor edits. Existing card ids become editor overrides; unknown ids
@@ -518,6 +570,15 @@ def act_campaign_import(p):
     deck-builder board. Everything remains hand-editable afterwards."""
     sys.path.insert(0, os.path.join(ROOT, "pipeline"))
     import render_placeholders as rp
+    campaign = os.path.basename(str(p.get("campaign") or "still_hour"))
+    camp_dir = os.path.join(ROOT, "campaigns", campaign)
+    if not os.path.isdir(camp_dir):
+        return {"ok": False, "message": "no campaign called '{}'".format(campaign)}
+    assignments_path = os.path.join(camp_dir, "scenario_assignments.json")
+    imported_spec = os.path.join(ROOT, "pipeline",
+                                 "stillhour_imported_spec.json" if campaign == "still_hour"
+                                 else "{}_imported_spec.json".format(campaign))
+    overrides_path = os.path.join(camp_dir, "card_overrides.json")
     data = p.get("data")
     if isinstance(data, str):
         try:
@@ -550,9 +611,9 @@ def act_campaign_import(p):
     created, updated, skipped = [], [], []
     with _state_lock:
         imported = []
-        if os.path.exists(IMPORTED_SPEC_PATH):
+        if os.path.exists(imported_spec):
             try:
-                imported = json.load(open(IMPORTED_SPEC_PATH, encoding="utf-8"))
+                imported = json.load(open(imported_spec, encoding="utf-8"))
             except ValueError:
                 imported = []
         ov = rp.load_card_overrides()
@@ -576,11 +637,16 @@ def act_campaign_import(p):
                 spec.setdefault("name", cid)
                 imported = [x for x in imported if x.get("id") != cid] + [spec]
                 created.append(cid)
-        _write_json_atomic(IMPORTED_SPEC_PATH, imported)
-        _write_json_atomic(rp.CARD_OVERRIDES_PATH, ov)
+        _write_json_atomic(imported_spec, imported)
+        _write_json_atomic(overrides_path, ov)
         assign = data.get("assignments") or data.get("scenarios_board")
         if isinstance(assign, dict):
-            cur = load_assignments()
+            cur = {}
+            if os.path.exists(assignments_path):
+                try:
+                    cur = json.load(open(assignments_path, encoding="utf-8"))
+                except ValueError:
+                    cur = {}
             for sid, stacks in assign.items():
                 if isinstance(stacks, dict):
                     dst = cur.setdefault(str(sid)[:64], {})
@@ -588,7 +654,7 @@ def act_campaign_import(p):
                         if st in SCENARIO_STACKS and isinstance(ids, list):
                             dst[st] = [os.path.basename(str(i))[:64]
                                        for i in ids][:60]
-            _write_json_atomic(ASSIGNMENTS_PATH, cur)
+            _write_json_atomic(assignments_path, cur)
         subprocess.run([sys.executable,
                         os.path.join(ROOT, "pipeline", "render_placeholders.py")],
                        check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
@@ -1310,7 +1376,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "type_set": act_type_set, "upload_font": act_upload_font,
            "tts_spawn": act_tts_spawn, "plugin_update": act_plugin_update,
            "card_save": act_card_save, "art_remove": act_art_remove,
-           "scenario_save": act_scenario_save, "campaign_import": act_campaign_import,
+           "scenario_save": act_scenario_save, "campaign_import": act_campaign_import, "campaign_new": act_campaign_new,
            "campaign_compile": act_campaign_compile,
            "prompt_get": act_prompt_get, "prompt_save": act_prompt_save,
            "style_save": act_style_save, "inpaint_frames": act_inpaint_frames,
@@ -1586,6 +1652,7 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 <span id=busy class=stat><span class=dot id=busydot></span><span id=busytext>idle</span></span>
 <button class=btn onclick=refresh() title="refresh the gallery and cards">&#8635;</button>
 <label>campaign</label><select id=campaign onchange=refresh()></select>
+<button class=btn onclick=campNew() title="start a new, empty campaign — then import a written campaign into it">+ New</button>
 <button class="btn primary" onclick="post('auto',{dry_run:dry()})" title="generate &rarr; place &rarr; compose &rarr; TTS, hands-off">&#9889; Auto-build ALL &rarr; TTS</button>
 </header>
 <nav>
@@ -2627,6 +2694,15 @@ document.getElementById('camp_spawn').disabled=!(total&&locked===total);
 const pool=document.getElementById('scen_pool_cards');pool.innerHTML='';
 for(const c of ((LS&&LS.cards)||[]))if(!assigned.has(c.id))pool.appendChild(dcardEl(c.id));
 stackDropify(document.getElementById('scen_pool'));}
+async function campNew(){
+const name=prompt('Name the new campaign (e.g. "The Hollow Winter"):');
+if(!name)return;
+const j=await post('campaign_new',{name});
+if(j.ok){addlog('campaign created: '+j.name);
+await refresh();
+const sel=document.getElementById('campaign');sel.value=j.id;refresh();
+alert('Created "'+j.name+'".\n\nNow use 5 · Scenarios → Import campaign JSON to pour your written campaign into it.');}
+else alert(j.message||'could not create the campaign');}
 async function campCompile(){const el=document.getElementById('camp_out');
 el.textContent='compiling\u2026';
 const j=await post('campaign_compile',{});
@@ -2636,7 +2712,7 @@ else{el.textContent=j.message||'compile failed';addlog('compile blocked: '+(j.me
 async function feedImport(input){const f=input.files[0];if(!f)return;
 const info=document.getElementById('feed_info');info.textContent='importing\u2026';
 const rd=new FileReader();
-rd.onload=async()=>{const j=await post('campaign_import',{data:rd.result});
+rd.onload=async()=>{const j=await post('campaign_import',{data:rd.result,campaign:camp()});
 if(j.ok){info.textContent=`imported \u2713 ${j.created.length} new, ${j.updated.length} updated`;
 addlog('campaign feed: '+j.created.length+' new, '+j.updated.length+' updated, '+j.skipped.length+' skipped');
 await refresh();scenBuild();}
