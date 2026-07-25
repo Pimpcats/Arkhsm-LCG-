@@ -350,7 +350,11 @@ def install_a1111(dry_run=False, log=print):
     user_bat = os.path.join(dest_dir, "webui", "webui-user.bat")
     os.makedirs(os.path.dirname(user_bat), exist_ok=True)
     with open(user_bat, "w", encoding="utf-8") as f:
-        f.write("@echo off\nset COMMANDLINE_ARGS=--api\ncall webui.bat\n")
+        f.write("@echo off\n"
+                "rem headless: API only, no A1111 browser UI - CardForge drives it\n"
+                "set COMMANDLINE_ARGS=--api --nowebui --autolaunch-disable "
+                "--skip-version-check\n"
+                "call webui.bat\n")
     # point the rig at the vendored install
     cfg = rig.load_rig()
     cfg["a1111"]["cwd"] = dest_dir

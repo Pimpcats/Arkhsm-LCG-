@@ -1631,27 +1631,14 @@ the .safetensors into <code>vendor/models/</code> instead.</p>
 prefers it automatically once installed</span>
 </div>
 <hr>
-<div class=row>
-<b style="min-width:180px">Arkham frames <span class=hint style="font-weight:400">(already included)</span></b>
-<button class=btn onclick="post('plugin_update')">Re-extract from plugin</button>
-<span id=vendor_plugin class=hint></span>
-<span class=hint>drop any newer <code>ArkhamHorrorLCG.seext</code> into <code>assets/plugins/</code>
-first — frames, regions and overlays re-extract from the newest file and every card recomposes;
-new plugin versions keep working without code changes</span>
-</div>
-<hr>
-<div class=row>
-<b style="min-width:180px">Strange Eons <span class=hint style="font-weight:400">(optional)</span></b>
-<button class="btn" onclick="post('install_se')">Download &amp; install into this folder</button>
-<span id=vendor_se class=hint></span>
-</div>
-<p class=hint><b>You don&rsquo;t need this.</b> CardForge renders every card itself on the authentic
-plugin frames &mdash; Strange Eons is a legacy alternate route kept only for anyone who wants to hand-tweak
-a card in SE. Skip it and the whole pipeline (Cards &rarr; Scenarios &rarr; campaign box) works exactly the
-same.<br>If you do want it: this fetches the official release into <code>vendor/strange-eons/</code> and
-points the Frame tab at it; the Arkham plugin (jaqenZann&rsquo;s external build via the
-<a href="https://barnabyfiles.wordpress.com" target=_blank>Barnaby Files guide</a>) and the AH font pack
-from the Mythos Busters Discord are manual installs inside SE.</p>
+<div class=row><b>Thanks to</b></div>
+<p class=hint>This app is built on work generously shared with the fan community.
+<b>Strange Eons</b> by <a href="https://strangeeons.cgjennings.ca" target=_blank>Christopher G. Jennings</a>
+&mdash; the card-design tool this whole ecosystem grew around. The <b>Arkham Horror LCG plugin</b> by
+<b>jaqenZann</b> (building on <b>Tokeeto</b>&rsquo;s work) &mdash; its authentic frames, regions and
+overlays ship inside this folder and every card here is drawn on them. And the <b>SCED</b> team, whose
+Tabletop Simulator structure this campaign box is built to match.<br>
+Fan project &mdash; free, never for sale. Arkham Horror: The Card Game is &copy; Fantasy Flight Games.</p>
 </div></section>
 
 <section id=cards>

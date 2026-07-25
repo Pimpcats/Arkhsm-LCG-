@@ -18,7 +18,9 @@ from . import runner
 POLL_SECONDS = 5
 
 RIG_DEFAULTS = {
-    "a1111": {"cwd": "", "command": "webui.bat --api", "startup_timeout": 420},
+    # headless by default: --nowebui serves only the API, so the backend runs
+    # inside CardForge and never opens a second web UI of its own
+    "a1111": {"cwd": "", "command": "webui.bat --api --nowebui", "startup_timeout": 420},
     "comfy": {"cwd": "", "command": "python main.py", "startup_timeout": 300},
 }
 
