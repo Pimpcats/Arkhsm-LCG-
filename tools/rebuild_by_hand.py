@@ -254,13 +254,8 @@ def main():
                 path = os.path.join(ROOT, "art", "faces", f)
                 if os.path.exists(path):
                     os.remove(path)
-        ovp = rp.CARD_OVERRIDES_PATH
-        ovj = json.load(open(ovp, encoding="utf-8")) \
-            if os.path.exists(ovp) else {}
-        if any(i in ovj for i in idmap.values()):
-            for i in idmap.values():
-                ovj.pop(i, None)
-            json.dump(ovj, open(ovp, "w", encoding="utf-8"), indent=2)
+        # the copy's edits lived in its own campaign folder, which just went
+        # with the rmtree above — nothing to unpick from anyone else's file
         print("(rebuilt copy cleaned up — pass --keep to inspect it)")
     return 0 if ok else 1
 

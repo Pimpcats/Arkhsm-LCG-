@@ -115,7 +115,43 @@ def build_gmnotes(c):
         # defeated (loop campaigns respawn enemies; the log gates the claim).
         if "victory" in c:
             m["victory"] = c["victory"]
+        if t == "Location":
+            # The official shape (docs/art_reference/sced_objects/
+            # location_revealed.json): a locationFront/locationBack pair whose
+            # icons is this location's own symbol and whose connections is a
+            # pipe-separated list of the symbols printed along its bottom edge.
+            # This is how SCED itself knows a map is connected.
+            side = {}
+            if c.get("icons"):
+                side["icons"] = LOC_SYMBOL_META.get(
+                    str(c["icons"]).strip().lower(), str(c["icons"]).title())
+            conns = [LOC_SYMBOL_META.get(
+                     str(x.get("symbol") if isinstance(x, dict) else x
+                         ).strip().lower(),
+                     str(x.get("symbol") if isinstance(x, dict) else x).title())
+                     for x in (c.get("connections") or [])]
+            conns = [x for x in conns if x]
+            if conns:
+                side["connections"] = "|".join(conns)
+            if c.get("clues"):
+                side["uses"] = [{
+                    "countPerInvestigator" if c.get("clues_per_investigator")
+                    else "count": c["clues"], "type": "Clue", "token": "clue"}]
+            if side:
+                m["locationFront"] = dict(side)
+                m["locationBack"] = dict(
+                    side, **({"victory": c["victory"]} if "victory" in c else {}))
     return json.dumps(m, separators=(",", ":"))
+
+
+# our lowercase symbol names -> the capitalised names SCED's own metadata uses
+LOC_SYMBOL_META = {
+    "circle": "Circle", "square": "Square", "triangle": "Triangle",
+    "diamond": "Diamond", "moon": "Moon", "star": "Star", "heart": "Heart",
+    "hourglass": "Hourglass", "cross": "Plus", "plus": "Plus",
+    "quote": "Quote", "slash": "Slash", "doubleslash": "DoubleSlash",
+    "spade": "Spade", "clover": "Clover", "t": "Tee", "tee": "Tee",
+}
 
 
 # Optional real-art overlay written by CardForge Studio's Apply tab:

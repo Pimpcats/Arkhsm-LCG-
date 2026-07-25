@@ -104,17 +104,44 @@ here can also just be typed in by hand under **Card content → Card properties*
 ### The location map
 
 `5 · Scenarios → 🗺 map` on a scenario box opens the black bordered slot grid
-you see when a scenario is laid out in TTS. Each slot is a real table position
-(6 columns × 4 rows, measured off the official SCED box).
+you see when a scenario is laid out in TTS.
+
+**The grid is 4 columns × 4 rows.** Measured off the real scenario box
+(`docs/art_reference/sced_objects/scenario_box_memory_bag.json`): columns are
+6.60 apart from x −30.24, rows 7.65 apart from z 11.46. It stops at four
+columns because a fifth would sit at x −3.84, on top of the encounter deck at
+x −3.85.
 
 - **Arrange** — drag location cards between slots, then *Save layout*. Those
   exact coordinates are what the campaign box scripts.
-- **Connect** — click one location, then the one it connects to. Both cards
-  immediately print the other's symbol; any location without a symbol is given
-  a free symbol and colour automatically. Click the same pair again to unlink.
+- **Connect** — either click one location and then the one it connects to, or
+  grab the coloured connector nub on a card and drop it on its neighbour. Both
+  cards immediately print the other's symbol; a location with no symbol yet is
+  given a free symbol and colour. Repeat on the same pair to unlink.
+- **Table preview** — the whole scenario drawn to scale from above: locations
+  where you put them, plus the encounter / agenda / act / named / reference /
+  set-aside furniture they have to fit around. Anything that overlaps is
+  outlined in red. This is the layout the campaign box will spawn, so you can
+  see whether it works before sending anything to TTS.
 
 Connections are stored on the cards themselves (`icons` + `connections`), so
-the map and the printed card can never disagree.
+the map, the printed card and the compiled object can never disagree.
+
+### How connections reach TTS
+
+The official mod **draws no lines** — a location tells the game what it
+connects to through its GMNotes, and players read the symbols printed along
+the card's bottom edge. A real location carries:
+
+```json
+"locationFront": {"icons": "Diamond", "connections": "Tee|Plus|Circle|Square"}
+```
+
+Compiled cards now carry exactly that shape, so SCED reads our maps the way it
+reads its own. On top of it, the scenario box's `LuaScriptState.cn` carries the
+same connections as TTS vector-line segments
+(`{points, color, thickness}`) in each location's colour — that part is ours,
+not the official mod's, and needs a script hook to actually draw them.
 
 ### Scenario board stacks
 

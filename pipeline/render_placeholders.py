@@ -43,8 +43,17 @@ def load_art_index():
 
 
 PLACEMENTS_PATH = os.path.join(ROOT, "out", "still_hour", "placements.json")
-CARD_OVERRIDES_PATH = os.path.join(ROOT, "campaigns", "still_hour",
-                                   "card_overrides.json")
+
+
+def overrides_path(campaign=None):
+    """Where a campaign's hand edits live. Every campaign keeps its own, so
+    deleting one can never take another's work with it — and so the compiler,
+    which reads the campaign's own folder, sees exactly what the editor wrote."""
+    return os.path.join(ROOT, "campaigns", campaign or "still_hour",
+                        "card_overrides.json")
+
+
+CARD_OVERRIDES_PATH = overrides_path()      # the default campaign's file
 
 # owner-editable fields, routed to the spec dict vs the print layer
 OV_SPEC_KEYS = ("name", "subtitle", "traits", "cost", "level", "victory",
@@ -98,17 +107,33 @@ def pip_count(v):
         return 0
 
 
-def load_card_overrides():
+def load_card_overrides(campaign=None):
     """Per-card content edits from the Studio's card editor: name, rules
     text, combat values, damage/horror pips… merged over spec + print layer
     at render time (and by the SE bundle). Tolerant of a transient partial
-    read (concurrent write) — a bad parse yields no overrides, not a crash."""
-    if os.path.exists(CARD_OVERRIDES_PATH):
+    read (concurrent write) — a bad parse yields no overrides, not a crash.
+
+    With no campaign it reads every campaign's file, newest last, so a render
+    pass over the whole repo still finds each card's own edits."""
+    if campaign is not None:
+        path = overrides_path(campaign)
+        if os.path.exists(path):
+            try:
+                return json.load(open(path, encoding="utf-8"))
+            except ValueError:
+                return {}
+        return {}
+    merged = {}
+    camp_root = os.path.join(ROOT, "campaigns")
+    for name in sorted(os.listdir(camp_root)) if os.path.isdir(camp_root) else []:
+        path = overrides_path(name)
+        if not os.path.exists(path):
+            continue
         try:
-            return json.load(open(CARD_OVERRIDES_PATH, encoding="utf-8"))
+            merged.update(json.load(open(path, encoding="utf-8")))
         except ValueError:
-            return {}
-    return {}
+            continue
+    return merged
 
 
 def apply_card_overrides(c, pt, ov):

@@ -1023,7 +1023,20 @@ _r = requests.post(BASE + "/api/map_save",
                    json={"campaign": _sc, "scenario": _ms,
                          "slots": {_locs[0]: [99, 99]}}).json()
 check("out-of-range slots are clamped, never crash",
-      _r.get("ok") and _r["slots"][_locs[0]] == [5, 3])
+      _r.get("ok") and _r["slots"][_locs[0]] == [3, 3])
+# the map is four columns because a fifth lands on the encounter deck
+_g = requests.get(BASE + "/api/status?campaign=" + _sc).json()["scenarios"]
+check("the grid is the four columns the real table has room for",
+      _g["grid"]["cols"] == 4 and _g["grid"]["rows"] == 4)
+check("a fifth column would collide with the encounter deck",
+      abs(studio.map_xz(4, 0)[0] -
+          [f["x"] for f in _g["furniture"] if f["key"] == "encounter"][0]) < 1.0)
+check("the preview knows the rest of the table, not just the map",
+      {f["key"] for f in _g["furniture"]} >=
+      {"encounter", "agenda_deck", "act_deck", "setup_aside"})
+check("table preview + draggable connectors present in the UI",
+      "pvDraw" in page and "pvToggle" in page and "mnub" in page
+      and "MAP_LINK_FROM" in page and "pvclash" in page)
 requests.post(BASE + "/api/map_save",
               json={"campaign": _sc, "scenario": _ms,
                     "slots": {_locs[0]: [1, 0], _locs[1]: [2, 0],
@@ -1106,6 +1119,77 @@ check("card properties panel present in the UI",
       "cc_props" in page and "ccPropsDraw" in page and "CC_PROPS" in page
       and "elderSign" in page and "wildIcons" in page)
 _made += [_pc, _ag]
+# a campaign's hand edits live in ITS folder — the compiler reads that folder,
+# so anything written elsewhere would be invisible when the box is built
+check("edits land in the campaign's own folder",
+      _locs[0] in json.load(open(os.path.join(
+          ROOT, "campaigns", _sc, "card_overrides.json"), encoding="utf-8")))
+check("and nowhere near another campaign's",
+      _locs[0] not in json.load(open(os.path.join(
+          ROOT, "campaigns", "still_hour", "card_overrides.json"),
+          encoding="utf-8")))
+# the connections travel into the compiled box as drawable line segments
+_lockable = requests.get(BASE + "/api/status?campaign=" + _sc).json()["scenarios"]
+_asg = dict(_lockable["assignments"])
+for _k in _asg:
+    _asg[_k]["_locked"] = True
+requests.post(BASE + "/api/scenario_save",
+              json={"campaign": _sc, "assignments": _asg})
+_cmp = requests.post(BASE + "/api/campaign_compile",
+                     json={"campaign": _sc}).json()
+check("a laid-out scenario compiles", _cmp.get("ok"))
+_boxes = []
+
+
+def _find_boxes(o):
+    if isinstance(o, dict):
+        if "ScenarioBox" in (o.get("Tags") or []):
+            _boxes.append(o)
+        for _v in o.values():
+            _find_boxes(_v)
+    elif isinstance(o, list):
+        for _v in o:
+            _find_boxes(_v)
+
+
+if _cmp.get("ok"):
+    _find_boxes(json.load(open(os.path.join(ROOT, _cmp["out"]),
+                               encoding="utf-8")))
+_states = [json.loads(b["LuaScriptState"]) for b in _boxes]
+check("the compiled box scripts the arranged positions",
+      any(s.get("ml") for s in _states))
+check("and carries the connections as drawable line segments",
+      any(len(s.get("cn") or []) for s in _states)
+      and all(len(ln["points"]) == 2 and len(ln["color"]) == 3
+              for s in _states for ln in (s.get("cn") or [])))
+# …and the cards themselves tell SCED they are connected, in its own shape
+_lc = []
+
+
+def _find_locs(o):
+    if isinstance(o, dict):
+        if o.get("Name") == "Card" and o.get("GMNotes"):
+            try:
+                _md = json.loads(o["GMNotes"])
+            except ValueError:
+                _md = {}
+            if _md.get("type") == "Location":
+                _lc.append(_md)
+        for _v in o.values():
+            _find_locs(_v)
+    elif isinstance(o, list):
+        for _v in o:
+            _find_locs(_v)
+
+
+for _b in _boxes:
+    _find_locs(_b)
+check("locations carry SCED's own connection metadata (icons + connections)",
+      any(m.get("locationFront", {}).get("connections") for m in _lc)
+      and all(m["locationFront"]["icons"][:1].isupper()
+              for m in _lc if m.get("locationFront", {}).get("icons")))
+if _cmp.get("ok") and os.path.exists(os.path.join(ROOT, _cmp["out"])):
+    os.remove(os.path.join(ROOT, _cmp["out"]))
 check("map grid + connect mode present in the UI",
       "mapOpen" in page and "mapgrid" in page and "map_mode_link" in page
       and "mapConnect" in page.replace("map_connect", "mapConnect")
@@ -1126,11 +1210,8 @@ for _f in [os.path.join(ROOT, "pipeline", _sc + "_cards_spec.json"),
         os.remove(_f)
 # connection edits land in the shared overrides file — take the test's back out
 _ovp = os.path.join(ROOT, "campaigns", "still_hour", "card_overrides.json")
-_ovj = json.load(open(_ovp, encoding="utf-8"))
-if any(_i in _ovj for _i in _made):
-    for _i in _made:
-        _ovj.pop(_i, None)
-    json.dump(_ovj, open(_ovp, "w", encoding="utf-8"), indent=2)
+check("the test campaign left no edits in the owner's campaign",
+      not any(_i in json.load(open(_ovp, encoding="utf-8")) for _i in _made))
 # a FRESH CLONE ships no composed faces (art/ is gitignored) — the app must
 # render them itself or it opens completely empty with nothing to click
 import shutil as _sh

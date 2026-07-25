@@ -367,15 +367,46 @@ def act_inpaint_frames(p):
                    dry_run=bool(p.get("dry_run")))
 
 
+def campaign_of(card, default="still_hour"):
+    """Which campaign actually owns this card id.
+
+    An edit has to be written into its own campaign's folder, because that is
+    the folder the compiler reads. Trusting the client's idea of the current
+    campaign would silently strand the edit if the two ever disagreed."""
+    if card in {c.get("id") for path in spec_files(default)
+                if os.path.exists(path)
+                for c in _load_json_list(path)}:
+        return default
+    camp_root = os.path.join(ROOT, "campaigns")
+    for name in sorted(os.listdir(camp_root)) if os.path.isdir(camp_root) else []:
+        if name == default or not os.path.isdir(os.path.join(camp_root, name)):
+            continue
+        for path in spec_files(name):
+            if os.path.exists(path) and any(
+                    c.get("id") == card for c in _load_json_list(path)):
+                return name
+    return default
+
+
+def _load_json_list(path):
+    try:
+        data = json.load(open(path, encoding="utf-8"))
+        return data if isinstance(data, list) else []
+    except (ValueError, OSError):
+        return []
+
+
 def act_card_save(p):
     """Persist owner content edits (name/text/stats/pips) for one card into
-    campaigns/still_hour/card_overrides.json, then recompose its face.
-    Empty string clears a field back to the authored value."""
+    that campaign's own campaigns/<id>/card_overrides.json, then recompose its
+    face. Empty string clears a field back to the authored value."""
     sys.path.insert(0, os.path.join(ROOT, "pipeline"))
     import render_placeholders as rp
+    campaign = os.path.basename(str(p.get("campaign") or "still_hour"))
     card = os.path.basename(str(p.get("card", "")).strip())
     if not card:
         return {"ok": False, "message": "no card given"}
+    campaign = campaign_of(card, campaign)
 
     def clean(k, v):
         """Type each field to what the renderer expects, so no editor input can
@@ -412,7 +443,7 @@ def act_card_save(p):
         return out
 
     with _state_lock:
-        ov = rp.load_card_overrides()
+        ov = rp.load_card_overrides(campaign)
         entry = dict(ov.get(card, {}))
         for k in rp.OV_SPEC_KEYS + rp.OV_PT_KEYS:
             if k not in p:
@@ -502,7 +533,7 @@ def act_card_save(p):
             ov[card] = entry
         else:
             ov.pop(card, None)
-        _write_json_atomic(rp.CARD_OVERRIDES_PATH, ov)
+        _write_json_atomic(rp.overrides_path(campaign), ov)
         subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py"),
                         "--only", card], check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
     log("card content saved: {} ({} field(s) overridden)".format(card, len(entry)))
@@ -614,7 +645,27 @@ def act_scenario_rename(p):
 # laid out. Columns/rows map 1:1 onto table coordinates measured from the real
 # SCED box (columns 6.6 apart, rows 7.65 apart, locations rotated 270).
 MAP_GRID = {"x0": -30.24, "dx": 6.60, "z0": 11.46, "dz": -7.65,
-            "cols": 6, "rows": 4, "y": 1.53, "rot": 270}
+            "cols": 4, "rows": 4, "y": 1.53, "rot": 270,
+            # a location card's own footprint on the table, in the same units
+            "cw": 2.63, "ch": 3.68}
+
+# The rest of the table, at the coordinates the real box uses. These are not
+# slots you can drop a location on — they are what the map has to fit around,
+# and the reason the grid stops at four columns: a fifth would land on the
+# encounter deck at x -3.85.
+MAP_FURNITURE = [
+    {"key": "encounter", "label": "Encounter deck", "x": -3.85, "z": 5.72,
+     "rot": 270},
+    {"key": "agenda_deck", "label": "Agenda", "x": -2.94, "z": 0.36,
+     "rot": 180},
+    {"key": "act_deck", "label": "Act", "x": -1.79, "z": -5.02, "rot": 0},
+    {"key": "named", "label": "Named / story", "x": -3.85, "z": -10.39,
+     "rot": 270},
+    {"key": "reference", "label": "Scenario reference", "x": -12.22,
+     "z": -8.90, "rot": 90},
+    {"key": "setup_aside", "label": "Set-aside", "x": 1.69, "z": 14.24,
+     "rot": 225},
+]
 
 
 def rp_keys():
@@ -735,7 +786,7 @@ def act_map_connect(p):
             scope = None
 
     with _state_lock:
-        ov = rp.load_card_overrides()
+        ov = rp.load_card_overrides(campaign)
         ident = {cid: _loc_identity(cid, spec_by_id, ov) for cid in spec_by_id
                  if spec_by_id[cid].get("type") == "Location"}
         taken = {s for cid, (s, _) in ident.items()
@@ -790,7 +841,7 @@ def act_map_connect(p):
                 ov[cid] = entry
             else:
                 ov.pop(cid, None)
-        _write_json_atomic(rp.CARD_OVERRIDES_PATH, ov)
+        _write_json_atomic(rp.overrides_path(campaign), ov)
         subprocess.run([sys.executable,
                         os.path.join(ROOT, "pipeline", "render_placeholders.py"),
                         "--only", a, b],
@@ -1050,7 +1101,7 @@ def act_campaign_import(p):
                 imported = json.load(open(imported_spec, encoding="utf-8"))
             except ValueError:
                 imported = []
-        ov = rp.load_card_overrides()
+        ov = rp.load_card_overrides(campaign)
         for c in cards:
             if not isinstance(c, dict) or not c.get("id"):
                 skipped.append(str(c)[:40])
@@ -1647,7 +1698,8 @@ def _scenario_board(campaign="still_hour"):
         except ValueError:
             assigns = {}
     return {"scenarios": scen, "stacks": list(SCENARIO_STACKS),
-            "assignments": assigns, "grid": dict(MAP_GRID)}
+            "assignments": assigns, "grid": dict(MAP_GRID),
+            "furniture": [dict(f) for f in MAP_FURNITURE]}
 
 
 def status(campaign="still_hour"):
@@ -1747,7 +1799,7 @@ def status(campaign="still_hour"):
                 "variants": variants, "stubs": vstubs, "chosen": chosen,
             })
     font_overrides = rp.load_font_overrides()
-    card_overrides = rp.load_card_overrides()
+    card_overrides = rp.load_card_overrides(campaign)
     print_text = se_bridge._load_print_text()
     spec_by_id = {}
     for p2 in spec_files(campaign):
@@ -2128,6 +2180,26 @@ position:relative;z-index:4}
 outline-offset:-3px;box-shadow:0 0 14px rgba(232,178,74,.55)}
 .msym{position:absolute;bottom:2px;right:4px;font-size:9px;z-index:5;
 color:#e8b24a;background:rgba(0,0,0,.55);border-radius:4px;padding:0 3px}
+/* the connector you grab: a coloured nub in the card's own connection colour,
+   dragged onto another location to link them */
+.mnub{position:absolute;top:-11px;left:50%;transform:translateX(-50%);
+width:24px;height:13px;border-radius:7px;z-index:7;cursor:grab;
+border:1px solid rgba(0,0,0,.55);box-shadow:0 1px 3px rgba(0,0,0,.5)}
+.mnub:active{cursor:grabbing}
+.mslot.linkable{border-color:var(--accent);border-style:solid;
+background:rgba(232,178,74,.10)}
+#mappreview{display:none;margin-top:12px;padding:12px;border-radius:10px;
+background:#07070a;border:1px solid rgba(201,162,74,.25)}
+#pvstage{position:relative;margin:0 auto;background:#0b0b0f;border-radius:8px;
+overflow:hidden}
+#pvstage .pvcard{position:absolute;border-radius:3px;object-fit:fill;
+box-shadow:0 2px 6px rgba(0,0,0,.6)}
+#pvstage .pvbox{position:absolute;border-radius:4px;display:flex;
+align-items:center;justify-content:center;text-align:center;
+border:1px dashed rgba(255,255,255,.28);color:rgba(255,255,255,.55);
+font-size:9px;line-height:1.1;padding:2px;background:rgba(255,255,255,.03)}
+#pvstage .pvclash{outline:2px solid #d05050;outline-offset:1px}
+#pvstage svg{position:absolute;inset:0;pointer-events:none;z-index:2}
 #mapwrap h4{margin:0 0 10px;font-size:13px;color:#d8c9a6}
 #scen_pool{border:1px solid var(--line);border-radius:12px;padding:8px;margin-bottom:10px;background:var(--surface2)}
 .reqchip{display:inline-block;font-size:10px;color:var(--dim);border:1px dashed rgba(255,255,255,.22);
@@ -2197,11 +2269,19 @@ title="drag location cards between slots">&#10021; Arrange</button>
 <button class=btn id=map_mode_link onclick="mapMode('link')"
 title="click one location then another to connect them — each card gets the other's symbol printed on it">&#128279; Connect</button>
 <span class=spacer></span>
+<button class=btn id=map_pv onclick=pvToggle()
+title="see the whole scenario laid out to scale — exactly where every object lands on the table — before you send anything to TTS">&#128065; Table preview</button>
 <button class=btn onclick=mapSave()>Save layout</button>
 <button class=btn onclick="document.getElementById('mapwrap').style.display='none'">Close</button></div>
 <div id=mapstage><div id=mapgrid></div><svg id=maplines></svg></div>
 <div class=row style="margin-top:10px"><span class=hint id=mapinfo></span></div>
 <div class=row style="margin-top:6px"><span class=hint id=maplegend></span></div>
+<div id=mappreview>
+<div class=row><b style="font-size:12px">Table preview</b>
+<span class=hint>every object at its real table position and size &mdash; this is the layout the campaign box will spawn</span>
+<span class=spacer></span><span class=hint id=pvinfo></span></div>
+<div id=pvstage></div>
+</div>
 </div>
 </div></section>
 <section id=advanced><div class=panel>
@@ -3272,7 +3352,8 @@ const ids=[...st.querySelectorAll('.dcard')].map(d=>d.dataset.cid);
 if(ids.length)A[sid][st.dataset.stack]=ids;}}
 return A;}
 async function scenSave(){await post('scenario_save',{campaign:camp(),assignments:scenAssignments()});}
-let MAP_SID=null,MAP_DRAG=null,MAP_MODE='move',MAP_SEL=null;
+let MAP_SID=null,MAP_DRAG=null,MAP_MODE='move',MAP_SEL=null,MAP_LINK_FROM=null,
+MAP_PV=false;
 const MAP_GLYPH={circle:'●',square:'■',triangle:'▲',
 diamond:'◆',moon:'☽',star:'★',heart:'♥',
 hourglass:'⧖',cross:'✚',quote:'”',slash:'/',
@@ -3306,11 +3387,19 @@ if(cid)cell.appendChild(mapCard(cid));
 cell.addEventListener('dragover',e=>{e.preventDefault();cell.classList.add('over');});
 cell.addEventListener('dragleave',()=>cell.classList.remove('over'));
 cell.addEventListener('drop',e=>{e.preventDefault();cell.classList.remove('over');
+// a connector was dropped here -> link the two locations
+if(MAP_LINK_FROM){const tgt=cell.querySelector('img');
+const from=MAP_LINK_FROM;MAP_LINK_FROM=null;
+for(const s of document.querySelectorAll('#mapgrid .mslot'))
+s.classList.remove('linkable');
+if(tgt&&tgt.dataset.cid!==from)mapLink(from,tgt.dataset.cid);
+return;}
 if(!MAP_DRAG)return;
 const src=MAP_DRAG.parentElement;
 if(cell.querySelector('img')&&src&&src.classList.contains('mslot')){
 src.appendChild(cell.querySelector('img'));}
-cell.appendChild(MAP_DRAG);MAP_DRAG=null;mapBadges();mapInfo();mapLines();});
+cell.appendChild(MAP_DRAG);MAP_DRAG=null;mapBadges();mapInfo();mapLines();
+pvDraw();});
 grid.appendChild(cell);}
 // unplaced locations sit under the grid
 const un=locs.filter(i=>!(i in placed));
@@ -3318,8 +3407,9 @@ const tray=document.createElement('div');tray.style.cssText='grid-column:1/-1;di
 tray.innerHTML=un.length?'':'<span class=hint>every location in this scenario is on the map</span>';
 for(const cid of un)tray.appendChild(mapCard(cid));
 tray.addEventListener('dragover',e=>e.preventDefault());
-tray.addEventListener('drop',e=>{e.preventDefault();if(MAP_DRAG){tray.appendChild(MAP_DRAG);MAP_DRAG=null;mapBadges();mapInfo();mapLines();}});
-grid.appendChild(tray);mapBadges();mapInfo();mapLines();mapLegend();}
+tray.addEventListener('drop',e=>{e.preventDefault();if(MAP_LINK_FROM){MAP_LINK_FROM=null;return;}
+if(MAP_DRAG){tray.appendChild(MAP_DRAG);MAP_DRAG=null;mapBadges();mapInfo();mapLines();pvDraw();}});
+grid.appendChild(tray);mapBadges();mapInfo();mapLines();mapLegend();pvDraw();}
 function mapFind(cid){return ((LS&&LS.cards)||[]).find(x=>x.id===cid);}
 function mapSym(cid){const c=mapFind(cid);
 return ((c&&c.content&&c.content.icons)||'').trim().toLowerCase();}
@@ -3341,25 +3431,45 @@ im.addEventListener('dragstart',()=>{MAP_DRAG=im;});
 if(MAP_MODE==='link'){if(MAP_SEL===cid)im.classList.add('sel');
 im.addEventListener('click',()=>mapClick(cid));}
 return im;}
-// symbol badges live on the slot, not the card image, so dragging a card
-// between slots can never leave a stray badge behind
+// symbol badges and the drag-out connector live on the slot, not the card
+// image, so dragging a card between slots can never leave a stray one behind
 function mapBadges(){
-for(const b of document.querySelectorAll('#mapgrid .msym'))b.remove();
+for(const b of document.querySelectorAll('#mapgrid .msym, #mapgrid .mnub'))
+b.remove();
 for(const im of document.querySelectorAll('#mapgrid .mslot img')){
-const sym=mapSym(im.dataset.cid);if(!sym)continue;
 const host=im.parentElement;if(!host)continue;
-const c=mapFind(im.dataset.cid);
+const cid=im.dataset.cid,c=mapFind(cid),sym=mapSym(cid);
+const col=mapColor((c&&c.content&&c.content.color)||'');
+// the connector: grab it and drop it on the location it connects to
+const nub=document.createElement('span');nub.className='mnub';
+nub.draggable=true;nub.style.background=col;
+nub.title='drag this connector onto the location '+
+((c&&c.name)||cid)+' connects to';
+nub.addEventListener('dragstart',e=>{MAP_LINK_FROM=cid;MAP_DRAG=null;
+e.dataTransfer.effectAllowed='link';
+try{e.dataTransfer.setData('text/plain',cid);}catch(_){}
+for(const s of document.querySelectorAll('#mapgrid .mslot'))
+if(s.querySelector('img')&&s.querySelector('img').dataset.cid!==cid)
+s.classList.add('linkable');});
+nub.addEventListener('dragend',()=>{MAP_LINK_FROM=null;
+for(const s of document.querySelectorAll('#mapgrid .mslot'))
+s.classList.remove('linkable');});
+host.appendChild(nub);
+if(!sym)continue;
 const bad=document.createElement('span');bad.className='msym';
-bad.style.color=mapColor((c&&c.content&&c.content.color)||'');
-bad.textContent=MAP_GLYPH[sym]||sym;host.appendChild(bad);}}
+bad.style.color=col;bad.textContent=MAP_GLYPH[sym]||sym;
+host.appendChild(bad);}}
+// linking two locations, however you got here: clicking both, or dragging a
+// connector from one onto the other
+async function mapLink(a,b){
+const rm=mapLinked(a,b)&&mapLinked(b,a);
+const j=await post('map_connect',{campaign:camp(),scenario:MAP_SID,a:a,b:b,remove:rm});
+if(j.ok){addlog((rm?'unlinked ':'linked ')+a+' ↔ '+b);await refresh();mapDraw();}
+else{alert(j.message||'could not change that connection');mapDraw();}}
 async function mapClick(cid){
 if(!MAP_SEL){MAP_SEL=cid;mapDraw();return;}
 if(MAP_SEL===cid){MAP_SEL=null;mapDraw();return;}
-const a=MAP_SEL,rm=mapLinked(a,cid)&&mapLinked(cid,a);
-MAP_SEL=null;
-const j=await post('map_connect',{campaign:camp(),scenario:MAP_SID,a:a,b:cid,remove:rm});
-if(j.ok){addlog((rm?'unlinked ':'linked ')+a+' ↔ '+cid);await refresh();mapDraw();}
-else{alert(j.message||'could not change that connection');mapDraw();}}
+const a=MAP_SEL;MAP_SEL=null;await mapLink(a,cid);}
 // the connection lines: drawn from what the cards actually print, so the map
 // and the rendered card can never disagree
 function mapLines(){const svg=document.getElementById('maplines');
@@ -3404,6 +3514,92 @@ const n=Number(el.dataset.links||0);
 el.innerHTML=(parts.length?parts.join(''):'<i>no location symbols yet — Connect two locations and they are assigned automatically</i>')
 +'<br><span style="opacity:.7">'+n+' connection(s) drawn'
 +' — a dashed line means only one side prints the other&rsquo;s symbol</span>';}
+// ---- LIVE TABLE PREVIEW -------------------------------------------------
+// The whole scenario drawn to scale from above, at the same table coordinates
+// the campaign box scripts: locations where you put them, and the encounter /
+// agenda / act / set-aside furniture they have to fit around. Overlaps are
+// outlined in red, so a layout that will not work is visible before anything
+// is sent to TTS.
+function pvToggle(){MAP_PV=!MAP_PV;
+document.getElementById('mappreview').style.display=MAP_PV?'block':'none';
+document.getElementById('map_pv').className='btn'+(MAP_PV?' primary':'');
+if(MAP_PV)pvDraw();}
+function pvDraw(){if(!MAP_PV)return;
+const S=(LS&&LS.scenarios)||{};const g=S.grid||{};
+const stage=document.getElementById('pvstage');if(!stage)return;
+const items=[];
+// locations, at whatever slot they currently sit in on the grid above
+for(const cell of document.querySelectorAll('#mapgrid .mslot')){
+const img=cell.querySelector('img');if(!img)continue;
+const[c,r]=cell.dataset.rc.split(',').map(Number);
+const card=mapFind(img.dataset.cid);
+items.push({kind:'card',cid:img.dataset.cid,
+name:(card&&card.name)||img.dataset.cid,
+x:g.x0+c*g.dx, z:g.z0+r*g.dz, w:g.cw||2.63, h:g.ch||3.68});}
+// …and the fixed furniture, drawn as labelled footprints
+for(const f of (S.furniture||[])){
+const side=(f.rot===90||f.rot===270);
+items.push({kind:'box',name:f.label,x:f.x,z:f.z,
+w:side?(g.ch||3.68):(g.cw||2.63),
+h:side?(g.cw||2.63):(g.ch||3.68)});}
+if(!items.length){stage.innerHTML=
+'<div class=hint style="padding:24px;text-align:center">place a location on the grid to see the table</div>';
+stage.style.height='';document.getElementById('pvinfo').textContent='';return;}
+// world bounds -> a stage that fits the panel
+let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9;
+for(const it of items){x0=Math.min(x0,it.x-it.w/2);x1=Math.max(x1,it.x+it.w/2);
+z0=Math.min(z0,it.z-it.h/2);z1=Math.max(z1,it.z+it.h/2);}
+const pad=1.5;x0-=pad;x1+=pad;z0-=pad;z1+=pad;
+const avail=Math.max(320,(stage.parentElement.clientWidth||900)-24);
+const k=Math.min(avail/(x1-x0),620/(z1-z0));
+const W=Math.round((x1-x0)*k),H=Math.round((z1-z0)*k);
+stage.style.width=W+'px';stage.style.height=H+'px';stage.innerHTML='';
+// +x runs right; +z runs AWAY from the player, so it draws upward
+const px=it=>[(it.x-it.w/2-x0)*k,(z1-it.z-it.h/2)*k,it.w*k,it.h*k];
+const clash=new Set();
+for(let i=0;i<items.length;i++)for(let j=i+1;j<items.length;j++){
+const a=items[i],b=items[j];
+if(Math.abs(a.x-b.x)<(a.w+b.w)/2&&Math.abs(a.z-b.z)<(a.h+b.h)/2){
+clash.add(i);clash.add(j);}}
+const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+svg.setAttribute('width',W);svg.setAttribute('height',H);
+stage.appendChild(svg);
+const at={};
+items.forEach((it,i)=>{const[l,t,w,h]=px(it);
+if(it.kind==='card'){at[it.cid]=[l+w/2,t+h/2];
+const im=document.createElement('img');im.className='pvcard';
+im.src='/art?p=art/faces/'+it.cid+'.png&ts='+((LS&&LS.faces_ver)||0);
+im.style.cssText='left:'+l+'px;top:'+t+'px;width:'+w+'px;height:'+h+'px';
+im.title=it.name+'  (x '+it.x.toFixed(2)+' / z '+it.z.toFixed(2)+')';
+if(clash.has(i))im.classList.add('pvclash');
+stage.appendChild(im);}
+else{const d=document.createElement('div');d.className='pvbox';
+d.style.cssText='left:'+l+'px;top:'+t+'px;width:'+w+'px;height:'+h+'px';
+d.textContent=it.name;d.title=it.name+'  (x '+it.x.toFixed(2)+' / z '+it.z.toFixed(2)+')';
+if(clash.has(i))d.classList.add('pvclash');
+stage.appendChild(d);}});
+// the connections, drawn between the location centres
+let links=0;const ids=Object.keys(at);
+for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++){
+const a=ids[i],b=ids[j];
+if(!(mapLinked(a,b)||mapLinked(b,a)))continue;
+const one=!(mapLinked(a,b)&&mapLinked(b,a));
+for(const pass of [0,1]){
+const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
+ln.setAttribute('x1',at[a][0]);ln.setAttribute('y1',at[a][1]);
+ln.setAttribute('x2',at[b][0]);ln.setAttribute('y2',at[b][1]);
+ln.setAttribute('stroke',pass?mapColor(((mapFind(a)||{}).content||{}).color):'#000');
+ln.setAttribute('stroke-width',pass?'2.5':'5');
+ln.setAttribute('stroke-linecap','round');
+ln.setAttribute('opacity',pass?(one?'.6':'.95'):'.5');
+if(one&&pass)ln.setAttribute('stroke-dasharray','6 4');
+svg.appendChild(ln);}
+links++;}
+document.getElementById('pvinfo').innerHTML=
+Object.keys(at).length+' location(s) &middot; '+links+' connection(s) &middot; '+
+((x1-x0).toFixed(1))+' &times; '+((z1-z0).toFixed(1))+' table units'+
+(clash.size?' &mdash; <b style="color:#e08080">'+clash.size+
+' object(s) overlap</b>':' &mdash; nothing overlaps');}
 function mapSlots(){const out={};
 for(const cell of document.querySelectorAll('#mapgrid .mslot')){
 const img=cell.querySelector('img');
@@ -3524,6 +3720,58 @@ symInit();refresh();poll();setInterval(refresh,4000);
 </script></body></html>"""
 
 
+def migrate_overrides():
+    """Move each campaign's hand edits into its own folder.
+
+    Card edits used to land in still_hour/card_overrides.json whatever campaign
+    you were editing. Card ids are prefixed per campaign so nothing collided,
+    but the compiler reads a campaign's own folder — so another campaign's
+    edits were invisible to it. Runs once, then finds nothing to do."""
+    sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+    import render_placeholders as rp
+    home = os.path.join(ROOT, "campaigns", "still_hour", "card_overrides.json")
+    if not os.path.exists(home):
+        return 0
+    try:
+        shared = json.load(open(home, encoding="utf-8"))
+    except ValueError:
+        return 0
+    camp_root = os.path.join(ROOT, "campaigns")
+    moved = 0
+    for name in sorted(os.listdir(camp_root)):
+        if name == "still_hour" or not os.path.isdir(
+                os.path.join(camp_root, name)):
+            continue
+        mine = set()
+        for path in spec_files(name):
+            if not os.path.exists(path):
+                continue
+            try:
+                mine |= {c.get("id") for c in
+                         json.load(open(path, encoding="utf-8"))}
+            except ValueError:
+                continue
+        take = {cid: shared[cid] for cid in list(shared) if cid in mine}
+        if not take:
+            continue
+        dest = rp.overrides_path(name)
+        own = {}
+        if os.path.exists(dest):
+            try:
+                own = json.load(open(dest, encoding="utf-8"))
+            except ValueError:
+                own = {}
+        for cid, entry in take.items():
+            own.setdefault(cid, entry)
+            shared.pop(cid, None)
+            moved += 1
+        _write_json_atomic(dest, own)
+    if moved:
+        _write_json_atomic(home, shared)
+        print("moved {} card edit(s) into their own campaign".format(moved))
+    return moved
+
+
 def ensure_faces(campaign="still_hour"):
     """Render every card face if they are missing.
 
@@ -3554,6 +3802,7 @@ def ensure_faces(campaign="still_hour"):
 
 
 def main():
+    migrate_overrides()
     ensure_faces()
     server = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
     print("CardForge Studio: http://127.0.0.1:{}  (Ctrl-C to stop)".format(PORT))
