@@ -80,23 +80,33 @@ class _Tee(io.TextIOBase):
         return len(s)
 
 
+LAST_JOB = {}
+
+
 def run_job(name, fn, *args, **kw):
-    """Run a pipeline step on the worker thread, teeing prints into the log."""
+    """Run a pipeline step on the worker thread, teeing prints into the log.
+    The outcome is recorded in LAST_JOB so the UI can SHOW a failure instead of
+    silently dropping back to idle."""
     if _busy.is_set():
         return False
     def work():
         _busy.set()
+        LAST_JOB.clear()
+        LAST_JOB.update({"name": name, "state": "running", "error": ""})
         log("=== {} started ===".format(name))
         try:
             with redirect_stdout(_Tee()):
                 fn(*args, **kw)
             log("=== {} finished ===".format(name))
+            LAST_JOB.update({"state": "ok", "error": ""})
         except SystemExit as e:
             log("=== {} exited: {} ===".format(name, e))
-        except Exception:
+            LAST_JOB.update({"state": "ok", "error": ""})
+        except Exception as e:  # noqa: BLE001 - reported to the owner, not raised
             for line in traceback.format_exc().splitlines():
                 log(line)
             log("=== {} FAILED ===".format(name))
+            LAST_JOB.update({"state": "failed", "error": str(e)[:400]})
         finally:
             _busy.clear()
     threading.Thread(target=work, daemon=True).start()
@@ -1203,7 +1213,8 @@ def status(campaign="still_hour"):
     if os.path.isdir(faces_dir_abs):
         faces_ver = int(max((os.path.getmtime(os.path.join(faces_dir_abs, f))
                              for f in os.listdir(faces_dir_abs)), default=0))
-    return {"busy": _busy.is_set(), "campaign": campaign, "campaigns": campaigns,
+    return {"busy": _busy.is_set(), "last_job": dict(LAST_JOB),
+            "campaign": campaign, "campaigns": campaigns,
             "backend": camp.get("backend"), "checkpoint": camp.get("checkpoint"),
             "style": {"positive": camp.get("style_positive", ""),
                       "negative": camp.get("style_negative", "")},
@@ -1450,6 +1461,9 @@ backdrop-filter:blur(16px);border-top:1px solid var(--line);transition:height .2
 font-size:12px;color:var(--dim)}
 #log{padding:0 26px 12px;height:176px;overflow-y:auto;
 font:11.5px ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;color:#c9c5bb}
+.okpill{color:#7fd18c;font-weight:600}
+.badpill{color:#e2707a;font-weight:600}
+.warnpill{color:#e8b24a;font-weight:600}
 #editor{display:none;animation:fade .2s ease}
 #ed_toolbar{position:sticky;top:0;z-index:6;background:var(--surface);
 padding:8px 10px;margin:-6px -10px 6px;border-bottom:1px solid var(--line);border-radius:0 0 10px 10px}
@@ -1522,6 +1536,9 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 <button id=tab-apply onclick="tab('apply')">6 &middot; Play in TTS</button>
 <button id=tab-advanced onclick="tab('advanced')">&#9881; Advanced</button>
 </nav><main>
+<div id=joberr style="display:none;margin:10px auto;max-width:1100px;padding:10px 14px;
+border:1px solid rgba(226,112,122,.45);background:rgba(226,112,122,.10);
+border-radius:10px;color:#f0c9cd;font-size:13px"></div>
 
 <section id=scenarios><div class=panel>
 <div class=row><b>Scenario builder</b>
@@ -1615,24 +1632,26 @@ prefers it automatically once installed</span>
 </div>
 <hr>
 <div class=row>
-<b style="min-width:180px">2c &middot; Arkham plugin</b>
-<button class=btn onclick="post('plugin_update')">Refresh templates from plugin</button>
+<b style="min-width:180px">Arkham frames <span class=hint style="font-weight:400">(already included)</span></b>
+<button class=btn onclick="post('plugin_update')">Re-extract from plugin</button>
+<span id=vendor_plugin class=hint></span>
 <span class=hint>drop any newer <code>ArkhamHorrorLCG.seext</code> into <code>assets/plugins/</code>
 first — frames, regions and overlays re-extract from the newest file and every card recomposes;
 new plugin versions keep working without code changes</span>
 </div>
 <hr>
 <div class=row>
-<b style="min-width:180px">3 &middot; Strange Eons</b>
-<button class="btn primary" onclick="post('install_se')">Download &amp; install into this folder</button>
+<b style="min-width:180px">Strange Eons <span class=hint style="font-weight:400">(optional)</span></b>
+<button class="btn" onclick="post('install_se')">Download &amp; install into this folder</button>
 <span id=vendor_se class=hint></span>
 </div>
-<p class=hint>Fetches the latest official release into <code>vendor/strange-eons/</code> and points the Frame
-tab&rsquo;s launch command at it. Then two manual pieces it can&rsquo;t fetch for you (they live behind a blog
-and a Discord): the <b>Arkham plugin — use jaqenZann&rsquo;s external build</b> from the
-<a href="https://barnabyfiles.wordpress.com" target=_blank>Barnaby Files guide</a> (NOT the outdated in-app
-catalog plugin), and the <b>AH font pack</b> from the Mythos Busters Discord — install those inside Strange
-Eons once, and every exported card uses the exact official fonts.</p>
+<p class=hint><b>You don&rsquo;t need this.</b> CardForge renders every card itself on the authentic
+plugin frames &mdash; Strange Eons is a legacy alternate route kept only for anyone who wants to hand-tweak
+a card in SE. Skip it and the whole pipeline (Cards &rarr; Scenarios &rarr; campaign box) works exactly the
+same.<br>If you do want it: this fetches the official release into <code>vendor/strange-eons/</code> and
+points the Frame tab at it; the Arkham plugin (jaqenZann&rsquo;s external build via the
+<a href="https://barnabyfiles.wordpress.com" target=_blank>Barnaby Files guide</a>) and the AH font pack
+from the Mythos Busters Discord are manual installs inside SE.</p>
 </div></section>
 
 <section id=cards>
@@ -2094,14 +2113,34 @@ lr.innerHTML=Object.entries(s.characters||{}).map(([n,c])=>
 `<label>trigger</label><input type=text size=18 data-char="${n}" data-field=trigger value="${(c.trigger||'').replace(/"/g,'&quot;')}">`+
 `</div>`).join('');}
 const v=s.vendor||{};
+const pl=v.plugin||{};const pe=document.getElementById('vendor_plugin');
+if(pe)pe.innerHTML=(pl.templates&&pl.regions)?
+('<span class=okpill>&#10003; '+pl.templates+' frames, '+pl.overlays+' overlays, '+pl.icons+
+' icons, '+pl.regions+' regions extracted</span>'):
+'<span class=badpill>&#10007; frames missing &mdash; click Re-extract</span>';
 document.getElementById('vendor_a1111').innerHTML=v.a1111_installed?
-'&#10003; installed in vendor/a1111':'not installed (fine if you already run A1111 elsewhere)';
+'<span class=okpill>&#10003; installed &amp; verified in vendor/a1111</span>':
+(v.a1111_partial?'<span class=badpill>&#10007; install incomplete &mdash; vendor/a1111 exists but has no usable webui; click Install again</span>':
+'not installed (fine if you already run A1111 elsewhere)');
 document.getElementById('vendor_model').innerHTML=(v.models||[]).length?
-'&#10003; installed: '+v.models.join(', '):(v.has_token?'key saved — ready to install':'not installed yet');
+'<span class=okpill>&#10003; installed: '+v.models.join(', ')+'</span>':
+(v.has_token?'<span class=warnpill>key saved &mdash; ready to install</span>':'not installed yet');
 document.getElementById('vendor_se').innerHTML=v.se_installed?
-'&#10003; installed at '+v.se_path:((v.se_downloads||[]).length?
-'downloaded: '+v.se_downloads.join(', ')+' — finish the install':'not installed yet');
-document.getElementById('busytext').textContent=s.busy?'working&hellip;'.replace('&hellip;','…'):'idle';
+'<span class=okpill>&#10003; installed at '+v.se_path+'</span>':
+((v.se_downloads||[]).length?
+'<span class=warnpill>downloaded: '+v.se_downloads.join(', ')+' &mdash; run the installer to finish</span>':
+'not installed yet');
+const lj=s.last_job||{};
+const bt=document.getElementById('busytext');
+if(s.busy){bt.textContent='working…';bt.className='';}
+else if(lj.state==='failed'){bt.innerHTML='<span class=badpill>'+(lj.name||'job')+' failed</span>';}
+else{bt.textContent='idle';bt.className='';}
+const je=document.getElementById('joberr');
+if(je){if(!s.busy&&lj.state==='failed'&&lj.error){
+je.style.display='block';
+je.innerHTML='<b>'+(lj.name||'job')+' failed:</b> '+String(lj.error).replace(/</g,'&lt;')+
+' <span class=hint>(full details in Activity, bottom of the page)</span>';}
+else je.style.display='none';}
 renderCards(s);
 const rep=s.report.generated!==undefined?
 `<span class=stat>generated <b>${s.report.generated}</b></span>`+

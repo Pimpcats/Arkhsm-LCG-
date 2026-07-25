@@ -28,6 +28,7 @@ Dry-run mode fabricates tiny stub artifacts with no network, so the whole
 flow is testable anywhere (and is what the selftest drives).
 """
 import json
+import json
 import os
 import platform
 import subprocess
@@ -72,12 +73,43 @@ def vendor_status():
         "models": models,
         "models_dir": "vendor/models",
         "a1111_installed": a1111_installed(),
+        "a1111_partial": (os.path.isdir(a1111_dir())
+                          and bool(os.listdir(a1111_dir()))
+                          and not a1111_installed()),
+        "a1111_dir": "vendor/a1111",
         "se_installed": bool(se_exe),
         "se_path": os.path.relpath(se_exe, runner.repo_root()) if se_exe else None,
         "se_downloads": sorted(os.listdir(vendor_dir("strange-eons")))
         if os.path.isdir(vendor_dir("strange-eons")) else [],
         "has_token": bool(load_token()),
+        "plugin": _plugin_status(),
     }
+
+
+def _plugin_status():
+    """The Arkham SE plugin is VENDORED and already extracted — this reports
+    what the renderer is actually drawing from, so the Setup row can show a
+    verified state instead of looking like an install step."""
+    root = runner.repo_root()
+    seext = os.path.join(root, "assets", "plugins", "ArkhamHorrorLCG.seext")
+    fdir = os.path.join(root, "assets", "frames", "se")
+
+    def _count(sub):
+        d = os.path.join(fdir, sub)
+        return len([f for f in os.listdir(d) if f.endswith(".png")]) \
+            if os.path.isdir(d) else 0
+
+    regions = 0
+    rp = os.path.join(fdir, "regions.json")
+    if os.path.exists(rp):
+        try:
+            regions = sum(len(v) for v in json.load(
+                open(rp, encoding="utf-8")).values())
+        except (ValueError, OSError):
+            regions = 0
+    return {"have_seext": os.path.exists(seext),
+            "templates": _count("templates"), "overlays": _count("overlays"),
+            "icons": _count("icons"), "regions": regions}
 
 
 def _download(url, dest, headers=None, log=print):
@@ -233,11 +265,20 @@ def a1111_dir():
 
 
 def a1111_installed():
+    """True only when a usable A1111 actually sits in vendor/a1111 — a
+    launcher AND the webui payload, not just an empty folder from a failed
+    download (which is what made the button look like it did nothing)."""
     d = a1111_dir()
-    return os.path.isdir(d) and (
-        os.path.exists(os.path.join(d, "run.bat"))
-        or os.path.exists(os.path.join(d, "webui", "webui.py"))
-        or os.path.exists(os.path.join(d, "webui.py")))
+    if not os.path.isdir(d):
+        return False
+    launcher = any(os.path.exists(os.path.join(d, f))
+                   for f in ("run.bat", "webui.sh", "webui.bat",
+                             os.path.join("webui", "webui.bat"),
+                             os.path.join("webui", "webui.sh")))
+    payload = any(os.path.exists(os.path.join(d, f))
+                  for f in ("webui.py", os.path.join("webui", "webui.py"),
+                            os.path.join("webui", "launch.py")))
+    return bool(launcher and payload)
 
 
 def install_a1111(dry_run=False, log=print):
@@ -259,11 +300,33 @@ def install_a1111(dry_run=False, log=print):
     else:
         import requests, zipfile  # noqa: E401
         log("querying GitHub for the A1111 standalone package…")
-        rels = requests.get(A1111_RELEASES_API + "?per_page=15", timeout=30).json()
         asset = None
+        try:
+            resp = requests.get(A1111_RELEASES_API + "?per_page=15", timeout=30)
+            rels = resp.json()
+        except Exception as e:  # noqa: BLE001 - offline/DNS/TLS all land here
+            raise RuntimeError(
+                "could not reach GitHub to find the A1111 package ({}). Check "
+                "your internet connection, or install A1111 yourself and point "
+                "the Illustrate tab's Backend row at it.".format(e))
+        # GitHub answers with an OBJECT (not a list) on rate limit / error —
+        # say so plainly instead of crashing on it
+        if isinstance(rels, dict):
+            msg = rels.get("message", "unexpected response")
+            if "rate limit" in msg.lower():
+                msg = ("GitHub rate-limited this machine (this resets within "
+                       "the hour). Wait and click again, or install A1111 "
+                       "yourself and point the Backend row at it.")
+            raise RuntimeError("GitHub said: " + msg)
+        if not isinstance(rels, list):
+            raise RuntimeError("unexpected GitHub response while looking for "
+                               "the A1111 package")
         for rel in rels:
-            for a in rel.get("assets", []):
-                if a["name"].startswith("sd.webui") and a["name"].endswith(".zip"):
+            if not isinstance(rel, dict):
+                continue
+            for a in rel.get("assets") or []:
+                name = (a or {}).get("name", "")
+                if name.startswith("sd.webui") and name.endswith(".zip"):
                     asset = a
                     break
             if asset:
