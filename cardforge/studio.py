@@ -625,6 +625,8 @@ def act_font_set(p):
 
 
 TYPE_FIELDS = ("name", "subtitle", "traits", "text", "flavor", "victory", "stats")
+LOG_FIELDS = ("player", "investigator1", "xp1", "investigator2", "xp2",
+              "investigator3", "xp3")
 
 
 def act_type_set(p):
@@ -1154,6 +1156,10 @@ def status(campaign="still_hour"):
             "shroud": mc.get("shroud"), "clues": mc.get("clues"),
             "doom": mc.get("doom"),
             "back_text": mpt.get("back_text", ""),
+            "player": mpt.get("player", ""),
+            "investigator1": mpt.get("investigator1", ""), "xp1": mpt.get("xp1", ""),
+            "investigator2": mpt.get("investigator2", ""), "xp2": mpt.get("xp2", ""),
+            "investigator3": mpt.get("investigator3", ""), "xp3": mpt.get("xp3", ""),
             "tokens": mc.get("tokens") or [],
             "icons": mc.get("icons", ""), "color": mc.get("color", ""),
             "clues_per_investigator": bool(mc.get("clues_per_investigator")),
@@ -1502,7 +1508,7 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 <div id=camp_bar>
 <b>Campaign box</b><span id=camp_progress class=stat>0/0 locked</span>
 <span class=slot>&#128214; Campaign guide &mdash; PDF slot (Phase 3)</span>
-<span class=slot>&#128221; Campaign log / notes &mdash; coming next</span>
+<button class="btn slot" onclick="tab('cards');openEditor('sthr-campaign-log')" title="open the campaign log sheet: player, investigators, XP, notes">&#128221; Campaign log / notes</button>
 <span class=spacer></span>
 <button class="btn primary" id=camp_spawn disabled onclick="addlog('Phase 3: the compiler builds the scripted campaign box next')"
 title="enabled once every scenario box is locked in — compiles the whole campaign into a scripted TTS box">&#128230; Spawn campaign box &rarr; TTS</button>
@@ -1691,6 +1697,13 @@ title="drop this card onto the table of your RUNNING Tabletop Simulator — appe
 <b style="font-size:12px">Chaos-token rows</b> <span class=hint>the scenario reference table &mdash; token + its modifier text</span>
 <div id=tok_rows></div>
 <button class=btn style="font-size:11px;padding:4px 10px" onclick=tokAdd()>+ token row</button>
+</div>
+<div id=cc_log style="display:none;margin:6px 0;padding:10px;border:1px solid var(--line);border-radius:8px">
+<b style="font-size:12px">Campaign log</b> <span class=hint>who&rsquo;s playing, each investigator and their XP &mdash; the notes box below is the log itself</span>
+<div class=row style="margin-top:6px"><label>player</label><input id=cl_player size=18></div>
+<div class=row><label>investigator 1</label><input id=cl_investigator1 size=18><label>XP</label><input id=cl_xp1 size=4></div>
+<div class=row><label>investigator 2</label><input id=cl_investigator2 size=18><label>XP</label><input id=cl_xp2 size=4></div>
+<div class=row><label>investigator 3</label><input id=cl_investigator3 size=18><label>XP</label><input id=cl_xp3 size=4></div>
 </div>
 <div id=cc_back_wrap style="display:none">
 <label>back / deck-building text</label><textarea id=cc_back rows=4 spellcheck=false onfocus="glyphTarget('cc_back')"></textarea>
@@ -2185,7 +2198,10 @@ o.symbol=String(o.symbol).toLowerCase();o.color=N2H[String(o.color).toLowerCase(
 
   leDraw();}
 if(t==='Scenario'){TOK_ROWS=(ct.tokens||[]).map(x=>({token:x.token||'',text:x.text||''}));tokDraw();}
-if(t==='Investigator')document.getElementById('cc_back').value=ct.back_text||'';}
+if(t==='Investigator')document.getElementById('cc_back').value=ct.back_text||'';
+document.getElementById('cc_log').style.display=(t==='CampaignLog')?'block':'none';
+if(t==='CampaignLog')for(const f of LOG_F)document.getElementById('cl_'+f).value=ct[f]||'';}
+const LOG_F=['player','investigator1','xp1','investigator2','xp2','investigator3','xp3'];
 let LE_CONNS=[],TOK_ROWS=[];
 function leDraw(){const SY=['circle','square','triangle','diamond','moon','star','heart','hourglass','cross','quote','slash','doubleslash','spade','clover','t'];
 document.getElementById('le_conns').innerHTML=LE_CONNS.map((c,i)=>
@@ -2218,6 +2234,7 @@ p.clues_per_investigator=document.getElementById('le_perinv').checked;
 p.connections=LE_CONNS.filter(c=>c.symbol);}
 if(t==='Scenario')p.tokens=TOK_ROWS.filter(r=>r.token||r.text);
 if(t==='Investigator')p.back_text=document.getElementById('cc_back').value;
+if(t==='CampaignLog')for(const f of LOG_F)p[f]=document.getElementById('cl_'+f).value;
 const j=await post('card_save',p);
 if(j.ok){document.getElementById('cc_info').textContent='saved \u2713';edFaceRefresh();}}
 async function edArtRemove(){await post('art_remove',{card:ed.g.id});

@@ -127,10 +127,17 @@
     "deck": 95041,
     "id": "sthr-appointed-approach",
     "type": "Story",
-    "name": "The Appointed’s Approach",
+    "name": "The Appointed\u2019s Approach",
     "class": "Mythos",
     "traits": "",
     "encounter": true,
     "quantity": 1
+  },
+  {
+    "id": "sthr-campaign-log",
+    "type": "CampaignLog",
+    "name": "Campaign Log",
+    "subtitle": "THE STILL HOUR",
+    "campaign_name": "The Still Hour"
   }
 ]

@@ -50,7 +50,8 @@ OV_SPEC_KEYS = ("name", "subtitle", "traits", "cost", "level", "victory",
                 "wil", "int", "com", "agi", "slot", "health", "sanity",
                 "shroud", "clues", "doom")
 OV_PT_KEYS = ("text", "flavor", "back_text", "fight", "evade",
-              "damage", "horror")
+              "damage", "horror", "player", "investigator1", "xp1",
+              "investigator2", "xp2", "investigator3", "xp3")
 # fields that are only ever str()-formatted onto the card (an "X" cost or "—"
 # is legal, so these aren't forced to int)…
 OV_NUMERIC_KEYS = ("cost", "level", "victory", "wil", "int", "com", "agi",
@@ -1767,7 +1768,78 @@ def s_story(c, pt, dest, art_path=None, placement=None):
     img.save(dest)
 
 
+
+
+def s_campaign_log(c, pt, dest, art_path=None, placement=None):
+    """The campaign log / notes asset — a fillable sheet that travels with the
+    campaign box: who is playing, each investigator with their XP/Years, and the
+    running campaign notes. Rendered on the parchment scenario stock; every
+    field is editable in the Studio like any card."""
+    img, d = _se_frame_compose("AHLCG-Chaos", "Chaos",
+                               "Encounter-portrait-clip", None, None)
+    nreg = se_reg("Chaos", "Name")
+    _box_text(d, c.get("name", "Campaign Log"),
+              (nreg[0], nreg[1], nreg[2], nreg[1] + 74),
+              title=True, grow=1.0, max_size=44, key="name")
+    _box_text(d, c.get("subtitle", "") or pt.get("campaign", ""),
+              se_reg("Chaos", "Difficulty"), bold=True, max_size=20,
+              fill=(74, 60, 46), key="subtitle")
+    b = se_reg("Chaos", "Body")
+    x0, x1 = b[0] - 96, b[2] + 24
+    y = b[1] - 6
+    ink = (58, 46, 36)
+    rule = (150, 132, 104)
+
+    def field(label, value, ly):
+        _box_text(d, label, (x0, ly, x0 + 150, ly + 26), bold=True,
+                  max_size=20, align="left", fill=ink)
+        d.line([(x0 + 158, ly + 24), (x1, ly + 24)], fill=rule, width=2)
+        if value:
+            _box_text(d, str(value), (x0 + 164, ly, x1, ly + 24),
+                      max_size=20, align="left", fill=ink)
+        return ly + 42
+
+    y = field("Player", pt.get("player", ""), y)
+    y = field("Campaign", c.get("campaign_name", "The Still Hour"), y)
+    y += 6
+    for i in range(1, 4):
+        inv = pt.get("investigator{}".format(i), "")
+        xp = pt.get("xp{}".format(i), "")
+        _box_text(d, "Investigator {}".format(i), (x0, y, x0 + 150, y + 26),
+                  bold=True, max_size=20, align="left", fill=ink)
+        d.line([(x0 + 158, y + 24), (x1 - 150, y + 24)], fill=rule, width=2)
+        if inv:
+            _box_text(d, str(inv), (x0 + 164, y, x1 - 156, y + 24),
+                      max_size=20, align="left", fill=ink)
+        _box_text(d, "XP", (x1 - 140, y, x1 - 100, y + 26), bold=True,
+                  max_size=20, align="left", fill=ink)
+        d.line([(x1 - 96, y + 24), (x1, y + 24)], fill=rule, width=2)
+        if xp not in ("", None):
+            _box_text(d, str(xp), (x1 - 92, y, x1, y + 24), max_size=20,
+                      align="left", fill=ink)
+        y += 42
+    y += 10
+    _box_text(d, "Campaign notes", (x0, y, x0 + 260, y + 26), bold=True,
+              max_size=20, align="left", fill=ink)
+    y += 32
+    notes = pt.get("text", "") or pt.get("notes", "")
+    if notes:
+        y = _box_block(d, notes, (x0, y, x1, b[3] + 40), start=21,
+                       min_size=15, fill=ink, key="text")
+    else:
+        for _ in range(9):
+            if y + 30 > b[3] + 40:
+                break
+            d.line([(x0, y + 22), (x1, y + 22)], fill=rule, width=2)
+            y += 34
+    _box_text(d, _wm(art_path), se_reg("Chaos", "Copyright"),
+              fill=(120, 100, 80), max_size=14)
+    img.save(dest)
+
+
+
 SCENARIO_RENDERERS = {"Location": s_location, "Agenda": s_agenda,
+                      "CampaignLog": s_campaign_log,
                       "Act": s_act, "Scenario": s_scenario_ref,
                       "Story": s_story}
 
