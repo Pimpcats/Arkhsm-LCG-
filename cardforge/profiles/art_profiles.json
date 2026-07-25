@@ -13,7 +13,7 @@
       "upscale": 1.5,
       "denoise": 0.4
     },
-    "type_positive": "an investigator in a place that tells their story, three-quarter view, waist-up, holding a period prop, character to one side of frame, environmental background with depth, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject, strong readable silhouette",
+    "type_positive": "an investigator in a place that tells their story, three-quarter view, waist-up, holding a period prop, character to one side of frame, environmental background with depth, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject, strong readable silhouette, weathered unglamorous faces",
     "type_negative": "full body, multiple people, busy background, uniform detail, hyperdetailed background, over-rendered, artstation, cgi, octane, excessive micro-detail, glossy, bloom, glow, over-sharpened, hdr, empty background, plain backdrop, gradient background, floating head, bust portrait, museum oil painting, gallery art, canvas texture, impasto, soft focus, blurry, smudged, muddy, low detail, sketchy",
     "allow_character": true,
     "variants": 2
@@ -27,7 +27,7 @@
     "sampler": "dpmpp_2m_sde",
     "checkpoint": "SET_ME.safetensors",
     "comfy_workflow": "workflows/txt2img_object.json",
-    "type_positive": "the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject, strong readable silhouette",
+    "type_positive": "the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject",
     "type_negative": "people, faces, text, uniform detail, hyperdetailed background, over-rendered, artstation, cgi, octane, excessive micro-detail, glossy, bloom, glow, over-sharpened, hdr, empty background, plain backdrop, gradient background, floating head, bust portrait, museum oil painting, gallery art, canvas texture, impasto, soft focus, blurry, smudged, muddy, low detail, sketchy",
     "allow_character": false,
     "variants": 2
@@ -41,7 +41,7 @@
     "sampler": "dpmpp_2m_sde",
     "checkpoint": "SET_ME.safetensors",
     "comfy_workflow": "workflows/txt2img_scene.json",
-    "type_positive": "a single dramatic moment of impact, close composition filling the frame, motion, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject, strong readable silhouette",
+    "type_positive": "a single dramatic moment of impact, close composition filling the frame, motion, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject, strong readable silhouette, weathered unglamorous faces",
     "type_negative": "static, empty, uniform detail, hyperdetailed background, over-rendered, artstation, cgi, octane, excessive micro-detail, glossy, bloom, glow, over-sharpened, hdr, empty background, plain backdrop, gradient background, floating head, bust portrait, museum oil painting, gallery art, canvas texture, impasto, soft focus, blurry, smudged, muddy, low detail, sketchy",
     "allow_character": true,
     "variants": 2
@@ -55,7 +55,7 @@
     "sampler": "dpmpp_2m_sde",
     "checkpoint": "SET_ME.safetensors",
     "comfy_workflow": "workflows/txt2img_scene.json",
-    "type_positive": "hands mid-gesture, intimate crop, tension in the pose, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject, strong readable silhouette",
+    "type_positive": "hands mid-gesture, intimate crop, tension in the pose, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject, strong readable silhouette, weathered unglamorous faces",
     "type_negative": "wide shot, crowd, uniform detail, hyperdetailed background, over-rendered, artstation, cgi, octane, excessive micro-detail, glossy, bloom, glow, over-sharpened, hdr, empty background, plain backdrop, gradient background, floating head, bust portrait, museum oil painting, gallery art, canvas texture, impasto, soft focus, blurry, smudged, muddy, low detail, sketchy",
     "allow_character": true,
     "variants": 2
@@ -69,7 +69,7 @@
     "sampler": "dpmpp_2m_sde",
     "checkpoint": "SET_ME.safetensors",
     "comfy_workflow": "workflows/txt2img_scene.json",
-    "type_positive": "one ominous symbolic beat, surreal wrongness, a figure caught in it, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject, strong readable silhouette",
+    "type_positive": "one ominous symbolic beat, surreal wrongness, a figure caught in it, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject, strong readable silhouette, weathered unglamorous faces",
     "type_negative": "cheerful, mundane, uniform detail, hyperdetailed background, over-rendered, artstation, cgi, octane, excessive micro-detail, glossy, bloom, glow, over-sharpened, hdr, empty background, plain backdrop, gradient background, floating head, bust portrait, museum oil painting, gallery art, canvas texture, impasto, soft focus, blurry, smudged, muddy, low detail, sketchy",
     "allow_character": false,
     "variants": 3
@@ -83,7 +83,7 @@
     "sampler": "dpmpp_2m_sde",
     "checkpoint": "SET_ME.safetensors",
     "comfy_workflow": "workflows/txt2img_creature.json",
-    "type_positive": "a single threatening figure, menacing, occupying most of the frame, caught mid-approach, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject, strong readable silhouette",
+    "type_positive": "a single threatening figure, menacing, occupying most of the frame, caught mid-approach, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject, strong readable silhouette, weathered unglamorous faces",
     "type_negative": "friendly, comic, uniform detail, hyperdetailed background, over-rendered, artstation, cgi, octane, excessive micro-detail, glossy, bloom, glow, over-sharpened, hdr, empty background, plain backdrop, gradient background, floating head, bust portrait, museum oil painting, gallery art, canvas texture, impasto, soft focus, blurry, smudged, muddy, low detail, sketchy",
     "allow_character": false,
     "variants": 3
@@ -97,7 +97,7 @@
     "sampler": "dpmpp_2m_sde",
     "checkpoint": "SET_ME.safetensors",
     "comfy_workflow": "workflows/txt2img_environment.json",
-    "type_positive": "the place itself, empty of people, atmospheric depth, wrong-feeling stillness, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject, strong readable silhouette",
+    "type_positive": "the place itself, empty of people, atmospheric depth, wrong-feeling stillness, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject",
     "type_negative": "characters, crowds, portrait, uniform detail, hyperdetailed background, over-rendered, artstation, cgi, octane, excessive micro-detail, glossy, bloom, glow, over-sharpened, hdr, empty background, plain backdrop, gradient background, floating head, bust portrait, museum oil painting, gallery art, canvas texture, impasto, soft focus, blurry, smudged, muddy, low detail, sketchy",
     "allow_character": false,
     "variants": 2
@@ -125,9 +125,51 @@
     "sampler": "dpmpp_2m_sde",
     "checkpoint": "SET_ME.safetensors",
     "comfy_workflow": "workflows/txt2img_portrait.json",
-    "type_positive": "tight head-and-shoulders portrait, simple background, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject, strong readable silhouette",
+    "type_positive": "tight head-and-shoulders portrait, simple background, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject, strong readable silhouette, weathered unglamorous faces",
     "type_negative": "full body, uniform detail, hyperdetailed background, over-rendered, artstation, cgi, octane, excessive micro-detail, glossy, bloom, glow, over-sharpened, hdr, empty background, plain backdrop, gradient background, floating head, bust portrait, museum oil painting, gallery art, canvas texture, impasto, soft focus, blurry, smudged, muddy, low detail, sketchy",
     "allow_character": true,
     "variants": 1
+  },
+  "act": {
+    "aspect": "portrait",
+    "width": 1216,
+    "height": 1536,
+    "steps": 32,
+    "cfg": 4.5,
+    "sampler": "dpmpp_2m_sde",
+    "checkpoint": "SET_ME.safetensors",
+    "comfy_workflow": "workflows/txt2img_environment.json",
+    "type_positive": "the scene the investigators are working toward, a place mid-event, cinematic wide framing, no central portrait, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject",
+    "type_negative": "characters, crowds, portrait, uniform detail, hyperdetailed background, over-rendered, artstation, cgi, octane, excessive micro-detail, glossy, bloom, glow, over-sharpened, hdr, empty background, plain backdrop, gradient background, floating head, bust portrait, museum oil painting, gallery art, canvas texture, impasto, soft focus, blurry, smudged, muddy, low detail, sketchy",
+    "allow_character": false,
+    "variants": 2
+  },
+  "scenario": {
+    "aspect": "portrait",
+    "width": 1088,
+    "height": 1536,
+    "steps": 32,
+    "cfg": 4.5,
+    "sampler": "dpmpp_2m_sde",
+    "checkpoint": "SET_ME.safetensors",
+    "comfy_workflow": "workflows/txt2img_environment.json",
+    "type_positive": "an emblematic image of the whole night, symbolic, atmospheric, wide establishing view, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject",
+    "type_negative": "characters, crowds, portrait, uniform detail, hyperdetailed background, over-rendered, artstation, cgi, octane, excessive micro-detail, glossy, bloom, glow, over-sharpened, hdr, empty background, plain backdrop, gradient background, floating head, bust portrait, museum oil painting, gallery art, canvas texture, impasto, soft focus, blurry, smudged, muddy, low detail, sketchy",
+    "allow_character": false,
+    "variants": 2
+  },
+  "story": {
+    "aspect": "landscape",
+    "width": 1536,
+    "height": 768,
+    "steps": 32,
+    "cfg": 4.5,
+    "sampler": "dpmpp_2m_sde",
+    "checkpoint": "SET_ME.safetensors",
+    "comfy_workflow": "workflows/txt2img_environment.json",
+    "type_positive": "a quiet narrative beat, an interlude moment, atmospheric, restrained composition, detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject",
+    "type_negative": "characters, crowds, portrait, uniform detail, hyperdetailed background, over-rendered, artstation, cgi, octane, excessive micro-detail, glossy, bloom, glow, over-sharpened, hdr, empty background, plain backdrop, gradient background, floating head, bust portrait, museum oil painting, gallery art, canvas texture, impasto, soft focus, blurry, smudged, muddy, low detail, sketchy",
+    "allow_character": false,
+    "variants": 2
   }
 }

@@ -875,6 +875,13 @@ _pos, _neg, _par = _cmp.compose(
     _profs, None)
 check("a campaign style LoRA reaches every composed prompt",
       "<lora:mylora:0.7>" in _pos)
+# the sweep needs a template for EVERY card type, not just player cards
+sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+import build_art_manifest as _bam
+check("every card type maps to its own art template",
+      all(_bam.ART_TYPE.get(t) in _profs for t in
+          ("Investigator", "Asset", "Event", "Skill", "Treachery", "Enemy",
+           "Location", "Agenda", "Act", "Scenario", "Story")))
 check("generation aspect matches each card's art window",
       _profs["investigator_portrait"]["aspect"] == "portrait"
       and _profs["enemy"]["aspect"] == "landscape"

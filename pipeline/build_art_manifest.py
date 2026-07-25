@@ -26,7 +26,16 @@ ART_TYPE = {
     "Skill": "skill",
     "Treachery": "treachery",
     "Enemy": "enemy",
+    # scenario side — every card type gets its own art template so a full
+    # sweep covers the whole campaign, not just the player cards
+    "Location": "location",
+    "Agenda": "agenda",
+    "Act": "act",
+    "Scenario": "scenario",
+    "Story": "story",
 }
+# card types that carry no illustration of their own (the log is a form)
+NO_ART = {"CampaignLog"}
 
 # ---- which cards render with a character LoRA/reference (art_profiles allow_character) ----
 CHARACTER = {
@@ -106,7 +115,7 @@ def main():
             continue
         job = {
             "id": cid,
-            "art_type": ART_TYPE[c["type"]],
+            "art_type": ART_TYPE.get(c["type"], "location"),
             "scene": SCENES[cid],
             "seed": seed_for(cid),
         }
