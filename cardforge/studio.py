@@ -437,6 +437,48 @@ def act_card_save(p):
                 entry.pop("color", None)
         if "clues_per_investigator" in p:
             entry["clues_per_investigator"] = bool(p["clues_per_investigator"])
+        # the rest of what an official card carries — class, elite/unique marks,
+        # act & agenda numbering, encounter set, quantity, uses… so nothing on
+        # a real card needs a JSON edit to reproduce
+        for k in rp.OV_FLAG_KEYS:
+            if k in p and k != "clues_per_investigator":
+                entry[k] = bool(p[k])
+                if not entry[k]:
+                    entry.pop(k)      # false is the authored default
+        for k in rp.OV_COUNT_KEYS:
+            if k in p:
+                s = str(p[k]).strip()
+                if s.lstrip("-").isdigit():
+                    entry[k] = int(s)
+                else:
+                    entry.pop(k, None)
+        for k in rp.OV_PROP_KEYS:
+            if k == "signatures" or k not in p:
+                continue
+            s = str(p[k]).strip()[:200]
+            if s:
+                entry[k] = s
+            else:
+                entry.pop(k, None)
+        # signatures are structured (card id -> how many copies), so they get a
+        # row editor rather than a text box that would print "[object Object]"
+        if "signatures" in p:
+            sig = {}
+            src = p["signatures"]
+            if isinstance(src, list):
+                for it in src[:12]:
+                    if isinstance(it, dict):
+                        for cid, n in it.items():
+                            sig[os.path.basename(str(cid))[:64]] = \
+                                max(1, min(9, int(n or 1)))
+            elif isinstance(src, dict):
+                for cid, n in list(src.items())[:12]:
+                    sig[os.path.basename(str(cid))[:64]] = \
+                        max(1, min(9, int(n or 1)))
+            if sig:
+                entry["signatures"] = [sig]
+            else:
+                entry.pop("signatures", None)
         if "connections" in p:
             conns = clean_connections(p["connections"])
             if conns:
@@ -566,6 +608,198 @@ def act_scenario_rename(p):
 
 
 
+
+
+# The TTS location map: the black bordered slot grid you see when a scenario is
+# laid out. Columns/rows map 1:1 onto table coordinates measured from the real
+# SCED box (columns 6.6 apart, rows 7.65 apart, locations rotated 270).
+MAP_GRID = {"x0": -30.24, "dx": 6.60, "z0": 11.46, "dz": -7.65,
+            "cols": 6, "rows": 4, "y": 1.53, "rot": 270}
+
+
+def rp_keys():
+    """Every card field the editor can set by hand — the one list the card
+    editor, the campaign feed and the by-hand rebuild all agree on."""
+    sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+    import render_placeholders as rp
+    return (rp.OV_SPEC_KEYS + rp.OV_PT_KEYS + rp.OV_LOC_KEYS
+            + rp.OV_FLAG_KEYS + rp.OV_COUNT_KEYS + rp.OV_PROP_KEYS
+            + ("tokens",))
+
+
+def map_xz(col, row):
+    """Table position of a grid slot."""
+    return (round(MAP_GRID["x0"] + col * MAP_GRID["dx"], 3),
+            round(MAP_GRID["z0"] + row * MAP_GRID["dz"], 3))
+
+
+def act_map_save(p):
+    """Save where each location card sits on a scenario's map grid.
+
+    Body: {campaign, scenario, slots: {card_id: [col, row]}}. Stored beside the
+    board so the compiler can script exactly the layout you arranged.
+    """
+    campaign = os.path.basename(str(p.get("campaign") or "still_hour"))
+    sid = str(p.get("scenario") or "").strip()
+    slots = p.get("slots")
+    if not sid or not isinstance(slots, dict):
+        return {"ok": False, "message": "need a scenario and slots"}
+    clean = {}
+    for cid, rc in slots.items():
+        if (isinstance(rc, (list, tuple)) and len(rc) == 2
+                and all(isinstance(v, int) for v in rc)):
+            col = max(0, min(MAP_GRID["cols"] - 1, rc[0]))
+            row = max(0, min(MAP_GRID["rows"] - 1, rc[1]))
+            clean[os.path.basename(str(cid))[:64]] = [col, row]
+    apath = os.path.join(ROOT, "campaigns", campaign,
+                         "scenario_assignments.json")
+    with _state_lock:
+        board = {}
+        if os.path.exists(apath):
+            try:
+                board = json.load(open(apath, encoding="utf-8"))
+            except ValueError:
+                board = {}
+        box = board.setdefault(sid, {})
+        if clean:
+            box["_map"] = clean
+        else:
+            box.pop("_map", None)
+        _write_json_atomic(apath, board)
+    log("map saved: {} ({} placed)".format(sid, len(clean)))
+    return {"ok": True, "scenario": sid, "slots": clean,
+            "grid": dict(MAP_GRID)}
+
+
+
+# Auto-assigned identity for a location that has no symbol yet. Arkham gives
+# every location on a map its own symbol+colour so the connection icons printed
+# on its neighbours read at a glance; these are the plugin's own symbols in the
+# order the official maps tend to use them.
+CONN_POOL = [("circle", "red"), ("square", "blue"), ("triangle", "green"),
+             ("diamond", "purple"), ("moon", "teal"), ("star", "gold"),
+             ("heart", "pink"), ("hourglass", "orange"), ("cross", "brown"),
+             ("quote", "grey"), ("slash", "yellow"), ("doubleslash", "red"),
+             ("spade", "blue"), ("clover", "green"), ("t", "purple")]
+
+
+def _loc_identity(cid, spec_by_id, ov):
+    """A location's own (symbol, colour) as it renders today."""
+    import render_placeholders as rp
+    mc, _ = rp.apply_card_overrides(spec_by_id.get(cid, {}), {}, ov.get(cid))
+    return (str(mc.get("icons") or "").strip().lower(),
+            str(mc.get("color") or "").strip())
+
+
+def act_map_connect(p):
+    """Link (or unlink) two locations on the map.
+
+    Body: {campaign, a, b, remove?}. A link is symmetrical and is stored the way
+    the game prints it: each card gains the *other* card's symbol in its own
+    connections row. Any location without a symbol of its own is given the first
+    free symbol/colour pair, so one click is genuinely all it takes.
+    """
+    import render_placeholders as rp
+    campaign = os.path.basename(str(p.get("campaign") or "still_hour"))
+    a = os.path.basename(str(p.get("a") or ""))[:64]
+    b = os.path.basename(str(p.get("b") or ""))[:64]
+    remove = bool(p.get("remove"))
+    if not a or not b or a == b:
+        return {"ok": False, "message": "pick two different locations"}
+
+    spec_by_id = {}
+    for path in spec_files(campaign):
+        try:
+            for sc in json.load(open(path, encoding="utf-8")):
+                spec_by_id[sc["id"]] = sc
+        except (ValueError, OSError):
+            continue
+    if a not in spec_by_id or b not in spec_by_id:
+        return {"ok": False, "message": "unknown location"}
+    if any(spec_by_id[x].get("type") != "Location" for x in (a, b)):
+        return {"ok": False, "message": "connections join two locations"}
+
+    # A symbol only has to be unique on one map, exactly as in the printed
+    # game, so "already used" is judged against this scenario's locations.
+    sid = str(p.get("scenario") or "").strip()
+    scope = None
+    apath = os.path.join(ROOT, "campaigns", campaign,
+                         "scenario_assignments.json")
+    if sid and os.path.exists(apath):
+        try:
+            board = json.load(open(apath, encoding="utf-8"))
+            here = board.get(sid, {}).get("locations")
+            if isinstance(here, list) and here:
+                scope = set(here) | {a, b}
+        except ValueError:
+            scope = None
+
+    with _state_lock:
+        ov = rp.load_card_overrides()
+        ident = {cid: _loc_identity(cid, spec_by_id, ov) for cid in spec_by_id
+                 if spec_by_id[cid].get("type") == "Location"}
+        taken = {s for cid, (s, _) in ident.items()
+                 if s and (scope is None or cid in scope)}
+
+        def identity(cid):
+            """This location's symbol, minting one if it has none yet."""
+            sym, col = ident[cid]
+            if sym:
+                return sym, col
+            for s, c in CONN_POOL:
+                if s not in taken:
+                    sym, col = s, c
+                    break
+            else:                                   # >15 locations: reuse
+                sym, col = CONN_POOL[len(taken) % len(CONN_POOL)]
+            taken.add(sym)
+            ident[cid] = (sym, col)
+            entry = dict(ov.get(cid, {}))
+            entry["icons"] = sym
+            entry.setdefault("color", col)
+            ov[cid] = entry
+            return sym, ident[cid][1]
+
+        if remove:
+            pairs = [(a, ident[b][0]), (b, ident[a][0])]
+        else:
+            sa, _ = identity(a)
+            sb, _ = identity(b)
+            pairs = [(a, sb), (b, sa)]
+
+        for cid, sym in pairs:
+            if not sym:
+                continue
+            entry = dict(ov.get(cid, {}))
+            base, _ = rp.apply_card_overrides(spec_by_id.get(cid, {}), {},
+                                              ov.get(cid))
+            conns = [dict(c) if isinstance(c, dict) else {"symbol": str(c)}
+                     for c in (base.get("connections") or [])]
+            conns = [c for c in conns
+                     if str(c.get("symbol", "")).lower() != sym]
+            if not remove:
+                other = a if cid == b else b
+                col = ident[other][1]
+                conns.append({"symbol": sym, "color": col} if col
+                             else {"symbol": sym})
+            if conns:
+                entry["connections"] = conns[:6]
+            else:
+                entry.pop("connections", None)
+            if entry:
+                ov[cid] = entry
+            else:
+                ov.pop(cid, None)
+        _write_json_atomic(rp.CARD_OVERRIDES_PATH, ov)
+        subprocess.run([sys.executable,
+                        os.path.join(ROOT, "pipeline", "render_placeholders.py"),
+                        "--only", a, b],
+                       check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+    log("{} {} <-> {}".format("unlinked" if remove else "linked", a, b))
+    return {"ok": True, "a": a, "b": b, "removed": remove,
+            "symbols": {a: ident[a][0], b: ident[b][0]}}
+
+
 def act_scenario_save(p):
     """Persist the deck-builder board: which card ids sit in which stack of
     which scenario. Body: {assignments: {scenario_id: {stack: [ids]}}} replaces
@@ -583,6 +817,8 @@ def act_scenario_save(p):
                 cs[st] = [os.path.basename(str(i))[:64] for i in ids][:60]
         if stacks.get("_locked"):
             cs["_locked"] = True
+        if isinstance(stacks.get("_map"), dict):
+            cs["_map"] = stacks["_map"]
         if cs:
             clean[str(sid)[:64]] = cs
     campaign = os.path.basename(str(p.get("campaign") or "still_hour"))
@@ -659,8 +895,10 @@ def act_card_new(p):
             card.update({"fight": 2, "health": 2, "evade": 2,
                          "damage": 1, "horror": 0})
         if ctype == "Investigator":
-            card.update({"wil": 3, "int": 3, "com": 3, "agi": 3,
-                         "health": 7, "sanity": 7,
+            # every new investigator starts at 1 everywhere — click the value
+            # up from there rather than editing someone else's defaults
+            card.update({"wil": 1, "int": 1, "com": 1, "agi": 1,
+                         "health": 1, "sanity": 1,
                          "class": cls or "Neutral"})
         if ctype in ("Asset", "Event", "Skill"):
             card.setdefault("class", cls or "Neutral")
@@ -798,17 +1036,12 @@ def act_campaign_import(p):
                 known |= {c.get("id") for c in json.load(open(fp, encoding="utf-8"))}
             except ValueError:
                 pass
-    SPEC_FIELDS = ("id", "type", "class", "name", "subtitle", "traits", "cost",
-                   "level", "victory", "wil", "int", "com", "agi", "slot",
-                   "health", "sanity", "shroud", "clues", "doom", "icons",
-                   "color", "clues_per_investigator", "connections", "tokens",
-                   "difficulty", "index", "number", "weakness", "elite",
-                   "unique", "encounter", "quantity", "deck")
-    OVERRIDE_FIELDS = ("name", "subtitle", "traits", "cost", "level", "victory",
-                       "wil", "int", "com", "agi", "slot", "health", "sanity",
-                       "shroud", "clues", "doom", "text", "flavor", "back_text",
-                       "fight", "evade", "damage", "horror", "icons", "color",
-                       "clues_per_investigator", "connections", "tokens")
+    # a feed can set anything the hand editor can set — same key list, so the
+    # two paths never drift apart
+    OVERRIDE_FIELDS = (rp.OV_SPEC_KEYS + rp.OV_PT_KEYS + rp.OV_LOC_KEYS
+                       + rp.OV_FLAG_KEYS + rp.OV_COUNT_KEYS + rp.OV_PROP_KEYS
+                       + ("tokens",))
+    SPEC_FIELDS = ("id", "type") + OVERRIDE_FIELDS
     created, updated, skipped = [], [], []
     with _state_lock:
         imported = []
@@ -1414,7 +1647,7 @@ def _scenario_board(campaign="still_hour"):
         except ValueError:
             assigns = {}
     return {"scenarios": scen, "stacks": list(SCENARIO_STACKS),
-            "assignments": assigns}
+            "assignments": assigns, "grid": dict(MAP_GRID)}
 
 
 def status(campaign="still_hour"):
@@ -1544,6 +1777,7 @@ def status(campaign="still_hour"):
             "shroud": mc.get("shroud"), "clues": mc.get("clues"),
             "doom": mc.get("doom"),
             "back_text": mpt.get("back_text", ""),
+            "back_flavor": mpt.get("back_flavor", ""),
             "player": mpt.get("player", ""),
             "investigator1": mpt.get("investigator1", ""), "xp1": mpt.get("xp1", ""),
             "investigator2": mpt.get("investigator2", ""), "xp2": mpt.get("xp2", ""),
@@ -1553,6 +1787,10 @@ def status(campaign="still_hour"):
             "clues_per_investigator": bool(mc.get("clues_per_investigator")),
             "connections": mc.get("connections") or [],
         }
+        for _k in rp.OV_FLAG_KEYS:
+            c["content"][_k] = bool(mc.get(_k))
+        for _k in rp.OV_COUNT_KEYS + rp.OV_PROP_KEYS:
+            c["content"][_k] = mc.get(_k) if mc.get(_k) is not None else ""
         c["regions"] = rp.content_regions(c["type"])
         c["overridden"] = sorted(card_overrides.get(c["id"], {}).keys())
         # per-text-area typography: global defaults with this card's on top
@@ -1608,7 +1846,8 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "type_set": act_type_set, "upload_font": act_upload_font,
            "tts_spawn": act_tts_spawn, "plugin_update": act_plugin_update,
            "card_save": act_card_save, "art_remove": act_art_remove,
-           "scenario_save": act_scenario_save,
+           "scenario_save": act_scenario_save, "map_save": act_map_save,
+           "map_connect": act_map_connect,
            "scenario_new": act_scenario_new,
            "scenario_delete": act_scenario_delete,
            "scenario_rename": act_scenario_rename, "campaign_import": act_campaign_import, "campaign_new": act_campaign_new,
@@ -1642,7 +1881,10 @@ class Handler(BaseHTTPRequestHandler):
             self._do_get()
         except Exception as e:  # noqa: BLE001 - a bad read must answer, not drop
             try:
-                self._json({"error": str(e)}, 500)
+                # keep the keys every poller relies on, so one bad read shows
+                # up as an error instead of breaking the whole UI loop
+                self._json({"error": str(e), "busy": _busy.is_set(),
+                            "cards": [], "campaigns": []}, 500)
             except Exception:  # noqa: BLE001 - client already gone
                 pass
 
@@ -1869,6 +2111,24 @@ transition:transform .16s ease,box-shadow .16s ease}
 .dcard.dragging{opacity:.45;transform:scale(.95) rotate(-3deg)}
 .dcard.justdropped{animation:settle .28s ease}
 @keyframes settle{0%{transform:translateY(-10px) scale(1.12)}70%{transform:translateY(2px) scale(.98)}100%{transform:none}}
+#mapwrap{display:none;margin:10px 0;padding:14px;border-radius:12px;
+background:#0a0a0c;border:1px solid rgba(201,162,74,.30)}
+#mapstage{position:relative}
+#mapgrid{display:grid;gap:10px;justify-content:center}
+#maplines{position:absolute;inset:0;pointer-events:none;z-index:6}
+.mslot{width:104px;height:146px;border:2px dashed rgba(255,255,255,.16);
+border-radius:8px;display:flex;align-items:center;justify-content:center;
+position:relative;transition:border-color .15s,background .15s}
+.mslot.over{border-color:var(--accent);background:rgba(232,178,74,.10)}
+.mslot .co{position:absolute;top:2px;left:4px;font-size:9px;color:rgba(255,255,255,.30)}
+.mslot img{width:100%;height:100%;object-fit:cover;border-radius:6px;cursor:grab;
+position:relative;z-index:4}
+#mapwrap.linking .mslot img{cursor:crosshair}
+#mapwrap.linking .mslot img.sel{outline:3px solid var(--accent);
+outline-offset:-3px;box-shadow:0 0 14px rgba(232,178,74,.55)}
+.msym{position:absolute;bottom:2px;right:4px;font-size:9px;z-index:5;
+color:#e8b24a;background:rgba(0,0,0,.55);border-radius:4px;padding:0 3px}
+#mapwrap h4{margin:0 0 10px;font-size:13px;color:#d8c9a6}
 #scen_pool{border:1px solid var(--line);border-radius:12px;padding:8px;margin-bottom:10px;background:var(--surface2)}
 .reqchip{display:inline-block;font-size:10px;color:var(--dim);border:1px dashed rgba(255,255,255,.22);
 border-radius:5px;padding:1px 6px;margin:1px;letter-spacing:.2px}
@@ -1928,6 +2188,21 @@ title="compiles every locked scenario into one scripted SCED campaign box (dist/
 </div>
 <div id=scen_pool><small class=hint>UNASSIGNED CARDS &mdash; drag onto the board</small><div id=scen_pool_cards></div></div>
 <div id=scen_board></div>
+<div id=mapwrap>
+<div class=row><h4 id=maptitle>Location map</h4>
+<span class=hint>this is the black map border you see in TTS &mdash; slots are the real table positions</span>
+<span class=spacer></span>
+<button class="btn primary" id=map_mode_move onclick="mapMode('move')"
+title="drag location cards between slots">&#10021; Arrange</button>
+<button class=btn id=map_mode_link onclick="mapMode('link')"
+title="click one location then another to connect them — each card gets the other's symbol printed on it">&#128279; Connect</button>
+<span class=spacer></span>
+<button class=btn onclick=mapSave()>Save layout</button>
+<button class=btn onclick="document.getElementById('mapwrap').style.display='none'">Close</button></div>
+<div id=mapstage><div id=mapgrid></div><svg id=maplines></svg></div>
+<div class=row style="margin-top:10px"><span class=hint id=mapinfo></span></div>
+<div class=row style="margin-top:6px"><span class=hint id=maplegend></span></div>
+</div>
 </div></section>
 <section id=advanced><div class=panel>
 <h2>Generate any card <small>pick a card, tune the prompt and settings, generate</small></h2>
@@ -2101,6 +2376,17 @@ title="drop this card onto the table of your RUNNING Tabletop Simulator — appe
 <label>traits</label><input id=cc_traits size=18 onfocus="tyBind('traits')">
 </div>
 <div class=row id=cc_stats></div>
+<div id=cc_props style="margin:6px 0;padding:10px;border:1px solid var(--line);border-radius:8px">
+<b style="font-size:12px">Card properties</b>
+<span class=hint>class &middot; encounter set &middot; act/agenda numbering &middot; the marks a real card carries &mdash; only what this card type uses is shown</span>
+<div class=row id=cc_props_row style="margin-top:6px"></div>
+<div id=cc_sigs style="display:none;margin-top:8px">
+<b style="font-size:12px">Signature cards</b>
+<span class=hint>the cards that always come with this investigator &mdash; pick one of your own cards and how many copies</span>
+<div id=sig_rows></div>
+<button class=btn style="font-size:11px;padding:4px 10px" onclick=sigAdd()>+ signature card</button>
+</div>
+</div>
 <div id=cc_loc style="display:none;margin:6px 0;padding:10px;border:1px solid var(--line);border-radius:8px">
 <b style="font-size:12px">Location elements</b> <span class=hint>own symbol &middot; colour &middot; per-investigator clues &middot; connections (all render instantly on save)</span>
 <div class=row style="margin-top:6px">
@@ -2125,6 +2411,7 @@ title="drop this card onto the table of your RUNNING Tabletop Simulator — appe
 </div>
 <div id=cc_back_wrap style="display:none">
 <label>back / deck-building text</label><textarea id=cc_back rows=4 spellcheck=false onfocus="glyphTarget('cc_back')"></textarea>
+<label>back flavor</label><textarea id=cc_backflavor rows=2 spellcheck=false onfocus="glyphTarget('cc_backflavor')"></textarea>
 </div>
 <div class=row id=ed_symbols style="margin:2px 0 4px;gap:5px;flex-wrap:wrap;align-items:center">
 <span class=hint>insert symbol&nbsp;&mdash;&nbsp;click into rules/flavor first:</span></div>
@@ -2619,11 +2906,15 @@ function ccStep(f,d){const el=document.getElementById('cc_'+f);
 const cap=(f==='damage'||f==='horror')?5:99;
 let v=parseInt(el.value);if(isNaN(v))v=0;v=Math.max(0,Math.min(cap,v+d));el.value=v;ccPips(f,v);}
 function ccNum(f,label,pips){
+// left-click the value to add 1, right-click to take 1 away — you can still
+// type straight into it
 return `<span style="display:inline-flex;align-items:center;gap:4px;margin-right:10px">`+
 `<label>${label}</label>`+
-`<button class=btn style="padding:2px 9px" onclick="ccStep('${f}',-1)">&minus;</button>`+
-`<input id=cc_${f} style="width:44px;text-align:center" oninput="ccPips('${f}',this.value)">`+
-`<button class=btn style="padding:2px 9px" onclick="ccStep('${f}',1)">+</button>`+
+`<input id=cc_${f} class=stepper style="width:52px;text-align:center;cursor:pointer" `+
+`title="left-click +1 · right-click −1 · or type" `+
+`oninput="ccPips('${f}',this.value)" `+
+`onclick="ccStep('${f}',1)" `+
+`oncontextmenu="ccStep('${f}',-1);return false">`+
 (pips?`<span id=ccp_${f} style="font-size:15px;letter-spacing:1px"></span>`:'')+
 `</span>`;}
 function ccFill(c){const ct=c.content||{};
@@ -2666,9 +2957,79 @@ o.symbol=String(o.symbol).toLowerCase();o.color=N2H[String(o.color).toLowerCase(
 
   leDraw();}
 if(t==='Scenario'){TOK_ROWS=(ct.tokens||[]).map(x=>({token:x.token||'',text:x.text||''}));tokDraw();}
-if(t==='Investigator')document.getElementById('cc_back').value=ct.back_text||'';
+if(t==='Investigator'){document.getElementById('cc_back').value=ct.back_text||'';
+document.getElementById('cc_backflavor').value=ct.back_flavor||'';}
 document.getElementById('cc_log').style.display=(t==='CampaignLog')?'block':'none';
-if(t==='CampaignLog')for(const f of LOG_F)document.getElementById('cl_'+f).value=ct[f]||'';}
+if(t==='CampaignLog')for(const f of LOG_F)document.getElementById('cl_'+f).value=ct[f]||'';
+ccPropsDraw(t,ct);}
+// ---- card properties: everything an official card carries beyond its stats.
+// Per type, so a Location editor never shows "elite" and an Act never shows
+// "cost". Nothing here needs a JSON edit any more.
+const CLASSES=['Guardian','Seeker','Rogue','Mystic','Survivor','Neutral','Mythos'];
+const CC_PROPS={
+Investigator:[['class','class','sel',CLASSES],
+  ['deck','ArkhamDB deck id','txt'],
+  ['elderSign','elder sign [elder] effect','txt']],
+Asset:[['class','class','sel',CLASSES],['uses','uses (e.g. 3 supplies)','txt'],
+  ['memoryCost','memory cost','num'],['permanent','permanent','chk']],
+Event:[['class','class','sel',CLASSES],['memoryCost','memory cost','num']],
+Skill:[['class','class','sel',CLASSES],['wildIcons','wild icons','num'],
+  ['memoryCost','memory cost','num']],
+Enemy:[['class','class','sel',CLASSES],['encounter','encounter set','txt'],
+  ['quantity','copies in deck','num'],['elite','elite','chk'],
+  ['unique','unique','chk'],['weakness','weakness','chk']],
+Treachery:[['class','class','sel',CLASSES],['encounter','encounter set','txt'],
+  ['quantity','copies in deck','num'],['weakness','weakness','chk']],
+Story:[['class','class','sel',CLASSES],['encounter','encounter set','txt'],
+  ['quantity','copies in deck','num']],
+Agenda:[['index','prints as “Agenda …”','txt'],
+  ['number','encounter number (1/9)','txt']],
+Act:[['index','prints as “Act …”','txt'],
+  ['number','encounter number (2/9)','txt']],
+Scenario:[['number','encounter number','txt'],
+  ['difficulty','difficulty line','txt']],
+CampaignLog:[['campaign_name','campaign name','txt']],
+Location:[]};
+let CC_PROP_F=[];
+function ccPropsDraw(t,ct){
+const defs=CC_PROPS[t]||[];CC_PROP_F=defs;
+const wrap=document.getElementById('cc_props');
+wrap.style.display=(defs.length||t==='Investigator')?'block':'none';
+document.getElementById('cc_sigs').style.display=
+(t==='Investigator')?'block':'none';
+if(t==='Investigator'){SIG_ROWS=[];
+for(const grp of (ct.signatures||[]))
+for(const k in (grp||{}))SIG_ROWS.push({id:k,n:grp[k]});
+sigDraw();}
+document.getElementById('cc_props_row').innerHTML=defs.map(d=>{
+const[f,label,kind,opts]=d;const v=ct[f];
+if(kind==='chk')return `<label style="cursor:pointer;margin-right:14px">`+
+`<input type=checkbox id=cp_${f} ${v?'checked':''}> ${label}</label>`;
+if(kind==='sel')return `<span style="margin-right:12px"><label>${label}</label> `+
+`<select id=cp_${f}>`+['<option value="">—</option>',
+...opts.map(o=>`<option ${String(v)===o?'selected':''}>${o}</option>`)].join('')+
+`</select></span>`;
+if(kind==='num')return `<span style="margin-right:12px"><label>${label}</label> `+
+`<input id=cp_${f} value="${v===0||v?v:''}" style="width:56px;text-align:center"></span>`;
+return `<span style="margin-right:12px"><label>${label}</label> `+
+`<input id=cp_${f} value="${String(v==null?'':v).replace(/"/g,'&quot;')}" size=18></span>`;
+}).join('');}
+let SIG_ROWS=[];
+function sigDraw(){
+const pick=((LS&&LS.cards)||[]).filter(c=>
+['Asset','Event','Skill','Treachery'].indexOf(c.type)>=0);
+document.getElementById('sig_rows').innerHTML=SIG_ROWS.map((r,i)=>
+`<div class=row style="margin-top:4px"><select onchange="SIG_ROWS[${i}].id=this.value">`+
+['<option value="">— pick a card —</option>',
+ ...pick.map(c=>`<option value="${c.id}" ${r.id===c.id?'selected':''}>`+
+ `${String(c.name).replace(/</g,'&lt;')} (${c.type})</option>`),
+ (r.id&&!pick.some(c=>c.id===r.id))?`<option value="${r.id}" selected>${r.id}</option>`:''
+].join('')+`</select>`+
+`<label>copies</label><input value="${r.n||1}" style="width:44px;text-align:center" `+
+`onchange="SIG_ROWS[${i}].n=this.value">`+
+`<button class=btn style="font-size:11px;padding:3px 9px" `+
+`onclick="SIG_ROWS.splice(${i},1);sigDraw()">&times;</button></div>`).join('');}
+function sigAdd(){if(SIG_ROWS.length<12){SIG_ROWS.push({id:'',n:1});sigDraw();}}
 const LOG_F=['player','investigator1','xp1','investigator2','xp2','investigator3','xp3'];
 let LE_CONNS=[],TOK_ROWS=[];
 function leDraw(){const SY=['circle','square','triangle','diamond','moon','star','heart','hourglass','cross','quote','slash','doubleslash','spade','clover','t'];
@@ -2701,8 +3062,13 @@ p.color=document.getElementById('le_color').value;
 p.clues_per_investigator=document.getElementById('le_perinv').checked;
 p.connections=LE_CONNS.filter(c=>c.symbol);}
 if(t==='Scenario')p.tokens=TOK_ROWS.filter(r=>r.token||r.text);
-if(t==='Investigator')p.back_text=document.getElementById('cc_back').value;
+if(t==='Investigator'){p.back_text=document.getElementById('cc_back').value;
+p.back_flavor=document.getElementById('cc_backflavor').value;}
 if(t==='CampaignLog')for(const f of LOG_F)p[f]=document.getElementById('cl_'+f).value;
+for(const d of CC_PROP_F){const el=document.getElementById('cp_'+d[0]);
+if(el)p[d[0]]=(d[2]==='chk')?el.checked:el.value;}
+if(t==='Investigator')p.signatures=SIG_ROWS.filter(r=>r.id)
+.map(r=>({[r.id]:Number(r.n)||1}));
 const j=await post('card_save',p);
 if(j.ok){document.getElementById('cc_info').textContent='saved \u2713';edFaceRefresh();}}
 async function edArtRemove(){await post('art_remove',{card:ed.g.id});
@@ -2906,6 +3272,150 @@ const ids=[...st.querySelectorAll('.dcard')].map(d=>d.dataset.cid);
 if(ids.length)A[sid][st.dataset.stack]=ids;}}
 return A;}
 async function scenSave(){await post('scenario_save',{campaign:camp(),assignments:scenAssignments()});}
+let MAP_SID=null,MAP_DRAG=null,MAP_MODE='move',MAP_SEL=null;
+const MAP_GLYPH={circle:'●',square:'■',triangle:'▲',
+diamond:'◆',moon:'☽',star:'★',heart:'♥',
+hourglass:'⧖',cross:'✚',quote:'”',slash:'/',
+doubleslash:'//',spade:'♠',clover:'♣',t:'T'};
+const MAP_HEX={red:'#960e12',orange:'#b85418',yellow:'#be9428',green:'#2c663c',
+teal:'#1a605e',blue:'#204884',purple:'#5c246e',pink:'#a8386e',brown:'#6c482e',
+grey:'#625e64',gray:'#625e64',gold:'#aa8e46'};
+function mapColor(c){c=(c||'').trim();if(!c)return '#c9a24a';
+return MAP_HEX[c.toLowerCase()]||c;}
+function mapMode(m){MAP_MODE=m;MAP_SEL=null;
+document.getElementById('mapwrap').classList.toggle('linking',m==='link');
+document.getElementById('map_mode_move').className='btn'+(m==='move'?' primary':'');
+document.getElementById('map_mode_link').className='btn'+(m==='link'?' primary':'');
+mapDraw();}
+function mapOpen(sid,name){MAP_SID=sid;
+document.getElementById('maptitle').textContent='Location map — '+name;
+document.getElementById('mapwrap').style.display='block';mapMode('move');
+document.getElementById('mapwrap').scrollIntoView({behavior:'smooth',block:'center'});}
+function mapDraw(){const S=(LS&&LS.scenarios)||{};const g=S.grid||{cols:6,rows:4};
+const A=(S.assignments||{})[MAP_SID]||{};
+const placed=A._map||{};const locs=(A.locations||[]);
+const grid=document.getElementById('mapgrid');
+grid.style.gridTemplateColumns='repeat('+g.cols+',104px)';grid.innerHTML='';
+const at={};for(const cid in placed)at[placed[cid].join(',')]=cid;
+for(let r=0;r<g.rows;r++)for(let c=0;c<g.cols;c++){
+const cell=document.createElement('div');cell.className='mslot';cell.dataset.rc=c+','+r;
+const x=(g.x0+c*g.dx).toFixed(1),z=(g.z0+r*g.dz).toFixed(1);
+cell.innerHTML='<span class=co>'+x+' / '+z+'</span>';
+const cid=at[c+','+r];
+if(cid)cell.appendChild(mapCard(cid));
+cell.addEventListener('dragover',e=>{e.preventDefault();cell.classList.add('over');});
+cell.addEventListener('dragleave',()=>cell.classList.remove('over'));
+cell.addEventListener('drop',e=>{e.preventDefault();cell.classList.remove('over');
+if(!MAP_DRAG)return;
+const src=MAP_DRAG.parentElement;
+if(cell.querySelector('img')&&src&&src.classList.contains('mslot')){
+src.appendChild(cell.querySelector('img'));}
+cell.appendChild(MAP_DRAG);MAP_DRAG=null;mapBadges();mapInfo();mapLines();});
+grid.appendChild(cell);}
+// unplaced locations sit under the grid
+const un=locs.filter(i=>!(i in placed));
+const tray=document.createElement('div');tray.style.cssText='grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;margin-top:6px';
+tray.innerHTML=un.length?'':'<span class=hint>every location in this scenario is on the map</span>';
+for(const cid of un)tray.appendChild(mapCard(cid));
+tray.addEventListener('dragover',e=>e.preventDefault());
+tray.addEventListener('drop',e=>{e.preventDefault();if(MAP_DRAG){tray.appendChild(MAP_DRAG);MAP_DRAG=null;mapBadges();mapInfo();mapLines();}});
+grid.appendChild(tray);mapBadges();mapInfo();mapLines();mapLegend();}
+function mapFind(cid){return ((LS&&LS.cards)||[]).find(x=>x.id===cid);}
+function mapSym(cid){const c=mapFind(cid);
+return ((c&&c.content&&c.content.icons)||'').trim().toLowerCase();}
+function mapConns(cid){const c=mapFind(cid);
+return (((c&&c.content&&c.content.connections)||[])
+.map(x=>(typeof x==='string'?x:(x.symbol||'')).toLowerCase()).filter(Boolean));}
+function mapLinked(a,b){const sb=mapSym(b);
+return !!sb&&mapConns(a).indexOf(sb)>=0;}
+function mapCard(cid){const c=mapFind(cid);
+const im=document.createElement('img');im.dataset.cid=cid;
+im.draggable=(MAP_MODE==='move');
+const sym=mapSym(cid);
+im.title=(c?c.name:cid)+(MAP_MODE==='link'
+?(MAP_SEL?' — click to link/unlink with '+(mapFind(MAP_SEL)||{}).name
+:' — click to start a connection')
+:' — drag to a slot')+(sym?'  ['+sym+']':'');
+im.src='/art?p=art/faces/'+cid+'.png&ts='+((LS&&LS.faces_ver)||0);
+im.addEventListener('dragstart',()=>{MAP_DRAG=im;});
+if(MAP_MODE==='link'){if(MAP_SEL===cid)im.classList.add('sel');
+im.addEventListener('click',()=>mapClick(cid));}
+return im;}
+// symbol badges live on the slot, not the card image, so dragging a card
+// between slots can never leave a stray badge behind
+function mapBadges(){
+for(const b of document.querySelectorAll('#mapgrid .msym'))b.remove();
+for(const im of document.querySelectorAll('#mapgrid .mslot img')){
+const sym=mapSym(im.dataset.cid);if(!sym)continue;
+const host=im.parentElement;if(!host)continue;
+const c=mapFind(im.dataset.cid);
+const bad=document.createElement('span');bad.className='msym';
+bad.style.color=mapColor((c&&c.content&&c.content.color)||'');
+bad.textContent=MAP_GLYPH[sym]||sym;host.appendChild(bad);}}
+async function mapClick(cid){
+if(!MAP_SEL){MAP_SEL=cid;mapDraw();return;}
+if(MAP_SEL===cid){MAP_SEL=null;mapDraw();return;}
+const a=MAP_SEL,rm=mapLinked(a,cid)&&mapLinked(cid,a);
+MAP_SEL=null;
+const j=await post('map_connect',{campaign:camp(),scenario:MAP_SID,a:a,b:cid,remove:rm});
+if(j.ok){addlog((rm?'unlinked ':'linked ')+a+' ↔ '+cid);await refresh();mapDraw();}
+else{alert(j.message||'could not change that connection');mapDraw();}}
+// the connection lines: drawn from what the cards actually print, so the map
+// and the rendered card can never disagree
+function mapLines(){const svg=document.getElementById('maplines');
+if(!svg)return;
+const stage=document.getElementById('mapstage');
+const sb=stage.getBoundingClientRect();
+svg.setAttribute('width',sb.width);svg.setAttribute('height',sb.height);
+svg.setAttribute('viewBox','0 0 '+sb.width+' '+sb.height);
+svg.innerHTML='';
+const pts={};
+for(const im of document.querySelectorAll('#mapgrid .mslot img')){
+const r=im.getBoundingClientRect();
+pts[im.dataset.cid]=[r.left-sb.left+r.width/2,r.top-sb.top+r.height/2];}
+const ids=Object.keys(pts);let n=0;
+for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++){
+const a=ids[i],b=ids[j];
+if(!(mapLinked(a,b)||mapLinked(b,a)))continue;
+const one=!(mapLinked(a,b)&&mapLinked(b,a));   // one-way connection
+// dark casing under the colour so the line still reads over card art
+for(const pass of [0,1]){
+const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
+ln.setAttribute('x1',pts[a][0]);ln.setAttribute('y1',pts[a][1]);
+ln.setAttribute('x2',pts[b][0]);ln.setAttribute('y2',pts[b][1]);
+ln.setAttribute('stroke',pass?mapColor(((mapFind(a)||{}).content||{}).color):'#000');
+ln.setAttribute('stroke-width',pass?'3':'6');
+ln.setAttribute('stroke-linecap','round');
+ln.setAttribute('opacity',pass?(one?'.6':'.95'):'.5');
+if(one&&pass)ln.setAttribute('stroke-dasharray','7 5');
+svg.appendChild(ln);}
+n++;}
+const li=document.getElementById('maplegend');
+if(li)li.dataset.links=n;}
+function mapLegend(){const el=document.getElementById('maplegend');if(!el)return;
+const S=(LS&&LS.scenarios)||{};const A=(S.assignments||{})[MAP_SID]||{};
+const parts=[];
+for(const cid of (A.locations||[])){const c=mapFind(cid);if(!c)continue;
+const sym=mapSym(cid);if(!sym)continue;
+parts.push('<span style="margin-right:12px"><b style="color:'
++mapColor((c.content||{}).color)+'">'+(MAP_GLYPH[sym]||sym)+'</b> '
++(c.name||cid)+'</span>');}
+const n=Number(el.dataset.links||0);
+el.innerHTML=(parts.length?parts.join(''):'<i>no location symbols yet — Connect two locations and they are assigned automatically</i>')
++'<br><span style="opacity:.7">'+n+' connection(s) drawn'
++' — a dashed line means only one side prints the other&rsquo;s symbol</span>';}
+function mapSlots(){const out={};
+for(const cell of document.querySelectorAll('#mapgrid .mslot')){
+const img=cell.querySelector('img');
+if(img){const[c,r]=cell.dataset.rc.split(',').map(Number);out[img.dataset.cid]=[c,r];}}
+return out;}
+function mapInfo(){const n=Object.keys(mapSlots()).length;
+document.getElementById('mapinfo').textContent=MAP_MODE==='link'
+?(MAP_SEL?'now click the location it connects to (click it again to unlink)'
+:'click a location, then click the one it connects to — both cards get the other’s symbol printed on them straight away')
+:n+' location(s) placed — Save layout writes these exact table positions into the scenario script';}
+async function mapSave(){const j=await post('map_save',{campaign:camp(),scenario:MAP_SID,slots:mapSlots()});
+if(j.ok){addlog('map layout saved for '+MAP_SID);await refresh();mapDraw();}}
 async function scenNew(){const el=document.getElementById('ns_name');
 const name=el.value.trim();if(!name){alert('Name the scenario first.');return;}
 const j=await post('scenario_new',{campaign:camp(),name});
@@ -2938,14 +3448,21 @@ function scenBuild(){const S=(LS&&LS.scenarios)||{scenarios:[],stacks:[],assignm
 const board=document.getElementById('scen_board');board.innerHTML='';
 const assigned=new Set();let locked=0;
 const nameOf=cid=>{const c=((LS&&LS.cards)||[]).find(x=>x.id===cid);return c?String(c.name).toLowerCase():'';};
+// a JS string literal safe to sit inside a double-quoted HTML attribute:
+// without the escaping a scenario name with a space silently broke the
+// rename / remove / map buttons
+const jsAttr=v=>JSON.stringify(String(v)).replace(/&/g,'&amp;')
+.replace(/"/g,'&quot;').replace(/</g,'&lt;');
 for(const sc of S.scenarios){const A=S.assignments[sc.id]||{};
 const isLocked=!!A._locked;if(isLocked)locked++;
 const box=document.createElement('div');box.className='scenbox'+(isLocked?' locked':'');box.dataset.sid=sc.id;
 box.innerHTML=`<h3>${isLocked?'&#128274; ':''}${sc.name||sc.id}</h3>`+
 `<div class=row style="margin:-4px 0 6px"><button class=btn style="font-size:10px;padding:2px 7px" `+
-`onclick="scenRen('${sc.id}',${JSON.stringify(sc.name||sc.id)})">rename</button>`+
+`onclick="scenRen('${sc.id}',${jsAttr(sc.name||sc.id)})">rename</button>`+
 `<button class=btn style="font-size:10px;padding:2px 7px" `+
-`onclick="scenDel('${sc.id}',${JSON.stringify(sc.name||sc.id)})">remove</button></div>`;
+`onclick="scenDel('${sc.id}',${jsAttr(sc.name||sc.id)})">remove</button>`+
+`<button class=btn style="font-size:10px;padding:2px 7px" `+
+`onclick="mapOpen('${sc.id}',${jsAttr(sc.name||sc.id)})">&#128506; map</button></div>`;
 for(const st of S.stacks){const div=document.createElement('div');div.className='stack';div.dataset.stack=st;
 const inStack=(A[st]||[]);
 const names=inStack.map(nameOf);

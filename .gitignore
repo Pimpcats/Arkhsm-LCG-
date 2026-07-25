@@ -13,3 +13,7 @@ vendor/
 assets/fonts/ArnoPro*
 assets/fonts/MinionPro*
 pipeline/art_urls.json
+
+# selftest safety copies of the owner state (removed when the run ends)
+*.pretest-backup
+*.pretest-copy

@@ -50,7 +50,7 @@ CARD_OVERRIDES_PATH = os.path.join(ROOT, "campaigns", "still_hour",
 OV_SPEC_KEYS = ("name", "subtitle", "traits", "cost", "level", "victory",
                 "wil", "int", "com", "agi", "slot", "health", "sanity",
                 "shroud", "clues", "doom")
-OV_PT_KEYS = ("text", "flavor", "back_text", "fight", "evade",
+OV_PT_KEYS = ("text", "flavor", "back_text", "back_flavor", "fight", "evade",
               "damage", "horror", "player", "investigator1", "xp1",
               "investigator2", "xp2", "investigator3", "xp3")
 # fields that are only ever str()-formatted onto the card (an "X" cost or "—"
@@ -64,6 +64,18 @@ OV_PIP_KEYS = ("damage", "horror")
 # investigator, and the connection list — all editable from the Studio so any
 # spot on a location can be swapped without touching JSON
 OV_LOC_KEYS = ("icons", "color", "clues_per_investigator", "connections")
+# "card properties" — the rest of what an official card carries: its class (and
+# so its frame colour), the elite/unique/weakness marks, act & agenda numbering,
+# encounter set and deck quantity, asset uses and memory cost, skill wild icons,
+# an investigator's elder-sign effect and signature cards. Everything here is
+# editable from the Studio, so a whole campaign can be typed in by hand.
+OV_FLAG_KEYS = ("elite", "unique", "weakness", "permanent",
+                "clues_per_investigator")
+OV_COUNT_KEYS = ("quantity", "memoryCost", "wildIcons")
+# index is what prints ("Agenda 1"), number is the encounter number ("1/9") —
+# both are free text on real cards, so neither is forced to an int
+OV_PROP_KEYS = ("class", "deck", "difficulty", "encounter", "uses",
+                "elderSign", "signatures", "campaign_name", "index", "number")
 
 # owner watermark, printed in the official footer text/format on every card
 WATERMARK = "Pimpcats ACE"
@@ -107,7 +119,7 @@ def apply_card_overrides(c, pt, ov):
     for k in OV_SPEC_KEYS:
         if k in ov and not (k in ("health", "sanity") and c.get("type") == "Enemy"):
             c[k] = ov[k]
-    for k in OV_LOC_KEYS:
+    for k in OV_LOC_KEYS + OV_FLAG_KEYS + OV_COUNT_KEYS + OV_PROP_KEYS:
         if k in ov:
             c[k] = ov[k]
     if "tokens" in ov:

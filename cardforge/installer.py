@@ -67,26 +67,30 @@ def save_token(token):
         f.write(token.strip())
 
 
+def _ls(path):
+    """Directory listing that answers [] instead of raising — an install job
+    can be rewriting vendor/ while the UI polls status."""
+    try:
+        return sorted(os.listdir(path))
+    except OSError:
+        return []
+
+
 def vendor_status():
     """What's installed under vendor/ right now (paths relative to the repo)."""
-    models = []
-    mdir = vendor_dir("models")
-    if os.path.isdir(mdir):
-        models = sorted(f for f in os.listdir(mdir)
-                        if f.endswith((".safetensors", ".ckpt")))
+    models = [f for f in _ls(vendor_dir("models"))
+              if f.endswith((".safetensors", ".ckpt"))]
     se_exe = _find_se_binary()
     return {
         "models": models,
         "models_dir": "vendor/models",
         "a1111_installed": a1111_installed(),
-        "a1111_partial": (os.path.isdir(a1111_dir())
-                          and bool(os.listdir(a1111_dir()))
+        "a1111_partial": (bool(_ls(a1111_dir()))
                           and not a1111_installed()),
         "a1111_dir": "vendor/a1111",
         "se_installed": bool(se_exe),
         "se_path": os.path.relpath(se_exe, runner.repo_root()) if se_exe else None,
-        "se_downloads": sorted(os.listdir(vendor_dir("strange-eons")))
-        if os.path.isdir(vendor_dir("strange-eons")) else [],
+        "se_downloads": _ls(vendor_dir("strange-eons")),
         "has_token": bool(load_token()),
         "plugin": _plugin_status(),
         "fonts": _font_status(),

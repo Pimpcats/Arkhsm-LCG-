@@ -76,23 +76,45 @@ hand-written campaign is just a faster way to fill the same forms.
 
 ### Card fields by type
 
-Everything is optional except `id` (and `type`+`name` for new cards).
+Everything is optional except `id` (and `type`+`name` for new cards). The feed
+can set exactly what the card editor can set — no more, no less — so anything
+here can also just be typed in by hand under **Card content → Card properties**.
 
 - **all types** — `name subtitle traits text flavor victory class`
-- **Asset/Event/Skill** — `cost level slot health sanity wil int com agi`
-- **Investigator** — `wil int com agi health sanity back_text`
-- **Enemy** — `fight health evade damage horror elite unique`
-- **Treachery** — `weakness`
+- **Asset/Event/Skill** — `cost level slot health sanity wil int com agi
+  memoryCost`; Asset also `uses permanent`; Skill also `wildIcons`
+- **Investigator** — `wil int com agi health sanity back_text back_flavor
+  deck elderSign signatures`
+- **Enemy** — `fight health evade damage horror elite unique weakness
+  encounter quantity`
+- **Treachery/Story** — `weakness encounter quantity`
 - **Location** — `shroud clues clues_per_investigator icons color
   connections[{symbol,color}]` (symbols: circle square triangle diamond moon
   star heart hourglass cross quote slash doubleslash spade clover t;
   colors: named or #hex)
-- **Scenario** — `difficulty tokens[{token,text}]`
+- **Scenario** — `difficulty number tokens[{token,text}]`
   (tokens: skull cultist tablet elderthing)
-- **Agenda/Act** — `doom clues index number`
+- **Agenda/Act** — `doom clues index number` — `index` is what prints
+  ("Agenda 1"), `number` is the encounter number ("1/9")
+- **CampaignLog** — `campaign_name player investigator1..3 xp1..3`
 - Rules text takes the same `[markup]` as the editor: `[action] [fast]
   [reaction] [wil] [int] [com] [agi] [wild] [perinv] [unique] [skull]
   [cultist] [tablet] [elderthing] [elder] [autofail] [codex]`.
+
+### The location map
+
+`5 · Scenarios → 🗺 map` on a scenario box opens the black bordered slot grid
+you see when a scenario is laid out in TTS. Each slot is a real table position
+(6 columns × 4 rows, measured off the official SCED box).
+
+- **Arrange** — drag location cards between slots, then *Save layout*. Those
+  exact coordinates are what the campaign box scripts.
+- **Connect** — click one location, then the one it connects to. Both cards
+  immediately print the other's symbol; any location without a symbol is given
+  a free symbol and colour automatically. Click the same pair again to unlink.
+
+Connections are stored on the cards themselves (`icons` + `connections`), so
+the map and the printed card can never disagree.
 
 ### Scenario board stacks
 

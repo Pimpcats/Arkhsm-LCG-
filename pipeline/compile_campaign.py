@@ -187,10 +187,19 @@ def build_scenario_box(sc, assign, cards, campaign_name="Campaign"):
         if not ids:
             continue
         if stack == "locations":
-            # every location is placed individually on the official grid, the
-            # way a real scenario lays its map out
+            # every location is placed individually. If the owner arranged the
+            # scenario's map grid, those exact slots are scripted; otherwise
+            # they fall onto the default grid in order.
+            placed = assign.get("_map") or {}
             for n, cid in enumerate(ids):
-                (x, y, z), rot = location_slot(n)
+                slot = placed.get(cid)
+                if (isinstance(slot, (list, tuple)) and len(slot) == 2):
+                    col, row = int(slot[0]), int(slot[1])
+                    x = LOCATION_GRID["x0"] + col * LOCATION_GRID["dx"]
+                    z = LOCATION_GRID["z0"] + row * LOCATION_GRID["dz"]
+                    y, rot = LOCATION_GRID["y"], LOCATION_GRID["rot"]
+                else:
+                    (x, y, z), rot = location_slot(n)
                 o = B.build_card(normalize(cards[cid]))
                 o["Transform"] = transform(x, z, y=y, ry=rot)
                 contained.append(o)

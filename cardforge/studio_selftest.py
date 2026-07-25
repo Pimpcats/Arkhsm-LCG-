@@ -54,6 +54,25 @@ def _sideline(path):
         _BACKUPS.append((path, bak))
 
 
+_SNAPSHOTS = []
+
+
+def _snapshot(path):
+    """Keep a copy of something the test edits IN PLACE (the app needs the
+    real file present while it runs). Restored even if the run is killed
+    part-way — a half-finished test must never leave the owner's campaign
+    pointing at a stub checkpoint."""
+    if os.path.isdir(path):
+        bak = path + ".pretest-copy"
+        shutil.rmtree(bak, ignore_errors=True)
+        shutil.copytree(path, bak)
+        _SNAPSHOTS.append((path, bak, True))
+    elif os.path.isfile(path):
+        bak = path + ".pretest-copy"
+        shutil.copy2(path, bak)
+        _SNAPSHOTS.append((path, bak, False))
+
+
 def _restore_owner_state():
     for path, bak in _BACKUPS:
         if os.path.exists(bak):
@@ -62,8 +81,18 @@ def _restore_owner_state():
             elif os.path.isfile(path):
                 os.remove(path)
             os.rename(bak, path)
-    if _BACKUPS:
-        print("owner state restored ({} path(s))".format(len(_BACKUPS)))
+    for path, bak, isdir in _SNAPSHOTS:
+        if not os.path.exists(bak):
+            continue
+        if isdir:
+            shutil.rmtree(path, ignore_errors=True)
+            os.rename(bak, path)
+        else:
+            shutil.copy2(bak, path)
+            os.remove(bak)
+    if _BACKUPS or _SNAPSHOTS:
+        print("owner state restored ({} path(s))"
+              .format(len(_BACKUPS) + len(_SNAPSHOTS)))
 
 
 atexit.register(_restore_owner_state)
@@ -71,6 +100,9 @@ atexit.register(_restore_owner_state)
 _sideline(os.path.join(ROOT, "out", "still_hour"))
 for f in ("state/still_hour.ledger.json", "pipeline/art_urls.json"):
     _sideline(os.path.join(ROOT, f))
+# these the app must keep seeing while the test runs, so copy rather than move
+_snapshot(os.path.join(ROOT, "campaigns", "still_hour"))
+_snapshot(os.path.join(ROOT, "dist"))
 shutil.rmtree(se_bridge.se_dir(), ignore_errors=True)
 faces_dir = os.path.join(ROOT, "art", "faces")
 _sideline(faces_dir)
@@ -959,6 +991,128 @@ check("hand-made cards appear in their own campaign only",
 check("every hand-made card composed onto its real template",
       all(os.path.exists(os.path.join(ROOT, "art", "faces", i + ".png"))
           for i in _made))
+check("a new investigator starts at 1 in every skill",
+      all(_x["content"].get(_k) == 1
+          for _x in _cards if _x["type"] == "Investigator"
+          for _k in ("wil", "int", "com", "agi", "health", "sanity")))
+check("stat pips step on left-click and right-click in the UI",
+      "ccStep(" in page and "oncontextmenu" in page
+      and "left-click +1" in page)
+# THE TTS LOCATION MAP: the black bordered slot grid, arranged then scripted
+_ms = requests.post(BASE + "/api/scenario_new",
+                    json={"campaign": _sc, "name": "Map Test"}).json()["id"]
+_locs = []
+for _n in ("Alpha Gate", "Beta Market", "Gamma Chapel"):
+    _locs.append(requests.post(BASE + "/api/card_new",
+                               json={"campaign": _sc, "type": "Location",
+                                     "name": _n}).json()["id"])
+requests.post(BASE + "/api/scenario_save",
+              json={"campaign": _sc,
+                    "assignments": {_ms: {"locations": _locs}}})
+_r = requests.post(BASE + "/api/map_save",
+                   json={"campaign": _sc, "scenario": _ms,
+                         "slots": {_locs[0]: [1, 0], _locs[1]: [2, 0],
+                                   _locs[2]: [1, 1]}}).json()
+check("a map layout saves against the real TTS grid",
+      _r.get("ok") and _r["slots"][_locs[0]] == [1, 0]
+      and _r["grid"]["rot"] == 270)
+check("grid slots resolve to the measured table coordinates",
+      studio.map_xz(0, 0) == (-30.24, 11.46)
+      and studio.map_xz(1, 1) == (-23.64, 3.81))
+_r = requests.post(BASE + "/api/map_save",
+                   json={"campaign": _sc, "scenario": _ms,
+                         "slots": {_locs[0]: [99, 99]}}).json()
+check("out-of-range slots are clamped, never crash",
+      _r.get("ok") and _r["slots"][_locs[0]] == [5, 3])
+requests.post(BASE + "/api/map_save",
+              json={"campaign": _sc, "scenario": _ms,
+                    "slots": {_locs[0]: [1, 0], _locs[1]: [2, 0],
+                              _locs[2]: [1, 1]}})
+# CONNECTIONS: one click links two locations, both sides in one move
+_r = requests.post(BASE + "/api/map_connect",
+                   json={"campaign": _sc, "scenario": _ms,
+                         "a": _locs[0], "b": _locs[1]}).json()
+check("connecting two locations succeeds and mints their symbols",
+      _r.get("ok") and _r["symbols"][_locs[0]]
+      and _r["symbols"][_locs[0]] != _r["symbols"][_locs[1]])
+_by = {c["id"]: c for c in
+       requests.get(BASE + "/api/status?campaign=" + _sc).json()["cards"]}
+
+
+def _conns(_i):
+    return [x.get("symbol") for x in
+            _by[_i]["content"].get("connections") or []]
+
+
+check("both cards print the other's symbol, exactly as the game does",
+      _conns(_locs[0]) == [_by[_locs[1]]["content"]["icons"]]
+      and _conns(_locs[1]) == [_by[_locs[0]]["content"]["icons"]])
+check("a location that had no symbol also got a colour",
+      _by[_locs[0]]["content"].get("color"))
+requests.post(BASE + "/api/map_connect",
+              json={"campaign": _sc, "scenario": _ms,
+                    "a": _locs[0], "b": _locs[2]})
+_r = requests.post(BASE + "/api/map_connect",
+                   json={"campaign": _sc, "scenario": _ms,
+                         "a": _locs[0], "b": _locs[1],
+                         "remove": True}).json()
+_by = {c["id"]: c for c in
+       requests.get(BASE + "/api/status?campaign=" + _sc).json()["cards"]}
+check("unlinking drops the symbol from both sides only",
+      _r.get("ok")
+      and _by[_locs[1]]["content"]["icons"] not in _conns(_locs[0])
+      and _by[_locs[2]]["content"]["icons"] in _conns(_locs[0]))
+check("connecting a location to itself is refused",
+      not requests.post(BASE + "/api/map_connect",
+                        json={"campaign": _sc, "scenario": _ms,
+                              "a": _locs[0], "b": _locs[0]}).json().get("ok"))
+check("an unknown card id is refused, not rendered",
+      not requests.post(BASE + "/api/map_connect",
+                        json={"campaign": _sc, "scenario": _ms,
+                              "a": _locs[0], "b": "no-such-card"})
+      .json().get("ok"))
+# CARD PROPERTIES: everything an official card carries beyond its stats,
+# so a whole campaign can be typed in without ever opening a JSON file
+_pc = requests.post(BASE + "/api/card_new",
+                    json={"campaign": _sc, "type": "Enemy",
+                          "name": "Prop Test"}).json()["id"]
+requests.post(BASE + "/api/card_save",
+              json={"campaign": _sc, "card": _pc, "class": "Mythos",
+                    "elite": True, "unique": True, "weakness": False,
+                    "encounter": "The Still Hour", "quantity": 3})
+_p = {c["id"]: c for c in requests.get(
+    BASE + "/api/status?campaign=" + _sc).json()["cards"]}[_pc]["content"]
+check("class / elite / unique / encounter set / quantity save by hand",
+      _p["class"] == "Mythos" and _p["elite"] is True
+      and _p["unique"] is True and _p["encounter"] == "The Still Hour"
+      and _p["quantity"] == 3)
+check("an unticked flag returns to the authored default", not _p["weakness"])
+_ag = requests.post(BASE + "/api/card_new",
+                    json={"campaign": _sc, "type": "Agenda",
+                          "name": "Prop Agenda"}).json()["id"]
+requests.post(BASE + "/api/card_save",
+              json={"campaign": _sc, "card": _ag, "index": "2",
+                    "number": "1/9"})
+_p = {c["id"]: c for c in requests.get(
+    BASE + "/api/status?campaign=" + _sc).json()["cards"]}[_ag]["content"]
+check("agenda numbering is hand-editable and keeps '1/9' as written",
+      str(_p["index"]) == "2" and _p["number"] == "1/9")
+check("every field the campaign's cards use has an editor control",
+      not [k for c in json.load(open(os.path.join(
+          ROOT, "pipeline", "stillhour_cards_spec.json"), encoding="utf-8"))
+          for k in c
+          if k not in set(studio.rp_keys()) | {"id", "type"}])
+check("card properties panel present in the UI",
+      "cc_props" in page and "ccPropsDraw" in page and "CC_PROPS" in page
+      and "elderSign" in page and "wildIcons" in page)
+_made += [_pc, _ag]
+check("map grid + connect mode present in the UI",
+      "mapOpen" in page and "mapgrid" in page and "map_mode_link" in page
+      and "mapConnect" in page.replace("map_connect", "mapConnect")
+      and "maplines" in page)
+check("scenario buttons survive a name with spaces (attribute escaping)",
+      "jsAttr(sc.name" in page)
+_made += _locs
 check("a hand-made card can be deleted",
       requests.post(BASE + "/api/card_delete",
                     json={"campaign": _sc, "card": _made[0]}).json().get("ok"))
@@ -970,6 +1124,13 @@ for _f in [os.path.join(ROOT, "pipeline", _sc + "_cards_spec.json"),
           [os.path.join(ROOT, "art", "faces", i + ".png") for i in _made]:
     if os.path.exists(_f):
         os.remove(_f)
+# connection edits land in the shared overrides file — take the test's back out
+_ovp = os.path.join(ROOT, "campaigns", "still_hour", "card_overrides.json")
+_ovj = json.load(open(_ovp, encoding="utf-8"))
+if any(_i in _ovj for _i in _made):
+    for _i in _made:
+        _ovj.pop(_i, None)
+    json.dump(_ovj, open(_ovp, "w", encoding="utf-8"), indent=2)
 # a FRESH CLONE ships no composed faces (art/ is gitignored) — the app must
 # render them itself or it opens completely empty with nothing to click
 import shutil as _sh
