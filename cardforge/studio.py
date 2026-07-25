@@ -323,9 +323,18 @@ def act_style_save(p):
     campaign = p.get("campaign", "still_hour")
     path = os.path.join(runner.campaign_dir(campaign), "campaign.json")
     camp = json.load(open(path, encoding="utf-8"))
-    for k in ("style_positive", "style_negative"):
-        if p.get(k) is not None:
-            camp[k] = p[k].strip()
+    for k in ("style_positive", "style_negative", "style_lora",
+              "style_lora_weight", "style_trigger"):
+        if p.get(k) is None:
+            continue
+        v = p[k]
+        if k == "style_lora_weight":          # numeric, not text
+            try:
+                camp[k] = max(0.0, min(2.0, float(v)))
+            except (TypeError, ValueError):
+                camp[k] = 0.8
+        else:
+            camp[k] = str(v).strip()
     with open(path, "w", encoding="utf-8") as f:
         json.dump(camp, f, indent=2)
     log("house style updated")
@@ -1247,7 +1256,10 @@ def status(campaign="still_hour"):
             "build": build_stamp(),
             "campaign": campaign, "campaigns": campaigns,
             "backend": camp.get("backend"), "checkpoint": camp.get("checkpoint"),
-            "style": {"positive": camp.get("style_positive", ""),
+            "style": {"lora": camp.get("style_lora", ""),
+                      "lora_weight": camp.get("style_lora_weight", 0.8),
+                      "trigger": camp.get("style_trigger", ""),
+                      "positive": camp.get("style_positive", ""),
                       "negative": camp.get("style_negative", "")},
             "report": report, "gallery": gallery,
             "rig": {k: v for k, v in rig.load_rig().items() if k != "_note"},
@@ -1819,6 +1831,13 @@ New variants land in the strip above and the gallery when the job finishes.</p>
 <p id=model_active class=hint style="margin:4px 0 8px"></p>
 <details style="margin:6px 0">
 <summary style="cursor:pointer;color:var(--dim)">House style &mdash; the ART_SPEC block every batch prompt ends with</summary>
+<div class=row style="margin-bottom:6px">
+<label>style LoRA</label><input type=text id=style_lora size=26 placeholder="filename without .safetensors">
+<label>weight</label><input type=number id=style_lw step=0.05 min=0 max=2 style="width:75px" value=0.8>
+<label>trigger</label><input type=text id=style_trig size=18 placeholder="trigger words, if any">
+</div>
+<p class=hint style="margin:0 0 6px">A style LoRA here is applied to <b>every</b> card in the campaign,
+so the whole set matches. Per-character LoRAs (Illustrate &rarr; Characters) still stack on top.</p>
 <label>style (appended to every prompt)</label><textarea id=style_pos rows=2 spellcheck=false></textarea>
 <label>negative (start of every negative prompt)</label><textarea id=style_neg rows=2 spellcheck=false></textarea>
 <div class=row style="margin-top:6px"><button class=btn onclick=styleSave()>Save house style</button>
@@ -1935,7 +1954,11 @@ el.innerHTML='backend has loaded: <b>'+(j.active||'?')+'</b> &middot; every gene
 let modelsLoadedOnce=false;
 function modelSet(){const v=document.getElementById('model').value;
 if(v)post('model_set',{checkpoint:v});}
-function styleSave(){post('style_save',{style_positive:document.getElementById('style_pos').value,
+function styleSave(){post('style_save',{
+style_lora:document.getElementById('style_lora').value,
+style_lora_weight:parseFloat(document.getElementById('style_lw').value)||0.8,
+style_trigger:document.getElementById('style_trig').value,
+style_positive:document.getElementById('style_pos').value,
 style_negative:document.getElementById('style_neg').value});}
 let ADV_COMPOSED=null;
 async function advLoad(){const card=document.getElementById('adv_card').value;
@@ -2112,6 +2135,9 @@ document.getElementById('modelinfo').innerHTML=s.checkpoint?
 ' — load the list and pick your model':'')):'';
 for(const [id,val] of [['style_pos',(s.style||{}).positive||''],
 ['style_neg',(s.style||{}).negative||''],
+['style_lora',(s.style||{}).lora||''],
+['style_lw',(s.style||{}).lora_weight||0.8],
+['style_trig',(s.style||{}).trigger||''],
 ['gen_steps',(s.gen||{}).steps||''],['gen_cfg',(s.gen||{}).cfg||''],
 ['gen_sampler',(s.gen||{}).sampler||'']]){
 const el=document.getElementById(id);if(el&&document.activeElement!==el)el.value=val;}

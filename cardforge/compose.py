@@ -50,8 +50,18 @@ def compose(job, campaign, profiles, character=None):
             # backend's problem (Comfy IPAdapter) or skipped (A1111 v1).
             lora_tok = "{}, ".format(char["trigger"])
 
-    positive = "{}{}, {}, {}".format(
-        lora_tok, job["scene"], prof["type_positive"], campaign["style_positive"])
+    # campaign-wide style LoRA: applies to EVERY card so the whole set matches
+    # ({"style_lora": "name", "style_lora_weight": 0.8, "style_trigger": "..."})
+    style_tok = ""
+    if campaign.get("style_lora"):
+        style_tok = "<lora:{}:{}> ".format(
+            campaign["style_lora"], campaign.get("style_lora_weight", 0.8))
+    if campaign.get("style_trigger"):
+        style_tok += "{}, ".format(campaign["style_trigger"])
+
+    positive = "{}{}{}, {}, {}".format(
+        style_tok, lora_tok, job["scene"], prof["type_positive"],
+        campaign["style_positive"])
     negative = "{}, {}".format(campaign["style_negative"], prof["type_negative"])
     params = {
         "width": prof["width"], "height": prof["height"], "steps": prof["steps"],

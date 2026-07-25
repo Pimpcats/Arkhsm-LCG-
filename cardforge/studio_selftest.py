@@ -857,6 +857,28 @@ check("campaign box carries memory-bag layout + log + guide",
       json.loads(_top["LuaScriptState"])["ml"]
       and any("CampaignLog" in (o.get("Tags") or []) for o in _top["ContainedObjects"])
       and any("CampaignGuide" in (o.get("Tags") or []) for o in _top["ContainedObjects"]))
+# locked house style: one LoRA + framing rules drive EVERY card
+_camp_cfg = json.load(open(os.path.join(ROOT, "campaigns", "still_hour",
+                                        "campaign.json"), encoding="utf-8"))
+check("house style locked in the campaign",
+      "cosmic horror" in _camp_cfg["style_positive"]
+      and "muted earthy palette" in _camp_cfg["style_positive"])
+_profs = json.load(open(os.path.join(ROOT, "cardforge", "profiles",
+                                     "art_profiles.json"), encoding="utf-8"))
+check("every art profile carries the detail-hierarchy craft rules",
+      all("detail concentrated on the focal point" in v["type_positive"]
+          for k, v in _profs.items() if not k.startswith("_")))
+import cardforge.compose as _cmp
+_pos, _neg, _par = _cmp.compose(
+    {"id": "t", "art_type": "enemy", "scene": "a test", "seed": 1},
+    dict(_camp_cfg, style_lora="mylora", style_lora_weight=0.7),
+    _profs, None)
+check("a campaign style LoRA reaches every composed prompt",
+      "<lora:mylora:0.7>" in _pos)
+check("generation aspect matches each card's art window",
+      _profs["investigator_portrait"]["aspect"] == "portrait"
+      and _profs["enemy"]["aspect"] == "landscape"
+      and _profs["location"]["aspect"] == "landscape")
 check("Spawn campaign box wired in the UI",
       "campCompile" in page and "campaign_compile" in page)
 check("typography panel (font/size/bold/italic per area) in the UI",

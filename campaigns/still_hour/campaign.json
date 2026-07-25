@@ -3,7 +3,10 @@
   "base_url": null,
   "checkpoint": "paintersCheckpoint_v11_STUB.safetensors",
   "output_dir": "out/still_hour",
-  "style_positive": "cosmic horror illustration, painterly, muted desaturated palette, 1920s New England, starless folding sky, oil-paint texture, Arkham Horror card art",
-  "style_negative": "text, watermark, signature, frame, border, ui, logo, deformed hands, extra fingers, modern clothing, bright saturated colors, cartoon, 3d render, cheerful, lens flare",
-  "_checkpoint_note": "Owner pick (OPTIONS doc B1): Painter's Checkpoint v1.1 (SDXL, Civitai model 240154) \u2014 set 'checkpoint' to its exact local filename. Bake-off alternates: ZavyChromaXL, DreamShaper XL. Use Painter's for the hires/upscale pass regardless."
+  "style_positive": "1920s New England cosmic horror card game illustration, painted digital art, muted earthy palette \u2014 ochre, oxblood, moss green, cold slate, lamp-gold, single warm light source against cool shadow, restrained natural lighting, atmospheric depth and fog, period-accurate 1920s clothing and props, weathered unglamorous faces, narrative moment, quiet dread",
+  "style_negative": "text, watermark, signature, logo, border, frame, ui, caption, photorealistic, photograph, 3d render, plastic, anime, cartoon, comic, cel shading, neon, oversaturated, pastel, cheerful, sunny, bright saturated colors, modern clothing, smartphone, car, contemporary setting, deformed hands, extra fingers, extra limbs, mutated, bad anatomy",
+  "_checkpoint_note": "Owner pick (OPTIONS doc B1): Painter's Checkpoint v1.1 (SDXL, Civitai model 240154) \u2014 set 'checkpoint' to its exact local filename. Bake-off alternates: ZavyChromaXL, DreamShaper XL. Use Painter's for the hires/upscale pass regardless.",
+  "style_lora": "",
+  "style_lora_weight": 0.8,
+  "style_trigger": ""
 }
