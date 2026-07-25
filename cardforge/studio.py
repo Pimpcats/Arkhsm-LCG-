@@ -533,6 +533,30 @@ def act_campaign_import(p):
 
 
 
+
+
+def act_campaign_compile(p):
+    """Phase 3 — compile the Scenarios board into a scripted SCED campaign box
+    (CampaignBox > ScenarioBox per scenario > a deck per stack, plus the
+    campaign log token and guide). Requires every scenario locked in unless
+    force is set."""
+    sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+    import compile_campaign as cc
+    out = os.path.join(ROOT, "dist", "the_still_hour_campaign.json")
+    with _state_lock:
+        try:
+            r = cc.compile_campaign(out, require_locked=not p.get("force"))
+        except Exception as e:  # noqa: BLE001 - report, never kill the thread
+            return {"ok": False, "message": "compile failed: {}".format(e)}
+    if r.get("ok"):
+        log("campaign box compiled: {} scenario(s), {} card(s) -> {}".format(
+            r["scenarios"], r["cards"], r["out"]))
+    else:
+        log("compile blocked: " + r.get("message", ""))
+    return r
+
+
+
 def act_art_remove(p):
     """Remove a card's chosen art: back to the bare template."""
     campaign = p.get("campaign", "still_hour")
@@ -1216,6 +1240,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "tts_spawn": act_tts_spawn, "plugin_update": act_plugin_update,
            "card_save": act_card_save, "art_remove": act_art_remove,
            "scenario_save": act_scenario_save, "campaign_import": act_campaign_import,
+           "campaign_compile": act_campaign_compile,
            "prompt_get": act_prompt_get, "prompt_save": act_prompt_save,
            "style_save": act_style_save, "inpaint_frames": act_inpaint_frames,
            "gen_settings": act_gen_settings, "lora_save": act_lora_save,
@@ -1510,8 +1535,9 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 <span class=slot>&#128214; Campaign guide &mdash; PDF slot (Phase 3)</span>
 <button class="btn slot" onclick="tab('cards');openEditor('sthr-campaign-log')" title="open the campaign log sheet: player, investigators, XP, notes">&#128221; Campaign log / notes</button>
 <span class=spacer></span>
-<button class="btn primary" id=camp_spawn disabled onclick="addlog('Phase 3: the compiler builds the scripted campaign box next')"
-title="enabled once every scenario box is locked in — compiles the whole campaign into a scripted TTS box">&#128230; Spawn campaign box &rarr; TTS</button>
+<button class="btn primary" id=camp_spawn disabled onclick=campCompile()
+title="compiles every locked scenario into one scripted SCED campaign box (dist/the_still_hour_campaign.json) — load it in TTS as a saved object">&#128230; Spawn campaign box &rarr; TTS</button>
+<span id=camp_out class=hint></span>
 </div>
 <div id=scen_pool><small class=hint>UNASSIGNED CARDS &mdash; drag onto the board</small><div id=scen_pool_cards></div></div>
 <div id=scen_board></div>
@@ -2484,6 +2510,12 @@ document.getElementById('camp_spawn').disabled=!(total&&locked===total);
 const pool=document.getElementById('scen_pool_cards');pool.innerHTML='';
 for(const c of ((LS&&LS.cards)||[]))if(!assigned.has(c.id))pool.appendChild(dcardEl(c.id));
 stackDropify(document.getElementById('scen_pool'));}
+async function campCompile(){const el=document.getElementById('camp_out');
+el.textContent='compiling\u2026';
+const j=await post('campaign_compile',{});
+if(j.ok){el.textContent=`\u2713 ${j.scenarios} scenarios, ${j.cards} cards \u2192 ${j.out}`;
+addlog('campaign box compiled -> '+j.out+' (load it in TTS: Objects > Saved Objects)');}
+else{el.textContent=j.message||'compile failed';addlog('compile blocked: '+(j.message||''));}}
 async function feedImport(input){const f=input.files[0];if(!f)return;
 const info=document.getElementById('feed_info');info.textContent='importing\u2026';
 const rd=new FileReader();

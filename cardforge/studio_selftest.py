@@ -836,6 +836,29 @@ requests.post(BASE + "/api/type_set", json={"card": "sthr-bell", "field": "text"
 requests.post(BASE + "/api/type_set", json={"card": "_default", "field": "name"})
 check("resetting a text area clears it back to the default stack",
       "sthr-bell" not in json.load(open(RP.FONT_OVERRIDES_PATH, encoding="utf-8")))
+# Phase 3: the campaign compiler
+r = requests.post(BASE + "/api/campaign_compile", json={}).json()
+check("compile is gated until every scenario is locked in",
+      r.get("ok") is False and "locked" in r.get("message", ""))
+r = requests.post(BASE + "/api/campaign_compile", json={"force": True}).json()
+check("compile builds the campaign box (scenarios + cards)",
+      r.get("ok") is True and r.get("scenarios", 0) >= 1 and r.get("cards", 0) >= 1)
+_camp = json.load(open(os.path.join(ROOT, "dist", "the_still_hour_campaign.json"),
+                      encoding="utf-8"))
+_top = _camp["ObjectStates"][0]
+check("campaign box matches the SCED hierarchy (CampaignBox > ScenarioBox)",
+      _top["Name"] == "Custom_Model_Bag"
+      and "CampaignBox" in _top["Tags"] and "Reloadable" in _top["Tags"]
+      and json.loads(_top["GMNotes"])["type"] == "CampaignBox"
+      and any(json.loads(o["GMNotes"]).get("type") == "ScenarioBox"
+              for o in _top["ContainedObjects"]
+              if o["Name"] == "Custom_Model_Bag"))
+check("campaign box carries memory-bag layout + log + guide",
+      json.loads(_top["LuaScriptState"])["ml"]
+      and any("CampaignLog" in (o.get("Tags") or []) for o in _top["ContainedObjects"])
+      and any("CampaignGuide" in (o.get("Tags") or []) for o in _top["ContainedObjects"]))
+check("Spawn campaign box wired in the UI",
+      "campCompile" in page and "campaign_compile" in page)
 check("typography panel (font/size/bold/italic per area) in the UI",
       "ed_typebar" in page and "tyBind" in page and "ty_bold" in page
       and "ty_italic" in page and "ty_size" in page)
