@@ -862,9 +862,20 @@ _camp_cfg = json.load(open(os.path.join(ROOT, "campaigns", "still_hour",
                                         "campaign.json"), encoding="utf-8"))
 check("house style locked in the campaign",
       "cosmic horror" in _camp_cfg["style_positive"]
-      and "muted earthy palette" in _camp_cfg["style_positive"])
+      and "painted digital art" in _camp_cfg["style_positive"])
+# the house style must describe the ARTIST'S HAND only — lighting, palette and
+# environment vary per card, or all 100+ cards come out looking copy-pasted
+_scene_words = ("lamp-gold", "single warm light source", "fog", "moonlight",
+                "candlelit", "ochre, oxblood")
+check("house style carries no fixed lighting / palette / environment",
+      not any(w in _camp_cfg["style_positive"] for w in _scene_words))
 _profs = json.load(open(os.path.join(ROOT, "cardforge", "profiles",
                                      "art_profiles.json"), encoding="utf-8"))
+check("type framing carries no fixed lighting either",
+      not any(w in v["type_positive"]
+              for k, v in _profs.items() if not k.startswith("_")
+              for w in ("warm rim light", "single warm light source",
+                        "atmospheric depth and fog")))
 check("every art profile carries the detail-hierarchy craft rules",
       all("detail concentrated on the focal point" in v["type_positive"]
           for k, v in _profs.items() if not k.startswith("_")))
