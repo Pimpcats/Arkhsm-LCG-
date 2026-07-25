@@ -185,7 +185,6 @@ def build_scenario_box(sc, assign, cards, campaign_name="Campaign"):
     """One scenario = a memory-bag book that lays its stacks out on Place."""
     sid = sc["id"]
     contained, ml = [], {}
-    loc_xz = {}                       # card id -> where it ends up on the table
     for stack, label in STACK_ORDER:
         ids = [i for i in (assign.get(stack) or []) if i in cards]
         if not ids:
@@ -206,7 +205,6 @@ def build_scenario_box(sc, assign, cards, campaign_name="Campaign"):
                     (x, y, z), rot = location_slot(n)
                 o = B.build_card(normalize(cards[cid]))
                 o["Transform"] = transform(x, z, y=y, ry=rot)
-                loc_xz[cid] = (round(x, 3), round(z, 3))
                 contained.append(o)
                 ml[o["GUID"]] = {"lock": False,
                                  "pos": {"x": round(x, 3), "y": round(y, 3),
@@ -236,67 +234,13 @@ def build_scenario_box(sc, assign, cards, campaign_name="Campaign"):
                                "cycle": campaign_name}),
         "Transform": transform(scale=1.0),
         "ColorDiffuse": dict(B.COLOR_DIFFUSE),
-        "LuaScriptState": json.dumps(
-            dict({"ml": ml}, **({"cn": connection_lines(cards, loc_xz)}
-                                if loc_xz else {}))),
+        # SCED's memory bag reads exactly two keys back out of this — ml and
+        # setupButton (see its onLoad) — so ml is all there is to write. It
+        # draws no lines of its own; connections travel on the cards, in the
+        # locationFront/locationBack metadata the game actually reads.
+        "LuaScriptState": json.dumps({"ml": ml}),
         "ContainedObjects": contained,
     }
-
-
-# how thick / how high off the table a drawn connector sits
-CONN_LINE = {"y": 1.45, "thickness": 0.12}
-# the same location colours the cards print, as TTS 0..1 RGB
-CONN_RGB = {"red": (0.59, 0.05, 0.07), "orange": (0.72, 0.33, 0.09),
-            "yellow": (0.75, 0.58, 0.16), "green": (0.17, 0.40, 0.24),
-            "teal": (0.10, 0.38, 0.37), "blue": (0.13, 0.28, 0.52),
-            "purple": (0.36, 0.14, 0.43), "pink": (0.66, 0.22, 0.43),
-            "brown": (0.42, 0.28, 0.18), "grey": (0.38, 0.37, 0.39),
-            "gray": (0.38, 0.37, 0.39), "gold": (0.67, 0.56, 0.27)}
-
-
-def conn_rgb(name):
-    s = str(name or "").strip().lower()
-    if s in CONN_RGB:
-        return list(CONN_RGB[s])
-    if s.startswith("#") and len(s) == 7:
-        try:
-            return [round(int(s[i:i + 2], 16) / 255.0, 3) for i in (1, 3, 5)]
-        except ValueError:
-            pass
-    return [0.69, 0.59, 0.29]
-
-
-def connection_lines(cards, loc_xz):
-    """The map's connections as TTS vector-line segments.
-
-    The official mod shows connections with the symbols printed on the cards
-    and draws nothing on the table; these are ours, carried alongside the
-    placement data so a scenario that is laid out can also be *drawn*. Each
-    entry is {points, color, thickness} — the shape TTS's setVectorLines takes.
-    """
-    sym = {cid: (str((cards.get(cid) or {}).get("icons") or "").strip().lower(),
-                 (cards.get(cid) or {}).get("color") or "")
-           for cid in loc_xz}
-    out, seen = [], set()
-    for cid, (x, z) in sorted(loc_xz.items()):
-        for conn in ((cards.get(cid) or {}).get("connections") or []):
-            s = str(conn.get("symbol") if isinstance(conn, dict) else conn
-                    ).strip().lower()
-            for other, (osym, ocol) in sorted(sym.items()):
-                if other == cid or not osym or osym != s:
-                    continue
-                key = tuple(sorted((cid, other)))
-                if key in seen:
-                    continue
-                seen.add(key)
-                ox, oz = loc_xz[other]
-                out.append({
-                    "points": [[x, CONN_LINE["y"], z],
-                               [ox, CONN_LINE["y"], oz]],
-                    "color": conn_rgb(sym[cid][1] or ocol),
-                    "thickness": CONN_LINE["thickness"],
-                })
-    return out
 
 
 def build_log_token(cards, campaign_name=None):

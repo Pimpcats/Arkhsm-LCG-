@@ -1158,10 +1158,8 @@ if _cmp.get("ok"):
 _states = [json.loads(b["LuaScriptState"]) for b in _boxes]
 check("the compiled box scripts the arranged positions",
       any(s.get("ml") for s in _states))
-check("and carries the connections as drawable line segments",
-      any(len(s.get("cn") or []) for s in _states)
-      and all(len(ln["points"]) == 2 and len(ln["color"]) == 3
-              for s in _states for ln in (s.get("cn") or [])))
+check("and writes only what SCED's memory bag reads back (ml)",
+      all(set(s) <= {"ml", "setupButton"} for s in _states))
 # …and the cards themselves tell SCED they are connected, in its own shape
 _lc = []
 

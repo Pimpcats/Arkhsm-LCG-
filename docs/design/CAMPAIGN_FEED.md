@@ -129,19 +129,29 @@ the map, the printed card and the compiled object can never disagree.
 
 ### How connections reach TTS
 
-The official mod **draws no lines** — a location tells the game what it
-connects to through its GMNotes, and players read the symbols printed along
-the card's bottom edge. A real location carries:
+**The drawn lines are ours, and they stay in this app.** SCED draws no lines at
+all — `setVectorLines` appears nowhere in its memory-bag script, and its
+`onLoad` reads exactly two keys back out of a box's saved state:
+
+```lua
+memoryList  = loadedData.ml          -- guid -> {pos, rot, lock}
+setupButton = loadedData.setupButton
+```
+
+Anything else in that state is decoded and discarded, so the compiled box
+writes `ml` and nothing else. Placement is a GUID lookup: Place walks
+`memoryList` calling `setRotation` / `setPositionSmooth` / `setLock`.
+
+What TTS *does* read is the card's own metadata. A real location carries:
 
 ```json
 "locationFront": {"icons": "Diamond", "connections": "Tee|Plus|Circle|Square"}
 ```
 
-Compiled cards now carry exactly that shape, so SCED reads our maps the way it
-reads its own. On top of it, the scenario box's `LuaScriptState.cn` carries the
-same connections as TTS vector-line segments
-(`{points, color, thickness}`) in each location's colour — that part is ours,
-not the official mod's, and needs a script hook to actually draw them.
+Compiled locations carry exactly that shape, so the game knows our maps are
+connected the way it knows its own — and players read the symbols printed along
+the card's bottom edge, as they always have. The lines on the map and in the
+table preview are a design aid for laying the scenario out, nothing more.
 
 ### Scenario board stacks
 
