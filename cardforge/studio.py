@@ -209,6 +209,23 @@ def act_rig_save(p):
     return {"ok": True, "rig": {k: v for k, v in cfg.items() if k != "_note"}}
 
 
+def act_backend_set(p):
+    """Switch the campaign between the A1111 and ComfyUI backends. Krea 2 /
+    FLUX-family checkpoints don't load in classic A1111, so a Comfy setup needs
+    to be selectable from the app rather than hand-edited."""
+    campaign = p.get("campaign", "still_hour")
+    kind = (p.get("backend") or "").strip().lower()
+    if kind not in ("a1111", "comfy"):
+        return {"ok": False, "message": "backend must be a1111 or comfy"}
+    path = os.path.join(runner.campaign_dir(campaign), "campaign.json")
+    camp = json.load(open(path, encoding="utf-8"))
+    camp["backend"] = kind
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(camp, f, indent=2)
+    log("backend -> " + kind)
+    return {"ok": True, "backend": kind}
+
+
 def act_models(p):
     """List checkpoints installed on the campaign's backend (model picker)."""
     camp = runner.load_campaign(p.get("campaign", "still_hour"))
@@ -1286,7 +1303,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "index": act_index, "backend_check": act_backend_check,
            "rig_save": act_rig_save, "backend_launch": act_backend_launch,
            "seed_pick": act_seed_pick,
-           "models": act_models, "model_set": act_model_set,
+           "models": act_models, "backend_set": act_backend_set, "model_set": act_model_set,
            "install_checkpoint": act_install_checkpoint,
            "install_se": act_install_se, "install_a1111": act_install_a1111,
            "install_fonts": act_install_fonts, "font_set": act_font_set,
@@ -1815,7 +1832,11 @@ New variants land in the strip above and the gallery when the job finishes.</p>
 <div id=steps_illustrate class=stepbox></div>
 <hr>
 <div class=row>
-<b>Backend</b> <span id=rig_kind class=stat></span>
+<b>Backend</b>
+<select id=rig_kind onchange="post('backend_set',{backend:this.value}).then(()=>refresh())"
+title="A1111 runs SD1.5/SDXL checkpoints. Krea 2 / FLUX-family models need ComfyUI.">
+<option value=a1111>A1111 (SD1.5 / SDXL)</option>
+<option value=comfy>ComfyUI (Krea 2 / FLUX)</option></select>
 <label>folder</label><input type=text id=rig_cwd size=22 placeholder="C:\SD\SDXL" onchange=rigSave()>
 <label>start with</label><input type=text id=rig_cmd size=18 onchange=rigSave()>
 <button class="btn primary" onclick=rigLaunch()>&#9655; Launch backend</button>
@@ -2126,7 +2147,7 @@ if(sel.options.length!==s.campaigns.length){sel.innerHTML='';
 for(const c of s.campaigns){const o=document.createElement('option');o.value=o.text=c;
 if(c===s.campaign)o.selected=true;sel.add(o);}}
 document.getElementById('busydot').className='dot'+(s.busy?' busy':'');
-const kind=s.backend||'a1111';document.getElementById('rig_kind').textContent=kind;
+const kind=s.backend||'a1111';{const rk=document.getElementById('rig_kind');if(rk&&document.activeElement!==rk)rk.value=kind;}
 const rg=(s.rig||{})[kind]||{};
 for(const [id,val] of [['rig_cwd',rg.cwd||''],['rig_cmd',rg.command||'']]){
 const el=document.getElementById(id);if(el&&document.activeElement!==el)el.value=val;}

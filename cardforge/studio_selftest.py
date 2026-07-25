@@ -898,6 +898,17 @@ check("generation aspect matches each card's art window",
       _profs["investigator_portrait"]["aspect"] == "portrait"
       and _profs["enemy"]["aspect"] == "landscape"
       and _profs["location"]["aspect"] == "landscape")
+# the backend must be switchable from the app: Krea 2 / FLUX checkpoints
+# don't load in classic A1111, so a Comfy setup has to be selectable
+_r = requests.post(BASE + "/api/backend_set", json={"backend": "comfy"}).json()
+check("backend switches to ComfyUI from the app",
+      _r.get("ok") and requests.get(
+          BASE + "/api/status?campaign=still_hour").json()["backend"] == "comfy")
+check("an unknown backend is rejected",
+      requests.post(BASE + "/api/backend_set",
+                    json={"backend": "nope"}).json().get("ok") is False)
+requests.post(BASE + "/api/backend_set", json={"backend": "a1111"})
+check("backend picker present in the UI", "backend_set" in page)
 check("Spawn campaign box wired in the UI",
       "campCompile" in page and "campaign_compile" in page)
 check("typography panel (font/size/bold/italic per area) in the UI",
