@@ -4,7 +4,7 @@ Everything lands inside the repo folder and every path is resolved from
 runner.repo_root() at call time, so the whole folder can move machines or
 drives and keep working:
 
-    vendor/models/           the art checkpoint (Painter's Checkpoint v1.1)
+    vendor/models/           the art checkpoint (MoodyKrea2Mix)
     vendor/strange-eons/     the Strange Eons download (+ app/ once installed)
 
 Checkpoint: pulled via Civitai's public API (model 240154), preferring the
@@ -35,8 +35,14 @@ import subprocess
 
 from . import runner, se_bridge
 
-CIVITAI_MODEL_ID = 240154            # Painter's Checkpoint (SDXL)
-CIVITAI_VERSION_HINT = "1.1"
+# The art checkpoint the Setup tab installs. Searched BY NAME on Civitai so the
+# model can be changed here (or per campaign via campaign.json "art_model")
+# without needing a hardcoded id. CIVITAI_MODEL_ID is an optional exact-id
+# override for when search is ambiguous.
+CIVITAI_MODEL_ID = 2731187           # Moody Krea 2 Mix (Krea 2 checkpoint merge)
+CIVITAI_MODEL_QUERY = "moody krea 2 mix"
+CIVITAI_VERSION_HINT = ""            # empty = take the LATEST version published
+CIVITAI_MODEL_LABEL = "Moody Krea 2 Mix"
 SE_RELEASES_API = "https://api.github.com/repos/CGJennings/strange-eons/releases/latest"
 CHUNK = 1 << 20                      # 1 MiB
 
@@ -148,34 +154,79 @@ def _download(url, dest, headers=None, log=print):
 # ---------------------------------------------------------------- checkpoint --
 
 def install_checkpoint(campaign="still_hour", token=None, dry_run=False, log=print):
-    """Download Painter's Checkpoint v1.1 into vendor/models/, then point the
-    campaign at it. Returns the checkpoint filename."""
+    """Download the campaign art checkpoint into vendor/models/, then point the
+    campaign at it. The model is found by NAME on Civitai (overridable per
+    campaign with "art_model"/"art_model_version"), so swapping models needs no
+    code change. Returns the checkpoint filename."""
     os.makedirs(vendor_dir("models"), exist_ok=True)
     if token:
         save_token(token)
     token = load_token()
 
+    # per-campaign override, else the module default
+    query, hint = CIVITAI_MODEL_QUERY, CIVITAI_VERSION_HINT
+    try:
+        _cp = os.path.join(runner.campaign_dir(campaign), "campaign.json")
+        _c = json.load(open(_cp, encoding="utf-8"))
+        query = _c.get("art_model") or query
+        hint = _c.get("art_model_version") or hint
+    except (OSError, ValueError):
+        pass
+
     if dry_run:
-        fname = "paintersCheckpoint_v11_STUB.safetensors"
+        fname = "{}_STUB.safetensors".format(query)
         with open(os.path.join(vendor_dir("models"), fname), "wb") as f:
             f.write(b"stub-checkpoint")
         log("dry-run: wrote stub checkpoint " + fname)
     else:
         import requests
-        log("querying Civitai for model {}…".format(CIVITAI_MODEL_ID))
-        meta = requests.get(
-            "https://civitai.com/api/v1/models/{}".format(CIVITAI_MODEL_ID),
-            timeout=30).json()
+        headers = {"Authorization": "Bearer " + token} if token else {}
+        if CIVITAI_MODEL_ID:
+            log("querying Civitai for model {}…".format(CIVITAI_MODEL_ID))
+            meta = requests.get(
+                "https://civitai.com/api/v1/models/{}".format(CIVITAI_MODEL_ID),
+                timeout=30, headers=headers).json()
+        else:
+            log("searching Civitai for \"{}\"…".format(query))
+            try:
+                res = requests.get("https://civitai.com/api/v1/models",
+                                   params={"query": query, "types": "Checkpoint",
+                                           "limit": 10},
+                                   timeout=30, headers=headers).json()
+            except Exception as e:  # noqa: BLE001 - offline/proxy/TLS
+                raise RuntimeError(
+                    "could not reach Civitai ({}). Check your connection, or "
+                    "download the model yourself and drop the .safetensors "
+                    "into vendor/models/.".format(e))
+            if isinstance(res, dict) and res.get("error"):
+                raise RuntimeError("Civitai said: {}".format(res["error"]))
+            items = (res or {}).get("items") or []
+            if not items:
+                raise RuntimeError(
+                    "Civitai has no checkpoint matching \"{}\". Check the name "
+                    "in Setup, or drop the .safetensors into vendor/models/ "
+                    "yourself.".format(query))
+            # prefer an exact-ish name match over search ranking
+            ql = query.lower().replace(" ", "")
+            meta = next((m for m in items
+                         if ql in (m.get("name", "").lower().replace(" ", ""))),
+                        items[0])
+            log("found: {} (id {})".format(meta.get("name"), meta.get("id")))
         versions = meta.get("modelVersions") or []
+        # no hint -> newest published version (Civitai lists newest first), so
+        # the installer keeps working as the model is updated
         version = next((v for v in versions
-                        if CIVITAI_VERSION_HINT in (v.get("name") or "")),
+                        if hint and hint in (v.get("name") or "")),
                        versions[0] if versions else None)
+        if version:
+            log("version: {}{}".format(version.get("name"),
+                                       "" if hint else " (latest)"))
         if not version:
             raise RuntimeError("Civitai returned no versions for the model")
         vfile = next((f for f in version.get("files", [])
                       if f.get("name", "").endswith(".safetensors")),
                      (version.get("files") or [{}])[0])
-        fname = vfile.get("name") or "painters_checkpoint.safetensors"
+        fname = vfile.get("name") or (query + ".safetensors")
         url = version.get("downloadUrl") or \
             "https://civitai.com/api/download/models/{}".format(version["id"])
         if token:

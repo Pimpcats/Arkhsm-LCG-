@@ -603,8 +603,9 @@ check("checkpoint install job accepted", r.get("started"))
 check("checkpoint install completes", wait_idle(30))
 s = requests.get(BASE + "/api/status?campaign=still_hour").json()
 check("stub checkpoint lands in vendor/models and campaign points at it",
-      s["vendor"]["models"] == ["paintersCheckpoint_v11_STUB.safetensors"]
-      and s["checkpoint"] == "paintersCheckpoint_v11_STUB.safetensors")
+      len(s["vendor"]["models"]) == 1
+      and s["vendor"]["models"][0].endswith("_STUB.safetensors")
+      and s["checkpoint"] == s["vendor"]["models"][0])
 check("a1111 launch gains --ckpt-dir vendor/models",
       "--ckpt-dir" in installer.ckpt_dir_args()
       and "vendor" in installer.ckpt_dir_args())

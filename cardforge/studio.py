@@ -1639,7 +1639,7 @@ override, same as the Cards-tab editor.</p>
 <div id=lora_rows></div>
 <div class=row style="margin-top:6px"><button class=btn onclick=loraSave()>Save LoRAs</button>
 <span class=hint>no LoRA yet? leave empty — the character renders from description + trigger words.
-Train LoRAs on the SAME checkpoint you generate with (Painter&rsquo;s).</span></div>
+Train LoRAs on the SAME checkpoint you generate with (MoodyKrea2Mix).</span></div>
 </div></section>
 
 <section id=setup class=on><div class=panel>
@@ -1659,10 +1659,10 @@ First launch self-installs its dependencies (one-time, several GB).</p>
 <div class=row>
 <b style="min-width:180px">2 &middot; Art model</b>
 <input type=password id=civitai_token size=28 placeholder="Civitai API key (needed to download)">
-<button class="btn primary" onclick="post('install_checkpoint',{token:document.getElementById('civitai_token').value})">Install Painter&rsquo;s Checkpoint</button>
+<button class="btn primary" onclick="post('install_checkpoint',{token:document.getElementById('civitai_token').value})">Install MoodyKrea2Mix v4.0</button>
 <span id=vendor_model class=hint></span>
 </div>
-<p class=hint>Downloads Painter&rsquo;s Checkpoint v1.1 (SDXL) into <code>vendor/models/</code>, points the
+<p class=hint>Downloads <b>MoodyKrea2Mix v4.0</b> &mdash; the campaign&rsquo;s art checkpoint &mdash; into <code>vendor/models/</code>, points the
 campaign at it, and launches A1111 with <code>--ckpt-dir vendor/models</code> so it&rsquo;s found wherever this
 folder lives. Get a free API key at civitai.com &rarr; account settings. Already have the file? Just drop
 the .safetensors into <code>vendor/models/</code> instead.</p>
@@ -2103,7 +2103,7 @@ el('steps_cards',
  step(true,'<b>Drag</b> the art to position, <b>scroll</b> to size, <b>Save</b> — placement is kept and reused by the final Strange Eons render')+
  step(true,'These in-app faces are a fast <b>preview</b>; the print-identical faces come from the Frame tab'));
 el('steps_illustrate',
- step(false,'<b>1.</b> <b>&#9655; Launch backend</b>, wait for the drawer to say it&rsquo;s up, then hit <b>&#8635;</b> on the Checkpoint row and pick <b>Painter&rsquo;s</b> — the line below tells you what the backend actually has loaded')+
+ step(false,'<b>1.</b> <b>&#9655; Launch backend</b>, wait for the drawer to say it&rsquo;s up, then hit <b>&#8635;</b> on the Checkpoint row and pick <b>MoodyKrea2Mix</b> — the line below tells you what the backend actually has loaded')+
  step(seedsDone,'<b>2.</b> <b>Step 0 · Seeds</b> — 4 portrait candidates per investigator appear below')+
  step(picksDone,'<b>3.</b> Click each investigator&rsquo;s best portrait &rarr; <b>Make canonical</b>')+
  step(gen,'<b>4.</b> <b>Starter batch</b> to check the look &rarr; then <b>&#9889; Auto-build ALL</b> (top right) does every card')+
