@@ -1,10 +1,10 @@
 {
   "backend": "a1111",
   "base_url": null,
-  "checkpoint": "paintersCheckpoint_v11_STUB.safetensors",
+  "checkpoint": "moodykrea2mixV20.safetensors",
   "output_dir": "out/still_hour",
-  "style_positive": "1920s cosmic horror card game illustration, painted digital art, traditional illustration craft, naturalistic but restrained colour, grounded period realism, dramatic legible lighting, narrative moment",
-  "style_negative": "text, watermark, signature, logo, border, frame, ui, caption, photorealistic, photograph, 3d render, plastic, anime, cartoon, comic, cel shading, neon, candy colours, oversaturated, pastel, cheerful, twee, modern clothing, smartphone, car, contemporary setting, deformed hands, extra fingers, extra limbs, mutated, bad anatomy",
+  "style_positive": "1920s cosmic horror illustration, painted digital art, traditional illustration craft, visible brushwork and painted edges, illustrative simplification, shapes read as value masses, economy of detail, naturalistic but restrained color, period-accurate, dramatic legible lighting, narrative moment",
+  "style_negative": "photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, depth of field, bokeh, motion blur, film grain, 3d render, octane, cgi, plastic, waxy skin, subsurface scattering, text, watermark, signature, logo, border, frame, ui, caption, anime, cartoon, comic, cel shading, neon, candy colors, oversaturated, pastel, cheerful, twee, modern clothing, smartphone, car, contemporary setting, deformed hands, extra fingers, extra limbs, mutated, bad anatomy",
   "_checkpoint_note": "Owner pick (OPTIONS doc B1): Painter's Checkpoint v1.1 (SDXL, Civitai model 240154) \u2014 set 'checkpoint' to its exact local filename. Bake-off alternates: ZavyChromaXL, DreamShaper XL. Use Painter's for the hires/upscale pass regardless.",
   "style_lora": "",
   "style_lora_weight": 0.8,
