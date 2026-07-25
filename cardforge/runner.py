@@ -73,6 +73,8 @@ def load_manifest(name, starter=False):
     path = os.path.join(campaign_dir(name), fname)
     if not os.path.exists(path) and starter:
         path = os.path.join(repo_root(), "pipeline", "art_manifest_starter.json")
+    if not os.path.exists(path):
+        return []          # a campaign with no art manifest yet is empty, not broken
     return [j for j in json.load(open(path, encoding="utf-8")) if not j.get("_comment")]
 
 

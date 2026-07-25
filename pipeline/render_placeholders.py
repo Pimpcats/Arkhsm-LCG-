@@ -17,6 +17,7 @@ Run: python3 pipeline/render_placeholders.py   (from repo root)
 Out: art/faces/{id}.png  (flows through Frame coverage -> Apply)
 """
 import argparse
+import glob
 import json
 import os
 import sys
@@ -1899,12 +1900,18 @@ def main():
                     help="force the drawn (non-template) placeholder look")
     args = ap.parse_args()
     use_tpl = (not args.no_template) and T.has_template("investigator_front")
-    cards = json.load(open(os.path.join(HERE, "stillhour_cards_spec.json"), encoding="utf-8"))
-    for extra in ("stillhour_encounter_spec.json", "stillhour_scenario_spec.json",
-                  "stillhour_imported_spec.json"):
-        p = os.path.join(HERE, extra)
-        if os.path.exists(p):
-            cards += json.load(open(p, encoding="utf-8"))
+    # EVERY campaign's specs — the authored Still Hour set plus any
+    # <campaign>_*_spec.json written by the app (hand-made or imported cards),
+    # so a campaign built from scratch renders exactly like the authored one
+    cards, seen = [], set()
+    for sp in sorted(glob.glob(os.path.join(HERE, "*_spec.json"))):
+        try:
+            for c in json.load(open(sp, encoding="utf-8")):
+                if c.get("id") and c["id"] not in seen:
+                    seen.add(c["id"])
+                    cards.append(c)
+        except (ValueError, OSError):
+            continue
     if args.only:
         cards = [c for c in cards if c["id"] in set(args.only)]
     print_text = {k: v for k, v in

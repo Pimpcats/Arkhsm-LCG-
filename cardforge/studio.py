@@ -513,6 +513,119 @@ def act_scenario_save(p):
 
 
 
+
+
+CARD_TYPES = ("Investigator", "Asset", "Event", "Skill", "Treachery", "Enemy",
+              "Location", "Agenda", "Act", "Scenario", "Story", "CampaignLog")
+CARD_CLASSES = ("Guardian", "Seeker", "Rogue", "Mystic", "Survivor", "Neutral",
+                "Mythos")
+
+
+def act_card_new(p):
+    """Create a blank card on its real template — the core of building a
+    campaign by hand. No AI, no backend: pick a type and a name and the card
+    exists immediately, ready to edit and to drag onto a scenario."""
+    sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+    import render_placeholders as rp
+    campaign = os.path.basename(str(p.get("campaign") or "still_hour"))
+    ctype = str(p.get("type") or "").strip()
+    name = str(p.get("name") or "").strip()[:80]
+    if ctype not in CARD_TYPES:
+        return {"ok": False, "message": "pick a card type"}
+    if not name:
+        return {"ok": False, "message": "give the card a name"}
+    cls = str(p.get("class") or "").strip()
+    if cls and cls not in CARD_CLASSES:
+        cls = ""
+    prefix = "".join(w[0] for w in campaign.split("_") if w)[:4] or "card"
+    slug = "".join(ch if ch.isalnum() else "-" for ch in name.lower()).strip("-")
+    slug = "-".join(x for x in slug.split("-") if x)[:32] or "card"
+    base = "{}-{}".format(prefix, slug)
+
+    path = own_spec_path(campaign)
+    with _state_lock:
+        cards = []
+        if os.path.exists(path):
+            try:
+                cards = json.load(open(path, encoding="utf-8"))
+            except ValueError:
+                cards = []
+        taken = set()
+        for fp in spec_files(campaign):
+            if os.path.exists(fp):
+                try:
+                    taken |= {c.get("id") for c in
+                              json.load(open(fp, encoding="utf-8"))}
+                except ValueError:
+                    pass
+        cid, n = base, 2
+        while cid in taken:
+            cid, n = "{}-{}".format(base, n), n + 1
+
+        card = {"id": cid, "type": ctype, "name": name}
+        if cls:
+            card["class"] = cls
+        if ctype in ("Enemy", "Treachery", "Location", "Agenda", "Act",
+                     "Scenario", "Story"):
+            card.setdefault("class", cls or "Mythos")
+            card["encounter"] = True
+        if ctype == "Location":
+            card.update({"shroud": 2, "clues": 1,
+                         "clues_per_investigator": True})
+        if ctype == "Enemy":
+            card.update({"fight": 2, "health": 2, "evade": 2,
+                         "damage": 1, "horror": 0})
+        if ctype == "Investigator":
+            card.update({"wil": 3, "int": 3, "com": 3, "agi": 3,
+                         "health": 7, "sanity": 7,
+                         "class": cls or "Neutral"})
+        if ctype in ("Asset", "Event", "Skill"):
+            card.setdefault("class", cls or "Neutral")
+        cards.append(card)
+        _write_json_atomic(path, cards)
+        subprocess.run([sys.executable,
+                        os.path.join(ROOT, "pipeline", "render_placeholders.py"),
+                        "--only", cid],
+                       check=False, cwd=ROOT, stdout=subprocess.DEVNULL)
+    log("card created: {} ({} {})".format(name, ctype, cid))
+    return {"ok": True, "id": cid, "type": ctype, "name": name}
+
+
+def act_card_delete(p):
+    """Remove a hand-made card from this campaign's own spec."""
+    campaign = os.path.basename(str(p.get("campaign") or "still_hour"))
+    cid = os.path.basename(str(p.get("card") or ""))
+    if not cid:
+        return {"ok": False, "message": "no card given"}
+    removed = False
+    with _state_lock:
+        for path in (own_spec_path(campaign),
+                     os.path.join(ROOT, "pipeline",
+                                  ("stillhour_imported_spec.json"
+                                   if campaign == "still_hour"
+                                   else campaign + "_imported_spec.json"))):
+            if not os.path.exists(path):
+                continue
+            try:
+                cards = json.load(open(path, encoding="utf-8"))
+            except ValueError:
+                continue
+            keep = [c for c in cards if c.get("id") != cid]
+            if len(keep) != len(cards):
+                _write_json_atomic(path, keep)
+                removed = True
+        face = os.path.join(ROOT, "art", "faces", cid + ".png")
+        if removed and os.path.exists(face):
+            os.remove(face)
+    if not removed:
+        return {"ok": False,
+                "message": "that card is part of the authored campaign, not a "
+                           "card you made — edit it instead of deleting"}
+    log("card deleted: " + cid)
+    return {"ok": True, "id": cid}
+
+
+
 def act_campaign_new(p):
     """Create a brand-new campaign folder so a written campaign can be imported
     into its own space instead of merging into The Still Hour.
@@ -557,6 +670,11 @@ def act_campaign_new(p):
     _write_json_atomic(os.path.join(dest, "scenario_manifest.json"),
                        {"campaign": {"id": cid, "name": name},
                         "scenarios": []})
+    # the art manifests the illustrate/frame steps read — empty, but present,
+    # so a brand-new campaign never crashes anything that expects them
+    _write_json_atomic(os.path.join(dest, "manifest.json"), [])
+    _write_json_atomic(os.path.join(dest, "manifest_starter.json"), [])
+    _write_json_atomic(os.path.join(dest, "prompt_overrides.json"), {})
     os.makedirs(os.path.join(ROOT, "out", cid), exist_ok=True)
     log("campaign created: {} ({})".format(name, cid))
     return {"ok": True, "id": cid, "name": name}
@@ -778,6 +896,29 @@ def act_font_set(p):
     where = "every card" if card == "_default" else card
     log("fonts for {}: {}".format(where, entry or "default stack"))
     return {"ok": True, "fonts": entry}
+
+
+def spec_files(campaign="still_hour"):
+    """The card-spec files for ONE campaign.
+
+    The Still Hour keeps its authored stillhour_* specs; every other campaign
+    reads and writes <campaign>_*_spec.json, so a campaign built from scratch
+    starts genuinely empty instead of showing another campaign's cards.
+    """
+    if campaign == "still_hour":
+        names = ("stillhour_cards_spec.json", "stillhour_encounter_spec.json",
+                 "stillhour_scenario_spec.json", "stillhour_imported_spec.json")
+    else:
+        names = ("{}_cards_spec.json".format(campaign),
+                 "{}_imported_spec.json".format(campaign))
+    return [os.path.join(ROOT, "pipeline", n) for n in names]
+
+
+def own_spec_path(campaign="still_hour"):
+    """Where hand-made cards for this campaign are written."""
+    return os.path.join(ROOT, "pipeline",
+                        "stillhour_handmade_spec.json" if campaign == "still_hour"
+                        else "{}_cards_spec.json".format(campaign))
 
 
 TYPE_FIELDS = ("name", "subtitle", "traits", "text", "flavor", "victory", "stats")
@@ -1231,8 +1372,7 @@ def status(campaign="still_hour"):
     sys.path.insert(0, os.path.join(ROOT, "pipeline"))
     import render_placeholders as rp
     specs = {}
-    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json", "stillhour_scenario_spec.json", "stillhour_imported_spec.json"):
-        p = os.path.join(ROOT, "pipeline", spec_file)
+    for p in spec_files(campaign):
         if os.path.exists(p):
             for c in json.load(open(p, encoding="utf-8")):
                 specs[c["id"]] = c["type"]
@@ -1260,8 +1400,7 @@ def status(campaign="still_hour"):
             return "Recollections"
         return "Signatures & Weaknesses"
     catalog = []
-    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json", "stillhour_scenario_spec.json", "stillhour_imported_spec.json"):
-        path = os.path.join(ROOT, "pipeline", spec_file)
+    for path in spec_files(campaign):
         if not os.path.exists(path):
             continue
         for c in json.load(open(path, encoding="utf-8")):
@@ -1284,8 +1423,7 @@ def status(campaign="still_hour"):
     card_overrides = rp.load_card_overrides()
     print_text = se_bridge._load_print_text()
     spec_by_id = {}
-    for spec_file in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json", "stillhour_scenario_spec.json", "stillhour_imported_spec.json"):
-        p2 = os.path.join(ROOT, "pipeline", spec_file)
+    for p2 in spec_files(campaign):
         if os.path.exists(p2):
             for sc in json.load(open(p2, encoding="utf-8")):
                 spec_by_id[sc["id"]] = sc
@@ -1377,6 +1515,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "tts_spawn": act_tts_spawn, "plugin_update": act_plugin_update,
            "card_save": act_card_save, "art_remove": act_art_remove,
            "scenario_save": act_scenario_save, "campaign_import": act_campaign_import, "campaign_new": act_campaign_new,
+           "card_new": act_card_new, "card_delete": act_card_delete,
            "campaign_compile": act_campaign_compile,
            "prompt_get": act_prompt_get, "prompt_save": act_prompt_save,
            "style_save": act_style_save, "inpaint_frames": act_inpaint_frames,
@@ -1792,6 +1931,21 @@ title="Stable Diffusion regenerates each template's text regions into empty card
 <input type=file id=df_fontfile accept=".ttf,.otf" style="display:none" onchange=dfFontUpload(this)>
 <span id=df_info class=hint></span>
 </div></details>
+<div class=row style="margin:6px 0 10px;padding:10px;border:1px solid var(--line);border-radius:9px">
+<b style="font-size:12px">New card</b>
+<select id=nc_type>
+<option>Location</option><option>Enemy</option><option>Treachery</option>
+<option>Asset</option><option>Event</option><option>Skill</option>
+<option>Investigator</option><option>Agenda</option><option>Act</option>
+<option>Scenario</option><option>Story</option></select>
+<select id=nc_class title="class / faction — Mythos for encounter cards">
+<option value="">class…</option><option>Guardian</option><option>Seeker</option>
+<option>Rogue</option><option>Mystic</option><option>Survivor</option>
+<option>Neutral</option><option>Mythos</option></select>
+<input id=nc_name size=24 placeholder="card name" onkeydown="if(event.key==='Enter')cardNew()">
+<button class="btn primary" onclick=cardNew()>+ Create card</button>
+<span class=hint>appears instantly on its real template, ready to edit &amp; drag onto a scenario</span>
+</div>
 <div id=chips_cards class=chips></div>
 <div id=cardgroups></div>
 <div id=editor>
@@ -2263,18 +2417,19 @@ if(pe)pe.innerHTML=(pl.templates&&pl.regions)?
 ('<span class=okpill>&#10003; '+pl.templates+' frames, '+pl.overlays+' overlays, '+pl.icons+
 ' icons, '+pl.regions+' regions extracted</span>'):
 '<span class=badpill>&#10007; frames missing &mdash; click Re-extract</span>';
-document.getElementById('vendor_a1111').innerHTML=v.a1111_installed?
+const _set=(id,html)=>{const e=document.getElementById(id);if(e)e.innerHTML=html;};
+_set('vendor_a1111',v.a1111_installed?
 '<span class=okpill>&#10003; installed &amp; verified in vendor/a1111</span>':
 (v.a1111_partial?'<span class=badpill>&#10007; install incomplete &mdash; vendor/a1111 exists but has no usable webui; click Install again</span>':
-'not installed (fine if you already run A1111 elsewhere)');
-document.getElementById('vendor_model').innerHTML=(v.models||[]).length?
+'not installed (fine if you already run A1111 elsewhere)'));
+_set('vendor_model',(v.models||[]).length?
 '<span class=okpill>&#10003; installed: '+v.models.join(', ')+'</span>':
-(v.has_token?'<span class=warnpill>key saved &mdash; ready to install</span>':'not installed yet');
-document.getElementById('vendor_se').innerHTML=v.se_installed?
+(v.has_token?'<span class=warnpill>key saved &mdash; ready to install</span>':'not installed yet'));
+_set('vendor_se',v.se_installed?
 '<span class=okpill>&#10003; installed at '+v.se_path+'</span>':
 ((v.se_downloads||[]).length?
 '<span class=warnpill>downloaded: '+v.se_downloads.join(', ')+' &mdash; run the installer to finish</span>':
-'not installed yet');
+'not installed yet'));
 const lj=s.last_job||{};
 const bt=document.getElementById('busytext');
 if(s.busy){bt.textContent='working…';bt.className='';}
@@ -2694,6 +2849,16 @@ document.getElementById('camp_spawn').disabled=!(total&&locked===total);
 const pool=document.getElementById('scen_pool_cards');pool.innerHTML='';
 for(const c of ((LS&&LS.cards)||[]))if(!assigned.has(c.id))pool.appendChild(dcardEl(c.id));
 stackDropify(document.getElementById('scen_pool'));}
+async function cardNew(){
+const name=document.getElementById('nc_name').value.trim();
+if(!name){alert('Give the card a name first.');return;}
+const j=await post('card_new',{campaign:camp(),
+type:document.getElementById('nc_type').value,
+class:document.getElementById('nc_class').value,name});
+if(j.ok){document.getElementById('nc_name').value='';
+addlog('card created: '+j.name+' ('+j.type+')');
+await refresh();openEditor(j.id);}
+else alert(j.message||'could not create the card');}
 async function campNew(){
 const name=prompt('Name the new campaign (e.g. "The Hollow Winter"):');
 if(!name)return;

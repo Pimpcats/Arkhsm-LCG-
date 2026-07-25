@@ -936,6 +936,40 @@ for _f in (os.path.join(ROOT, "pipeline", _cid + "_imported_spec.json"),
     if os.path.exists(_f):
         os.remove(_f)
 check("New campaign button present in the UI", "campNew" in page)
+# BUILD FROM SCRATCH, no AI: a new campaign starts empty and cards can be made
+# by hand on their real templates
+_r = requests.post(BASE + "/api/campaign_new", json={"name": "Scratch SelfTest"}).json()
+_sc = _r.get("id")
+check("a brand-new campaign starts genuinely empty",
+      len(requests.get(BASE + "/api/status?campaign=" + _sc).json()["cards"]) == 0)
+_made = []
+for _t in ("Location", "Enemy", "Investigator", "Asset"):
+    _c = requests.post(BASE + "/api/card_new",
+                       json={"campaign": _sc, "type": _t,
+                             "name": "Test " + _t}).json()
+    if _c.get("ok"):
+        _made.append(_c["id"])
+check("cards can be created by hand, no AI or backend", len(_made) == 4)
+_cards = requests.get(BASE + "/api/status?campaign=" + _sc).json()["cards"]
+check("hand-made cards appear in their own campaign only",
+      len(_cards) == 4
+      and all(c["id"] not in [x["id"] for x in requests.get(
+          BASE + "/api/status?campaign=still_hour").json()["cards"]]
+          for c in _cards))
+check("every hand-made card composed onto its real template",
+      all(os.path.exists(os.path.join(ROOT, "art", "faces", i + ".png"))
+          for i in _made))
+check("a hand-made card can be deleted",
+      requests.post(BASE + "/api/card_delete",
+                    json={"campaign": _sc, "card": _made[0]}).json().get("ok"))
+check("New card control present in the UI", "cardNew" in page and "nc_type" in page)
+_sh.rmtree(os.path.join(ROOT, "campaigns", _sc), ignore_errors=True)
+_sh.rmtree(os.path.join(ROOT, "out", _sc), ignore_errors=True)
+for _f in [os.path.join(ROOT, "pipeline", _sc + "_cards_spec.json"),
+           os.path.join(ROOT, "pipeline", _sc + "_imported_spec.json")] + \
+          [os.path.join(ROOT, "art", "faces", i + ".png") for i in _made]:
+    if os.path.exists(_f):
+        os.remove(_f)
 # a FRESH CLONE ships no composed faces (art/ is gitignored) — the app must
 # render them itself or it opens completely empty with nothing to click
 import shutil as _sh
