@@ -486,6 +486,86 @@ def load_assignments():
     return {}
 
 
+
+
+def act_scenario_new(p):
+    """Add a scenario box to a campaign. A campaign built from scratch starts
+    with no scenarios, so this is how the board gets its boxes."""
+    campaign = os.path.basename(str(p.get("campaign") or "still_hour"))
+    name = str(p.get("name") or "").strip()[:60]
+    if not name:
+        return {"ok": False, "message": "name the scenario"}
+    mpath = os.path.join(ROOT, "campaigns", campaign, "scenario_manifest.json")
+    if not os.path.exists(mpath):
+        return {"ok": False, "message": "no campaign called '{}'".format(campaign)}
+    with _state_lock:
+        try:
+            m = json.load(open(mpath, encoding="utf-8"))
+        except ValueError:
+            m = {"scenarios": []}
+        scen = m.setdefault("scenarios", [])
+        slug = "".join(ch if ch.isalnum() else "_" for ch in name.lower())
+        slug = "_".join(x for x in slug.split("_") if x)[:40] or "scenario"
+        taken = {s.get("id") for s in scen}
+        sid, n = slug, 2
+        while sid in taken:
+            sid, n = "{}_{}".format(slug, n), n + 1
+        scen.append({"id": sid, "name": name,
+                     "order": max([s.get("order", 0) for s in scen] or [-1]) + 1,
+                     "stacks": {}})
+        _write_json_atomic(mpath, m)
+    log("scenario added: {} ({})".format(name, sid))
+    return {"ok": True, "id": sid, "name": name}
+
+
+def act_scenario_delete(p):
+    """Remove a scenario box and its board assignments."""
+    campaign = os.path.basename(str(p.get("campaign") or "still_hour"))
+    sid = str(p.get("scenario") or "").strip()
+    mpath = os.path.join(ROOT, "campaigns", campaign, "scenario_manifest.json")
+    apath = os.path.join(ROOT, "campaigns", campaign, "scenario_assignments.json")
+    if not os.path.exists(mpath):
+        return {"ok": False, "message": "no such campaign"}
+    with _state_lock:
+        m = json.load(open(mpath, encoding="utf-8"))
+        before = len(m.get("scenarios", []))
+        m["scenarios"] = [s for s in m.get("scenarios", []) if s.get("id") != sid]
+        if len(m["scenarios"]) == before:
+            return {"ok": False, "message": "no scenario called '{}'".format(sid)}
+        _write_json_atomic(mpath, m)
+        if os.path.exists(apath):
+            try:
+                a = json.load(open(apath, encoding="utf-8"))
+                a.pop(sid, None)
+                _write_json_atomic(apath, a)
+            except ValueError:
+                pass
+    log("scenario removed: " + sid)
+    return {"ok": True, "id": sid}
+
+
+def act_scenario_rename(p):
+    """Rename a scenario box."""
+    campaign = os.path.basename(str(p.get("campaign") or "still_hour"))
+    sid = str(p.get("scenario") or "").strip()
+    name = str(p.get("name") or "").strip()[:60]
+    mpath = os.path.join(ROOT, "campaigns", campaign, "scenario_manifest.json")
+    if not name or not os.path.exists(mpath):
+        return {"ok": False, "message": "need a scenario and a new name"}
+    with _state_lock:
+        m = json.load(open(mpath, encoding="utf-8"))
+        hit = False
+        for sc in m.get("scenarios", []):
+            if sc.get("id") == sid:
+                sc["name"] = name
+                hit = True
+        if not hit:
+            return {"ok": False, "message": "no scenario called '{}'".format(sid)}
+        _write_json_atomic(mpath, m)
+    return {"ok": True, "id": sid, "name": name}
+
+
+
 def act_scenario_save(p):
     """Persist the deck-builder board: which card ids sit in which stack of
     which scenario. Body: {assignments: {scenario_id: {stack: [ids]}}} replaces
@@ -505,8 +585,11 @@ def act_scenario_save(p):
             cs["_locked"] = True
         if cs:
             clean[str(sid)[:64]] = cs
+    campaign = os.path.basename(str(p.get("campaign") or "still_hour"))
+    apath = os.path.join(ROOT, "campaigns", campaign,
+                         "scenario_assignments.json")
     with _state_lock:
-        _write_json_atomic(ASSIGNMENTS_PATH, clean)
+        _write_json_atomic(apath, clean)
     log("scenario board saved ({} scenario(s))".format(len(clean)))
     return {"ok": True, "assignments": clean}
 
@@ -792,10 +875,14 @@ def act_campaign_compile(p):
     force is set."""
     sys.path.insert(0, os.path.join(ROOT, "pipeline"))
     import compile_campaign as cc
-    out = os.path.join(ROOT, "dist", "the_still_hour_campaign.json")
+    campaign = os.path.basename(str(p.get("campaign") or "still_hour"))
+    out = os.path.join(ROOT, "dist",
+                       "the_still_hour_campaign.json" if campaign == "still_hour"
+                       else campaign + "_campaign.json")
     with _state_lock:
         try:
-            r = cc.compile_campaign(out, require_locked=not p.get("force"))
+            r = cc.compile_campaign(out, require_locked=not p.get("force"),
+                                    campaign=campaign)
         except Exception as e:  # noqa: BLE001 - report, never kill the thread
             return {"ok": False, "message": "compile failed: {}".format(e)}
     if r.get("ok"):
@@ -1290,11 +1377,10 @@ def act_apply(p):
 
 # ------------------------------------------------------------------- status --
 
-def _scenario_board():
+def _scenario_board(campaign="still_hour"):
     """The deck-builder board: scenario list from the manifest + saved
     card-to-stack assignments."""
-    mpath = os.path.join(ROOT, "campaigns", "still_hour",
-                         "scenario_manifest.json")
+    mpath = os.path.join(ROOT, "campaigns", campaign, "scenario_manifest.json")
     scen = []
     try:
         m = json.load(open(mpath, encoding="utf-8"))
@@ -1319,8 +1405,16 @@ def _scenario_board():
         scen.sort(key=lambda x: x["order"])
     except (ValueError, OSError):
         pass
+    apath = os.path.join(ROOT, "campaigns", campaign,
+                         "scenario_assignments.json")
+    assigns = {}
+    if os.path.exists(apath):
+        try:
+            assigns = json.load(open(apath, encoding="utf-8"))
+        except ValueError:
+            assigns = {}
     return {"scenarios": scen, "stacks": list(SCENARIO_STACKS),
-            "assignments": load_assignments()}
+            "assignments": assigns}
 
 
 def status(campaign="still_hour"):
@@ -1494,7 +1588,7 @@ def status(campaign="still_hour"):
                                "weight": (v or {}).get("weight", 0.8),
                                "trigger": (v or {}).get("trigger", "")}
                            for n, v in chars.items() if not n.startswith("_")},
-            "scenarios": _scenario_board(),
+            "scenarios": _scenario_board(campaign),
             "se": {"config": se_bridge.load_config(),
                    "bundle_exists": os.path.exists(
                        os.path.join(se_bridge.se_dir(), "frame_cards.js")),
@@ -1514,7 +1608,10 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "type_set": act_type_set, "upload_font": act_upload_font,
            "tts_spawn": act_tts_spawn, "plugin_update": act_plugin_update,
            "card_save": act_card_save, "art_remove": act_art_remove,
-           "scenario_save": act_scenario_save, "campaign_import": act_campaign_import, "campaign_new": act_campaign_new,
+           "scenario_save": act_scenario_save,
+           "scenario_new": act_scenario_new,
+           "scenario_delete": act_scenario_delete,
+           "scenario_rename": act_scenario_rename, "campaign_import": act_campaign_import, "campaign_new": act_campaign_new,
            "card_new": act_card_new, "card_delete": act_card_delete,
            "campaign_compile": act_campaign_compile,
            "prompt_get": act_prompt_get, "prompt_save": act_prompt_save,
@@ -1814,6 +1911,12 @@ border-radius:10px;color:#f0c9cd;font-size:13px"></div>
 <button class=btn onclick="document.getElementById('feed_file').click()" title="pour a written campaign (JSON) into the editor: existing cards become overrides, new cards are created, the board pre-fills">&#128229; Import campaign JSON&hellip;</button>
 <input type=file id=feed_file accept=".json,application/json" style="display:none" onchange=feedImport(this)>
 <span id=feed_info class=hint></span></div>
+<div class=row style="margin-bottom:8px">
+<b style="font-size:12px">New scenario box</b>
+<input id=ns_name size=26 placeholder="scenario name" onkeydown="if(event.key==='Enter')scenNew()">
+<button class="btn primary" onclick=scenNew()>+ Add scenario</button>
+<span class=hint>each box holds its own locations, act/agenda, encounter set and set-aside cards</span>
+</div>
 <div id=camp_bar>
 <b>Campaign box</b><span id=camp_progress class=stat>0/0 locked</span>
 <span class=slot>&#128214; Campaign guide &mdash; PDF slot (Phase 3)</span>
@@ -2802,7 +2905,18 @@ for(const st of box.querySelectorAll('.stack')){
 const ids=[...st.querySelectorAll('.dcard')].map(d=>d.dataset.cid);
 if(ids.length)A[sid][st.dataset.stack]=ids;}}
 return A;}
-async function scenSave(){await post('scenario_save',{assignments:scenAssignments()});}
+async function scenSave(){await post('scenario_save',{campaign:camp(),assignments:scenAssignments()});}
+async function scenNew(){const el=document.getElementById('ns_name');
+const name=el.value.trim();if(!name){alert('Name the scenario first.');return;}
+const j=await post('scenario_new',{campaign:camp(),name});
+if(j.ok){el.value='';addlog('scenario added: '+j.name);await refresh();scenBuild();}
+else alert(j.message||'could not add the scenario');}
+async function scenDel(sid,name){if(!confirm('Remove the scenario box "'+name+'"?\nCards go back to the pool.'))return;
+const j=await post('scenario_delete',{campaign:camp(),scenario:sid});
+if(j.ok){addlog('scenario removed: '+name);await refresh();scenBuild();}}
+async function scenRen(sid,cur){const name=prompt('Rename scenario:',cur);if(!name||name===cur)return;
+const j=await post('scenario_rename',{campaign:camp(),scenario:sid,name});
+if(j.ok){await refresh();scenBuild();}}
 function dcardEl(cid){const c=((LS&&LS.cards)||[]).find(x=>x.id===cid);
 const d=document.createElement('div');d.className='dcard';d.dataset.cid=cid;d.draggable=true;
 d.title=(c?c.name:cid);
@@ -2827,7 +2941,11 @@ const nameOf=cid=>{const c=((LS&&LS.cards)||[]).find(x=>x.id===cid);return c?Str
 for(const sc of S.scenarios){const A=S.assignments[sc.id]||{};
 const isLocked=!!A._locked;if(isLocked)locked++;
 const box=document.createElement('div');box.className='scenbox'+(isLocked?' locked':'');box.dataset.sid=sc.id;
-box.innerHTML=`<h3>${isLocked?'&#128274; ':''}${sc.name||sc.id}</h3>`;
+box.innerHTML=`<h3>${isLocked?'&#128274; ':''}${sc.name||sc.id}</h3>`+
+`<div class=row style="margin:-4px 0 6px"><button class=btn style="font-size:10px;padding:2px 7px" `+
+`onclick="scenRen('${sc.id}',${JSON.stringify(sc.name||sc.id)})">rename</button>`+
+`<button class=btn style="font-size:10px;padding:2px 7px" `+
+`onclick="scenDel('${sc.id}',${JSON.stringify(sc.name||sc.id)})">remove</button></div>`;
 for(const st of S.stacks){const div=document.createElement('div');div.className='stack';div.dataset.stack=st;
 const inStack=(A[st]||[]);
 const names=inStack.map(nameOf);
@@ -2843,6 +2961,8 @@ lb.innerHTML=isLocked?'&#128275; Unlock scenario':'&#128274; Lock in as finished
 lb.onclick=()=>{box.classList.toggle('locked');scenSave().then(()=>{refresh().then(scenBuild);});};
 box.appendChild(lb);
 board.appendChild(box);}
+if(!S.scenarios.length)board.innerHTML=
+'<div class=hint style="padding:16px">No scenario boxes yet &mdash; add one above, then drag cards from the pool into its stacks.</div>';
 const total=S.scenarios.length;
 document.getElementById('camp_progress').textContent=locked+'/'+total+' locked';
 document.getElementById('camp_spawn').disabled=!(total&&locked===total);
@@ -2870,7 +2990,7 @@ alert('Created "'+j.name+'".\n\nNow use 5 · Scenarios → Import campaign JSON 
 else alert(j.message||'could not create the campaign');}
 async function campCompile(){const el=document.getElementById('camp_out');
 el.textContent='compiling\u2026';
-const j=await post('campaign_compile',{});
+const j=await post('campaign_compile',{campaign:camp()});
 if(j.ok){el.textContent=`\u2713 ${j.scenarios} scenarios, ${j.cards} cards \u2192 ${j.out}`;
 addlog('campaign box compiled -> '+j.out+' (load it in TTS: Objects > Saved Objects)');}
 else{el.textContent=j.message||'compile failed';addlog('compile blocked: '+(j.message||''));}}

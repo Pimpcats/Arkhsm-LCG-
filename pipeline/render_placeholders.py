@@ -452,8 +452,8 @@ def render_investigator_front(c, pt, dest, art_path=None, placement=None):
     # stat plates row over the body column
     gfont = _font(18, glyph=True)
     x = 292
-    for value, token in ((c["wil"], "[wil]"), (c["int"], "[int]"),
-                         (c["com"], "[com]"), (c["agi"], "[agi]")):
+    for value, token in ((c.get("wil", "-"), "[wil]"), (c.get("int", "-"), "[int]"),
+                         (c.get("com", "-"), "[com]"), (c.get("agi", "-"), "[agi]")):
         stat_plate(d, x, 80, value, color, size=40)
         center_text(d, MARKUP[token], x + 20, 132, gfont, INK)
         x += 112
@@ -468,9 +468,9 @@ def render_investigator_front(c, pt, dest, art_path=None, placement=None):
     # health / sanity (under the body column)
     cx = (280 + w - 20) / 2
     d.ellipse([cx - 76, h - 80, cx - 32, h - 36], fill=RED, outline=(15, 15, 15))
-    center_text(d, str(c["health"]), cx - 54, h - 74, _font(22, bold=True), INK)
+    center_text(d, str(c.get("health", "-")), cx - 54, h - 74, _font(22, bold=True), INK)
     d.ellipse([cx + 32, h - 80, cx + 76, h - 36], fill=BLUE, outline=(15, 15, 15))
-    center_text(d, str(c["sanity"]), cx + 54, h - 74, _font(22, bold=True), INK)
+    center_text(d, str(c.get("sanity", "-")), cx + 54, h - 74, _font(22, bold=True), INK)
     footer(d, w, h, c["id"])
     img.save(dest)
 
@@ -613,7 +613,7 @@ def t_investigator_front(c, pt, dest, art_path=None, placement=None):
     # stat strip base then coins
     T.rrect(d, R["stats_strip"], T.SCROLL, radius=14)
     skill_colors = [(58, 92, 148), (128, 66, 130), (150, 48, 44), (56, 116, 74)]
-    for (box, val, sc) in zip(R["stats"], (c["wil"], c["int"], c["com"], c["agi"]), skill_colors):
+    for (box, val, sc) in zip(R["stats"], (c.get("wil", "-"), c.get("int", "-"), c.get("com", "-"), c.get("agi", "-")), skill_colors):
         d.ellipse(list(box), fill=sc, outline=(20, 16, 12), width=2)
         center_text(d, str(val), (box[0] + box[2]) / 2, box[1] + 8, _font(22, bold=True), T.SCROLL_INK)
     # portrait
@@ -633,9 +633,9 @@ def t_investigator_front(c, pt, dest, art_path=None, placement=None):
     # health / sanity
     cx = (px0 + px1) / 2
     d.ellipse([cx - 66, R["hs_y"], cx - 22, R["hs_y"] + 42], fill=T.RED, outline=(15, 12, 10), width=2)
-    center_text(d, str(c["health"]), cx - 44, R["hs_y"] + 6, _font(22, bold=True), T.SCROLL_INK)
+    center_text(d, str(c.get("health", "-")), cx - 44, R["hs_y"] + 6, _font(22, bold=True), T.SCROLL_INK)
     d.ellipse([cx + 22, R["hs_y"], cx + 66, R["hs_y"] + 42], fill=T.BLUE, outline=(15, 12, 10), width=2)
-    center_text(d, str(c["sanity"]), cx + 44, R["hs_y"] + 6, _font(22, bold=True), T.SCROLL_INK)
+    center_text(d, str(c.get("sanity", "-")), cx + 44, R["hs_y"] + 6, _font(22, bold=True), T.SCROLL_INK)
     T.cover_illus_credit(img, d, img.width, img.height, landscape=True)
     img.save(dest)
 
@@ -976,7 +976,7 @@ def p_investigator_front(c, pt, dest, art_path=None, placement=None):
     _box_text(d, c.get("subtitle", ""), R["Archetype"], italic=True, key="subtitle")
     for key, stat in (("Willpower", "wil"), ("Intellect", "int"),
                       ("Combat", "com"), ("Agility", "agi")):
-        _box_text(d, str(c[stat]), R[key], stat=True, grow=1.2)
+        _box_text(d, str(c.get(stat, "-")), R[key], stat=True, grow=1.2, key="stats")
     _box_text(d, c.get("traits", ""), R["Keywords"], bold=True, italic=True,
               max_size=26)
     a = R["Ability Text"]
@@ -984,9 +984,9 @@ def p_investigator_front(c, pt, dest, art_path=None, placement=None):
     fl = R["Flavor Text"]
     _box_block(d, pt.get("flavor", ""), (fl[0], fl[1], fl[2], fl[3] + 30),
                fill=(84, 66, 50), italic=True, start=24, key="flavor")
-    _box_text(d, str(c["health"]), R["Health"], fill=(255, 246, 240),
+    _box_text(d, str(c.get("health", "-")), R["Health"], fill=(255, 246, 240),
               stat=True, grow=0.85)
-    _box_text(d, str(c["sanity"]), R["Sanity"], fill=(240, 246, 255),
+    _box_text(d, str(c.get("sanity", "-")), R["Sanity"], fill=(240, 246, 255),
               stat=True, grow=0.85)
     # class disc over the template's custom faction icon
     cc = CLASS_COLORS.get(c.get("class", "Neutral"), (94, 94, 102))
@@ -1443,13 +1443,13 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
                   max_size=26, max_w_factor=1.0, key="subtitle")
     for key, stat in (("Willpower", "wil"), ("Intellect", "int"),
                       ("Combat", "com"), ("Agility", "agi")):
-        _box_text(d, str(c[stat]), se_reg("Investigator", key),
+        _box_text(d, str(c.get(stat, "-")), se_reg("Investigator", key),
                   stat=True, grow=1.0)
     _se_body(d, c, pt, "Investigator", text_start=20, extra_bottom=0)
     # health (red heart) + sanity (blue brain) chits from the official stat kit
     # — the plugin's own SanityBase is corrupt, so these are the clean source
-    for kind, key, val in (("health_heart", "Stamina", c["health"]),
-                           ("sanity_brain", "Sanity", c["sanity"])):
+    for kind, key, val in (("health_heart", "Stamina", c.get("health")),
+                           ("sanity_brain", "Sanity", c.get("sanity"))):
         box = se_reg("Investigator", key)
         cx, cy = (box[0] + box[2]) // 2, (box[1] + box[3]) // 2
         chit, numbered = _vital_chit(kind, val)

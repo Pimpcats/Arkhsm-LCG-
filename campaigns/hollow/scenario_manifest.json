@@ -1,0 +1,14 @@
+{
+  "campaign": {
+    "id": "hollow",
+    "name": "Hollow"
+  },
+  "scenarios": [
+    {
+      "id": "the_drowned_mill",
+      "name": "The Drowned Mill",
+      "order": 0,
+      "stacks": {}
+    }
+  ]
+}

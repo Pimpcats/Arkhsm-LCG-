@@ -1,17 +1,17 @@
 {
-  "SaveName": "The Still Hour",
-  "GameMode": "The Still Hour",
+  "SaveName": "Still Hour",
+  "GameMode": "Still Hour",
   "ObjectStates": [
     {
       "Name": "Custom_Model_Bag",
-      "Nickname": "The Still Hour",
+      "Nickname": "Still Hour",
       "Description": "fan content \u2014 not for sale",
       "GUID": "8ab74a",
       "Tags": [
         "CampaignBox",
         "Reloadable"
       ],
-      "GMNotes": "{\"filename\": \"still_hour\", \"id\": \"CB-STHR\", \"type\": \"CampaignBox\"}",
+      "GMNotes": "{\"filename\": \"still_hour\", \"id\": \"CB-STILL_HO\", \"type\": \"CampaignBox\"}",
       "Transform": {
         "posX": 0.0,
         "posY": 1.5,
@@ -28,17 +28,17 @@
         "g": 0.713235259,
         "b": 0.713235259
       },
-      "LuaScriptState": "{\"ml\": {\"b6dd5e\": {\"lock\": false, \"pos\": {\"x\": -14.0, \"y\": 1.5, \"z\": 12.0}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"508535\": {\"lock\": false, \"pos\": {\"x\": -10.0, \"y\": 1.5, \"z\": 12.0}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"ae0870\": {\"lock\": false, \"pos\": {\"x\": -6.0, \"y\": 1.5, \"z\": 12.0}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"5bbfee\": {\"lock\": false, \"pos\": {\"x\": -2.0, \"y\": 1.5, \"z\": 12.0}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"f6a66b\": {\"lock\": false, \"pos\": {\"x\": 2.0, \"y\": 1.5, \"z\": 12.0}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"64c28d\": {\"lock\": false, \"pos\": {\"x\": 6.0, \"y\": 1.5, \"z\": 12.0}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"a7713c\": {\"lock\": false, \"pos\": {\"x\": 10.0, \"y\": 1.5, \"z\": 12.0}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"c1efe6\": {\"lock\": false, \"pos\": {\"x\": 14.0, \"y\": 1.5, \"z\": 12.0}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"952e1d\": {\"lock\": false, \"pos\": {\"x\": 9.0, \"y\": 1.5, \"z\": -6.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}, \"cfc52d\": {\"lock\": false, \"pos\": {\"x\": 12.5, \"y\": 1.5, \"z\": -6.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}}}",
+      "LuaScriptState": "{\"ml\": {\"b6dd5e\": {\"lock\": false, \"pos\": {\"x\": -14.0, \"y\": 1.5, \"z\": 12.0}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"508535\": {\"lock\": false, \"pos\": {\"x\": -10.0, \"y\": 1.5, \"z\": 12.0}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"ae0870\": {\"lock\": false, \"pos\": {\"x\": -6.0, \"y\": 1.5, \"z\": 12.0}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"5bbfee\": {\"lock\": false, \"pos\": {\"x\": -2.0, \"y\": 1.5, \"z\": 12.0}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"f6a66b\": {\"lock\": false, \"pos\": {\"x\": 2.0, \"y\": 1.5, \"z\": 12.0}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"64c28d\": {\"lock\": false, \"pos\": {\"x\": 6.0, \"y\": 1.5, \"z\": 12.0}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"a7713c\": {\"lock\": false, \"pos\": {\"x\": 10.0, \"y\": 1.5, \"z\": 12.0}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"c1efe6\": {\"lock\": false, \"pos\": {\"x\": 14.0, \"y\": 1.5, \"z\": 12.0}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"602ccf\": {\"lock\": false, \"pos\": {\"x\": 9.0, \"y\": 1.5, \"z\": -6.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}, \"b2aa02\": {\"lock\": false, \"pos\": {\"x\": 12.5, \"y\": 1.5, \"z\": -6.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}}}",
       "ContainedObjects": [
         {
           "Name": "Custom_Model_Bag",
           "Nickname": "The First Hour",
-          "Description": "The Still Hour",
+          "Description": "Still Hour",
           "GUID": "b6dd5e",
           "Tags": [
             "ScenarioBox"
           ],
-          "GMNotes": "{\"id\": \"prologue\", \"type\": \"ScenarioBox\", \"cycle\": \"The Still Hour\"}",
+          "GMNotes": "{\"id\": \"prologue\", \"type\": \"ScenarioBox\", \"cycle\": \"Still Hour\"}",
           "Transform": {
             "posX": 0.0,
             "posY": 1.5,
@@ -55,7 +55,7 @@
             "g": 0.713235259,
             "b": 0.713235259
           },
-          "LuaScriptState": "{\"ml\": {\"2ea8f2\": {\"lock\": false, \"pos\": {\"x\": -6.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}, \"ef8782\": {\"lock\": false, \"pos\": {\"x\": -3.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}, \"0e8af3\": {\"lock\": false, \"pos\": {\"x\": 0.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}, \"2655a6\": {\"lock\": false, \"pos\": {\"x\": 3.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}}}",
+          "LuaScriptState": "{\"ml\": {\"2ea8f2\": {\"lock\": false, \"pos\": {\"x\": -12.22, \"y\": 1.59, \"z\": -8.9}, \"rot\": {\"x\": 0, \"y\": 90, \"z\": 0}}, \"ef8782\": {\"lock\": false, \"pos\": {\"x\": -2.94, \"y\": 1.61, \"z\": 0.36}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}, \"84faf0\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": 11.46}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"68f83d\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": 3.81}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"3d6c60\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": -3.84}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"2655a6\": {\"lock\": false, \"pos\": {\"x\": -3.85, \"y\": 1.75, \"z\": 5.72}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}}}",
           "ContainedObjects": [
             {
               "Name": "Card",
@@ -78,11 +78,11 @@
               "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-scn-stillhour\",\"type\":\"Scenario\",\"class\":\"Mythos\",\"traits\":\"\",\"cycle\":\"The Still Hour\"}",
               "Transform": {
-                "posX": -6.0,
-                "posY": 1.5,
-                "posZ": 0.0,
+                "posX": -12.22,
+                "posY": 1.59,
+                "posZ": -8.9,
                 "rotX": 0,
-                "rotY": 180,
+                "rotY": 90,
                 "rotZ": 0,
                 "scaleX": 1.15,
                 "scaleY": 1,
@@ -116,9 +116,9 @@
                 "ScenarioCard"
               ],
               "Transform": {
-                "posX": -3.0,
-                "posY": 1.5,
-                "posZ": 0.0,
+                "posX": -2.94,
+                "posY": 1.61,
+                "posZ": 0.36,
                 "rotX": 0,
                 "rotY": 180,
                 "rotZ": 0,
@@ -679,33 +679,43 @@
               ]
             },
             {
-              "Name": "Deck",
-              "Nickname": "The First Hour \u2014 Locations",
+              "Name": "Card",
+              "Nickname": "The Square",
               "Description": "",
-              "GUID": "0e8af3",
+              "GUID": "84faf0",
+              "CardID": 9899200,
+              "SidewaysCard": false,
               "Tags": [
+                "Location",
                 "ScenarioCard"
               ],
-              "Transform": {
-                "posX": 0.0,
-                "posY": 1.5,
-                "posZ": 0.0,
-                "rotX": 0,
-                "rotY": 180,
-                "rotZ": 0,
-                "scaleX": 1.15,
-                "scaleY": 1,
-                "scaleZ": 1.15
-              },
+              "LuaScript": "",
+              "LuaScriptState": "",
               "ColorDiffuse": {
                 "r": 0.713235259,
                 "g": 0.713235259,
                 "b": 0.713235259
               },
-              "DeckIDs": [
-                9899200,
-                9629300,
-                9844000
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-square\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove. Central.\",\"cycle\":\"The Still Hour\"}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": 11.46,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
               ],
               "CustomDeck": {
                 "98992": {
@@ -716,7 +726,49 @@
                   "Type": 0,
                   "UniqueBack": false,
                   "BackIsHidden": false
-                },
+                }
+              }
+            },
+            {
+              "Name": "Card",
+              "Nickname": "The Long Pier",
+              "Description": "",
+              "GUID": "68f83d",
+              "CardID": 9629300,
+              "SidewaysCard": false,
+              "Tags": [
+                "Location",
+                "ScenarioCard"
+              ],
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-longpier\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove. Coastal.\",\"cycle\":\"The Still Hour\"}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": 3.8100000000000005,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
+              ],
+              "CustomDeck": {
                 "96293": {
                   "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Long+Pier",
                   "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
@@ -725,7 +777,49 @@
                   "Type": 0,
                   "UniqueBack": false,
                   "BackIsHidden": false
-                },
+                }
+              }
+            },
+            {
+              "Name": "Card",
+              "Nickname": "The Almanac Steps",
+              "Description": "",
+              "GUID": "3d6c60",
+              "CardID": 9844000,
+              "SidewaysCard": false,
+              "Tags": [
+                "Location",
+                "ScenarioCard"
+              ],
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-almanacsteps\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove.\",\"cycle\":\"The Still Hour\"}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": -3.84,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
+              ],
+              "CustomDeck": {
                 "98440": {
                   "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Almanac+Steps",
                   "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
@@ -735,162 +829,7 @@
                   "UniqueBack": false,
                   "BackIsHidden": false
                 }
-              },
-              "ContainedObjects": [
-                {
-                  "Name": "Card",
-                  "Nickname": "The Square",
-                  "Description": "",
-                  "GUID": "84faf0",
-                  "CardID": 9899200,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-square\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove. Central.\",\"cycle\":\"The Still Hour\"}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "98992": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Square",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                },
-                {
-                  "Name": "Card",
-                  "Nickname": "The Long Pier",
-                  "Description": "",
-                  "GUID": "68f83d",
-                  "CardID": 9629300,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-longpier\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove. Coastal.\",\"cycle\":\"The Still Hour\"}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "96293": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Long+Pier",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                },
-                {
-                  "Name": "Card",
-                  "Nickname": "The Almanac Steps",
-                  "Description": "",
-                  "GUID": "3d6c60",
-                  "CardID": 9844000,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-almanacsteps\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove.\",\"cycle\":\"The Still Hour\"}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "98440": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Almanac+Steps",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                }
-              ]
+              }
             },
             {
               "Name": "Deck",
@@ -901,11 +840,11 @@
                 "ScenarioCard"
               ],
               "Transform": {
-                "posX": 3.0,
-                "posY": 1.5,
-                "posZ": 0.0,
+                "posX": -3.85,
+                "posY": 1.75,
+                "posZ": 5.72,
                 "rotX": 0,
-                "rotY": 180,
+                "rotY": 270,
                 "rotZ": 0,
                 "scaleX": 1.15,
                 "scaleY": 1,
@@ -1708,12 +1647,12 @@
         {
           "Name": "Custom_Model_Bag",
           "Nickname": "The Lighthouse",
-          "Description": "The Still Hour",
+          "Description": "Still Hour",
           "GUID": "508535",
           "Tags": [
             "ScenarioBox"
           ],
-          "GMNotes": "{\"id\": \"district_lighthouse\", \"type\": \"ScenarioBox\", \"cycle\": \"The Still Hour\"}",
+          "GMNotes": "{\"id\": \"district_lighthouse\", \"type\": \"ScenarioBox\", \"cycle\": \"Still Hour\"}",
           "Transform": {
             "posX": 0.0,
             "posY": 1.5,
@@ -1730,36 +1669,46 @@
             "g": 0.713235259,
             "b": 0.713235259
           },
-          "LuaScriptState": "{\"ml\": {\"6e088b\": {\"lock\": false, \"pos\": {\"x\": -6.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}, \"fcbbbd\": {\"lock\": false, \"pos\": {\"x\": -3.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}}}",
+          "LuaScriptState": "{\"ml\": {\"08a4a6\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": 11.46}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"097afb\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": 3.81}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"66e1cb\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": -3.84}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"fcbbbd\": {\"lock\": false, \"pos\": {\"x\": -3.85, \"y\": 1.75, \"z\": 5.72}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}}}",
           "ContainedObjects": [
             {
-              "Name": "Deck",
-              "Nickname": "The Lighthouse \u2014 Locations",
+              "Name": "Card",
+              "Nickname": "The Lantern Room",
               "Description": "",
-              "GUID": "6e088b",
+              "GUID": "08a4a6",
+              "CardID": 9843800,
+              "SidewaysCard": false,
               "Tags": [
+                "Location",
                 "ScenarioCard"
               ],
-              "Transform": {
-                "posX": -6.0,
-                "posY": 1.5,
-                "posZ": 0.0,
-                "rotX": 0,
-                "rotY": 180,
-                "rotZ": 0,
-                "scaleX": 1.15,
-                "scaleY": 1,
-                "scaleZ": 1.15
-              },
+              "LuaScript": "",
+              "LuaScriptState": "",
               "ColorDiffuse": {
                 "r": 0.713235259,
                 "g": 0.713235259,
                 "b": 0.713235259
               },
-              "DeckIDs": [
-                9843800,
-                9630700,
-                9747500
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-lanternroom\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Lighthouse.\",\"cycle\":\"The Still Hour\"}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": 11.46,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
               ],
               "CustomDeck": {
                 "98438": {
@@ -1770,7 +1719,49 @@
                   "Type": 0,
                   "UniqueBack": false,
                   "BackIsHidden": false
-                },
+                }
+              }
+            },
+            {
+              "Name": "Card",
+              "Nickname": "The Winding Stair",
+              "Description": "",
+              "GUID": "097afb",
+              "CardID": 9630700,
+              "SidewaysCard": false,
+              "Tags": [
+                "Location",
+                "ScenarioCard"
+              ],
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-windingstair\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Lighthouse.\",\"cycle\":\"The Still Hour\"}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": 3.8100000000000005,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
+              ],
+              "CustomDeck": {
                 "96307": {
                   "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Winding+Stair",
                   "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
@@ -1779,7 +1770,49 @@
                   "Type": 0,
                   "UniqueBack": false,
                   "BackIsHidden": false
-                },
+                }
+              }
+            },
+            {
+              "Name": "Card",
+              "Nickname": "The Keeper's Quarters",
+              "Description": "The Keeper's Vigil",
+              "GUID": "66e1cb",
+              "CardID": 9747500,
+              "SidewaysCard": false,
+              "Tags": [
+                "Location",
+                "ScenarioCard"
+              ],
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-keepersquarters\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Lighthouse.\",\"cycle\":\"The Still Hour\",\"victory\":1}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": -3.84,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
+              ],
+              "CustomDeck": {
                 "97475": {
                   "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Keeper's+Quarters",
                   "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
@@ -1789,162 +1822,7 @@
                   "UniqueBack": false,
                   "BackIsHidden": false
                 }
-              },
-              "ContainedObjects": [
-                {
-                  "Name": "Card",
-                  "Nickname": "The Lantern Room",
-                  "Description": "",
-                  "GUID": "08a4a6",
-                  "CardID": 9843800,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-lanternroom\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Lighthouse.\",\"cycle\":\"The Still Hour\"}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "98438": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Lantern+Room",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                },
-                {
-                  "Name": "Card",
-                  "Nickname": "The Winding Stair",
-                  "Description": "",
-                  "GUID": "097afb",
-                  "CardID": 9630700,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-windingstair\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Lighthouse.\",\"cycle\":\"The Still Hour\"}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "96307": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Winding+Stair",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                },
-                {
-                  "Name": "Card",
-                  "Nickname": "The Keeper's Quarters",
-                  "Description": "The Keeper's Vigil",
-                  "GUID": "66e1cb",
-                  "CardID": 9747500,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-keepersquarters\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Lighthouse.\",\"cycle\":\"The Still Hour\",\"victory\":1}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "97475": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Keeper's+Quarters",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                }
-              ]
+              }
             },
             {
               "Name": "Deck",
@@ -1955,11 +1833,11 @@
                 "ScenarioCard"
               ],
               "Transform": {
-                "posX": -3.0,
-                "posY": 1.5,
-                "posZ": 0.0,
+                "posX": -3.85,
+                "posY": 1.75,
+                "posZ": 5.72,
                 "rotX": 0,
-                "rotY": 180,
+                "rotY": 270,
                 "rotZ": 0,
                 "scaleX": 1.15,
                 "scaleY": 1,
@@ -2102,12 +1980,12 @@
         {
           "Name": "Custom_Model_Bag",
           "Nickname": "The Drowned Church",
-          "Description": "The Still Hour",
+          "Description": "Still Hour",
           "GUID": "ae0870",
           "Tags": [
             "ScenarioBox"
           ],
-          "GMNotes": "{\"id\": \"district_church\", \"type\": \"ScenarioBox\", \"cycle\": \"The Still Hour\"}",
+          "GMNotes": "{\"id\": \"district_church\", \"type\": \"ScenarioBox\", \"cycle\": \"Still Hour\"}",
           "Transform": {
             "posX": 0.0,
             "posY": 1.5,
@@ -2124,37 +2002,46 @@
             "g": 0.713235259,
             "b": 0.713235259
           },
-          "LuaScriptState": "{\"ml\": {\"38792d\": {\"lock\": false, \"pos\": {\"x\": -6.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}, \"1c04c6\": {\"lock\": false, \"pos\": {\"x\": -3.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}, \"dbfd89\": {\"lock\": false, \"pos\": {\"x\": 0.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}}}",
+          "LuaScriptState": "{\"ml\": {\"e1839e\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": 11.46}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"9d9088\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": 3.81}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"a66610\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": -3.84}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"2e85c5\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": -11.49}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"1c04c6\": {\"lock\": false, \"pos\": {\"x\": -3.85, \"y\": 1.75, \"z\": 5.72}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"dbfd89\": {\"lock\": false, \"pos\": {\"x\": -3.85, \"y\": 1.6, \"z\": -10.39}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}}}",
           "ContainedObjects": [
             {
-              "Name": "Deck",
-              "Nickname": "The Drowned Church \u2014 Locations",
+              "Name": "Card",
+              "Nickname": "The Nave",
               "Description": "",
-              "GUID": "38792d",
+              "GUID": "e1839e",
+              "CardID": 9729400,
+              "SidewaysCard": false,
               "Tags": [
+                "Location",
                 "ScenarioCard"
               ],
-              "Transform": {
-                "posX": -6.0,
-                "posY": 1.5,
-                "posZ": 0.0,
-                "rotX": 0,
-                "rotY": 180,
-                "rotZ": 0,
-                "scaleX": 1.15,
-                "scaleY": 1,
-                "scaleZ": 1.15
-              },
+              "LuaScript": "",
+              "LuaScriptState": "",
               "ColorDiffuse": {
                 "r": 0.713235259,
                 "g": 0.713235259,
                 "b": 0.713235259
               },
-              "DeckIDs": [
-                9729400,
-                9615200,
-                9610400,
-                9690100
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-nave\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Church.\",\"cycle\":\"The Still Hour\"}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": 11.46,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
               ],
               "CustomDeck": {
                 "97294": {
@@ -2165,7 +2052,49 @@
                   "Type": 0,
                   "UniqueBack": false,
                   "BackIsHidden": false
-                },
+                }
+              }
+            },
+            {
+              "Name": "Card",
+              "Nickname": "The Belfry",
+              "Description": "",
+              "GUID": "9d9088",
+              "CardID": 9615200,
+              "SidewaysCard": false,
+              "Tags": [
+                "Location",
+                "ScenarioCard"
+              ],
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-belfry\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Church.\",\"cycle\":\"The Still Hour\"}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": 3.8100000000000005,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
+              ],
+              "CustomDeck": {
                 "96152": {
                   "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Belfry",
                   "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
@@ -2174,7 +2103,49 @@
                   "Type": 0,
                   "UniqueBack": false,
                   "BackIsHidden": false
-                },
+                }
+              }
+            },
+            {
+              "Name": "Card",
+              "Nickname": "The Flooded Crypt",
+              "Description": "",
+              "GUID": "a66610",
+              "CardID": 9610400,
+              "SidewaysCard": false,
+              "Tags": [
+                "Location",
+                "ScenarioCard"
+              ],
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-floodedcrypt\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Church. Sunken.\",\"cycle\":\"The Still Hour\",\"victory\":1}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": -3.84,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
+              ],
+              "CustomDeck": {
                 "96104": {
                   "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Flooded+Crypt",
                   "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
@@ -2183,7 +2154,49 @@
                   "Type": 0,
                   "UniqueBack": false,
                   "BackIsHidden": false
-                },
+                }
+              }
+            },
+            {
+              "Name": "Card",
+              "Nickname": "The Vestry",
+              "Description": "",
+              "GUID": "2e85c5",
+              "CardID": 9690100,
+              "SidewaysCard": false,
+              "Tags": [
+                "Location",
+                "ScenarioCard"
+              ],
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-vestry\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Church.\",\"cycle\":\"The Still Hour\"}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": -11.490000000000002,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
+              ],
+              "CustomDeck": {
                 "96901": {
                   "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Vestry",
                   "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
@@ -2193,213 +2206,7 @@
                   "UniqueBack": false,
                   "BackIsHidden": false
                 }
-              },
-              "ContainedObjects": [
-                {
-                  "Name": "Card",
-                  "Nickname": "The Nave",
-                  "Description": "",
-                  "GUID": "e1839e",
-                  "CardID": 9729400,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-nave\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Church.\",\"cycle\":\"The Still Hour\"}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "97294": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Nave",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                },
-                {
-                  "Name": "Card",
-                  "Nickname": "The Belfry",
-                  "Description": "",
-                  "GUID": "9d9088",
-                  "CardID": 9615200,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-belfry\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Church.\",\"cycle\":\"The Still Hour\"}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "96152": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Belfry",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                },
-                {
-                  "Name": "Card",
-                  "Nickname": "The Flooded Crypt",
-                  "Description": "",
-                  "GUID": "a66610",
-                  "CardID": 9610400,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-floodedcrypt\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Church. Sunken.\",\"cycle\":\"The Still Hour\",\"victory\":1}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "96104": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Flooded+Crypt",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                },
-                {
-                  "Name": "Card",
-                  "Nickname": "The Vestry",
-                  "Description": "",
-                  "GUID": "2e85c5",
-                  "CardID": 9690100,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-vestry\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Church.\",\"cycle\":\"The Still Hour\"}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "96901": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Vestry",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                }
-              ]
+              }
             },
             {
               "Name": "Deck",
@@ -2410,11 +2217,11 @@
                 "ScenarioCard"
               ],
               "Transform": {
-                "posX": -3.0,
-                "posY": 1.5,
-                "posZ": 0.0,
+                "posX": -3.85,
+                "posY": 1.75,
+                "posZ": 5.72,
                 "rotX": 0,
-                "rotY": 180,
+                "rotY": 270,
                 "rotZ": 0,
                 "scaleX": 1.15,
                 "scaleY": 1,
@@ -2573,11 +2380,11 @@
               "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-drownedchoir\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Echo. Monster.\",\"cycle\":\"The Still Hour\"}",
               "Transform": {
-                "posX": 0.0,
-                "posY": 1.5,
-                "posZ": 0.0,
+                "posX": -3.85,
+                "posY": 1.6,
+                "posZ": -10.39,
                 "rotX": 0,
-                "rotY": 180,
+                "rotY": 270,
                 "rotZ": 0,
                 "scaleX": 1.15,
                 "scaleY": 1,
@@ -2607,12 +2414,12 @@
         {
           "Name": "Custom_Model_Bag",
           "Nickname": "The Sunken Road",
-          "Description": "The Still Hour",
+          "Description": "Still Hour",
           "GUID": "5bbfee",
           "Tags": [
             "ScenarioBox"
           ],
-          "GMNotes": "{\"id\": \"district_road\", \"type\": \"ScenarioBox\", \"cycle\": \"The Still Hour\"}",
+          "GMNotes": "{\"id\": \"district_road\", \"type\": \"ScenarioBox\", \"cycle\": \"Still Hour\"}",
           "Transform": {
             "posX": 0.0,
             "posY": 1.5,
@@ -2629,36 +2436,46 @@
             "g": 0.713235259,
             "b": 0.713235259
           },
-          "LuaScriptState": "{\"ml\": {\"be1b1b\": {\"lock\": false, \"pos\": {\"x\": -6.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}, \"b69dd8\": {\"lock\": false, \"pos\": {\"x\": -3.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}, \"c0835d\": {\"lock\": false, \"pos\": {\"x\": 0.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}}}",
+          "LuaScriptState": "{\"ml\": {\"072f6c\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": 11.46}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"e96cd3\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": 3.81}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"9fd989\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": -3.84}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"b69dd8\": {\"lock\": false, \"pos\": {\"x\": -3.85, \"y\": 1.75, \"z\": 5.72}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"c0835d\": {\"lock\": false, \"pos\": {\"x\": -3.85, \"y\": 1.6, \"z\": -10.39}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}}}",
           "ContainedObjects": [
             {
-              "Name": "Deck",
-              "Nickname": "The Sunken Road \u2014 Locations",
+              "Name": "Card",
+              "Nickname": "The Milestones",
               "Description": "",
-              "GUID": "be1b1b",
+              "GUID": "072f6c",
+              "CardID": 9889200,
+              "SidewaysCard": false,
               "Tags": [
+                "Location",
                 "ScenarioCard"
               ],
-              "Transform": {
-                "posX": -6.0,
-                "posY": 1.5,
-                "posZ": 0.0,
-                "rotX": 0,
-                "rotY": 180,
-                "rotZ": 0,
-                "scaleX": 1.15,
-                "scaleY": 1,
-                "scaleZ": 1.15
-              },
+              "LuaScript": "",
+              "LuaScriptState": "",
               "ColorDiffuse": {
                 "r": 0.713235259,
                 "g": 0.713235259,
                 "b": 0.713235259
               },
-              "DeckIDs": [
-                9889200,
-                9674700,
-                9891300
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-milestones\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Road.\",\"cycle\":\"The Still Hour\"}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": 11.46,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
               ],
               "CustomDeck": {
                 "98892": {
@@ -2669,7 +2486,49 @@
                   "Type": 0,
                   "UniqueBack": false,
                   "BackIsHidden": false
-                },
+                }
+              }
+            },
+            {
+              "Name": "Card",
+              "Nickname": "The Low Bridge",
+              "Description": "",
+              "GUID": "e96cd3",
+              "CardID": 9674700,
+              "SidewaysCard": false,
+              "Tags": [
+                "Location",
+                "ScenarioCard"
+              ],
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-lowbridge\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Road.\",\"cycle\":\"The Still Hour\"}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": 3.8100000000000005,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
+              ],
+              "CustomDeck": {
                 "96747": {
                   "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Low+Bridge",
                   "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
@@ -2678,7 +2537,49 @@
                   "Type": 0,
                   "UniqueBack": false,
                   "BackIsHidden": false
-                },
+                }
+              }
+            },
+            {
+              "Name": "Card",
+              "Nickname": "The Turning",
+              "Description": "",
+              "GUID": "9fd989",
+              "CardID": 9891300,
+              "SidewaysCard": false,
+              "Tags": [
+                "Location",
+                "ScenarioCard"
+              ],
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-turning\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Road.\",\"cycle\":\"The Still Hour\"}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": -3.84,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
+              ],
+              "CustomDeck": {
                 "98913": {
                   "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Turning",
                   "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
@@ -2688,162 +2589,7 @@
                   "UniqueBack": false,
                   "BackIsHidden": false
                 }
-              },
-              "ContainedObjects": [
-                {
-                  "Name": "Card",
-                  "Nickname": "The Milestones",
-                  "Description": "",
-                  "GUID": "072f6c",
-                  "CardID": 9889200,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-milestones\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Road.\",\"cycle\":\"The Still Hour\"}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "98892": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Milestones",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                },
-                {
-                  "Name": "Card",
-                  "Nickname": "The Low Bridge",
-                  "Description": "",
-                  "GUID": "e96cd3",
-                  "CardID": 9674700,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-lowbridge\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Road.\",\"cycle\":\"The Still Hour\"}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "96747": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Low+Bridge",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                },
-                {
-                  "Name": "Card",
-                  "Nickname": "The Turning",
-                  "Description": "",
-                  "GUID": "9fd989",
-                  "CardID": 9891300,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-turning\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Road.\",\"cycle\":\"The Still Hour\"}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "98913": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Turning",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                }
-              ]
+              }
             },
             {
               "Name": "Card",
@@ -2866,11 +2612,11 @@
               "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-bridgeremembers\",\"type\":\"Treachery\",\"class\":\"Mythos\",\"traits\":\"Omen.\",\"cycle\":\"The Still Hour\"}",
               "Transform": {
-                "posX": -3.0,
-                "posY": 1.5,
-                "posZ": 0.0,
+                "posX": -3.85,
+                "posY": 1.75,
+                "posZ": 5.72,
                 "rotX": 0,
-                "rotY": 180,
+                "rotY": 270,
                 "rotZ": 0,
                 "scaleX": 1.15,
                 "scaleY": 1,
@@ -2916,11 +2662,11 @@
               "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-waitingcongregation\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Echo. Humanoid.\",\"cycle\":\"The Still Hour\"}",
               "Transform": {
-                "posX": 0.0,
-                "posY": 1.5,
-                "posZ": 0.0,
+                "posX": -3.85,
+                "posY": 1.6,
+                "posZ": -10.39,
                 "rotX": 0,
-                "rotY": 180,
+                "rotY": 270,
                 "rotZ": 0,
                 "scaleX": 1.15,
                 "scaleY": 1,
@@ -2950,12 +2696,12 @@
         {
           "Name": "Custom_Model_Bag",
           "Nickname": "The Square (Town Hall)",
-          "Description": "The Still Hour",
+          "Description": "Still Hour",
           "GUID": "f6a66b",
           "Tags": [
             "ScenarioBox"
           ],
-          "GMNotes": "{\"id\": \"district_square\", \"type\": \"ScenarioBox\", \"cycle\": \"The Still Hour\"}",
+          "GMNotes": "{\"id\": \"district_square\", \"type\": \"ScenarioBox\", \"cycle\": \"Still Hour\"}",
           "Transform": {
             "posX": 0.0,
             "posY": 1.5,
@@ -2972,36 +2718,46 @@
             "g": 0.713235259,
             "b": 0.713235259
           },
-          "LuaScriptState": "{\"ml\": {\"d56612\": {\"lock\": false, \"pos\": {\"x\": -6.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}, \"de0a8c\": {\"lock\": false, \"pos\": {\"x\": -3.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}}}",
+          "LuaScriptState": "{\"ml\": {\"47f8ee\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": 11.46}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"fed38f\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": 3.81}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"3080de\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": -3.84}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"de0a8c\": {\"lock\": false, \"pos\": {\"x\": -3.85, \"y\": 1.75, \"z\": 5.72}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}}}",
           "ContainedObjects": [
             {
-              "Name": "Deck",
-              "Nickname": "The Square (Town Hall) \u2014 Locations",
+              "Name": "Card",
+              "Nickname": "The Town Hall Steps",
               "Description": "",
-              "GUID": "d56612",
+              "GUID": "47f8ee",
+              "CardID": 9678200,
+              "SidewaysCard": false,
               "Tags": [
+                "Location",
                 "ScenarioCard"
               ],
-              "Transform": {
-                "posX": -6.0,
-                "posY": 1.5,
-                "posZ": 0.0,
-                "rotX": 0,
-                "rotY": 180,
-                "rotZ": 0,
-                "scaleX": 1.15,
-                "scaleY": 1,
-                "scaleZ": 1.15
-              },
+              "LuaScript": "",
+              "LuaScriptState": "",
               "ColorDiffuse": {
                 "r": 0.713235259,
                 "g": 0.713235259,
                 "b": 0.713235259
               },
-              "DeckIDs": [
-                9678200,
-                9830300,
-                9771800
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-townhallsteps\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove. Central.\",\"cycle\":\"The Still Hour\"}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": 11.46,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
               ],
               "CustomDeck": {
                 "96782": {
@@ -3012,7 +2768,49 @@
                   "Type": 0,
                   "UniqueBack": false,
                   "BackIsHidden": false
-                },
+                }
+              }
+            },
+            {
+              "Name": "Card",
+              "Nickname": "The Records Office",
+              "Description": "",
+              "GUID": "fed38f",
+              "CardID": 9830300,
+              "SidewaysCard": false,
+              "Tags": [
+                "Location",
+                "ScenarioCard"
+              ],
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-recordsoffice\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove.\",\"cycle\":\"The Still Hour\",\"victory\":1}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": 3.8100000000000005,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
+              ],
+              "CustomDeck": {
                 "98303": {
                   "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Records+Office",
                   "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
@@ -3021,7 +2819,49 @@
                   "Type": 0,
                   "UniqueBack": false,
                   "BackIsHidden": false
-                },
+                }
+              }
+            },
+            {
+              "Name": "Card",
+              "Nickname": "The Well",
+              "Description": "",
+              "GUID": "3080de",
+              "CardID": 9771800,
+              "SidewaysCard": false,
+              "Tags": [
+                "Location",
+                "ScenarioCard"
+              ],
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-well\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove.\",\"cycle\":\"The Still Hour\"}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": -3.84,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
+              ],
+              "CustomDeck": {
                 "97718": {
                   "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Well",
                   "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
@@ -3031,162 +2871,7 @@
                   "UniqueBack": false,
                   "BackIsHidden": false
                 }
-              },
-              "ContainedObjects": [
-                {
-                  "Name": "Card",
-                  "Nickname": "The Town Hall Steps",
-                  "Description": "",
-                  "GUID": "47f8ee",
-                  "CardID": 9678200,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-townhallsteps\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove. Central.\",\"cycle\":\"The Still Hour\"}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "96782": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Town+Hall+Steps",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                },
-                {
-                  "Name": "Card",
-                  "Nickname": "The Records Office",
-                  "Description": "",
-                  "GUID": "fed38f",
-                  "CardID": 9830300,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-recordsoffice\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove.\",\"cycle\":\"The Still Hour\",\"victory\":1}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "98303": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Records+Office",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                },
-                {
-                  "Name": "Card",
-                  "Nickname": "The Well",
-                  "Description": "",
-                  "GUID": "3080de",
-                  "CardID": 9771800,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-well\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove.\",\"cycle\":\"The Still Hour\"}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "97718": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Well",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                }
-              ]
+              }
             },
             {
               "Name": "Deck",
@@ -3197,11 +2882,11 @@
                 "ScenarioCard"
               ],
               "Transform": {
-                "posX": -3.0,
-                "posY": 1.5,
-                "posZ": 0.0,
+                "posX": -3.85,
+                "posY": 1.75,
+                "posZ": 5.72,
                 "rotX": 0,
-                "rotY": 180,
+                "rotY": 270,
                 "rotZ": 0,
                 "scaleX": 1.15,
                 "scaleY": 1,
@@ -3344,12 +3029,12 @@
         {
           "Name": "Custom_Model_Bag",
           "Nickname": "The Fairground",
-          "Description": "The Still Hour",
+          "Description": "Still Hour",
           "GUID": "64c28d",
           "Tags": [
             "ScenarioBox"
           ],
-          "GMNotes": "{\"id\": \"district_fairground\", \"type\": \"ScenarioBox\", \"cycle\": \"The Still Hour\"}",
+          "GMNotes": "{\"id\": \"district_fairground\", \"type\": \"ScenarioBox\", \"cycle\": \"Still Hour\"}",
           "Transform": {
             "posX": 0.0,
             "posY": 1.5,
@@ -3366,36 +3051,46 @@
             "g": 0.713235259,
             "b": 0.713235259
           },
-          "LuaScriptState": "{\"ml\": {\"8103c3\": {\"lock\": false, \"pos\": {\"x\": -6.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}, \"1d135c\": {\"lock\": false, \"pos\": {\"x\": -3.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}}}",
+          "LuaScriptState": "{\"ml\": {\"15d5ad\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": 11.46}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"0e7c2d\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": 3.81}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"b1fa36\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": -3.84}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"1d135c\": {\"lock\": false, \"pos\": {\"x\": -3.85, \"y\": 1.75, \"z\": 5.72}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}}}",
           "ContainedObjects": [
             {
-              "Name": "Deck",
-              "Nickname": "The Fairground \u2014 Locations",
+              "Name": "Card",
+              "Nickname": "The Wheel",
               "Description": "",
-              "GUID": "8103c3",
+              "GUID": "15d5ad",
+              "CardID": 9895700,
+              "SidewaysCard": false,
               "Tags": [
+                "Location",
                 "ScenarioCard"
               ],
-              "Transform": {
-                "posX": -6.0,
-                "posY": 1.5,
-                "posZ": 0.0,
-                "rotX": 0,
-                "rotY": 180,
-                "rotZ": 0,
-                "scaleX": 1.15,
-                "scaleY": 1,
-                "scaleZ": 1.15
-              },
+              "LuaScript": "",
+              "LuaScriptState": "",
               "ColorDiffuse": {
                 "r": 0.713235259,
                 "g": 0.713235259,
                 "b": 0.713235259
               },
-              "DeckIDs": [
-                9895700,
-                9729300,
-                9892600
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-wheel\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Fairground.\",\"cycle\":\"The Still Hour\"}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": 11.46,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
               ],
               "CustomDeck": {
                 "98957": {
@@ -3406,7 +3101,49 @@
                   "Type": 0,
                   "UniqueBack": false,
                   "BackIsHidden": false
-                },
+                }
+              }
+            },
+            {
+              "Name": "Card",
+              "Nickname": "The Hall of Mirrors",
+              "Description": "",
+              "GUID": "0e7c2d",
+              "CardID": 9729300,
+              "SidewaysCard": false,
+              "Tags": [
+                "Location",
+                "ScenarioCard"
+              ],
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-hallofmirrors\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Fairground.\",\"cycle\":\"The Still Hour\"}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": 3.8100000000000005,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
+              ],
+              "CustomDeck": {
                 "97293": {
                   "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Hall+of+Mirrors",
                   "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
@@ -3415,7 +3152,49 @@
                   "Type": 0,
                   "UniqueBack": false,
                   "BackIsHidden": false
-                },
+                }
+              }
+            },
+            {
+              "Name": "Card",
+              "Nickname": "The Ticket Booth",
+              "Description": "",
+              "GUID": "b1fa36",
+              "CardID": 9892600,
+              "SidewaysCard": false,
+              "Tags": [
+                "Location",
+                "ScenarioCard"
+              ],
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-ticketbooth\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Fairground.\",\"cycle\":\"The Still Hour\",\"victory\":1}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": -3.84,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
+              ],
+              "CustomDeck": {
                 "98926": {
                   "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Ticket+Booth",
                   "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
@@ -3425,162 +3204,7 @@
                   "UniqueBack": false,
                   "BackIsHidden": false
                 }
-              },
-              "ContainedObjects": [
-                {
-                  "Name": "Card",
-                  "Nickname": "The Wheel",
-                  "Description": "",
-                  "GUID": "15d5ad",
-                  "CardID": 9895700,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-wheel\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Fairground.\",\"cycle\":\"The Still Hour\"}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "98957": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Wheel",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                },
-                {
-                  "Name": "Card",
-                  "Nickname": "The Hall of Mirrors",
-                  "Description": "",
-                  "GUID": "0e7c2d",
-                  "CardID": 9729300,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-hallofmirrors\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Fairground.\",\"cycle\":\"The Still Hour\"}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "97293": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Hall+of+Mirrors",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                },
-                {
-                  "Name": "Card",
-                  "Nickname": "The Ticket Booth",
-                  "Description": "",
-                  "GUID": "b1fa36",
-                  "CardID": 9892600,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-ticketbooth\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Fairground.\",\"cycle\":\"The Still Hour\",\"victory\":1}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "98926": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Ticket+Booth",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                }
-              ]
+              }
             },
             {
               "Name": "Deck",
@@ -3591,11 +3215,11 @@
                 "ScenarioCard"
               ],
               "Transform": {
-                "posX": -3.0,
-                "posY": 1.5,
-                "posZ": 0.0,
+                "posX": -3.85,
+                "posY": 1.75,
+                "posZ": 5.72,
                 "rotX": 0,
-                "rotY": 180,
+                "rotY": 270,
                 "rotZ": 0,
                 "scaleX": 1.15,
                 "scaleY": 1,
@@ -3738,12 +3362,12 @@
         {
           "Name": "Custom_Model_Bag",
           "Nickname": "The Almanac House",
-          "Description": "The Still Hour",
+          "Description": "Still Hour",
           "GUID": "a7713c",
           "Tags": [
             "ScenarioBox"
           ],
-          "GMNotes": "{\"id\": \"district_almanac\", \"type\": \"ScenarioBox\", \"cycle\": \"The Still Hour\"}",
+          "GMNotes": "{\"id\": \"district_almanac\", \"type\": \"ScenarioBox\", \"cycle\": \"Still Hour\"}",
           "Transform": {
             "posX": 0.0,
             "posY": 1.5,
@@ -3760,36 +3384,46 @@
             "g": 0.713235259,
             "b": 0.713235259
           },
-          "LuaScriptState": "{\"ml\": {\"2afe23\": {\"lock\": false, \"pos\": {\"x\": -6.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}, \"ea4252\": {\"lock\": false, \"pos\": {\"x\": -3.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}}}",
+          "LuaScriptState": "{\"ml\": {\"1af073\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": 11.46}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"788427\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": 3.81}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"942963\": {\"lock\": false, \"pos\": {\"x\": -30.24, \"y\": 1.53, \"z\": -3.84}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}, \"ea4252\": {\"lock\": false, \"pos\": {\"x\": -3.85, \"y\": 1.75, \"z\": 5.72}, \"rot\": {\"x\": 0, \"y\": 270, \"z\": 0}}}}",
           "ContainedObjects": [
             {
-              "Name": "Deck",
-              "Nickname": "The Almanac House \u2014 Locations",
+              "Name": "Card",
+              "Nickname": "The Reading Room",
               "Description": "",
-              "GUID": "2afe23",
+              "GUID": "1af073",
+              "CardID": 9749100,
+              "SidewaysCard": false,
               "Tags": [
+                "Location",
                 "ScenarioCard"
               ],
-              "Transform": {
-                "posX": -6.0,
-                "posY": 1.5,
-                "posZ": 0.0,
-                "rotX": 0,
-                "rotY": 180,
-                "rotZ": 0,
-                "scaleX": 1.15,
-                "scaleY": 1,
-                "scaleZ": 1.15
-              },
+              "LuaScript": "",
+              "LuaScriptState": "",
               "ColorDiffuse": {
                 "r": 0.713235259,
                 "g": 0.713235259,
                 "b": 0.713235259
               },
-              "DeckIDs": [
-                9749100,
-                9815100,
-                9792300
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-readingroom\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Almanac House.\",\"cycle\":\"The Still Hour\"}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": 11.46,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
               ],
               "CustomDeck": {
                 "97491": {
@@ -3800,7 +3434,49 @@
                   "Type": 0,
                   "UniqueBack": false,
                   "BackIsHidden": false
-                },
+                }
+              }
+            },
+            {
+              "Name": "Card",
+              "Nickname": "The Press",
+              "Description": "",
+              "GUID": "788427",
+              "CardID": 9815100,
+              "SidewaysCard": false,
+              "Tags": [
+                "Location",
+                "ScenarioCard"
+              ],
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-press\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Almanac House.\",\"cycle\":\"The Still Hour\"}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": 3.8100000000000005,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
+              ],
+              "CustomDeck": {
                 "98151": {
                   "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Press",
                   "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
@@ -3809,7 +3485,49 @@
                   "Type": 0,
                   "UniqueBack": false,
                   "BackIsHidden": false
-                },
+                }
+              }
+            },
+            {
+              "Name": "Card",
+              "Nickname": "The Sealed Study",
+              "Description": "",
+              "GUID": "942963",
+              "CardID": 9792300,
+              "SidewaysCard": false,
+              "Tags": [
+                "Location",
+                "ScenarioCard"
+              ],
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "ColorDiffuse": {
+                "r": 0.713235259,
+                "g": 0.713235259,
+                "b": 0.713235259
+              },
+              "Hands": true,
+              "HideWhenFaceDown": true,
+              "GMNotes": "{\"id\":\"sthr-loc-sealedstudy\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Almanac House.\",\"cycle\":\"The Still Hour\",\"victory\":1}",
+              "Transform": {
+                "posX": -30.24,
+                "posY": 1.53,
+                "posZ": -3.84,
+                "rotX": 0,
+                "rotY": 270,
+                "rotZ": 0,
+                "scaleX": 1.15,
+                "scaleY": 1,
+                "scaleZ": 1.15
+              },
+              "CustomUIAssets": [
+                {
+                  "Name": "font_arkhamicons",
+                  "Type": 1,
+                  "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                }
+              ],
+              "CustomDeck": {
                 "97923": {
                   "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Sealed+Study",
                   "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
@@ -3819,162 +3537,7 @@
                   "UniqueBack": false,
                   "BackIsHidden": false
                 }
-              },
-              "ContainedObjects": [
-                {
-                  "Name": "Card",
-                  "Nickname": "The Reading Room",
-                  "Description": "",
-                  "GUID": "1af073",
-                  "CardID": 9749100,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-readingroom\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Almanac House.\",\"cycle\":\"The Still Hour\"}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "97491": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Reading+Room",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                },
-                {
-                  "Name": "Card",
-                  "Nickname": "The Press",
-                  "Description": "",
-                  "GUID": "788427",
-                  "CardID": 9815100,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-press\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Almanac House.\",\"cycle\":\"The Still Hour\"}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "98151": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Press",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                },
-                {
-                  "Name": "Card",
-                  "Nickname": "The Sealed Study",
-                  "Description": "",
-                  "GUID": "942963",
-                  "CardID": 9792300,
-                  "SidewaysCard": false,
-                  "Tags": [
-                    "Location",
-                    "ScenarioCard"
-                  ],
-                  "LuaScript": "",
-                  "LuaScriptState": "",
-                  "ColorDiffuse": {
-                    "r": 0.713235259,
-                    "g": 0.713235259,
-                    "b": 0.713235259
-                  },
-                  "Hands": true,
-                  "HideWhenFaceDown": true,
-                  "GMNotes": "{\"id\":\"sthr-loc-sealedstudy\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Almanac House.\",\"cycle\":\"The Still Hour\",\"victory\":1}",
-                  "Transform": {
-                    "posX": 0,
-                    "posY": 1.5,
-                    "posZ": 0,
-                    "rotX": 0,
-                    "rotY": 180,
-                    "rotZ": 0,
-                    "scaleX": 1.15,
-                    "scaleY": 1,
-                    "scaleZ": 1.15
-                  },
-                  "CustomUIAssets": [
-                    {
-                      "Name": "font_arkhamicons",
-                      "Type": 1,
-                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-                    }
-                  ],
-                  "CustomDeck": {
-                    "97923": {
-                      "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Sealed+Study",
-                      "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
-                      "NumWidth": 1,
-                      "NumHeight": 1,
-                      "Type": 0,
-                      "UniqueBack": false,
-                      "BackIsHidden": false
-                    }
-                  }
-                }
-              ]
+              }
             },
             {
               "Name": "Deck",
@@ -3985,11 +3548,11 @@
                 "ScenarioCard"
               ],
               "Transform": {
-                "posX": -3.0,
-                "posY": 1.5,
-                "posZ": 0.0,
+                "posX": -3.85,
+                "posY": 1.75,
+                "posZ": 5.72,
                 "rotX": 0,
-                "rotY": 180,
+                "rotY": 270,
                 "rotZ": 0,
                 "scaleX": 1.15,
                 "scaleY": 1,
@@ -4192,12 +3755,12 @@
         {
           "Name": "Custom_Model_Bag",
           "Nickname": "The Last Hour",
-          "Description": "The Still Hour",
+          "Description": "Still Hour",
           "GUID": "c1efe6",
           "Tags": [
             "ScenarioBox"
           ],
-          "GMNotes": "{\"id\": \"finale\", \"type\": \"ScenarioBox\", \"cycle\": \"The Still Hour\"}",
+          "GMNotes": "{\"id\": \"finale\", \"type\": \"ScenarioBox\", \"cycle\": \"Still Hour\"}",
           "Transform": {
             "posX": 0.0,
             "posY": 1.5,
@@ -4214,7 +3777,7 @@
             "g": 0.713235259,
             "b": 0.713235259
           },
-          "LuaScriptState": "{\"ml\": {\"2ea8f2\": {\"lock\": false, \"pos\": {\"x\": -6.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}, \"69bc02\": {\"lock\": false, \"pos\": {\"x\": -3.0, \"y\": 1.5, \"z\": 0.0}, \"rot\": {\"x\": 0, \"y\": 180, \"z\": 0}}}}",
+          "LuaScriptState": "{\"ml\": {\"2ea8f2\": {\"lock\": false, \"pos\": {\"x\": -12.22, \"y\": 1.59, \"z\": -8.9}, \"rot\": {\"x\": 0, \"y\": 90, \"z\": 0}}, \"69bc02\": {\"lock\": false, \"pos\": {\"x\": 1.69, \"y\": 1.56, \"z\": 14.24}, \"rot\": {\"x\": 0, \"y\": 225, \"z\": 0}}}}",
           "ContainedObjects": [
             {
               "Name": "Card",
@@ -4237,11 +3800,11 @@
               "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-scn-stillhour\",\"type\":\"Scenario\",\"class\":\"Mythos\",\"traits\":\"\",\"cycle\":\"The Still Hour\"}",
               "Transform": {
-                "posX": -6.0,
-                "posY": 1.5,
-                "posZ": 0.0,
+                "posX": -12.22,
+                "posY": 1.59,
+                "posZ": -8.9,
                 "rotX": 0,
-                "rotY": 180,
+                "rotY": 90,
                 "rotZ": 0,
                 "scaleX": 1.15,
                 "scaleY": 1,
@@ -4287,11 +3850,11 @@
               "HideWhenFaceDown": true,
               "GMNotes": "{\"id\":\"sthr-crossing\",\"type\":\"Treachery\",\"class\":\"Mythos\",\"traits\":\"Omen.\",\"cycle\":\"The Still Hour\",\"quantity\":1}",
               "Transform": {
-                "posX": -3.0,
-                "posY": 1.5,
-                "posZ": 0.0,
+                "posX": 1.69,
+                "posY": 1.56,
+                "posZ": 14.24,
                 "rotX": 0,
-                "rotY": 180,
+                "rotY": 225,
                 "rotZ": 0,
                 "scaleX": 1.15,
                 "scaleY": 1,
@@ -4320,9 +3883,9 @@
         },
         {
           "Name": "Custom_Token",
-          "Nickname": "The Still Hour \u2014 Campaign Log",
+          "Nickname": "Still Hour \u2014 Campaign Log",
           "Description": "Page 1",
-          "GUID": "952e1d",
+          "GUID": "602ccf",
           "Tags": [
             "CampaignLog"
           ],
@@ -4363,9 +3926,9 @@
         },
         {
           "Name": "Custom_PDF",
-          "Nickname": "The Still Hour \u2014 Campaign Guide",
+          "Nickname": "Still Hour \u2014 Campaign Guide",
           "Description": "fan content",
-          "GUID": "cfc52d",
+          "GUID": "b2aa02",
           "Tags": [
             "CampaignGuide"
           ],
