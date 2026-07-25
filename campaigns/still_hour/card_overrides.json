@@ -137,14 +137,34 @@
     "clues": 2,
     "text": "The loop's start location.",
     "flavor": "Everyone is out for the occultation. None of them will look at you twice — not this time, not ever.",
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "star",
+    "color": "#1a605e",
+    "connections": [
+      {
+        "symbol": "quote",
+        "color": "#204884"
+      },
+      {
+        "symbol": "cross",
+        "color": "#aa8e46"
+      }
+    ]
   },
   "sthr-loc-longpier": {
     "name": "The Long Pier",
     "traits": "Ambergrove. Coastal.",
     "shroud": 2,
     "clues": 2,
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "quote",
+    "color": "#204884",
+    "connections": [
+      {
+        "symbol": "star",
+        "color": "#1a605e"
+      }
+    ]
   },
   "sthr-loc-almanacsteps": {
     "name": "The Almanac Steps",
@@ -152,7 +172,15 @@
     "shroud": 2,
     "clues": 3,
     "text": "Objective — If 5+ total clues have been gathered, an investigator here may resolve the Occultation (no test).",
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "cross",
+    "color": "#aa8e46",
+    "connections": [
+      {
+        "symbol": "star",
+        "color": "#1a605e"
+      }
+    ]
   },
   "sthr-scn-stillhour": {
     "name": "The Still Hour",
@@ -181,14 +209,38 @@
     "shroud": 3,
     "clues": 2,
     "text": "Objective — With 4+ clues discovered in this district, test [com] or [wil] (3) here to light the lamp. Success: record \"The Lamp Was Never Lit.\"",
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "diamond",
+    "color": "#b85418",
+    "connections": [
+      {
+        "symbol": "circle",
+        "color": "#5c246e"
+      }
+    ]
   },
   "sthr-loc-windingstair": {
     "name": "The Winding Stair",
     "traits": "Lighthouse.",
     "shroud": 2,
     "clues": 1,
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "circle",
+    "color": "#5c246e",
+    "connections": [
+      {
+        "symbol": "diamond",
+        "color": "#b85418"
+      },
+      {
+        "symbol": "moon",
+        "color": "#960e12"
+      },
+      {
+        "symbol": "star",
+        "color": "#1a605e"
+      }
+    ]
   },
   "sthr-loc-keepersquarters": {
     "name": "The Keeper's Quarters",
@@ -197,7 +249,15 @@
     "shroud": 2,
     "clues": 2,
     "text": "Deep objective (Act II, lamp lit) — Spend 2 clues from here to read the keeper's logbook. Record \"The Keeper's Ninth Death.\"",
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "moon",
+    "color": "#960e12",
+    "connections": [
+      {
+        "symbol": "circle",
+        "color": "#5c246e"
+      }
+    ]
   },
   "sthr-darkthatwaits": {
     "name": "The Dark That Waits",
@@ -219,7 +279,27 @@
     "traits": "Church.",
     "shroud": 2,
     "clues": 3,
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "heart",
+    "color": "#2c663c",
+    "connections": [
+      {
+        "symbol": "triangle",
+        "color": "#be9428"
+      },
+      {
+        "symbol": "clover",
+        "color": "#4a7c46"
+      },
+      {
+        "symbol": "spade",
+        "color": "#1c2a52"
+      },
+      {
+        "symbol": "star",
+        "color": "#1a605e"
+      }
+    ]
   },
   "sthr-loc-belfry": {
     "name": "The Belfry",
@@ -227,7 +307,15 @@
     "shroud": 3,
     "clues": 2,
     "flavor": "The bell tolled thirteen times. The thirteenth is the sound the night is stuck on.",
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "triangle",
+    "color": "#be9428",
+    "connections": [
+      {
+        "symbol": "heart",
+        "color": "#2c663c"
+      }
+    ]
   },
   "sthr-loc-floodedcrypt": {
     "name": "The Flooded Crypt",
@@ -236,7 +324,15 @@
     "shroud": 4,
     "clues": 3,
     "text": "Sealed until the log shows \"The Thirteenth Toll.\" Deep objective — Recover the drowned almanac-page (3 clues here). Record \"The Hour Was Wrong.\"",
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "spade",
+    "color": "#1c2a52",
+    "connections": [
+      {
+        "symbol": "heart",
+        "color": "#2c663c"
+      }
+    ]
   },
   "sthr-loc-vestry": {
     "name": "The Vestry",
@@ -244,7 +340,15 @@
     "shroud": 2,
     "clues": 2,
     "text": "Objective — With 6+ clues discovered in this district, read the register here. Record \"The Thirteenth Toll.\"",
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "clover",
+    "color": "#4a7c46",
+    "connections": [
+      {
+        "symbol": "heart",
+        "color": "#2c663c"
+      }
+    ]
   },
   "sthr-thirteen": {
     "name": "Thirteen",
@@ -261,14 +365,38 @@
     "traits": "Road.",
     "shroud": 1,
     "clues": 2,
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "square",
+    "color": "#6c482e",
+    "connections": [
+      {
+        "symbol": "doubleslash",
+        "color": "#625e64"
+      },
+      {
+        "symbol": "star",
+        "color": "#1a605e"
+      }
+    ]
   },
   "sthr-loc-lowbridge": {
     "name": "The Low Bridge",
     "traits": "Road.",
     "shroud": 3,
     "clues": 2,
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "doubleslash",
+    "color": "#625e64",
+    "connections": [
+      {
+        "symbol": "square",
+        "color": "#6c482e"
+      },
+      {
+        "symbol": "slash",
+        "color": "#8a5a2e"
+      }
+    ]
   },
   "sthr-loc-turning": {
     "name": "The Turning",
@@ -276,7 +404,15 @@
     "shroud": 2,
     "clues": 3,
     "text": "Objective — Move Turning → Bridge → Milestones (reverse of the Echoes), discovering 1+ clue at each. Record \"The Road Remembers.\" Deep objective (Act II) — evade or Hold an awakened Echo here and read the face beneath the hood. Record \"Who Walks Beside You.\"",
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "slash",
+    "color": "#8a5a2e",
+    "connections": [
+      {
+        "symbol": "doubleslash",
+        "color": "#625e64"
+      }
+    ]
   },
   "sthr-bridgeremembers": {
     "name": "The Bridge Remembers",
@@ -289,7 +425,23 @@
     "shroud": 2,
     "clues": 2,
     "text": "Once the log shows \"The Sheriff Is Already Dead\": once per loop, an investigator here may look at the top card of the Occultation deck.",
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "t",
+    "color": "#2c4a7c",
+    "connections": [
+      {
+        "symbol": "hourglass",
+        "color": "#7c5a2e"
+      },
+      {
+        "symbol": "circle",
+        "color": "#3a7c7a"
+      },
+      {
+        "symbol": "star",
+        "color": "#1a605e"
+      }
+    ]
   },
   "sthr-loc-recordsoffice": {
     "name": "The Records Office",
@@ -298,7 +450,15 @@
     "shroud": 3,
     "clues": 3,
     "text": "Deep objective (Act II) — Find the ledger (3 clues here). Record \"The Vote That Never Ends.\"",
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "hourglass",
+    "color": "#7c5a2e",
+    "connections": [
+      {
+        "symbol": "t",
+        "color": "#2c4a7c"
+      }
+    ]
   },
   "sthr-loc-well": {
     "name": "The Well",
@@ -306,7 +466,15 @@
     "shroud": 2,
     "clues": 2,
     "text": "Objective — With 5+ clues discovered in this district, examine the body here. Record \"The Sheriff Is Already Dead.\"",
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "circle",
+    "color": "#3a7c7a",
+    "connections": [
+      {
+        "symbol": "t",
+        "color": "#2c4a7c"
+      }
+    ]
   },
   "sthr-samespeech": {
     "name": "The Same Speech",
@@ -325,14 +493,30 @@
     "shroud": 3,
     "clues": 2,
     "text": "Objective — Test [agi] (3) here to ride the Wheel. Success: discover 2 clues from any location in this district and record \"The Wheel Still Turns.\"",
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "spade",
+    "color": "#7c2a5c",
+    "connections": [
+      {
+        "symbol": "moon",
+        "color": "#a83870"
+      }
+    ]
   },
   "sthr-loc-hallofmirrors": {
     "name": "The Hall of Mirrors",
     "traits": "Fairground.",
     "shroud": 2,
     "clues": 3,
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "quote",
+    "color": "#6c2a4a",
+    "connections": [
+      {
+        "symbol": "moon",
+        "color": "#a83870"
+      }
+    ]
   },
   "sthr-loc-ticketbooth": {
     "name": "The Ticket Booth",
@@ -341,7 +525,23 @@
     "shroud": 2,
     "clues": 2,
     "text": "Deep objective (Act II) — Speak with the ticket-taker. Record \"The Ticket-Taker's Bargain.\"",
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "moon",
+    "color": "#a83870",
+    "connections": [
+      {
+        "symbol": "spade",
+        "color": "#7c2a5c"
+      },
+      {
+        "symbol": "quote",
+        "color": "#6c2a4a"
+      },
+      {
+        "symbol": "star",
+        "color": "#1a605e"
+      }
+    ]
   },
   "sthr-wheelsturn": {
     "name": "The Wheel's Turn",
@@ -358,7 +558,23 @@
     "traits": "Almanac House.",
     "shroud": 2,
     "clues": 2,
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "diamond",
+    "color": "#2a5c7c",
+    "connections": [
+      {
+        "symbol": "triangle",
+        "color": "#4a3c6c"
+      },
+      {
+        "symbol": "spade",
+        "color": "#1c2a52"
+      },
+      {
+        "symbol": "star",
+        "color": "#1a605e"
+      }
+    ]
   },
   "sthr-loc-press": {
     "name": "The Press",
@@ -366,7 +582,15 @@
     "shroud": 3,
     "clues": 3,
     "text": "Objective — With 6+ clues discovered in this district, set the Press to reprint the true time. Record \"What the Almanac Hid.\"",
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "triangle",
+    "color": "#4a3c6c",
+    "connections": [
+      {
+        "symbol": "diamond",
+        "color": "#2a5c7c"
+      }
+    ]
   },
   "sthr-loc-sealedstudy": {
     "name": "The Sealed Study",
@@ -375,7 +599,15 @@
     "shroud": 4,
     "clues": 3,
     "text": "Sealed until the log shows \"What the Almanac Hid\" and \"The Vote That Never Ends.\" Deep objective — Recover the name (3 clues here). Record \"The Latecomer's Name.\" The finale is declared here.",
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "icons": "spade",
+    "color": "#1c2a52",
+    "connections": [
+      {
+        "symbol": "diamond",
+        "color": "#2a5c7c"
+      }
+    ]
   },
   "sthr-pagethatwasnt": {
     "name": "The Page That Wasn't",
