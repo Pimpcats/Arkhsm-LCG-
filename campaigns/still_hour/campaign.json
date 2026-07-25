@@ -1,7 +1,7 @@
 {
   "backend": "a1111",
   "base_url": null,
-  "checkpoint": "moodykrea2mixV20.safetensors",
+  "checkpoint": "moody krea 2 mix_STUB.safetensors",
   "output_dir": "out/still_hour",
   "style_positive": "1920s cosmic horror illustration, painted digital art, traditional illustration craft, visible brushwork and painted edges, illustrative simplification, shapes read as value masses, economy of detail, naturalistic but restrained color, period-accurate, dramatic legible lighting, narrative moment",
   "style_negative": "photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, depth of field, bokeh, motion blur, film grain, 3d render, octane, cgi, plastic, waxy skin, subsurface scattering, text, watermark, signature, logo, border, frame, ui, caption, anime, cartoon, comic, cel shading, neon, candy colors, oversaturated, pastel, cheerful, twee, modern clothing, smartphone, car, contemporary setting, deformed hands, extra fingers, extra limbs, mutated, bad anatomy",

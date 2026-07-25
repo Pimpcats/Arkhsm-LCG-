@@ -909,6 +909,19 @@ check("an unknown backend is rejected",
                     json={"backend": "nope"}).json().get("ok") is False)
 requests.post(BASE + "/api/backend_set", json={"backend": "a1111"})
 check("backend picker present in the UI", "backend_set" in page)
+# a FRESH CLONE ships no composed faces (art/ is gitignored) — the app must
+# render them itself or it opens completely empty with nothing to click
+import shutil as _sh
+_fd = os.path.join(ROOT, "art", "faces")
+_tmp = _fd + ".freshclone"
+_sh.rmtree(_tmp, ignore_errors=True)
+os.rename(_fd, _tmp)
+try:
+    _n = studio.ensure_faces()
+    check("a fresh clone composes its card faces on first run", _n >= 45)
+finally:
+    _sh.rmtree(_fd, ignore_errors=True)
+    os.rename(_tmp, _fd)
 check("Spawn campaign box wired in the UI",
       "campCompile" in page and "campaign_compile" in page)
 check("typography panel (font/size/bold/italic per area) in the UI",

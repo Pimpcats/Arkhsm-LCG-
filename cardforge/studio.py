@@ -2646,7 +2646,37 @@ symInit();refresh();poll();setInterval(refresh,4000);
 </script></body></html>"""
 
 
+def ensure_faces(campaign="still_hour"):
+    """Render every card face if they are missing.
+
+    art/ is gitignored, so a fresh clone ships NO composed faces — without this
+    the app opens completely empty: no card thumbnails, an empty scenario pool,
+    nothing to click. Rendering needs no GPU and no backend (it draws the cards
+    on the bundled frames), so it is safe to do on startup.
+    """
+    faces_dir = os.path.join(ROOT, "art", "faces")
+    have = len([f for f in os.listdir(faces_dir)
+                if f.endswith(".png")]) if os.path.isdir(faces_dir) else 0
+    if have:
+        return have
+    print("first run: composing card faces (no GPU needed)…")
+    try:
+        subprocess.run([sys.executable,
+                        os.path.join(ROOT, "pipeline", "render_placeholders.py")],
+                       check=True, cwd=ROOT)
+    except (subprocess.CalledProcessError, OSError) as e:
+        print("could not compose faces automatically: {}\n"
+              "run this yourself:  python3 pipeline/render_placeholders.py"
+              .format(e))
+        return 0
+    n = len([f for f in os.listdir(faces_dir) if f.endswith(".png")]) \
+        if os.path.isdir(faces_dir) else 0
+    print("composed {} card face(s)".format(n))
+    return n
+
+
 def main():
+    ensure_faces()
     server = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
     print("CardForge Studio: http://127.0.0.1:{}  (Ctrl-C to stop)".format(PORT))
     try:
