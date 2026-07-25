@@ -4,6 +4,17 @@
 ## What this is
 An **original Arkham Horror LCG campaign**, "The Still Hour," built as a module for the **SCED** Tabletop Simulator mod. A time-loop cosmic-horror campaign for **3 investigators** (scales 1–4).
 
+## Run the app (one click)
+
+Double-click in the repo folder:
+- **Windows** — `Start CardForge.bat`
+- **macOS** — `Start CardForge.command`
+- **Linux** — `./start-cardforge.sh`
+
+It finds Python, installs Pillow on first run, starts the studio and opens
+<http://127.0.0.1:8570> in your browser. Close the window (or Ctrl-C) to stop.
+Manual equivalent: `python3 cardforge/studio.py`.
+
 ## Where the code lives
 - **Repo:** `github.com/Pimpcats/Arkhsm-LCG-` (public)
 - **Working branch:** `claude/new-session-r230bz` ← everything is here. **`main` is just a stub README — do not read `main`.**
