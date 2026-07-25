@@ -106,11 +106,13 @@ here can also just be typed in by hand under **Card content → Card properties*
 `5 · Scenarios → 🗺 map` on a scenario box opens the black bordered slot grid
 you see when a scenario is laid out in TTS.
 
-**The grid is 4 columns × 4 rows.** Measured off the real scenario box
-(`docs/art_reference/sced_objects/scenario_box_memory_bag.json`): columns are
-6.60 apart from x −30.24, rows 7.65 apart from z 11.46. It stops at four
-columns because a fifth would sit at x −3.84, on top of the encounter deck at
-x −3.85.
+**The grid is 5 columns × 5 rows** — the slots the playmat shows in TTS. The
+step and origin are measured off the real scenario box
+(`docs/art_reference/sced_objects/scenario_box_memory_bag.json`): columns 6.60
+apart from x −30.24, rows 7.65 apart from z 11.46. The 5 × 5 extent comes from
+the playmat itself; the exact coordinates of the outer column and row are
+extrapolated from that step, not measured. Exporting the playmat object would
+settle them — a TTS playmat carries its snap points.
 
 - **Arrange** — drag location cards between slots, then *Save layout*. Those
   exact coordinates are what the campaign box scripts.
@@ -129,9 +131,16 @@ the map, the printed card and the compiled object can never disagree.
 
 ### How connections reach TTS
 
-**The drawn lines are ours, and they stay in this app.** SCED draws no lines at
-all — `setVectorLines` appears nowhere in its memory-bag script, and its
-`onLoad` reads exactly two keys back out of a box's saved state:
+**SCED draws the lines itself, from the cards.** Put two connected locations on
+the playmat and it links them; drag one anywhere and the line stretches to
+follow; take one off the mat and the line goes. It works off symbol matching,
+not positions: each location's GMNotes carry `icons` (its own symbol) and
+`connections` (the symbols it connects to), and the mod pairs one card's
+`connections` entries against the other cards' `icons`.
+
+So nothing about the lines needs to be compiled into the box — and the box
+could not carry them anyway. The memory bag's `onLoad` reads exactly two keys
+out of a box's saved state and discards the rest:
 
 ```lua
 memoryList  = loadedData.ml          -- guid -> {pos, rot, lock}
@@ -148,10 +157,15 @@ What TTS *does* read is the card's own metadata. A real location carries:
 "locationFront": {"icons": "Diamond", "connections": "Tee|Plus|Circle|Square"}
 ```
 
-Compiled locations carry exactly that shape, so the game knows our maps are
-connected the way it knows its own — and players read the symbols printed along
-the card's bottom edge, as they always have. The lines on the map and in the
-table preview are a design aid for laying the scenario out, nothing more.
+Compiled locations carry exactly that shape, so SCED draws our maps' lines the
+way it draws its own — that is the whole hook-up, and there is nothing further
+to wire.
+
+The lines on our map and table preview mirror that behaviour: edge to edge,
+stretching to wherever you put the cards, and gone the moment a location leaves
+the board. One thing ours add — each half of a line is coloured with the symbol
+at the *far* end, so following a colour off a card leads you to the location
+whose symbol that is. SCED's own lines are plain white.
 
 ### Scenario board stacks
 

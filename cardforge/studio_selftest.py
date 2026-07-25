@@ -1023,14 +1023,14 @@ _r = requests.post(BASE + "/api/map_save",
                    json={"campaign": _sc, "scenario": _ms,
                          "slots": {_locs[0]: [99, 99]}}).json()
 check("out-of-range slots are clamped, never crash",
-      _r.get("ok") and _r["slots"][_locs[0]] == [3, 3])
-# the map is four columns because a fifth lands on the encounter deck
+      _r.get("ok") and _r["slots"][_locs[0]] == [4, 4])
+# the playmat's own slot grid, as seen in TTS
 _g = requests.get(BASE + "/api/status?campaign=" + _sc).json()["scenarios"]
-check("the grid is the four columns the real table has room for",
-      _g["grid"]["cols"] == 4 and _g["grid"]["rows"] == 4)
-check("a fifth column would collide with the encounter deck",
-      abs(studio.map_xz(4, 0)[0] -
-          [f["x"] for f in _g["furniture"] if f["key"] == "encounter"][0]) < 1.0)
+check("the grid matches the playmat's 5 x 5 slots",
+      _g["grid"]["cols"] == 5 and _g["grid"]["rows"] == 5)
+check("slot steps stay on the measured 6.60 / 7.65 spacing",
+      abs(studio.map_xz(1, 0)[0] - studio.map_xz(0, 0)[0] - 6.60) < 0.01
+      and abs(studio.map_xz(0, 0)[1] - studio.map_xz(0, 1)[1] - 7.65) < 0.01)
 check("the preview knows the rest of the table, not just the map",
       {f["key"] for f in _g["furniture"]} >=
       {"encounter", "agenda_deck", "act_deck", "setup_aside"})

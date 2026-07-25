@@ -645,7 +645,7 @@ def act_scenario_rename(p):
 # laid out. Columns/rows map 1:1 onto table coordinates measured from the real
 # SCED box (columns 6.6 apart, rows 7.65 apart, locations rotated 270).
 MAP_GRID = {"x0": -30.24, "dx": 6.60, "z0": 11.46, "dz": -7.65,
-            "cols": 4, "rows": 4, "y": 1.53, "rot": 270,
+            "cols": 5, "rows": 5, "y": 1.53, "rot": 270,
             # a location card's own footprint on the table, in the same units
             "cw": 2.63, "ch": 3.68}
 
@@ -2166,7 +2166,10 @@ transition:transform .16s ease,box-shadow .16s ease}
 #mapwrap{display:none;margin:10px 0;padding:14px;border-radius:12px;
 background:#0a0a0c;border:1px solid rgba(201,162,74,.30)}
 #mapstage{position:relative}
-#mapgrid{display:grid;gap:10px;justify-content:center}
+/* the real table leaves more than a card's width between locations; the
+   editor grid keeps it tighter to stay usable, but wide enough that the
+   connecting lines between neighbours actually read */
+#mapgrid{display:grid;gap:34px;justify-content:center}
 #maplines{position:absolute;inset:0;pointer-events:none;z-index:6}
 .mslot{width:104px;height:146px;border:2px dashed rgba(255,255,255,.16);
 border-radius:8px;display:flex;align-items:center;justify-content:center;
@@ -3479,29 +3482,52 @@ const sb=stage.getBoundingClientRect();
 svg.setAttribute('width',sb.width);svg.setAttribute('height',sb.height);
 svg.setAttribute('viewBox','0 0 '+sb.width+' '+sb.height);
 svg.innerHTML='';
-const pts={};
+// only cards actually on the board take part — one dragged back to the tray
+// drops its lines, the same way a location off the playmat does in TTS
+const pts={};let size=[60,84];
 for(const im of document.querySelectorAll('#mapgrid .mslot img')){
 const r=im.getBoundingClientRect();
+size=[r.width,r.height];
 pts[im.dataset.cid]=[r.left-sb.left+r.width/2,r.top-sb.top+r.height/2];}
 const ids=Object.keys(pts);let n=0;
 for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++){
-const a=ids[i],b=ids[j];
-if(!(mapLinked(a,b)||mapLinked(b,a)))continue;
-const one=!(mapLinked(a,b)&&mapLinked(b,a));   // one-way connection
-// dark casing under the colour so the line still reads over card art
-for(const pass of [0,1]){
-const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
-ln.setAttribute('x1',pts[a][0]);ln.setAttribute('y1',pts[a][1]);
-ln.setAttribute('x2',pts[b][0]);ln.setAttribute('y2',pts[b][1]);
-ln.setAttribute('stroke',pass?mapColor(((mapFind(a)||{}).content||{}).color):'#000');
-ln.setAttribute('stroke-width',pass?'3':'6');
-ln.setAttribute('stroke-linecap','round');
-ln.setAttribute('opacity',pass?(one?'.6':'.95'):'.5');
-if(one&&pass)ln.setAttribute('stroke-dasharray','7 5');
-svg.appendChild(ln);}
-n++;}
+if(drawConn(svg,ids[i],ids[j],pts,size))n++;}
 const li=document.getElementById('maplegend');
 if(li)li.dataset.links=n;}
+// ---- one connection, drawn the way TTS draws it -------------------------
+// Runs from card edge to card edge, never centre to centre, and stretches to
+// wherever the two cards happen to be — exactly like SCED, where a location
+// stays connected as long as both cards are on the board. Ours adds the one
+// thing SCED's plain white lines do not tell you: each half is coloured with
+// the symbol printed at the FAR end, so following a colour off a card leads
+// you to the location whose symbol that is.
+function edgePoint(from,to,hw,hh){
+const dx=to[0]-from[0],dy=to[1]-from[1];
+const ad=Math.abs(dx),ay=Math.abs(dy);
+if(ad<0.001&&ay<0.001)return from.slice();
+const t=Math.min(ad>0.001?hw/ad:1e9, ay>0.001?hh/ay:1e9);
+return [from[0]+dx*t, from[1]+dy*t];}
+function drawConn(svg,a,b,pts,size){
+if(!pts[a]||!pts[b])return false;                 // off the board -> no line
+if(!(mapLinked(a,b)||mapLinked(b,a)))return false;
+const one=!(mapLinked(a,b)&&mapLinked(b,a));      // only one side prints it
+const hw=(size&&size[0]||60)/2, hh=(size&&size[1]||84)/2;
+const A=edgePoint(pts[a],pts[b],hw,hh), B=edgePoint(pts[b],pts[a],hw,hh);
+const M=[(A[0]+B[0])/2,(A[1]+B[1])/2];
+const colA=mapColor(((mapFind(a)||{}).content||{}).color);
+const colB=mapColor(((mapFind(b)||{}).content||{}).color);
+const seg=(p,q,col,w,op,dash)=>{
+const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
+ln.setAttribute('x1',p[0]);ln.setAttribute('y1',p[1]);
+ln.setAttribute('x2',q[0]);ln.setAttribute('y2',q[1]);
+ln.setAttribute('stroke',col);ln.setAttribute('stroke-width',w);
+ln.setAttribute('stroke-linecap','round');ln.setAttribute('opacity',op);
+if(dash)ln.setAttribute('stroke-dasharray','7 5');
+svg.appendChild(ln);};
+seg(A,B,'#000',5,'.45');                          // casing, as on the playmat
+seg(A,M,colB,2.5,one?'.6':'.95',one);             // leaving A -> B's symbol
+seg(M,B,colA,2.5,one?'.6':'.95',one);             // leaving B -> A's symbol
+return true;}
 function mapLegend(){const el=document.getElementById('maplegend');if(!el)return;
 const S=(LS&&LS.scenarios)||{};const A=(S.assignments||{})[MAP_SID]||{};
 const parts=[];
@@ -3580,21 +3606,9 @@ if(clash.has(i))d.classList.add('pvclash');
 stage.appendChild(d);}});
 // the connections, drawn between the location centres
 let links=0;const ids=Object.keys(at);
+const csz=[(g.cw||2.63)*k,(g.ch||3.68)*k];
 for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++){
-const a=ids[i],b=ids[j];
-if(!(mapLinked(a,b)||mapLinked(b,a)))continue;
-const one=!(mapLinked(a,b)&&mapLinked(b,a));
-for(const pass of [0,1]){
-const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
-ln.setAttribute('x1',at[a][0]);ln.setAttribute('y1',at[a][1]);
-ln.setAttribute('x2',at[b][0]);ln.setAttribute('y2',at[b][1]);
-ln.setAttribute('stroke',pass?mapColor(((mapFind(a)||{}).content||{}).color):'#000');
-ln.setAttribute('stroke-width',pass?'2.5':'5');
-ln.setAttribute('stroke-linecap','round');
-ln.setAttribute('opacity',pass?(one?'.6':'.95'):'.5');
-if(one&&pass)ln.setAttribute('stroke-dasharray','6 4');
-svg.appendChild(ln);}
-links++;}
+if(drawConn(svg,ids[i],ids[j],at,csz))links++;}
 document.getElementById('pvinfo').innerHTML=
 Object.keys(at).length+' location(s) &middot; '+links+' connection(s) &middot; '+
 ((x1-x0).toFixed(1))+' &times; '+((z1-z0).toFixed(1))+' table units'+

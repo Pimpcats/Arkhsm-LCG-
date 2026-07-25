@@ -77,18 +77,19 @@ PLACE = {
     "named":       {"pos": (-3.85, 1.60, -10.39), "rot": 270},
     "setup_aside": {"pos": (1.69, 1.56, 14.24), "rot": 225},
 }
-# The map area, measured off the real scenario box: columns 6.60 apart from
-# x -30.24, rows 7.65 apart from z 11.46. It stops at four columns because a
-# fifth would land at x -3.84, on top of the encounter deck (-3.85).
+# The playmat's location slots: 5 x 5, stepping 6.60 in x from -30.24 and
+# -7.65 in z from 11.46. The step and origin are measured off the real
+# scenario box (docs/art_reference/sced_objects/scenario_box_memory_bag.json);
+# the 5 x 5 extent is what the playmat shows in TTS.
 LOCATION_GRID = {"x0": -30.24, "dx": 6.60, "z0": 11.46, "dz": -7.65,
-                 "cols": 4, "rows": 4, "y": 1.53, "rot": 270}
+                 "cols": 5, "rows": 5, "y": 1.53, "rot": 270}
 
 
 def location_slot(i):
     """Nth location on the official grid: fills a column top-to-bottom, then
     steps right — the same shape the real scenario books lay out."""
     col, row = divmod(i, LOCATION_GRID["rows"])
-    col = min(col, LOCATION_GRID["cols"] - 1)     # never wander into the decks
+    col = min(col, LOCATION_GRID["cols"] - 1)     # stay on the playmat
     return ((LOCATION_GRID["x0"] + col * LOCATION_GRID["dx"],
              LOCATION_GRID["y"],
              LOCATION_GRID["z0"] + row * LOCATION_GRID["dz"]),
