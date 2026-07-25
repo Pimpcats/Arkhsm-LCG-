@@ -247,10 +247,13 @@ def main():
                      os.path.join(ROOT, "dist", dest + "_campaign.json")):
             if os.path.exists(path):
                 os.remove(path)
+        # investigators also compose a "-back" face — name both explicitly so
+        # the sweep can never reach a card this run did not create
         for i in idmap.values():
-            f = os.path.join(ROOT, "art", "faces", i + ".png")
-            if os.path.exists(f):
-                os.remove(f)
+            for f in (i + ".png", i + "-back.png"):
+                path = os.path.join(ROOT, "art", "faces", f)
+                if os.path.exists(path):
+                    os.remove(path)
         ovp = rp.CARD_OVERRIDES_PATH
         ovj = json.load(open(ovp, encoding="utf-8")) \
             if os.path.exists(ovp) else {}
