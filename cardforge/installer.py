@@ -83,7 +83,20 @@ def vendor_status():
         if os.path.isdir(vendor_dir("strange-eons")) else [],
         "has_token": bool(load_token()),
         "plugin": _plugin_status(),
+        "fonts": _font_status(),
     }
+
+
+def _font_status():
+    """Which title fonts are actually present — so the Setup row can show a
+    verified green state instead of a button that appears to do nothing."""
+    d = os.path.join(runner.repo_root(), "assets", "fonts")
+    have = sorted(f for f in os.listdir(d)
+                  if f.lower().endswith((".ttf", ".otf"))) \
+        if os.path.isdir(d) else []
+    return {"arkhamic": [f for f in have if f.lower().startswith("arkhamic")],
+            "teutonic": [f for f in have if f.lower().startswith("teutonic")],
+            "count": len(have)}
 
 
 def _plugin_status():
@@ -221,11 +234,30 @@ def install_fonts(dry_run=False, log=print):
             f.write(b"stub-font")
         log("dry-run: wrote stub Arkhamic.ttf")
         return {"installed": ["Arkhamic.ttf"]}
+    have = [f for f in os.listdir(dest)
+            if f.lower().startswith("arkhamic") and f.lower().endswith((".ttf", ".otf"))]
+    if have:
+        log("Arkhamic already installed: " + ", ".join(sorted(have)))
+        return {"installed": sorted(have), "already": True}
     import requests
     log("querying GitHub for Arkhamic releases…")
-    rels = requests.get(ARKHAMIC_RELEASES_API + "?per_page=5", timeout=30).json()
+    try:
+        rels = requests.get(ARKHAMIC_RELEASES_API + "?per_page=5", timeout=30).json()
+    except Exception as e:  # noqa: BLE001 - offline/DNS/TLS
+        raise RuntimeError(
+            "could not reach GitHub to fetch Arkhamic ({}). The app already "
+            "ships Teutonic, so cards still render; retry when you are "
+            "online.".format(e))
+    if isinstance(rels, dict):
+        msg = rels.get("message", "unexpected response")
+        if "rate limit" in msg.lower():
+            msg = ("GitHub rate-limited this machine (resets within the hour) "
+                   "— try again later")
+        raise RuntimeError("GitHub said: " + msg)
+    if not isinstance(rels, list):
+        raise RuntimeError("unexpected GitHub response while fetching Arkhamic")
     got = []
-    for rel in rels if isinstance(rels, list) else []:
+    for rel in rels:
         for a in rel.get("assets", []):
             name = a["name"]
             if name.lower().endswith((".ttf", ".otf")):

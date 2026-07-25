@@ -24,6 +24,7 @@ import shlex
 import subprocess
 import sys
 import threading
+import time
 import traceback
 from contextlib import redirect_stdout
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -78,6 +79,35 @@ class _Tee(io.TextIOBase):
             if part.strip():
                 log(part)
         return len(s)
+
+
+_STARTED = time.time()
+APP_VERSION = "1.4.0"
+
+
+def build_stamp():
+    """Version + git commit + this file's timestamp, so the header can PROVE
+    which build is actually running (a git pull does nothing until the server
+    is restarted — this makes that obvious instead of guesswork)."""
+    commit = ""
+    try:
+        head = os.path.join(ROOT, ".git", "HEAD")
+        ref = open(head, encoding="utf-8").read().strip()
+        if ref.startswith("ref: "):
+            rp = os.path.join(ROOT, ".git", ref[5:])
+            commit = open(rp, encoding="utf-8").read().strip()[:7] \
+                if os.path.exists(rp) else ""
+        else:
+            commit = ref[:7]
+    except OSError:
+        commit = ""
+    try:
+        mt = os.path.getmtime(os.path.abspath(__file__))
+        built = time.strftime("%Y-%m-%d %H:%M", time.localtime(mt))
+    except OSError:
+        built = "?"
+    return {"version": APP_VERSION, "commit": commit, "built": built,
+            "started": time.strftime("%H:%M", time.localtime(_STARTED))}
 
 
 LAST_JOB = {}
@@ -1214,6 +1244,7 @@ def status(campaign="still_hour"):
         faces_ver = int(max((os.path.getmtime(os.path.join(faces_dir_abs, f))
                              for f in os.listdir(faces_dir_abs)), default=0))
     return {"busy": _busy.is_set(), "last_job": dict(LAST_JOB),
+            "build": build_stamp(),
             "campaign": campaign, "campaigns": campaigns,
             "backend": camp.get("backend"), "checkpoint": camp.get("checkpoint"),
             "style": {"positive": camp.get("style_positive", ""),
@@ -1521,6 +1552,7 @@ border-radius:12px;padding:10px 14px;margin-bottom:10px;background:var(--surface
 hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 </style></head><body>
 <header><h1>CardForge Studio</h1><span class=sub>THE STILL HOUR · fan content</span>
+<span id=build class=stat title="the build actually running right now — if this doesn't match your latest pull, restart the app">v…</span>
 <span class=spacer></span>
 <span id=busy class=stat><span class=dot id=busydot></span><span id=busytext>idle</span></span>
 <button class=btn onclick=refresh() title="refresh the gallery and cards">&#8635;</button>
@@ -1626,6 +1658,7 @@ the .safetensors into <code>vendor/models/</code> instead.</p>
 <div class=row>
 <b style="min-width:180px">2b &middot; Title font</b>
 <button class=btn onclick="post('install_fonts')">Install Arkhamic</button>
+<span id=vendor_font class=hint></span>
 <span class=hint>the community&rsquo;s OFL extension of Teutonic (the official title face) — from
 <a href="https://github.com/javnik36/arkhamic" target=_blank>javnik36/arkhamic</a>; the renderer
 prefers it automatically once installed</span>
@@ -2099,7 +2132,18 @@ lr.innerHTML=Object.entries(s.characters||{}).map(([n,c])=>
 `<label>strength</label><input type=number step=0.05 min=0 max=2 style="width:75px" data-char="${n}" data-field=weight value="${c.weight}">`+
 `<label>trigger</label><input type=text size=18 data-char="${n}" data-field=trigger value="${(c.trigger||'').replace(/"/g,'&quot;')}">`+
 `</div>`).join('');}
+const bd=s.build||{};const be=document.getElementById('build');
+if(be){be.innerHTML='v'+(bd.version||'?')+(bd.commit?(' · '+bd.commit):'')+
+' · built '+(bd.built||'?');
+be.title='Running build: v'+(bd.version||'?')+' commit '+(bd.commit||'?')+
+', file dated '+(bd.built||'?')+', server started '+(bd.started||'?')+
+'. A git pull does NOT change the running app — restart it, then hard-refresh (Ctrl+F5).';}
 const v=s.vendor||{};
+const fs=v.fonts||{};const fe=document.getElementById('vendor_font');
+if(fe)fe.innerHTML=(fs.arkhamic||[]).length?
+('<span class=okpill>&#10003; installed: '+fs.arkhamic.join(', ')+'</span>'):
+((fs.teutonic||[]).length?'<span class=warnpill>using Teutonic &mdash; click to add Arkhamic</span>':
+'not installed yet');
 const pl=v.plugin||{};const pe=document.getElementById('vendor_plugin');
 if(pe)pe.innerHTML=(pl.templates&&pl.regions)?
 ('<span class=okpill>&#10003; '+pl.templates+' frames, '+pl.overlays+' overlays, '+pl.icons+
