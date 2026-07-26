@@ -2689,6 +2689,11 @@ position:relative;transition:border-color .15s,background .15s}
 .mslot .co{position:absolute;top:2px;left:4px;font-size:9px;color:rgba(255,255,255,.30)}
 .mslot img{width:100%;height:100%;object-fit:cover;border-radius:6px;cursor:grab;
 position:relative;z-index:4}
+/* map card thumbnails: fixed small size everywhere (esp. the unplaced tray),
+   so an unplaced location never renders at full size and swamps the map */
+.mcard{width:96px;height:134px;object-fit:cover;border-radius:6px;cursor:grab;
+border:1px solid rgba(255,255,255,.12)}
+.mslot .mcard{width:100%;height:100%;border:0}
 #mapwrap.linking .mslot img{cursor:crosshair}
 #mapwrap.linking .mslot img.sel{outline:3px solid var(--accent);
 outline-offset:-3px;box-shadow:0 0 14px rgba(232,178,74,.55)}
@@ -4162,7 +4167,7 @@ const src=MAP_DRAG.parentElement;
 if(cell.querySelector('img')&&src&&src.classList.contains('mslot')){
 src.appendChild(cell.querySelector('img'));}
 cell.appendChild(MAP_DRAG);MAP_DRAG=null;mapBadges();mapInfo();mapLines();
-pvDraw();});
+pvDraw();mapAutoSave();});
 grid.appendChild(cell);}
 // unplaced locations sit under the grid
 const un=locs.filter(i=>!(i in placed));
@@ -4171,7 +4176,7 @@ tray.innerHTML=un.length?'':'<span class=hint>every location in this scenario is
 for(const cid of un)tray.appendChild(mapCard(cid));
 tray.addEventListener('dragover',e=>e.preventDefault());
 tray.addEventListener('drop',e=>{e.preventDefault();if(MAP_LINK_FROM){MAP_LINK_FROM=null;return;}
-if(MAP_DRAG){tray.appendChild(MAP_DRAG);MAP_DRAG=null;mapBadges();mapInfo();mapLines();pvDraw();}});
+if(MAP_DRAG){tray.appendChild(MAP_DRAG);MAP_DRAG=null;mapBadges();mapInfo();mapLines();pvDraw();mapAutoSave();}});
 grid.appendChild(tray);mapBadges();mapInfo();mapLines();mapLegend();pvDraw();}
 function mapFind(cid){return ((LS&&LS.cards)||[]).find(x=>x.id===cid);}
 function mapSym(cid){const c=mapFind(cid);
@@ -4182,7 +4187,7 @@ return (((c&&c.content&&c.content.connections)||[])
 function mapLinked(a,b){const sb=mapSym(b);
 return !!sb&&mapConns(a).indexOf(sb)>=0;}
 function mapCard(cid){const c=mapFind(cid);
-const im=document.createElement('img');im.dataset.cid=cid;
+const im=document.createElement('img');im.dataset.cid=cid;im.className='mcard';
 im.draggable=(MAP_MODE==='move');
 const sym=mapSym(cid);
 im.title=(c?c.name:cid)+(MAP_MODE==='link'
@@ -4422,6 +4427,10 @@ document.getElementById('mapinfo').textContent=MAP_MODE==='link'
 :n+' location(s) placed — Save layout writes these exact table positions into the scenario script';}
 async function mapSave(){const j=await post('map_save',{campaign:camp(),scenario:MAP_SID,slots:mapSlots()});
 if(j.ok){addlog('map layout saved for '+MAP_SID);await refresh();mapDraw();}}
+// persist the layout silently after every move, so it survives a later refresh
+// (e.g. when you connect two locations) instead of popping cards back to the tray
+async function mapAutoSave(){if(!MAP_SID)return;
+try{await post('map_save',{campaign:camp(),scenario:MAP_SID,slots:mapSlots()});}catch(_){}}
 async function scenNew(){const el=document.getElementById('ns_name');
 const name=el.value.trim();if(!name){alert('Name the scenario first.');return;}
 const j=await post('scenario_new',{campaign:camp(),name});
