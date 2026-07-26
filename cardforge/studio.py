@@ -3610,8 +3610,10 @@ function ccPips(f,v){const el=document.getElementById('ccp_'+f);if(!el)return;
 const n=parseInt(v)||0;
 el.textContent=(f==='damage'?'\u2764\ufe0f':'\ud83e\udde0').repeat(Math.max(0,Math.min(n,5)));}
 function ccStep(f,d){const el=document.getElementById('cc_'+f);
-const cap=(f==='damage'||f==='horror')?5:99;
-let v=parseInt(el.value);if(isNaN(v))v=0;v=Math.max(0,Math.min(cap,v+d));el.value=v;ccPips(f,v);}
+// XP level clicks the pips: up to 5, down to 1 (damage/horror cap at 5)
+const cap=(f==='damage'||f==='horror'||f==='level')?5:99;
+const lo=(f==='level')?1:0;
+let v=parseInt(el.value);if(isNaN(v))v=0;v=Math.max(lo,Math.min(cap,v+d));el.value=v;ccPips(f,v);}
 function ccNum(f,label,pips){
 // left-click the value to add 1, right-click to take 1 away — you can still
 // type straight into it
@@ -3638,7 +3640,8 @@ else if(t==='Event')defs=[['cost','cost'],['level','level'],['victory','victory'
 else if(t==='Location')defs=[['shroud','shroud'],['clues','clues'],['victory','victory']];
 else if(t==='Agenda')defs=[['doom','doom']];
 else if(t==='Act')defs=[['clues','clues']];
-else if(t==='Scenario'||t==='Story'||t==='Treachery'||t==='Skill')defs=[];
+else if(t==='Skill')defs=[['level','level']];
+else if(t==='Scenario'||t==='Story'||t==='Treachery')defs=[];
 else defs=[['level','level'],['victory','victory']];
 CC_NUM=defs.map(d=>d[0]);
 document.getElementById('cc_stats').innerHTML=defs.map(d=>ccNum(d[0],d[1],d[2])).join('');

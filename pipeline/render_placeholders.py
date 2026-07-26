@@ -2140,6 +2140,19 @@ def content_regions(card_type):
         sub = r(card_type, "SubtitleText", letter) or r(card_type, "Subtitle", letter)
         if sub:
             out["subtitle"] = sub
+    # the XP pip band — click it like a stat (left +1 to 5, right -1 to 1) to set
+    # the card's level; sits over the lower cost disc / skill cup
+    if card_type in ("Asset", "Event"):
+        cb = se_reg(card_type, "Cost")
+        if cb:
+            w = cb[2] - cb[0]
+            cx = (cb[0] + cb[2]) / 2
+            out["level"] = [int(cx - w * 0.56), int(cb[1] + w * 0.70),
+                            int(cx + w * 0.56), int(cb[3] + w * 0.25)]
+    elif card_type == "Skill":
+        cup = se_reg("Skill", "Level")
+        if cup:
+            out["level"] = list(cup)
     return {k: v for k, v in out.items() if v}
 
 
