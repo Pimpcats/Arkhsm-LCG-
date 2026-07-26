@@ -33,6 +33,13 @@ import template_render as T  # noqa: E402  (official-frame template mode)
 
 FACES_DIR = os.path.join(ROOT, "art", "faces")
 
+# Furniture-only mode: compose the frame + text + discs on a TRANSPARENT art
+# window instead of a face with art baked in. The live editor overlays this on
+# top of the real, draggable art so the art reads *behind* the frame furniture
+# exactly as the finished card does. Set by the --furniture CLI flag; the normal
+# render path is completely unaffected when it is False.
+FURNITURE = False
+
 
 def load_art_index():
     """id -> chosen illustration path (CardForge's out/<campaign>/index.json)."""
@@ -855,6 +862,19 @@ def _field_style(key):
     return FIELD_STYLE.get(key) if key else None
 
 
+def _nudge(box, st):
+    """Translate a text region by the owner's saved (dx, dy) offset — the result
+    of dragging the text box in the editor. Offsets are in face pixels (the same
+    space content_regions reports), so a pure translation keeps size and wrap."""
+    if not st:
+        return box
+    dx = int(st.get("dx", 0) or 0)
+    dy = int(st.get("dy", 0) or 0)
+    if not (dx or dy):
+        return box
+    return (box[0] + dx, box[1] + dy, box[2] + dx, box[3] + dy)
+
+
 def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
               grow=1.5, min_size=13, max_w_factor=None, max_size=None,
               align="center", stat=False, key=None):
@@ -871,6 +891,7 @@ def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
     if stat and key is None:
         key = "stats"
     st = _field_style(key)
+    box = _nudge(box, st)
     font_file = None
     size_scale = 1.0
     if st:
@@ -922,6 +943,7 @@ def _box_block(d, text, box, fill=PSD_INK, start=30, min_size=15,
     if not text:
         return box[1]
     st = _field_style(key)
+    box = _nudge(box, st)
     font_file = None
     if st:
         font_file = st.get("font") or None
@@ -1344,11 +1366,17 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
         or _se_img("templates", "AHLCG-{}-N".format(kind))
     W, H = 375 * SE_SCALE, 525 * SE_SCALE
     frame2 = frame.resize((W, H), Image.LANCZOS)
-    img = Image.new("RGB", (W, H), frame_underlay(frame))
     clip = se_reg(kind, "Portrait-portrait-clip")
-    if art_path:
-        paste_cover(img, art_path, clip, placement)
-    img.paste(frame2, (0, 0), frame2)
+    if FURNITURE:
+        # furniture-only: frame (player frames are windowed) on a transparent
+        # window; the text/icons drawn below land on top of it
+        img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        img.paste(frame2, (0, 0), frame2)
+    else:
+        img = Image.new("RGB", (W, H), frame_underlay(frame))
+        if art_path:
+            paste_cover(img, art_path, clip, placement)
+        img.paste(frame2, (0, 0), frame2)
     d = ImageDraw.Draw(img)
 
     # commit-icon column (skill boxes + stat icons)
@@ -1422,6 +1450,16 @@ def _se_frame_compose(tpl_name, kind, clip_key, art_path, placement,
     frame2 = frame.resize((W, H), Image.LANCZOS)
     clip = se_reg(kind, clip_key)
     windowed = frame.getchannel("A").getextrema()[0] < 250
+    if FURNITURE:
+        # Everything that sits ON TOP of the art in the finished card, on a
+        # transparent window. For a windowed frame that is the frame itself
+        # (plus the text/discs the caller draws next); for an opaque frame the
+        # art is pasted OVER the frame, so only the later text/discs belong on
+        # top — the frame stays out of the overlay.
+        img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        if windowed:
+            img.paste(frame2, (0, 0), frame2)
+        return img, ImageDraw.Draw(img)
     if windowed:
         img = Image.new("RGB", (W, H), underlay or frame_underlay(frame))
         if art_path:
@@ -1934,7 +1972,12 @@ def main():
     ap.add_argument("--only", nargs="*", help="render only these card ids")
     ap.add_argument("--no-template", action="store_true",
                     help="force the drawn (non-template) placeholder look")
+    ap.add_argument("--furniture", action="store_true",
+                    help="render frame+text+discs on a transparent art window "
+                         "(<id>-furniture.png) for the live editor overlay")
     args = ap.parse_args()
+    global FURNITURE
+    FURNITURE = bool(args.furniture)
     use_tpl = (not args.no_template) and T.has_template("investigator_front")
     # EVERY campaign's specs — the authored Still Hour set plus any
     # <campaign>_*_spec.json written by the app (hand-made or imported cards),
@@ -1976,8 +2019,11 @@ def main():
         art = art_index.get(c["id"])
         place = placements.get(c["id"])
         composed += 1 if art else 0
-        dest = os.path.join(FACES_DIR, c["id"] + ".png")
-        back_dest = os.path.join(FACES_DIR, c["id"] + "-back.png")
+        # furniture faces go to their own filenames so they never clobber the
+        # real, art-baked faces (or backs) the compiler and gallery read
+        suffix = "-furniture" if FURNITURE else ""
+        dest = os.path.join(FACES_DIR, c["id"] + suffix + ".png")
+        back_dest = os.path.join(FACES_DIR, c["id"] + suffix + "-back.png")
         if c["type"] == "Investigator":
             if has_se_frames():
                 s_investigator_front(c, pt, dest, art_path=art, placement=place)

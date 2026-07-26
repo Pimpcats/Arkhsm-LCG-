@@ -115,7 +115,7 @@ page = requests.get(BASE + "/").text
 check("single page serves", "CardForge Studio" in page)
 check("workflow tabs present in flow order",
       all(t in page for t in ("1 &middot; Setup", "2 &middot; Illustrate",
-                              "3 &middot; Cards", "4 &middot; Frame",
+                              "3 &middot; Cards", "4 &middot; Campaign / scenarios",
                               "5 &middot; Play in TTS"))
       and page.index("1 &middot; Setup") < page.index("2 &middot; Illustrate")
       < page.index("3 &middot; Cards"))
