@@ -396,6 +396,40 @@ def _load_json_list(path):
         return []
 
 
+# global undo stack: (campaign, card, prev_override_or_None) newest last. Each
+# content save pushes the pre-edit state; Ctrl+Z / the Undo button pops it.
+_UNDO_STACK = []
+
+
+def _undo_push(campaign, card, prev):
+    import copy
+    _UNDO_STACK.append((campaign, card, copy.deepcopy(prev) if prev else None))
+    del _UNDO_STACK[:-200]   # cap the history
+
+
+def act_card_undo(p):
+    """Revert the most recent card content edit anywhere (global undo)."""
+    sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+    import render_placeholders as rp
+    if not _UNDO_STACK:
+        return {"ok": False, "message": "nothing to undo"}
+    with _state_lock:
+        campaign, card, prev = _UNDO_STACK.pop()
+        ov = rp.load_card_overrides(campaign)
+        if prev is None:
+            ov.pop(card, None)
+        else:
+            ov[card] = prev
+        _write_json_atomic(rp.overrides_path(campaign), ov)
+        subprocess.run([sys.executable,
+                        os.path.join(ROOT, "pipeline", "render_placeholders.py"),
+                        "--only", card],
+                       check=False, cwd=ROOT, stdout=subprocess.DEVNULL)
+    log("undo: reverted last edit to {}".format(card))
+    return {"ok": True, "card": card, "campaign": campaign,
+            "remaining": len(_UNDO_STACK)}
+
+
 def act_card_save(p):
     """Persist owner content edits (name/text/stats/pips) for one card into
     that campaign's own campaigns/<id>/card_overrides.json, then recompose its
@@ -444,6 +478,8 @@ def act_card_save(p):
 
     with _state_lock:
         ov = rp.load_card_overrides(campaign)
+        # snapshot the pre-edit state for global undo (Ctrl+Z / the Undo button)
+        _undo_push(campaign, card, ov.get(card))
         entry = dict(ov.get(card, {}))
         for k in rp.OV_SPEC_KEYS + rp.OV_PT_KEYS:
             if k not in p:
@@ -2296,6 +2332,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "scenario_delete": act_scenario_delete,
            "scenario_rename": act_scenario_rename, "campaign_import": act_campaign_import, "campaign_new": act_campaign_new,
            "card_new": act_card_new, "card_delete": act_card_delete,
+           "card_undo": act_card_undo,
            "campaign_compile": act_campaign_compile,
            "prompt_get": act_prompt_get, "prompt_save": act_prompt_save,
            "style_save": act_style_save, "inpaint_frames": act_inpaint_frames,
@@ -2978,6 +3015,8 @@ title="delete this card (hand-made cards only)">&#128465; Delete</button>
 title="best-effort background removal so the art blends onto the frame (works best on a plain background)">Cut out background</button>
 <button class=btn id=ed_flipbtn style="font-size:12px;padding:5px 12px" onclick=edFlip()
 title="show the card's back">&#8635; Flip to back</button>
+<button class=btn id=ed_undobtn style="font-size:12px;padding:5px 12px" onclick=cfUndo()
+title="undo the last edit (Ctrl+Z)">&#8630; Undo</button>
 <input type=file id=ed_file accept="image/*" style="display:none" onchange=edUpload(this)>
 </div>
 <div id=ed_strip></div>
@@ -3266,6 +3305,17 @@ async function useAndEdit(id,v){await post('choose',{card:id,file:v});
 const c=((LS&&LS.cards)||[]).find(x=>x.id===id);
 if(c){tab('cards');editArt(Object.assign({},c,{chosen:v,face:true}));}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')zoomClose();});
+// global undo: reverts the last card content edit (server-side history)
+async function cfUndo(){const j=await post('card_undo',{});
+if(j&&j.ok){addlog('undo &rarr; '+j.card);await refresh();
+if(typeof ed!=='undefined'&&ed&&ed.g.id===j.card){
+const c=((LS&&LS.cards)||[]).find(x=>x.id===j.card);
+if(c){ed.g=Object.assign(ed.g,c);ccFill(c);edRegions();edFaceRefresh();}}}
+else addlog((j&&j.message)||'nothing to undo');}
+document.addEventListener('keydown',e=>{
+if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&(e.key==='z'||e.key==='Z')){
+const t=e.target||{};if(/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName||''))return;
+e.preventDefault();cfUndo();}});
 // last campaign the owner had open, so the app reopens it instead of always
 // dumping you back in the finished Still Hour set
 let START_CAMP='';try{START_CAMP=localStorage.getItem('cf_campaign')||'';}catch(_){}
@@ -3676,15 +3726,32 @@ document.getElementById('sig_rows').innerHTML=SIG_ROWS.map((r,i)=>
 function sigAdd(){if(SIG_ROWS.length<12){SIG_ROWS.push({id:'',n:1});sigDraw();}}
 const LOG_F=['player','investigator1','xp1','investigator2','xp2','investigator3','xp3'];
 let LE_CONNS=[],TOK_ROWS=[];
+function leHex(v){const N2H={red:'#960e12',orange:'#b85418',yellow:'#be9428',green:'#2c663c',teal:'#1a605e',blue:'#204884',purple:'#5c246e',pink:'#a83870',brown:'#6c482e',grey:'#625e64',gray:'#625e64',gold:'#aa8e46'};
+v=String(v||'').toLowerCase();return N2H[v]||(/^#[0-9a-f]{6}$/.test(v)?v:'#b09b4a');}
+function leLocs(){return ((LS&&LS.cards)||[]).filter(c=>c.type==='Location'&&(!ed||c.id!==ed.g.id));}
+// the location whose OWN symbol matches this connection (so the dropdown can
+// show which real location a connection points at)
+function leLocFor(sym){sym=String(sym||'').toLowerCase();if(!sym)return '';
+const l=leLocs().find(c=>((c.content&&c.content.icons)||'').toLowerCase()===sym);return l?l.id:'';}
+// picking a location fills this connection's symbol + colour from that card, so
+// you reference locations you already made instead of re-picking a raw symbol
+function leLocPick(i,cid){const c=leLocs().find(x=>x.id===cid);if(!c)return;
+const ct=c.content||{};if(ct.icons)LE_CONNS[i].symbol=String(ct.icons).toLowerCase();
+if(ct.color)LE_CONNS[i].color=leHex(ct.color);leDraw();}
 function leDraw(){const SY=['circle','square','triangle','diamond','moon','star','heart','hourglass','cross','quote','slash','doubleslash','spade','clover','t'];
-document.getElementById('le_conns').innerHTML=LE_CONNS.map((c,i)=>
-`<div class=row style="margin-top:4px"><label>#${i+1}</label>`+
-`<select onchange="LE_CONNS[${i}].symbol=this.value">`+
+const locs=leLocs();
+document.getElementById('le_conns').innerHTML=LE_CONNS.map((c,i)=>{
+const selLoc=leLocFor(c.symbol);
+return `<div class=row style="margin-top:4px"><label>#${i+1}</label>`+
+`<select onchange="leLocPick(${i},this.value)" title="connect to a location you've already made">`+
+['<option value="">— location —</option>',...locs.map(l=>`<option value="${l.id}" ${selLoc===l.id?'selected':''}>${(l.name||l.id).replace(/</g,'&lt;')}</option>`)].join('')+
+`</select>`+
+`<select onchange="LE_CONNS[${i}].symbol=this.value" title="or a raw symbol">`+
 ['<option value="">—</option>',...SY.map(n=>`<option ${c.symbol===n?'selected':''}>${n}</option>`)].join('')+
-`</select><input type=color value="${/^#[0-9a-fA-F]{6}$/.test(c.color)?c.color:'#b09b4a'}" `+
-`onchange="LE_CONNS[${i}].color=this.value" style="width:40px;height:26px;padding:1px;border-radius:6px;border:1px solid var(--line);background:none">`+
-`<button class=btn style="font-size:11px;padding:3px 9px" onclick="LE_CONNS.splice(${i},1);leDraw()">&times;</button></div>`).join('');}
-function leAddConn(){if(LE_CONNS.length<6){LE_CONNS.push({symbol:'circle',color:'#b09b4a'});leDraw();}}
+`</select>`+
+`<input type=color value="${leHex(c.color)}" onchange="LE_CONNS[${i}].color=this.value" style="width:40px;height:26px;padding:1px;border-radius:6px;border:1px solid var(--line);background:none" title="connection colour">`+
+`<button class=btn style="font-size:11px;padding:3px 9px" onclick="LE_CONNS.splice(${i},1);leDraw()">&times;</button></div>`;}).join('');}
+function leAddConn(){if(LE_CONNS.length<6){LE_CONNS.push({symbol:'',color:'#b09b4a'});leDraw();}}
 function tokDraw(){const TOKS=['skull','cultist','tablet','elderthing'];
 document.getElementById('tok_rows').innerHTML=TOK_ROWS.map((t,i)=>
 `<div class=row style="margin-top:4px"><select onchange="TOK_ROWS[${i}].token=this.value">`+
