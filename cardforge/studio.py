@@ -3011,13 +3011,17 @@ title="show the card's back">&#8635; Flip to back</button>
 <button class=btn style="font-size:12px;padding:5px 12px;margin-top:4px" onclick="document.getElementById('ed_fontfile').click()">Upload font&hellip;</button>
 <input type=file id=ed_fontfile accept=".ttf,.otf" style="display:none" onchange=edFontUpload(this)>
 </div>
-<div id=ed_content><h2>Card content <small>type directly — blank returns a field to the authored version; saves affect THIS card only</small></h2>
+<div id=ed_content><h2>Card <small>click any text or number on the card to edit it directly — the panels below are only what the card can&rsquo;t show</small></h2>
+<!-- name / subtitle / traits / stats are edited ON the card now; kept here
+     (hidden) as the data model the on-card editors read and write -->
+<div id=cc_textform style="display:none">
 <div class=row>
 <label>name</label><input id=cc_name size=20 onfocus="tyBind('name')">
 <label>subtitle</label><input id=cc_subtitle size=16 onfocus="tyBind('subtitle')">
 <label>traits</label><input id=cc_traits size=18 onfocus="tyBind('traits')">
 </div>
 <div class=row id=cc_stats></div>
+</div>
 <div id=cc_props style="margin:6px 0;padding:10px;border:1px solid var(--line);border-radius:8px">
 <b style="font-size:12px">Card properties</b>
 <span class=hint>class &middot; encounter set &middot; act/agenda numbering &middot; the marks a real card carries &mdash; only what this card type uses is shown</span>

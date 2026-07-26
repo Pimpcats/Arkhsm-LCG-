@@ -2122,6 +2122,24 @@ def content_regions(card_type):
                "clues": r("Act", "Clues")}
     elif card_type in ("Scenario", "Story"):
         out = {"name": r(card_type, "Name"), "text": r(card_type, "Body")}
+    # so every printed field is editable ON the card: split the Body into a
+    # traits strip (top) / rules (middle) / flavour strip (bottom), and add the
+    # subtitle plate where the frame prints one
+    body = out.get("text")
+    if body:
+        top, bot = body[1], body[3]
+        h = bot - top
+        th = min(46, int(h * 0.20))
+        fh = min(58, int(h * 0.24))
+        if h > th + fh + 70:
+            out["traits"] = [body[0], top, body[2], top + th]
+            out["flavor"] = [body[0], bot - fh, body[2], bot]
+            out["text"] = [body[0], top + th, body[2], bot - fh]
+    if card_type in ("Investigator", "Asset", "Event"):
+        letter = "N" if card_type in ("Asset", "Event") else ""
+        sub = r(card_type, "SubtitleText", letter) or r(card_type, "Subtitle", letter)
+        if sub:
+            out["subtitle"] = sub
     return {k: v for k, v in out.items() if v}
 
 
