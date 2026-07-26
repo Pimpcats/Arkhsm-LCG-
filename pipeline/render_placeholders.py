@@ -40,6 +40,12 @@ FACES_DIR = os.path.join(ROOT, "art", "faces")
 # render path is completely unaffected when it is False.
 FURNITURE = False
 
+# Blank mode: the card with NO illustration — background (class colour /
+# parchment) + frame + text, art window empty. The editor uses it as the
+# backdrop behind the live draggable art, so the class background always shows
+# and there is never a baked-in illustration to double with the live art.
+BLANK = False
+
 
 def load_art_index():
     """id -> chosen illustration path (CardForge's out/<campaign>/index.json)."""
@@ -1373,7 +1379,12 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
     W, H = 375 * SE_SCALE, 525 * SE_SCALE
     frame2 = frame.resize((W, H), Image.LANCZOS)
     clip = se_reg(kind, "Portrait-portrait-clip")
-    if FURNITURE:
+    if BLANK:
+        # no art: parchment background + frame, so the editor shows the empty
+        # window behind the live art
+        img = Image.new("RGB", (W, H), frame_underlay(frame))
+        img.paste(frame2, (0, 0), frame2)
+    elif FURNITURE:
         # furniture-only: frame (player frames are windowed) on a transparent
         # window; the text/icons drawn below land on top of it
         img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -1456,6 +1467,17 @@ def _se_frame_compose(tpl_name, kind, clip_key, art_path, placement,
     frame2 = frame.resize((W, H), Image.LANCZOS)
     clip = se_reg(kind, clip_key)
     windowed = frame.getchannel("A").getextrema()[0] < 250
+    if BLANK:
+        # the card with no art: keep the background the frame provides so the
+        # editor can show the class colour behind the live art
+        if windowed:
+            img = Image.new("RGB", (W, H), underlay or frame_underlay(frame))
+            img.paste(frame2, (0, 0), frame2)
+        else:
+            img = frame2.convert("RGB")
+            if underlay and clip:
+                ImageDraw.Draw(img).rectangle(list(clip), fill=underlay)
+        return img, ImageDraw.Draw(img)
     if FURNITURE:
         # The frame (plus the text/discs the caller draws next) on a TRANSPARENT
         # art window, so the live editor can lay real art behind it. A windowed
@@ -1983,9 +2005,13 @@ def main():
     ap.add_argument("--furniture", action="store_true",
                     help="render frame+text+discs on a transparent art window "
                          "(<id>-furniture.png) for the live editor overlay")
+    ap.add_argument("--blank", action="store_true",
+                    help="render the card with NO art (<id>-blank.png): the "
+                         "editor backdrop showing the class background")
     args = ap.parse_args()
-    global FURNITURE
+    global FURNITURE, BLANK
     FURNITURE = bool(args.furniture)
+    BLANK = bool(args.blank)
     use_tpl = (not args.no_template) and T.has_template("investigator_front")
     # EVERY campaign's specs — the authored Still Hour set plus any
     # <campaign>_*_spec.json written by the app (hand-made or imported cards),
@@ -2027,9 +2053,9 @@ def main():
         art = art_index.get(c["id"])
         place = placements.get(c["id"])
         composed += 1 if art else 0
-        # furniture faces go to their own filenames so they never clobber the
-        # real, art-baked faces (or backs) the compiler and gallery read
-        suffix = "-furniture" if FURNITURE else ""
+        # furniture/blank faces go to their own filenames so they never clobber
+        # the real, art-baked faces (or backs) the compiler and gallery read
+        suffix = "-furniture" if FURNITURE else "-blank" if BLANK else ""
         dest = os.path.join(FACES_DIR, c["id"] + suffix + ".png")
         back_dest = os.path.join(FACES_DIR, c["id"] + suffix + "-back.png")
         if c["type"] == "Investigator":

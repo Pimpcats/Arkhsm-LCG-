@@ -1763,13 +1763,16 @@ def act_compose_one(p):
 
 
 def act_compose_furniture(p):
-    """Compose the card's FURNITURE overlay (<id>-furniture.png): frame + text +
-    discs on a transparent art window. The editor lays this over the live,
-    draggable art so the art reads behind the frame exactly as the render does.
-    Synchronous; leaves the real face untouched."""
-    subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py"),
-                    "--furniture", "--only", p["card"]],
-                   check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+    """Compose the two editor overlays for a card, both leaving the real face
+    untouched:
+      <id>-furniture.png  frame + text + discs on a TRANSPARENT art window
+      <id>-blank.png      the card with NO art (class background + frame + text)
+    The editor stacks blank (backdrop) < live art < furniture, so the art reads
+    behind the frame and the class background always shows."""
+    rp = os.path.join(ROOT, "pipeline", "render_placeholders.py")
+    for mode in ("--furniture", "--blank"):
+        subprocess.run([sys.executable, rp, mode, "--only", p["card"]],
+                       check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
     return {"ok": True, "composed": True}
 
 
@@ -2503,8 +2506,11 @@ border-radius:12px;padding:12px 14px}
 #ed_stage{position:relative;margin:12px auto;overflow:hidden;border-radius:10px;
 border:1px solid var(--line);background:#14151b}
 #ed_face{display:block;user-select:none;pointer-events:none}
-#ed_win{position:absolute;overflow:hidden;cursor:grab;outline:2px dashed var(--accent);
-outline-offset:-2px;border-radius:2px;z-index:1}
+/* the art window: no heavy box by default — just the art on its background.
+   A faint outline appears on hover so you can still find the draggable area. */
+#ed_win{position:absolute;overflow:hidden;cursor:grab;outline:1px solid transparent;
+outline-offset:-1px;border-radius:2px;z-index:1;transition:outline-color .15s}
+#ed_stage:hover #ed_win{outline-color:rgba(232,178,74,.35)}
 #ed_art{position:absolute;user-select:none}
 /* the furniture overlay: frame + text + discs on a transparent art window, laid
    OVER the live art so the art reads behind the frame exactly as the render */
@@ -3377,7 +3383,7 @@ const disp=Math.min(1,410/cw);ed.disp=disp;
 const stage=document.getElementById('ed_stage');
 stage.style.width=(cw*disp)+'px';stage.style.height=(ch*disp)+'px';
 const face=document.getElementById('ed_face');
-face.src='/art?p=art/faces/'+c.id+'.png&ts='+Date.now();
+face.src='/art?p=art/faces/'+c.id+'-blank.png&ts='+Date.now();
 face.style.width=(cw*disp)+'px';
 const win=document.getElementById('ed_win');
 win.style.left=(x0*disp)+'px';win.style.top=(y0*disp)+'px';
@@ -3724,8 +3730,9 @@ ed.scale=1;ed.ox=0;ed.oy=0;document.getElementById('ed_scale').value=1;
 edStrip();edLoadArt();edFaceRefresh();}};
 rd.readAsDataURL(f);input.value='';}
 function edFaceRefresh(){if(!ed)return;
-document.getElementById('ed_face').src=
-'/art?p=art/faces/'+ed.g.id+'.png&ts='+Date.now();
+document.getElementById('ed_face').style.display='block';
+// edFurnitureRefresh recomposes and reloads both the blank backdrop and the
+// furniture overlay (text can change with a content edit)
 edFurnitureRefresh();}
 function edPreview(){if(!ed||!ed.natW)return;
 ed.scale=parseFloat(document.getElementById('ed_scale').value);
@@ -3737,28 +3744,37 @@ const art=document.getElementById('ed_art');
 art.style.width=w+'px';art.style.height=h+'px';
 art.style.left=(-(w-(bw*ed.disp))/2+ed.ox*ed.disp)+'px';
 art.style.top =(-(h-(bh*ed.disp))/2+ed.oy*ed.disp)+'px';}
+// the live art moves over the blank backdrop (which carries no illustration, so
+// nothing doubles); when the gesture settles we persist the placement so it
+// survives and the exported face matches
+let ED_ARTBUSY=null;
+async function edSavePlacement(){if(!ed)return;
+const body={card:ed.g.id,scale:ed.scale,ox:ed.ox,oy:ed.oy};
+if(ed.scaleY&&Math.abs(ed.scaleY-ed.scale)>0.001)body.scale_y=ed.scaleY;
+await post('place',body);}
+function edArtIdle(){clearTimeout(ED_ARTBUSY);
+ED_ARTBUSY=setTimeout(()=>{if(ed)edSavePlacement();},500);}
 (function(){const win=document.getElementById('ed_win');let drag=null;
 win.addEventListener('mousedown',e=>{if(!ed)return;
 drag={x:e.clientX,y:e.clientY,ox:ed.ox,oy:ed.oy};win.style.cursor='grabbing';e.preventDefault();});
 window.addEventListener('mousemove',e=>{if(!drag||!ed)return;
 ed.ox=drag.ox+(e.clientX-drag.x)/ed.disp;ed.oy=drag.oy+(e.clientY-drag.y)/ed.disp;edPreview();});
-window.addEventListener('mouseup',()=>{drag=null;win.style.cursor='grab';});
+window.addEventListener('mouseup',()=>{if(drag)edArtIdle();drag=null;win.style.cursor='grab';});
 win.addEventListener('wheel',e=>{e.preventDefault();const s=document.getElementById('ed_scale');
-s.value=Math.max(0.5,Math.min(6,parseFloat(s.value)-e.deltaY*0.0012));edPreview();});})();
-// ---- live furniture overlay: frame + text + discs on a transparent window,
-// composed by the server and laid over the draggable art so art reads BEHIND
-// the frame exactly as the finished card does ----
+s.value=Math.max(0.5,Math.min(6,parseFloat(s.value)-e.deltaY*0.0012));edArtIdle();edPreview();});})();
+// ---- editor preview layers: the BLANK backdrop (class background + frame,
+// no art) sits behind the live draggable art, and the FURNITURE overlay (frame
+// + text on a transparent window) sits on top. Because the backdrop carries no
+// illustration there is no baked art to double with the live art, and the class
+// background always shows even with no art dropped in yet. ----
 async function edFurnitureRefresh(){if(!ed)return;const id=ed.g.id;
 const furn=document.getElementById('ed_furniture');
 const face=document.getElementById('ed_face');
 try{await post('compose_furniture',{card:id});}catch(_){}
 if(!ed||ed.g.id!==id)return;
-// once the furniture overlay (frame+text+discs, transparent window) is up we
-// HIDE the baked face — otherwise its baked-in art shows behind the live art
-// and reads as a duplicate when you drag or scroll. Furniture failing falls
-// back to the baked face so the preview is never blank.
-furn.onload=()=>{furn.style.display='block';face.style.display='none';};
-furn.onerror=()=>{furn.style.display='none';face.style.display='block';};
+face.src='/art?p=art/faces/'+id+'-blank.png&ts='+Date.now();
+furn.onload=()=>{furn.style.display='block';};
+furn.onerror=()=>{furn.style.display='none';};
 furn.src='/art?p=art/faces/'+id+'-furniture.png&ts='+Date.now();
 edRegions();}
 // ---- editable text boxes ON the card. name and rules text can be dragged to
