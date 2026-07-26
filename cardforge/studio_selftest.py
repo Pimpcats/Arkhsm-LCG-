@@ -124,6 +124,22 @@ check("workflow tabs present in flow order",
 check("Strange Eons credited",
       "strangeeons.cgjennings.ca" in page)
 
+# UI contract guardrail (see docs/design/UI_HANDOFF.md): every id the JS reads
+# with getElementById MUST exist as an id in the served page, so a UI redesign
+# that drops or renames a hook fails here with the exact id instead of silently
+# breaking a control. Dynamic ids (cc_<field> etc.) are built at runtime, so we
+# check the static ones the JS names literally.
+import re as _re
+# vendor_plugin is a stale, defensively-guarded (`if(pe)`) reference that never
+# had a matching element; baseline it so the guardrail flags NEW dropped hooks.
+_ALLOWED_MISSING = {"vendor_plugin"}
+_read = set(_re.findall(r"getElementById\(['\"]([a-zA-Z0-9_]+)['\"]\)", page))
+_declared = set(_re.findall(r"\bid=['\"]?([a-zA-Z0-9_]+)", page))
+_missing = sorted(h for h in _read if h not in _declared and h not in _ALLOWED_MISSING)
+check("UI contract: every JS hook id exists in the page"
+      + (" (missing: " + ", ".join(_missing) + ")" if _missing else ""),
+      not _missing)
+
 print("== ILLUSTRATE: dry-run batch through the API ==")
 r = requests.post(BASE + "/api/generate",
                   json={"campaign": "still_hour", "starter": True, "dry_run": True}).json()
