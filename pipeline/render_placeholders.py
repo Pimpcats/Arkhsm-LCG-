@@ -437,13 +437,21 @@ def draw_wrapped(draw, text, x, y, size, max_width, fill, italic=False,
                  leading=1.25, bold=False, font_file=None):
     tfont = _font(size, italic=italic, bold=bold, font_file=font_file)
     gfont = _font(size, glyph=True)
+    # centre the inline icons (action/reaction/elder sign...) vertically on the
+    # text line they sit in, the way the official cards do, instead of hanging
+    # them from the line top
+    tasc, _ = tfont.getmetrics()
+    gmid = int(tasc * 0.60)
     for line in wrap_runs(draw, text, size, max_width, italic=italic,
                           bold=bold, font_file=font_file):
         cx = x
         for is_glyph, piece in line:
-            font = gfont if is_glyph else tfont
-            draw.text((cx, y), piece, font=font, fill=fill)
-            cx += draw.textlength(piece, font=font)
+            if is_glyph:
+                draw.text((cx, y + gmid), piece, font=gfont, fill=fill, anchor="lm")
+                cx += draw.textlength(piece, font=gfont)
+            else:
+                draw.text((cx, y), piece, font=tfont, fill=fill)
+                cx += draw.textlength(piece, font=tfont)
         y += int(size * leading)
     return y
 
@@ -1029,14 +1037,21 @@ def _flow_around(d, text, box, obstacle, start=22, min_size=13, fill=PSD_INK,
         return placed, y, fits
 
     placed, endy = None, top
+    size = start
     for size in range(start, min_size - 1, -1):
         placed, endy, fits = layout(size)
         if fits:
             break
+    # centre inline icons vertically on the text line, like the official cards
+    tasc, _ = _font(size, italic=italic).getmetrics()
+    gmid = int(tasc * 0.60)
     for ly, lx, line in placed:
         cx = lx
         for is_g, piece, font in line:
-            d.text((cx, ly), piece, font=font, fill=fill)
+            if is_g:
+                d.text((cx, ly + gmid), piece, font=font, fill=fill, anchor="lm")
+            else:
+                d.text((cx, ly), piece, font=font, fill=fill)
             cx += d.textlength(piece, font=font)
     return endy
 
@@ -1280,9 +1295,9 @@ SHROUD_DISC = (10, 10, 12)
 SHROUD_NUM = (244, 242, 236)
 CLUE_DISC = (214, 202, 170)
 CLUE_INK = (20, 24, 52)
-# the shroud/clue text regions sit ~12px above the template's printed discs, so
-# the numeral reads high; drop it to sit centred in the disc
-DISC_NUM_DY = 12
+# the shroud/clue text regions sit above the template's printed discs, so the
+# numeral reads high; drop it to sit centred in the disc
+DISC_NUM_DY = 16
 
 
 def _luma(color):
@@ -1559,14 +1574,16 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
     # health (red heart) + sanity (blue brain) chits from the official stat kit
     # — the plugin's own SanityBase is corrupt, so these are the clean source.
     # Push them apart (health left, sanity right) so the two big chits get a
-    # gap between them instead of hugging, like the reference cards.
+    # gap between them instead of hugging, and lift them a touch off the bottom
+    # border, like the reference cards.
     VITAL_GAP = 30
+    VITAL_RISE = 12
     for kind, key, fld, val, off in (
             ("health_heart", "Stamina", "health", c.get("health"), -VITAL_GAP),
             ("sanity_brain", "Sanity", "sanity", c.get("sanity"), VITAL_GAP)):
         reg = _nudge(se_reg("Investigator", key), _field_style(fld))
         cx = (reg[0] + reg[2]) // 2 + off
-        cy = (reg[1] + reg[3]) // 2
+        cy = (reg[1] + reg[3]) // 2 - VITAL_RISE
         hw, hh = (reg[2] - reg[0]) // 2, (reg[3] - reg[1]) // 2
         box = (cx - hw, cy - hh, cx + hw, cy + hh)   # numeral follows the chit
         chit, numbered = _vital_chit(kind, val)

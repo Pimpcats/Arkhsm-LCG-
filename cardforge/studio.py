@@ -3913,7 +3913,9 @@ const ov=document.createElement(multiline?'textarea':'input');
 ov.className='ed_inline';ov.value=dst.value;
 ov.style.left=el.style.left;ov.style.top=el.style.top;
 ov.style.width=el.style.width;if(multiline)ov.style.height=el.style.height;
-document.getElementById('ed_stage').appendChild(ov);ov.focus();if(ov.select)ov.select();
+document.getElementById('ed_stage').appendChild(ov);
+// focus in place — never scroll or zoom the card out of view
+try{ov.focus({preventScroll:true});}catch(_){ov.focus();}if(ov.select)ov.select();
 let done=false;const fin=save=>{if(done)return;done=true;
 if(save){dst.value=ov.value;edSave();}ov.remove();};
 ov.addEventListener('blur',()=>fin(true));
