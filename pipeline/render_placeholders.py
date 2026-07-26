@@ -1554,11 +1554,18 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
                   stat=True, grow=1.0, pos_key=stat)
     _se_body(d, c, pt, "Investigator", text_start=20, extra_bottom=0)
     # health (red heart) + sanity (blue brain) chits from the official stat kit
-    # — the plugin's own SanityBase is corrupt, so these are the clean source
-    for kind, key, fld, val in (("health_heart", "Stamina", "health", c.get("health")),
-                                ("sanity_brain", "Sanity", "sanity", c.get("sanity"))):
-        box = _nudge(se_reg("Investigator", key), _field_style(fld))
-        cx, cy = (box[0] + box[2]) // 2, (box[1] + box[3]) // 2
+    # — the plugin's own SanityBase is corrupt, so these are the clean source.
+    # Push them apart (health left, sanity right) so the two big chits get a
+    # gap between them instead of hugging, like the reference cards.
+    VITAL_GAP = 30
+    for kind, key, fld, val, off in (
+            ("health_heart", "Stamina", "health", c.get("health"), -VITAL_GAP),
+            ("sanity_brain", "Sanity", "sanity", c.get("sanity"), VITAL_GAP)):
+        reg = _nudge(se_reg("Investigator", key), _field_style(fld))
+        cx = (reg[0] + reg[2]) // 2 + off
+        cy = (reg[1] + reg[3]) // 2
+        hw, hh = (reg[2] - reg[0]) // 2, (reg[3] - reg[1]) // 2
+        box = (cx - hw, cy - hh, cx + hw, cy + hh)   # numeral follows the chit
         chit, numbered = _vital_chit(kind, val)
         if chit is not None:
             _paste_icon_fit(img, chit, (cx - 66, cy - 72, cx + 66, cy + 72))

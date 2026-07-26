@@ -2930,7 +2930,7 @@ title="Stable Diffusion regenerates each template's text regions into empty card
 <div id=ed_sheet>
 <div class="row" id=ed_toolbar><button class=btn onclick=edClose()>&#8592; All cards</button>
 <b id=ed_title style="font-size:15px"></b>
-<span class=hint>drag art in the window &middot; scroll to size &middot; click a text area to edit it in the panel &middot; drag the name / rules box to move it</span>
+<span class=hint>drag art in the window &middot; scroll to size &middot; click a text area to edit it (drag it to move) &middot; click a stat to +1, right-click &minus;1</span>
 <span class=spacer></span>
 <label>width</label><input type=range id=ed_scale min=0.5 max=6 step=0.02 style="width:120px" oninput=edPreview()>
 <label>height</label><input type=range id=ed_scaley min=0.5 max=6 step=0.02 style="width:120px" oninput=edPreview()>
@@ -3897,7 +3897,7 @@ el.className='ed_rg'+(rf.stat?' ed_statrg':'')+(ED_SEL===key?' sel':'');
 el.dataset.key=key;
 el.style.left=((b[0]+dx)*ed.disp)+'px';el.style.top=((b[1]+dy)*ed.disp)+'px';
 el.style.width=((b[2]-b[0])*ed.disp)+'px';el.style.height=((b[3]-b[1])*ed.disp)+'px';
-el.title=rf.stat?'drag to move · left-click +1 · right-click − 1':'drag to move · double-click to edit';
+el.title=rf.stat?'left-click +1 · right-click − 1 · drag to move':'click to edit · drag to move';
 host.appendChild(el);}}
 // step a stat by clicking its numeral on the card (reuses the form stepper)
 let ED_STAT_T=null;
@@ -3905,8 +3905,9 @@ function edStatStep(key,delta){const cc=document.getElementById('cc_'+key);if(!c
 if(typeof ccStep==='function')ccStep(key,delta);
 else cc.value=(parseInt(cc.value)||0)+delta;
 clearTimeout(ED_STAT_T);ED_STAT_T=setTimeout(()=>{if(ed)edSave();},400);}
-// double-click a text area to edit it right on the card
-function edInlineEdit(key,el){const dst=document.getElementById(edCcId(key));if(!dst)return;
+// click a text area to edit it right on the card (one editor open at a time)
+function edInlineEdit(key,el){if(document.querySelector('.ed_inline'))return;
+const dst=document.getElementById(edCcId(key));if(!dst)return;
 const multiline=(key==='text'||key==='flavor');
 const ov=document.createElement(multiline?'textarea':'input');
 ov.className='ed_inline';ov.value=dst.value;
@@ -3930,15 +3931,13 @@ host.addEventListener('contextmenu',e=>{
 const el=e.target.closest('.ed_rg');if(!el||!ed)return;
 const rf=edRegionField(el.dataset.key);
 if(rf.stat){e.preventDefault();edSelectRegion(el.dataset.key);edStatStep(el.dataset.key,-1);}});
-host.addEventListener('dblclick',e=>{
-const el=e.target.closest('.ed_rg');if(!el||!ed)return;
-if(!edRegionField(el.dataset.key).stat)edInlineEdit(el.dataset.key,el);});
 window.addEventListener('mousemove',e=>{if(!rdrag)return;
 const mx=e.clientX-rdrag.x,my=e.clientY-rdrag.y;
 if(Math.abs(mx)+Math.abs(my)>3)rdrag.moved=true;
 rdrag.el.style.left=(rdrag.base.l+mx)+'px';rdrag.el.style.top=(rdrag.base.t+my)+'px';});
 window.addEventListener('mouseup',async e=>{if(!rdrag)return;const d=rdrag;rdrag=null;if(!ed)return;
-if(!d.moved){if(d.stat)edStatStep(d.key,1);return;}   // a click, not a drag
+// a click (no drag): stats step +1, text areas open the inline editor
+if(!d.moved){if(d.stat)edStatStep(d.key,1);else edInlineEdit(d.key,d.el);return;}
 const ndx=Math.round(d.dx0+(e.clientX-d.x)/ed.disp);
 const ndy=Math.round(d.dy0+(e.clientY-d.y)/ed.disp);
 const j=await post('field_pos',{card:ed.g.id,field:d.field,dx:ndx,dy:ndy});
