@@ -520,22 +520,21 @@ def pips(draw, x, y, n, color, r=9):
     return x + n * (2 * r + 6)
 
 
-def _draw_level_pips(draw, level, box, fill=(238, 232, 216)):
-    """Draw an Asset/Event/Skill's XP level as small pips centred in the level
-    banner beneath the cost — the way real cards show it. A leveled card must
-    never print a second number stacked under the cost disc."""
+def _draw_level_pips(draw, level, cx, cy, gap, r, fill=(238, 232, 216)):
+    """Fill one XP pip per level along a shallow arc, centred on (cx, cy) — the
+    spot where the frame prints its empty XP bubbles. The bubble-free NoLevel
+    disc is laid down first, so a leveled card reads as N filled pips with no
+    leftover empties, like a printed card. Pips step out by `gap` and lift
+    slightly toward the ends."""
     n = pip_count(level)
     if n <= 0:
         return
-    r, gap = 7, 5
-    step = 2 * r + gap
-    total = n * step - gap
-    x0 = (box[0] + box[2]) // 2 - total // 2
-    cy = (box[1] + box[3]) // 2 - r
+    rise = gap * 0.16
     for k in range(n):
-        x = x0 + k * step
-        draw.ellipse([x, cy, x + 2 * r, cy + 2 * r],
-                     fill=fill, outline=(30, 26, 22), width=2)
+        o = k - (n - 1) / 2.0
+        x, y = cx + o * gap, cy - rise * o * o
+        draw.ellipse([x - r, y - r, x + r, y + r],
+                     fill=fill, outline=(28, 24, 20), width=2)
 
 
 def footer(draw, w, h, card_id):
@@ -1490,12 +1489,29 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
             or _se_img("overlays", "AHLCG-SkillIcon-" + gl)
         _paste_region(img, icon, se_reg(kind, "SkillIcon{}".format(i + 1)))
 
-    if kind in ("Asset", "Event") and c.get("cost") is not None:
-        _box_text(d, str(c["cost"]), se_reg(kind, "Cost"),
-                  fill=(238, 232, 216), title=True, grow=0.95, pos_key="cost")
-    if c.get("level"):
-        _draw_level_pips(d, c["level"],
-                         _nudge(se_reg(kind, "Level"), _field_style("level")))
+    # cost disc + XP track. The base frame bakes an empty XP-bubble arc into the
+    # cost disc (asset/event) or the skill "cup"; lay the plugin's bubble-free
+    # disc (NoLevel) over it first, then draw the cost and one filled pip per
+    # level — a printed leveled card shows N pips, never leftover empty bubbles.
+    if kind in ("Asset", "Event"):
+        _paste_region(img, _se_img("overlays", "AHLCG-NoLevel"),
+                      se_reg(kind, "NoLevel"))
+        if c.get("cost") is not None:
+            _box_text(d, str(c["cost"]), se_reg(kind, "Cost"),
+                      fill=(238, 232, 216), title=True, grow=0.95, pos_key="cost")
+        if c.get("level"):
+            disc = _nudge(se_reg(kind, "Cost"), _field_style("level"))
+            w = disc[2] - disc[0]
+            _draw_level_pips(d, c["level"], (disc[0] + disc[2]) / 2.0,
+                             disc[3] + w * 0.10, w * 0.20, max(5, int(w * 0.095)))
+    elif kind == "Skill" and c.get("level"):
+        _paste_region(img, _se_img("overlays", "AHLCG-NoLevelSkill"),
+                      se_reg(kind, "NoLevel"))
+        cup = _nudge(se_reg(kind, "Level"), _field_style("level"))
+        cw = cup[2] - cup[0]
+        _draw_level_pips(d, c["level"], (cup[0] + cup[2]) / 2.0,
+                         cup[1] + (cup[3] - cup[1]) * 0.46,
+                         cw * 0.13, max(4, int(cw * 0.072)))
 
     _box_text(d, c["name"], se_reg(kind, "Name", letter), title=True, grow=1.15, key="name")
     if c.get("subtitle"):
