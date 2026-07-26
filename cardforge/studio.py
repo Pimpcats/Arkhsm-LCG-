@@ -1542,6 +1542,11 @@ def own_spec_path(campaign="still_hour"):
 
 
 TYPE_FIELDS = ("name", "subtitle", "traits", "text", "flavor", "victory", "stats")
+# fields that can carry a drag position (text areas + every individual stat
+# numeral, so each stat can be nudged on its own)
+POS_FIELDS = set(TYPE_FIELDS) | {"wil", "int", "com", "agi", "health", "sanity",
+                                 "fight", "evade", "damage", "horror", "shroud",
+                                 "clues", "cost", "level", "doom"}
 LOG_FIELDS = ("player", "investigator1", "xp1", "investigator2", "xp2",
               "investigator3", "xp3")
 
@@ -1611,8 +1616,8 @@ def act_field_pos(p):
     import render_placeholders as rp
     card = os.path.basename(str(p.get("card", "")).strip()) or "_default"
     field = str(p.get("field", "")).strip()
-    if field not in TYPE_FIELDS:
-        return {"ok": False, "message": "unknown text area: " + field}
+    if field not in POS_FIELDS:
+        return {"ok": False, "message": "unknown area: " + field}
 
     def _clamp(v):
         try:
@@ -3874,23 +3879,24 @@ const FIELD_CC={name:'cc_name',subtitle:'cc_subtitle',traits:'cc_traits',
 text:'cc_text',flavor:'cc_flavor'};
 function edCcId(key){return FIELD_CC[key]||('cc_'+key);}
 function edRegionField(key){
+// posField = where the drag offset is stored (each stat on its own);
+// styleField = which typography style applies (all stats share "stats").
 // name / rules text: drag to move + double-click to edit inline.
-// stat numerals (health, sanity, shroud, cost, doom...): left-click +1,
-// right-click -1 straight on the card.
-if(FIELD_CC[key])return {field:key,cc:FIELD_CC[key],stat:false,drag:true};
-return {field:'stats',cc:'cc_'+key,stat:true,drag:false};}
+// stat numerals: drag to move, left-click +1, right-click -1.
+if(FIELD_CC[key])return {posField:key,styleField:key,cc:FIELD_CC[key],stat:false};
+return {posField:key,styleField:'stats',cc:'cc_'+key,stat:true};}
 let ED_SEL=null;
 function edRegions(){const host=document.getElementById('ed_regions');if(!host)return;
 host.innerHTML='';if(!ed||!ed.g.regions)return;
 for(const key in ed.g.regions){const b=ed.g.regions[key];if(!b)continue;
-const rf=edRegionField(key);const st=(ed.g.type_styles||{})[rf.field]||{};
-const dx=(rf.drag?(st.dx||0):0),dy=(rf.drag?(st.dy||0):0);
+const rf=edRegionField(key);const st=(ed.g.type_styles||{})[rf.posField]||{};
+const dx=st.dx||0,dy=st.dy||0;
 const el=document.createElement('div');
 el.className='ed_rg'+(rf.stat?' stat':'')+(ED_SEL===key?' sel':'');
 el.dataset.key=key;
 el.style.left=((b[0]+dx)*ed.disp)+'px';el.style.top=((b[1]+dy)*ed.disp)+'px';
 el.style.width=((b[2]-b[0])*ed.disp)+'px';el.style.height=((b[3]-b[1])*ed.disp)+'px';
-el.title=rf.stat?'left-click +1 · right-click − 1':'drag to move · double-click to edit';
+el.title=rf.stat?'drag to move · left-click +1 · right-click − 1':'drag to move · double-click to edit';
 host.appendChild(el);}}
 // step a stat by clicking its numeral on the card (reuses the form stepper)
 let ED_STAT_T=null;
@@ -3913,13 +3919,11 @@ ov.addEventListener('keydown',ev=>{if(ev.key==='Escape'){ev.preventDefault();fin
 else if(ev.key==='Enter'&&!multiline){ev.preventDefault();fin(true);}});}
 (function(){let rdrag=null;const host=document.getElementById('ed_regions');
 host.addEventListener('mousedown',e=>{
-const el=e.target.closest('.ed_rg');if(!el||!ed||e.button!==0)return;
+const el=e.target.closest('.ed_rg');if(!el||!ed||e.button!==0)return;e.preventDefault();
 const key=el.dataset.key;const rf=edRegionField(key);
 edSelectRegion(key);
-if(rf.stat){e.preventDefault();edStatStep(key,1);return;}
-if(!rf.drag)return;e.preventDefault();
-const st=(ed.g.type_styles||{})[rf.field]||{};
-rdrag={el,key,field:rf.field,x:e.clientX,y:e.clientY,
+const st=(ed.g.type_styles||{})[rf.posField]||{};
+rdrag={el,key,field:rf.posField,stat:rf.stat,x:e.clientX,y:e.clientY,
 dx0:st.dx||0,dy0:st.dy||0,base:{l:parseFloat(el.style.left),t:parseFloat(el.style.top)},moved:false};});
 host.addEventListener('contextmenu',e=>{
 const el=e.target.closest('.ed_rg');if(!el||!ed)return;
@@ -3930,10 +3934,10 @@ const el=e.target.closest('.ed_rg');if(!el||!ed)return;
 if(!edRegionField(el.dataset.key).stat)edInlineEdit(el.dataset.key,el);});
 window.addEventListener('mousemove',e=>{if(!rdrag)return;
 const mx=e.clientX-rdrag.x,my=e.clientY-rdrag.y;
-if(Math.abs(mx)+Math.abs(my)>2)rdrag.moved=true;
+if(Math.abs(mx)+Math.abs(my)>3)rdrag.moved=true;
 rdrag.el.style.left=(rdrag.base.l+mx)+'px';rdrag.el.style.top=(rdrag.base.t+my)+'px';});
-window.addEventListener('mouseup',async e=>{if(!rdrag)return;const d=rdrag;rdrag=null;
-if(!d.moved||!ed)return;
+window.addEventListener('mouseup',async e=>{if(!rdrag)return;const d=rdrag;rdrag=null;if(!ed)return;
+if(!d.moved){if(d.stat)edStatStep(d.key,1);return;}   // a click, not a drag
 const ndx=Math.round(d.dx0+(e.clientX-d.x)/ed.disp);
 const ndy=Math.round(d.dy0+(e.clientY-d.y)/ed.disp);
 const j=await post('field_pos',{card:ed.g.id,field:d.field,dx:ndx,dy:ndy});
@@ -3943,16 +3947,15 @@ if(ndx)cur.dx=ndx;else delete cur.dx;if(ndy)cur.dy=ndy;else delete cur.dy;
 if(Object.keys(cur).length)ed.g.type_styles[d.field]=cur;else delete ed.g.type_styles[d.field];
 edFaceRefresh();addlog('moved '+d.field);}});})();
 function edSelectRegion(key){ED_SEL=key;
-const rf=edRegionField(key);tyBind(rf.field);
+const rf=edRegionField(key);tyBind(rf.styleField);
 for(const el of document.querySelectorAll('.ed_rg'))
 el.classList.toggle('sel',el.dataset.key===key);}
-function edMoveReset(){if(!ed||!ED_SEL)return;const rf=edRegionField(ED_SEL);
-if(!rf.drag)return;
-post('field_pos',{card:ed.g.id,field:rf.field,dx:0,dy:0}).then(j=>{if(!j.ok)return;
-if(ed.g.type_styles&&ed.g.type_styles[rf.field]){
-delete ed.g.type_styles[rf.field].dx;delete ed.g.type_styles[rf.field].dy;
-if(!Object.keys(ed.g.type_styles[rf.field]).length)delete ed.g.type_styles[rf.field];}
-edFaceRefresh();addlog('reset '+rf.field+' position');});}
+function edMoveReset(){if(!ed||!ED_SEL)return;const f=edRegionField(ED_SEL).posField;
+post('field_pos',{card:ed.g.id,field:f,dx:0,dy:0}).then(j=>{if(!j.ok)return;
+if(ed.g.type_styles&&ed.g.type_styles[f]){
+delete ed.g.type_styles[f].dx;delete ed.g.type_styles[f].dy;
+if(!Object.keys(ed.g.type_styles[f]).length)delete ed.g.type_styles[f];}
+edFaceRefresh();addlog('reset '+f+' position');});}
 // side-panel text editor mirrors the selected area's content field
 let ED_TXT_T=null;
 function edSideText(){const cc=FIELD_CC[TY_FIELD];if(!cc)return;

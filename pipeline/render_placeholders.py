@@ -889,7 +889,7 @@ def _nudge(box, st):
 
 def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
               grow=1.5, min_size=13, max_w_factor=None, max_size=None,
-              align="center", stat=False, key=None):
+              align="center", stat=False, key=None, pos_key=None):
     """Center text on a region bbox, auto-sized. Region bboxes come from the
     template's example text, so start from the box height and shrink to fit.
     Titles must stay inside their region (they sit between the art and the
@@ -903,7 +903,9 @@ def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
     if stat and key is None:
         key = "stats"
     st = _field_style(key)
-    box = _nudge(box, st)
+    # typography comes from `key` (stats share one style); position comes from
+    # `pos_key` when given, so each stat numeral can be nudged on its own
+    box = _nudge(box, _field_style(pos_key) if pos_key else st)
     font_file = None
     size_scale = 1.0
     if st:
@@ -1411,10 +1413,10 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
 
     if kind in ("Asset", "Event") and c.get("cost") is not None:
         _box_text(d, str(c["cost"]), se_reg(kind, "Cost"),
-                  fill=(238, 232, 216), title=True, grow=0.95)
+                  fill=(238, 232, 216), title=True, grow=0.95, pos_key="cost")
     if c.get("level"):
         _box_text(d, str(c["level"]), se_reg(kind, "Level"),
-                  fill=(238, 232, 216), stat=True, grow=0.9)
+                  fill=(238, 232, 216), stat=True, grow=0.9, pos_key="level")
 
     _box_text(d, c["name"], se_reg(kind, "Name", letter), title=True, grow=1.15, key="name")
     if c.get("subtitle"):
@@ -1443,10 +1445,10 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
     if kind == "Asset":
         if c.get("health") is not None:
             _box_text(d, str(c["health"]), se_reg(kind, "Stamina"),
-                      fill=(250, 244, 238), stat=True, grow=0.9)
+                      fill=(250, 244, 238), stat=True, grow=0.9, pos_key="health")
         if c.get("sanity") is not None:
             _box_text(d, str(c["sanity"]), se_reg(kind, "Sanity"),
-                      fill=(240, 246, 255), stat=True, grow=0.9)
+                      fill=(240, 246, 255), stat=True, grow=0.9, pos_key="sanity")
 
     _box_text(d, _wm(art_path), se_reg(kind, "Artist"),
               fill=(225, 218, 202), grow=1.0)
@@ -1549,13 +1551,13 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
     for key, stat in (("Willpower", "wil"), ("Intellect", "int"),
                       ("Combat", "com"), ("Agility", "agi")):
         _box_text(d, str(c.get(stat, "-")), se_reg("Investigator", key),
-                  stat=True, grow=1.0)
+                  stat=True, grow=1.0, pos_key=stat)
     _se_body(d, c, pt, "Investigator", text_start=20, extra_bottom=0)
     # health (red heart) + sanity (blue brain) chits from the official stat kit
     # — the plugin's own SanityBase is corrupt, so these are the clean source
-    for kind, key, val in (("health_heart", "Stamina", c.get("health")),
-                           ("sanity_brain", "Sanity", c.get("sanity"))):
-        box = se_reg("Investigator", key)
+    for kind, key, fld, val in (("health_heart", "Stamina", "health", c.get("health")),
+                                ("sanity_brain", "Sanity", "sanity", c.get("sanity"))):
+        box = _nudge(se_reg("Investigator", key), _field_style(fld))
         cx, cy = (box[0] + box[2]) // 2, (box[1] + box[3]) // 2
         chit, numbered = _vital_chit(kind, val)
         if chit is not None:
@@ -1599,12 +1601,13 @@ def s_enemy(c, pt, dest, art_path=None, placement=None):
     if c.get("subtitle"):
         _box_text(d, c["subtitle"], se_reg("Enemy", "SubtitleText"),
                   italic=True, max_size=26, max_w_factor=1.0, key="subtitle")
-    for key, val in (("Attack", pt.get("fight")), ("Health", pt.get("health")),
-                     ("Evade", pt.get("evade"))):
+    for key, fld, val in (("Attack", "fight", pt.get("fight")),
+                          ("Health", "health", pt.get("health")),
+                          ("Evade", "evade", pt.get("evade"))):
         blank = val in (None, "", "None")     # Bolton has no em dash
         _box_text(d, "—" if blank else str(val),
                   se_reg("Enemy", key), stat=not blank, bold=blank, grow=1.0,
-                  fill=(238, 232, 216))
+                  fill=(238, 232, 216), pos_key=fld)
     _box_text(d, "ENEMY", se_reg("Enemy", "Label"), bold=True, max_size=15,
               fill=(74, 60, 46))
     _se_body(d, c, pt, "Enemy", extra_bottom=0, text_start=22, victory=False)
@@ -1691,7 +1694,7 @@ def s_location(c, pt, dest, art_path=None, placement=None):
             sh = se_reg("Location", "Shroud")
             dia = sh[2] - sh[0]
             _box_text(d, str(c["shroud"]), sh, stat=True, grow=1.0,
-                      max_size=int(dia * 0.52), fill=SHROUD_NUM)
+                      max_size=int(dia * 0.52), fill=SHROUD_NUM, pos_key="shroud")
         if c.get("clues") not in (None, ""):
             base = se_reg("Location", "Clues")
             per_inv = bool(c.get("clues_per_investigator"))
@@ -1705,7 +1708,7 @@ def s_location(c, pt, dest, art_path=None, placement=None):
                 _box_text(d, str(c["clues"]),
                           (nx - dia, cy - dia, nx + dia, cy + dia),
                           stat=True, grow=1.0, max_size=int(dia * 0.56),
-                          fill=CLUE_INK)
+                          fill=CLUE_INK, pos_key="clues")
                 hat = _tint_icon(_se_img("icons", "AHLCG-PerInvestigator"),
                                  CLUE_INK)
                 hcx, hcy = cx + int(dia * 0.24), cy - int(dia * 0.02)
@@ -1714,7 +1717,7 @@ def s_location(c, pt, dest, art_path=None, placement=None):
                                            hcx + hw, hcy + hh))
             else:
                 _box_text(d, str(c["clues"]), base, stat=True, grow=1.0,
-                          max_size=int(dia * 0.60), fill=CLUE_INK)
+                          max_size=int(dia * 0.60), fill=CLUE_INK, pos_key="clues")
         if c.get("victory"):
             _box_text(d, "Victory {}.".format(c["victory"]),
                       se_reg("Location", "Victory"), bold=True, max_size=20, key="victory")
@@ -1787,7 +1790,7 @@ def s_agenda(c, pt, dest, art_path=None, placement=None):
     _box_text(d, c["name"], se_reg("Agenda", "Name"), title=True, grow=1.15, key="name")
     if c.get("doom") not in (None, ""):
         _box_text(d, str(c["doom"]), se_reg("Agenda", "Doom"),
-                  stat=True, grow=1.0, fill=(238, 232, 216))
+                  stat=True, grow=1.0, fill=(238, 232, 216), pos_key="doom")
     _scenario_body(d, "Agenda", c, pt)
     _scenario_footer(d, "Agenda", c, art_path)
     img.save(dest)
@@ -1804,7 +1807,7 @@ def s_act(c, pt, dest, art_path=None, placement=None):
     _box_text(d, c["name"], se_reg("Act", "Name"), title=True, grow=1.15, key="name")
     if c.get("clues") not in (None, ""):
         _box_text(d, str(c["clues"]), se_reg("Act", "Clues"),
-                  stat=True, grow=1.0, fill=(238, 232, 216))
+                  stat=True, grow=1.0, fill=(238, 232, 216), pos_key="clues")
     _scenario_body(d, "Act", c, pt)
     _scenario_footer(d, "Act", c, art_path)
     img.save(dest)
