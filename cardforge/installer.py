@@ -88,6 +88,10 @@ def vendor_status():
         "a1111_partial": (bool(_ls(a1111_dir()))
                           and not a1111_installed()),
         "a1111_dir": "vendor/a1111",
+        "comfy_installed": comfy_installed(),
+        "comfy_partial": comfy_partial(),
+        "comfy_dir": "vendor/comfy",
+        "comfy_windows_only": platform.system() != "Windows",
         "se_installed": bool(se_exe),
         "se_path": os.path.relpath(se_exe, runner.repo_root()) if se_exe else None,
         "se_downloads": _ls(vendor_dir("strange-eons")),
@@ -450,6 +454,191 @@ def install_a1111(dry_run=False, log=print):
     log("rig -> vendor/a1111 (run.bat, API on). First real launch installs "
         "its own dependencies — give it time and watch its console window.")
     return {"installed": True, "dir": dest_dir}
+
+
+
+# -------------------------------------------------------------------- comfy --
+# Windows only for now, as asked. The official portable package ships its own
+# embedded Python, so nothing lands on the system — same self-contained rule
+# the rest of vendor/ follows. https://github.com/Comfy-Org/ComfyUI#installing
+
+COMFY_RELEASES_API = ("https://api.github.com/repos/comfyanonymous/"
+                      "ComfyUI/releases")
+# preference order: the modern nvidia build, then the older-card cu126 build,
+# then AMD, then Intel. Matched as patterns because the asset names carry
+# version suffixes that change release to release.
+COMFY_ASSETS = ("ComfyUI_windows_portable_nvidia",
+                "ComfyUI_windows_portable_nvidia_cu126",
+                "ComfyUI_windows_portable_amd",
+                "ComfyUI_windows_portable_intel")
+COMFY_LAUNCHER = "run_cardforge.bat"
+
+
+def comfy_dir():
+    return vendor_dir("comfy")
+
+
+def _comfy_root(d=None):
+    """The portable archive unpacks a ComfyUI_windows_portable/ folder; accept
+    either that or a flattened extract."""
+    d = d or comfy_dir()
+    for cand in (os.path.join(d, "ComfyUI_windows_portable"), d):
+        if os.path.isdir(os.path.join(cand, "ComfyUI")):
+            return cand
+    return d
+
+
+def comfy_installed():
+    """True only when a usable ComfyUI actually sits in vendor/comfy — the
+    embedded python AND main.py, not just a folder left by a failed download."""
+    root = _comfy_root()
+    return (os.path.exists(os.path.join(root, "ComfyUI", "main.py"))
+            and os.path.exists(os.path.join(root, "python_embeded",
+                                            "python.exe")))
+
+
+def comfy_partial():
+    d = comfy_dir()
+    return os.path.isdir(d) and bool(os.listdir(d)) and not comfy_installed()
+
+
+def _extract_7z(archive, dest, log=print):
+    """Unpack a .7z without adding a dependency if we can avoid one.
+
+    Windows 10+ ships a libarchive-based tar.exe that reads 7z, and most
+    machines that run ComfyUI already have 7-Zip. py7zr is the last resort and
+    only used if it happens to be importable."""
+    tried = []
+    for cmd in (["tar", "-xf", archive, "-C", dest],
+                [r"C:\Program Files\7-Zip\7z.exe", "x", "-y",
+                 "-o" + dest, archive],
+                [r"C:\Program Files (x86)\7-Zip\7z.exe", "x", "-y",
+                 "-o" + dest, archive],
+                ["7z", "x", "-y", "-o" + dest, archive]):
+        tried.append(cmd[0])
+        try:
+            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL,
+                           stderr=subprocess.DEVNULL)
+            log("extracted with " + os.path.basename(cmd[0]))
+            return
+        except (OSError, subprocess.CalledProcessError):
+            continue
+    try:
+        import py7zr
+        log("extracting with py7zr…")
+        with py7zr.SevenZipFile(archive, "r") as z:
+            z.extractall(dest)
+        return
+    except ImportError:
+        pass
+    raise RuntimeError(
+        "could not unpack the .7z (tried {}). Install 7-Zip from "
+        "https://www.7-zip.org, or extract {} into {} yourself and click "
+        "Install again to finish wiring it up."
+        .format(", ".join(tried), archive, dest))
+
+
+def install_comfy(dry_run=False, log=print):
+    """Self-contained ComfyUI: download the official Windows portable package
+    (embedded Python, nothing touches the system) into vendor/comfy/, write a
+    launcher that starts it headless with the API on, and point the rig at it.
+
+    Windows only for now — the portable package is a Windows build."""
+    from . import rig
+    if not dry_run and platform.system() != "Windows":
+        raise RuntimeError(
+            "the ComfyUI portable package is Windows-only — on {} install "
+            "ComfyUI yourself (git clone comfyanonymous/ComfyUI) and point the "
+            "Illustrate tab's Backend row at it."
+            .format(platform.system() or "this OS"))
+    dest_dir = comfy_dir()
+    os.makedirs(dest_dir, exist_ok=True)
+
+    if dry_run:
+        root = os.path.join(dest_dir, "ComfyUI_windows_portable")
+        os.makedirs(os.path.join(root, "ComfyUI"), exist_ok=True)
+        os.makedirs(os.path.join(root, "python_embeded"), exist_ok=True)
+        for f in (os.path.join("ComfyUI", "main.py"),
+                  os.path.join("python_embeded", "python.exe")):
+            with open(os.path.join(root, f), "w", encoding="utf-8") as fh:
+                fh.write("rem stub\n")
+        log("dry-run: wrote stub ComfyUI install")
+    else:
+        import requests
+        log("querying GitHub for the ComfyUI portable package…")
+        try:
+            rels = requests.get(COMFY_RELEASES_API + "?per_page=10",
+                                timeout=30).json()
+        except Exception as e:  # noqa: BLE001 - offline/DNS/TLS all land here
+            raise RuntimeError(
+                "could not reach GitHub to find the ComfyUI package ({}). "
+                "Check your connection, or install ComfyUI yourself and point "
+                "the Illustrate tab's Backend row at it.".format(e))
+        # GitHub answers with an OBJECT on rate limit / error
+        if isinstance(rels, dict):
+            msg = rels.get("message", "unexpected response")
+            if "rate limit" in msg.lower():
+                msg = ("GitHub rate-limited this machine (resets within the "
+                       "hour). Wait and click again, or install ComfyUI "
+                       "yourself and point the Backend row at it.")
+            raise RuntimeError("GitHub said: " + msg)
+        if not isinstance(rels, list):
+            raise RuntimeError("unexpected GitHub response while looking for "
+                               "the ComfyUI package")
+        asset = None
+        for want in COMFY_ASSETS:
+            for rel in rels:
+                if not isinstance(rel, dict):
+                    continue
+                for a in rel.get("assets") or []:
+                    name = (a or {}).get("name", "")
+                    if name.startswith(want) and name.endswith(".7z"):
+                        asset = a
+                        break
+                if asset:
+                    break
+            if asset:
+                break
+        if not asset:
+            raise RuntimeError(
+                "no ComfyUI_windows_portable*.7z asset found in recent "
+                "releases — download it from "
+                "https://github.com/comfyanonymous/ComfyUI/releases and "
+                "extract it into vendor/comfy/, then click Install again.")
+        pkg = os.path.join(dest_dir, asset["name"])
+        log("downloading {} ({:.0f} MB)…".format(asset["name"],
+                                                 asset.get("size", 0) / 1e6))
+        _download(asset["browser_download_url"], pkg, log=log)
+        log("extracting…")
+        _extract_7z(pkg, dest_dir, log=log)
+        os.remove(pkg)
+
+    root = _comfy_root(dest_dir)
+    # our own launcher: headless (no browser popped), API listening, and the
+    # shared vendor/models folder added so the checkpoint installer's downloads
+    # are visible to Comfy as well as A1111
+    bat = os.path.join(root, COMFY_LAUNCHER)
+    with open(bat, "w", encoding="utf-8") as f:
+        f.write("@echo off\n"
+                "rem headless: API only, no browser - CardForge drives it\n"
+                ".\\python_embeded\\python.exe -s ComfyUI\\main.py "
+                "--windows-standalone-build --disable-auto-launch "
+                "--port 8188 --extra-model-paths-config "
+                "cardforge_models.yaml\n")
+    # tell Comfy where the shared checkpoints live
+    with open(os.path.join(root, "cardforge_models.yaml"), "w",
+              encoding="utf-8") as f:
+        f.write("cardforge:\n"
+                "  base_path: {}\n"
+                "  checkpoints: .\n".format(vendor_dir("models")))
+    cfg = rig.load_rig()
+    cfg.setdefault("comfy", {})
+    cfg["comfy"]["cwd"] = root
+    cfg["comfy"]["command"] = COMFY_LAUNCHER
+    rig.save_rig(cfg)
+    log("rig -> vendor/comfy ({}, API on :8188, sharing vendor/models)."
+        .format(COMFY_LAUNCHER))
+    return {"installed": True, "dir": root}
 
 
 # -------------------------------------------------------------- strange eons --

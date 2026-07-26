@@ -1614,13 +1614,14 @@ def s_location(c, pt, dest, art_path=None, placement=None):
     _box_text(d, "LOCATION", se_reg(kind, "Label"), bold=True, max_size=17,
               fill=(74, 60, 46))
     if not back:
+        # The frame already PRINTS both wells - the black shroud disc and the
+        # tan clue magnifier are part of AHLCG-Location.png. Drawing our own
+        # disc on top stacked a second, slightly-off circle over the real one,
+        # which is exactly what made them read as pasted on. Only the numeral
+        # goes in, the way the plugin itself does it.
         if c.get("shroud") not in (None, ""):
             sh = se_reg("Location", "Shroud")
-            dia = int((sh[2] - sh[0]) * 1.02)  # fill the frame's well exactly
-            _paste_disc(img, _disc(dia, SHROUD_DISC,
-                                   rim=_shade(SHROUD_DISC, 0.4),
-                                   rim_w=max(2, dia // 22)), sh)
-            # number sized to sit inside the disc's inner boundary
+            dia = sh[2] - sh[0]
             _box_text(d, str(c["shroud"]), sh, stat=True, grow=1.0,
                       max_size=int(dia * 0.52), fill=SHROUD_NUM)
         if c.get("clues") not in (None, ""):
@@ -1628,9 +1629,7 @@ def s_location(c, pt, dest, art_path=None, placement=None):
             per_inv = bool(c.get("clues_per_investigator"))
             cx = (base[0] + base[2]) // 2
             cy = (base[1] + base[3]) // 2
-            dia = int((base[2] - base[0]) * 1.02)  # fill the frame's well exactly
-            _paste_disc(img, _disc(dia, CLUE_DISC, rim=_shade(CLUE_DISC, 0.55),
-                                   rim_w=max(2, dia // 24)), base)
+            dia = base[2] - base[0]
             if per_inv:
                 # number left of centre + a small per-investigator hat to its
                 # upper-right, both inside the disc (ref: Rainy London Streets)
