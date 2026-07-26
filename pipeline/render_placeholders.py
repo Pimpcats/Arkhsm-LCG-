@@ -1280,6 +1280,9 @@ SHROUD_DISC = (10, 10, 12)
 SHROUD_NUM = (244, 242, 236)
 CLUE_DISC = (214, 202, 170)
 CLUE_INK = (20, 24, 52)
+# the shroud/clue text regions sit ~12px above the template's printed discs, so
+# the numeral reads high; drop it to sit centred in the disc
+DISC_NUM_DY = 12
 
 
 def _luma(color):
@@ -1568,7 +1571,7 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
         box = (cx - hw, cy - hh, cx + hw, cy + hh)   # numeral follows the chit
         chit, numbered = _vital_chit(kind, val)
         if chit is not None:
-            _paste_icon_fit(img, chit, (cx - 66, cy - 72, cx + 66, cy + 72))
+            _paste_icon_fit(img, chit, (cx - 58, cy - 62, cx + 58, cy + 62))
             if not numbered:
                 _box_text(d, str(val), box, fill=(255, 255, 255), stat=True, grow=0.9)
         else:
@@ -1700,7 +1703,8 @@ def s_location(c, pt, dest, art_path=None, placement=None):
         if c.get("shroud") not in (None, ""):
             sh = se_reg("Location", "Shroud")
             dia = sh[2] - sh[0]
-            _box_text(d, str(c["shroud"]), sh, stat=True, grow=1.0,
+            shn = (sh[0], sh[1] + DISC_NUM_DY, sh[2], sh[3] + DISC_NUM_DY)
+            _box_text(d, str(c["shroud"]), shn, stat=True, grow=1.0,
                       max_size=int(dia * 0.52), fill=SHROUD_NUM, pos_key="shroud")
         if c.get("clues") not in (None, ""):
             base = se_reg("Location", "Clues")
@@ -1713,7 +1717,7 @@ def s_location(c, pt, dest, art_path=None, placement=None):
                 # upper-right, both inside the disc (ref: Rainy London Streets)
                 nx = cx - int(dia * 0.14)
                 _box_text(d, str(c["clues"]),
-                          (nx - dia, cy - dia, nx + dia, cy + dia),
+                          (nx - dia, cy - dia + DISC_NUM_DY, nx + dia, cy + dia + DISC_NUM_DY),
                           stat=True, grow=1.0, max_size=int(dia * 0.56),
                           fill=CLUE_INK, pos_key="clues")
                 hat = _tint_icon(_se_img("icons", "AHLCG-PerInvestigator"),
@@ -1723,7 +1727,8 @@ def s_location(c, pt, dest, art_path=None, placement=None):
                 _paste_icon_fit(img, hat, (hcx - hw, hcy - hh,
                                            hcx + hw, hcy + hh))
             else:
-                _box_text(d, str(c["clues"]), base, stat=True, grow=1.0,
+                basen = (base[0], base[1] + DISC_NUM_DY, base[2], base[3] + DISC_NUM_DY)
+                _box_text(d, str(c["clues"]), basen, stat=True, grow=1.0,
                           max_size=int(dia * 0.60), fill=CLUE_INK, pos_key="clues")
         if c.get("victory"):
             _box_text(d, "Victory {}.".format(c["victory"]),
