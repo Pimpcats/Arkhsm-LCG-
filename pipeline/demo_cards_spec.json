@@ -8,5 +8,17 @@
     "shroud": 2,
     "clues": 1,
     "clues_per_investigator": true
+  },
+  {
+    "id": "d-blight",
+    "type": "Enemy",
+    "name": "blight",
+    "class": "Mythos",
+    "encounter": true,
+    "fight": 2,
+    "health": 2,
+    "evade": 2,
+    "damage": 1,
+    "horror": 0
   }
 ]
