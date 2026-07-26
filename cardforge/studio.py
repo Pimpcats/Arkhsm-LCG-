@@ -2492,17 +2492,35 @@ backdrop-filter:blur(10px);animation:fade .2s ease;align-items:center;justify-co
 #zoom_box{background:var(--surface);border:1px solid var(--line);border-radius:18px;
 box-shadow:var(--shadow);padding:14px;max-width:92vw}
 #zoom_img{display:block;max-width:88vw;max-height:78vh;border-radius:10px;margin:0 auto}
+/* the editor breaks out of the 1180px content cap so three columns
+   (content · card · style) have room; centred, capped at 1460px / 95vw */
 #ed_sheet{background:var(--surface2);border:1px solid var(--line);border-radius:18px;
-box-shadow:var(--shadow);margin:14px 0;padding:18px 20px}
+box-shadow:var(--shadow);margin:14px 0;padding:18px 20px;
+width:min(1460px,95vw);margin-left:calc(-1*(min(1460px,95vw) - 100%)/2)}
 /* Photoshop-style editor: the card canvas on the left, a properties panel on
    the right that acts on whichever text area is selected on the card */
-#ed_main{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
-#ed_left{flex:0 0 auto}
-#ed_side{flex:1 1 250px;min-width:230px;max-width:340px;position:sticky;top:12px;
+/* three columns: content (left) · card (center) · text style (right) */
+#ed_main{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
+#ed_content{order:1;flex:1 1 300px;min-width:270px;max-width:400px;position:sticky;top:12px;
+max-height:calc(100vh - 90px);overflow-y:auto;
+background:rgba(120,150,190,.06);border:1px solid rgba(120,150,190,.20);
+border-radius:12px;padding:12px 14px}
+#ed_left{order:2;flex:0 0 auto;margin:0 auto}
+#ed_side{order:3;flex:1 1 250px;min-width:230px;max-width:340px;position:sticky;top:12px;
+max-height:calc(100vh - 90px);overflow-y:auto;
 background:rgba(120,150,190,.10);border:1px solid rgba(120,150,190,.28);
 border-radius:12px;padding:12px 14px}
 #ed_side .ed_side_grp{margin:6px 0}
 #ed_side .ed_side_grp label{display:block;margin-bottom:2px}
+/* condensed content panel: tighter rows, labels above compact inputs */
+#ed_content h2{font-size:14px;margin:0 0 8px}
+#ed_content .row{gap:6px;margin:5px 0}
+#ed_content label{font-size:11px;color:var(--dim)}
+#ed_content input[type=text],#ed_content input:not([type]),#ed_content select,
+#ed_content textarea{padding:5px 8px;font-size:12px}
+#ed_content #cc_props,#ed_content #cc_loc,#ed_content #cc_tokens,
+#ed_content #cc_log{padding:8px;margin:6px 0}
+#ed_content textarea{width:100%;box-sizing:border-box}
 #ed_stage{position:relative;margin:12px auto;overflow:hidden;border-radius:10px;
 border:1px solid var(--line);background:#14151b}
 #ed_face{display:block;user-select:none;pointer-events:none}
@@ -2898,8 +2916,7 @@ title="delete this card (hand-made cards only)">&#128465; Delete</button>
 <button class=btn style="font-size:12px;padding:5px 12px;margin-top:4px" onclick="document.getElementById('ed_fontfile').click()">Upload font&hellip;</button>
 <input type=file id=ed_fontfile accept=".ttf,.otf" style="display:none" onchange=edFontUpload(this)>
 </div>
-</div>
-<div style="margin-top:14px"><h2>Card content <small>type directly — blank returns a field to the authored version; saves affect THIS card only</small></h2>
+<div id=ed_content><h2>Card content <small>type directly — blank returns a field to the authored version; saves affect THIS card only</small></h2>
 <div class=row>
 <label>name</label><input id=cc_name size=20 onfocus="tyBind('name')">
 <label>subtitle</label><input id=cc_subtitle size=16 onfocus="tyBind('subtitle')">
@@ -2950,7 +2967,7 @@ title="delete this card (hand-made cards only)">&#128465; Delete</button>
 <div class=row style="margin-top:6px">
 <span class=hint>use <b>Save</b> at the top — it saves the text, the art and the layout together</span>
 <span id=cc_info class=hint></span>
-</div></div>
+</div></div></div>
 <details id=ed_promptbox style="margin-top:12px">
 <summary style="cursor:pointer;color:var(--dim)">Prompt &mdash; generate art for THIS card (A1111-style boxes)</summary>
 <label>prompt</label><textarea id=ed_pos rows=3 spellcheck=false></textarea>
