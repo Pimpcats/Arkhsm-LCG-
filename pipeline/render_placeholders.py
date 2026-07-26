@@ -1450,8 +1450,8 @@ def _level_pip():
 # the five printed XP notches on the cost disc, measured off the frame as
 # fractions of the Cost box (width w, from box centre-x and box top). The arc is
 # wide and deep: outer notches high on the sides, centre notch lowest.
-_NOTCH_XO = (-0.513, -0.300, 0.0, 0.300, 0.513)   # x offset from centre / w
-_NOTCH_YF = (0.738, 0.913, 1.025, 0.913, 0.738)   # y below box top / w
+_NOTCH_XO = (-0.455, -0.285, 0.0, 0.285, 0.455)   # x offset from centre / w
+_NOTCH_YF = (0.815, 0.935, 1.025, 0.935, 0.815)   # y below box top / w
 # the skill "cup" prints a tighter, shallower notch arc than the cost disc
 _SKILL_NOTCH_XO = (-0.370, -0.245, 0.0, 0.245, 0.370)
 _SKILL_NOTCH_YF = (0.153, 0.265, 0.353, 0.265, 0.153)
