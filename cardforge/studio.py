@@ -2478,7 +2478,7 @@ PAGE = r"""<!doctype html><html><head><meta charset="utf-8">
 *{box-sizing:border-box;margin:0}
 body{background:var(--bg);color:var(--ink);
 font:15px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
--webkit-font-smoothing:antialiased}
+-webkit-font-smoothing:antialiased;padding-bottom:52px}
 /* the banner (assets/branding/banner.png, 2048x512) rides behind the header.
    The overlay is graded — darker at the edges where the title and buttons sit,
    lighter across the middle so the art reads. If the banner isn't there yet the
@@ -3054,6 +3054,10 @@ title="undo the last edit (Ctrl+Z)">&#8630; Undo</button>
 <div class=ed_side_grp><label>body</label><select id=ed_font_body onchange=edFontSet() style="width:100%"></select></div>
 <button class=btn style="font-size:12px;padding:5px 12px;margin-top:4px" onclick="document.getElementById('ed_fontfile').click()">Upload font&hellip;</button>
 <input type=file id=ed_fontfile accept=".ttf,.otf" style="display:none" onchange=edFontUpload(this)>
+<hr style="margin:10px 0;border-color:rgba(120,150,190,.28)">
+<b style="font-size:12px">Insert symbol</b>
+<span class=hint style="display:block;margin:2px 0 4px">click into a rules/flavor box on the card first, then a symbol</span>
+<div id=ed_symbols style="display:flex;gap:5px;flex-wrap:wrap;align-items:center"></div>
 </div>
 <div id=ed_content><h2>Card <small>click any text or number on the card to edit it directly — the panels below are only what the card can&rsquo;t show</small></h2>
 <!-- name / subtitle / traits / stats are edited ON the card now; kept here
@@ -3107,12 +3111,13 @@ title="undo the last edit (Ctrl+Z)">&#8630; Undo</button>
 <label>back / deck-building text</label><textarea id=cc_back rows=4 spellcheck=false onfocus="glyphTarget('cc_back')"></textarea>
 <label>back flavor</label><textarea id=cc_backflavor rows=2 spellcheck=false onfocus="glyphTarget('cc_backflavor')"></textarea>
 </div>
-<div class=row id=ed_symbols style="margin:2px 0 4px;gap:5px;flex-wrap:nowrap;overflow-x:auto;align-items:center">
-<span class=hint>insert symbol&nbsp;&mdash;&nbsp;click into rules/flavor first:</span></div>
-<label>rules text</label><textarea id=cc_text rows=5 spellcheck=false onfocus="tyBind('text');glyphTarget('cc_text')"></textarea>
-<label>flavor</label><textarea id=cc_flavor rows=2 spellcheck=false onfocus="tyBind('flavor');glyphTarget('cc_flavor')"></textarea>
+<!-- rules text + flavor are edited ON the card (click them); kept hidden here as
+     the data model. The symbol palette moved to the right panel. -->
+<div id=cc_rulesform style="display:none">
+<textarea id=cc_text rows=5 spellcheck=false onfocus="tyBind('text');glyphTarget('cc_text')"></textarea>
+<textarea id=cc_flavor rows=2 spellcheck=false onfocus="tyBind('flavor');glyphTarget('cc_flavor')"></textarea>
+</div>
 <div class=row style="margin-top:6px">
-<span class=hint>use <b>Save</b> at the top — it saves the text, the art and the layout together</span>
 <span id=cc_info class=hint></span>
 </div></div></div>
 <details id=ed_promptbox style="margin-top:12px">
@@ -3867,7 +3872,10 @@ function symInit(){const el=document.getElementById('ed_symbols');if(!el||el.dat
 for(const [tok,gly,cap] of SYMS){const b=document.createElement('button');
 b.type='button';b.className='symbtn';b.title=tok;
 b.innerHTML='<span class=gly>'+gly+'</span><small>'+cap+'</small>';
-b.onclick=()=>symInsert(tok);el.appendChild(b);}
+// mousedown+preventDefault keeps the caret in the focused field (incl. the
+// on-card inline editor) instead of blurring it when the button is clicked
+b.addEventListener('mousedown',e=>{e.preventDefault();symInsert(tok);});
+el.appendChild(b);}
 el.dataset.built='1';}
 function symInsert(tok){const el=document.getElementById(GLYPH_TARGET)||document.getElementById('cc_text');
 if(!el)return;const s=el.selectionStart==null?el.value.length:el.selectionStart;
@@ -4086,14 +4094,17 @@ function edInlineEdit(key,el){if(document.querySelector('.ed_inline'))return;
 const dst=document.getElementById(edCcId(key));if(!dst)return;
 const multiline=(key==='text'||key==='flavor');
 const ov=document.createElement(multiline?'textarea':'input');
-ov.className='ed_inline';ov.value=dst.value;
+ov.className='ed_inline';ov.id='ed_inline_live';ov.value=dst.value;
 ov.style.left=el.style.left;ov.style.top=el.style.top;
 ov.style.width=el.style.width;if(multiline)ov.style.height=el.style.height;
 document.getElementById('ed_stage').appendChild(ov);
+// the right-panel symbol palette inserts into whatever is focused; point it at
+// this on-card editor so glyphs go into the box you're editing on the card
+glyphTarget('ed_inline_live');
 // focus in place — never scroll or zoom the card out of view
 try{ov.focus({preventScroll:true});}catch(_){ov.focus();}if(ov.select)ov.select();
 let done=false;const fin=save=>{if(done)return;done=true;
-if(save){dst.value=ov.value;edSave();}ov.remove();};
+if(save){dst.value=ov.value;edSave();}ov.remove();glyphTarget('cc_text');};
 ov.addEventListener('blur',()=>fin(true));
 ov.addEventListener('keydown',ev=>{if(ev.key==='Escape'){ev.preventDefault();fin(false);}
 else if(ev.key==='Enter'&&!multiline){ev.preventDefault();fin(true);}});}
