@@ -1297,7 +1297,7 @@ CLUE_DISC = (214, 202, 170)
 CLUE_INK = (20, 24, 52)
 # the shroud/clue text regions sit above the template's printed discs, so the
 # numeral reads high; drop it to sit centred in the disc
-DISC_NUM_DY = 16
+DISC_NUM_DY = 12
 
 
 def _luma(color):
@@ -1574,9 +1574,9 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
     # health (red heart) + sanity (blue brain) chits from the official stat kit
     # — the plugin's own SanityBase is corrupt, so these are the clean source.
     # Push them apart (health left, sanity right) so the two big chits get a
-    # gap between them instead of hugging, and lift them a touch off the bottom
-    # border, like the reference cards.
-    VITAL_GAP = 30
+    # small gap between them instead of hugging, and lift them a touch off the
+    # bottom border, like the reference cards.
+    VITAL_GAP = 14
     VITAL_RISE = 12
     for kind, key, fld, val, off in (
             ("health_heart", "Stamina", "health", c.get("health"), -VITAL_GAP),
