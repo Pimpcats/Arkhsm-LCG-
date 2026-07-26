@@ -2598,12 +2598,13 @@ outline-offset:-1px;border-radius:2px;z-index:1;transition:outline-color .15s}
 border-radius:3px;transition:border-color .12s,background .12s}
 .ed_rg:hover{border-color:rgba(232,178,74,.75);background:rgba(232,178,74,.10)}
 .ed_rg.sel{border-color:var(--accent);background:rgba(232,178,74,.14)}
-/* a stat region shows +/- affordance on hover (left-click +1, right-click -1) */
-.ed_rg.stat{cursor:ns-resize}
-.ed_rg.stat::after{content:'+ / \2212';position:absolute;left:50%;bottom:-16px;
+/* a stat region shows +/- affordance on hover (left-click +1, right-click -1).
+   NB: use ed_statrg, not "stat" — the app already has a .stat badge class. */
+.ed_rg.ed_statrg{cursor:ns-resize}
+.ed_rg.ed_statrg::after{content:'+ / \2212';position:absolute;left:50%;bottom:-16px;
 transform:translateX(-50%);font-size:10px;color:var(--accent);white-space:nowrap;
 opacity:0;transition:opacity .12s;pointer-events:none}
-.ed_rg.stat:hover::after{opacity:.9}
+.ed_rg.ed_statrg:hover::after{opacity:.9}
 /* inline on-card text editor (double-click a text area) */
 .ed_inline{position:absolute;z-index:5;box-sizing:border-box;
 background:rgba(18,20,26,.97);border:1px solid var(--accent);color:var(--ink);
@@ -3892,7 +3893,7 @@ for(const key in ed.g.regions){const b=ed.g.regions[key];if(!b)continue;
 const rf=edRegionField(key);const st=(ed.g.type_styles||{})[rf.posField]||{};
 const dx=st.dx||0,dy=st.dy||0;
 const el=document.createElement('div');
-el.className='ed_rg'+(rf.stat?' stat':'')+(ED_SEL===key?' sel':'');
+el.className='ed_rg'+(rf.stat?' ed_statrg':'')+(ED_SEL===key?' sel':'');
 el.dataset.key=key;
 el.style.left=((b[0]+dx)*ed.disp)+'px';el.style.top=((b[1]+dy)*ed.disp)+'px';
 el.style.width=((b[2]-b[0])*ed.disp)+'px';el.style.height=((b[3]-b[1])*ed.disp)+'px';
