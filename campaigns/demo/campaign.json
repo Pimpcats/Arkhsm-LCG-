@@ -1,5 +1,5 @@
 {
-  "backend": "a1111",
+  "backend": "comfy",
   "base_url": null,
   "checkpoint": "SET_ME.safetensors",
   "output_dir": "out/demo",

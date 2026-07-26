@@ -1,0 +1,12 @@
+[
+  {
+    "id": "d-still",
+    "type": "Location",
+    "name": "Still",
+    "class": "Mythos",
+    "encounter": true,
+    "shroud": 2,
+    "clues": 1,
+    "clues_per_investigator": true
+  }
+]

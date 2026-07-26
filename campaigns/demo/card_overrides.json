@@ -1,0 +1,9 @@
+{
+  "d-still": {
+    "name": "Still",
+    "shroud": 2,
+    "clues": 1,
+    "color": "#25807a",
+    "clues_per_investigator": true
+  }
+}

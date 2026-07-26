@@ -1,11 +1,11 @@
 {
   "a1111": {
-    "cwd": "C:/SD/SDXL",
+    "cwd": "C:\\Users\\Squarestudio\\Documents\\ComfyUI\\.venv\\Lib\\site-packages\\cm_cli",
     "command": "webui.bat --api",
     "startup_timeout": 420
   },
   "comfy": {
-    "cwd": "",
+    "cwd": "C:\\Users\\Squarestudio\\Documents\\ComfyUI\\.venv\\Lib\\site-packages\\cm_cli",
     "command": "python main.py",
     "startup_timeout": 300
   },

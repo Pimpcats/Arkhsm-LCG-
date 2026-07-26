@@ -1,5 +1,5 @@
 {
-  "backend": "a1111",
+  "backend": "comfy",
   "base_url": null,
   "checkpoint": "moodykrea2mixV20.safetensors",
   "output_dir": "out/still_hour",
