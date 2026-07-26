@@ -520,6 +520,24 @@ def pips(draw, x, y, n, color, r=9):
     return x + n * (2 * r + 6)
 
 
+def _draw_level_pips(draw, level, box, fill=(238, 232, 216)):
+    """Draw an Asset/Event/Skill's XP level as small pips centred in the level
+    banner beneath the cost — the way real cards show it. A leveled card must
+    never print a second number stacked under the cost disc."""
+    n = pip_count(level)
+    if n <= 0:
+        return
+    r, gap = 7, 5
+    step = 2 * r + gap
+    total = n * step - gap
+    x0 = (box[0] + box[2]) // 2 - total // 2
+    cy = (box[1] + box[3]) // 2 - r
+    for k in range(n):
+        x = x0 + k * step
+        draw.ellipse([x, cy, x + 2 * r, cy + 2 * r],
+                     fill=fill, outline=(30, 26, 22), width=2)
+
+
 def footer(draw, w, h, card_id):
     draw.rectangle([0, h - 26, w, h], fill=(14, 13, 18))
     draw.text((10, h - 22), WATERMARK + " · THE STILL HOUR", font=_font(12), fill=DIM)
@@ -1476,8 +1494,8 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
         _box_text(d, str(c["cost"]), se_reg(kind, "Cost"),
                   fill=(238, 232, 216), title=True, grow=0.95, pos_key="cost")
     if c.get("level"):
-        _box_text(d, str(c["level"]), se_reg(kind, "Level"),
-                  fill=(238, 232, 216), stat=True, grow=0.9, pos_key="level")
+        _draw_level_pips(d, c["level"],
+                         _nudge(se_reg(kind, "Level"), _field_style("level")))
 
     _box_text(d, c["name"], se_reg(kind, "Name", letter), title=True, grow=1.15, key="name")
     if c.get("subtitle"):
