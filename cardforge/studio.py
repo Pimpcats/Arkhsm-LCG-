@@ -717,6 +717,16 @@ MAP_FURNITURE = [
 ]
 
 
+def has_face(cid):
+    """Is this card's face actually composed? A render killed part-way leaves a
+    zero-byte PNG, which every plain exists() check happily counted as done."""
+    path = os.path.join(ROOT, "art", "faces", str(cid) + ".png")
+    try:
+        return os.path.getsize(path) > 0
+    except OSError:
+        return False
+
+
 def rp_keys():
     """Every card field the editor can set by hand — the one list the card
     editor, the campaign feed and the by-hand rebuild all agree on."""
@@ -1906,7 +1916,7 @@ def status(campaign="still_hour"):
             chosen_path = os.path.join(cdir, "chosen.txt")
             chosen = open(chosen_path, encoding="utf-8").read().strip() if os.path.exists(chosen_path) \
                 else (pngs[0] if pngs else None)
-            face = os.path.exists(os.path.join(ROOT, "art", "faces", cid + ".png"))
+            face = has_face(cid)
             gallery.append({"id": cid, "variants": pngs, "stubs": stubs,
                             "chosen": chosen, "face": face})
     # Step-0 seed portraits: candidates per character + the picked canonical
@@ -1972,7 +1982,7 @@ def status(campaign="still_hour"):
             catalog.append({
                 "id": c["id"], "name": c["name"], "type": c["type"],
                 "class": c.get("class", ""), "group": group_for(c),
-                "face": os.path.exists(os.path.join(ROOT, "art", "faces", c["id"] + ".png")),
+                "face": has_face(c["id"]),
                 "spoiler": bool(c.get("encounter")),
                 "variants": variants, "stubs": vstubs, "chosen": chosen,
             })
@@ -2327,13 +2337,37 @@ transition:all .15s}
 #ed_strip img:hover{transform:translateY(-2px)}
 #ed_strip img.on{border-color:var(--accent)}
 /* --- scenario deck-builder board --- */
-#scen_board{display:flex;gap:14px;overflow-x:auto;padding:6px 2px 18px;align-items:flex-start}
-.scenbox{min-width:250px;max-width:250px;background:var(--surface2);border:1px solid var(--line);
+/* the board scrolls sideways; the wrapper fades both edges so it is obvious
+   there is more campaign off-screen than fits */
+#board_wrap{position:relative}
+#board_wrap::before,#board_wrap::after{content:'';position:absolute;top:0;bottom:18px;
+width:38px;pointer-events:none;z-index:2;opacity:0;transition:opacity .18s}
+#board_wrap::before{left:0;background:linear-gradient(90deg,var(--surface),transparent)}
+#board_wrap::after{right:0;background:linear-gradient(270deg,var(--surface),transparent)}
+#board_wrap.more-l::before{opacity:1}
+#board_wrap.more-r::after{opacity:1}
+#scen_board{display:flex;gap:14px;overflow-x:auto;padding:6px 2px 18px;align-items:stretch}
+/* every column the same height, with its own scroll, so the row has a baseline
+   and one fat scenario cannot stretch the whole board */
+.scenbox{min-width:250px;max-width:250px;max-height:66vh;display:flex;flex-direction:column;
+background:var(--surface2);border:1px solid var(--line);
 border-radius:12px;padding:10px}
 .scenbox h3{margin:0 0 8px;font-size:14px}
+/* the scrolling middle of a column: stacks live here, the title above and the
+   lock button below stay put */
+.stacks{flex:1;overflow-y:auto;overflow-x:hidden;padding-right:2px}
 .stack{margin-bottom:8px;border:1px dashed rgba(255,255,255,.14);border-radius:9px;padding:6px;min-height:34px;transition:border-color .15s,background .15s}
 .stack.over{border-color:var(--accent);background:rgba(232,178,74,.08)}
 .stack small{display:block;color:var(--dim);margin-bottom:4px;letter-spacing:.3px;text-transform:uppercase;font-size:10px}
+/* an empty stack is still a drop target, but it collapses to a thin labelled
+   rail instead of costing as much room as a full one */
+.stack.empty{min-height:0;padding:3px 7px;margin-bottom:5px;opacity:.6}
+.stack.empty small{margin:0;display:inline}
+.stack.empty:hover,.stack.empty.over{opacity:1}
+/* requirements sit in their own strip ABOVE the cards — sharing one inline
+   flow with them was what shattered the stacks */
+.stack .reqs{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px}
+.stack .cards{display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start}
 .dcard{display:inline-block;width:52px;margin:2px;cursor:grab;position:relative;
 transition:transform .16s ease,box-shadow .16s ease}
 .dcard img{width:100%;border-radius:4px;display:block;box-shadow:0 1px 4px rgba(0,0,0,.5)}
@@ -2397,11 +2431,11 @@ font-size:9px;line-height:1.1;padding:2px;background:rgba(255,255,255,.03)}
 #mapwrap h4{margin:0 0 10px;font-size:13px;color:#d8c9a6}
 #scen_pool{border:1px solid var(--line);border-radius:12px;padding:8px;margin-bottom:10px;background:var(--surface2)}
 .reqchip{display:inline-block;font-size:10px;color:var(--dim);border:1px dashed rgba(255,255,255,.22);
-border-radius:5px;padding:1px 6px;margin:1px;letter-spacing:.2px}
+border-radius:5px;padding:1px 6px;letter-spacing:.2px;white-space:nowrap}
 .reqchip.met{color:#7fbf7f;border-style:solid;border-color:rgba(127,191,127,.4);text-decoration:line-through}
 .scenbox.locked{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
 .scenbox.locked .stack{border-style:solid;opacity:.85}
-.lockbtn{width:100%;margin-top:4px}
+.lockbtn{width:100%;margin-top:8px;flex:none}
 #camp_bar{display:flex;gap:10px;align-items:center;border:1px solid var(--line);
 border-radius:12px;padding:10px 14px;margin-bottom:10px;background:var(--surface2)}
 #camp_bar .slot{border:1px dashed rgba(255,255,255,.2);border-radius:8px;padding:4px 10px;font-size:12px;color:var(--dim)}
@@ -2453,7 +2487,8 @@ title="compiles every locked scenario into one scripted SCED campaign box (dist/
 <span id=camp_out class=hint></span>
 </div>
 <div id=scen_pool><small class=hint>UNASSIGNED CARDS &mdash; drag onto the board</small><div id=scen_pool_cards></div></div>
-<div id=scen_board></div>
+<div class=row style="margin:2px 0 4px"><span class=hint id=board_hint></span></div>
+<div id=board_wrap><div id=scen_board></div></div>
 <div id=mapwrap>
 <div class=row><h4 id=maptitle>Location map</h4>
 <span class=hint>this is the black map border you see in TTS &mdash; slots are the real table positions</span>
@@ -3888,14 +3923,45 @@ d.innerHTML=`<img src="/art?p=art/faces/${cid}.png&ts=${(LS&&LS.faces_ver)||0}" 
 d.addEventListener('dragstart',e=>{SCEN_DRAG=d;d.classList.add('dragging');e.dataTransfer.setData('text',cid);});
 d.addEventListener('dragend',()=>{d.classList.remove('dragging');SCEN_DRAG=null;});
 return d;}
+// Fade whichever edge has more board beyond it, and say how many boxes are
+// off-screen — the row used to just stop with no sign the campaign continued.
+function boardEdges(){
+const b=document.getElementById('scen_board'),w=document.getElementById('board_wrap');
+if(!b||!w)return;
+const more=b.scrollWidth-b.clientWidth;
+w.classList.toggle('more-l',b.scrollLeft>4);
+w.classList.toggle('more-r',b.scrollLeft<more-4);
+const h=document.getElementById('board_hint');if(!h)return;
+const boxes=b.querySelectorAll('.scenbox').length;
+if(!boxes){h.textContent='';return;}
+const seen=Math.max(1,Math.round(b.clientWidth/264));
+h.innerHTML=boxes+' scenario box'+(boxes===1?'':'es')+
+(more>4?' &mdash; showing '+Math.min(seen,boxes)+', scroll sideways for the rest &rarr;':'');
+if(!b.dataset.edges){b.dataset.edges='1';
+b.addEventListener('scroll',boardEdges,{passive:true});
+window.addEventListener('resize',boardEdges);}}
 function stackDropify(el){
 el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('over');});
 el.addEventListener('dragleave',()=>el.classList.remove('over'));
 el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('over');
-if(!SCEN_DRAG)return;el.appendChild(SCEN_DRAG);
+if(!SCEN_DRAG)return;
+const from=SCEN_DRAG.closest('.stack');
+// land in the card grid so cards never interleave with the requirement chips
+(el.querySelector(':scope > .cards')||el).appendChild(SCEN_DRAG);
 SCEN_DRAG.classList.add('justdropped');
 setTimeout(()=>SCEN_DRAG&&SCEN_DRAG.classList.remove('justdropped'),300);
+// refresh the two stacks in place — a full reload on every drop would stall
+// the drag and re-fetch the whole catalog for nothing
+stackTouch(el);if(from&&from!==el)stackTouch(from);
 scenSave();});}
+// keep a stack's count badge and collapsed state true after a drop
+function stackTouch(el){
+if(!el||!el.classList.contains('stack'))return;
+const n=el.querySelectorAll('.dcard').length;
+const lbl=el.querySelector('small');
+if(lbl){const base=(lbl.textContent||'').replace(/\s+\d+$/,'');
+lbl.innerHTML=base+(n?' <b style="color:var(--dim)">'+n+'</b>':'');}
+el.classList.toggle('empty',!n&&!el.querySelector('.reqs'));}
 const STACK_LABEL={locations:'Locations',act_deck:'Act deck',agenda_deck:'Agenda deck',
 encounter:'Encounter sets',named:'Named enemies',reference:'Scenario reference',setup_aside:'Set aside'};
 function scenBuild(){const S=(LS&&LS.scenarios)||{scenarios:[],stacks:[],assignments:{}};
@@ -3917,16 +3983,23 @@ box.innerHTML=`<h3>${isLocked?'&#128274; ':''}${sc.name||sc.id}</h3>`+
 `onclick="scenDel('${sc.id}',${jsAttr(sc.name||sc.id)})">remove</button>`+
 `<button class=btn style="font-size:10px;padding:2px 7px" `+
 `onclick="mapOpen('${sc.id}',${jsAttr(sc.name||sc.id)})">&#128506; map</button></div>`;
+const mid=document.createElement('div');mid.className='stacks';
 for(const st of S.stacks){const div=document.createElement('div');div.className='stack';div.dataset.stack=st;
 const inStack=(A[st]||[]);
 const names=inStack.map(nameOf);
 // soft requirements: the manifest's template for this stack, struck through once met
 const reqs=((sc.req||{})[st]||[]).map(r=>
 `<span class="reqchip ${names.some(n=>n&&n.includes(String(r).toLowerCase().slice(0,12)))?'met':''}">${r}</span>`).join('');
-div.innerHTML=`<small>${STACK_LABEL[st]||st}</small>${reqs}`;
-for(const cid of inStack){div.appendChild(dcardEl(cid));assigned.add(cid);}
+// chips get their own strip; cards get their own grid. Sharing one flow was
+// what made the stacks look shattered.
+if(!inStack.length&&!reqs)div.classList.add('empty');
+div.innerHTML=`<small>${STACK_LABEL[st]||st}${inStack.length?' <b style="color:var(--dim)">'+inStack.length+'</b>':''}</small>`+
+(reqs?`<div class=reqs>${reqs}</div>`:'')+`<div class=cards></div>`;
+const holder=div.querySelector('.cards');
+for(const cid of inStack){holder.appendChild(dcardEl(cid));assigned.add(cid);}
 if(!isLocked)stackDropify(div);
-box.appendChild(div);}
+mid.appendChild(div);}
+box.appendChild(mid);
 const lb=document.createElement('button');lb.className='btn lockbtn'+(isLocked?'':' primary');
 lb.innerHTML=isLocked?'&#128275; Unlock scenario':'&#128274; Lock in as finished';
 lb.onclick=()=>{box.classList.toggle('locked');scenSave().then(()=>{refresh().then(scenBuild);});};
@@ -3935,6 +4008,7 @@ board.appendChild(box);}
 if(!S.scenarios.length)board.innerHTML=
 '<div class=hint style="padding:16px">No scenario boxes yet &mdash; add one above, then drag cards from the pool into its stacks.</div>';
 const total=S.scenarios.length;
+boardEdges();
 document.getElementById('camp_progress').textContent=locked+'/'+total+' locked';
 document.getElementById('camp_spawn').disabled=!(total&&locked===total);
 const pool=document.getElementById('scen_pool_cards');pool.innerHTML='';
@@ -4040,7 +4114,8 @@ def ensure_faces(campaign="still_hour"):
     """
     faces_dir = os.path.join(ROOT, "art", "faces")
     have = len([f for f in os.listdir(faces_dir)
-                if f.endswith(".png")]) if os.path.isdir(faces_dir) else 0
+                if f.endswith(".png") and has_face(f[:-4])]) \
+        if os.path.isdir(faces_dir) else 0
     if have:
         return have
     print("first run: composing card faces (no GPU needed)…")
@@ -4053,7 +4128,8 @@ def ensure_faces(campaign="still_hour"):
               "run this yourself:  python3 pipeline/render_placeholders.py"
               .format(e))
         return 0
-    n = len([f for f in os.listdir(faces_dir) if f.endswith(".png")]) \
+    n = len([f for f in os.listdir(faces_dir)
+             if f.endswith(".png") and has_face(f[:-4])]) \
         if os.path.isdir(faces_dir) else 0
     print("composed {} card face(s)".format(n))
     return n

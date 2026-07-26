@@ -1148,6 +1148,30 @@ check("dragging cards on the board never wipes the map or the connections",
 check("connection chips are draggable in the UI",
       "mchip" in page and "MAP_MOVE_FROM" in page and "move_from" in page
       and "mapNeighbours" in page)
+# the scenario board's layout: chips and cards in separate containers, empty
+# stacks collapsed, columns a shared height, the board's edges faded
+check("requirement chips and cards sit in separate containers",
+      ".stack .reqs{" in page and ".stack .cards{" in page
+      and "class=reqs" in page and "class=cards" in page
+      and "> .cards" in page)
+check("an empty stack collapses to a rail but stays a drop target",
+      ".stack.empty{" in page and "classList.add('empty')" in page
+      and "stackTouch" in page)
+check("columns share one height and scroll inside themselves",
+      "max-height:66vh" in page and ".stacks{flex:1;overflow-y:auto"
+      in page.replace("\n", ""))
+check("the board fades its edges and says how much is off-screen",
+      "board_wrap" in page and "more-l" in page and "more-r" in page
+      and "boardEdges" in page and "scroll sideways" in page)
+# a truncated render leaves a 0-byte png; it must not count as a composed face
+_zero = os.path.join(ROOT, "art", "faces", "_selftest_zero.png")
+open(_zero, "wb").close()
+try:
+    check("a zero-byte face counts as missing, not composed",
+          not studio.has_face("_selftest_zero")
+          and studio.has_face("sthr-appointed"))
+finally:
+    os.remove(_zero)
 check("connecting a location to itself is refused",
       not requests.post(BASE + "/api/map_connect",
                         json={"campaign": _sc, "scenario": _ms,
