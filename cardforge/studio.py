@@ -1795,6 +1795,59 @@ def act_upload_art(p):
     return {"ok": True, "composed": True, "file": fname}
 
 
+def _auto_cutout(im):
+    """Best-effort background removal so dropped art blends onto the frame.
+    Uses rembg when the owner has installed it (clean subject masks); otherwise
+    a corner flood-fill that clears a roughly uniform background. Returns RGBA
+    with the background made transparent."""
+    from PIL import Image, ImageDraw, ImageChops, ImageFilter
+    try:                                   # rembg, if installed — best quality
+        from rembg import remove
+        return remove(im.convert("RGBA"))
+    except Exception:
+        pass
+    rgb = im.convert("RGB")
+    W, H = rgb.size
+    seed = rgb.copy()
+    SENT = (0, 254, 1)
+    for xy in ((0, 0), (W - 1, 0), (0, H - 1), (W - 1, H - 1),
+               (W // 2, 0), (W // 2, H - 1), (0, H // 2), (W - 1, H // 2)):
+        try:
+            ImageDraw.floodfill(seed, xy, SENT, thresh=42)
+        except Exception:
+            pass
+    bg = ImageChops.difference(seed, Image.new("RGB", (W, H), SENT)) \
+        .convert("L").point(lambda v: 0 if v < 10 else 255)   # 0=bg, 255=keep
+    bg = bg.filter(ImageFilter.GaussianBlur(1.2))
+    out = im.convert("RGBA")
+    out.putalpha(ImageChops.multiply(out.split()[3], bg))
+    return out
+
+
+def act_art_cutout(p):
+    """Remove the background of the card's current art so it blends onto the
+    frame (investigator class colour, asset parchment...). Saves the result as
+    a new chosen variant; the original art is left untouched."""
+    campaign = p.get("campaign", "still_hour")
+    card = p["card"]
+    camp = runner.load_campaign(campaign)
+    card_dir = os.path.join(runner.out_dir_for(camp), card)
+    fname = os.path.basename(str(p.get("file") or ""))
+    src = os.path.join(card_dir, fname) if fname else None
+    if not src or not os.path.exists(src):
+        return {"ok": False, "message": "no chosen art to cut out"}
+    from PIL import Image
+    try:
+        cut = _auto_cutout(Image.open(src))
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "message": "cutout failed: {}".format(e)}
+    existing = [f for f in os.listdir(card_dir) if f.startswith("cutout_")]
+    out_name = "cutout_{}.png".format(len(existing) + 1)
+    cut.save(os.path.join(card_dir, out_name))
+    _choose_art(campaign, card, out_name)
+    return {"ok": True, "composed": True, "file": out_name}
+
+
 def act_place(p):
     """Save an art placement (drag/zoom) and recompose that card from the
     original image — placement is data, so quality never degrades."""
@@ -2231,6 +2284,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "upload_font": act_upload_font,
            "tts_spawn": act_tts_spawn, "plugin_update": act_plugin_update,
            "card_save": act_card_save, "art_remove": act_art_remove,
+           "art_cutout": act_art_cutout,
            "scenario_save": act_scenario_save, "map_save": act_map_save,
            "map_connect": act_map_connect,
            "scenario_new": act_scenario_new,
@@ -2888,6 +2942,8 @@ title="delete this card (hand-made cards only)">&#128465; Delete</button>
 <div class=row><span class=hint>art for this card — pick one, or bring your own:</span>
 <button class=btn style="font-size:12px;padding:5px 12px" onclick="document.getElementById('ed_file').click()">Upload image&hellip;</button>
 <button class=btn style="font-size:12px;padding:5px 12px" onclick=edArtRemove()>Remove image</button>
+<button class=btn style="font-size:12px;padding:5px 12px" onclick=edCutout()
+title="best-effort background removal so the art blends onto the frame (works best on a plain background)">Cut out background</button>
 <input type=file id=ed_file accept="image/*" style="display:none" onchange=edUpload(this)>
 </div>
 <div id=ed_strip></div>
@@ -3756,6 +3812,13 @@ if(j.file){ed.g.variants=(ed.g.variants||[]).concat([j.file]);ed.g.chosen=j.file
 ed.scale=1;ed.ox=0;ed.oy=0;document.getElementById('ed_scale').value=1;
 edStrip();edLoadArt();edFaceRefresh();}};
 rd.readAsDataURL(f);input.value='';}
+async function edCutout(){if(!ed||!ed.g.chosen){alert('Pick or upload art first.');return;}
+addlog('removing background…');
+const j=await post('art_cutout',{card:ed.g.id,file:ed.g.chosen});
+if(j&&j.file){ed.g.variants=(ed.g.variants||[]).concat([j.file]);ed.g.chosen=j.file;
+ed.scale=1;ed.ox=0;ed.oy=0;document.getElementById('ed_scale').value=1;
+edStrip();edLoadArt();edFaceRefresh();addlog('background removed — it now blends onto the frame');}
+else alert((j&&j.message)||'could not remove the background');}
 function edFaceRefresh(){if(!ed)return;
 document.getElementById('ed_face').style.display='block';
 // edFurnitureRefresh recomposes and reloads both the blank backdrop and the
