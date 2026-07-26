@@ -93,7 +93,8 @@ OV_LOC_KEYS = ("icons", "color", "clues_per_investigator", "connections")
 # editable from the Studio, so a whole campaign can be typed in by hand.
 OV_FLAG_KEYS = ("elite", "unique", "weakness", "permanent",
                 "clues_per_investigator")
-OV_COUNT_KEYS = ("quantity", "memoryCost", "wildIcons")
+OV_COUNT_KEYS = ("quantity", "memoryCost", "wildIcons",
+                 "wilIcons", "intIcons", "comIcons", "agiIcons")
 # index is what prints ("Agenda 1"), number is the encounter number ("1/9") —
 # both are free text on real cards, so neither is forced to an int
 OV_PROP_KEYS = ("class", "deck", "difficulty", "encounter", "uses",
@@ -518,23 +519,6 @@ def pips(draw, x, y, n, color, r=9):
         cx = x + k * (2 * r + 6)
         draw.ellipse([cx, y, cx + 2 * r, y + 2 * r], fill=color, outline=(15, 15, 15))
     return x + n * (2 * r + 6)
-
-
-def _draw_level_pips(draw, level, cx, cy, gap, r, fill=(238, 232, 216)):
-    """Fill one XP pip per level along a shallow arc, centred on (cx, cy) — the
-    spot where the frame prints its empty XP bubbles. The bubble-free NoLevel
-    disc is laid down first, so a leveled card reads as N filled pips with no
-    leftover empties, like a printed card. Pips step out by `gap` and lift
-    slightly toward the ends."""
-    n = pip_count(level)
-    if n <= 0:
-        return
-    rise = gap * 0.16
-    for k in range(n):
-        o = k - (n - 1) / 2.0
-        x, y = cx + o * gap, cy - rise * o * o
-        draw.ellipse([x - r, y - r, x + r, y + r],
-                     fill=fill, outline=(28, 24, 20), width=2)
 
 
 def footer(draw, w, h, card_id):
@@ -1489,29 +1473,14 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
             or _se_img("overlays", "AHLCG-SkillIcon-" + gl)
         _paste_region(img, icon, se_reg(kind, "SkillIcon{}".format(i + 1)))
 
-    # cost disc + XP track. The base frame bakes an empty XP-bubble arc into the
-    # cost disc (asset/event) or the skill "cup"; lay the plugin's bubble-free
-    # disc (NoLevel) over it first, then draw the cost and one filled pip per
-    # level — a printed leveled card shows N pips, never leftover empty bubbles.
-    if kind in ("Asset", "Event"):
-        _paste_region(img, _se_img("overlays", "AHLCG-NoLevel"),
-                      se_reg(kind, "NoLevel"))
-        if c.get("cost") is not None:
-            _box_text(d, str(c["cost"]), se_reg(kind, "Cost"),
-                      fill=(238, 232, 216), title=True, grow=0.95, pos_key="cost")
-        if c.get("level"):
-            disc = _nudge(se_reg(kind, "Cost"), _field_style("level"))
-            w = disc[2] - disc[0]
-            _draw_level_pips(d, c["level"], (disc[0] + disc[2]) / 2.0,
-                             disc[3] + w * 0.10, w * 0.20, max(5, int(w * 0.095)))
-    elif kind == "Skill" and c.get("level"):
-        _paste_region(img, _se_img("overlays", "AHLCG-NoLevelSkill"),
-                      se_reg(kind, "NoLevel"))
-        cup = _nudge(se_reg(kind, "Level"), _field_style("level"))
-        cw = cup[2] - cup[0]
-        _draw_level_pips(d, c["level"], (cup[0] + cup[2]) / 2.0,
-                         cup[1] + (cup[3] - cup[1]) * 0.46,
-                         cw * 0.13, max(4, int(cw * 0.072)))
+    # cost disc + XP track. The frame prints its own XP notch meter into the
+    # cost disc (asset/event) / skill "cup" — empty on a level-0 card. The
+    # official filled-notch overlay is composited by _draw_level_pips once the
+    # asset is available; until then the printed empty meter shows, so nothing
+    # is hand-drawn.
+    if kind in ("Asset", "Event") and c.get("cost") is not None:
+        _box_text(d, str(c["cost"]), se_reg(kind, "Cost"),
+                  fill=(238, 232, 216), title=True, grow=0.95, pos_key="cost")
 
     _box_text(d, c["name"], se_reg(kind, "Name", letter), title=True, grow=1.15, key="name")
     if c.get("subtitle"):
