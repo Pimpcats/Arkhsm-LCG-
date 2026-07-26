@@ -1435,6 +1435,44 @@ def _paste_icon_fit(img, overlay, box):
     img.paste(ov, (box[0] + (bw - w) // 2, box[1] + (bh - h) // 2), ov)
 
 
+LEVEL_PIP_PATH = os.path.join(ROOT, "assets", "xp", "level_pip.png")
+
+
+def _level_pip():
+    """The official white XP pip (source-extracted, assets/xp/level_pip.png),
+    cached. None if the asset isn't present."""
+    if "level_pip" not in _SE_CACHE:
+        _SE_CACHE["level_pip"] = (Image.open(LEVEL_PIP_PATH).convert("RGBA")
+                                  if os.path.exists(LEVEL_PIP_PATH) else None)
+    return _SE_CACHE["level_pip"]
+
+
+def _notch_centers(box, spread=0.205, drop=0.99, lift=0.075):
+    """The five XP-notch centres along the half-circle at the bottom of the cost
+    disc, derived from the Cost region box (so they track it if it moves)."""
+    w = box[2] - box[0]
+    cx = (box[0] + box[2]) / 2.0
+    base_y = box[1] + w * drop
+    return [(cx + o * (w * spread), base_y - (w * lift) * (o / 2.0) ** 2)
+            for o in (-2, -1, 0, 1, 2)]
+
+
+def _fill_level_notches(img, box, level, centers=None, width_frac=0.17):
+    """Stamp the official white pip into the first `level` printed notches — the
+    empty notch meter is part of the frame, so filling it this way matches a
+    printed card. `centers` overrides the default cost-disc arc (e.g. for the
+    skill cup)."""
+    n = pip_count(level)
+    pip = _level_pip()
+    if n <= 0 or pip is None:
+        return
+    tw = max(1, int((box[2] - box[0]) * width_frac))
+    th = max(1, round(pip.height * tw / pip.width))
+    p = pip.resize((tw, th), Image.LANCZOS)
+    for x, y in (centers or _notch_centers(box))[:n]:
+        img.paste(p, (int(round(x - tw / 2)), int(round(y - th / 2))), p)
+
+
 def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
     """Asset / Event / Skill on the plugin's authentic per-class frame."""
     letter = "W" if c.get("weakness") else CLASS_LETTER.get(c.get("class"), "N")
@@ -1481,6 +1519,18 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
     if kind in ("Asset", "Event") and c.get("cost") is not None:
         _box_text(d, str(c["cost"]), se_reg(kind, "Cost"),
                   fill=(238, 232, 216), title=True, grow=0.95, pos_key="cost")
+    # XP level: fill the frame's printed notch meter with the official white pip
+    if c.get("level"):
+        if kind in ("Asset", "Event"):
+            _fill_level_notches(img, se_reg(kind, "Cost"), c["level"])
+        elif kind == "Skill":
+            cup = se_reg("Skill", "Level")
+            cw = cup[2] - cup[0]
+            cx = (cup[0] + cup[2]) / 2.0
+            base = cup[1] + (cup[3] - cup[1]) * 0.52
+            cen = [(cx + o * (cw * 0.16), base - (cw * 0.055) * (o / 2.0) ** 2)
+                   for o in (-2, -1, 0, 1, 2)]
+            _fill_level_notches(img, cup, c["level"], centers=cen, width_frac=0.14)
 
     _box_text(d, c["name"], se_reg(kind, "Name", letter), title=True, grow=1.15, key="name")
     if c.get("subtitle"):
