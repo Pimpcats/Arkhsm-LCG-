@@ -243,7 +243,11 @@ def paste_cover(img, art_path, box, placement=None):
     the original file with Lanczos, so placement edits are lossless-in, one
     resample out."""
     try:
-        art = Image.open(os.path.join(ROOT, art_path)).convert("RGB")
+        # keep the alpha channel: a PNG cut-out (transparent background) must
+        # composite over the frame's own background — the class colour on an
+        # investigator, the parchment on an asset — instead of being flattened
+        # onto a dark rectangle. A photo with no alpha still fills the window.
+        art = Image.open(os.path.join(ROOT, art_path)).convert("RGBA")
     except Exception:
         return False
     p = placement or {}
@@ -256,9 +260,11 @@ def paste_cover(img, art_path, box, placement=None):
     # center, then pan by the stored offsets (window pixels)
     px = (art.width - bw) / 2 - float(p.get("ox", 0))
     py = (art.height - bh) / 2 - float(p.get("oy", 0))
-    canvas = Image.new("RGB", (bw, bh), (34, 31, 42))
-    canvas.paste(art, (-round(px), -round(py)))
-    img.paste(canvas, (box[0], box[1]))
+    # clip to the window on a transparent layer, then composite with the art's
+    # own alpha so transparent areas reveal whatever the frame draws behind
+    layer = Image.new("RGBA", (bw, bh), (0, 0, 0, 0))
+    layer.alpha_composite(art, (-round(px), -round(py)))
+    img.paste(layer, (box[0], box[1]), layer)
     return True
 
 CLASS_COLORS = {
