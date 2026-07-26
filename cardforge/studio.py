@@ -2355,7 +2355,8 @@ class Handler(BaseHTTPRequestHandler):
             rel = os.path.normpath(q.get("p", "")).lstrip(os.sep)
             path = os.path.join(ROOT, rel)
             allowed = (os.path.join(ROOT, "out"), os.path.join(ROOT, "art"),
-                       os.path.join(ROOT, "assets", "branding"))
+                       os.path.join(ROOT, "assets", "branding"),
+                       os.path.join(ROOT, "assets", "frames"))
             if not path.startswith(allowed) or not os.path.exists(path):
                 self._json({"error": "not found"}, 404)
                 return
@@ -2605,6 +2606,11 @@ border-radius:3px;transition:border-color .12s,background .12s}
 transform:translateX(-50%);font-size:10px;color:var(--accent);white-space:nowrap;
 opacity:0;transition:opacity .12s;pointer-events:none}
 .ed_rg.ed_statrg:hover::after{opacity:.9}
+/* skill-icon strip: click a chip to change its skill, right-click to remove */
+.si_chip{width:46px;height:46px;padding:3px;border:1px solid var(--line);
+border-radius:8px;background:var(--surface2);cursor:pointer;transition:border-color .12s,transform .12s}
+.si_chip:hover{border-color:var(--accent);transform:translateY(-1px)}
+.si_chip img{width:100%;height:100%;object-fit:contain;display:block}
 /* inline on-card text editor (double-click a text area) */
 .ed_inline{position:absolute;z-index:5;box-sizing:border-box;
 background:rgba(18,20,26,.97);border:1px solid var(--accent);color:var(--ink);
@@ -3015,6 +3021,10 @@ title="best-effort background removal so the art blends onto the frame (works be
 </div>
 <div id=le_conns></div>
 <button class=btn style="font-size:11px;padding:4px 10px" onclick=leAddConn()>+ connection</button>
+</div>
+<div id=cc_skillicons style="display:none;margin:6px 0;padding:10px;border:1px solid var(--line);border-radius:8px">
+<b style="font-size:12px">Skill icons</b> <span class=hint>the commit icons down the left edge &mdash; click an icon to change its skill, right-click to remove</span>
+<div id=si_strip style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px"></div>
 </div>
 <div id=cc_tokens style="display:none;margin:6px 0;padding:10px;border:1px solid var(--line);border-radius:8px">
 <b style="font-size:12px">Chaos-token rows</b> <span class=hint>the scenario reference table &mdash; token + its modifier text</span>
@@ -3539,7 +3549,9 @@ document.getElementById('cc_info').textContent=
 // per-type panels: location elements / chaos-token rows / investigator back
 document.getElementById('cc_loc').style.display=(t==='Location')?'block':'none';
 document.getElementById('cc_tokens').style.display=(t==='Scenario')?'block':'none';
+document.getElementById('cc_skillicons').style.display=(t==='Skill')?'block':'none';
 document.getElementById('cc_back_wrap').style.display=(t==='Investigator')?'block':'none';
+if(t==='Skill'){SKILL_ICONS=siFromCounts(ct);siDraw();}
 if(t==='Location'){
   const SYMS_L=['circle','square','triangle','diamond','moon','star','heart','hourglass','cross','quote','slash','doubleslash','spade','clover','t'];
   const sel=document.getElementById('le_icon');sel.innerHTML='<option value="">—</option>';
@@ -3575,9 +3587,6 @@ Asset:[['class','class','sel',CLASSES],['slot','slot','sel',SLOTS],
   ['memoryCost','memory cost','num'],['permanent','permanent','chk']],
 Event:[['class','class','sel',CLASSES],['memoryCost','memory cost','num']],
 Skill:[['class','class','sel',CLASSES],
-  ['wilIcons','willpower icons','num'],['intIcons','intellect icons','num'],
-  ['comIcons','combat icons','num'],['agiIcons','agility icons','num'],
-  ['wildIcons','wild icons','num'],
   ['memoryCost','memory cost','num']],
 Enemy:[['class','class','sel',CLASSES],['encounter','encounter set','txt'],
   ['quantity','copies in deck','num'],['elite','elite','chk'],
@@ -3653,6 +3662,25 @@ TOKS.map(n=>`<option ${t.token===n?'selected':''}>${n}</option>`).join('')+
 `onchange="TOK_ROWS[${i}].text=this.value">`+
 `<button class=btn style="font-size:11px;padding:3px 9px" onclick="TOK_ROWS.splice(${i},1);tokDraw()">&times;</button></div>`).join('');}
 function tokAdd(){if(TOK_ROWS.length<8){TOK_ROWS.push({token:'skull',text:'-1.'});tokDraw();}}
+// --- skill commit icons: an ordered strip you can add to, remove from, and
+// click to change any icon into any of the five skills (all official assets) --
+let SKILL_ICONS=[];
+const SI_ORDER=[['wil','W'],['int','I'],['com','C'],['agi','A'],['wild','D']];
+function siLetter(k){const f=SI_ORDER.find(x=>x[0]===k);return f?f[1]:'D';}
+function siDraw(){const strip=document.getElementById('si_strip');if(!strip)return;
+strip.innerHTML=SKILL_ICONS.map((k,i)=>
+`<button class=si_chip title="click: change skill · right-click: remove" `+
+`onclick="siCycle(${i})" oncontextmenu="siRemove(${i});return false">`+
+`<img src="/art?p=assets/frames/se/overlays/AHLCG-SkillIcon-${siLetter(k)}.png" draggable=false></button>`
+).join('')+`<button class=btn id=si_add style="font-size:12px;padding:7px 12px" onclick=siAdd()>+ icon</button>`;}
+function siAdd(){if(SKILL_ICONS.length<8){SKILL_ICONS.push('wil');siDraw();}}
+function siCycle(i){const cur=SI_ORDER.findIndex(x=>x[0]===SKILL_ICONS[i]);
+SKILL_ICONS[i]=SI_ORDER[(cur+1)%SI_ORDER.length][0];siDraw();}
+function siRemove(i){SKILL_ICONS.splice(i,1);siDraw();}
+function siFromCounts(ct){const a=[];for(const[k]of SI_ORDER){const n=parseInt(ct[k+'Icons'])||0;
+for(let j=0;j<n;j++)a.push(k);}return a;}
+function siToCounts(){const c={wilIcons:0,intIcons:0,comIcons:0,agiIcons:0,wildIcons:0};
+for(const k of SKILL_ICONS)c[k+'Icons']++;return c;}
 async function ccSave(){const p={card:ed.g.id,
 name:document.getElementById('cc_name').value,
 subtitle:document.getElementById('cc_subtitle').value,
@@ -3666,6 +3694,7 @@ p.color=document.getElementById('le_color').value;
 p.clues_per_investigator=document.getElementById('le_perinv').checked;
 p.connections=LE_CONNS.filter(c=>c.symbol);}
 if(t==='Scenario')p.tokens=TOK_ROWS.filter(r=>r.token||r.text);
+if(t==='Skill')Object.assign(p,siToCounts());
 if(t==='Investigator'){p.back_text=document.getElementById('cc_back').value;
 p.back_flavor=document.getElementById('cc_backflavor').value;}
 if(t==='CampaignLog')for(const f of LOG_F)p[f]=document.getElementById('cl_'+f).value;
