@@ -2593,6 +2593,13 @@ outline-offset:-1px;border-radius:2px;z-index:1;transition:outline-color .15s}
 /* the furniture overlay: frame + text + discs on a transparent art window, laid
    OVER the live art so the art reads behind the frame exactly as the render */
 #ed_furniture{position:absolute;top:0;left:0;pointer-events:none;display:none;z-index:2}
+/* the flipped-to-back view: a plain image of the card's rendered back, over all */
+#ed_back{position:absolute;top:0;left:0;display:block;user-select:none;z-index:4}
+#ed_noback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+z-index:4;color:var(--dim);font-size:13px;background:#14151b}
+/* the art window highlighted when selected (click it; DELETE removes the art) */
+#ed_win.art_sel{outline:2px solid var(--accent)!important;outline-offset:-2px;
+box-shadow:0 0 0 2px rgba(232,178,74,.25)}
 /* draggable text-box handles sit on top of everything and take the clicks */
 #ed_regions{position:absolute;inset:0;z-index:3;pointer-events:none}
 .ed_rg{position:absolute;pointer-events:auto;cursor:move;border:1px dashed transparent;
@@ -2601,11 +2608,18 @@ border-radius:3px;transition:border-color .12s,background .12s}
 .ed_rg.sel{border-color:var(--accent);background:rgba(232,178,74,.14)}
 /* a stat region shows +/- affordance on hover (left-click +1, right-click -1).
    NB: use ed_statrg, not "stat" — the app already has a .stat badge class. */
-.ed_rg.ed_statrg{cursor:ns-resize}
+/* stat numerals are click-only: left +1, right -1. No drag, and no fill on
+   hover so the number underneath stays readable. */
+.ed_rg.ed_statrg{cursor:pointer}
+.ed_rg.ed_statrg:hover{background:transparent;border-color:rgba(232,178,74,.55)}
 .ed_rg.ed_statrg::after{content:'+ / \2212';position:absolute;left:50%;bottom:-16px;
 transform:translateX(-50%);font-size:10px;color:var(--accent);white-space:nowrap;
 opacity:0;transition:opacity .12s;pointer-events:none}
 .ed_rg.ed_statrg:hover::after{opacity:.9}
+/* the value that flashes on the card the instant you click, before the redraw */
+.ed_statval{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+font-weight:800;font-size:150%;color:#fff;text-shadow:0 0 6px #000,0 0 3px #000;
+opacity:0;transition:opacity .1s;pointer-events:none}
 /* skill-icon strip: click a chip to change its skill, right-click to remove */
 .si_chip{width:46px;height:46px;padding:3px;border:1px solid var(--line);
 border-radius:8px;background:var(--surface2);cursor:pointer;transition:border-color .12s,transform .12s}
@@ -2950,12 +2964,15 @@ title="delete this card (hand-made cards only)">&#128465; Delete</button>
 <div id=ed_left>
 <div id=ed_stage>
 <img id=ed_face><div id=ed_win><img id=ed_art draggable=false></div><img id=ed_furniture><div id=ed_regions></div>
+<img id=ed_back style="display:none"><div id=ed_noback style="display:none">this card has no separate back</div>
 </div>
 <div class=row><span class=hint>art for this card — pick one, or bring your own:</span>
 <button class=btn style="font-size:12px;padding:5px 12px" onclick="document.getElementById('ed_file').click()">Upload image&hellip;</button>
 <button class=btn style="font-size:12px;padding:5px 12px" onclick=edArtRemove()>Remove image</button>
 <button class=btn style="font-size:12px;padding:5px 12px" onclick=edCutout()
 title="best-effort background removal so the art blends onto the frame (works best on a plain background)">Cut out background</button>
+<button class=btn id=ed_flipbtn style="font-size:12px;padding:5px 12px" onclick=edFlip()
+title="show the card's back">&#8635; Flip to back</button>
 <input type=file id=ed_file accept="image/*" style="display:none" onchange=edUpload(this)>
 </div>
 <div id=ed_strip></div>
@@ -2994,13 +3011,17 @@ title="best-effort background removal so the art blends onto the frame (works be
 <button class=btn style="font-size:12px;padding:5px 12px;margin-top:4px" onclick="document.getElementById('ed_fontfile').click()">Upload font&hellip;</button>
 <input type=file id=ed_fontfile accept=".ttf,.otf" style="display:none" onchange=edFontUpload(this)>
 </div>
-<div id=ed_content><h2>Card content <small>type directly — blank returns a field to the authored version; saves affect THIS card only</small></h2>
+<div id=ed_content><h2>Card <small>click any text or number on the card to edit it directly — the panels below are only what the card can&rsquo;t show</small></h2>
+<!-- name / subtitle / traits / stats are edited ON the card now; kept here
+     (hidden) as the data model the on-card editors read and write -->
+<div id=cc_textform style="display:none">
 <div class=row>
 <label>name</label><input id=cc_name size=20 onfocus="tyBind('name')">
 <label>subtitle</label><input id=cc_subtitle size=16 onfocus="tyBind('subtitle')">
 <label>traits</label><input id=cc_traits size=18 onfocus="tyBind('traits')">
 </div>
 <div class=row id=cc_stats></div>
+</div>
 <div id=cc_props style="margin:6px 0;padding:10px;border:1px solid var(--line);border-radius:8px">
 <b style="font-size:12px">Card properties</b>
 <span class=hint>class &middot; encounter set &middot; act/agenda numbering &middot; the marks a real card carries &mdash; only what this card type uses is shown</span>
@@ -3490,6 +3511,11 @@ win.style.width=((x1-x0)*disp)+'px';win.style.height=((y1-y0)*disp)+'px';
 const furn=document.getElementById('ed_furniture');
 furn.style.width=(cw*disp)+'px';furn.style.display='none';
 face.style.display='block';  // shown as the placeholder until furniture loads
+// reset flip + art selection for the freshly-opened card
+ED_FLIPPED=false;edArtSelect(false);
+document.getElementById('ed_back').style.display='none';
+document.getElementById('ed_noback').style.display='none';
+{const _fb=document.getElementById('ed_flipbtn');if(_fb)_fb.innerHTML='↻ Flip to back';}
 document.getElementById('ed_title').textContent=c.name;
 document.getElementById('ed_scale').value=ed.scale;
 for(const [id,cur] of [['ed_font_title',(c.fonts||{}).title||''],
@@ -3866,6 +3892,27 @@ document.getElementById('ed_face').style.display='block';
 // edFurnitureRefresh recomposes and reloads both the blank backdrop and the
 // furniture overlay (text can change with a content edit)
 edFurnitureRefresh();}
+// flip the editor between the card's front and its rendered back (-back.png)
+let ED_FLIPPED=false;
+function edFlip(){if(!ed)return;ED_FLIPPED=!ED_FLIPPED;edApplyFlip();}
+function edApplyFlip(){if(!ed)return;
+const front=['ed_face','ed_win','ed_furniture','ed_regions'];
+const back=document.getElementById('ed_back'),nob=document.getElementById('ed_noback');
+const btn=document.getElementById('ed_flipbtn');
+if(ED_FLIPPED){
+for(const i of front){const e=document.getElementById(i);if(e)e.style.display='none';}
+back.style.width=document.getElementById('ed_stage').style.width;
+back.onload=()=>{back.style.display='block';nob.style.display='none';};
+back.onerror=()=>{back.style.display='none';nob.style.display='flex';};
+back.src='/art?p=art/faces/'+ed.g.id+'-back.png&ts='+Date.now();
+if(btn)btn.innerHTML='↻ Flip to front';
+}else{
+back.style.display='none';nob.style.display='none';
+document.getElementById('ed_face').style.display='block';
+document.getElementById('ed_win').style.display='';
+document.getElementById('ed_furniture').style.display='block';
+document.getElementById('ed_regions').style.display='';
+if(btn)btn.innerHTML='↻ Flip to back';}}
 function edPreview(){if(!ed||!ed.natW)return;
 ed.scale=parseFloat(document.getElementById('ed_scale').value);
 ed.scaleY=parseFloat(document.getElementById('ed_scaley').value)||ed.scale;
@@ -3886,12 +3933,23 @@ if(ed.scaleY&&Math.abs(ed.scaleY-ed.scale)>0.001)body.scale_y=ed.scaleY;
 await post('place',body);}
 function edArtIdle(){clearTimeout(ED_ARTBUSY);
 ED_ARTBUSY=setTimeout(()=>{if(ed)edSavePlacement();},500);}
+// select the art (click) vs pan it (drag). When selected, DELETE removes it.
+let ED_ART_SEL=false;
+function edArtSelect(on){ED_ART_SEL=!!on;const w=document.getElementById('ed_win');
+if(w)w.classList.toggle('art_sel',ED_ART_SEL);}
 (function(){const win=document.getElementById('ed_win');let drag=null;
 win.addEventListener('mousedown',e=>{if(!ed)return;
-drag={x:e.clientX,y:e.clientY,ox:ed.ox,oy:ed.oy};win.style.cursor='grabbing';e.preventDefault();});
+drag={x:e.clientX,y:e.clientY,ox:ed.ox,oy:ed.oy,moved:false};win.style.cursor='grabbing';e.preventDefault();});
 window.addEventListener('mousemove',e=>{if(!drag||!ed)return;
+if(Math.abs(e.clientX-drag.x)+Math.abs(e.clientY-drag.y)>3)drag.moved=true;
 ed.ox=drag.ox+(e.clientX-drag.x)/ed.disp;ed.oy=drag.oy+(e.clientY-drag.y)/ed.disp;edPreview();});
-window.addEventListener('mouseup',()=>{if(drag)edArtIdle();drag=null;win.style.cursor='grab';});
+window.addEventListener('mouseup',()=>{if(drag){if(drag.moved)edArtIdle();else edArtSelect(!ED_ART_SEL);}
+drag=null;win.style.cursor='grab';});
+// DELETE / BACKSPACE removes the selected art (never while typing in a field)
+document.addEventListener('keydown',e=>{
+if((e.key==='Delete'||e.key==='Backspace')&&ED_ART_SEL&&ed
+&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target&&e.target.tagName)||'')){
+e.preventDefault();edArtSelect(false);edArtRemove();}});
 win.addEventListener('wheel',e=>{e.preventDefault();const s=document.getElementById('ed_scale');
 s.value=Math.max(0.5,Math.min(6,parseFloat(s.value)-e.deltaY*0.0012));edArtIdle();edPreview();});})();
 // ---- editor preview layers: the BLANK backdrop (class background + frame,
@@ -3933,14 +3991,24 @@ el.className='ed_rg'+(rf.stat?' ed_statrg':'')+(ED_SEL===key?' sel':'');
 el.dataset.key=key;
 el.style.left=((b[0]+dx)*ed.disp)+'px';el.style.top=((b[1]+dy)*ed.disp)+'px';
 el.style.width=((b[2]-b[0])*ed.disp)+'px';el.style.height=((b[3]-b[1])*ed.disp)+'px';
-el.title=rf.stat?'left-click +1 · right-click − 1 · drag to move':'click to edit · drag to move';
+el.title=rf.stat?'left-click +1 · right-click − 1':'click to edit · drag to move';
 host.appendChild(el);}}
-// step a stat by clicking its numeral on the card (reuses the form stepper)
+// step a stat by clicking its numeral on the card (reuses the form stepper).
+// The new value flashes on the card instantly; the full re-render is debounced
+// so rapid clicks batch into one recompose instead of one per click.
 let ED_STAT_T=null;
 function edStatStep(key,delta){const cc=document.getElementById('cc_'+key);if(!cc)return;
 if(typeof ccStep==='function')ccStep(key,delta);
 else cc.value=(parseInt(cc.value)||0)+delta;
-clearTimeout(ED_STAT_T);ED_STAT_T=setTimeout(()=>{if(ed)edSave();},400);}
+edStatBadge(key,cc.value);
+clearTimeout(ED_STAT_T);ED_STAT_T=setTimeout(()=>{if(ed)edSave();},260);}
+// instant feedback: show the value large over its region until the card redraws
+function edStatBadge(key,val){const host=document.getElementById('ed_regions');if(!host)return;
+const el=host.querySelector('.ed_rg[data-key="'+CSS.escape(key)+'"]');if(!el)return;
+let b=el.querySelector('.ed_statval');
+if(!b){b=document.createElement('div');b.className='ed_statval';el.appendChild(b);}
+b.textContent=(val===''||val==null)?'–':val;b.style.opacity='1';
+clearTimeout(el._bt);el._bt=setTimeout(()=>{b.style.opacity='0';},900);}
 // click a text area to edit it right on the card (one editor open at a time)
 function edInlineEdit(key,el){if(document.querySelector('.ed_inline'))return;
 const dst=document.getElementById(edCcId(key));if(!dst)return;
@@ -3962,8 +4030,11 @@ host.addEventListener('mousedown',e=>{
 const el=e.target.closest('.ed_rg');if(!el||!ed||e.button!==0)return;e.preventDefault();
 const key=el.dataset.key;const rf=edRegionField(key);
 edSelectRegion(key);
+// stat numerals (skills, health, sanity, cost, shroud, clues…): pure click —
+// left-click +1 on the spot, no drag, no manual typing. Text areas still drag.
+if(rf.stat){edStatStep(key,1);return;}
 const st=(ed.g.type_styles||{})[rf.posField]||{};
-rdrag={el,key,field:rf.posField,stat:rf.stat,x:e.clientX,y:e.clientY,
+rdrag={el,key,field:rf.posField,x:e.clientX,y:e.clientY,
 dx0:st.dx||0,dy0:st.dy||0,base:{l:parseFloat(el.style.left),t:parseFloat(el.style.top)},moved:false};});
 host.addEventListener('contextmenu',e=>{
 const el=e.target.closest('.ed_rg');if(!el||!ed)return;
@@ -3974,8 +4045,8 @@ const mx=e.clientX-rdrag.x,my=e.clientY-rdrag.y;
 if(Math.abs(mx)+Math.abs(my)>3)rdrag.moved=true;
 rdrag.el.style.left=(rdrag.base.l+mx)+'px';rdrag.el.style.top=(rdrag.base.t+my)+'px';});
 window.addEventListener('mouseup',async e=>{if(!rdrag)return;const d=rdrag;rdrag=null;if(!ed)return;
-// a click (no drag): stats step +1, text areas open the inline editor
-if(!d.moved){if(d.stat)edStatStep(d.key,1);else edInlineEdit(d.key,d.el);return;}
+// a click (no drag) on a text area opens the inline editor
+if(!d.moved){edInlineEdit(d.key,d.el);return;}
 const ndx=Math.round(d.dx0+(e.clientX-d.x)/ed.disp);
 const ndy=Math.round(d.dy0+(e.clientY-d.y)/ed.disp);
 const j=await post('field_pos',{card:ed.g.id,field:d.field,dx:ndx,dy:ndy});

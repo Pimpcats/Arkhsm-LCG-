@@ -1447,17 +1447,25 @@ def _level_pip():
     return _SE_CACHE["level_pip"]
 
 
-def _notch_centers(box, spread=0.205, drop=0.99, lift=0.075):
-    """The five XP-notch centres along the half-circle at the bottom of the cost
-    disc, derived from the Cost region box (so they track it if it moves)."""
+# the five printed XP notches on the cost disc, measured off the frame as
+# fractions of the Cost box (width w, from box centre-x and box top). The arc is
+# wide and deep: outer notches high on the sides, centre notch lowest.
+_NOTCH_XO = (-0.513, -0.300, 0.0, 0.300, 0.513)   # x offset from centre / w
+_NOTCH_YF = (0.738, 0.913, 1.025, 0.913, 0.738)   # y below box top / w
+# the skill "cup" prints a tighter, shallower notch arc than the cost disc
+_SKILL_NOTCH_XO = (-0.370, -0.245, 0.0, 0.245, 0.370)
+_SKILL_NOTCH_YF = (0.153, 0.265, 0.353, 0.265, 0.153)
+
+
+def _notch_centers(box, xo=_NOTCH_XO, yf=_NOTCH_YF):
+    """The five printed XP-notch centres, derived from the region box so they
+    track it if the frame moves."""
     w = box[2] - box[0]
     cx = (box[0] + box[2]) / 2.0
-    base_y = box[1] + w * drop
-    return [(cx + o * (w * spread), base_y - (w * lift) * (o / 2.0) ** 2)
-            for o in (-2, -1, 0, 1, 2)]
+    return [(cx + xo[i] * w, box[1] + yf[i] * w) for i in range(5)]
 
 
-def _fill_level_notches(img, box, level, centers=None, width_frac=0.17):
+def _fill_level_notches(img, box, level, centers=None, width_frac=0.16):
     """Stamp the official white pip into the first `level` printed notches — the
     empty notch meter is part of the frame, so filling it this way matches a
     printed card. `centers` overrides the default cost-disc arc (e.g. for the
@@ -1511,26 +1519,18 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
             or _se_img("overlays", "AHLCG-SkillIcon-" + gl)
         _paste_region(img, icon, se_reg(kind, "SkillIcon{}".format(i + 1)))
 
-    # cost disc + XP track. The frame prints its own XP notch meter into the
-    # cost disc (asset/event) / skill "cup" — empty on a level-0 card. The
-    # official filled-notch overlay is composited by _draw_level_pips once the
-    # asset is available; until then the printed empty meter shows, so nothing
-    # is hand-drawn.
     if kind in ("Asset", "Event") and c.get("cost") is not None:
         _box_text(d, str(c["cost"]), se_reg(kind, "Cost"),
                   fill=(238, 232, 216), title=True, grow=0.95, pos_key="cost")
-    # XP level: fill the frame's printed notch meter with the official white pip
+    # XP level: fill the frame's printed notch meter with the official white pip,
+    # left-to-right, on the exact measured notch centres
     if c.get("level"):
         if kind in ("Asset", "Event"):
             _fill_level_notches(img, se_reg(kind, "Cost"), c["level"])
         elif kind == "Skill":
             cup = se_reg("Skill", "Level")
-            cw = cup[2] - cup[0]
-            cx = (cup[0] + cup[2]) / 2.0
-            base = cup[1] + (cup[3] - cup[1]) * 0.52
-            cen = [(cx + o * (cw * 0.16), base - (cw * 0.055) * (o / 2.0) ** 2)
-                   for o in (-2, -1, 0, 1, 2)]
-            _fill_level_notches(img, cup, c["level"], centers=cen, width_frac=0.14)
+            cen = _notch_centers(cup, _SKILL_NOTCH_XO, _SKILL_NOTCH_YF)
+            _fill_level_notches(img, cup, c["level"], centers=cen, width_frac=0.10)
 
     _box_text(d, c["name"], se_reg(kind, "Name", letter), title=True, grow=1.15, key="name")
     if c.get("subtitle"):
@@ -2122,6 +2122,24 @@ def content_regions(card_type):
                "clues": r("Act", "Clues")}
     elif card_type in ("Scenario", "Story"):
         out = {"name": r(card_type, "Name"), "text": r(card_type, "Body")}
+    # so every printed field is editable ON the card: split the Body into a
+    # traits strip (top) / rules (middle) / flavour strip (bottom), and add the
+    # subtitle plate where the frame prints one
+    body = out.get("text")
+    if body:
+        top, bot = body[1], body[3]
+        h = bot - top
+        th = min(46, int(h * 0.20))
+        fh = min(58, int(h * 0.24))
+        if h > th + fh + 70:
+            out["traits"] = [body[0], top, body[2], top + th]
+            out["flavor"] = [body[0], bot - fh, body[2], bot]
+            out["text"] = [body[0], top + th, body[2], bot - fh]
+    if card_type in ("Investigator", "Asset", "Event"):
+        letter = "N" if card_type in ("Asset", "Event") else ""
+        sub = r(card_type, "SubtitleText", letter) or r(card_type, "Subtitle", letter)
+        if sub:
+            out["subtitle"] = sub
     return {k: v for k, v in out.items() if v}
 
 
