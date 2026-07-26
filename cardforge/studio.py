@@ -2816,12 +2816,12 @@ title="Stable Diffusion regenerates each template's text regions into empty card
 </div></details>
 <div class=row style="margin:6px 0 10px;padding:10px;border:1px solid var(--line);border-radius:9px">
 <b style="font-size:12px">New card</b>
-<select id=nc_type>
+<select id=nc_type onchange=ncClassVis()>
 <option>Location</option><option>Enemy</option><option>Treachery</option>
 <option>Asset</option><option>Event</option><option>Skill</option>
 <option>Investigator</option><option>Agenda</option><option>Act</option>
 <option>Scenario</option><option>Story</option></select>
-<select id=nc_class title="class / faction — Mythos for encounter cards">
+<select id=nc_class title="class / faction — only player cards carry a class">
 <option value="">class…</option><option>Guardian</option><option>Seeker</option>
 <option>Rogue</option><option>Mystic</option><option>Survivor</option>
 <option>Neutral</option><option>Mythos</option></select>
@@ -2934,7 +2934,7 @@ title="drop this card onto the table of your RUNNING Tabletop Simulator — appe
 <label>back / deck-building text</label><textarea id=cc_back rows=4 spellcheck=false onfocus="glyphTarget('cc_back')"></textarea>
 <label>back flavor</label><textarea id=cc_backflavor rows=2 spellcheck=false onfocus="glyphTarget('cc_backflavor')"></textarea>
 </div>
-<div class=row id=ed_symbols style="margin:2px 0 4px;gap:5px;flex-wrap:wrap;align-items:center">
+<div class=row id=ed_symbols style="margin:2px 0 4px;gap:5px;flex-wrap:nowrap;overflow-x:auto;align-items:center">
 <span class=hint>insert symbol&nbsp;&mdash;&nbsp;click into rules/flavor first:</span></div>
 <label>rules text</label><textarea id=cc_text rows=5 spellcheck=false onfocus="tyBind('text');glyphTarget('cc_text')"></textarea>
 <label>flavor</label><textarea id=cc_flavor rows=2 spellcheck=false onfocus="tyBind('flavor');glyphTarget('cc_flavor')"></textarea>
@@ -4269,6 +4269,12 @@ document.getElementById('camp_spawn').disabled=!(total&&locked===total);
 const pool=document.getElementById('scen_pool_cards');pool.innerHTML='';
 for(const c of ((LS&&LS.cards)||[]))if(!assigned.has(c.id))pool.appendChild(dcardEl(c.id));
 stackDropify(document.getElementById('scen_pool'));}
+// only player cards carry a class/faction — hide the picker for encounter and
+// mythos types (Enemy, Location, Treachery, Agenda, Act, Scenario, Story)
+function ncClassVis(){const t=document.getElementById('nc_type').value;
+const cls=document.getElementById('nc_class');
+const show=['Investigator','Asset','Event','Skill'].includes(t);
+cls.style.display=show?'':'none';if(!show)cls.value='';}
 async function cardNew(){
 const name=document.getElementById('nc_name').value.trim();
 if(!name){alert('Give the card a name first.');return;}
@@ -4308,7 +4314,7 @@ addlog('campaign feed: '+j.created.length+' new, '+j.updated.length+' updated, '
 await refresh();scenBuild();}
 else{info.textContent='import failed: '+(j.message||'');}};
 rd.readAsText(f);input.value='';}
-symInit();refresh();poll();setInterval(refresh,4000);
+symInit();ncClassVis();refresh();poll();setInterval(refresh,4000);
 </script></body></html>"""
 
 
