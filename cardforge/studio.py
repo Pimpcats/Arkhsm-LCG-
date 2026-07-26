@@ -2539,6 +2539,16 @@ outline-offset:-1px;border-radius:2px;z-index:1;transition:outline-color .15s}
 border-radius:3px;transition:border-color .12s,background .12s}
 .ed_rg:hover{border-color:rgba(232,178,74,.75);background:rgba(232,178,74,.10)}
 .ed_rg.sel{border-color:var(--accent);background:rgba(232,178,74,.14)}
+/* a stat region shows +/- affordance on hover (left-click +1, right-click -1) */
+.ed_rg.stat{cursor:ns-resize}
+.ed_rg.stat::after{content:'+ / \2212';position:absolute;left:50%;bottom:-16px;
+transform:translateX(-50%);font-size:10px;color:var(--accent);white-space:nowrap;
+opacity:0;transition:opacity .12s;pointer-events:none}
+.ed_rg.stat:hover::after{opacity:.9}
+/* inline on-card text editor (double-click a text area) */
+.ed_inline{position:absolute;z-index:5;box-sizing:border-box;
+background:rgba(18,20,26,.97);border:1px solid var(--accent);color:var(--ink);
+border-radius:3px;padding:2px 5px;font:13px/1.3 inherit;resize:none;outline:none}
 #ed_strip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
 #ed_strip img{height:74px;border-radius:8px;cursor:pointer;border:2px solid transparent;
 transition:all .15s}
@@ -3799,32 +3809,62 @@ edRegions();}
 // area selects into the side panel. Stat numerals select but don't drag. ----
 const FIELD_CC={name:'cc_name',subtitle:'cc_subtitle',traits:'cc_traits',
 text:'cc_text',flavor:'cc_flavor'};
+function edCcId(key){return FIELD_CC[key]||('cc_'+key);}
 function edRegionField(key){
-// which saved text field a clicked region maps to
-if(key==='name'||key==='text')return {field:key,drag:true};
-return {field:'stats',drag:false};}
+// name / rules text: drag to move + double-click to edit inline.
+// stat numerals (health, sanity, shroud, cost, doom...): left-click +1,
+// right-click -1 straight on the card.
+if(FIELD_CC[key])return {field:key,cc:FIELD_CC[key],stat:false,drag:true};
+return {field:'stats',cc:'cc_'+key,stat:true,drag:false};}
 let ED_SEL=null;
 function edRegions(){const host=document.getElementById('ed_regions');if(!host)return;
 host.innerHTML='';if(!ed||!ed.g.regions)return;
 for(const key in ed.g.regions){const b=ed.g.regions[key];if(!b)continue;
 const rf=edRegionField(key);const st=(ed.g.type_styles||{})[rf.field]||{};
 const dx=(rf.drag?(st.dx||0):0),dy=(rf.drag?(st.dy||0):0);
-const el=document.createElement('div');el.className='ed_rg'+(ED_SEL===key?' sel':'');
+const el=document.createElement('div');
+el.className='ed_rg'+(rf.stat?' stat':'')+(ED_SEL===key?' sel':'');
 el.dataset.key=key;
 el.style.left=((b[0]+dx)*ed.disp)+'px';el.style.top=((b[1]+dy)*ed.disp)+'px';
 el.style.width=((b[2]-b[0])*ed.disp)+'px';el.style.height=((b[3]-b[1])*ed.disp)+'px';
-if(!rf.drag)el.style.cursor='pointer';
-el.title=rf.drag?'drag to move · click to edit':'click to style';
+el.title=rf.stat?'left-click +1 · right-click − 1':'drag to move · double-click to edit';
 host.appendChild(el);}}
-(function(){let rdrag=null;
-document.getElementById('ed_regions').addEventListener('mousedown',e=>{
-const el=e.target.closest('.ed_rg');if(!el||!ed)return;e.preventDefault();
+// step a stat by clicking its numeral on the card (reuses the form stepper)
+let ED_STAT_T=null;
+function edStatStep(key,delta){const cc=document.getElementById('cc_'+key);if(!cc)return;
+if(typeof ccStep==='function')ccStep(key,delta);
+else cc.value=(parseInt(cc.value)||0)+delta;
+clearTimeout(ED_STAT_T);ED_STAT_T=setTimeout(()=>{if(ed)edSave();},400);}
+// double-click a text area to edit it right on the card
+function edInlineEdit(key,el){const dst=document.getElementById(edCcId(key));if(!dst)return;
+const multiline=(key==='text'||key==='flavor');
+const ov=document.createElement(multiline?'textarea':'input');
+ov.className='ed_inline';ov.value=dst.value;
+ov.style.left=el.style.left;ov.style.top=el.style.top;
+ov.style.width=el.style.width;if(multiline)ov.style.height=el.style.height;
+document.getElementById('ed_stage').appendChild(ov);ov.focus();if(ov.select)ov.select();
+let done=false;const fin=save=>{if(done)return;done=true;
+if(save){dst.value=ov.value;edSave();}ov.remove();};
+ov.addEventListener('blur',()=>fin(true));
+ov.addEventListener('keydown',ev=>{if(ev.key==='Escape'){ev.preventDefault();fin(false);}
+else if(ev.key==='Enter'&&!multiline){ev.preventDefault();fin(true);}});}
+(function(){let rdrag=null;const host=document.getElementById('ed_regions');
+host.addEventListener('mousedown',e=>{
+const el=e.target.closest('.ed_rg');if(!el||!ed||e.button!==0)return;
 const key=el.dataset.key;const rf=edRegionField(key);
 edSelectRegion(key);
-if(!rf.drag)return;
+if(rf.stat){e.preventDefault();edStatStep(key,1);return;}
+if(!rf.drag)return;e.preventDefault();
 const st=(ed.g.type_styles||{})[rf.field]||{};
 rdrag={el,key,field:rf.field,x:e.clientX,y:e.clientY,
 dx0:st.dx||0,dy0:st.dy||0,base:{l:parseFloat(el.style.left),t:parseFloat(el.style.top)},moved:false};});
+host.addEventListener('contextmenu',e=>{
+const el=e.target.closest('.ed_rg');if(!el||!ed)return;
+const rf=edRegionField(el.dataset.key);
+if(rf.stat){e.preventDefault();edSelectRegion(el.dataset.key);edStatStep(el.dataset.key,-1);}});
+host.addEventListener('dblclick',e=>{
+const el=e.target.closest('.ed_rg');if(!el||!ed)return;
+if(!edRegionField(el.dataset.key).stat)edInlineEdit(el.dataset.key,el);});
 window.addEventListener('mousemove',e=>{if(!rdrag)return;
 const mx=e.clientX-rdrag.x,my=e.clientY-rdrag.y;
 if(Math.abs(mx)+Math.abs(my)>2)rdrag.moved=true;
