@@ -1559,7 +1559,7 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
         cx, cy = (box[0] + box[2]) // 2, (box[1] + box[3]) // 2
         chit, numbered = _vital_chit(kind, val)
         if chit is not None:
-            _paste_icon_fit(img, chit, (cx - 46, cy - 50, cx + 46, cy + 50))
+            _paste_icon_fit(img, chit, (cx - 66, cy - 72, cx + 66, cy + 72))
             if not numbered:
                 _box_text(d, str(val), box, fill=(255, 255, 255), stat=True, grow=0.9)
         else:
