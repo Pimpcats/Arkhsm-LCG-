@@ -1,0 +1,10 @@
+{
+  "scenarios": [
+    {
+      "id": "demo",
+      "name": "demo",
+      "order": 0,
+      "stacks": {}
+    }
+  ]
+}

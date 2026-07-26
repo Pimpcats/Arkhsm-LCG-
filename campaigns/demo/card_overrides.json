@@ -5,17 +5,36 @@
     "clues": 1,
     "color": "#25807a",
     "clues_per_investigator": false,
-    "icons": "circle",
-    "connections": [
-      {
-        "symbol": "square",
-        "color": "#b09b4a"
-      }
-    ]
+    "icons": "circle"
   },
   "d-treachary": {
     "name": "treachary",
     "class": "Mythos",
     "encounter": "true"
+  },
+  "d-guy": {
+    "name": "Tobias",
+    "wil": 8,
+    "int": 1,
+    "com": 1,
+    "agi": 1,
+    "health": 4,
+    "sanity": 2,
+    "class": "Guardian",
+    "subtitle": "fdsaf",
+    "text": "hello",
+    "signatures": [
+      {
+        "d-treachary": 1
+      }
+    ]
+  },
+  "d-test": {
+    "name": "test",
+    "shroud": 2,
+    "clues": 1,
+    "icons": "hourglass",
+    "color": "#ffff80",
+    "clues_per_investigator": true
   }
 }

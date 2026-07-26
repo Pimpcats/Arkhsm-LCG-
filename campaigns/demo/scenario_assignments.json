@@ -1,0 +1,12 @@
+{
+  "demo": {
+    "locations": [
+      "d-still",
+      "d-test"
+    ],
+    "encounter": [
+      "d-treachary"
+    ],
+    "_links": []
+  }
+}

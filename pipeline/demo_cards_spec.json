@@ -46,5 +46,22 @@
     "name": "treachary",
     "class": "Mythos",
     "encounter": true
+  },
+  {
+    "id": "d-test",
+    "type": "Location",
+    "name": "test",
+    "class": "Mythos",
+    "encounter": true,
+    "shroud": 2,
+    "clues": 1,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "d-scenario-test",
+    "type": "Scenario",
+    "name": "Scenario test",
+    "class": "Mythos",
+    "encounter": true
   }
 ]
