@@ -617,13 +617,16 @@ def act_scenario_new(p):
     name = str(p.get("name") or "").strip()[:60]
     if not name:
         return {"ok": False, "message": "name the scenario"}
-    mpath = os.path.join(ROOT, "campaigns", campaign, "scenario_manifest.json")
-    if not os.path.exists(mpath):
+    if not os.path.isdir(os.path.join(ROOT, "campaigns", campaign)):
         return {"ok": False, "message": "no campaign called '{}'".format(campaign)}
+    # A campaign made before scenarios existed has no manifest yet. It is still
+    # a real campaign — seed one rather than refusing, or a campaign in the
+    # picker can never take its first scenario box.
+    mpath = os.path.join(ROOT, "campaigns", campaign, "scenario_manifest.json")
     with _state_lock:
         try:
             m = json.load(open(mpath, encoding="utf-8"))
-        except ValueError:
+        except (OSError, ValueError):
             m = {"scenarios": []}
         scen = m.setdefault("scenarios", [])
         slug = "".join(ch if ch.isalnum() else "_" for ch in name.lower())
@@ -647,7 +650,7 @@ def act_scenario_delete(p):
     mpath = os.path.join(ROOT, "campaigns", campaign, "scenario_manifest.json")
     apath = os.path.join(ROOT, "campaigns", campaign, "scenario_assignments.json")
     if not os.path.exists(mpath):
-        return {"ok": False, "message": "no such campaign"}
+        return {"ok": False, "message": "this campaign has no scenarios yet"}
     with _state_lock:
         m = json.load(open(mpath, encoding="utf-8"))
         before = len(m.get("scenarios", []))
@@ -2462,9 +2465,8 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 <button id=tab-setup class=on onclick="tab('setup')">1 &middot; Setup</button>
 <button id=tab-illustrate onclick="tab('illustrate')">2 &middot; Illustrate</button>
 <button id=tab-cards onclick="tab('cards')">3 &middot; Cards</button>
-<button id=tab-frame onclick="tab('frame')">4 &middot; Frame</button>
-<button id=tab-scenarios onclick="tab('scenarios');scenBuild()">5 &middot; Scenarios</button>
-<button id=tab-apply onclick="tab('apply')">6 &middot; Play in TTS</button>
+<button id=tab-scenarios onclick="tab('scenarios');scenBuild()">4 &middot; Campaign / scenarios</button>
+<button id=tab-apply onclick="tab('apply')">5 &middot; Play in TTS</button>
 <button id=tab-advanced onclick="tab('advanced')">&#9881; Advanced</button>
 </nav><main>
 <div id=joberr style="display:none;margin:10px auto;max-width:1100px;padding:10px 14px;
@@ -2832,35 +2834,6 @@ A1111 note: <code>webui.bat --api</code> guarantees the API; if you rely on cust
 <div id=gallery class=gal></div>
 </div></section>
 
-<section id=frame><div class=panel>
-<div id=steps_frame class=stepbox></div>
-<hr>
-<p class=hint>Strange Eons produces the pixel-perfect final cards; this tab drives it.
-Tools: <a href="https://strangeeons.cgjennings.ca" target=_blank>Strange Eons 3</a> &middot;
-<a href="https://github.com/CGJennings/strange-eons" target=_blank>source</a>.
-<b>Plugin: skip the in-app catalog (outdated)</b> — use jaqenZann&rsquo;s external build via the
-Barnaby Files guide; AH font pack via the Mythos Busters Discord.</p>
-<div class=row style="align-items:flex-start">
-<div style="flex:1;min-width:320px">
-<h2>Owner config <small>once per plugin version</small></h2>
-<div class=row><label>launch command</label><input type=text id=se_cmd size=42></div>
-<div class=row><label>faces dir</label><input type=text id=se_faces size=16>
-<label>DPI</label><input type=number id=se_dpi style="width:70px"></div>
-<label>class-map keys</label><textarea id=se_classmap rows=8></textarea>
-<label>setting keys</label><textarea id=se_keys rows=5></textarea>
-<div class=row style="margin-top:8px"><button class=btn onclick=seSave()>Save config</button></div>
-</div>
-<div style="flex:1;min-width:280px">
-<h2>Run</h2>
-<div class=row>
-<button class=btn onclick="post('se_bundle')">1 &middot; Write frame bundle</button>
-<button class=btn onclick="post('se_launch')">2 &middot; Launch Strange Eons</button>
-</div>
-<p id=se_bundle_state class=hint></p>
-<h2>Coverage</h2><div id=se_cov></div>
-</div></div>
-</div></section>
-
 <section id=apply><div class=panel>
 <div id=steps_apply class=stepbox></div>
 <hr>
@@ -2892,7 +2865,7 @@ Barnaby Files guide; AH font pack via the Mythos Busters Discord.</p>
 <script>
 let seq=0, cur='setup', ed=null, ST=null;
 window.revealed=window.revealed||new Set();
-function tab(t){cur=t;for(const x of ['setup','cards','illustrate','frame','apply','scenarios','advanced']){
+function tab(t){cur=t;for(const x of ['setup','cards','illustrate','apply','scenarios','advanced']){
 document.getElementById(x).classList.toggle('on',x===t);
 document.getElementById('tab-'+x).classList.toggle('on',x===t);}
 if(t==='illustrate'&&!modelsLoadedOnce){modelsLoadedOnce=true;modelsLoad();}}
@@ -3057,25 +3030,17 @@ const el=(id,html)=>{const e=document.getElementById(id);if(e)e.innerHTML=html;}
 el('steps_setup',
  step(v.a1111_installed||v.comfy_installed,'<b>1.</b> Install a backend into this folder — A1111, or ComfyUI for Krea 2 / FLUX checkpoints — skip if you already run one elsewhere')+
  step(hasModel,'<b>2.</b> Install the art model (needs a free Civitai API key), or drop your .safetensors into <code>vendor/models/</code>')+
- step(v.se_installed,'<b>3.</b> Install Strange Eons — it renders the FINAL cards with the real fonts')+
- step(false,'<b>4.</b> Inside Strange Eons, once: jaqenZann&rsquo;s Arkham plugin + AH font pack (links below)')+
- step(false,'Then work the tabs left to right: <b>2 &middot; Illustrate</b> &rarr; <b>3 &middot; Cards</b> &rarr; <b>5 &middot; Play in TTS</b>'));
+ step(false,'Then work the tabs left to right: <b>2 &middot; Illustrate</b> &rarr; <b>3 &middot; Cards</b> &rarr; <b>4 &middot; Campaign / scenarios</b> &rarr; <b>5 &middot; Play in TTS</b>'));
 el('steps_cards',
  step(true,'<b>Pick a category</b> below, click a card to open it')+
- step(true,'<b>Drag</b> the art to position, <b>scroll</b> to size, <b>Save</b> — placement is kept and reused by the final Strange Eons render')+
- step(true,'These in-app faces are a fast <b>preview</b>; the print-identical faces come from the Frame tab'));
+ step(true,'<b>Drag</b> the art to position, <b>scroll</b> to size, <b>Save</b> — the placement is kept and used by every export')+
+ step(true,'Cards render here onto the plugin&rsquo;s own frames — what you see is what goes into TTS'));
 el('steps_illustrate',
  step(false,'<b>1.</b> <b>&#9655; Launch backend</b>, wait for the drawer to say it&rsquo;s up, then hit <b>&#8635;</b> on the Checkpoint row and pick <b>MoodyKrea2Mix</b> — the line below tells you what the backend actually has loaded')+
  step(seedsDone,'<b>2.</b> <b>Step 0 · Seeds</b> — 4 portrait candidates per investigator appear below')+
  step(picksDone,'<b>3.</b> Click each investigator&rsquo;s best portrait &rarr; <b>Make canonical</b>')+
  step(gen,'<b>4.</b> <b>Starter batch</b> to check the look &rarr; then <b>&#9889; Auto-build ALL</b> (top right) does every card')+
  step(true,'<b>5.</b> Don&rsquo;t like a result? Open the card in <b>3 &middot; Cards</b> &rarr; &#127922; Reroll gives new takes'));
-el('steps_frame',
- step(v.se_installed,'<b>1.</b> Install Strange Eons (Setup tab) + the jaqenZann plugin and AH fonts inside it')+
- step(!(s.se&&JSON.stringify(s.se.config.classmap).includes('TODO')),'<b>2.</b> Fill the class-map + setting keys once (open one card of each type in SE to read them)')+
- step(s.se&&s.se.bundle_exists,'<b>3.</b> <b>Write frame bundle</b> — packs every card + your art + placements into an SE script')+
- step(allFramed,'<b>4.</b> <b>Launch Strange Eons</b> &rarr; it exports every face; coverage below fills to '+cov.total)+
- step(false,'<b>5.</b> Apply tab &rarr; the exported faces replace the previews in the mod'));
 el('steps_apply',
  step(false,'<b>1.</b> <b>Compose cards &amp; Export to TTS</b> — writes local file:/// art and rebuilds the mod')+
  step(false,'<b>2.</b> Copy <code>dist/the_still_hour_mod.json</code> to <code>Documents/My Games/Tabletop Simulator/Saves/</code>')+
@@ -3190,19 +3155,7 @@ sd.files.map(f=>`<img loading=lazy class="seedthumb${f===sd.picked?' chosen':''}
 `onclick="zoomOpen(this.src,'${ch} — ${f}','Make canonical',()=>post('seed_pick',{character:'${ch}',file:'${f}'}))">`).join('')+
 (sd.picked?`<span class=hint>&#10003; ${sd.picked}</span>`:`<span class=hint>none picked yet</span>`)+
 `</div>`;}).join('');
-const se=s.se;document.getElementById('se_cmd').value=se.config.launch_command;
-document.getElementById('se_faces').value=se.config.faces_dir;
-document.getElementById('se_dpi').value=se.config.export_dpi;
-if(document.activeElement.id!=='se_classmap')
- document.getElementById('se_classmap').value=JSON.stringify(se.config.classmap,null,2);
-if(document.activeElement.id!=='se_keys')
- document.getElementById('se_keys').value=JSON.stringify(se.config.keys,null,2);
-document.getElementById('se_bundle_state').textContent=
- se.bundle_exists?'bundle ready: se/frame_cards.js':'no bundle yet — write it first';
-const cov=se.coverage;
-document.getElementById('se_cov').innerHTML=
-`<span class=stat>framed <b style="color:var(--good)">${cov.framed.length}</b>/${cov.total}</span>`+
-`<span class=stat><code>${cov.faces_dir}</code></span>`;
+const cov=(s.se&&s.se.coverage)||{framed:[],total:0};
 document.getElementById('applyinfo').innerHTML=
 `<span class=stat>faces ready: <b>${cov.framed.filter(f=>!f.endsWith('-back')).length}</b></span>`;}
 
@@ -3593,9 +3546,6 @@ function edClose(){document.getElementById('editor').style.display='none';
 document.getElementById('chips_cards').style.display='';
 document.getElementById('cardgroups').style.display='';
 ed=null;refresh();}
-function seSave(){post('se_save_config',{launch_command:document.getElementById('se_cmd').value,
-faces_dir:document.getElementById('se_faces').value,export_dpi:document.getElementById('se_dpi').value,
-classmap:document.getElementById('se_classmap').value,keys:document.getElementById('se_keys').value});}
 function applyArt(){post('apply',{mode:document.getElementById('applymode').value,
 base_url:document.getElementById('baseurl').value});}
 // ---------------- scenario deck-builder ----------------
