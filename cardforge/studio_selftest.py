@@ -1037,6 +1037,11 @@ check("the preview knows the rest of the table, not just the map",
 check("table preview + draggable connectors present in the UI",
       "pvDraw" in page and "pvToggle" in page and "mnub" in page
       and "MAP_LINK_FROM" in page and "pvclash" in page)
+check("slot spacing is adjustable and only changes how the map is drawn",
+      "map_gap" in page and "mapGap(" in page and "--mapgap" in page
+      and "cf_mapgap" in page
+      # the saved layout is grid slots, so spacing can never reach it
+      and "px" not in json.dumps(_r.get("slots", {})))
 requests.post(BASE + "/api/map_save",
               json={"campaign": _sc, "scenario": _ms,
                     "slots": {_locs[0]: [1, 0], _locs[1]: [2, 0],

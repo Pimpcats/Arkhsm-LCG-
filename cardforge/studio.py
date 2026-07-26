@@ -2166,10 +2166,11 @@ transition:transform .16s ease,box-shadow .16s ease}
 #mapwrap{display:none;margin:10px 0;padding:14px;border-radius:12px;
 background:#0a0a0c;border:1px solid rgba(201,162,74,.30)}
 #mapstage{position:relative}
-/* the real table leaves more than a card's width between locations; the
-   editor grid keeps it tighter to stay usable, but wide enough that the
-   connecting lines between neighbours actually read */
-#mapgrid{display:grid;gap:34px;justify-content:center}
+/* The real table leaves about one and a half card widths between locations.
+   The default here is close to that so connections read at a glance, and the
+   Spacing slider moves it — the layout you save is the same either way, since
+   slots are grid positions, not pixels. */
+#mapgrid{display:grid;gap:var(--mapgap,86px);justify-content:center}
 #maplines{position:absolute;inset:0;pointer-events:none;z-index:6}
 .mslot{width:104px;height:146px;border:2px dashed rgba(255,255,255,.16);
 border-radius:8px;display:flex;align-items:center;justify-content:center;
@@ -2272,6 +2273,10 @@ title="drag location cards between slots">&#10021; Arrange</button>
 <button class=btn id=map_mode_link onclick="mapMode('link')"
 title="click one location then another to connect them — each card gets the other's symbol printed on it">&#128279; Connect</button>
 <span class=spacer></span>
+<label style="font-size:11px;color:var(--dim)">spacing</label>
+<input type=range id=map_gap min=16 max=190 step=2 value=86 style="width:110px"
+title="how far apart the slots sit — only how the map is drawn here, never what gets saved"
+oninput="mapGap(this.value)">
 <button class=btn id=map_pv onclick=pvToggle()
 title="see the whole scenario laid out to scale — exactly where every object lands on the table — before you send anything to TTS">&#128065; Table preview</button>
 <button class=btn onclick=mapSave()>Save layout</button>
@@ -3371,9 +3376,20 @@ document.getElementById('mapwrap').classList.toggle('linking',m==='link');
 document.getElementById('map_mode_move').className='btn'+(m==='move'?' primary':'');
 document.getElementById('map_mode_link').className='btn'+(m==='link'?' primary':'');
 mapDraw();}
+// How far apart the slots are drawn. Purely visual: a slot is a grid position,
+// so the saved layout and the scripted table coordinates never change with it.
+function mapGap(px){
+document.getElementById('mapgrid').style.setProperty('--mapgap',px+'px');
+try{localStorage.setItem('cf_mapgap',px);}catch(_){}
+// the cards moved, so the lines between them have to be redrawn
+mapLines();}
+function mapGapInit(){let v=86;
+try{v=Number(localStorage.getItem('cf_mapgap'))||86;}catch(_){}
+const el=document.getElementById('map_gap');if(el)el.value=v;
+document.getElementById('mapgrid').style.setProperty('--mapgap',v+'px');}
 function mapOpen(sid,name){MAP_SID=sid;
 document.getElementById('maptitle').textContent='Location map — '+name;
-document.getElementById('mapwrap').style.display='block';mapMode('move');
+document.getElementById('mapwrap').style.display='block';mapGapInit();mapMode('move');
 document.getElementById('mapwrap').scrollIntoView({behavior:'smooth',block:'center'});}
 function mapDraw(){const S=(LS&&LS.scenarios)||{};const g=S.grid||{cols:6,rows:4};
 const A=(S.assignments||{})[MAP_SID]||{};
