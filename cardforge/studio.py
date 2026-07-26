@@ -1570,6 +1570,12 @@ def act_install_a1111(p):
                    dry_run=bool(p.get("dry_run")))
 
 
+def act_install_comfy(p):
+    """Setup: self-contained ComfyUI into vendor/comfy (Windows portable)."""
+    return run_job("install-comfy", installer.install_comfy,
+                   dry_run=bool(p.get("dry_run")))
+
+
 def act_install_checkpoint(p):
     """Setup: download the art model into vendor/models (self-contained)."""
     return run_job("install-checkpoint", installer.install_checkpoint,
@@ -2082,6 +2088,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "models": act_models, "backend_set": act_backend_set, "model_set": act_model_set,
            "install_checkpoint": act_install_checkpoint,
            "install_se": act_install_se, "install_a1111": act_install_a1111,
+           "install_comfy": act_install_comfy,
            "install_fonts": act_install_fonts, "font_set": act_font_set,
            "type_set": act_type_set, "upload_font": act_upload_font,
            "tts_spawn": act_tts_spawn, "plugin_update": act_plugin_update,
@@ -2565,6 +2572,16 @@ Train LoRAs on the SAME checkpoint you generate with (MoodyKrea2Mix).</span></di
 <button class="btn primary" onclick="post('install_a1111')">Install A1111 into this folder</button>
 <span id=vendor_a1111 class=hint></span>
 </div>
+<div class=row style="margin-top:6px">
+<b style="min-width:180px">1b &middot; ComfyUI <small style="color:var(--dim)">(Windows)</small></b>
+<button class="btn primary" id=btn_comfy onclick="post('install_comfy')">Install ComfyUI into this folder</button>
+<span id=vendor_comfy class=hint></span>
+</div>
+<p class=hint>Downloads the official <b>Windows portable</b> package (its own embedded Python &mdash;
+nothing touches your system) into <code>vendor/comfy/</code>, writes a headless launcher with the
+API on <code>:8188</code>, and shares <code>vendor/models/</code> so a checkpoint installed above is
+visible to both backends. Krea&nbsp;2 and FLUX-family checkpoints need this path &mdash; classic
+A1111 will not load them. Pick which one a campaign uses in <b>2 &middot; Illustrate &rarr; Backend</b>.</p>
 <p class=hint>Downloads the official standalone package (bundled Python) into <code>vendor/a1111/</code>
 with the API already switched on, and points the launcher at it. Already run A1111 elsewhere
 (e.g. <code>C:\SD\SDXL</code>)? Skip this — the Illustrate tab&rsquo;s Backend row keeps using yours.
@@ -3038,7 +3055,7 @@ const gen=s.report&&s.report.generated>0&&!s.report.dry_run;
 const allFramed=cov.total>0&&cov.framed.length===cov.total;
 const el=(id,html)=>{const e=document.getElementById(id);if(e)e.innerHTML=html;};
 el('steps_setup',
- step(v.a1111_installed,'<b>1.</b> Install Stable Diffusion (A1111) into this folder — skip if you already run it elsewhere')+
+ step(v.a1111_installed||v.comfy_installed,'<b>1.</b> Install a backend into this folder — A1111, or ComfyUI for Krea 2 / FLUX checkpoints — skip if you already run one elsewhere')+
  step(hasModel,'<b>2.</b> Install the art model (needs a free Civitai API key), or drop your .safetensors into <code>vendor/models/</code>')+
  step(v.se_installed,'<b>3.</b> Install Strange Eons — it renders the FINAL cards with the real fonts')+
  step(false,'<b>4.</b> Inside Strange Eons, once: jaqenZann&rsquo;s Arkham plugin + AH font pack (links below)')+
@@ -3125,6 +3142,13 @@ _set('vendor_a1111',v.a1111_installed?
 '<span class=okpill>&#10003; installed &amp; verified in vendor/a1111</span>':
 (v.a1111_partial?'<span class=badpill>&#10007; install incomplete &mdash; vendor/a1111 exists but has no usable webui; click Install again</span>':
 'not installed (fine if you already run A1111 elsewhere)'));
+_set('vendor_comfy',v.comfy_installed?
+'<span class=okpill>&#10003; installed &amp; verified in vendor/comfy</span>':
+(v.comfy_partial?'<span class=badpill>&#10007; install incomplete &mdash; vendor/comfy exists but has no usable ComfyUI; click Install again</span>':
+(v.comfy_windows_only?'<span class=warnpill>Windows only for now &mdash; on this OS install ComfyUI yourself and point the Backend row at it</span>':
+'not installed (fine if you already run ComfyUI elsewhere)')));
+const _cb=document.getElementById('btn_comfy');
+if(_cb)_cb.disabled=!!v.comfy_windows_only;
 _set('vendor_model',(v.models||[]).length?
 '<span class=okpill>&#10003; installed: '+v.models.join(', ')+'</span>':
 (v.has_token?'<span class=warnpill>key saved &mdash; ready to install</span>':'not installed yet'));

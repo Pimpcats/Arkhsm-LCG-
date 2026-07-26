@@ -625,7 +625,17 @@ with open(camp_path, "w", encoding="utf-8") as f:
 
 print("== SETUP: self-contained vendor installs (dry-run) ==")
 import shutil as _sh
+import platform as _plat
 from cardforge import installer, se_bridge as _seb
+
+
+def _expect_raises(fn, *a, **kw):
+    """Run something that should refuse, and hand back what it said."""
+    try:
+        fn(*a, **kw)
+        return ""
+    except Exception as e:  # noqa: BLE001 - the message IS the assertion
+        return str(e)
 camp_backup2 = open(camp_path, encoding="utf-8").read()
 se_cfg_backup = json.dumps(_seb.load_config())
 _sh.rmtree(os.path.join(ROOT, "vendor"), ignore_errors=True)
@@ -655,6 +665,33 @@ check("A1111 lands in vendor/ and the rig points at it",
 check("vendored webui-user.bat forces --api",
       "--api" in open(os.path.join(ROOT, "vendor", "a1111", "webui",
                                    "webui-user.bat"), encoding="utf-8").read())
+# ComfyUI: the Krea 2 / FLUX path, Windows portable, installed the same way
+r = requests.post(BASE + "/api/install_comfy", json={"dry_run": True}).json()
+check("ComfyUI install job accepted", r.get("started"))
+check("ComfyUI install completes", wait_idle(30))
+s = requests.get(BASE + "/api/status?campaign=still_hour").json()
+rig_after = json.load(open(_rig.rig_path(), encoding="utf-8"))
+_croot = os.path.join(ROOT, "vendor", "comfy", "ComfyUI_windows_portable")
+check("ComfyUI lands in vendor/ and the rig points at it",
+      s["vendor"]["comfy_installed"]
+      and rig_after["comfy"]["cwd"].endswith("ComfyUI_windows_portable")
+      and rig_after["comfy"]["command"] == installer.COMFY_LAUNCHER)
+_bat = open(os.path.join(_croot, installer.COMFY_LAUNCHER),
+            encoding="utf-8").read()
+check("the vendored launcher runs headless with the API on",
+      "--disable-auto-launch" in _bat and "--port 8188" in _bat
+      and "python_embeded" in _bat)
+check("ComfyUI is pointed at the SHARED vendor/models checkpoints",
+      "checkpoints" in open(os.path.join(_croot, "cardforge_models.yaml"),
+                            encoding="utf-8").read()
+      and "--extra-model-paths-config" in _bat)
+check("a real (non dry-run) install is refused off Windows",
+      _plat.system() == "Windows"
+      or "Windows-only" in _expect_raises(installer.install_comfy))
+check("both backends are offered in the Setup tab",
+      "install_comfy" in page and "vendor_comfy" in page
+      and "btn_comfy" in page)
+_sh.rmtree(os.path.join(ROOT, "vendor", "comfy"), ignore_errors=True)
 with open(_rig.rig_path(), "w", encoding="utf-8") as f:
     f.write(rig_backup_setup)
 r = requests.post(BASE + "/api/install_se", json={"dry_run": True}).json()
