@@ -533,11 +533,60 @@ def act_card_save(p):
             ov[card] = entry
         else:
             ov.pop(card, None)
+        # Changing a location's own identifier changes what its neighbours have
+        # to print, so their rows are rebuilt from the connection graph too.
+        also = _resync_neighbours(campaign, card, ov) if "icons" in p else []
         _write_json_atomic(rp.overrides_path(campaign), ov)
         subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py"),
-                        "--only", card], check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
-    log("card content saved: {} ({} field(s) overridden)".format(card, len(entry)))
-    return {"ok": True, "overrides": entry}
+                        "--only", card] + also, check=True, cwd=ROOT,
+                       stdout=subprocess.DEVNULL)
+    log("card content saved: {} ({} field(s) overridden{})".format(
+        card, len(entry),
+        ", {} neighbour(s) resynced".format(len(also)) if also else ""))
+    return {"ok": True, "overrides": entry, "resynced": also}
+
+
+def _resync_neighbours(campaign, card, ov):
+    """After a location's own symbol changes, rewrite the connection rows of
+    every location it is joined to, in every scenario it appears in."""
+    import render_placeholders as rp
+    apath = os.path.join(ROOT, "campaigns", campaign,
+                         "scenario_assignments.json")
+    if not os.path.exists(apath):
+        return []
+    try:
+        board = json.load(open(apath, encoding="utf-8"))
+    except ValueError:
+        return []
+    spec_by_id = {}
+    for path in spec_files(campaign):
+        try:
+            for sc in json.load(open(path, encoding="utf-8")):
+                spec_by_id[sc["id"]] = sc
+        except (ValueError, OSError):
+            continue
+    if spec_by_id.get(card, {}).get("type") != "Location":
+        return []
+    ident = {cid: _loc_identity(cid, spec_by_id, ov) for cid in spec_by_id
+             if spec_by_id[cid].get("type") == "Location"}
+    touched = []
+    for sid, box in board.items():
+        locs = box.get("locations")
+        if not isinstance(locs, list) or card not in locs:
+            continue
+        printed = {}
+        for cid in locs:
+            mc, _ = rp.apply_card_overrides(spec_by_id.get(cid, {}), {},
+                                            ov.get(cid))
+            printed[cid] = [str(c.get("symbol") if isinstance(c, dict) else c
+                                ).strip().lower()
+                            for c in (mc.get("connections") or [])]
+        links = scenario_links(board, sid, locs, ident, printed)
+        for cid in rebuild_connections(campaign, locs, links, ident,
+                                       spec_by_id, ov):
+            if cid != card and cid not in touched:
+                touched.append(cid)
+    return touched
 
 
 
@@ -742,19 +791,116 @@ def _loc_identity(cid, spec_by_id, ov):
             str(mc.get("color") or "").strip())
 
 
-def act_map_connect(p):
-    """Link (or unlink) two locations on the map.
+def _norm_edge(a, b):
+    return tuple(sorted((a, b)))
 
-    Body: {campaign, a, b, remove?}. A link is symmetrical and is stored the way
-    the game prints it: each card gains the *other* card's symbol in its own
-    connections row. Any location without a symbol of its own is given the first
-    free symbol/colour pair, so one click is genuinely all it takes.
+
+def scenario_links(board, sid, locs=None, ident=None, conns=None):
+    """The scenario's connections as a plain edge list.
+
+    The edge list is the truth; the symbols printed along a card's bottom edge
+    are derived from it. A campaign authored before this existed has no list,
+    so the first read reconstructs one from what the cards currently print.
+    """
+    box = board.get(sid) or {}
+    raw = box.get("_links")
+    if isinstance(raw, list):
+        seen, out = set(), []
+        for e in raw:
+            if isinstance(e, (list, tuple)) and len(e) == 2:
+                a = os.path.basename(str(e[0]))[:64]
+                b = os.path.basename(str(e[1]))[:64]
+                if a and b and a != b and _norm_edge(a, b) not in seen:
+                    seen.add(_norm_edge(a, b))
+                    out.append([a, b])
+        return out
+    if not locs or ident is None or conns is None:
+        return []
+    by_sym = {}
+    for cid in locs:
+        sym = (ident.get(cid) or ("", ""))[0]
+        if sym:
+            by_sym.setdefault(sym, []).append(cid)
+    seen, out = set(), []
+    for cid in locs:
+        for sym in conns.get(cid) or []:
+            for other in by_sym.get(sym, []):
+                if other == cid or _norm_edge(cid, other) in seen:
+                    continue
+                seen.add(_norm_edge(cid, other))
+                out.append([cid, other])
+    return out
+
+
+def rebuild_connections(campaign, locs, links, ident, spec_by_id, ov):
+    """Rewrite every location's printed connection row from the edge list.
+
+    This is the whole point of keeping a graph: a card's bottom row is exactly
+    the symbols of the locations it is joined to, recomputed from scratch every
+    time, so moving a connector from one location to another moves the symbol
+    with it. A card can never print its OWN symbol down there, because a card
+    is never its own neighbour.
+    """
+    import render_placeholders as rp
+    nb = {cid: [] for cid in locs}
+    for a, b in links:
+        if a in nb and b in nb:
+            nb[a].append(b)
+            nb[b].append(a)
+    touched = []
+    for cid in locs:
+        own = (ident.get(cid) or ("", ""))[0]
+        want = []
+        for other in nb.get(cid, []):
+            sym, col = ident.get(other) or ("", "")
+            if not sym or sym == own:      # never its own symbol, ever
+                continue
+            if any(c["symbol"] == sym for c in want):
+                continue
+            want.append({"symbol": sym, "color": col} if col
+                        else {"symbol": sym})
+        want = want[:6]                    # the frame carries Connection1..6
+        base, _ = rp.apply_card_overrides(spec_by_id.get(cid, {}), {},
+                                          ov.get(cid))
+        have = [{"symbol": str(c.get("symbol") if isinstance(c, dict) else c
+                               ).lower(),
+                 "color": str((c.get("color") if isinstance(c, dict) else "")
+                              or "")}
+                for c in (base.get("connections") or [])]
+        if have == [{"symbol": c["symbol"], "color": c.get("color", "")}
+                    for c in want]:
+            continue                       # already right, no re-render
+        entry = dict(ov.get(cid, {}))
+        if want:
+            entry["connections"] = want
+        else:
+            entry.pop("connections", None)
+        if entry:
+            ov[cid] = entry
+        else:
+            ov.pop(cid, None)
+        touched.append(cid)
+    return touched
+
+
+def act_map_connect(p):
+    """Join, separate, or MOVE a connection between locations.
+
+    Body: {campaign, scenario, a, b}            join a and b
+          {campaign, scenario, a, b, remove}    separate them
+          {campaign, scenario, a, b, move_from} detach a's connector from
+                                                move_from and attach it to b
+
+    The scenario keeps an edge list and every affected card's printed symbols
+    are rebuilt from it, so a connector that moves takes its symbol with it —
+    off the location it left, onto the one it landed on.
     """
     import render_placeholders as rp
     campaign = os.path.basename(str(p.get("campaign") or "still_hour"))
     a = os.path.basename(str(p.get("a") or ""))[:64]
     b = os.path.basename(str(p.get("b") or ""))[:64]
     remove = bool(p.get("remove"))
+    move_from = os.path.basename(str(p.get("move_from") or ""))[:64]
     if not a or not b or a == b:
         return {"ok": False, "message": "pick two different locations"}
 
@@ -765,36 +911,49 @@ def act_map_connect(p):
                 spec_by_id[sc["id"]] = sc
         except (ValueError, OSError):
             continue
-    if a not in spec_by_id or b not in spec_by_id:
-        return {"ok": False, "message": "unknown location"}
-    if any(spec_by_id[x].get("type") != "Location" for x in (a, b)):
-        return {"ok": False, "message": "connections join two locations"}
+    for x in (a, b) + ((move_from,) if move_from else ()):
+        if x not in spec_by_id:
+            return {"ok": False, "message": "unknown location"}
+        if spec_by_id[x].get("type") != "Location":
+            return {"ok": False, "message": "connections join two locations"}
 
-    # A symbol only has to be unique on one map, exactly as in the printed
-    # game, so "already used" is judged against this scenario's locations.
     sid = str(p.get("scenario") or "").strip()
-    scope = None
     apath = os.path.join(ROOT, "campaigns", campaign,
                          "scenario_assignments.json")
-    if sid and os.path.exists(apath):
-        try:
-            board = json.load(open(apath, encoding="utf-8"))
-            here = board.get(sid, {}).get("locations")
-            if isinstance(here, list) and here:
-                scope = set(here) | {a, b}
-        except ValueError:
-            scope = None
 
     with _state_lock:
+        board = {}
+        if os.path.exists(apath):
+            try:
+                board = json.load(open(apath, encoding="utf-8"))
+            except ValueError:
+                board = {}
+        here = (board.get(sid) or {}).get("locations")
+        locs = list(here) if isinstance(here, list) and here else []
+        for x in (a, b, move_from):
+            if x and x not in locs:
+                locs.append(x)
+
         ov = rp.load_card_overrides(campaign)
         ident = {cid: _loc_identity(cid, spec_by_id, ov) for cid in spec_by_id
                  if spec_by_id[cid].get("type") == "Location"}
-        taken = {s for cid, (s, _) in ident.items()
-                 if s and (scope is None or cid in scope)}
+        printed = {}
+        for cid in locs:
+            mc, _ = rp.apply_card_overrides(spec_by_id.get(cid, {}), {},
+                                            ov.get(cid))
+            printed[cid] = [str(c.get("symbol") if isinstance(c, dict) else c
+                                ).strip().lower()
+                            for c in (mc.get("connections") or [])]
+        links = scenario_links(board, sid, locs, ident, printed)
+
+        # a symbol only has to be unique on one map, as in the printed game
+        taken = {ident[cid][0] for cid in locs
+                 if cid in ident and ident[cid][0]}
 
         def identity(cid):
-            """This location's symbol, minting one if it has none yet."""
-            sym, col = ident[cid]
+            """This location's own symbol, minting one if it has none yet.
+            Its identifier never changes once set — only the row below does."""
+            sym, col = ident.get(cid) or ("", "")
             if sym:
                 return sym, col
             for s, c in CONN_POOL:
@@ -809,46 +968,48 @@ def act_map_connect(p):
             entry["icons"] = sym
             entry.setdefault("color", col)
             ov[cid] = entry
-            return sym, ident[cid][1]
+            return sym, col
 
-        if remove:
-            pairs = [(a, ident[b][0]), (b, ident[a][0])]
+        def drop(x, y):
+            key = _norm_edge(x, y)
+            return [e for e in links if _norm_edge(e[0], e[1]) != key]
+
+        if move_from:
+            if _norm_edge(a, move_from) not in {_norm_edge(*e) for e in links}:
+                return {"ok": False,
+                        "message": "those two are not connected"}
+            links = drop(a, move_from)
+            if _norm_edge(a, b) not in {_norm_edge(*e) for e in links}:
+                identity(a)
+                identity(b)
+                links.append([a, b])
+        elif remove:
+            links = drop(a, b)
         else:
-            sa, _ = identity(a)
-            sb, _ = identity(b)
-            pairs = [(a, sb), (b, sa)]
+            identity(a)
+            identity(b)
+            if _norm_edge(a, b) not in {_norm_edge(*e) for e in links}:
+                links.append([a, b])
 
-        for cid, sym in pairs:
-            if not sym:
-                continue
-            entry = dict(ov.get(cid, {}))
-            base, _ = rp.apply_card_overrides(spec_by_id.get(cid, {}), {},
-                                              ov.get(cid))
-            conns = [dict(c) if isinstance(c, dict) else {"symbol": str(c)}
-                     for c in (base.get("connections") or [])]
-            conns = [c for c in conns
-                     if str(c.get("symbol", "")).lower() != sym]
-            if not remove:
-                other = a if cid == b else b
-                col = ident[other][1]
-                conns.append({"symbol": sym, "color": col} if col
-                             else {"symbol": sym})
-            if conns:
-                entry["connections"] = conns[:6]
-            else:
-                entry.pop("connections", None)
-            if entry:
-                ov[cid] = entry
-            else:
-                ov.pop(cid, None)
+        touched = rebuild_connections(campaign, locs, links, ident,
+                                      spec_by_id, ov)
         _write_json_atomic(rp.overrides_path(campaign), ov)
-        subprocess.run([sys.executable,
-                        os.path.join(ROOT, "pipeline", "render_placeholders.py"),
-                        "--only", a, b],
-                       check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
-    log("{} {} <-> {}".format("unlinked" if remove else "linked", a, b))
+        if sid:
+            board.setdefault(sid, {})["_links"] = links
+            _write_json_atomic(apath, board)
+        if touched:
+            subprocess.run([sys.executable,
+                            os.path.join(ROOT, "pipeline",
+                                         "render_placeholders.py"),
+                            "--only"] + touched,
+                           check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+    log("{} {} <-> {} ({} card(s) re-rendered)".format(
+        "moved" if move_from else ("unlinked" if remove else "linked"),
+        a, b, len(touched)))
     return {"ok": True, "a": a, "b": b, "removed": remove,
-            "symbols": {a: ident[a][0], b: ident[b][0]}}
+            "moved_from": move_from or None, "links": links,
+            "rerendered": touched,
+            "symbols": {cid: ident[cid][0] for cid in locs if cid in ident}}
 
 
 def act_scenario_save(p):
@@ -870,12 +1031,29 @@ def act_scenario_save(p):
             cs["_locked"] = True
         if isinstance(stacks.get("_map"), dict):
             cs["_map"] = stacks["_map"]
+        if isinstance(stacks.get("_links"), list):
+            cs["_links"] = stacks["_links"]
         if cs:
             clean[str(sid)[:64]] = cs
     campaign = os.path.basename(str(p.get("campaign") or "still_hour"))
     apath = os.path.join(ROOT, "campaigns", campaign,
                          "scenario_assignments.json")
     with _state_lock:
+        # The board UI only knows about stacks, so it sends stacks. The map
+        # layout and the connection graph belong to the same scenario and must
+        # survive a card being dragged between stacks — carry them over unless
+        # the caller is deliberately replacing them.
+        old = {}
+        if os.path.exists(apath):
+            try:
+                old = json.load(open(apath, encoding="utf-8"))
+            except ValueError:
+                old = {}
+        for sid, cs in clean.items():
+            prev = old.get(sid) or {}
+            for keep in ("_map", "_links"):
+                if keep not in cs and keep in prev:
+                    cs[keep] = prev[keep]
         _write_json_atomic(apath, clean)
     log("scenario board saved ({} scenario(s))".format(len(clean)))
     return {"ok": True, "assignments": clean}
@@ -2182,8 +2360,20 @@ position:relative;z-index:4}
 #mapwrap.linking .mslot img{cursor:crosshair}
 #mapwrap.linking .mslot img.sel{outline:3px solid var(--accent);
 outline-offset:-3px;box-shadow:0 0 14px rgba(232,178,74,.55)}
-.msym{position:absolute;bottom:2px;right:4px;font-size:9px;z-index:5;
-color:#e8b24a;background:rgba(0,0,0,.55);border-radius:4px;padding:0 3px}
+/* a location's OWN identifier, top-left, exactly where the card prints it —
+   this one never moves and never appears in the row below */
+.msym{position:absolute;top:2px;left:4px;font-size:10px;z-index:5;
+color:#e8b24a;background:rgba(0,0,0,.6);border-radius:4px;padding:0 3px}
+/* the row below: one chip per location this one connects to. Grab a chip and
+   drop it on another location to move that connection there. */
+.mrow{position:absolute;bottom:-9px;left:0;right:0;z-index:7;display:flex;
+gap:3px;justify-content:center;pointer-events:none}
+.mchip{pointer-events:auto;cursor:grab;font-size:10px;line-height:1;
+min-width:16px;text-align:center;border-radius:5px;padding:2px 3px;
+background:#14141a;border:1px solid rgba(0,0,0,.6);
+box-shadow:0 1px 3px rgba(0,0,0,.55)}
+.mchip:active{cursor:grabbing}
+.mchip.moving{opacity:.35}
 /* the connector you grab: a coloured nub in the card's own connection colour,
    dragged onto another location to link them */
 .mnub{position:absolute;top:-11px;left:50%;transform:translateX(-50%);
@@ -3361,7 +3551,7 @@ if(ids.length)A[sid][st.dataset.stack]=ids;}}
 return A;}
 async function scenSave(){await post('scenario_save',{campaign:camp(),assignments:scenAssignments()});}
 let MAP_SID=null,MAP_DRAG=null,MAP_MODE='move',MAP_SEL=null,MAP_LINK_FROM=null,
-MAP_PV=false;
+MAP_MOVE_FROM=null,MAP_PV=false;
 const MAP_GLYPH={circle:'●',square:'■',triangle:'▲',
 diamond:'◆',moon:'☽',star:'★',heart:'♥',
 hourglass:'⧖',cross:'✚',quote:'”',slash:'/',
@@ -3408,10 +3598,12 @@ cell.addEventListener('dragleave',()=>cell.classList.remove('over'));
 cell.addEventListener('drop',e=>{e.preventDefault();cell.classList.remove('over');
 // a connector was dropped here -> link the two locations
 if(MAP_LINK_FROM){const tgt=cell.querySelector('img');
-const from=MAP_LINK_FROM;MAP_LINK_FROM=null;
+const from=MAP_LINK_FROM,was=MAP_MOVE_FROM;
+MAP_LINK_FROM=null;MAP_MOVE_FROM=null;
 for(const s of document.querySelectorAll('#mapgrid .mslot'))
 s.classList.remove('linkable');
-if(tgt&&tgt.dataset.cid!==from)mapLink(from,tgt.dataset.cid);
+if(tgt&&tgt.dataset.cid!==from&&tgt.dataset.cid!==was)
+mapLink(from,tgt.dataset.cid,was);
 return;}
 if(!MAP_DRAG)return;
 const src=MAP_DRAG.parentElement;
@@ -3452,13 +3644,46 @@ im.addEventListener('click',()=>mapClick(cid));}
 return im;}
 // symbol badges and the drag-out connector live on the slot, not the card
 // image, so dragging a card between slots can never leave a stray one behind
+// Who is this location joined to, right now, on this board?
+function mapNeighbours(cid){
+const out=[];
+for(const im of document.querySelectorAll('#mapgrid .mslot img')){
+const o=im.dataset.cid;
+if(o!==cid&&(mapLinked(cid,o)||mapLinked(o,cid)))out.push(o);}
+return out;}
 function mapBadges(){
-for(const b of document.querySelectorAll('#mapgrid .msym, #mapgrid .mnub'))
+for(const b of document.querySelectorAll('#mapgrid .msym, #mapgrid .mnub, #mapgrid .mrow'))
 b.remove();
 for(const im of document.querySelectorAll('#mapgrid .mslot img')){
 const host=im.parentElement;if(!host)continue;
 const cid=im.dataset.cid,c=mapFind(cid),sym=mapSym(cid);
 const col=mapColor((c&&c.content&&c.content.color)||'');
+// the connection row, one chip per neighbour, in that neighbour's colour —
+// the card's own symbol is never among them, because it is never its own
+// neighbour
+const row=document.createElement('span');row.className='mrow';
+for(const other of mapNeighbours(cid)){
+const oc=mapFind(other),osym=mapSym(other);
+const chip=document.createElement('span');chip.className='mchip';
+chip.draggable=true;
+chip.style.color=mapColor((oc&&oc.content&&oc.content.color)||'');
+chip.textContent=MAP_GLYPH[osym]||osym||'?';
+chip.title=((c&&c.name)||cid)+' connects to '+((oc&&oc.name)||other)+
+'  —  drag this onto another location to move the connection there';
+chip.addEventListener('dragstart',e=>{
+MAP_LINK_FROM=cid;MAP_MOVE_FROM=other;MAP_DRAG=null;
+chip.classList.add('moving');
+e.dataTransfer.effectAllowed='move';
+try{e.dataTransfer.setData('text/plain',cid);}catch(_){}
+for(const s of document.querySelectorAll('#mapgrid .mslot'))
+if(s.querySelector('img')&&s.querySelector('img').dataset.cid!==cid)
+s.classList.add('linkable');});
+chip.addEventListener('dragend',()=>{MAP_LINK_FROM=null;MAP_MOVE_FROM=null;
+chip.classList.remove('moving');
+for(const s of document.querySelectorAll('#mapgrid .mslot'))
+s.classList.remove('linkable');});
+row.appendChild(chip);}
+if(row.children.length)host.appendChild(row);
 // the connector: grab it and drop it on the location it connects to
 const nub=document.createElement('span');nub.className='mnub';
 nub.draggable=true;nub.style.background=col;
@@ -3480,10 +3705,13 @@ bad.style.color=col;bad.textContent=MAP_GLYPH[sym]||sym;
 host.appendChild(bad);}}
 // linking two locations, however you got here: clicking both, or dragging a
 // connector from one onto the other
-async function mapLink(a,b){
-const rm=mapLinked(a,b)&&mapLinked(b,a);
-const j=await post('map_connect',{campaign:camp(),scenario:MAP_SID,a:a,b:b,remove:rm});
-if(j.ok){addlog((rm?'unlinked ':'linked ')+a+' ↔ '+b);await refresh();mapDraw();}
+async function mapLink(a,b,moveFrom){
+// moveFrom set -> this connection is being moved off that location onto b
+const rm=!moveFrom&&mapLinked(a,b)&&mapLinked(b,a);
+const j=await post('map_connect',{campaign:camp(),scenario:MAP_SID,a:a,b:b,
+remove:rm,move_from:moveFrom||''});
+if(j.ok){addlog((moveFrom?('moved '+a+' → '+b+' (was '+moveFrom+')')
+:((rm?'unlinked ':'linked ')+a+' ↔ '+b)));await refresh();mapDraw();}
 else{alert(j.message||'could not change that connection');mapDraw();}}
 async function mapClick(cid){
 if(!MAP_SEL){MAP_SEL=cid;mapDraw();return;}

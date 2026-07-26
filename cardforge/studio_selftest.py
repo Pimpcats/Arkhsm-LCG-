@@ -1080,6 +1080,74 @@ check("unlinking drops the symbol from both sides only",
       _r.get("ok")
       and _by[_locs[1]]["content"]["icons"] not in _conns(_locs[0])
       and _by[_locs[2]]["content"]["icons"] in _conns(_locs[0]))
+# MOVING a connector: detach it from one location, attach it to another. The
+# symbol has to travel with it, and the card's own identifier must not budge.
+requests.post(BASE + "/api/map_connect",
+              json={"campaign": _sc, "scenario": _ms,
+                    "a": _locs[0], "b": _locs[1]})
+
+
+def _cards_now():
+    return {c["id"]: c["content"] for c in
+            requests.get(BASE + "/api/status?campaign=" + _sc).json()["cards"]}
+
+
+def _bottom(_c, _i):
+    return [x.get("symbol") for x in _c[_i].get("connections") or []]
+
+
+_c = _cards_now()
+_own0, _sym1, _sym2 = _c[_locs[0]]["icons"], _c[_locs[1]]["icons"], None
+_r = requests.post(BASE + "/api/map_connect",
+                   json={"campaign": _sc, "scenario": _ms, "a": _locs[0],
+                         "b": _locs[2], "move_from": _locs[1]}).json()
+_c = _cards_now()
+_sym2 = _c[_locs[2]]["icons"]
+check("moving a connector takes its symbol off the old location",
+      _r.get("ok") and _sym1 not in _bottom(_c, _locs[0])
+      and _own0 not in _bottom(_c, _locs[1]))
+check("…and prints it on the new one, both ways",
+      _sym2 in _bottom(_c, _locs[0]) and _own0 in _bottom(_c, _locs[2]))
+check("a location's own identifier never moves with it",
+      _c[_locs[0]]["icons"] == _own0)
+check("no location ever prints its own symbol below",
+      not any(_c[_i]["icons"] and _c[_i]["icons"] in _bottom(_c, _i)
+              for _i in _locs))
+# _locs[0]-_locs[2] is the only edge now, so _locs[1] has nothing to move
+check("moving a connection that does not exist is refused",
+      not requests.post(BASE + "/api/map_connect",
+                        json={"campaign": _sc, "scenario": _ms,
+                              "a": _locs[1], "b": _locs[0],
+                              "move_from": _locs[2]}).json().get("ok"))
+check("…and a refused move changes nothing",
+      _bottom(_cards_now(), _locs[0]) == _bottom(_c, _locs[0]))
+# changing a location's OWN symbol has to update what its neighbours print
+_r = requests.post(BASE + "/api/card_save",
+                   json={"campaign": _sc, "card": _locs[2],
+                         "icons": "hourglass", "color": "orange"}).json()
+_c = _cards_now()
+check("changing an identifier resyncs every neighbour's row",
+      _locs[0] in (_r.get("resynced") or [])
+      and "hourglass" in _bottom(_c, _locs[0])
+      and _sym2 not in _bottom(_c, _locs[0]))
+# the map layout and the graph must survive an unrelated board edit
+requests.post(BASE + "/api/map_save",
+              json={"campaign": _sc, "scenario": _ms,
+                    "slots": {_locs[0]: [0, 0], _locs[2]: [1, 0]}})
+_before = requests.get(BASE + "/api/status?campaign=" + _sc
+                       ).json()["scenarios"]["assignments"][_ms]
+requests.post(BASE + "/api/scenario_save",
+              json={"campaign": _sc,
+                    "assignments": {_ms: {"locations": list(_locs)}}})
+_after = requests.get(BASE + "/api/status?campaign=" + _sc
+                      ).json()["scenarios"]["assignments"][_ms]
+check("dragging cards on the board never wipes the map or the connections",
+      _before.get("_map") and _before.get("_links")
+      and _after.get("_map") == _before["_map"]
+      and _after.get("_links") == _before["_links"])
+check("connection chips are draggable in the UI",
+      "mchip" in page and "MAP_MOVE_FROM" in page and "move_from" in page
+      and "mapNeighbours" in page)
 check("connecting a location to itself is refused",
       not requests.post(BASE + "/api/map_connect",
                         json={"campaign": _sc, "scenario": _ms,
