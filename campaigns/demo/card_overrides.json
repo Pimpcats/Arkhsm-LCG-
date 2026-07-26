@@ -4,6 +4,18 @@
     "shroud": 2,
     "clues": 1,
     "color": "#25807a",
-    "clues_per_investigator": true
+    "clues_per_investigator": false,
+    "icons": "circle",
+    "connections": [
+      {
+        "symbol": "square",
+        "color": "#b09b4a"
+      }
+    ]
+  },
+  "d-treachary": {
+    "name": "treachary",
+    "class": "Mythos",
+    "encounter": "true"
   }
 }

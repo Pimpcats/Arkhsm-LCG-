@@ -2,7 +2,8 @@
   "d-still": {
     "fields": {
       "text": {
-        "size": 1.08
+        "size": 1.08,
+        "dy": -5
       }
     }
   }

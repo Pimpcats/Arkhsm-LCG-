@@ -20,5 +20,31 @@
     "evade": 2,
     "damage": 1,
     "horror": 0
+  },
+  {
+    "id": "d-guy",
+    "type": "Investigator",
+    "name": "guy",
+    "class": "Guardian",
+    "wil": 1,
+    "int": 1,
+    "com": 1,
+    "agi": 1,
+    "health": 1,
+    "sanity": 1
+  },
+  {
+    "id": "d-agenda-1",
+    "type": "Agenda",
+    "name": "Agenda 1",
+    "class": "Mythos",
+    "encounter": true
+  },
+  {
+    "id": "d-treachary",
+    "type": "Treachery",
+    "name": "treachary",
+    "class": "Mythos",
+    "encounter": true
   }
 ]
