@@ -1450,8 +1450,8 @@ def _level_pip():
 # the five printed XP notches on the cost disc, measured off the frame as
 # fractions of the Cost box (width w, from box centre-x and box top). The arc is
 # wide and deep: outer notches high on the sides, centre notch lowest.
-_NOTCH_XO = (-0.455, -0.285, 0.0, 0.285, 0.455)   # x offset from centre / w
-_NOTCH_YF = (0.815, 0.935, 1.025, 0.935, 0.815)   # y below box top / w
+_NOTCH_XO = (-0.475, -0.290, 0.0, 0.290, 0.475)   # x offset from centre / w
+_NOTCH_YF = (0.745, 0.925, 1.025, 0.925, 0.745)   # y below box top / w
 # the skill "cup" prints a tighter, shallower notch arc than the cost disc
 _SKILL_NOTCH_XO = (-0.370, -0.245, 0.0, 0.245, 0.370)
 _SKILL_NOTCH_YF = (0.153, 0.265, 0.353, 0.265, 0.153)
@@ -1465,7 +1465,7 @@ def _notch_centers(box, xo=_NOTCH_XO, yf=_NOTCH_YF):
     return [(cx + xo[i] * w, box[1] + yf[i] * w) for i in range(5)]
 
 
-def _fill_level_notches(img, box, level, centers=None, width_frac=0.16):
+def _fill_level_notches(img, box, level, centers=None, width_frac=0.135):
     """Stamp the official white pip into the first `level` printed notches — the
     empty notch meter is part of the frame, so filling it this way matches a
     printed card. `centers` overrides the default cost-disc arc (e.g. for the
