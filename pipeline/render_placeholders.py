@@ -1181,24 +1181,21 @@ def _se_img(sub, name):
 VITALS_DIR = os.path.join(ROOT, "assets", "stat", "vitals")
 
 
+# Solid (not faded) health/sanity chits: the plugin's own solid heart for
+# health, a solid-filled brain for sanity (the plugin's SanityBase is corrupt).
+# The numeral is always drawn on top in white, so every value reads the same.
+_VITAL_SOLID = {"health_heart": "health_solid.png",
+                "sanity_brain": "sanity_solid.png"}
+
+
 def _vital_chit(kind, value):
-    """Health-heart / sanity-brain chit for an investigator (official stat
-    elements kit). Returns (image, number_baked_in). Values 5-9 ship
-    pre-numbered; anything else uses the empty chit + an overlaid numeral."""
-    key = "vitals/" + kind
-    try:
-        v = int(value)
-    except (TypeError, ValueError):
-        v = None
-    if v is not None and 5 <= v <= 9:
-        p = os.path.join(VITALS_DIR, "{}_{}.png".format(kind, v))
-        k = key + str(v)
-        if k not in _SE_CACHE:
-            _SE_CACHE[k] = Image.open(p).convert("RGBA") if os.path.exists(p) else None
-        if _SE_CACHE[k] is not None:
-            return _SE_CACHE[k], True
-    p = os.path.join(VITALS_DIR, kind + ".png")
+    """Health-heart / sanity-brain chit for an investigator. Returns
+    (image, number_baked_in=False) — a solid chit; the caller overlays the
+    numeral so nothing looks faded and every value is consistent."""
+    fname = _VITAL_SOLID.get(kind, kind + ".png")
+    key = "vitals/" + fname
     if key not in _SE_CACHE:
+        p = os.path.join(VITALS_DIR, fname)
         _SE_CACHE[key] = Image.open(p).convert("RGBA") if os.path.exists(p) else None
     return _SE_CACHE[key], False
 
