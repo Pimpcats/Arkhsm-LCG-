@@ -2592,21 +2592,34 @@ box-shadow:var(--shadow);padding:14px;max-width:92vw}
 /* the editor breaks out of the 1180px content cap so three columns
    (content · card · style) have room; centred, capped at 1460px / 95vw */
 #ed_sheet{background:var(--surface2);border:1px solid var(--line);border-radius:18px;
-box-shadow:var(--shadow);margin:14px 0;padding:18px 20px;
-width:min(1460px,95vw);margin-left:calc(-1*(min(1460px,95vw) - 100%)/2)}
-/* Photoshop-style editor: the card canvas on the left, a properties panel on
-   the right that acts on whichever text area is selected on the card */
-/* three columns: content (left) · card (center) · text style (right) */
-#ed_main{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
-#ed_content{order:1;flex:1 1 300px;min-width:270px;max-width:400px;position:sticky;top:12px;
-max-height:calc(100vh - 90px);overflow-y:auto;
-background:rgba(120,150,190,.06);border:1px solid rgba(120,150,190,.20);
-border-radius:12px;padding:12px 14px}
-#ed_left{order:2;flex:0 0 auto;margin:0 auto}
-#ed_side{order:3;flex:1 1 250px;min-width:230px;max-width:340px;position:sticky;top:12px;
+box-shadow:var(--shadow);margin:14px auto;padding:18px 20px;max-width:1040px}
+/* card-first editor: the card canvas on the left, a slim vertical inspector on
+   the right that acts on whichever area you click on the card. Card details sit
+   below the inspector, collapsed by default, so the editor stays one screen. */
+#ed_main{display:grid;grid-template-columns:minmax(0,auto) 300px;gap:16px;
+align-items:start;justify-content:center}
+#ed_left{grid-column:1;grid-row:1 / span 2;margin:0 auto}
+#ed_side{grid-column:2;grid-row:1;position:sticky;top:12px;
 max-height:calc(100vh - 90px);overflow-y:auto;
 background:rgba(120,150,190,.10);border:1px solid rgba(120,150,190,.28);
 border-radius:12px;padding:12px 14px}
+#ed_content{grid-column:2;grid-row:2;
+background:rgba(120,150,190,.06);border:1px solid rgba(120,150,190,.20);
+border-radius:12px;padding:10px 14px}
+#ed_content h2{font-size:13px}
+#ed_content .ed_cbody{display:none;margin-top:8px}
+#ed_content.open .ed_cbody{display:block}
+#ed_content .ed_caret{display:inline-block;transition:transform .15s;font-size:11px}
+#ed_content.open .ed_caret{transform:rotate(90deg)}
+.ed_fold>summary{cursor:pointer;font-size:12px;font-weight:700;list-style:none;
+padding:2px 0;color:var(--ink)}
+.ed_fold>summary::-webkit-details-marker{display:none}
+.ed_fold>summary::before{content:'\25B8';display:inline-block;margin-right:6px;
+font-size:10px;transition:transform .15s}
+.ed_fold[open]>summary::before{transform:rotate(90deg)}
+.ed_fold>summary small{font-weight:400;color:var(--dim);margin-left:4px}
+@media(max-width:820px){#ed_main{grid-template-columns:1fr}
+#ed_left,#ed_side,#ed_content{grid-column:1}#ed_left{grid-row:auto}}
 #ed_side .ed_side_grp{margin:6px 0}
 #ed_side .ed_side_grp label{display:block;margin-bottom:2px}
 /* condensed content panel: tighter rows, labels above compact inputs */
@@ -3046,20 +3059,21 @@ title="undo the last edit (Ctrl+Z)">&#8630; Undo</button>
 <button class=btn style="font-size:11px;padding:4px 10px" onclick=tyReset()>Reset style</button>
 <button class=btn style="font-size:11px;padding:4px 10px" onclick=edMoveReset() title="return this text box to its authored position">Reset position</button>
 </div>
-<hr style="margin:10px 0;border-color:rgba(120,150,190,.28)">
-<b style="font-size:12px">Card fonts</b>
-<span class=hint style="display:block;margin:2px 0 4px">whole-card override &mdash; &ldquo;default&rdquo; follows the official stack</span>
+<details class=ed_fold style="margin-top:10px">
+<summary>Card fonts <small>whole-card font override</small></summary>
 <div class=ed_side_grp><label>title</label><select id=ed_font_title onchange=edFontSet() style="width:100%"></select></div>
 <div class=ed_side_grp><label>stat</label><select id=ed_font_stat onchange=edFontSet() style="width:100%"></select></div>
 <div class=ed_side_grp><label>body</label><select id=ed_font_body onchange=edFontSet() style="width:100%"></select></div>
 <button class=btn style="font-size:12px;padding:5px 12px;margin-top:4px" onclick="document.getElementById('ed_fontfile').click()">Upload font&hellip;</button>
 <input type=file id=ed_fontfile accept=".ttf,.otf" style="display:none" onchange=edFontUpload(this)>
-<hr style="margin:10px 0;border-color:rgba(120,150,190,.28)">
-<b style="font-size:12px">Insert symbol</b>
-<span class=hint style="display:block;margin:2px 0 4px">click into a rules/flavor box on the card first, then a symbol</span>
-<div id=ed_symbols style="display:flex;gap:5px;flex-wrap:wrap;align-items:center"></div>
+</details>
+<details class=ed_fold open style="margin-top:10px">
+<summary>Insert symbol <small>click a rules/flavor box on the card, then a symbol</small></summary>
+<div id=ed_symbols style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:6px"></div>
+</details>
 </div>
-<div id=ed_content><h2>Card <small>click any text or number on the card to edit it directly — the panels below are only what the card can&rsquo;t show</small></h2>
+<div id=ed_content><h2 onclick="document.getElementById('ed_content').classList.toggle('open')" style="cursor:pointer;margin:0" title="show/hide the extras the card can't display"><span class=ed_caret>&#9656;</span> Card details <small>class, slot, deck &amp; per-type options</small></h2>
+<div class=ed_cbody>
 <!-- name / subtitle / traits / stats are edited ON the card now; kept here
      (hidden) as the data model the on-card editors read and write -->
 <div id=cc_textform style="display:none">
@@ -3119,7 +3133,7 @@ title="undo the last edit (Ctrl+Z)">&#8630; Undo</button>
 </div>
 <div class=row style="margin-top:6px">
 <span id=cc_info class=hint></span>
-</div></div></div>
+</div></div></div></div>
 <details id=ed_promptbox style="margin-top:12px">
 <summary style="cursor:pointer;color:var(--dim)">Prompt &mdash; generate art for THIS card (A1111-style boxes)</summary>
 <label>prompt</label><textarea id=ed_pos rows=3 spellcheck=false></textarea>
