@@ -115,12 +115,14 @@ page = requests.get(BASE + "/").text
 check("single page serves", "CardForge Studio" in page)
 check("workflow tabs present in flow order",
       all(t in page for t in ("1 &middot; Setup", "2 &middot; Illustrate",
-                              "3 &middot; Cards", "4 &middot; Frame",
+                              "3 &middot; Cards", "4 &middot; Campaign / scenarios",
                               "5 &middot; Play in TTS"))
       and page.index("1 &middot; Setup") < page.index("2 &middot; Illustrate")
       < page.index("3 &middot; Cards"))
-check("Strange Eons links wired in",
-      "strangeeons.cgjennings.ca" in page and "github.com/CGJennings/strange-eons" in page)
+# the Strange Eons hand-off tab (which carried the github download link) was
+# removed with the Frame tab; the SE credit link in "Thanks to" is what remains
+check("Strange Eons credited",
+      "strangeeons.cgjennings.ca" in page)
 
 print("== ILLUSTRATE: dry-run batch through the API ==")
 r = requests.post(BASE + "/api/generate",

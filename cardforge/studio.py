@@ -1081,6 +1081,74 @@ CARD_TYPES = ("Investigator", "Asset", "Event", "Skill", "Treachery", "Enemy",
 CARD_CLASSES = ("Guardian", "Seeker", "Rogue", "Mystic", "Survivor", "Neutral",
                 "Mythos")
 
+# Recommended shape of a fresh scenario, measured off The Still Hour's prologue
+# (its biggest box) so a seeded campaign starts life looking like the real one:
+# (stack, card type, count). Two encounter rows because a real encounter deck is
+# a mix of Treachery and Enemy (9 + 4 = 13). Everything is a blank placeholder
+# on its true template — rename or delete to taste; nothing here is locked in.
+RECOMMENDED_SEED = (
+    ("locations",   "Location",  4),
+    ("act_deck",    "Act",       2),
+    ("agenda_deck", "Agenda",    9),
+    ("encounter",   "Treachery", 9),
+    ("encounter",   "Enemy",     4),
+    ("reference",   "Story",     1),
+)
+
+
+def _blank_card_spec(cid, ctype, name, cls=""):
+    """The blank-card spec used both by the hand editor and the campaign seeder:
+    a card on its real template with sensible per-type starting stats."""
+    card = {"id": cid, "type": ctype, "name": name}
+    if cls:
+        card["class"] = cls
+    if ctype in ("Enemy", "Treachery", "Location", "Agenda", "Act",
+                 "Scenario", "Story"):
+        card.setdefault("class", cls or "Mythos")
+        card["encounter"] = True
+    if ctype == "Location":
+        card.update({"shroud": 2, "clues": 1, "clues_per_investigator": True})
+    if ctype == "Enemy":
+        card.update({"fight": 2, "health": 2, "evade": 2,
+                     "damage": 1, "horror": 0})
+    if ctype == "Investigator":
+        # every new investigator starts at 1 everywhere — click the value up
+        # from there rather than editing someone else's defaults
+        card.update({"wil": 1, "int": 1, "com": 1, "agi": 1,
+                     "health": 1, "sanity": 1, "class": cls or "Neutral"})
+    if ctype in ("Asset", "Event", "Skill"):
+        card.setdefault("class", cls or "Neutral")
+    return card
+
+
+def _seed_campaign(cid, name):
+    """Give a brand-new campaign one starter scenario populated with blank
+    placeholder cards at the recommended per-scenario counts, so the owner opens
+    it to a board that already reads like a real scenario instead of a blank
+    slate. Returns the list of created card ids (for a single render pass)."""
+    prefix = "".join(w[0] for w in cid.split("_") if w)[:4] or "card"
+    counters, created, assign = {}, [], {}
+    spec = []
+    for stack, ctype, count in RECOMMENDED_SEED:
+        for _ in range(count):
+            counters[ctype] = counters.get(ctype, 0) + 1
+            n = counters[ctype]
+            cname = "{} {}".format(ctype, n)
+            ccid = "{}-{}-{}".format(prefix, ctype.lower(), n)
+            spec.append(_blank_card_spec(ccid, ctype, cname))
+            assign.setdefault(stack, []).append(ccid)
+            created.append(ccid)
+    dest = os.path.join(ROOT, "campaigns", cid)
+    _write_json_atomic(own_spec_path(cid), spec)
+    sid = "scenario_1"
+    _write_json_atomic(os.path.join(dest, "scenario_manifest.json"),
+                       {"campaign": {"id": cid, "name": name},
+                        "scenarios": [{"id": sid, "name": "Scenario 1",
+                                       "order": 0, "stacks": {}}]})
+    _write_json_atomic(os.path.join(dest, "scenario_assignments.json"),
+                       {sid: assign})
+    return created
+
 
 def act_card_new(p):
     """Create a blank card on its real template — the core of building a
@@ -1123,27 +1191,7 @@ def act_card_new(p):
         while cid in taken:
             cid, n = "{}-{}".format(base, n), n + 1
 
-        card = {"id": cid, "type": ctype, "name": name}
-        if cls:
-            card["class"] = cls
-        if ctype in ("Enemy", "Treachery", "Location", "Agenda", "Act",
-                     "Scenario", "Story"):
-            card.setdefault("class", cls or "Mythos")
-            card["encounter"] = True
-        if ctype == "Location":
-            card.update({"shroud": 2, "clues": 1,
-                         "clues_per_investigator": True})
-        if ctype == "Enemy":
-            card.update({"fight": 2, "health": 2, "evade": 2,
-                         "damage": 1, "horror": 0})
-        if ctype == "Investigator":
-            # every new investigator starts at 1 everywhere — click the value
-            # up from there rather than editing someone else's defaults
-            card.update({"wil": 1, "int": 1, "com": 1, "agi": 1,
-                         "health": 1, "sanity": 1,
-                         "class": cls or "Neutral"})
-        if ctype in ("Asset", "Event", "Skill"):
-            card.setdefault("class", cls or "Neutral")
+        card = _blank_card_spec(cid, ctype, name, cls)
         cards.append(card)
         _write_json_atomic(path, cards)
         subprocess.run([sys.executable,
@@ -1239,8 +1287,18 @@ def act_campaign_new(p):
     _write_json_atomic(os.path.join(dest, "manifest_starter.json"), [])
     _write_json_atomic(os.path.join(dest, "prompt_overrides.json"), {})
     os.makedirs(os.path.join(ROOT, "out", cid), exist_ok=True)
+    seeded = 0
+    if p.get("seed"):
+        ids = _seed_campaign(cid, name)
+        seeded = len(ids)
+        # one render pass for every seeded card, not one subprocess each
+        subprocess.run([sys.executable,
+                        os.path.join(ROOT, "pipeline", "render_placeholders.py"),
+                        "--only", *ids],
+                       check=False, cwd=ROOT, stdout=subprocess.DEVNULL)
+        log("seeded {} with {} placeholder card(s)".format(cid, seeded))
     log("campaign created: {} ({})".format(name, cid))
-    return {"ok": True, "id": cid, "name": name}
+    return {"ok": True, "id": cid, "name": name, "seeded": seeded}
 
 
 
@@ -1518,6 +1576,11 @@ def act_type_set(p):
         ov = rp.load_font_overrides()
         entry = dict(ov.get(card, {}))
         fields = dict(entry.get("fields", {}))
+        # keep any drag offset the box already has — typography and position are
+        # set by different controls and must not clobber each other
+        for _k in ("dx", "dy"):
+            if fields.get(field, {}).get(_k):
+                style[_k] = fields[field][_k]
         if style:
             fields[field] = style
         else:
@@ -1538,6 +1601,54 @@ def act_type_set(p):
     where = "every card" if card == "_default" else card
     log("text style [{}] on {}: {}".format(field, where, style or "reset"))
     return {"ok": True, "field": field, "style": style}
+
+
+def act_field_pos(p):
+    """Reposition one text area by dragging its box in the editor: store a pixel
+    offset (dx, dy) on the field, preserving its typography. dx == dy == 0 clears
+    the offset. Same store as type_set (font_overrides.json → fields)."""
+    sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+    import render_placeholders as rp
+    card = os.path.basename(str(p.get("card", "")).strip()) or "_default"
+    field = str(p.get("field", "")).strip()
+    if field not in TYPE_FIELDS:
+        return {"ok": False, "message": "unknown text area: " + field}
+
+    def _clamp(v):
+        try:
+            return max(-600, min(600, int(round(float(v or 0)))))
+        except (TypeError, ValueError):
+            return 0
+    dx, dy = _clamp(p.get("dx")), _clamp(p.get("dy"))
+    with _state_lock:
+        ov = rp.load_font_overrides()
+        entry = dict(ov.get(card, {}))
+        fields = dict(entry.get("fields", {}))
+        st = dict(fields.get(field, {}))
+        for k, v in (("dx", dx), ("dy", dy)):
+            if v:
+                st[k] = v
+            else:
+                st.pop(k, None)
+        if st:
+            fields[field] = st
+        else:
+            fields.pop(field, None)
+        if fields:
+            entry["fields"] = fields
+        else:
+            entry.pop("fields", None)
+        if entry:
+            ov[card] = entry
+        else:
+            ov.pop(card, None)
+        _write_json_atomic(rp.FONT_OVERRIDES_PATH, ov)
+        cmd = [sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py")]
+        if card != "_default":
+            cmd += ["--only", card]
+        subprocess.run(cmd, check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+    log("text moved [{}] on {}: dx={} dy={}".format(field, card, dx, dy))
+    return {"ok": True, "field": field, "dx": dx, "dy": dy}
 
 
 def act_upload_font(p):
@@ -1648,6 +1759,17 @@ def act_compose_one(p):
     """Compose one card's face (template + current art/placement), synchronous."""
     subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py"),
                     "--only", p["card"]], check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+    return {"ok": True, "composed": True}
+
+
+def act_compose_furniture(p):
+    """Compose the card's FURNITURE overlay (<id>-furniture.png): frame + text +
+    discs on a transparent art window. The editor lays this over the live,
+    draggable art so the art reads behind the frame exactly as the render does.
+    Synchronous; leaves the real face untouched."""
+    subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", "render_placeholders.py"),
+                    "--furniture", "--only", p["card"]],
+                   check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
     return {"ok": True, "composed": True}
 
 
@@ -2049,6 +2171,13 @@ def status(campaign="still_hour"):
                             for k in set(_fd) | set(_fc)}
     campaigns = sorted(d for d in os.listdir(os.path.join(ROOT, "campaigns"))
                        if os.path.isdir(os.path.join(ROOT, "campaigns", d)))
+    # Where the app lands when the browser has no remembered choice: the newest
+    # campaign that isn't the finished Still Hour reference set, so opening the
+    # app drops you into what you're actually building. Still Hour stays in the
+    # picker. Falls back to still_hour only when nothing else exists.
+    _others = [c for c in campaigns if c != "still_hour"]
+    default_campaign = (max(_others, key=lambda c: os.path.getmtime(
+        os.path.join(ROOT, "campaigns", c))) if _others else "still_hour")
     faces_dir_abs = os.path.join(ROOT, "art", "faces")
     faces_ver = 0
     if os.path.isdir(faces_dir_abs):
@@ -2057,6 +2186,7 @@ def status(campaign="still_hour"):
     return {"busy": _busy.is_set(), "last_job": dict(LAST_JOB),
             "build": build_stamp(),
             "campaign": campaign, "campaigns": campaigns,
+            "default_campaign": default_campaign,
             "backend": camp.get("backend"), "checkpoint": camp.get("checkpoint"),
             "style": {"lora": camp.get("style_lora", ""),
                       "lora_weight": camp.get("style_lora_weight", 0.8),
@@ -2093,7 +2223,8 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "install_se": act_install_se, "install_a1111": act_install_a1111,
            "install_comfy": act_install_comfy,
            "install_fonts": act_install_fonts, "font_set": act_font_set,
-           "type_set": act_type_set, "upload_font": act_upload_font,
+           "type_set": act_type_set, "field_pos": act_field_pos,
+           "upload_font": act_upload_font,
            "tts_spawn": act_tts_spawn, "plugin_update": act_plugin_update,
            "card_save": act_card_save, "art_remove": act_art_remove,
            "scenario_save": act_scenario_save, "map_save": act_map_save,
@@ -2111,6 +2242,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "render_placeholders": act_render_placeholders, "apply": act_apply,
            "place": act_place, "auto": act_auto, "upload_art": act_upload_art,
            "compose_one": act_compose_one,
+           "compose_furniture": act_compose_furniture,
            "export_tts": act_export_tts}
 
 
@@ -2145,6 +2277,9 @@ class Handler(BaseHTTPRequestHandler):
             body = PAGE.encode()
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
+            # a dev tool that reloads on pull — never let the browser serve a
+            # stale page, or new UI silently won't appear after an update
+            self.send_header("Cache-Control", "no-store")
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
@@ -2156,13 +2291,25 @@ class Handler(BaseHTTPRequestHandler):
             # serve an output image (gallery thumbnails)
             rel = os.path.normpath(q.get("p", "")).lstrip(os.sep)
             path = os.path.join(ROOT, rel)
-            allowed = (os.path.join(ROOT, "out"), os.path.join(ROOT, "art"))
+            allowed = (os.path.join(ROOT, "out"), os.path.join(ROOT, "art"),
+                       os.path.join(ROOT, "assets", "branding"))
             if not path.startswith(allowed) or not os.path.exists(path):
                 self._json({"error": "not found"}, 404)
                 return
             data = open(path, "rb").read()
             self.send_response(200)
             self.send_header("Content-Type", "image/png")
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+        elif u.path == "/favicon.ico":
+            path = os.path.join(ROOT, "assets", "branding", "cardforge.ico")
+            if not os.path.exists(path) or os.path.getsize(path) == 0:
+                self._json({"error": "not found"}, 404)
+                return
+            data = open(path, "rb").read()
+            self.send_response(200)
+            self.send_header("Content-Type", "image/x-icon")
             self.send_header("Content-Length", str(len(data)))
             self.end_headers()
             self.wfile.write(data)
@@ -2220,6 +2367,8 @@ class Handler(BaseHTTPRequestHandler):
 PAGE = r"""<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CardForge Studio</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/art?p=assets/branding/banner.png">
 <link rel=icon href="data:,">
 <style>
 :root{--bg:#0e0e13;--surface:#17171f;--surface2:#1e1e28;--line:rgba(255,255,255,.08);
@@ -2229,11 +2378,17 @@ PAGE = r"""<!doctype html><html><head><meta charset="utf-8">
 body{background:var(--bg);color:var(--ink);
 font:15px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
 -webkit-font-smoothing:antialiased}
+/* the banner (assets/branding/banner.png, 2048x512) rides behind the header.
+   The overlay is graded — darker at the edges where the title and buttons sit,
+   lighter across the middle so the art reads. If the banner isn't there yet the
+   image layer simply doesn't paint and the base tone shows. */
 header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:14px;
-padding:14px 26px;background:rgba(14,14,19,.8);backdrop-filter:blur(18px);
-border-bottom:1px solid var(--line)}
-header h1{font-size:17px;font-weight:600;letter-spacing:.2px}
-header .sub{color:var(--dim);font-size:13px}
+padding:18px 26px;min-height:66px;
+background:linear-gradient(90deg,rgba(14,14,19,.9),rgba(14,14,19,.6) 50%,rgba(14,14,19,.9)),
+url('/art?p=assets/branding/banner.png') center/cover no-repeat,rgba(14,14,19,.92);
+backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+header h1{font-size:17px;font-weight:600;letter-spacing:.2px;text-shadow:0 1px 6px rgba(0,0,0,.7)}
+header .sub{color:var(--dim);font-size:13px;text-shadow:0 1px 5px rgba(0,0,0,.7)}
 .spacer{margin-left:auto}
 select,input[type=text],input[type=number],input[type=range],textarea{
 background:var(--surface2);border:1px solid var(--line);color:var(--ink);
@@ -2335,12 +2490,30 @@ box-shadow:var(--shadow);padding:14px;max-width:92vw}
 #zoom_img{display:block;max-width:88vw;max-height:78vh;border-radius:10px;margin:0 auto}
 #ed_sheet{background:var(--surface2);border:1px solid var(--line);border-radius:18px;
 box-shadow:var(--shadow);margin:14px 0;padding:18px 20px}
-#ed_stage{position:relative;margin:12px auto;overflow:hidden;border-radius:10px;cursor:pointer;
-border:1px solid var(--line)}
+/* Photoshop-style editor: the card canvas on the left, a properties panel on
+   the right that acts on whichever text area is selected on the card */
+#ed_main{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+#ed_left{flex:0 0 auto}
+#ed_side{flex:1 1 250px;min-width:230px;max-width:340px;position:sticky;top:12px;
+background:rgba(120,150,190,.10);border:1px solid rgba(120,150,190,.28);
+border-radius:12px;padding:12px 14px}
+#ed_side .ed_side_grp{margin:6px 0}
+#ed_side .ed_side_grp label{display:block;margin-bottom:2px}
+#ed_stage{position:relative;margin:12px auto;overflow:hidden;border-radius:10px;
+border:1px solid var(--line);background:#14151b}
 #ed_face{display:block;user-select:none;pointer-events:none}
 #ed_win{position:absolute;overflow:hidden;cursor:grab;outline:2px dashed var(--accent);
-outline-offset:-2px;border-radius:2px}
+outline-offset:-2px;border-radius:2px;z-index:1}
 #ed_art{position:absolute;user-select:none}
+/* the furniture overlay: frame + text + discs on a transparent art window, laid
+   OVER the live art so the art reads behind the frame exactly as the render */
+#ed_furniture{position:absolute;top:0;left:0;pointer-events:none;display:none;z-index:2}
+/* draggable text-box handles sit on top of everything and take the clicks */
+#ed_regions{position:absolute;inset:0;z-index:3;pointer-events:none}
+.ed_rg{position:absolute;pointer-events:auto;cursor:move;border:1px dashed transparent;
+border-radius:3px;transition:border-color .12s,background .12s}
+.ed_rg:hover{border-color:rgba(232,178,74,.75);background:rgba(232,178,74,.10)}
+.ed_rg.sel{border-color:var(--accent);background:rgba(232,178,74,.14)}
 #ed_strip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
 #ed_strip img{height:74px;border-radius:8px;cursor:pointer;border:2px solid transparent;
 transition:all .15s}
@@ -2457,8 +2630,8 @@ hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 <span class=spacer></span>
 <span id=busy class=stat><span class=dot id=busydot></span><span id=busytext>idle</span></span>
 <button class=btn onclick=refresh() title="refresh the gallery and cards">&#8635;</button>
-<label>campaign</label><select id=campaign onchange=refresh()></select>
-<button class=btn onclick=campNew() title="start a new, empty campaign — then import a written campaign into it">+ New</button>
+<label>campaign</label><select id=campaign onchange=campPick()></select>
+<button class=btn onclick=campNew() title="start a new campaign, seeded with a recommended starter scenario">+ New</button>
 <button class="btn primary" onclick="post('auto',{dry_run:dry()})" title="generate &rarr; place &rarr; compose &rarr; TTS, hands-off">&#9889; Auto-build ALL &rarr; TTS</button>
 </header>
 <nav>
@@ -2662,7 +2835,7 @@ title="Stable Diffusion regenerates each template's text regions into empty card
 <div id=ed_sheet>
 <div class="row" id=ed_toolbar><button class=btn onclick=edClose()>&#8592; All cards</button>
 <b id=ed_title style="font-size:15px"></b>
-<span class=hint>drag art to position &middot; scroll to size &middot; click values ON the card to edit them</span>
+<span class=hint>drag art in the window &middot; scroll to size &middot; click a text area to edit it in the panel &middot; drag the name / rules box to move it</span>
 <span class=spacer></span>
 <label>width</label><input type=range id=ed_scale min=0.5 max=6 step=0.02 style="width:120px" oninput=edPreview()>
 <label>height</label><input type=range id=ed_scaley min=0.5 max=6 step=0.02 style="width:120px" oninput=edPreview()>
@@ -2670,8 +2843,10 @@ title="Stable Diffusion regenerates each template's text regions into empty card
 <button class=btn onclick="post('tts_spawn',{card:ed.g.id})"
 title="drop this card onto the table of your RUNNING Tabletop Simulator — appears instantly, any game/mod">&#9654; Drop into TTS</button>
 <button class=btn onclick=edClose()>Done</button></div>
+<div id=ed_main>
+<div id=ed_left>
 <div id=ed_stage>
-<img id=ed_face><div id=ed_win><img id=ed_art draggable=false></div>
+<img id=ed_face><div id=ed_win><img id=ed_art draggable=false></div><img id=ed_furniture><div id=ed_regions></div>
 </div>
 <div class=row><span class=hint>art for this card — pick one, or bring your own:</span>
 <button class=btn style="font-size:12px;padding:5px 12px" onclick="document.getElementById('ed_file').click()">Upload image&hellip;</button>
@@ -2679,27 +2854,41 @@ title="drop this card onto the table of your RUNNING Tabletop Simulator — appe
 <input type=file id=ed_file accept="image/*" style="display:none" onchange=edUpload(this)>
 </div>
 <div id=ed_strip></div>
-<div class=row style="margin-top:10px">
-<label>title font</label><select id=ed_font_title onchange=edFontSet()></select>
-<label>stat font</label><select id=ed_font_stat onchange=edFontSet()></select>
-<label>body font</label><select id=ed_font_body onchange=edFontSet()></select>
-<button class=btn style="font-size:12px;padding:5px 12px" onclick="document.getElementById('ed_fontfile').click()">Upload font&hellip;</button>
-<input type=file id=ed_fontfile accept=".ttf,.otf" style="display:none" onchange=edFontUpload(this)>
-<span class=hint>per-card override &mdash; &ldquo;default&rdquo; follows the official stack
-(Arkhamic titles/cost, Bolton stats, Arno/Minion body); recomposes instantly</span>
 </div>
-<div id=ed_typebar class=row style="margin-top:8px;padding:8px 10px;background:rgba(120,150,190,.10);border:1px solid rgba(120,150,190,.28);border-radius:8px;align-items:center">
-<b style="font-size:12px">Text style</b>
-<span class=hint>for area:</span><b id=ty_field style="color:var(--accent)">click an area on the card, or a field below</b>
-<span class=spacer></span>
-<label>font</label><select id=ty_font onchange=tySet() style="max-width:200px"></select>
-<label>size</label><input type=range id=ty_size min=0.6 max=1.8 step=0.02 value=1 style="width:110px" oninput="ty_pct.textContent=Math.round(this.value*100)+'%'" onchange=tySet()>
-<span id=ty_pct class=stat>100%</span>
+<div id=ed_side>
+<b style="font-size:13px">Selected area</b>
+<div style="margin:3px 0 8px"><b id=ty_field style="color:var(--accent)">click an area on the card</b></div>
+<div id=ed_side_textwrap style="display:none;margin-bottom:10px">
+<label style="display:block;margin-bottom:3px">text</label>
+<textarea id=ed_side_text rows=3 spellcheck=false style="width:100%;box-sizing:border-box;resize:vertical" oninput=edSideText()></textarea>
+<div class=hint style="margin-top:3px">type here, or drag the box on the card to move it</div>
+</div>
+<div class=ed_side_grp>
+<label>font</label><select id=ty_font onchange=tySet() style="width:100%"></select>
+</div>
+<div class=ed_side_grp>
+<label>size <span id=ty_pct class=stat>100%</span></label>
+<input type=range id=ty_size min=0.6 max=1.8 step=0.02 value=1 style="width:100%" oninput="ty_pct.textContent=Math.round(this.value*100)+'%'" onchange=tySet()>
+</div>
+<div class=row style="gap:12px;margin:2px 0">
 <label style="cursor:pointer"><input type=checkbox id=ty_bold onchange=tySet()> <b>B</b></label>
 <label style="cursor:pointer"><input type=checkbox id=ty_italic onchange=tySet()> <i>I</i></label>
-<button class=btn style="font-size:11px;padding:4px 10px" onclick="tyBind('stats')" title="style ALL stat numerals on this card (cost, skills, shroud, doom...)">stat numbers</button>
 <label style="cursor:pointer" title="apply this text style to EVERY card, not just this one"><input type=checkbox id=ty_all onchange=tySet()> all cards</label>
-<button class=btn style="font-size:11px;padding:4px 10px" onclick=tyReset()>Reset area</button>
+</div>
+<div class=row style="gap:6px;flex-wrap:wrap;margin-top:4px">
+<button class=btn style="font-size:11px;padding:4px 10px" onclick="tyBind('stats')" title="style ALL stat numerals on this card (cost, skills, shroud, doom...)">stat numbers</button>
+<button class=btn style="font-size:11px;padding:4px 10px" onclick=tyReset()>Reset style</button>
+<button class=btn style="font-size:11px;padding:4px 10px" onclick=edMoveReset() title="return this text box to its authored position">Reset position</button>
+</div>
+<hr style="margin:10px 0;border-color:rgba(120,150,190,.28)">
+<b style="font-size:12px">Card fonts</b>
+<span class=hint style="display:block;margin:2px 0 4px">whole-card override &mdash; &ldquo;default&rdquo; follows the official stack</span>
+<div class=ed_side_grp><label>title</label><select id=ed_font_title onchange=edFontSet() style="width:100%"></select></div>
+<div class=ed_side_grp><label>stat</label><select id=ed_font_stat onchange=edFontSet() style="width:100%"></select></div>
+<div class=ed_side_grp><label>body</label><select id=ed_font_body onchange=edFontSet() style="width:100%"></select></div>
+<button class=btn style="font-size:12px;padding:5px 12px;margin-top:4px" onclick="document.getElementById('ed_fontfile').click()">Upload font&hellip;</button>
+<input type=file id=ed_fontfile accept=".ttf,.otf" style="display:none" onchange=edFontUpload(this)>
+</div>
 </div>
 <div style="margin-top:14px"><h2>Card content <small>type directly — blank returns a field to the authored version; saves affect THIS card only</small></h2>
 <div class=row>
@@ -2943,7 +3132,14 @@ async function useAndEdit(id,v){await post('choose',{card:id,file:v});
 const c=((LS&&LS.cards)||[]).find(x=>x.id===id);
 if(c){tab('cards');editArt(Object.assign({},c,{chosen:v,face:true}));}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')zoomClose();});
-function camp(){return document.getElementById('campaign').value||'still_hour'}
+// last campaign the owner had open, so the app reopens it instead of always
+// dumping you back in the finished Still Hour set
+let START_CAMP='';try{START_CAMP=localStorage.getItem('cf_campaign')||'';}catch(_){}
+let CAMP_INIT=false;
+function camp(){return document.getElementById('campaign').value||START_CAMP||'still_hour'}
+function campPick(){const v=document.getElementById('campaign').value;
+START_CAMP=v;try{localStorage.setItem('cf_campaign',v);}catch(_){}
+if(typeof ed!=='undefined'&&ed)edClose();refresh();}
 async function post(action,params){params=params||{};params.campaign=camp();
 const r=await fetch('/api/'+action,{method:'POST',body:JSON.stringify(params)});
 const j=await r.json();if(j.message)addlog(j.message);refresh();return j;}
@@ -3052,6 +3248,12 @@ const sel=document.getElementById('campaign');
 if(sel.options.length!==s.campaigns.length){sel.innerHTML='';
 for(const c of s.campaigns){const o=document.createElement('option');o.value=o.text=c;
 if(c===s.campaign)o.selected=true;sel.add(o);}}
+// first paint only: land on the remembered campaign, or the server's default
+// (newest non-Still-Hour) — never override a live manual switch afterwards
+if(!CAMP_INIT){CAMP_INIT=true;
+let want=(START_CAMP&&s.campaigns.includes(START_CAMP))?START_CAMP:(s.default_campaign||s.campaign);
+if(want&&s.campaigns.includes(want)&&want!==s.campaign){
+START_CAMP=want;sel.value=want;return refresh();}}
 document.getElementById('busydot').className='dot'+(s.busy?' busy':'');
 const kind=s.backend||'a1111';{const rk=document.getElementById('rig_kind');if(rk&&document.activeElement!==rk)rk.value=kind;}
 const rg=(s.rig||{})[kind]||{};
@@ -3164,7 +3366,8 @@ if(!c.face){await post('compose_one',{card:c.id});c.face=true;}
 ed={g:c,scale:(c.placement||{scale:1}).scale,ox:(c.placement||{ox:0}).ox,
 oy:(c.placement||{oy:0}).oy,natW:0,natH:0,disp:1};
 const[cw,ch,x0,y0,x1,y1]=c.artbox;
-const disp=Math.min(1,820/cw);ed.disp=disp;
+// half the old size — the card sits beside the properties panel now
+const disp=Math.min(1,410/cw);ed.disp=disp;
 const stage=document.getElementById('ed_stage');
 stage.style.width=(cw*disp)+'px';stage.style.height=(ch*disp)+'px';
 const face=document.getElementById('ed_face');
@@ -3173,6 +3376,9 @@ face.style.width=(cw*disp)+'px';
 const win=document.getElementById('ed_win');
 win.style.left=(x0*disp)+'px';win.style.top=(y0*disp)+'px';
 win.style.width=((x1-x0)*disp)+'px';win.style.height=((y1-y0)*disp)+'px';
+const furn=document.getElementById('ed_furniture');
+furn.style.width=(cw*disp)+'px';furn.style.display='none';
+face.style.display='block';  // shown as the placeholder until furniture loads
 document.getElementById('ed_title').textContent=c.name;
 document.getElementById('ed_scale').value=ed.scale;
 for(const [id,cur] of [['ed_font_title',(c.fonts||{}).title||''],
@@ -3183,7 +3389,7 @@ document.getElementById('ed_scale').value=ed.scale;
 document.getElementById('ed_scaley').value=(c.placement||{}).scale_y||ed.scale;
 ccFill(c);
 document.getElementById('ty_all').checked=false;tyBind('name');
-edStrip();edLoadArt();edPromptLoad(c.id);
+edStrip();edLoadArt();edPromptLoad(c.id);edRegions();edFurnitureRefresh();
 document.getElementById('chips_cards').style.display='none';
 document.getElementById('cardgroups').style.display='none';
 document.getElementById('editor').style.display='block';
@@ -3385,7 +3591,14 @@ fillFontSel('ty_font',st.font||'');
 const sz=st.size||1;document.getElementById('ty_size').value=sz;
 document.getElementById('ty_pct').textContent=Math.round(sz*100)+'%';
 document.getElementById('ty_bold').checked=!!st.bold;
-document.getElementById('ty_italic').checked=!!st.italic;}
+document.getElementById('ty_italic').checked=!!st.italic;
+// mirror the selected area's text into the side panel (name/subtitle/traits/
+// rules/flavor have a text field; stats/victory don't)
+const wrap=document.getElementById('ed_side_textwrap');
+const cc=FIELD_CC[field];
+if(wrap){if(cc){const dst=document.getElementById(cc);
+document.getElementById('ed_side_text').value=dst?dst.value:'';
+wrap.style.display='';}else{wrap.style.display='none';}}}
 async function tySet(){if(!ed||!TY_FIELD)return;
 const all=document.getElementById('ty_all').checked;
 const body={card:all?'_default':ed.g.id,field:TY_FIELD,
@@ -3504,8 +3717,10 @@ if(j.file){ed.g.variants=(ed.g.variants||[]).concat([j.file]);ed.g.chosen=j.file
 ed.scale=1;ed.ox=0;ed.oy=0;document.getElementById('ed_scale').value=1;
 edStrip();edLoadArt();edFaceRefresh();}};
 rd.readAsDataURL(f);input.value='';}
-function edFaceRefresh(){document.getElementById('ed_face').src=
-'/art?p=art/faces/'+ed.g.id+'.png&ts='+Date.now();}
+function edFaceRefresh(){if(!ed)return;
+document.getElementById('ed_face').src=
+'/art?p=art/faces/'+ed.g.id+'.png&ts='+Date.now();
+edFurnitureRefresh();}
 function edPreview(){if(!ed||!ed.natW)return;
 ed.scale=parseFloat(document.getElementById('ed_scale').value);
 ed.scaleY=parseFloat(document.getElementById('ed_scaley').value)||ed.scale;
@@ -3524,19 +3739,84 @@ ed.ox=drag.ox+(e.clientX-drag.x)/ed.disp;ed.oy=drag.oy+(e.clientY-drag.y)/ed.dis
 window.addEventListener('mouseup',()=>{drag=null;win.style.cursor='grab';});
 win.addEventListener('wheel',e=>{e.preventDefault();const s=document.getElementById('ed_scale');
 s.value=Math.max(0.5,Math.min(6,parseFloat(s.value)-e.deltaY*0.0012));edPreview();});})();
-document.getElementById('ed_stage').addEventListener('click',e=>{
-if(!ed||!ed.g.regions)return;
-if(e.target.id==='ed_win'||e.target.id==='ed_art')return;
-const r=document.getElementById('ed_stage').getBoundingClientRect();
-const x=(e.clientX-r.left)/ed.disp, y=(e.clientY-r.top)/ed.disp;
-for(const f in ed.g.regions){const b=ed.g.regions[f];
-if(x>=b[0]&&x<=b[2]&&y>=b[1]&&y<=b[3]){
-const el=document.getElementById('cc_'+f);if(!el)continue;
-el.focus();if(el.select)el.select();
-el.style.outline='2px solid var(--accent)';
-setTimeout(()=>{el.style.outline='';},900);
-el.scrollIntoView({block:'center',behavior:'smooth'});
-return;}}});
+// ---- live furniture overlay: frame + text + discs on a transparent window,
+// composed by the server and laid over the draggable art so art reads BEHIND
+// the frame exactly as the finished card does ----
+async function edFurnitureRefresh(){if(!ed)return;const id=ed.g.id;
+const furn=document.getElementById('ed_furniture');
+const face=document.getElementById('ed_face');
+try{await post('compose_furniture',{card:id});}catch(_){}
+if(!ed||ed.g.id!==id)return;
+// once the furniture overlay (frame+text+discs, transparent window) is up we
+// HIDE the baked face — otherwise its baked-in art shows behind the live art
+// and reads as a duplicate when you drag or scroll. Furniture failing falls
+// back to the baked face so the preview is never blank.
+furn.onload=()=>{furn.style.display='block';face.style.display='none';};
+furn.onerror=()=>{furn.style.display='none';face.style.display='block';};
+furn.src='/art?p=art/faces/'+id+'-furniture.png&ts='+Date.now();
+edRegions();}
+// ---- editable text boxes ON the card. name and rules text can be dragged to
+// reposition (saved as a per-field offset the renderer honours); every text
+// area selects into the side panel. Stat numerals select but don't drag. ----
+const FIELD_CC={name:'cc_name',subtitle:'cc_subtitle',traits:'cc_traits',
+text:'cc_text',flavor:'cc_flavor'};
+function edRegionField(key){
+// which saved text field a clicked region maps to
+if(key==='name'||key==='text')return {field:key,drag:true};
+return {field:'stats',drag:false};}
+let ED_SEL=null;
+function edRegions(){const host=document.getElementById('ed_regions');if(!host)return;
+host.innerHTML='';if(!ed||!ed.g.regions)return;
+for(const key in ed.g.regions){const b=ed.g.regions[key];if(!b)continue;
+const rf=edRegionField(key);const st=(ed.g.type_styles||{})[rf.field]||{};
+const dx=(rf.drag?(st.dx||0):0),dy=(rf.drag?(st.dy||0):0);
+const el=document.createElement('div');el.className='ed_rg'+(ED_SEL===key?' sel':'');
+el.dataset.key=key;
+el.style.left=((b[0]+dx)*ed.disp)+'px';el.style.top=((b[1]+dy)*ed.disp)+'px';
+el.style.width=((b[2]-b[0])*ed.disp)+'px';el.style.height=((b[3]-b[1])*ed.disp)+'px';
+if(!rf.drag)el.style.cursor='pointer';
+el.title=rf.drag?'drag to move · click to edit':'click to style';
+host.appendChild(el);}}
+(function(){let rdrag=null;
+document.getElementById('ed_regions').addEventListener('mousedown',e=>{
+const el=e.target.closest('.ed_rg');if(!el||!ed)return;e.preventDefault();
+const key=el.dataset.key;const rf=edRegionField(key);
+edSelectRegion(key);
+if(!rf.drag)return;
+const st=(ed.g.type_styles||{})[rf.field]||{};
+rdrag={el,key,field:rf.field,x:e.clientX,y:e.clientY,
+dx0:st.dx||0,dy0:st.dy||0,base:{l:parseFloat(el.style.left),t:parseFloat(el.style.top)},moved:false};});
+window.addEventListener('mousemove',e=>{if(!rdrag)return;
+const mx=e.clientX-rdrag.x,my=e.clientY-rdrag.y;
+if(Math.abs(mx)+Math.abs(my)>2)rdrag.moved=true;
+rdrag.el.style.left=(rdrag.base.l+mx)+'px';rdrag.el.style.top=(rdrag.base.t+my)+'px';});
+window.addEventListener('mouseup',async e=>{if(!rdrag)return;const d=rdrag;rdrag=null;
+if(!d.moved||!ed)return;
+const ndx=Math.round(d.dx0+(e.clientX-d.x)/ed.disp);
+const ndy=Math.round(d.dy0+(e.clientY-d.y)/ed.disp);
+const j=await post('field_pos',{card:ed.g.id,field:d.field,dx:ndx,dy:ndy});
+if(j.ok){ed.g.type_styles=ed.g.type_styles||{};
+const cur=Object.assign({},ed.g.type_styles[d.field]||{});
+if(ndx)cur.dx=ndx;else delete cur.dx;if(ndy)cur.dy=ndy;else delete cur.dy;
+if(Object.keys(cur).length)ed.g.type_styles[d.field]=cur;else delete ed.g.type_styles[d.field];
+edFaceRefresh();addlog('moved '+d.field);}});})();
+function edSelectRegion(key){ED_SEL=key;
+const rf=edRegionField(key);tyBind(rf.field);
+for(const el of document.querySelectorAll('.ed_rg'))
+el.classList.toggle('sel',el.dataset.key===key);}
+function edMoveReset(){if(!ed||!ED_SEL)return;const rf=edRegionField(ED_SEL);
+if(!rf.drag)return;
+post('field_pos',{card:ed.g.id,field:rf.field,dx:0,dy:0}).then(j=>{if(!j.ok)return;
+if(ed.g.type_styles&&ed.g.type_styles[rf.field]){
+delete ed.g.type_styles[rf.field].dx;delete ed.g.type_styles[rf.field].dy;
+if(!Object.keys(ed.g.type_styles[rf.field]).length)delete ed.g.type_styles[rf.field];}
+edFaceRefresh();addlog('reset '+rf.field+' position');});}
+// side-panel text editor mirrors the selected area's content field
+let ED_TXT_T=null;
+function edSideText(){const cc=FIELD_CC[TY_FIELD];if(!cc)return;
+const src=document.getElementById('ed_side_text');const dst=document.getElementById(cc);
+if(dst){dst.value=src.value;}
+clearTimeout(ED_TXT_T);ED_TXT_T=setTimeout(()=>{if(ed)ccSave();},700);}
 async function edSave(){if(!ed)return;
 const body={card:ed.g.id,scale:ed.scale,ox:ed.ox,oy:ed.oy};
 if(ed.scaleY&&Math.abs(ed.scaleY-ed.scale)>0.001)body.scale_y=ed.scaleY;
@@ -3545,6 +3825,7 @@ edFaceRefresh();addlog(ed.g.id+' recomposed');}
 function edClose(){document.getElementById('editor').style.display='none';
 document.getElementById('chips_cards').style.display='';
 document.getElementById('cardgroups').style.display='';
+ED_SEL=null;document.getElementById('ed_furniture').style.display='none';
 ed=null;refresh();}
 function applyArt(){post('apply',{mode:document.getElementById('applymode').value,
 base_url:document.getElementById('baseurl').value});}
@@ -4001,11 +4282,16 @@ else alert(j.message||'could not create the card');}
 async function campNew(){
 const name=prompt('Name the new campaign (e.g. "The Hollow Winter"):');
 if(!name)return;
-const j=await post('campaign_new',{name});
-if(j.ok){addlog('campaign created: '+j.name);
-await refresh();
-const sel=document.getElementById('campaign');sel.value=j.id;refresh();
-alert('Created "'+j.name+'".\n\nNow use 5 · Scenarios → Import campaign JSON to pour your written campaign into it.');}
+const seed=confirm('Seed it with a starter scenario at the recommended card '
++'counts?\n\n(4 locations · 2 acts · 9 agendas · 13 encounter · 1 reference '
++'— blank placeholders on their real templates, all editable.)\n\n'
++'OK = seed · Cancel = empty campaign');
+const j=await post('campaign_new',{name,seed});
+if(j.ok){addlog('campaign created: '+j.name+(j.seeded?' (+'+j.seeded+' cards)':''));
+const sel=document.getElementById('campaign');sel.value=j.id;campPick();
+alert('Created "'+j.name+'".'+(j.seeded?('\n\nSeeded '+j.seeded+' placeholder cards into Scenario 1 '
++'— rename and edit them in 3 · Cards, or arrange them in 4 · Campaign / scenarios.')
+:'\n\nUse 4 · Campaign / scenarios → Import campaign JSON to pour a written campaign into it.'));}
 else alert(j.message||'could not create the campaign');}
 async function campCompile(){const el=document.getElementById('camp_out');
 el.textContent='compiling\u2026';
