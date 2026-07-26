@@ -3563,11 +3563,15 @@ ccPropsDraw(t,ct);}
 // Per type, so a Location editor never shows "elite" and an Act never shows
 // "cost". Nothing here needs a JSON edit any more.
 const CLASSES=['Guardian','Seeker','Rogue','Mystic','Survivor','Neutral','Mythos'];
+// the eight canonical asset slots — each maps to a frame overlay (Hand, two
+// Hands, Arcane, two Arcane, Ally, Body, Accessory, Tarot)
+const SLOTS=['Hand','Hand x2','Arcane','Arcane x2','Ally','Body','Accessory','Tarot'];
 const CC_PROPS={
 Investigator:[['class','class','sel',CLASSES],
   ['deck','ArkhamDB deck id','txt'],
   ['elderSign','elder sign [elder] effect','txt']],
-Asset:[['class','class','sel',CLASSES],['uses','uses (e.g. 3 supplies)','txt'],
+Asset:[['class','class','sel',CLASSES],['slot','slot','sel',SLOTS],
+  ['uses','uses (e.g. 3 supplies)','txt'],
   ['memoryCost','memory cost','num'],['permanent','permanent','chk']],
 Event:[['class','class','sel',CLASSES],['memoryCost','memory cost','num']],
 Skill:[['class','class','sel',CLASSES],['wildIcons','wild icons','num'],
