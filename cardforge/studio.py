@@ -2186,6 +2186,7 @@ def status(campaign="still_hour"):
     return {"busy": _busy.is_set(), "last_job": dict(LAST_JOB),
             "build": build_stamp(),
             "campaign": campaign, "campaigns": campaigns,
+            "campaign_name": camp.get("name") or campaign,
             "default_campaign": default_campaign,
             "backend": camp.get("backend"), "checkpoint": camp.get("checkpoint"),
             "style": {"lora": camp.get("style_lora", ""),
@@ -2625,7 +2626,7 @@ border-radius:12px;padding:10px 14px;margin-bottom:10px;background:var(--surface
 .hint{color:var(--dim);font-size:12px}
 hr{border:none;border-top:1px solid var(--line);margin:16px 0}
 </style></head><body>
-<header><h1>CardForge Studio</h1><span class=sub>THE STILL HOUR · fan content</span>
+<header><h1>CardForge Studio</h1><span class=sub id=hdr_sub>fan content</span>
 <span id=build class=stat title="the build actually running right now — if this doesn't match your latest pull, restart the app">v…</span>
 <span class=spacer></span>
 <span id=busy class=stat><span class=dot id=busydot></span><span id=busytext>idle</span></span>
@@ -2816,12 +2817,12 @@ title="Stable Diffusion regenerates each template's text regions into empty card
 </div></details>
 <div class=row style="margin:6px 0 10px;padding:10px;border:1px solid var(--line);border-radius:9px">
 <b style="font-size:12px">New card</b>
-<select id=nc_type>
+<select id=nc_type onchange=ncClassVis()>
 <option>Location</option><option>Enemy</option><option>Treachery</option>
 <option>Asset</option><option>Event</option><option>Skill</option>
 <option>Investigator</option><option>Agenda</option><option>Act</option>
 <option>Scenario</option><option>Story</option></select>
-<select id=nc_class title="class / faction — Mythos for encounter cards">
+<select id=nc_class title="class / faction — only player cards carry a class">
 <option value="">class…</option><option>Guardian</option><option>Seeker</option>
 <option>Rogue</option><option>Mystic</option><option>Survivor</option>
 <option>Neutral</option><option>Mythos</option></select>
@@ -2842,6 +2843,8 @@ title="Stable Diffusion regenerates each template's text regions into empty card
 <button class="btn primary" onclick=edSave()>Save</button>
 <button class=btn onclick="post('tts_spawn',{card:ed.g.id})"
 title="drop this card onto the table of your RUNNING Tabletop Simulator — appears instantly, any game/mod">&#9654; Drop into TTS</button>
+<button class=btn onclick=edDelete() style="color:#e06a5a;border-color:rgba(224,106,90,.4)"
+title="delete this card (hand-made cards only)">&#128465; Delete</button>
 <button class=btn onclick=edClose()>Done</button></div>
 <div id=ed_main>
 <div id=ed_left>
@@ -2934,12 +2937,12 @@ title="drop this card onto the table of your RUNNING Tabletop Simulator — appe
 <label>back / deck-building text</label><textarea id=cc_back rows=4 spellcheck=false onfocus="glyphTarget('cc_back')"></textarea>
 <label>back flavor</label><textarea id=cc_backflavor rows=2 spellcheck=false onfocus="glyphTarget('cc_backflavor')"></textarea>
 </div>
-<div class=row id=ed_symbols style="margin:2px 0 4px;gap:5px;flex-wrap:wrap;align-items:center">
+<div class=row id=ed_symbols style="margin:2px 0 4px;gap:5px;flex-wrap:nowrap;overflow-x:auto;align-items:center">
 <span class=hint>insert symbol&nbsp;&mdash;&nbsp;click into rules/flavor first:</span></div>
 <label>rules text</label><textarea id=cc_text rows=5 spellcheck=false onfocus="tyBind('text');glyphTarget('cc_text')"></textarea>
 <label>flavor</label><textarea id=cc_flavor rows=2 spellcheck=false onfocus="tyBind('flavor');glyphTarget('cc_flavor')"></textarea>
 <div class=row style="margin-top:6px">
-<button class="btn primary" onclick=ccSave()>Save content</button>
+<span class=hint>use <b>Save</b> at the top — it saves the text, the art and the layout together</span>
 <span id=cc_info class=hint></span>
 </div></div>
 <details id=ed_promptbox style="margin-top:12px">
@@ -3248,6 +3251,9 @@ const sel=document.getElementById('campaign');
 if(sel.options.length!==s.campaigns.length){sel.innerHTML='';
 for(const c of s.campaigns){const o=document.createElement('option');o.value=o.text=c;
 if(c===s.campaign)o.selected=true;sel.add(o);}}
+// header subtitle follows the campaign you're actually in, not a fixed title
+{const hs=document.getElementById('hdr_sub');
+if(hs)hs.textContent=((s.campaign_name||s.campaign||'')+' · fan content');}
 // first paint only: land on the remembered campaign, or the server's default
 // (newest non-Still-Hour) — never override a live manual switch afterwards
 if(!CAMP_INIT){CAMP_INIT=true;
@@ -3817,16 +3823,24 @@ function edSideText(){const cc=FIELD_CC[TY_FIELD];if(!cc)return;
 const src=document.getElementById('ed_side_text');const dst=document.getElementById(cc);
 if(dst){dst.value=src.value;}
 clearTimeout(ED_TXT_T);ED_TXT_T=setTimeout(()=>{if(ed)ccSave();},700);}
+// one Save: writes the content fields AND the art placement, then recomposes
+// so the preview reflects it immediately
 async function edSave(){if(!ed)return;
+await ccSave();
 const body={card:ed.g.id,scale:ed.scale,ox:ed.ox,oy:ed.oy};
 if(ed.scaleY&&Math.abs(ed.scaleY-ed.scale)>0.001)body.scale_y=ed.scaleY;
 await post('place',body);
-edFaceRefresh();addlog(ed.g.id+' recomposed');}
+edFaceRefresh();addlog(ed.g.id+' saved');}
 function edClose(){document.getElementById('editor').style.display='none';
 document.getElementById('chips_cards').style.display='';
 document.getElementById('cardgroups').style.display='';
 ED_SEL=null;document.getElementById('ed_furniture').style.display='none';
 ed=null;refresh();}
+async function edDelete(){if(!ed)return;
+if(!confirm('Delete "'+(ed.g.name||ed.g.id)+'"?\n\nThis removes the card from this campaign.'))return;
+const j=await post('card_delete',{card:ed.g.id});
+if(j.ok){addlog('card deleted: '+ed.g.id);edClose();}
+else alert(j.message||'could not delete this card');}
 function applyArt(){post('apply',{mode:document.getElementById('applymode').value,
 base_url:document.getElementById('baseurl').value});}
 // ---------------- scenario deck-builder ----------------
@@ -4269,6 +4283,12 @@ document.getElementById('camp_spawn').disabled=!(total&&locked===total);
 const pool=document.getElementById('scen_pool_cards');pool.innerHTML='';
 for(const c of ((LS&&LS.cards)||[]))if(!assigned.has(c.id))pool.appendChild(dcardEl(c.id));
 stackDropify(document.getElementById('scen_pool'));}
+// only player cards carry a class/faction — hide the picker for encounter and
+// mythos types (Enemy, Location, Treachery, Agenda, Act, Scenario, Story)
+function ncClassVis(){const t=document.getElementById('nc_type').value;
+const cls=document.getElementById('nc_class');
+const show=['Investigator','Asset','Event','Skill'].includes(t);
+cls.style.display=show?'':'none';if(!show)cls.value='';}
 async function cardNew(){
 const name=document.getElementById('nc_name').value.trim();
 if(!name){alert('Give the card a name first.');return;}
@@ -4308,7 +4328,7 @@ addlog('campaign feed: '+j.created.length+' new, '+j.updated.length+' updated, '
 await refresh();scenBuild();}
 else{info.textContent='import failed: '+(j.message||'');}};
 rd.readAsText(f);input.value='';}
-symInit();refresh();poll();setInterval(refresh,4000);
+symInit();ncClassVis();refresh();poll();setInterval(refresh,4000);
 </script></body></html>"""
 
 
