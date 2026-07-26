@@ -406,12 +406,21 @@ def _font(size, bold=False, italic=False, glyph=False, title=False,
     return ImageFont.load_default()
 
 
-def wrap_runs(draw, text, size, max_width, italic=False, bold=False,
-              font_file=None):
-    """Wrap [markup] text into lines of (is_glyph, chunk) runs."""
+# a hair of breathing space after an inline icon before the word it precedes,
+# and a real gap between rules paragraphs so short abilities don't run together
+GLYPH_PAD_FRAC = 0.16
+PARA_GAP_FRAC = 0.45
+
+
+def _para_lines(draw, text, size, max_width, italic=False, bold=False,
+                font_file=None):
+    """Wrap [markup] text into a list of paragraphs, each a list of lines of
+    (is_glyph, chunk) runs. Paragraph structure is preserved so callers can put
+    a gap between abilities."""
     tfont = _font(size, italic=italic, bold=bold, font_file=font_file)
     gfont = _font(size, glyph=True)
-    lines = []
+    gpad = int(size * GLYPH_PAD_FRAC)
+    paras = []
     for paragraph in text.split("\n"):
         words = []
         for is_glyph, chunk in glyphify(paragraph):
@@ -419,18 +428,38 @@ def wrap_runs(draw, text, size, max_width, italic=False, bold=False,
                 words.append((True, chunk))
             else:
                 words.extend((False, w) for w in chunk.split(" ") if w != "")
-        line, width = [], 0.0
+        lines, line, width = [], [], 0.0
         for is_glyph, w in words:
             font = gfont if is_glyph else tfont
             piece = w if is_glyph else (w + " ")
-            plen = draw.textlength(piece, font=font)
+            plen = draw.textlength(piece, font=font) + (gpad if is_glyph else 0)
             if line and width + plen > max_width:
                 lines.append(line)
                 line, width = [], 0.0
             line.append((is_glyph, piece))
             width += plen
         lines.append(line or [(False, "")])
+        paras.append(lines)
+    return paras
+
+
+def wrap_runs(draw, text, size, max_width, italic=False, bold=False,
+              font_file=None):
+    """Wrap [markup] text into lines of (is_glyph, chunk) runs (paragraphs
+    flattened)."""
+    lines = []
+    for para in _para_lines(draw, text, size, max_width, italic=italic,
+                            bold=bold, font_file=font_file):
+        lines.extend(para)
     return lines
+
+
+def _wrapped_height(text, size, nlines, leading):
+    """Total drawn height of `nlines` lines plus the gap between paragraphs, so
+    the fit search reserves room for the same spacing draw_wrapped lays down."""
+    lh = int(size * leading)
+    pgap = int(lh * PARA_GAP_FRAC)
+    return nlines * lh + max(0, text.count("\n")) * pgap
 
 
 def draw_wrapped(draw, text, x, y, size, max_width, fill, italic=False,
@@ -442,17 +471,24 @@ def draw_wrapped(draw, text, x, y, size, max_width, fill, italic=False,
     # them from the line top
     tasc, _ = tfont.getmetrics()
     gmid = int(tasc * 0.60)
-    for line in wrap_runs(draw, text, size, max_width, italic=italic,
-                          bold=bold, font_file=font_file):
-        cx = x
-        for is_glyph, piece in line:
-            if is_glyph:
-                draw.text((cx, y + gmid), piece, font=gfont, fill=fill, anchor="lm")
-                cx += draw.textlength(piece, font=gfont)
-            else:
-                draw.text((cx, y), piece, font=tfont, fill=fill)
-                cx += draw.textlength(piece, font=tfont)
-        y += int(size * leading)
+    gpad = int(size * GLYPH_PAD_FRAC)
+    lh = int(size * leading)
+    pgap = int(lh * PARA_GAP_FRAC)
+    for pi, lines in enumerate(_para_lines(draw, text, size, max_width,
+                                           italic=italic, bold=bold,
+                                           font_file=font_file)):
+        if pi:
+            y += pgap
+        for line in lines:
+            cx = x
+            for is_glyph, piece in line:
+                if is_glyph:
+                    draw.text((cx, y + gmid), piece, font=gfont, fill=fill, anchor="lm")
+                    cx += draw.textlength(piece, font=gfont) + gpad
+                else:
+                    draw.text((cx, y), piece, font=tfont, fill=fill)
+                    cx += draw.textlength(piece, font=tfont)
+            y += lh
     return y
 
 
@@ -957,7 +993,7 @@ def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
 
 
 def _box_block(d, text, box, fill=PSD_INK, start=30, min_size=15,
-               italic=False, leading=1.18, bold=False, key=None):
+               italic=False, leading=1.24, bold=False, key=None):
     """Wrapped [markup] text fitted into a box (shrinks until it fits).
 
     `key` names the editable area; a per-area typography override (font/size/
@@ -979,7 +1015,7 @@ def _box_block(d, text, box, fill=PSD_INK, start=30, min_size=15,
     for size in range(start, min_size - 1, -1):
         n = len(wrap_runs(d, text, size, bw, italic=italic, bold=bold,
                           font_file=font_file))
-        if n * int(size * leading) <= box[3] - box[1]:
+        if _wrapped_height(text, size, n, leading) <= box[3] - box[1]:
             break
     return draw_wrapped(d, text, box[0], box[1], size, bw, fill,
                         italic=italic, leading=leading, bold=bold,
@@ -1005,10 +1041,15 @@ def _flow_around(d, text, box, obstacle, start=22, min_size=13, fill=PSD_INK,
         tfont = _font(size, italic=italic)
         gfont = _font(size, glyph=True)
         lh = int(size * leading)
+        gpad = int(size * GLYPH_PAD_FRAC)
+        pgap = int(lh * PARA_GAP_FRAC)
         y = top
         placed = []
         fits = True
-        for para in text.split("\n"):
+        paras = text.split("\n")
+        for pi, para in enumerate(paras):
+            if pi:
+                y += pgap   # breathing room between abilities
             words = []
             for is_g, chunk in glyphify(para):
                 if is_g:
@@ -1020,7 +1061,7 @@ def _flow_around(d, text, box, obstacle, start=22, min_size=13, fill=PSD_INK,
             for is_g, w in words:
                 font = gfont if is_g else tfont
                 piece = w if is_g else w + " "
-                pl = d.textlength(piece, font=font)
+                pl = d.textlength(piece, font=font) + (gpad if is_g else 0)
                 if line and lw + pl > aw:
                     placed.append((y, lx, line))
                     y += lh
@@ -1032,7 +1073,7 @@ def _flow_around(d, text, box, obstacle, start=22, min_size=13, fill=PSD_INK,
                 lw += pl
             placed.append((y, lx, line))
             y += lh
-            if y + lh > bottom and para != text.split("\n")[-1]:
+            if y + lh > bottom and pi != len(paras) - 1:
                 fits = False
         return placed, y, fits
 
@@ -1045,14 +1086,16 @@ def _flow_around(d, text, box, obstacle, start=22, min_size=13, fill=PSD_INK,
     # centre inline icons vertically on the text line, like the official cards
     tasc, _ = _font(size, italic=italic).getmetrics()
     gmid = int(tasc * 0.60)
+    gpad = int(size * GLYPH_PAD_FRAC)
     for ly, lx, line in placed:
         cx = lx
         for is_g, piece, font in line:
             if is_g:
                 d.text((cx, ly + gmid), piece, font=font, fill=fill, anchor="lm")
+                cx += d.textlength(piece, font=font) + gpad
             else:
                 d.text((cx, ly), piece, font=font, fill=fill)
-            cx += d.textlength(piece, font=font)
+                cx += d.textlength(piece, font=font)
     return endy
 
 
