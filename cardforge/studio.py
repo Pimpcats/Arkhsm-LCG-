@@ -2277,6 +2277,9 @@ class Handler(BaseHTTPRequestHandler):
             body = PAGE.encode()
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
+            # a dev tool that reloads on pull — never let the browser serve a
+            # stale page, or new UI silently won't appear after an update
+            self.send_header("Cache-Control", "no-store")
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
@@ -2497,7 +2500,7 @@ border-radius:12px;padding:12px 14px}
 #ed_side .ed_side_grp{margin:6px 0}
 #ed_side .ed_side_grp label{display:block;margin-bottom:2px}
 #ed_stage{position:relative;margin:12px auto;overflow:hidden;border-radius:10px;
-border:1px solid var(--line)}
+border:1px solid var(--line);background:#14151b}
 #ed_face{display:block;user-select:none;pointer-events:none}
 #ed_win{position:absolute;overflow:hidden;cursor:grab;outline:2px dashed var(--accent);
 outline-offset:-2px;border-radius:2px;z-index:1}
@@ -3375,6 +3378,7 @@ win.style.left=(x0*disp)+'px';win.style.top=(y0*disp)+'px';
 win.style.width=((x1-x0)*disp)+'px';win.style.height=((y1-y0)*disp)+'px';
 const furn=document.getElementById('ed_furniture');
 furn.style.width=(cw*disp)+'px';furn.style.display='none';
+face.style.display='block';  // shown as the placeholder until furniture loads
 document.getElementById('ed_title').textContent=c.name;
 document.getElementById('ed_scale').value=ed.scale;
 for(const [id,cur] of [['ed_font_title',(c.fonts||{}).title||''],
@@ -3740,10 +3744,15 @@ s.value=Math.max(0.5,Math.min(6,parseFloat(s.value)-e.deltaY*0.0012));edPreview(
 // the frame exactly as the finished card does ----
 async function edFurnitureRefresh(){if(!ed)return;const id=ed.g.id;
 const furn=document.getElementById('ed_furniture');
+const face=document.getElementById('ed_face');
 try{await post('compose_furniture',{card:id});}catch(_){}
 if(!ed||ed.g.id!==id)return;
-furn.onload=()=>{furn.style.display='block';};
-furn.onerror=()=>{furn.style.display='none';};
+// once the furniture overlay (frame+text+discs, transparent window) is up we
+// HIDE the baked face — otherwise its baked-in art shows behind the live art
+// and reads as a duplicate when you drag or scroll. Furniture failing falls
+// back to the baked face so the preview is never blank.
+furn.onload=()=>{furn.style.display='block';face.style.display='none';};
+furn.onerror=()=>{furn.style.display='none';face.style.display='block';};
 furn.src='/art?p=art/faces/'+id+'-furniture.png&ts='+Date.now();
 edRegions();}
 // ---- editable text boxes ON the card. name and rules text can be dragged to

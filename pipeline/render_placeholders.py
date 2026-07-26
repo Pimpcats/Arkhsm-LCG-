@@ -1451,14 +1451,16 @@ def _se_frame_compose(tpl_name, kind, clip_key, art_path, placement,
     clip = se_reg(kind, clip_key)
     windowed = frame.getchannel("A").getextrema()[0] < 250
     if FURNITURE:
-        # Everything that sits ON TOP of the art in the finished card, on a
-        # transparent window. For a windowed frame that is the frame itself
-        # (plus the text/discs the caller draws next); for an opaque frame the
-        # art is pasted OVER the frame, so only the later text/discs belong on
-        # top — the frame stays out of the overlay.
+        # The frame (plus the text/discs the caller draws next) on a TRANSPARENT
+        # art window, so the live editor can lay real art behind it. A windowed
+        # frame already has its window cut; an opaque frame is solid, so punch a
+        # hole at the art clip rect — that is exactly where the finished card
+        # pastes the art over the frame.
         img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        if windowed:
-            img.paste(frame2, (0, 0), frame2)
+        img.paste(frame2, (0, 0), frame2)
+        if not windowed and clip:
+            img.paste(Image.new("RGBA", (clip[2] - clip[0], clip[3] - clip[1]),
+                                (0, 0, 0, 0)), (clip[0], clip[1]))
         return img, ImageDraw.Draw(img)
     if windowed:
         img = Image.new("RGB", (W, H), underlay or frame_underlay(frame))
