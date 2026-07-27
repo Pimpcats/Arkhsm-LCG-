@@ -1571,14 +1571,27 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
         _paste_region(img, _se_img("overlays", "AHLCG-" + SLOT_OVERLAY[c["slot"]]),
                       se_reg(kind, "Slot"))
     if kind == "Asset":
-        # health/sanity are the soak an ally or device absorbs — only real soak
-        # assets carry them, so a plain item (no value, or 0) prints no chit
-        if _soak_val(c.get("health")):
-            _box_text(d, str(int(c["health"])), se_reg(kind, "Stamina"),
-                      fill=(250, 244, 238), stat=True, grow=0.9, pos_key="health")
-        if _soak_val(c.get("sanity")):
-            _box_text(d, str(int(c["sanity"])), se_reg(kind, "Sanity"),
-                      fill=(240, 246, 255), stat=True, grow=0.9, pos_key="sanity")
+        # health/sanity are the soak an ally or device absorbs — draw them as the
+        # official red-heart / blue-brain chits (the same kit investigators use),
+        # numeral baked on, exactly like Guard Dog. A plain item has no soak, so
+        # nothing is drawn at all.
+        for ck, region, fld, val in (
+                ("health_heart", "Stamina", "health", c.get("health")),
+                ("sanity_brain", "Sanity", "sanity", c.get("sanity"))):
+            if not _soak_val(val):
+                continue
+            reg = _nudge(se_reg(kind, region), _field_style(fld))
+            cx = (reg[0] + reg[2]) // 2
+            cy = (reg[1] + reg[3]) // 2
+            chit, numbered = _vital_chit(ck, val)
+            if chit is not None:
+                _paste_icon_fit(img, chit, (cx - 44, cy - 46, cx + 44, cy + 46))
+                if not numbered:
+                    _box_text(d, str(int(val)), (cx - 30, cy - 30, cx + 30, cy + 30),
+                              fill=(255, 255, 255), stat=True, grow=0.9)
+            else:
+                _box_text(d, str(int(val)), reg, fill=(250, 244, 238),
+                          stat=True, grow=0.9, pos_key=fld)
 
     _box_text(d, _wm(art_path), se_reg(kind, "Artist"),
               fill=(225, 218, 202), grow=1.0)
