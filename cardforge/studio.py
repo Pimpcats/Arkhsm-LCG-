@@ -1310,9 +1310,11 @@ def act_campaign_new(p):
             base = {}
     os.makedirs(dest)
     camp = {
-        "backend": base.get("backend", "a1111"),
+        # a new campaign defaults to the no-install art path: an API key is all
+        # it takes, versus installing and running Stable Diffusion locally
+        "backend": base.get("backend", "openai"),
         "base_url": base.get("base_url"),
-        "checkpoint": base.get("checkpoint", "SET_ME.safetensors"),
+        "checkpoint": base.get("checkpoint", "gpt-image-1"),
         "output_dir": "out/" + cid,
         "name": name,
         # inherit the locked house style so a new campaign looks like the rest
@@ -2961,43 +2963,23 @@ Train LoRAs on the SAME checkpoint you generate with (MoodyKrea2Mix).</span></di
 </div></section>
 
 <section id=setup class=on><div class=panel>
-<h2>Optional art generator <small>nothing here is required &mdash; the app is ready to build cards as installed. These add AI art generation, and everything lands inside the app folder.</small></h2>
+<h2>Getting started <small>nothing to install &mdash; the app is ready to build cards right now</small></h2>
 <div id=steps_setup class=stepbox></div>
 <hr>
-<div class=row>
-<b style="min-width:180px">1 &middot; Stable Diffusion</b>
-<button class="btn primary" onclick="post('install_a1111')">Install A1111 into this folder</button>
-<span id=vendor_a1111 class=hint></span>
+<p class=hint style="font-size:13px;line-height:1.6">
+<b>You don&rsquo;t need to set anything up.</b> Every frame, font and icon ships inside the app.
+Go to <b>3 &middot; Cards</b>, hit <b>+ Create card</b>, and click straight onto the card to edit it.
+</p>
+<div class=row style="margin-top:4px">
+<b style="min-width:180px">Artwork</b>
+<span class=hint>Upload your own image on any card &mdash; or let the app generate one.</span>
 </div>
-<div class=row style="margin-top:6px">
-<b style="min-width:180px">1b &middot; ComfyUI <small style="color:var(--dim)">(Windows)</small></b>
-<button class="btn primary" id=btn_comfy onclick="post('install_comfy')">Install ComfyUI into this folder</button>
-<span id=vendor_comfy class=hint></span>
-</div>
-<p class=hint><b>What these two are for:</b> they paint the artwork on your cards.
-<b>Everything else works without them</b> &mdash; you can build and print every card in the app right
-now and just drop in your own images. Install one <i>only</i> if you want the app to generate art for
-you. Pick <b>one</b>, not both, then choose it in <b>2 &middot; Illustrate &rarr; Backend</b>.</p>
-<p class=hint><b>A1111</b> &mdash; the common choice; works with most art models.
-<b>ComfyUI</b> &mdash; same job, but it runs the newer models (Krea&nbsp;2, FLUX) that A1111 cannot load.
-Either one installs into this folder with its own private Python, so nothing touches the rest of your
-system, and both share <code>vendor/models/</code> so the art model below is found by whichever you use.
-Already run one elsewhere? Skip these and just point the Illustrate tab&rsquo;s Backend row at it.
-Heads up: a first launch pulls down several GB, and generating art really wants a decent GPU.</p>
-<hr>
-<div class=row>
-<b style="min-width:180px">2 &middot; Art model</b>
-<input type=password id=civitai_token size=28 placeholder="Civitai API key (needed to download)">
-<button class="btn primary" onclick="post('install_checkpoint',{token:document.getElementById('civitai_token').value})">Install MoodyKrea2Mix v4.0</button>
-<span id=vendor_model class=hint></span>
-</div>
-<p class=hint><b>What this is for:</b> the art model is the thing that actually does the painting &mdash;
-it decides the look. A1111 or ComfyUI on their own can&rsquo;t draw anything without one, so grab this
-only if you installed one of them above. <b>MoodyKrea2Mix v4.0</b> is the moody, painterly style this
-campaign was built around. It downloads into <code>vendor/models/</code> and is picked up automatically.
-The Civitai key is just a free download token &mdash; make an account at civitai.com &rarr; account
-settings. Already have the .safetensors file? Skip the key and drop it straight into
-<code>vendor/models/</code>.</p>
+<p class=hint><b>Bring your own:</b> open a card and use <b>Upload image&hellip;</b>. Drag to position,
+scroll to size. This always works and costs nothing.<br>
+<b>Generate it:</b> paste an OpenAI API key in <b>2 &middot; Illustrate</b> and the app will paint art
+from each card&rsquo;s description in your campaign&rsquo;s house style. It runs in the cloud, so there is
+nothing to install and no graphics card needed &mdash; but it bills per image against prepaid credit
+at platform.openai.com, which a ChatGPT subscription does not cover.</p>
 <hr>
 <div class=row><b>Thanks to</b></div>
 <p class=hint>This app is built on work generously shared with the fan community.
@@ -3205,10 +3187,10 @@ New variants land in the strip above and the gallery when the job finishes.</p>
 <div class=row>
 <b>Backend</b>
 <select id=rig_kind onchange="post('backend_set',{backend:this.value}).then(()=>refresh())"
-title="A1111 and ComfyUI run locally on your own GPU. OpenAI runs in the cloud — no install, but it bills per image.">
-<option value=a1111>A1111 (SD1.5 / SDXL)</option>
-<option value=comfy>ComfyUI (Krea 2 / FLUX)</option>
-<option value=openai>OpenAI (cloud &mdash; no install)</option></select>
+title="OpenAI needs only an API key. The two local options require you to install and run Stable Diffusion yourself.">
+<option value=openai>OpenAI &mdash; just an API key</option>
+<option value=a1111>Local: A1111 (advanced)</option>
+<option value=comfy>Local: ComfyUI (advanced)</option></select>
 <span id=rig_local><label>folder</label><input type=text id=rig_cwd size=22 placeholder="C:\SD\SDXL" onchange=rigSave()>
 <label>start with</label><input type=text id=rig_cmd size=18 onchange=rigSave()>
 <button class="btn primary" onclick=rigLaunch()>&#9655; Launch backend</button></span>
@@ -3509,10 +3491,12 @@ const picksDone=seedsDone&&Object.values(s.seeds).every(x=>x.picked);
 const gen=s.report&&s.report.generated>0&&!s.report.dry_run;
 const allFramed=cov.total>0&&cov.framed.length===cov.total;
 const el=(id,html)=>{const e=document.getElementById(id);if(e)e.innerHTML=html;};
+// nothing to install any more — the checklist is just the route through the app
 el('steps_setup',
- step(v.a1111_installed||v.comfy_installed,'<b>1.</b> Install a backend into this folder — A1111, or ComfyUI for Krea 2 / FLUX checkpoints — skip if you already run one elsewhere')+
- step(hasModel,'<b>2.</b> Install the art model (needs a free Civitai API key), or drop your .safetensors into <code>vendor/models/</code>')+
- step(false,'Then work the tabs left to right: <b>2 &middot; Illustrate</b> &rarr; <b>3 &middot; Cards</b> &rarr; <b>4 &middot; Campaign / scenarios</b> &rarr; <b>5 &middot; Play in TTS</b>'));
+ step(true,'<b>Nothing to install.</b> Frames, fonts and icons all ship inside the app')+
+ step(false,'<b>1.</b> Go to <b>3 &middot; Cards</b> &rarr; <b>+ Create card</b>, then click anywhere on the card to edit it')+
+ step(false,'<b>2.</b> Give it art: <b>Upload image&hellip;</b> on the card, or add an OpenAI key in <b>2 &middot; Illustrate</b> to generate it')+
+ step(false,'<b>3.</b> Group cards into scenarios in <b>4 &middot; Campaign</b>, then send the box to <b>5 &middot; Play in TTS</b>'));
 el('steps_cards',
  step(true,'<b>Pick a category</b> below, click a card to open it')+
  step(true,'<b>Drag</b> the art to position, <b>scroll</b> to size, <b>Save</b> — the placement is kept and used by every export')+
@@ -3599,20 +3583,8 @@ if(pe)pe.innerHTML=(pl.templates&&pl.regions)?
 ' icons, '+pl.regions+' regions extracted</span>'):
 '<span class=badpill>&#10007; frames missing &mdash; click Re-extract</span>';
 const _set=(id,html)=>{const e=document.getElementById(id);if(e)e.innerHTML=html;};
-_set('vendor_a1111',v.a1111_installed?
-'<span class=okpill>&#10003; installed &amp; verified in vendor/a1111</span>':
-(v.a1111_partial?'<span class=badpill>&#10007; install incomplete &mdash; vendor/a1111 exists but has no usable webui; click Install again</span>':
-'not installed (fine if you already run A1111 elsewhere)'));
-_set('vendor_comfy',v.comfy_installed?
-'<span class=okpill>&#10003; installed &amp; verified in vendor/comfy</span>':
-(v.comfy_partial?'<span class=badpill>&#10007; install incomplete &mdash; vendor/comfy exists but has no usable ComfyUI; click Install again</span>':
-(v.comfy_windows_only?'<span class=warnpill>Windows only for now &mdash; on this OS install ComfyUI yourself and point the Backend row at it</span>':
-'not installed (fine if you already run ComfyUI elsewhere)')));
-const _cb=document.getElementById('btn_comfy');
-if(_cb)_cb.disabled=!!v.comfy_windows_only;
-_set('vendor_model',(v.models||[]).length?
-'<span class=okpill>&#10003; installed: '+v.models.join(', ')+'</span>':
-(v.has_token?'<span class=warnpill>key saved &mdash; ready to install</span>':'not installed yet'));
+// A1111 / ComfyUI / checkpoint rows are gone from Setup — art comes from your
+// own images or the cloud generator, so there is nothing local to report on.
 _set('vendor_se',v.se_installed?
 '<span class=okpill>&#10003; installed at '+v.se_path+'</span>':
 ((v.se_downloads||[]).length?
@@ -3637,7 +3609,7 @@ const rep=s.report.generated!==undefined?
 (s.report.warnings||[]).map(w=>`<div class=hint>&#9888; ${w}</div>`).join(''):
 '<span class=stat>no batch run yet</span>';
 document.getElementById('repline').innerHTML=rep;
-LS=s;renderChips(s);renderGallery(s);
+LS=s;renderChips(s);renderGallery(s);renderSteps(s);
 if(!['df_title','df_stat','df_body'].includes((document.activeElement||{}).id))dfFill();
 const seedChars=Object.keys(s.seeds||{});
 document.getElementById('seedblock').style.display=seedChars.length?'':'none';
