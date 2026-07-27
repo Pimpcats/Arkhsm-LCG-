@@ -2909,7 +2909,7 @@ Train LoRAs on the SAME checkpoint you generate with (MoodyKrea2Mix).</span></di
 </div></section>
 
 <section id=setup class=on><div class=panel>
-<h2>Make this folder self-contained <small>everything installs INTO the app folder and is found again wherever the folder moves</small></h2>
+<h2>Optional art generator <small>nothing here is required &mdash; the app is ready to build cards as installed. These add AI art generation, and everything lands inside the app folder.</small></h2>
 <div id=steps_setup class=stepbox></div>
 <hr>
 <div class=row>
@@ -2922,15 +2922,16 @@ Train LoRAs on the SAME checkpoint you generate with (MoodyKrea2Mix).</span></di
 <button class="btn primary" id=btn_comfy onclick="post('install_comfy')">Install ComfyUI into this folder</button>
 <span id=vendor_comfy class=hint></span>
 </div>
-<p class=hint>Downloads the official <b>Windows portable</b> package (its own embedded Python &mdash;
-nothing touches your system) into <code>vendor/comfy/</code>, writes a headless launcher with the
-API on <code>:8188</code>, and shares <code>vendor/models/</code> so a checkpoint installed above is
-visible to both backends. Krea&nbsp;2 and FLUX-family checkpoints need this path &mdash; classic
-A1111 will not load them. Pick which one a campaign uses in <b>2 &middot; Illustrate &rarr; Backend</b>.</p>
-<p class=hint>Downloads the official standalone package (bundled Python) into <code>vendor/a1111/</code>
-with the API already switched on, and points the launcher at it. Already run A1111 elsewhere
-(e.g. <code>C:\SD\SDXL</code>)? Skip this — the Illustrate tab&rsquo;s Backend row keeps using yours.
-First launch self-installs its dependencies (one-time, several GB).</p>
+<p class=hint><b>What these two are for:</b> they paint the artwork on your cards.
+<b>Everything else works without them</b> &mdash; you can build and print every card in the app right
+now and just drop in your own images. Install one <i>only</i> if you want the app to generate art for
+you. Pick <b>one</b>, not both, then choose it in <b>2 &middot; Illustrate &rarr; Backend</b>.</p>
+<p class=hint><b>A1111</b> &mdash; the common choice; works with most art models.
+<b>ComfyUI</b> &mdash; same job, but it runs the newer models (Krea&nbsp;2, FLUX) that A1111 cannot load.
+Either one installs into this folder with its own private Python, so nothing touches the rest of your
+system, and both share <code>vendor/models/</code> so the art model below is found by whichever you use.
+Already run one elsewhere? Skip these and just point the Illustrate tab&rsquo;s Backend row at it.
+Heads up: a first launch pulls down several GB, and generating art really wants a decent GPU.</p>
 <hr>
 <div class=row>
 <b style="min-width:180px">2 &middot; Art model</b>
@@ -2938,19 +2939,13 @@ First launch self-installs its dependencies (one-time, several GB).</p>
 <button class="btn primary" onclick="post('install_checkpoint',{token:document.getElementById('civitai_token').value})">Install MoodyKrea2Mix v4.0</button>
 <span id=vendor_model class=hint></span>
 </div>
-<p class=hint>Downloads <b>MoodyKrea2Mix v4.0</b> &mdash; the campaign&rsquo;s art checkpoint &mdash; into <code>vendor/models/</code>, points the
-campaign at it, and launches A1111 with <code>--ckpt-dir vendor/models</code> so it&rsquo;s found wherever this
-folder lives. Get a free API key at civitai.com &rarr; account settings. Already have the file? Just drop
-the .safetensors into <code>vendor/models/</code> instead.</p>
-<hr>
-<div class=row>
-<b style="min-width:180px">2b &middot; Title font</b>
-<button class=btn onclick="post('install_fonts')">Install Arkhamic</button>
-<span id=vendor_font class=hint></span>
-<span class=hint>the community&rsquo;s OFL extension of Teutonic (the official title face) — from
-<a href="https://github.com/javnik36/arkhamic" target=_blank>javnik36/arkhamic</a>; the renderer
-prefers it automatically once installed</span>
-</div>
+<p class=hint><b>What this is for:</b> the art model is the thing that actually does the painting &mdash;
+it decides the look. A1111 or ComfyUI on their own can&rsquo;t draw anything without one, so grab this
+only if you installed one of them above. <b>MoodyKrea2Mix v4.0</b> is the moody, painterly style this
+campaign was built around. It downloads into <code>vendor/models/</code> and is picked up automatically.
+The Civitai key is just a free download token &mdash; make an account at civitai.com &rarr; account
+settings. Already have the .safetensors file? Skip the key and drop it straight into
+<code>vendor/models/</code>.</p>
 <hr>
 <div class=row><b>Thanks to</b></div>
 <p class=hint>This app is built on work generously shared with the fan community.
@@ -3500,11 +3495,8 @@ be.title='Running build: v'+(bd.version||'?')+' commit '+(bd.commit||'?')+
 ', file dated '+(bd.built||'?')+', server started '+(bd.started||'?')+
 '. A git pull does NOT change the running app — restart it, then hard-refresh (Ctrl+F5).';}
 const v=s.vendor||{};
-const fs=v.fonts||{};const fe=document.getElementById('vendor_font');
-if(fe)fe.innerHTML=(fs.arkhamic||[]).length?
-('<span class=okpill>&#10003; installed: '+fs.arkhamic.join(', ')+'</span>'):
-((fs.teutonic||[]).length?'<span class=warnpill>using Teutonic &mdash; click to add Arkhamic</span>':
-'not installed yet');
+// the title font (Arkhamic) ships inside the app and the renderer picks it up
+// on its own, so there is no Setup row to report on any more
 const pl=v.plugin||{};const pe=document.getElementById('vendor_plugin');
 if(pe)pe.innerHTML=(pl.templates&&pl.regions)?
 ('<span class=okpill>&#10003; '+pl.templates+' frames, '+pl.overlays+' overlays, '+pl.icons+
