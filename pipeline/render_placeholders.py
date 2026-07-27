@@ -111,6 +111,15 @@ def _wm(art_path):
 MAX_PIPS = 5                       # the plugin frames carry Damage1..5/Horror1..5
 
 
+def _soak_val(v):
+    """An asset's health/sanity soak prints only when it's a real positive
+    number — a plain item has None (or 0) and shows no chit at all."""
+    try:
+        return int(v) > 0
+    except (TypeError, ValueError):
+        return False
+
+
 def pip_count(v):
     """A damage/horror count is always a bounded int, no matter what junk a
     stale override or a hand-edited file holds — never let it reach range()
@@ -1534,9 +1543,14 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
 
     _box_text(d, c["name"], se_reg(kind, "Name", letter), title=True, grow=1.15, key="name")
     if c.get("subtitle"):
-        _box_text(d, c["subtitle"],
-                  se_reg(kind, "SubtitleText", letter)
-                  or se_reg(kind, "Subtitle", letter), italic=True, key="subtitle")
+        # the subtitle sits on a slim band just under the title; cap its size and
+        # width so it can't grow to title height and bleed up over the name (only
+        # Asset frames carry a subtitle band — Events/Skills return no region)
+        sub_box = (se_reg(kind, "SubtitleText", letter)
+                   or se_reg(kind, "Subtitle", letter))
+        if sub_box:
+            _box_text(d, c["subtitle"], sub_box, italic=True,
+                      max_size=22, max_w_factor=1.0, key="subtitle")
 
     # body: traits line, rules, flavor — stacked inside the Body region
     b = se_reg(kind, "Body")
@@ -1557,11 +1571,13 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
         _paste_region(img, _se_img("overlays", "AHLCG-" + SLOT_OVERLAY[c["slot"]]),
                       se_reg(kind, "Slot"))
     if kind == "Asset":
-        if c.get("health") is not None:
-            _box_text(d, str(c["health"]), se_reg(kind, "Stamina"),
+        # health/sanity are the soak an ally or device absorbs — only real soak
+        # assets carry them, so a plain item (no value, or 0) prints no chit
+        if _soak_val(c.get("health")):
+            _box_text(d, str(int(c["health"])), se_reg(kind, "Stamina"),
                       fill=(250, 244, 238), stat=True, grow=0.9, pos_key="health")
-        if c.get("sanity") is not None:
-            _box_text(d, str(c["sanity"]), se_reg(kind, "Sanity"),
+        if _soak_val(c.get("sanity")):
+            _box_text(d, str(int(c["sanity"])), se_reg(kind, "Sanity"),
                       fill=(240, 246, 255), stat=True, grow=0.9, pos_key="sanity")
 
     _box_text(d, _wm(art_path), se_reg(kind, "Artist"),
