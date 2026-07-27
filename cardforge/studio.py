@@ -2407,13 +2407,23 @@ class Handler(BaseHTTPRequestHandler):
             path = os.path.join(ROOT, rel)
             allowed = (os.path.join(ROOT, "out"), os.path.join(ROOT, "art"),
                        os.path.join(ROOT, "assets", "branding"),
-                       os.path.join(ROOT, "assets", "frames"))
+                       os.path.join(ROOT, "assets", "frames"),
+                       # health/sanity chits: the editor shows the real art the
+                       # instant you click, instead of a stand-in numeral
+                       os.path.join(ROOT, "assets", "stat"),
+                       # the card faces: @font-face in the editor so text you
+                       # type previews in the face it will actually print in
+                       os.path.join(ROOT, "assets", "fonts"))
             if not path.startswith(allowed) or not os.path.exists(path):
                 self._json({"error": "not found"}, 404)
                 return
             data = open(path, "rb").read()
+            ext = os.path.splitext(path)[1].lower()
+            ctype = {".ttf": "font/ttf", ".otf": "font/otf",
+                     ".ico": "image/x-icon", ".jpg": "image/jpeg",
+                     ".jpeg": "image/jpeg"}.get(ext, "image/png")
             self.send_response(200)
-            self.send_header("Content-Type", "image/png")
+            self.send_header("Content-Type", ctype)
             self.send_header("Content-Length", str(len(data)))
             self.end_headers()
             self.wfile.write(data)
@@ -2683,16 +2693,35 @@ opacity:0;transition:opacity .12s;pointer-events:none}
 /* the value that flashes on the card the instant you click, before the redraw */
 .ed_statval{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
 font-weight:800;font-size:150%;color:#fff;text-shadow:0 0 6px #000,0 0 3px #000;
-opacity:0;transition:opacity .1s;pointer-events:none}
+opacity:0;transition:opacity .06s;pointer-events:none}
+/* chit stats show the real art, scaled a little past the region so it fully
+   covers the chit already baked into the card underneath */
+.ed_statval.ed_statchit{text-shadow:none}
+.ed_statval.ed_statchit img{width:132%;height:132%;object-fit:contain;
+filter:drop-shadow(0 0 2px rgba(0,0,0,.35))}
 /* skill-icon strip: click a chip to change its skill, right-click to remove */
 .si_chip{width:46px;height:46px;padding:3px;border:1px solid var(--line);
 border-radius:8px;background:var(--surface2);cursor:pointer;transition:border-color .12s,transform .12s}
 .si_chip:hover{border-color:var(--accent);transform:translateY(-1px)}
 .si_chip img{width:100%;height:100%;object-fit:contain;display:block}
 /* inline on-card text editor (double-click a text area) */
+/* The real card faces, loaded into the browser so on-card editing previews the
+   text in the font it will actually print in. */
+@font-face{font-family:'CF-Title';src:url('/art?p=assets/fonts/Arkhamic_v2.2.ttf') format('truetype');font-display:swap}
+@font-face{font-family:'CF-Stat';src:url('/art?p=assets/fonts/BoltonBold.ttf') format('truetype');font-display:swap}
+@font-face{font-family:'CF-Body';src:url('/art?p=assets/fonts/NimbusRomNo9L-Reg.otf') format('opentype');font-display:swap}
+@font-face{font-family:'CF-Body';font-style:italic;src:url('/art?p=assets/fonts/NimbusRomNo9L-RegIta.otf') format('opentype');font-display:swap}
+@font-face{font-family:'CF-Body';font-weight:700;src:url('/art?p=assets/fonts/NimbusRomNo9L-Med.otf') format('opentype');font-display:swap}
+@font-face{font-family:'CF-Body';font-weight:700;font-style:italic;src:url('/art?p=assets/fonts/NimbusRomNo9L-MedIta.otf') format('opentype');font-display:swap}
+/* The on-card text editor is a PREVIEW, not a form box: no chrome, no fill —
+   just your text in the card's own face, sitting where it will print. A dotted
+   rule and a faint warm wash show which area has focus without hiding the card.
+   Per-field font/size/style/alignment are set inline by edInlineEdit(). */
 .ed_inline{position:absolute;z-index:5;box-sizing:border-box;
-background:rgba(18,20,26,.97);border:1px solid var(--accent);color:var(--ink);
-border-radius:3px;padding:2px 5px;font:13px/1.3 inherit;resize:none;outline:none}
+background:rgba(252,247,235,.94);border:1px dashed rgba(232,178,74,.9);
+color:#241d15;box-shadow:0 0 0 1px rgba(0,0,0,.18);
+border-radius:2px;padding:0;margin:0;resize:none;outline:none;overflow:hidden}
+.ed_inline::selection{background:rgba(232,178,74,.45);color:#241d15}
 #ed_strip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
 #ed_strip img{height:74px;border-radius:8px;cursor:pointer;border:2px solid transparent;
 transition:all .15s}
@@ -4153,15 +4182,57 @@ function edStatStep(key,delta){const cc=document.getElementById('cc_'+key);if(!c
 if(typeof ccStep==='function')ccStep(key,delta);
 else cc.value=(parseInt(cc.value)||0)+delta;
 edStatBadge(key,cc.value);
-clearTimeout(ED_STAT_T);ED_STAT_T=setTimeout(()=>{if(ed)edSave();},260);}
-// instant feedback: show the value large over its region until the card redraws
+// short coalescing window: long enough that holding a click doesn't fire a
+// save per step, short enough that a single click feels immediate
+clearTimeout(ED_STAT_T);ED_STAT_T=setTimeout(()=>{if(ed)edSave();},90);}
+// health/sanity print as chit ART, so a numeral drawn over them never matches.
+// Show the real chit png for the new value instead — pixel-identical to what
+// the redraw will produce, so the click looks instant and correct.
+function edChitSrc(key,val){
+const t=(ed&&ed.g)?ed.g.type:'';
+if(!(t==='Asset'||t==='Investigator'))return '';
+if(key!=='health'&&key!=='sanity')return '';
+const n=parseInt(val);if(!(n>=1&&n<=9))return '';
+return '/art?p=assets/stat/vitals/'+(key==='health'?'health_heart_':'sanity_brain_')+n+'.png';}
+// instant feedback over the region until the card redraws
 function edStatBadge(key,val){const host=document.getElementById('ed_regions');if(!host)return;
 const el=host.querySelector('.ed_rg[data-key="'+CSS.escape(key)+'"]');if(!el)return;
+const src=edChitSrc(key,val);
 let b=el.querySelector('.ed_statval');
 if(!b){b=document.createElement('div');b.className='ed_statval';el.appendChild(b);}
-b.textContent=(val===''||val==null)?'–':val;b.style.opacity='1';
-clearTimeout(el._bt);el._bt=setTimeout(()=>{b.style.opacity='0';},900);}
+if(src){b.classList.add('ed_statchit');b.innerHTML='<img src="'+src+'" alt="">';}
+else{b.classList.remove('ed_statchit');b.textContent=(val===''||val==null)?'–':val;}
+b.style.opacity='1';
+// hold it until the freshly-rendered card actually swaps in (edSave clears it)
+clearTimeout(el._bt);el._bt=setTimeout(()=>{b.style.opacity='0';},2500);}
 // click a text area to edit it right on the card (one editor open at a time)
+// How the RENDERER draws each editable area, mirrored for the on-card preview.
+// size = the point size render_placeholders uses in 750x1050 card space (a
+// single-line field auto-sizes to its box, so those are given as a fraction of
+// the region height); everything is multiplied by ed.disp to reach screen px.
+const ED_FIELD_STYLE={
+ name    :{font:'CF-Title',boxFrac:0.86,align:'center'},
+ subtitle:{font:'CF-Body', size:22,italic:true, align:'center'},
+ traits  :{font:'CF-Body', size:24,italic:true,bold:true,align:'center'},
+ text    :{font:'CF-Body', size:25,align:'left',lh:1.24},
+ flavor  :{font:'CF-Body', size:21,italic:true,align:'left',lh:1.24},
+ victory :{font:'CF-Body', size:22,bold:true,align:'center'}};
+// Style the on-card editor so typing previews in the real face, size, slant and
+// alignment the card will print — the point of editing on the card at all.
+function edInlineStyle(ov,key,el){
+ const d=(ed&&ed.disp)?ed.disp:1;
+ const st=ED_FIELD_STYLE[key]||{font:'CF-Stat',boxFrac:0.7,align:'center'};
+ let px;
+ if(st.size)px=st.size*d;
+ else px=(parseFloat(el.style.height)||20)*(st.boxFrac||0.8);
+ ov.style.fontFamily="'"+st.font+"', Georgia, serif";
+ ov.style.fontSize=Math.max(7,px)+'px';
+ ov.style.lineHeight=st.lh?String(st.lh):'1.15';
+ ov.style.fontStyle=st.italic?'italic':'normal';
+ ov.style.fontWeight=st.bold?'700':'400';
+ ov.style.textAlign=st.align||'center';
+ // a single-line field is vertically centred in its band, like the render
+ if(ov.tagName==='INPUT')ov.style.height=el.style.height;}
 function edInlineEdit(key,el){if(document.querySelector('.ed_inline'))return;
 const dst=document.getElementById(edCcId(key));if(!dst)return;
 const multiline=(key==='text'||key==='flavor');
@@ -4169,6 +4240,7 @@ const ov=document.createElement(multiline?'textarea':'input');
 ov.className='ed_inline';ov.id='ed_inline_live';ov.value=dst.value;
 ov.style.left=el.style.left;ov.style.top=el.style.top;
 ov.style.width=el.style.width;if(multiline)ov.style.height=el.style.height;
+edInlineStyle(ov,key,el);
 document.getElementById('ed_stage').appendChild(ov);
 // the right-panel symbol palette inserts into whatever is focused; point it at
 // this on-card editor so glyphs go into the box you're editing on the card
@@ -4233,7 +4305,11 @@ await ccSave();
 const body={card:ed.g.id,scale:ed.scale,ox:ed.ox,oy:ed.oy};
 if(ed.scaleY&&Math.abs(ed.scaleY-ed.scale)>0.001)body.scale_y=ed.scaleY;
 await post('place',body);
-edFaceRefresh();addlog(ed.g.id+' saved');}
+edFaceRefresh();edStatBadgeClear();addlog(ed.g.id+' saved');}
+// drop any pending stat overlay once the redrawn face is in — the card itself
+// is now showing the new value, so anything on top of it is stale
+function edStatBadgeClear(){
+for(const b of document.querySelectorAll('#ed_regions .ed_statval'))b.style.opacity='0';}
 function edClose(){document.getElementById('editor').style.display='none';
 document.getElementById('chips_cards').style.display='';
 document.getElementById('cardgroups').style.display='';
