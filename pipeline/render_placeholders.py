@@ -1260,7 +1260,7 @@ def _vital_chit(kind, value):
         v = int(value)
     except (TypeError, ValueError):
         v = None
-    if v is not None and 5 <= v <= 9:
+    if v is not None and 1 <= v <= 9:
         p = os.path.join(VITALS_DIR, "{}_{}.png".format(kind, v))
         k = key + str(v)
         if k not in _SE_CACHE:
