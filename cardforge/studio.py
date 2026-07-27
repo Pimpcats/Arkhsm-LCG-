@@ -3611,7 +3611,12 @@ const n=parseInt(v)||0;
 el.textContent=(f==='damage'?'\u2764\ufe0f':'\ud83e\udde0').repeat(Math.max(0,Math.min(n,5)));}
 function ccStep(f,d){const el=document.getElementById('cc_'+f);
 // XP level clicks the pips: up to 5, down to 1 (damage/horror cap at 5)
-const cap=(f==='damage'||f==='horror'||f==='level')?5:99;
+// health/sanity print as heart/brain chits and the art kit only covers 1-9,
+// so stop there on the card types that use chits (an Enemy's health is a
+// plain numeral on its plate, so it keeps the open range)
+const t=(typeof ed!=='undefined'&&ed&&ed.g)?ed.g.type:'';
+const chit=(f==='health'||f==='sanity')&&(t==='Asset'||t==='Investigator');
+const cap=(f==='damage'||f==='horror'||f==='level')?5:(chit?9:99);
 const lo=(f==='level')?1:0;
 let v=parseInt(el.value);if(isNaN(v))v=0;v=Math.max(lo,Math.min(cap,v+d));el.value=v;ccPips(f,v);}
 function ccNum(f,label,pips){
