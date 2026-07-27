@@ -4,18 +4,19 @@ CORRECT STYLE (what the printed cards use, e.g. Guard Dog):
   white numeral, coloured outline, numeral sits INSIDE the organ shape.
 
 STATUS
-  1, 2   owner-supplied, correct style. Minor pale halo on the cut edge —
-         shows against dark card backgrounds; owner is supplying cleaner files.
-  3      owner-supplied file was poor quality (colour fringing) and was
-         REMOVED at the owner's request; replacement pending.
-  4      never supplied — no art exists.
-  5-9    WRONG STYLE. These are inverted: coloured numeral, white outline, and
-         the numeral overflows past the organ. They predate the correct files
-         above and must be replaced with correct-style versions.
+  1, 2   owner-supplied, correct style. Slight pale halo on the cut edge.
+  3      NOT SUPPLIED. An earlier file was pulled for colour fringing.
+  4      NOT SUPPLIED. Never existed.
+  5-9    owner-supplied, correct style, cleanly cut (see
+         SOURCE_README_5to9.txt for the extraction method). These REPLACED an
+         earlier inverted-style set (coloured numeral / white outline /
+         numeral overflowing the organ), which was wrong and is gone.
 
-  Values with no file fall back to the empty chit + a numeral drawn in Bolton
-  by _chit_numeral() in pipeline/render_placeholders.py. That numeral is NOT
-  owner art — it is a stand-in and should be deleted once 3-9 are supplied.
+  Values 3 and 4 have no art, so they fall back to the empty chit plus a
+  numeral drawn in Bolton by _chit_numeral() in
+  pipeline/render_placeholders.py. That numeral is NOT owner art - it is a
+  visibly-different stand-in. DELETE _chit_numeral and its two call sites
+  once 3 and 4 are supplied.
 
 NAMING (picked up automatically, no code change needed)
   health_heart_<n>.png   n = 1..9
