@@ -15,6 +15,7 @@ from .ledger import Ledger
 from .resolver import CharacterResolver
 from .backends.a1111 import A1111Backend
 from .backends.comfy import ComfyBackend
+from .backends.openai_images import OpenAIBackend
 
 RETRIES = 2
 BACKOFF_SECONDS = 5
@@ -86,6 +87,12 @@ def make_backend(camp, dry_run=False):
         return ComfyBackend(camp.get("base_url") or ComfyBackend.DEFAULT_URL,
                             workflows_dir=os.path.join(repo_root(), "cardforge", "workflows"),
                             dry_run=dry_run, payload_dir=payload_dir)
+    if kind == "openai":
+        # hosted API — base_url stays the OpenAI endpoint unless overridden, and
+        # the "checkpoint" field carries the image model name instead of a file
+        return OpenAIBackend(camp.get("base_url") or OpenAIBackend.DEFAULT_URL,
+                             dry_run=dry_run, payload_dir=payload_dir,
+                             model=camp.get("checkpoint"))
     return A1111Backend(camp.get("base_url") or A1111Backend.DEFAULT_URL,
                         dry_run=dry_run, payload_dir=payload_dir)
 

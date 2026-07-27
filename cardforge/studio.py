@@ -215,8 +215,8 @@ def act_backend_set(p):
     to be selectable from the app rather than hand-edited."""
     campaign = p.get("campaign", "still_hour")
     kind = (p.get("backend") or "").strip().lower()
-    if kind not in ("a1111", "comfy"):
-        return {"ok": False, "message": "backend must be a1111 or comfy"}
+    if kind not in ("a1111", "comfy", "openai"):
+        return {"ok": False, "message": "backend must be a1111, comfy or openai"}
     path = os.path.join(runner.campaign_dir(campaign), "campaign.json")
     camp = json.load(open(path, encoding="utf-8"))
     camp["backend"] = kind
@@ -224,6 +224,19 @@ def act_backend_set(p):
         json.dump(camp, f, indent=2)
     log("backend -> " + kind)
     return {"ok": True, "backend": kind}
+
+
+def act_openai_key(p):
+    """Save (or clear) the OpenAI API key used by the openai backend. Stored in
+    state/ like the Civitai token, never in campaign.json — campaign files get
+    shared, keys shouldn't. Send no key to read back whether one is set."""
+    from cardforge.backends import openai_images as oai
+    if "key" in p:
+        oai.save_key(str(p.get("key") or ""))
+        log("OpenAI API key " + ("saved" if p.get("key") else "cleared"))
+    k = oai.load_key()
+    return {"ok": True, "set": bool(k),
+            "hint": ("•" * 8 + k[-4:]) if len(k) > 4 else ""}
 
 
 def act_models(p):
@@ -2317,6 +2330,7 @@ ACTIONS = {"generate": act_generate, "seeds": act_seeds, "contact": act_contact,
            "rig_save": act_rig_save, "backend_launch": act_backend_launch,
            "seed_pick": act_seed_pick,
            "models": act_models, "backend_set": act_backend_set, "model_set": act_model_set,
+           "openai_key": act_openai_key,
            "install_checkpoint": act_install_checkpoint,
            "install_se": act_install_se, "install_a1111": act_install_a1111,
            "install_comfy": act_install_comfy,
@@ -3153,14 +3167,33 @@ New variants land in the strip above and the gallery when the job finishes.</p>
 <div class=row>
 <b>Backend</b>
 <select id=rig_kind onchange="post('backend_set',{backend:this.value}).then(()=>refresh())"
-title="A1111 runs SD1.5/SDXL checkpoints. Krea 2 / FLUX-family models need ComfyUI.">
+title="A1111 and ComfyUI run locally on your own GPU. OpenAI runs in the cloud — no install, but it bills per image.">
 <option value=a1111>A1111 (SD1.5 / SDXL)</option>
-<option value=comfy>ComfyUI (Krea 2 / FLUX)</option></select>
-<label>folder</label><input type=text id=rig_cwd size=22 placeholder="C:\SD\SDXL" onchange=rigSave()>
+<option value=comfy>ComfyUI (Krea 2 / FLUX)</option>
+<option value=openai>OpenAI (cloud &mdash; no install)</option></select>
+<span id=rig_local><label>folder</label><input type=text id=rig_cwd size=22 placeholder="C:\SD\SDXL" onchange=rigSave()>
 <label>start with</label><input type=text id=rig_cmd size=18 onchange=rigSave()>
-<button class="btn primary" onclick=rigLaunch()>&#9655; Launch backend</button>
+<button class="btn primary" onclick=rigLaunch()>&#9655; Launch backend</button></span>
 <button class=btn onclick="post('backend_check')">Check</button>
 </div>
+<div class=row id=oai_row style="display:none;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px 14px">
+<b>OpenAI key</b>
+<input type=password id=oai_key size=30 placeholder="sk-...">
+<button class="btn primary" onclick=oaiSave()>Save key</button>
+<span id=oai_state class=hint></span>
+<label>model</label>
+<input type=text id=oai_model size=20 list=oai_models placeholder="gpt-image-1" onchange=modelSet2()
+title="type any model name your account has — the list is only a shortcut">
+<datalist id=oai_models></datalist>
+<button class=btn onclick=oaiModels() title="ask your account which image models it can use">&#8635; List my models</button>
+</div>
+<p class=hint id=oai_note style="display:none">Runs in the cloud, so there is nothing to install and no GPU needed &mdash;
+but it <b>bills per image</b> against prepaid credit at platform.openai.com, which a
+<b>ChatGPT subscription does not include</b>. Get a key at platform.openai.com &rarr; API keys.
+The key is stored in this app&rsquo;s <code>state/</code> folder, never in the campaign file.
+Two differences from the local backends: there is <b>no seed</b>, so a generation can&rsquo;t be
+reproduced exactly (re-roll works, pinning doesn&rsquo;t), and there is no negative-prompt field &mdash;
+your House style &ldquo;avoid&rdquo; list is appended to the prompt as words instead.</p>
 <div class=row style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px 14px">
 <b>Checkpoint</b>
 <select id=model onchange=modelSet() style="max-width:340px">
@@ -3265,6 +3298,23 @@ el.innerHTML='backend has loaded: <b>'+(j.active||'?')+'</b> &middot; every gene
 let modelsLoadedOnce=false;
 function modelSet(){const v=document.getElementById('model').value;
 if(v)post('model_set',{checkpoint:v});}
+// the OpenAI backend keeps its image model in the same campaign "checkpoint"
+// field the local backends use for a .safetensors name
+function modelSet2(){const v=document.getElementById('oai_model').value;
+if(v)post('model_set',{checkpoint:v});}
+async function oaiSave(){const el=document.getElementById('oai_key');
+const j=await post('openai_key',{key:el.value});el.value='';oaiState(j);
+oaiModels();}
+// the model list comes from the account, not from a list baked into this app,
+// so models released after this build still show up
+async function oaiModels(){const j=await post('models',{});
+const dl=document.getElementById('oai_models');if(!dl)return;
+dl.innerHTML=((j&&j.models)||[]).map(m=>'<option value="'+m+'">').join('');
+const s=document.getElementById('oai_state');
+if(s&&j&&j.models&&j.models.length)s.innerHTML+=' <span class=hint>'+j.models.length+' model(s) found</span>';}
+function oaiState(j){const s=document.getElementById('oai_state');if(!s)return;
+s.innerHTML=(j&&j.set)?('<span class=okpill>&#10003; key saved '+(j.hint||'')+'</span>')
+:'<span class=warnpill>no key yet</span>';}
 function styleSave(){post('style_save',{
 style_lora:document.getElementById('style_lora').value,
 style_lora_weight:parseFloat(document.getElementById('style_lw').value)||0.8,
@@ -3457,6 +3507,14 @@ if(want&&s.campaigns.includes(want)&&want!==s.campaign){
 START_CAMP=want;sel.value=want;return refresh();}}
 document.getElementById('busydot').className='dot'+(s.busy?' busy':'');
 const kind=s.backend||'a1111';{const rk=document.getElementById('rig_kind');if(rk&&document.activeElement!==rk)rk.value=kind;}
+// the cloud backend needs a key, not a folder/launcher — swap the rows over
+{const oai=(kind==='openai');
+for(const id of ['oai_row','oai_note']){const e=document.getElementById(id);if(e)e.style.display=oai?'':'none';}
+// nothing to launch or point at a folder when the backend is a hosted API
+{const rl=document.getElementById('rig_local');if(rl)rl.style.display=oai?'none':'';}
+const om=document.getElementById('oai_model');
+if(om&&document.activeElement!==om&&s.checkpoint&&!/\.(safetensors|ckpt)$/i.test(s.checkpoint))om.value=s.checkpoint;
+if(oai&&!window._oaiChecked){window._oaiChecked=1;post('openai_key',{}).then(oaiState);}}
 const rg=(s.rig||{})[kind]||{};
 for(const [id,val] of [['rig_cwd',rg.cwd||''],['rig_cmd',rg.command||'']]){
 const el=document.getElementById(id);if(el&&document.activeElement!==el)el.value=val;}
