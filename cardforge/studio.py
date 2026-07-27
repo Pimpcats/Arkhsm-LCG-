@@ -2713,15 +2713,24 @@ border-radius:8px;background:var(--surface2);cursor:pointer;transition:border-co
 @font-face{font-family:'CF-Body';font-style:italic;src:url('/art?p=assets/fonts/NimbusRomNo9L-RegIta.otf') format('opentype');font-display:swap}
 @font-face{font-family:'CF-Body';font-weight:700;src:url('/art?p=assets/fonts/NimbusRomNo9L-Med.otf') format('opentype');font-display:swap}
 @font-face{font-family:'CF-Body';font-weight:700;font-style:italic;src:url('/art?p=assets/fonts/NimbusRomNo9L-MedIta.otf') format('opentype');font-display:swap}
-/* The on-card text editor is a PREVIEW, not a form box: no chrome, no fill —
-   just your text in the card's own face, sitting where it will print. A dotted
-   rule and a faint warm wash show which area has focus without hiding the card.
+/* The on-card text editor is the TEXT ITSELF, drawn straight onto the card in
+   the card's own face — no panel, no fill. The only chrome is a dotted rule
+   marking the editable area. The card already has this field printed into the
+   face underneath, so each glyph carries a parchment-coloured halo that masks
+   what is behind it; that keeps the old text from ghosting through without
+   putting a visible box over the artwork.
    Per-field font/size/style/alignment are set inline by edInlineEdit(). */
 .ed_inline{position:absolute;z-index:5;box-sizing:border-box;
-background:rgba(252,247,235,.94);border:1px dashed rgba(232,178,74,.9);
-color:#241d15;box-shadow:0 0 0 1px rgba(0,0,0,.18);
-border-radius:2px;padding:0;margin:0;resize:none;outline:none;overflow:hidden}
-.ed_inline::selection{background:rgba(232,178,74,.45);color:#241d15}
+background:transparent;border:1px dashed rgba(232,178,74,.85);
+color:#241d15;border-radius:2px;padding:0;margin:0;
+resize:none;outline:none;overflow:hidden;
+text-shadow:0 0 4px #f4ecd8,0 0 4px #f4ecd8,0 0 3px #f4ecd8,
+            0 0 2px #f4ecd8,0 0 2px #f4ecd8,0 0 1px #f4ecd8}
+.ed_inline::selection{background:rgba(232,178,74,.5);color:#241d15}
+/* a title band is darker stock on some frames — drop the parchment halo there
+   and let the glyphs carry a soft dark one instead */
+.ed_inline.ed_ondark{color:#f6efdd;
+text-shadow:0 0 4px #1a1712,0 0 4px #1a1712,0 0 3px #1a1712,0 0 2px #1a1712}
 #ed_strip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
 #ed_strip img{height:74px;border-radius:8px;cursor:pointer;border:2px solid transparent;
 transition:all .15s}
@@ -4232,7 +4241,29 @@ function edInlineStyle(ov,key,el){
  ov.style.fontWeight=st.bold?'700':'400';
  ov.style.textAlign=st.align||'center';
  // a single-line field is vertically centred in its band, like the render
- if(ov.tagName==='INPUT')ov.style.height=el.style.height;}
+ if(ov.tagName==='INPUT')ov.style.height=el.style.height;
+ // the halo has to hide the printed text behind it, so it must match the stock
+ // this field sits on — sample the rendered face rather than guessing per type
+ if(edRegionIsDark(key))ov.classList.add('ed_ondark');}
+// Average luminance of the card face under a region. Same-origin image, so the
+// canvas is readable; any failure just falls back to the light-stock halo.
+function edRegionIsDark(key){
+ try{
+  const img=document.getElementById('ed_face');
+  const b=ed&&ed.g.regions&&ed.g.regions[key];
+  if(!img||!b||!img.naturalWidth)return false;
+  const ab=ed.g.artbox||[];             // [cardW, cardH, ...] in region space
+  const sx=img.naturalWidth/(ab[0]||img.naturalWidth);
+  const sy=img.naturalHeight/(ab[1]||img.naturalHeight);
+  const x=Math.max(0,Math.round(b[0]*sx)),y=Math.max(0,Math.round(b[1]*sy));
+  const w=Math.max(1,Math.round((b[2]-b[0])*sx)),h=Math.max(1,Math.round((b[3]-b[1])*sy));
+  const c=document.createElement('canvas');c.width=8;c.height=8;
+  const g=c.getContext('2d',{willReadFrequently:true});
+  g.drawImage(img,x,y,w,h,0,0,8,8);
+  const d=g.getImageData(0,0,8,8).data;let sum=0;
+  for(let i=0;i<d.length;i+=4)sum+=0.2126*d[i]+0.7152*d[i+1]+0.0722*d[i+2];
+  return (sum/(d.length/4))<110;
+ }catch(_){return false;}}
 function edInlineEdit(key,el){if(document.querySelector('.ed_inline'))return;
 const dst=document.getElementById(edCcId(key));if(!dst)return;
 const multiline=(key==='text'||key==='flavor');
