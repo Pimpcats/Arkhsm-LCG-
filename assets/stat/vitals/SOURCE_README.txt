@@ -1,22 +1,25 @@
-Health-heart / sanity-brain stat chits (owner-supplied art).
+Health-heart / sanity-brain stat chits (owner-supplied art). COMPLETE 1-9.
 
-CORRECT STYLE (what the printed cards use, e.g. Guard Dog):
+STYLE (matches the printed cards, e.g. Guard Dog):
   white numeral, coloured outline, numeral sits INSIDE the organ shape.
 
-STATUS
-  1, 2   owner-supplied, correct style. Slight pale halo on the cut edge.
-  3      NOT SUPPLIED. An earlier file was pulled for colour fringing.
-  4      NOT SUPPLIED. Never existed.
-  5-9    owner-supplied, correct style, cleanly cut (see
-         SOURCE_README_5to9.txt for the extraction method). These REPLACED an
-         earlier inverted-style set (coloured numeral / white outline /
-         numeral overflowing the organ), which was wrong and is gone.
+STATUS - every value 1..9 has art for both organs. Nothing is drawn by code.
+  1, 2   owner-supplied. Slight pale halo on the cut edge, visible against
+         dark frames; re-extract with the 3-9 method if it ever matters.
+  3, 4   owner-supplied. Per the owner's own notes these are NOT extracted
+         from card scans - they are constructed variants built to match the
+         5-9 set (same canvas and silhouette dimensions).
+  5-9    owner-supplied, extracted directly from 1000px card images; original
+         RGB preserved, only the alpha boundary was processed.
+  See SOURCE_README_3to9.txt for the owner's full extraction method.
 
-  Values 3 and 4 have no art, so they fall back to the empty chit plus a
-  numeral drawn in Bolton by _chit_numeral() in
-  pipeline/render_placeholders.py. That numeral is NOT owner art - it is a
-  visibly-different stand-in. DELETE _chit_numeral and its two call sites
-  once 3 and 4 are supplied.
+  An earlier inverted-style set (coloured numeral / white outline / numeral
+  overflowing the organ) was wrong and has been fully replaced.
+
+  There is NO code-drawn fallback numeral any more. _chit_numeral() was
+  deleted once this set completed. If a file here goes missing the renderer
+  falls back to a plain _box_text numeral, which will look obviously wrong -
+  that is intentional, so a missing asset is noticed rather than disguised.
 
 NAMING (picked up automatically, no code change needed)
   health_heart_<n>.png   n = 1..9

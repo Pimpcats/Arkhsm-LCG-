@@ -1273,28 +1273,6 @@ def _vital_chit(kind, value):
     return _SE_CACHE[key], False
 
 
-# the kit's baked 5-9 chits fill the numeral in the chit's OWN colour with a
-# thick white outline; a 1-4 value has no baked chit, so we draw it the same way
-# instead of a flat white number, so every value reads identically
-_CHIT_COLOR = {"health_heart": (212, 42, 50), "sanity_brain": (36, 82, 124)}
-
-
-def _chit_numeral(d, kind, val, cx, cy, chit_h):
-    """Draw a 1-4 value onto an empty heart/brain chit in the baked kit's style:
-    numeral filled in the chit's colour, thick white outline, sat slightly high
-    like the printed 5-9 chits."""
-    color = _CHIT_COLOR.get(kind, (235, 235, 235))
-    size = max(14, int(chit_h * 0.60))
-    f = _font(size, stat=True)
-    txt = str(int(val))
-    w = d.textlength(txt, font=f)
-    bb = f.getbbox(txt)
-    x = cx - w / 2.0
-    y = (cy - chit_h * 0.05) - (bb[1] + bb[3]) / 2.0
-    d.text((x, y), txt, font=f, fill=color,
-           stroke_width=max(3, int(size * 0.11)), stroke_fill=(255, 255, 255))
-
-
 def _paste_region(img, overlay, box):
     if overlay is None or box is None:
         return
@@ -1608,9 +1586,8 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
             chit, numbered = _vital_chit(ck, val)
             if chit is not None:
                 _paste_icon_fit(img, chit, (cx - 44, cy - 46, cx + 44, cy + 46))
-                if not numbered:
-                    _chit_numeral(d, ck, val, cx, cy, 92)
             else:
+                # only reachable if a chit file is missing from the kit
                 _box_text(d, str(int(val)), reg, fill=(250, 244, 238),
                           stat=True, grow=0.9, pos_key=fld)
 
@@ -1735,9 +1712,8 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
         chit, numbered = _vital_chit(kind, val)
         if chit is not None:
             _paste_icon_fit(img, chit, (cx - 58, cy - 62, cx + 58, cy + 62))
-            if not numbered:
-                _chit_numeral(d, kind, val, cx, cy, 124)
         else:
+            # only reachable if a chit file is missing from the kit
             _box_text(d, str(val), box, fill=(240, 240, 240), stat=True, grow=0.9)
     _box_text(d, _wm(art_path), se_reg("Investigator", "Artist"),
               fill=(70, 58, 46), max_size=18, align="left")
