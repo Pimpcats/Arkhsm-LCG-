@@ -7,6 +7,21 @@
     "encounter": [
       "d-treachary"
     ],
-    "_links": []
+    "_links": [
+      [
+        "d-still",
+        "d-test"
+      ]
+    ],
+    "_map": {
+      "d-test": [
+        2,
+        3
+      ],
+      "d-still": [
+        0,
+        4
+      ]
+    }
   }
 }

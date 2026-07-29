@@ -5,7 +5,15 @@
     "clues": 1,
     "color": "#25807a",
     "clues_per_investigator": false,
-    "icons": "circle"
+    "icons": "circle",
+    "text": "The night is eery[action][reaction][fast]",
+    "traits": "[action][fast][reaction][wil]",
+    "connections": [
+      {
+        "symbol": "hourglass",
+        "color": "#ffff80"
+      }
+    ]
   },
   "d-treachary": {
     "name": "treachary",
@@ -18,7 +26,7 @@
     "int": 1,
     "com": 1,
     "agi": 1,
-    "health": 4,
+    "health": 9,
     "sanity": 2,
     "class": "Guardian",
     "subtitle": "fdsaf",
@@ -35,6 +43,12 @@
     "clues": 1,
     "icons": "hourglass",
     "color": "#ffff80",
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "connections": [
+      {
+        "symbol": "circle",
+        "color": "#25807a"
+      }
+    ]
   }
 }
