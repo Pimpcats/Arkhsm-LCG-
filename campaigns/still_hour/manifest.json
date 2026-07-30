@@ -1,0 +1,258 @@
+[
+  {
+    "id": "sthr-elias",
+    "art_type": "investigator_portrait",
+    "scene": "standing before a dark unlit lighthouse at night, salt wind pulling at his coat",
+    "seed": 7240,
+    "character": "elias"
+  },
+  {
+    "id": "sthr-elias-back",
+    "art_type": "investigator_portrait",
+    "no_art": true,
+    "frame": "investigator_back"
+  },
+  {
+    "id": "sthr-lamp",
+    "art_type": "asset",
+    "scene": "an old brass storm-lantern glowing faint amber in fog, close-up still life",
+    "seed": 6540
+  },
+  {
+    "id": "sthr-donebefore",
+    "art_type": "skill",
+    "scene": "hands gripping a rail, knuckles white, ghostly repeated afterimages of the same gesture",
+    "seed": 2901,
+    "character": "elias"
+  },
+  {
+    "id": "sthr-eighthgrave",
+    "art_type": "treachery",
+    "scene": "eight identical fresh graves in a row under a folding starless sky, one open and empty",
+    "seed": 3720
+  },
+  {
+    "id": "sthr-ayako",
+    "art_type": "investigator_portrait",
+    "scene": "in a lamplit reading room past midnight, surrounded by open books, one page glowing faintly wrong",
+    "seed": 7289,
+    "character": "ayako"
+  },
+  {
+    "id": "sthr-ayako-back",
+    "art_type": "investigator_portrait",
+    "no_art": true,
+    "frame": "investigator_back"
+  },
+  {
+    "id": "sthr-lexicon",
+    "art_type": "asset",
+    "scene": "a battered journal filled with spiraling unreadable script, annotations crowding the margins, candlelight",
+    "seed": 836
+  },
+  {
+    "id": "sthr-itmeanswait",
+    "art_type": "event",
+    "scene": "a raised hand in a stillness gesture toward an unseen presence, dust motes frozen mid-air",
+    "seed": 3888,
+    "character": "ayako"
+  },
+  {
+    "id": "sthr-untranslatable",
+    "art_type": "treachery",
+    "scene": "a page of writhing script that hurts to look at, the letters casting shadows in the wrong direction",
+    "seed": 6086
+  },
+  {
+    "id": "sthr-cass",
+    "art_type": "investigator_portrait",
+    "scene": "alone at a card table, dealing the same hand again, smoke hanging motionless in the air",
+    "seed": 6540,
+    "character": "cass"
+  },
+  {
+    "id": "sthr-cass-back",
+    "art_type": "investigator_portrait",
+    "no_art": true,
+    "frame": "investigator_back"
+  },
+  {
+    "id": "sthr-markeddeck",
+    "art_type": "asset",
+    "scene": "a worn deck of playing cards fanned on green felt, tiny scratches on the backs catching lamplight",
+    "seed": 2803
+  },
+  {
+    "id": "sthr-seenthishand",
+    "art_type": "event",
+    "scene": "catching a falling card mid-air without looking at it, barroom blur behind",
+    "seed": 4504,
+    "character": "cass"
+  },
+  {
+    "id": "sthr-housewins",
+    "art_type": "enemy",
+    "scene": "a debt collector in a long coat at the end of a hallway, ledger in hand, face in shadow, patient",
+    "seed": 2537
+  },
+  {
+    "id": "sthr-seraphine",
+    "art_type": "investigator_portrait",
+    "scene": "mid-seance, reaching toward a darkness that reaches back, candle flames bending sideways",
+    "seed": 2271,
+    "character": "sera"
+  },
+  {
+    "id": "sthr-seraphine-back",
+    "art_type": "investigator_portrait",
+    "no_art": true,
+    "frame": "investigator_back"
+  },
+  {
+    "id": "sthr-bell",
+    "art_type": "asset",
+    "scene": "a small bronze hand-bell on dark velvet, its surface etched with hour markings, faint blue afterglow",
+    "seed": 6463
+  },
+  {
+    "id": "sthr-rememberending",
+    "art_type": "event",
+    "scene": "her eyes reflecting a scene that has not happened yet, the room around her dissolving",
+    "seed": 5890,
+    "character": "sera"
+  },
+  {
+    "id": "sthr-debtofhours",
+    "art_type": "treachery",
+    "scene": "a grandfather clock with its hands spinning backward, shadow spilling from the open case like water",
+    "seed": 3881
+  },
+  {
+    "id": "sthr-birdie",
+    "art_type": "investigator_portrait",
+    "scene": "on an empty night road at the edge of town, glancing back over her shoulder, distant lit windows",
+    "seed": 7919,
+    "character": "birdie"
+  },
+  {
+    "id": "sthr-birdie-back",
+    "art_type": "investigator_portrait",
+    "no_art": true,
+    "frame": "investigator_back"
+  },
+  {
+    "id": "sthr-compass",
+    "art_type": "asset",
+    "scene": "a small brass compass in an open palm, needle pointing at nothing on the map beneath",
+    "seed": 864
+  },
+  {
+    "id": "sthr-igetout",
+    "art_type": "event",
+    "scene": "slipping through a closing door of light, reaching hands just missing her coat",
+    "seed": 941,
+    "character": "birdie"
+  },
+  {
+    "id": "sthr-nobodybelieves",
+    "art_type": "treachery",
+    "scene": "a crowd of townsfolk looking straight through the viewer, one empty space where a person should be",
+    "seed": 6044
+  },
+  {
+    "id": "sthr-foreknowledge",
+    "art_type": "skill",
+    "scene": "a chess move played before the opponent's hand has left the piece, afterimages of futures",
+    "seed": 5274
+  },
+  {
+    "id": "sthr-dejavu",
+    "art_type": "event",
+    "scene": "the same doorway twice in one image, mirrored, a single figure entering both",
+    "seed": 8031
+  },
+  {
+    "id": "sthr-musclememory",
+    "art_type": "skill",
+    "scene": "hands performing a delicate task in total darkness, perfect and sure, faint motion trails",
+    "seed": 4756
+  },
+  {
+    "id": "sthr-rehearsedescape",
+    "art_type": "event",
+    "scene": "a night alley with an escape route chalk-marked in glowing lines only the viewer can see",
+    "seed": 6562
+  },
+  {
+    "id": "sthr-longwayround",
+    "art_type": "event",
+    "scene": "a street map with one path burned through it, footsteps skipping impossible distances",
+    "seed": 4805
+  },
+  {
+    "id": "sthr-borrowedtime",
+    "art_type": "asset",
+    "scene": "an hourglass with sand flowing upward into the top bulb, cradled in careful hands",
+    "seed": 4651
+  },
+  {
+    "id": "sthr-thistimeforsure",
+    "art_type": "event",
+    "scene": "the same die frozen mid-tumble at five angles at once, one face beginning to glow",
+    "seed": 7073
+  },
+  {
+    "id": "sthr-anchorpoint",
+    "art_type": "asset",
+    "scene": "a single fixed lit window on a street where everything else blurs with motion",
+    "seed": 3881
+  },
+  {
+    "id": "sthr-cassandrasnotebook",
+    "art_type": "asset",
+    "scene": "a notebook whose ink writes itself, the pages ahead already filled, pen hovering unheld",
+    "seed": 1026
+  },
+  {
+    "id": "sthr-hourlearnedname",
+    "art_type": "event",
+    "scene": "a name spoken as visible frost in the air, a vast shadow flinching back from it",
+    "seed": 6716
+  },
+  {
+    "id": "sthr-appointed",
+    "art_type": "enemy",
+    "scene": "a tall wrong silhouette at the far end of an empty street, too many angles, not quite arriving, featureless, dread, negative space",
+    "seed": 2306
+  },
+  {
+    "id": "sthr-appointedwhisper",
+    "art_type": "treachery",
+    "scene": "an ear-shaped ripple in the air over a sleeping town, words visible as thin black threads",
+    "seed": 7696
+  },
+  {
+    "id": "sthr-crossing",
+    "art_type": "treachery",
+    "scene": "a freestanding doorway in the town square, its far side showing the same square one hour later",
+    "seed": 1662
+  },
+  {
+    "id": "sthr-bellringer",
+    "art_type": "enemy",
+    "scene": "a drowned figure in sodden vestments hauling a bell rope in a flooded belfry, water past its waist, the bell mid-swing",
+    "seed": 2992
+  },
+  {
+    "id": "sthr-wearssheriff",
+    "art_type": "enemy",
+    "scene": "a sheriff on courthouse steps frozen mid-speech, seams of pale light splitting his silhouette, the crowd not noticing",
+    "seed": 4581
+  },
+  {
+    "id": "sthr-onewhorides",
+    "art_type": "enemy",
+    "scene": "a lone rider on a carousel horse at night, motion-blurred at the edges, face perfectly still and smiling",
+    "seed": 3895
+  }
+]

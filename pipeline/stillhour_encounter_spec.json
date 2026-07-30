@@ -1,0 +1,79 @@
+[
+  {
+    "deck": 95040,
+    "id": "sthr-appointed",
+    "type": "Enemy",
+    "name": "The Appointed",
+    "subtitle": "",
+    "class": "Mythos",
+    "traits": "Monster. Elite.",
+    "encounter": true,
+    "unique": true,
+    "elite": true,
+    "quantity": 1
+  },
+  {
+    "deck": 95041,
+    "id": "sthr-appointedwhisper",
+    "type": "Treachery",
+    "name": "The Appointed's Whisper",
+    "subtitle": "",
+    "class": "Mythos",
+    "traits": "",
+    "encounter": true,
+    "quantity": 2
+  },
+  {
+    "deck": 95042,
+    "id": "sthr-crossing",
+    "type": "Treachery",
+    "name": "The Crossing",
+    "subtitle": "",
+    "class": "Mythos",
+    "traits": "",
+    "encounter": true,
+    "quantity": 1
+  },
+  {
+    "deck": 95043,
+    "id": "sthr-bellringer",
+    "type": "Enemy",
+    "name": "The Bell-Ringer Beneath",
+    "subtitle": "What Pulls the Thirteenth Toll",
+    "class": "Mythos",
+    "traits": "Monster. Named. Elite.",
+    "encounter": true,
+    "unique": true,
+    "elite": true,
+    "victory": 2,
+    "quantity": 1
+  },
+  {
+    "deck": 95044,
+    "id": "sthr-wearssheriff",
+    "type": "Enemy",
+    "name": "What Wears the Sheriff",
+    "subtitle": "Giving the Same Speech",
+    "class": "Mythos",
+    "traits": "Humanoid. Monster. Named. Elite.",
+    "encounter": true,
+    "unique": true,
+    "elite": true,
+    "victory": 3,
+    "quantity": 1
+  },
+  {
+    "deck": 95045,
+    "id": "sthr-onewhorides",
+    "type": "Enemy",
+    "name": "The One Who Rides Forever",
+    "subtitle": "Round and Round",
+    "class": "Mythos",
+    "traits": "Humanoid. Named. Elite.",
+    "encounter": true,
+    "unique": true,
+    "elite": true,
+    "victory": 2,
+    "quantity": 1
+  }
+]

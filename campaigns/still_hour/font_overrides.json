@@ -1,0 +1,24 @@
+{
+  "d-still": {
+    "fields": {
+      "text": {
+        "size": 1.08,
+        "dy": -5
+      },
+      "name": {
+        "font": "Arkhamic.ttf"
+      }
+    }
+  },
+  "d-guy": {
+    "fields": {
+      "wil": {
+        "dx": 3,
+        "dy": -1
+      },
+      "text": {
+        "font": "Arkhamic.ttf"
+      }
+    }
+  }
+}

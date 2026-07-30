@@ -1,0 +1,74 @@
+--- THE STILL HOUR — campaign constants (derived from investigator count).
+-- Every threshold in the campaign is a function of the number of investigators,
+-- per aging_3p_v0.3 §2 and campaign_guide_v0.5 §10. Nothing here is hardcoded to
+-- three players; three players is simply the tuned baseline (n = 3 -> 12 / 18).
+--
+-- Rules encoded:
+--   reset threshold R  = 6 x investigators   (Dissonance hits R -> loop resets)
+--   Appointed Arrived  = 4 x investigators   (Noticed band; the Appointed arrives)
+--   Memory soft cap    = 6 x investigators
+--   contest target     = 4 x investigators   (finale; 8/12/16 at 2/3/4p — CO-001)
+--   scar cap           = floor(R / 3)         (start-of-loop Dissonance ceiling)
+--   bands              = thirds of R: Calm / Glitch / Noticed
+--
+-- Solo (n = 1) is intentionally looser than the pure 4x/6x rule
+-- (6 / 9 instead of 4 / 6) to keep true-solo playable — guide §10.
+local Constants = {}
+
+Constants.BAND_CALM = "Calm"
+Constants.BAND_GLITCH = "Glitch"
+Constants.BAND_NOTICED = "Noticed"
+
+-- Baseline static-token count added to the chaos bag per band (encounter v0.4 §0).
+Constants.STATIC_BY_BAND = {
+  [Constants.BAND_CALM] = 0,
+  [Constants.BAND_GLITCH] = 1,
+  [Constants.BAND_NOTICED] = 2,
+}
+
+Constants.HOUR_FIRST = 1
+Constants.HOUR_LAST = 9
+
+--- Compute the full constant set for a given investigator count.
+-- @param n integer number of investigators (>= 1)
+-- @return table of thresholds
+function Constants.forCount(n)
+  n = math.max(1, math.floor(n or 3))
+  local reset = 6 * n
+  local appointed = 4 * n
+  if n == 1 then
+    -- Documented solo override (guide §10): looser than 4/6.
+    reset = 9
+    appointed = 6
+  end
+  return {
+    investigators = n,
+    resetThreshold = reset,
+    appointedThreshold = appointed,
+    memoryCap = 6 * n,
+    -- Finale contest target = 4 x investigators (8 / 12 / 16 at 2 / 3 / 4p).
+    -- Resolved by CO-001: the guide's "12 at three players" was intended and
+    -- "3 x investigators" was an arithmetic slip (3 x 3 = 9). Nine made the
+    -- finale too easy and undercut the "cost is age" payoff.
+    contestTarget = 4 * n,
+    scarCap = math.floor(reset / 3),
+    bandGlitchStart = math.floor(reset / 3),
+    bandNoticedStart = math.floor(2 * reset / 3),
+  }
+end
+
+--- Classify a Dissonance value into its band.
+-- @param dissonance integer
+-- @param n integer investigator count
+-- @return string one of BAND_CALM / BAND_GLITCH / BAND_NOTICED
+function Constants.bandFor(dissonance, n)
+  local c = Constants.forCount(n)
+  if dissonance >= c.bandNoticedStart then
+    return Constants.BAND_NOTICED
+  elseif dissonance >= c.bandGlitchStart then
+    return Constants.BAND_GLITCH
+  end
+  return Constants.BAND_CALM
+end
+
+return Constants

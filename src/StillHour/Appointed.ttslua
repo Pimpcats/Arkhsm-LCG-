@@ -1,0 +1,151 @@
+--- THE STILL HOUR — THE APPOINTED (P5 / CO-002).
+--
+-- The boss is not a monster that spawns; it is an arrival the night owes. It
+-- occupies an Approach stage (Unseen -> Sensed -> Emerging -> Arrived) tracked in
+-- CampaignState.appointedStage, and manifests on the board once Sensed. It cannot
+-- be attacked, evaded, or defeated — only HELD BACK (pushed back one stage) to
+-- buy time on the clock.
+--
+-- This module owns the enemy's *behaviour*: manifest/remove by stage, the
+-- stage-gated Forced effects, Prey selection, and the Hold Back action. Board
+-- specifics (placing the figure, dealing damage to a seat) are delegated to a
+-- `ctx` of callbacks so the module stays board-agnostic and testable; any
+-- callback may be omitted (then it is a no-op).
+--
+-- Approach advancement lives OUTSIDE this module, on purpose: the clock
+-- (Hourglass.ttslua, Hours V/VII/VIII) and Dissonance bands (Dissonance.ttslua,
+-- entering Glitch/Noticed) call CampaignState.advanceAppointed(). Cards (The
+-- Crossing, The Debt of Hours) do the same. This module reads the resulting
+-- stage; it never advances itself.
+
+local Constants = require("StillHour/Constants")
+local CampaignState = require("StillHour/CampaignState")
+local Hourglass = require("StillHour/Hourglass")
+
+local Appointed = {}
+
+Appointed.STAGE_NAMES = { [0] = "Unseen", [1] = "Sensed", [2] = "Emerging", [3] = "Arrived" }
+Appointed.HOLD_BACK_DIFFICULTY = 4          -- test [wil] or [com] (4)
+Appointed.ARRIVED_DAMAGE = 2
+Appointed.ARRIVED_HORROR = 2
+
+------------------------------------------------------------------ stage read --
+
+function Appointed.stage()
+  return CampaignState.getAppointedStage()
+end
+
+function Appointed.stageName()
+  return Appointed.STAGE_NAMES[CampaignState.getAppointedStage()]
+end
+
+--- On the board while Sensed or later (stage >= 1).
+function Appointed.isManifest()
+  return CampaignState.getAppointedStage() >= 1
+end
+
+--- Gains Hunter while Emerging or later (stage >= 2).
+function Appointed.isHunter()
+  return CampaignState.getAppointedStage() >= 2
+end
+
+--------------------------------------------------------------------- targeting --
+
+--- Prey = the investigator with the most on-card Memory. Pass a map
+-- { investigatorId = memoryCount }. Ties resolve to the first max seen.
+function Appointed.prey(memoryByInvestigator)
+  local best, bestId
+  for id, m in pairs(memoryByInvestigator or {}) do
+    if best == nil or m > best then
+      best = m
+      bestId = id
+    end
+  end
+  return bestId
+end
+
+------------------------------------------------------------- board manifest --
+
+--- Reconcile the board figure to the current stage: place it at the farthest
+-- location when it should be manifest and isn't; remove it when stage drops to 0.
+-- ctx.isOnBoard() -> bool, ctx.placeAtFarthest(), ctx.removeFromBoard().
+function Appointed.syncBoard(ctx)
+  local onBoard = ctx and ctx.isOnBoard and ctx.isOnBoard()
+  if Appointed.isManifest() then
+    if not onBoard and ctx and ctx.placeAtFarthest then
+      ctx.placeAtFarthest()
+    end
+  else
+    if onBoard and ctx and ctx.removeFromBoard then
+      ctx.removeFromBoard()
+    end
+  end
+end
+
+--------------------------------------------------------- stage-gated effects --
+
+--- End of round, while Sensed (stage 1 only): each investigator at its location
+-- takes 1 horror. Returns horror dealt (0 if not Sensed).
+function Appointed.onRoundEnd(ctx)
+  if CampaignState.getAppointedStage() == 1 then
+    if ctx and ctx.horrorToInvestigatorsAtLocation then
+      ctx.horrorToInvestigatorsAtLocation(1)
+    end
+    return 1
+  end
+  return 0
+end
+
+--- On engaging an investigator, while Emerging (stage 2): that investigator
+-- takes 1 horror. Returns horror dealt (0 if not Emerging).
+function Appointed.onEngage(ctx)
+  if CampaignState.getAppointedStage() == 2 then
+    if ctx and ctx.horrorToEngaged then
+      ctx.horrorToEngaged(1)
+    end
+    return 1
+  end
+  return 0
+end
+
+--- The Appointed attacks. ONLY while Arrived (stage 3) does it deal damage: 2
+-- damage + 2 horror, then raise Dissonance by 1. A Sensed/Emerging figure does
+-- not attack, so this returns zeros below stage 3.
+-- @return table {damage, horror, dissonanceRaised}
+function Appointed.onAttack(deps)
+  if CampaignState.getAppointedStage() < 3 then
+    return { damage = 0, horror = 0, dissonanceRaised = false }
+  end
+  if deps and deps.dissonance then
+    deps.dissonance.raise(1, deps.bag)
+  else
+    CampaignState.raiseDissonance(1)
+  end
+  return { damage = Appointed.ARRIVED_DAMAGE, horror = Appointed.ARRIVED_HORROR, dissonanceRaised = true }
+end
+
+----------------------------------------------------------------- counterplay --
+
+--- Hold Back — call this on a SUCCESSFUL [wil]/[com] (4) test. Pushes the
+-- Approach back one stage AND rewinds the Hourglass by 1 Hour, then reconciles
+-- the board. Returns the new stage.
+function Appointed.holdBack(ctx)
+  local newStage = CampaignState.pushBackAppointed()
+  Hourglass.rewind(1, ctx)
+  Appointed.syncBoard(ctx)
+  return newStage
+end
+
+--- It cannot be defeated. Any effect that would defeat or remove it is replaced
+-- (it does not leave play). Always returns false ("was not defeated").
+function Appointed.attemptDefeat()
+  return false
+end
+
+--- It cannot be attacked or evaded either — expose these for callers/UX so the
+-- three "cannot" clauses live in one place.
+Appointed.canBeAttacked = false
+Appointed.canBeEvaded = false
+Appointed.canBeDefeated = false
+
+return Appointed

@@ -1,0 +1,13 @@
+{
+  "a1111": {
+    "cwd": "C:\\Users\\Squarestudio\\Documents\\ComfyUI\\.venv\\Lib\\site-packages\\cm_cli",
+    "command": "webui.bat --api",
+    "startup_timeout": 420
+  },
+  "comfy": {
+    "cwd": "C:\\Users\\Squarestudio\\Documents\\ComfyUI\\.venv\\Lib\\site-packages\\cm_cli",
+    "command": "python main.py",
+    "startup_timeout": 300
+  },
+  "_note": "Machine-local backend rig: where A1111/ComfyUI live and how to start them. The Studio's Illustrate tab edits this, launches the backend on demand, and auto-launches it before any generate job. A1111: 'webui.bat --api' guarantees the API is on; if you rely on custom COMMANDLINE_ARGS, set command to 'webui-user.bat' and add --api to that file instead."
+}

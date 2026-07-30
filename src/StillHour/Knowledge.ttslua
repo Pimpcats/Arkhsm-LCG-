@@ -1,0 +1,95 @@
+--- THE STILL HOUR — the Knowledge Track (P6 support).
+--
+-- The registry of facts about Ambergrove. Facts are unlocked by completing
+-- district objectives (CampaignState.unlockFact), never purchased. Flagged facts
+-- permanently edit the night — Hours (Hourglass), locations (Locations), and the
+-- finale gates handled here. This module is the single source of truth for the
+-- fact ids the rest of the code references, plus the Act/finale gates that read
+-- how many are known (campaign_guide_v0.5 §7-§8).
+
+local CampaignState = require("StillHour/CampaignState")
+
+local Knowledge = {}
+
+-- id -> { name, district, layer = "prologue"|"surface"|"deep"|"assembled" }
+Knowledge.FACTS = {
+  ["you-are-unstuck"]          = { name = "You Are Unstuck",           district = "Prologue",    layer = "prologue" },
+  ["the-lamp-was-never-lit"]   = { name = "The Lamp Was Never Lit",    district = "Lighthouse",  layer = "surface" },
+  ["the-keepers-ninth-death"]  = { name = "The Keeper's Ninth Death",  district = "Lighthouse",  layer = "deep" },
+  ["the-thirteenth-toll"]      = { name = "The Thirteenth Toll",       district = "Church",      layer = "surface" },
+  ["the-hour-was-wrong"]       = { name = "The Hour Was Wrong",        district = "Church",      layer = "deep" },
+  ["the-road-remembers"]       = { name = "The Road Remembers",        district = "Sunken Road", layer = "surface" },
+  ["who-walks-beside-you"]     = { name = "Who Walks Beside You",      district = "Sunken Road", layer = "deep" },
+  ["the-sheriff-is-already-dead"] = { name = "The Sheriff Is Already Dead", district = "Square", layer = "surface" },
+  ["the-vote-that-never-ends"] = { name = "The Vote That Never Ends",  district = "Square",      layer = "deep" },
+  ["the-wheel-still-turns"]    = { name = "The Wheel Still Turns",     district = "Fairground",  layer = "surface" },
+  ["the-ticket-takers-bargain"] = { name = "The Ticket-Taker's Bargain", district = "Fairground", layer = "deep" },
+  ["what-the-almanac-hid"]     = { name = "What the Almanac Hid",      district = "Almanac",     layer = "surface" },
+  ["the-appointeds-name"]      = { name = "The Appointed's Name",      district = "Almanac",     layer = "deep" },
+  ["the-way-the-night-breaks"] = { name = "The Way the Night Breaks",  district = "(assembled)", layer = "assembled" },
+}
+
+function Knowledge.knows(factId)
+  return CampaignState.knows(factId)
+end
+
+--- Unlock a fact by id. Returns true if newly unlocked. Errors on unknown id so
+-- typos surface immediately rather than silently no-op'ing.
+function Knowledge.unlock(factId)
+  assert(Knowledge.FACTS[factId], "unknown Knowledge fact: " .. tostring(factId))
+  return CampaignState.unlockFact(factId)
+end
+
+local function countKnownByLayer(layer)
+  local n = 0
+  for id, f in pairs(Knowledge.FACTS) do
+    if f.layer == layer and CampaignState.knows(id) then
+      n = n + 1
+    end
+  end
+  return n
+end
+
+function Knowledge.surfaceKnownCount()
+  return countKnownByLayer("surface")
+end
+
+function Knowledge.deepKnownCount()
+  return countKnownByLayer("deep")
+end
+
+--- Act II opens at the interlude once 3+ surface facts are known (guide §8).
+function Knowledge.actIIOpen()
+  return Knowledge.surfaceKnownCount() >= 3
+end
+
+--- "The Way the Night Breaks" assembles when you know The Appointed's Name, The
+-- Vote That Never Ends, and any ONE OTHER deep fact (guide §6.6).
+function Knowledge.canAssembleFinale()
+  if not (CampaignState.knows("the-appointeds-name") and CampaignState.knows("the-vote-that-never-ends")) then
+    return false
+  end
+  for id, f in pairs(Knowledge.FACTS) do
+    if f.layer == "deep" and id ~= "the-appointeds-name" and id ~= "the-vote-that-never-ends"
+        and CampaignState.knows(id) then
+      return true
+    end
+  end
+  return false
+end
+
+--- Unlock the assembled finale fact if its inputs are present. Returns true if it
+-- was newly assembled this call.
+function Knowledge.assembleFinale()
+  if Knowledge.canAssembleFinale() and not CampaignState.knows("the-way-the-night-breaks") then
+    return CampaignState.unlockFact("the-way-the-night-breaks")
+  end
+  return false
+end
+
+--- The finale may be attempted once the assembled fact is known.
+function Knowledge.finaleAttemptable()
+  return CampaignState.knows("the-way-the-night-breaks")
+end
+
+return Knowledge

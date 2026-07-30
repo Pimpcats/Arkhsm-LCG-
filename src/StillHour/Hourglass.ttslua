@@ -1,0 +1,209 @@
+--- THE STILL HOUR — the Hourglass / Occultation clock (P6, data model).
+--
+-- The Occultation is a FIXED, ordered stack of nine Hour cards (encounter v0.4
+-- §1). The Hourglass advances by time and by Skip effects; each newly reached
+-- Hour resolves its "when reached" effect IN ORDER — so a big Skip that jumps
+-- several Hours must resolve every intervening Hour, not just the destination.
+--
+-- Knowledge facts edit specific Hours. Two edits change the clock's STRUCTURE
+-- and are handled here:
+--   * "The Hour Was Wrong"     -> Hour IV is removed entirely (skipped).
+--   * "The Way the Night Breaks" -> reaching Hour IX may open the finale instead
+--     of forcing a reset.
+-- The remaining edits change what an Hour DOES; those are applied inside the
+-- per-Hour handlers via the knows() checks.
+--
+-- Board-specific consequences (who is at a Church, moving investigators off an
+-- impassable location, advancing the Appointed, etc.) are delegated to callbacks
+-- in `ctx` so this module stays board-agnostic and testable. Any callback may be
+-- omitted; it is then a no-op.
+--
+-- ctx fields (all optional):
+--   ctx.dissonance      -- the Dissonance module (for raise/reduce + bag sync)
+--   ctx.bag             -- chaos-bag adapter passed through to Dissonance
+--   ctx.anyoneAtChurch  -- function() -> bool
+--   ctx.log             -- function(hourNumber, hourName, message)
+--   ctx.onHourReached   -- function(hourNumber, descriptor)
+--   ctx.onReset         -- function()
+--   ctx.onFinaleAttemptable -- function()
+--   ctx.onAppointedAdvance  -- function(stage) board hook after the clock ratchets
+--                              the Appointed's Approach (Hours V/VII/VIII)
+--   ctx.addStatic       -- function(n) temporary bag static (Hour VI)
+--   ctx.removeStatic    -- function(n) (Hour VI when almanac fact known)
+--   ctx.enemiesGetFightBonus -- function(n) (Hour VIII)
+
+local Constants = require("StillHour/Constants")
+local CampaignState = require("StillHour/CampaignState")
+
+local Hourglass = {}
+
+Hourglass.HOUR_NAMES = {
+  [1] = "First Dark",
+  [2] = "Low Water",
+  [3] = "The Thirteenth Toll",
+  [4] = "The Road Gives Way",
+  [5] = "The Streets Empty",
+  [6] = "The Wrong Sky",
+  [7] = "The Guest Approaches",
+  [8] = "Almost",
+  [9] = "The Appointed Hour",
+}
+
+local function raiseDissonance(ctx, n)
+  if ctx and ctx.dissonance then
+    return ctx.dissonance.raise(n, ctx.bag)
+  end
+  return CampaignState.raiseDissonance(n)
+end
+
+-- Ratchet the Appointed's Approach up as the clock reaches its trigger Hours
+-- (CO-002 §1): Hour V -> Sensed(1), VII -> Emerging(2), VIII -> Arrived(3).
+local function advanceAppointed(ctx, stage)
+  local s = CampaignState.advanceAppointed(stage)
+  if ctx and ctx.onAppointedAdvance then
+    ctx.onAppointedAdvance(s)
+  end
+  return s
+end
+
+--- Is this Hour structurally removed from the clock by a Knowledge fact?
+function Hourglass.isHourRemoved(hour)
+  if hour == 4 and CampaignState.knows("the-hour-was-wrong") then
+    return true
+  end
+  return false
+end
+
+-- Per-Hour "when reached" handlers. Return a short descriptor string for logging.
+local HOUR_HANDLERS = {
+  [1] = function(_) return "The night begins." end,
+
+  [2] = function(ctx)
+    if ctx and ctx.eachInvestigatorDrawsEncounter then
+      ctx.eachInvestigatorDrawsEncounter()
+    end
+    return "Each investigator draws 1 encounter card."
+  end,
+
+  [3] = function(ctx)
+    -- Raise Dissonance by 1; by 2 instead if anyone is at a Church location,
+    -- UNLESS "The Thirteenth Toll" is known (then skip the extra +1).
+    local atChurch = ctx and ctx.anyoneAtChurch and ctx.anyoneAtChurch()
+    local amount = 1
+    if atChurch and not CampaignState.knows("the-thirteenth-toll") then
+      amount = 2
+    end
+    raiseDissonance(ctx, amount)
+    return string.format("Raise Dissonance by %d.", amount)
+  end,
+
+  [4] = function(ctx)
+    -- Handled structurally by isHourRemoved(); if we get here the fact is unknown.
+    if ctx and ctx.roadGivesWay then
+      ctx.roadGivesWay()
+    end
+    return "The location with the fewest clues becomes impassable."
+  end,
+
+  [5] = function(ctx)
+    advanceAppointed(ctx, 1)  -- Hour V -> at least Sensed
+    if CampaignState.band() ~= Constants.BAND_CALM then
+      if ctx and ctx.awakenSleepwalkingEchoes then
+        ctx.awakenSleepwalkingEchoes()
+      end
+      return "The streets empty. Sleepwalking Echoes awaken; the Appointed is Sensed."
+    end
+    return "The streets empty. The Appointed is Sensed (Echoes still asleep in Calm)."
+  end,
+
+  [6] = function(ctx)
+    if CampaignState.knows("what-the-almanac-hid") then
+      if ctx and ctx.removeStatic then ctx.removeStatic(1) end
+      return "Each investigator removes 1 [static]."
+    end
+    if ctx and ctx.addStatic then ctx.addStatic(1) end
+    return "Add 1 [static] token until the next reset."
+  end,
+
+  [7] = function(ctx)
+    advanceAppointed(ctx, 2)  -- Hour VII -> at least Emerging
+    return "The guest approaches. The Appointed is Emerging"
+      .. (CampaignState.knows("the-appointeds-name") and " (arriving exhausted)." or ".")
+  end,
+
+  [8] = function(ctx)
+    raiseDissonance(ctx, 2)
+    advanceAppointed(ctx, 3)  -- Hour VIII -> Arrived
+    if ctx and ctx.enemiesGetFightBonus then ctx.enemiesGetFightBonus(1) end
+    return "Almost. Raise Dissonance by 2; all enemies +1 Fight; the Appointed has Arrived."
+  end,
+
+  [9] = function(ctx)
+    if CampaignState.knows("the-way-the-night-breaks") then
+      if ctx and ctx.onFinaleAttemptable then ctx.onFinaleAttemptable() end
+      return "The Appointed Hour — you may attempt the finale."
+    end
+    if ctx and ctx.onReset then ctx.onReset() end
+    return "The Appointed Hour — the night ends. Trigger a reset."
+  end,
+}
+
+--- Resolve a single Hour's "when reached" effect (unless removed).
+local function resolveHour(hour, ctx)
+  if Hourglass.isHourRemoved(hour) then
+    return
+  end
+  local handler = HOUR_HANDLERS[hour]
+  local descriptor = handler and handler(ctx) or ""
+  if ctx and ctx.log then
+    ctx.log(hour, Hourglass.HOUR_NAMES[hour], descriptor)
+  end
+  if ctx and ctx.onHourReached then
+    ctx.onHourReached(hour, descriptor)
+  end
+end
+
+--- Advance the Hourglass by `n` Hours, resolving every newly reached Hour in
+-- order (removed Hours are stepped over without resolving). Stops at Hour IX.
+-- @return the new Hour
+function Hourglass.advance(n, ctx)
+  n = n or 1
+  local current = CampaignState.getHour()
+  for _ = 1, n do
+    if current >= Constants.HOUR_LAST then
+      break
+    end
+    -- Step to the next non-removed Hour.
+    repeat
+      current = current + 1
+    until current >= Constants.HOUR_LAST or not Hourglass.isHourRemoved(current)
+    CampaignState.setHour(current)
+    resolveHour(current, ctx)
+    if current >= Constants.HOUR_LAST then
+      break
+    end
+  end
+  return CampaignState.getHour()
+end
+
+--- Rewind the Hourglass by `n` Hours (e.g. Hold Back, the Bell). Rewinding does
+-- NOT re-resolve Hour effects (you are un-marking the Hour, not living it again).
+-- @return the new Hour
+function Hourglass.rewind(n, ctx)
+  n = n or 1
+  local current = CampaignState.getHour()
+  for _ = 1, n do
+    if current <= Constants.HOUR_FIRST then
+      break
+    end
+    repeat
+      current = current - 1
+    until current <= Constants.HOUR_FIRST or not Hourglass.isHourRemoved(current)
+  end
+  if ctx and ctx.log then
+    ctx.log(current, Hourglass.HOUR_NAMES[current], "Hourglass rewound.")
+  end
+  return CampaignState.setHour(current)
+end
+
+return Hourglass

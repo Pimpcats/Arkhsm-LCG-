@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+out/
+state/
+art/
+se/
+assets/frames/*
+!assets/frames/README.md
+!assets/frames/templates/
+!assets/frames/psd/
+!assets/frames/se/
+vendor/
+assets/fonts/ArnoPro*
+assets/fonts/MinionPro*
+pipeline/art_urls.json
+
+# selftest safety copies of the owner state (removed when the run ends)
+*.pretest-backup
+*.pretest-copy

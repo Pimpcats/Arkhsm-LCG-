@@ -1,0 +1,67 @@
+[
+  {
+    "id": "d-still",
+    "type": "Location",
+    "name": "Still",
+    "class": "Mythos",
+    "encounter": true,
+    "shroud": 2,
+    "clues": 1,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "d-blight",
+    "type": "Enemy",
+    "name": "blight",
+    "class": "Mythos",
+    "encounter": true,
+    "fight": 2,
+    "health": 2,
+    "evade": 2,
+    "damage": 1,
+    "horror": 0
+  },
+  {
+    "id": "d-guy",
+    "type": "Investigator",
+    "name": "guy",
+    "class": "Guardian",
+    "wil": 1,
+    "int": 1,
+    "com": 1,
+    "agi": 1,
+    "health": 1,
+    "sanity": 1
+  },
+  {
+    "id": "d-agenda-1",
+    "type": "Agenda",
+    "name": "Agenda 1",
+    "class": "Mythos",
+    "encounter": true
+  },
+  {
+    "id": "d-treachary",
+    "type": "Treachery",
+    "name": "treachary",
+    "class": "Mythos",
+    "encounter": true
+  },
+  {
+    "id": "d-test",
+    "type": "Location",
+    "name": "test",
+    "class": "Mythos",
+    "encounter": true,
+    "shroud": 2,
+    "clues": 1,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "d-scenario-test",
+    "type": "Scenario",
+    "name": "Scenario test",
+    "class": "Mythos",
+    "encounter": true
+  }
+]

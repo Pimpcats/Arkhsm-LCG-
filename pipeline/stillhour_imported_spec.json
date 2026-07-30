@@ -1,0 +1,415 @@
+[
+  {
+    "id": "sthr-hour-1",
+    "type": "Agenda",
+    "name": "Hour I — First Dark",
+    "index": 1,
+    "number": 1
+  },
+  {
+    "id": "sthr-hour-2",
+    "type": "Agenda",
+    "name": "Hour II — Low Water",
+    "index": 2,
+    "number": 2
+  },
+  {
+    "id": "sthr-hour-3",
+    "type": "Agenda",
+    "name": "Hour III — The Thirteenth Toll",
+    "index": 3,
+    "number": 3
+  },
+  {
+    "id": "sthr-hour-4",
+    "type": "Agenda",
+    "name": "Hour IV — The Road Gives Way",
+    "index": 4,
+    "number": 4
+  },
+  {
+    "id": "sthr-hour-5",
+    "type": "Agenda",
+    "name": "Hour V — The Streets Empty",
+    "index": 5,
+    "number": 5
+  },
+  {
+    "id": "sthr-hour-6",
+    "type": "Agenda",
+    "name": "Hour VI — The Wrong Sky",
+    "index": 6,
+    "number": 6
+  },
+  {
+    "id": "sthr-hour-7",
+    "type": "Agenda",
+    "name": "Hour VII — The Guest Approaches",
+    "index": 7,
+    "number": 7
+  },
+  {
+    "id": "sthr-hour-8",
+    "type": "Agenda",
+    "name": "Hour VIII — Almost",
+    "index": 8,
+    "number": 8
+  },
+  {
+    "id": "sthr-hour-9",
+    "type": "Agenda",
+    "name": "Hour IX — The Appointed Hour",
+    "index": 9,
+    "number": 9
+  },
+  {
+    "id": "sthr-losthour",
+    "type": "Treachery",
+    "name": "Lost Hour",
+    "traits": "Static."
+  },
+  {
+    "id": "sthr-slippage",
+    "type": "Treachery",
+    "name": "Slippage",
+    "traits": "Static."
+  },
+  {
+    "id": "sthr-waitingcongregation",
+    "type": "Enemy",
+    "class": "Mythos",
+    "name": "The Waiting Congregation",
+    "traits": "Echo. Humanoid.",
+    "health": 2
+  },
+  {
+    "id": "sthr-drownedchoir",
+    "type": "Enemy",
+    "class": "Mythos",
+    "name": "The Drowned Choir",
+    "traits": "Echo. Monster.",
+    "health": 3
+  },
+  {
+    "id": "sthr-familiarface",
+    "type": "Enemy",
+    "class": "Mythos",
+    "name": "Familiar Face",
+    "traits": "Echo. Humanoid.",
+    "health": 2
+  },
+  {
+    "id": "sthr-lamplighterecho",
+    "type": "Enemy",
+    "class": "Mythos",
+    "name": "The Lamplighter's Echo",
+    "traits": "Echo. Humanoid.",
+    "health": 3
+  },
+  {
+    "id": "sthr-wrongturn",
+    "type": "Treachery",
+    "name": "Wrong Turn",
+    "traits": "Static."
+  },
+  {
+    "id": "sthr-rewind",
+    "type": "Treachery",
+    "name": "Rewind",
+    "traits": "Static. Peril."
+  },
+  {
+    "id": "sthr-deadair",
+    "type": "Treachery",
+    "name": "Dead Air",
+    "traits": "Static."
+  },
+  {
+    "id": "sthr-loopnotices",
+    "type": "Treachery",
+    "name": "The Loop Notices You",
+    "traits": "Static."
+  },
+  {
+    "id": "sthr-yearinanight",
+    "type": "Treachery",
+    "name": "A Year in a Night",
+    "traits": "Hex. Peril."
+  },
+  {
+    "id": "sthr-forgotten",
+    "type": "Treachery",
+    "name": "What You've Forgotten",
+    "traits": "Hex."
+  },
+  {
+    "id": "sthr-oldbones",
+    "type": "Treachery",
+    "name": "Old Bones",
+    "traits": "Hex. Peril."
+  },
+  {
+    "id": "sthr-loc-longpier",
+    "type": "Location",
+    "name": "The Long Pier",
+    "traits": "Ambergrove. Coastal.",
+    "shroud": 2,
+    "clues": 2,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-loc-almanacsteps",
+    "type": "Location",
+    "name": "The Almanac Steps",
+    "traits": "Ambergrove.",
+    "shroud": 2,
+    "clues": 3,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-scn-stillhour",
+    "type": "Scenario",
+    "name": "The Still Hour",
+    "tokens": [
+      {
+        "token": "skull",
+        "text": "-1. If Dissonance is in the Glitch band or higher, -2 instead."
+      },
+      {
+        "token": "cultist",
+        "text": "-2. If you fail, raise Dissonance by 1."
+      },
+      {
+        "token": "tablet",
+        "text": "-3. If the Appointed is Sensed or later, take 1 horror."
+      },
+      {
+        "token": "elderthing",
+        "text": "-4. If you fail, advance the Hourglass by 1 Hour."
+      }
+    ],
+    "difficulty": "STANDARD / HARD"
+  },
+  {
+    "id": "sthr-darkthatwaits",
+    "type": "Treachery",
+    "name": "The Dark That Waits",
+    "traits": "Terror."
+  },
+  {
+    "id": "sthr-somethingonstair",
+    "type": "Enemy",
+    "class": "Mythos",
+    "name": "Something on the Stair",
+    "traits": "Echo. Humanoid.",
+    "health": 1
+  },
+  {
+    "id": "sthr-loc-nave",
+    "type": "Location",
+    "name": "The Nave",
+    "traits": "Church.",
+    "shroud": 2,
+    "clues": 3,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-loc-belfry",
+    "type": "Location",
+    "name": "The Belfry",
+    "traits": "Church.",
+    "shroud": 3,
+    "clues": 2,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-loc-floodedcrypt",
+    "type": "Location",
+    "name": "The Flooded Crypt",
+    "traits": "Church. Sunken.",
+    "victory": 1,
+    "shroud": 4,
+    "clues": 3,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-loc-vestry",
+    "type": "Location",
+    "name": "The Vestry",
+    "traits": "Church.",
+    "shroud": 2,
+    "clues": 2,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-thirteen",
+    "type": "Treachery",
+    "name": "Thirteen",
+    "traits": "Omen."
+  },
+  {
+    "id": "sthr-risingwater",
+    "type": "Treachery",
+    "name": "Rising Water",
+    "traits": "Hazard."
+  },
+  {
+    "id": "sthr-loc-milestones",
+    "type": "Location",
+    "name": "The Milestones",
+    "traits": "Road.",
+    "shroud": 1,
+    "clues": 2,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-loc-lowbridge",
+    "type": "Location",
+    "name": "The Low Bridge",
+    "traits": "Road.",
+    "shroud": 3,
+    "clues": 2,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-loc-turning",
+    "type": "Location",
+    "name": "The Turning",
+    "traits": "Road.",
+    "shroud": 2,
+    "clues": 3,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-bridgeremembers",
+    "type": "Treachery",
+    "name": "The Bridge Remembers",
+    "traits": "Omen."
+  },
+  {
+    "id": "sthr-loc-townhallsteps",
+    "type": "Location",
+    "name": "The Town Hall Steps",
+    "traits": "Ambergrove. Central.",
+    "shroud": 2,
+    "clues": 2,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-loc-recordsoffice",
+    "type": "Location",
+    "name": "The Records Office",
+    "traits": "Ambergrove.",
+    "victory": 1,
+    "shroud": 3,
+    "clues": 3,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-loc-well",
+    "type": "Location",
+    "name": "The Well",
+    "traits": "Ambergrove.",
+    "shroud": 2,
+    "clues": 2,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-samespeech",
+    "type": "Treachery",
+    "name": "The Same Speech",
+    "traits": "Terror. Peril."
+  },
+  {
+    "id": "sthr-crowdturns",
+    "type": "Treachery",
+    "name": "The Crowd Turns",
+    "traits": "Terror."
+  },
+  {
+    "id": "sthr-loc-wheel",
+    "type": "Location",
+    "name": "The Wheel",
+    "traits": "Fairground.",
+    "shroud": 3,
+    "clues": 2,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-loc-hallofmirrors",
+    "type": "Location",
+    "name": "The Hall of Mirrors",
+    "traits": "Fairground.",
+    "shroud": 2,
+    "clues": 3,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-loc-ticketbooth",
+    "type": "Location",
+    "name": "The Ticket Booth",
+    "traits": "Fairground.",
+    "victory": 1,
+    "shroud": 2,
+    "clues": 2,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-wheelsturn",
+    "type": "Treachery",
+    "name": "The Wheel's Turn",
+    "traits": "Omen."
+  },
+  {
+    "id": "sthr-reflectionlies",
+    "type": "Treachery",
+    "name": "Your Reflection Lies",
+    "traits": "Terror."
+  },
+  {
+    "id": "sthr-loc-readingroom",
+    "type": "Location",
+    "name": "The Reading Room",
+    "traits": "Almanac House.",
+    "shroud": 2,
+    "clues": 2,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-loc-press",
+    "type": "Location",
+    "name": "The Press",
+    "traits": "Almanac House.",
+    "shroud": 3,
+    "clues": 3,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-loc-sealedstudy",
+    "type": "Location",
+    "name": "The Sealed Study",
+    "traits": "Almanac House.",
+    "victory": 1,
+    "shroud": 4,
+    "clues": 3,
+    "clues_per_investigator": true
+  },
+  {
+    "id": "sthr-pagethatwasnt",
+    "type": "Treachery",
+    "name": "The Page That Wasn't",
+    "traits": "Hex. Peril."
+  },
+  {
+    "id": "sthr-inkrunsbackward",
+    "type": "Treachery",
+    "name": "Ink Runs Backward",
+    "traits": "Hex."
+  },
+  {
+    "id": "sthr-studydoor",
+    "type": "Treachery",
+    "name": "The Study Door",
+    "traits": "Omen."
+  }
+]

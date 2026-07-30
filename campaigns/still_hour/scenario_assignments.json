@@ -1,0 +1,119 @@
+{
+  "prologue": {
+    "locations": [
+      "sthr-loc-square",
+      "sthr-loc-longpier",
+      "sthr-loc-almanacsteps"
+    ],
+    "agenda_deck": [
+      "sthr-hour-1",
+      "sthr-hour-2",
+      "sthr-hour-3",
+      "sthr-hour-4",
+      "sthr-hour-5",
+      "sthr-hour-6",
+      "sthr-hour-7",
+      "sthr-hour-8",
+      "sthr-hour-9"
+    ],
+    "encounter": [
+      "sthr-losthour",
+      "sthr-slippage",
+      "sthr-waitingcongregation",
+      "sthr-drownedchoir",
+      "sthr-familiarface",
+      "sthr-lamplighterecho",
+      "sthr-wrongturn",
+      "sthr-rewind",
+      "sthr-deadair",
+      "sthr-loopnotices",
+      "sthr-yearinanight",
+      "sthr-forgotten",
+      "sthr-oldbones"
+    ],
+    "reference": [
+      "sthr-scn-stillhour"
+    ]
+  },
+  "district_lighthouse": {
+    "locations": [
+      "sthr-loc-lanternroom",
+      "sthr-loc-windingstair",
+      "sthr-loc-keepersquarters"
+    ],
+    "encounter": [
+      "sthr-darkthatwaits",
+      "sthr-somethingonstair"
+    ]
+  },
+  "district_church": {
+    "locations": [
+      "sthr-loc-nave",
+      "sthr-loc-belfry",
+      "sthr-loc-floodedcrypt",
+      "sthr-loc-vestry"
+    ],
+    "encounter": [
+      "sthr-thirteen",
+      "sthr-risingwater"
+    ],
+    "named": [
+      "sthr-drownedchoir"
+    ]
+  },
+  "district_road": {
+    "locations": [
+      "sthr-loc-milestones",
+      "sthr-loc-lowbridge",
+      "sthr-loc-turning"
+    ],
+    "encounter": [
+      "sthr-bridgeremembers"
+    ],
+    "named": [
+      "sthr-waitingcongregation"
+    ]
+  },
+  "district_square": {
+    "locations": [
+      "sthr-loc-townhallsteps",
+      "sthr-loc-recordsoffice",
+      "sthr-loc-well"
+    ],
+    "encounter": [
+      "sthr-samespeech",
+      "sthr-crowdturns"
+    ]
+  },
+  "district_fairground": {
+    "locations": [
+      "sthr-loc-wheel",
+      "sthr-loc-hallofmirrors",
+      "sthr-loc-ticketbooth"
+    ],
+    "encounter": [
+      "sthr-wheelsturn",
+      "sthr-reflectionlies"
+    ]
+  },
+  "district_almanac": {
+    "locations": [
+      "sthr-loc-readingroom",
+      "sthr-loc-press",
+      "sthr-loc-sealedstudy"
+    ],
+    "encounter": [
+      "sthr-pagethatwasnt",
+      "sthr-inkrunsbackward",
+      "sthr-studydoor"
+    ]
+  },
+  "finale": {
+    "setup_aside": [
+      "sthr-crossing"
+    ],
+    "reference": [
+      "sthr-scn-stillhour"
+    ]
+  }
+}

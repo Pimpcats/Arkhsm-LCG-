@@ -1,0 +1,143 @@
+[
+  {
+    "id": "sthr-loc-lanternroom",
+    "type": "Location",
+    "name": "The Lantern Room",
+    "traits": "Ambergrove. Lighthouse.",
+    "shroud": 3,
+    "clues": 2,
+    "icons": "Diamond",
+    "connections": [
+      "Circle"
+    ],
+    "clues_per_investigator": true,
+    "color": "orange"
+  },
+  {
+    "id": "sthr-loc-windingstair",
+    "type": "Location",
+    "name": "The Winding Stair",
+    "traits": "Ambergrove. Lighthouse.",
+    "shroud": 2,
+    "clues": 1,
+    "icons": "Circle",
+    "connections": [
+      "Diamond",
+      "Moon"
+    ],
+    "clues_per_investigator": true,
+    "color": "purple"
+  },
+  {
+    "id": "sthr-loc-keepersquarters",
+    "type": "Location",
+    "name": "The Keeper's Quarters",
+    "traits": "Ambergrove. Lighthouse.",
+    "shroud": 2,
+    "clues": 2,
+    "icons": "Moon",
+    "connections": [
+      {
+        "symbol": "Circle",
+        "color": "purple"
+      }
+    ],
+    "clues_per_investigator": true,
+    "color": "red",
+    "subtitle": "The Keeper's Vigil",
+    "victory": 1
+  },
+  {
+    "id": "sthr-loc-square",
+    "type": "Location",
+    "name": "The Square",
+    "traits": "Ambergrove. Central.",
+    "shroud": 2,
+    "clues": 2,
+    "icons": "Star",
+    "connections": [
+      {
+        "symbol": "Diamond",
+        "color": "orange"
+      },
+      {
+        "symbol": "Circle",
+        "color": "purple"
+      },
+      {
+        "symbol": "Moon",
+        "color": "red"
+      },
+      {
+        "symbol": "Square",
+        "color": "green"
+      }
+    ],
+    "clues_per_investigator": true,
+    "color": "teal"
+  },
+  {
+    "id": "sthr-agenda-hour1",
+    "type": "Agenda",
+    "name": "Hour I",
+    "doom": 3,
+    "index": "a",
+    "number": "1/9"
+  },
+  {
+    "id": "sthr-act-ninthdeath",
+    "type": "Act",
+    "name": "The Ninth Death",
+    "clues": 2,
+    "index": "1",
+    "number": "2/9"
+  },
+  {
+    "id": "sthr-scenario-lighthouse",
+    "type": "Scenario",
+    "name": "The Lighthouse",
+    "difficulty": "EASY / STANDARD",
+    "number": "1/9",
+    "tokens": [
+      {
+        "token": "skull",
+        "text": "-X. X is the number of Echo enemies in play (to a maximum of 3)."
+      },
+      {
+        "token": "cultist",
+        "text": "-2. If the Appointed is Emerging or Arrived, -4 instead."
+      },
+      {
+        "token": "tablet",
+        "text": "-3. Raise Dissonance by 1."
+      },
+      {
+        "token": "elderthing",
+        "text": "-3. Take 1 horror."
+      }
+    ]
+  },
+  {
+    "id": "sthr-story-firstdark",
+    "type": "Story",
+    "name": "First Dark",
+    "traits": "Interlude."
+  },
+  {
+    "deck": 95041,
+    "id": "sthr-appointed-approach",
+    "type": "Story",
+    "name": "The Appointed\u2019s Approach",
+    "class": "Mythos",
+    "traits": "",
+    "encounter": true,
+    "quantity": 1
+  },
+  {
+    "id": "sthr-campaign-log",
+    "type": "CampaignLog",
+    "name": "Campaign Log",
+    "subtitle": "THE STILL HOUR",
+    "campaign_name": "The Still Hour"
+  }
+]

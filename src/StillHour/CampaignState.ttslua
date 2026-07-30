@@ -1,0 +1,370 @@
+--- THE STILL HOUR — Campaign State Manager (SCED_BUILD_BRIEF P2).
+--
+-- THE single owned store for all novel-system state. Per the build brief's
+-- state-persistence design note (§5): everything in P4/P6/P7 reads and writes
+-- through this one manager. A card asks the manager ("is my once-per-loop flag
+-- set?"); it never stores loop state itself.
+--
+-- Persistence model:
+--   * This module holds an in-memory `state` table.
+--   * The host object's onSave() calls CampaignState.serialize() and stores the
+--     result in LuaScriptState; onLoad() calls CampaignState.deserialize(saved).
+--   * SCED's campaign save/import-export carries LuaScriptState across scene
+--     changes, so state survives BOTH node travel and a reset (board wipe).
+--   * See docs/INTEGRATION.md for the exact host-object wiring.
+--
+-- What persists across a RESET (loop end): banked Memory (soft-capped), the
+-- Knowledge Track, Years/brackets, loop counter. What clears: once-per-loop
+-- flags, the Hourglass (back to Hour I), Dissonance (down to the scar floor).
+-- Node travel WITHIN a loop preserves everything (the board, not tracked here,
+-- persists too — guide §1).
+
+local Constants = require("StillHour/Constants")
+
+local CampaignState = {}
+
+local STATE_VERSION = 1
+
+-- Canonical test-type keys (match the four skill icons).
+CampaignState.TEST_TYPES = { "willpower", "intellect", "combat", "agility" }
+
+local function freshState(n)
+  return {
+    version = STATE_VERSION,
+    investigators = math.max(1, math.floor(n or 3)),
+    loopsCompleted = 0,
+    bankedMemory = 0,
+    dissonance = 0,
+    hourglass = Constants.HOUR_FIRST,
+    knowledge = {},          -- factId -> true
+    oncePerLoopFlags = {},   -- flagId -> true (cleared on reset)
+    testTypesThisLoop = {},  -- testType -> true (this loop)
+    testTypesLastLoop = {},  -- snapshot of the previous loop (Muscle Memory reads this)
+    years = {},              -- investigatorId -> integer
+    brackets = {},           -- investigatorId -> {bracket, physical, mental}
+    appointedStage = 0,      -- The Appointed's Approach: 0 Unseen..3 Arrived (CO-002)
+    victoryLog = {},         -- enemyId -> true (Victory claimed; once per campaign)
+  }
+end
+
+-- Internal live state. Always initialised so callers never hit nil.
+local state = freshState(3)
+
+------------------------------------------------------------------- lifecycle --
+
+--- (Re)initialise a fresh campaign for `n` investigators. Wipes all state.
+function CampaignState.init(n)
+  state = freshState(n)
+  return state
+end
+
+--- Set the active investigator count (drives every threshold). Does not wipe state.
+function CampaignState.setInvestigatorCount(n)
+  state.investigators = math.max(1, math.floor(n or 3))
+  CampaignState.capMemory()
+end
+
+--- The derived constants (thresholds/bands) for the current investigator count.
+function CampaignState.constants()
+  return Constants.forCount(state.investigators)
+end
+
+--- Serialise the whole state to a JSON string (for LuaScriptState). Uses TTS's
+-- global JSON when present; falls back to a passed encoder for offline tests.
+function CampaignState.serialize(encoder)
+  local enc = encoder or (JSON and JSON.encode) or error("no JSON encoder available")
+  return enc(state)
+end
+
+--- Restore state from a JSON string produced by serialize(). Empty/nil -> fresh.
+function CampaignState.deserialize(saved, decoder)
+  if saved == nil or saved == "" then
+    return state
+  end
+  local dec = decoder or (JSON and JSON.decode) or error("no JSON decoder available")
+  local ok, restored = pcall(dec, saved)
+  if ok and type(restored) == "table" and restored.version then
+    state = restored
+    -- Defensive: ensure sub-tables exist after a partial/legacy save.
+    state.knowledge = state.knowledge or {}
+    state.oncePerLoopFlags = state.oncePerLoopFlags or {}
+    state.testTypesThisLoop = state.testTypesThisLoop or {}
+    state.testTypesLastLoop = state.testTypesLastLoop or {}
+    state.years = state.years or {}
+    state.brackets = state.brackets or {}
+    state.appointedStage = state.appointedStage or 0
+    state.victoryLog = state.victoryLog or {}
+  end
+  return state
+end
+
+--- Raw state accessor (read-only intent; do not mutate directly from cards).
+function CampaignState.raw()
+  return state
+end
+
+--------------------------------------------------------------------- memory --
+
+function CampaignState.getBankedMemory()
+  return state.bankedMemory
+end
+
+--- Enforce the start-of-loop soft cap (6 x investigators). Excess is lost.
+function CampaignState.capMemory()
+  local cap = CampaignState.constants().memoryCap
+  if state.bankedMemory > cap then
+    state.bankedMemory = cap
+  end
+  return state.bankedMemory
+end
+
+--- Bank Memory (e.g. moving on-card Memory to the campaign pool at the interlude).
+-- Not auto-capped here; the cap is applied at loop start via capMemory().
+function CampaignState.bankMemory(amount)
+  state.bankedMemory = math.max(0, state.bankedMemory + (amount or 0))
+  return state.bankedMemory
+end
+
+--- Attempt to debit `cost` banked Memory. Returns false (no change) on overdraw.
+-- Memory is a general experience currency (CO-001): it buys both regular card
+-- level-ups (cost = card level) and Recollections (cost = memoryCost). This is
+-- the core debit; see the semantic wrappers below.
+function CampaignState.spendMemory(cost)
+  cost = cost or 0
+  if cost < 0 or state.bankedMemory < cost then
+    return false
+  end
+  state.bankedMemory = state.bankedMemory - cost
+  return true
+end
+
+--- Buy a normal higher-level card upgrade: cost = the target card's level (1-5),
+-- exactly like official XP. Returns success bool.
+function CampaignState.purchaseUpgrade(cardLevel)
+  return CampaignState.spendMemory(cardLevel or 0)
+end
+
+--- Buy a Recollection into a deck: cost = its listed memoryCost. Returns success bool.
+function CampaignState.purchaseRecollection(memoryCost)
+  return CampaignState.spendMemory(memoryCost or 0)
+end
+
+----------------------------------------------------------------- dissonance --
+
+function CampaignState.getDissonance()
+  return state.dissonance
+end
+
+function CampaignState.band()
+  return Constants.bandFor(state.dissonance, state.investigators)
+end
+
+--- Clamp a raw Dissonance value into [0, resetThreshold] and store it.
+local function setDissonanceClamped(v)
+  local c = CampaignState.constants()
+  state.dissonance = math.max(0, math.min(c.resetThreshold, v))
+  return state.dissonance
+end
+
+--- Raise Dissonance. Returns new value, the band before, and the band after,
+-- so the caller (Dissonance module) can drive chaos-bag / Appointed hooks.
+function CampaignState.raiseDissonance(n)
+  local before = CampaignState.band()
+  local reachedReset = false
+  setDissonanceClamped(state.dissonance + (n or 1))
+  local c = CampaignState.constants()
+  if state.dissonance >= c.resetThreshold then
+    reachedReset = true
+  end
+  return state.dissonance, before, CampaignState.band(), reachedReset
+end
+
+--- Reduce Dissonance (specific cards only). Returns new value + bands.
+function CampaignState.reduceDissonance(n)
+  local before = CampaignState.band()
+  setDissonanceClamped(state.dissonance - (n or 1))
+  return state.dissonance, before, CampaignState.band()
+end
+
+--- True once Dissonance has reached the Appointed's Arrived threshold (Noticed
+-- band start = 4 x investigators). The Approach is driven by band-entry EVENTS
+-- (see Dissonance.raise); this is the corresponding level check.
+function CampaignState.dissonanceAtAppointedThreshold()
+  return state.dissonance >= CampaignState.constants().appointedThreshold
+end
+
+------------------------------------------------------------------ hourglass --
+
+function CampaignState.getHour()
+  return state.hourglass
+end
+
+--- Directly set the Hourglass (clamped I..IX). Advance/rewind logic that
+-- resolves intervening Hours lives in Hourglass.ttslua.
+function CampaignState.setHour(h)
+  state.hourglass = math.max(Constants.HOUR_FIRST, math.min(Constants.HOUR_LAST, math.floor(h)))
+  return state.hourglass
+end
+
+------------------------------------------------------------------ knowledge --
+
+function CampaignState.knows(factId)
+  return state.knowledge[factId] == true
+end
+
+function CampaignState.unlockFact(factId)
+  local was = state.knowledge[factId] == true
+  state.knowledge[factId] = true
+  return not was  -- true if newly unlocked
+end
+
+function CampaignState.knownFacts()
+  local list = {}
+  for factId in pairs(state.knowledge) do
+    list[#list + 1] = factId
+  end
+  table.sort(list)
+  return list
+end
+
+----------------------------------------------------------- once-per-loop flags --
+
+function CampaignState.isFlagSet(flagId)
+  return state.oncePerLoopFlags[flagId] == true
+end
+
+--- Set a once-per-loop flag. Returns true if it was newly set (i.e. the ability
+-- is allowed to fire now), false if it had already been used this loop.
+function CampaignState.setFlag(flagId)
+  if state.oncePerLoopFlags[flagId] then
+    return false
+  end
+  state.oncePerLoopFlags[flagId] = true
+  return true
+end
+
+----------------------------------------------------------- per-loop test types --
+
+--- Record that a test of `testType` was performed this loop (for Muscle Memory).
+function CampaignState.recordTestType(testType)
+  if testType then
+    state.testTypesThisLoop[testType] = true
+  end
+end
+
+--- Did the party perform this test type during the PREVIOUS loop?
+function CampaignState.performedLastLoop(testType)
+  return state.testTypesLastLoop[testType] == true
+end
+
+------------------------------------------------------------------ years/age --
+
+function CampaignState.getYears(investigatorId)
+  return state.years[investigatorId] or 0
+end
+
+function CampaignState.addYears(investigatorId, n)
+  state.years[investigatorId] = (state.years[investigatorId] or 0) + (n or 0)
+  return state.years[investigatorId]
+end
+
+function CampaignState.getBracket(investigatorId)
+  return state.brackets[investigatorId]
+end
+
+function CampaignState.setBracket(investigatorId, bracketData)
+  state.brackets[investigatorId] = bracketData
+end
+
+-------------------------------------------------------- the appointed (P5) --
+
+-- The Appointed occupies an Approach stage 0..3 (Unseen/Sensed/Emerging/Arrived,
+-- CO-002 §1). It only ever ratchets UP via driver events (clock, Dissonance
+-- bands, cards); Hold Back pushes it back one stage. It is on the board while
+-- stage >= 1. Persisted in state.appointedStage; reset() sets it to 0.
+
+function CampaignState.getAppointedStage()
+  return state.appointedStage
+end
+
+--- Ratchet the Approach UP to at least driverStage (clamped 0..3). Never lowers
+-- the stage — a driver can only raise it, so calling with a lower value is a
+-- no-op. Returns the resulting stage.
+function CampaignState.advanceAppointed(driverStage)
+  local target = math.max(0, math.min(3, math.floor(driverStage or 0)))
+  if target > state.appointedStage then
+    state.appointedStage = target
+  end
+  return state.appointedStage
+end
+
+--- Push the Approach back one stage (Hold Back success), clamped >= 0.
+function CampaignState.pushBackAppointed()
+  state.appointedStage = math.max(0, state.appointedStage - 1)
+  return state.appointedStage
+end
+
+--- Is the Appointed manifested on the board (stage >= 1)?
+function CampaignState.isAppointedInPlay()
+  return state.appointedStage >= 1
+end
+
+------------------------------------------------------------ victory (Memory) --
+
+-- Victory X in a loop campaign: defeated enemies return next loop, so Victory
+-- banks ONCE per named enemy per campaign — the night repeats, but you only
+-- learn a face once. The claim log lives on the campaign log (persists across
+-- resets; reset() must NOT clear it).
+
+--- Has this enemy's Victory already been claimed this campaign?
+function CampaignState.isVictoryClaimed(enemyId)
+  return state.victoryLog[enemyId] == true
+end
+
+--- Claim an enemy's Victory: banks `memoryValue` the first time only.
+-- Returns true if newly claimed (Memory banked), false if already claimed.
+function CampaignState.claimVictory(enemyId, memoryValue)
+  if state.victoryLog[enemyId] then
+    return false
+  end
+  state.victoryLog[enemyId] = true
+  CampaignState.bankMemory(memoryValue or 0)
+  return true
+end
+
+------------------------------------------------------------------ loop flow --
+
+--- End the current loop (a RESET). Advances the loop counter, drops Dissonance
+-- to the new scar floor, resets the Hourglass, clears once-per-loop flags, and
+-- snapshots this loop's test types for next loop's Muscle Memory reads.
+--
+-- Banking on-card Memory and applying Years happen in the interlude (call
+-- bankMemory()/Aging.applyInterlude() around this) — a reset alone does not
+-- bank Memory, per guide §4.
+function CampaignState.reset()
+  state.loopsCompleted = state.loopsCompleted + 1
+
+  -- Scar floor: completed loops, capped by scarCap.
+  local c = CampaignState.constants()
+  state.dissonance = math.min(state.loopsCompleted, c.scarCap)
+
+  state.hourglass = Constants.HOUR_FIRST
+  state.oncePerLoopFlags = {}
+  state.testTypesLastLoop = state.testTypesThisLoop
+  state.testTypesThisLoop = {}
+  state.appointedStage = 0
+  return state
+end
+
+--- Begin a new loop's play: enforce the Memory soft cap. Call at §2 setup after
+-- the interlude has banked Memory and bought Recollections.
+function CampaignState.startLoop()
+  CampaignState.capMemory()
+  return state
+end
+
+function CampaignState.getLoopsCompleted()
+  return state.loopsCompleted
+end
+
+return CampaignState

@@ -1,0 +1,326 @@
+{
+  "ObjectStates": [
+    {
+      "Name": "Bag",
+      "Nickname": "THE STILL HOUR \u2014 The Appointed",
+      "Description": "",
+      "GUID": "21304f",
+      "Tags": [
+        "StillHour"
+      ],
+      "Transform": {
+        "posX": 0,
+        "posY": 1.5,
+        "posZ": 0,
+        "rotX": 0,
+        "rotY": 180,
+        "rotZ": 0,
+        "scaleX": 1.15,
+        "scaleY": 1,
+        "scaleZ": 1.15
+      },
+      "ContainedObjects": [
+        {
+          "Name": "Card",
+          "Nickname": "The Appointed",
+          "Description": "",
+          "GUID": "5eb71d",
+          "CardID": 9504000,
+          "SidewaysCard": false,
+          "Tags": [
+            "ScenarioCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-appointed\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Monster. Elite.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95040": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-appointed.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "The Appointed's Whisper",
+          "Description": "",
+          "GUID": "fcd3da",
+          "CardID": 9504100,
+          "SidewaysCard": false,
+          "Tags": [
+            "ScenarioCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-appointedwhisper\",\"type\":\"Treachery\",\"class\":\"Mythos\",\"traits\":\"\",\"cycle\":\"The Still Hour\",\"quantity\":2}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95041": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-appointedwhisper.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "The Crossing",
+          "Description": "",
+          "GUID": "69bc02",
+          "CardID": 9504200,
+          "SidewaysCard": false,
+          "Tags": [
+            "ScenarioCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-crossing\",\"type\":\"Treachery\",\"class\":\"Mythos\",\"traits\":\"\",\"cycle\":\"The Still Hour\",\"quantity\":1}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95042": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-crossing.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "The Bell-Ringer Beneath",
+          "Description": "What Pulls the Thirteenth Toll",
+          "GUID": "8fcd82",
+          "CardID": 9504300,
+          "SidewaysCard": false,
+          "Tags": [
+            "ScenarioCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-bellringer\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Monster. Named. Elite.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1,\"victory\":2}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95043": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-bellringer.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "What Wears the Sheriff",
+          "Description": "Giving the Same Speech",
+          "GUID": "0bdec5",
+          "CardID": 9504400,
+          "SidewaysCard": false,
+          "Tags": [
+            "ScenarioCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-wearssheriff\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Humanoid. Monster. Named. Elite.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1,\"victory\":3}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95044": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-wearssheriff.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "The One Who Rides Forever",
+          "Description": "Round and Round",
+          "GUID": "dc1b17",
+          "CardID": 9504500,
+          "SidewaysCard": false,
+          "Tags": [
+            "ScenarioCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-onewhorides\",\"type\":\"Enemy\",\"class\":\"Mythos\",\"traits\":\"Humanoid. Named. Elite.\",\"cycle\":\"The Still Hour\",\"unique\":true,\"elite\":true,\"quantity\":1,\"victory\":2}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95045": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-onewhorides.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "elias": {
+    "lora": null,
+    "weight": 0.8,
+    "trigger": "eliaswarde man weathered lighthouse keeper",
+    "refs": [],
+    "description": "weathered lighthouse keeper, late fifties, grey-streaked beard, deep-set tired resolute eyes, heavy dark oilcloth coat, holding a lantern"
+  },
+  "ayako": {
+    "lora": null,
+    "weight": 0.8,
+    "trigger": "ayakosoma woman scholar spectacles",
+    "refs": [
+      "out/still_hour/seeds/ayako/7000.png",
+      "out/still_hour/seeds/ayako/7097.png"
+    ],
+    "description": "Japanese woman, thirties, sharp intelligent gaze, wire spectacles, ink-stained fingers, dark travelling coat, notebook"
+  },
+  "cass": {
+    "lora": null,
+    "weight": 0.8,
+    "trigger": "casslindqvist woman gambler pinstripe",
+    "refs": [],
+    "description": "sharp-featured woman, late twenties, short slicked hair, worn pinstripe waistcoat, a deck of cards, wary confident half-smile"
+  },
+  "sera": {
+    "lora": null,
+    "weight": 0.8,
+    "trigger": "seraphinevale woman spiritualist shawls",
+    "refs": [],
+    "description": "pale spiritualist woman, forties, dark loose hair, haunted distant eyes, layered dark shawls, faint occult jewelry"
+  },
+  "birdie": {
+    "lora": null,
+    "weight": 0.8,
+    "trigger": "birdieokonkwo young woman drifter compass",
+    "refs": [
+      "out/still_hour/seeds/birdie/7000.png",
+      "out/still_hour/seeds/birdie/7097.png"
+    ],
+    "description": "young Black woman, early twenties, patched practical coat, alert scrappy expression, small brass compass on a cord"
+  }
+}

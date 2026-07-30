@@ -1,0 +1,96 @@
+--- THE STILL HOUR — the interlude procedure (P7).
+--
+-- Runs after every reset (guide §4): age each investigator, bank on-card Memory,
+-- spend Memory (level-ups + Recollections), then begin the next loop (which
+-- enforces the soft cap). This module is the orchestration/logic layer; the TTS
+-- interlude panel (buttons in control.lua) calls into it. Board specifics —
+-- moving actual Memory tokens, swapping a physical stat line — are the caller's;
+-- this module owns the numbers and the rules.
+--
+-- Memory is a general experience currency (CO-001): buy Recollections at their
+-- memoryCost, and level up normal cards at 1 Memory per card level. Both debit
+-- the one shared banked pool via CampaignState.
+
+local CampaignState = require("StillHour/CampaignState")
+local Aging = require("StillHour/Aging")
+
+local Interlude = {}
+
+-- Recollection Memory prices (mirrors the memoryCost in the card spec / GMNotes).
+-- In-engine the panel can instead read memoryCost off each card's GMNotes; this
+-- table keeps the logic layer self-contained and testable.
+Interlude.RECOLLECTION_COST = {
+  ["sthr-foreknowledge"]      = 3,
+  ["sthr-dejavu"]             = 4,
+  ["sthr-musclememory"]       = 3,
+  ["sthr-rehearsedescape"]    = 3,
+  ["sthr-longwayround"]       = 2,
+  ["sthr-borrowedtime"]       = 4,
+  ["sthr-thistimeforsure"]    = 4,
+  ["sthr-anchorpoint"]        = 3,
+  ["sthr-cassandrasnotebook"] = 4,
+  ["sthr-hourlearnedname"]    = 5,
+}
+
+--------------------------------------------------------------------- aging --
+
+--- Age one investigator this interlude. `cond` = {defeated, endedInDanger,
+-- leanedOnLoop}; `lockedChoice` = {physical, mental} (needed the first time they
+-- enter Weathered). Returns the Aging result (years, bracket, drift, agedOut...).
+function Interlude.age(investigatorId, cond, lockedChoice)
+  return Aging.applyInterlude(investigatorId, cond, lockedChoice)
+end
+
+--- Age a whole party. `entries` = list of {id, cond, lockedChoice}. Returns a
+-- map id -> result.
+function Interlude.ageAll(entries)
+  local results = {}
+  for _, e in ipairs(entries or {}) do
+    results[e.id] = Interlude.age(e.id, e.cond, e.lockedChoice)
+  end
+  return results
+end
+
+--------------------------------------------------------------------- memory --
+
+--- Bank on-card Memory into the campaign pool (not yet capped; the cap applies
+-- at loop start).
+function Interlude.bank(amount)
+  return CampaignState.bankMemory(amount)
+end
+
+function Interlude.recollectionCost(cardId)
+  return Interlude.RECOLLECTION_COST[cardId]
+end
+
+function Interlude.canAfford(cost)
+  return cost ~= nil and CampaignState.getBankedMemory() >= cost
+end
+
+--- Buy a Recollection into a deck. Returns true on success, false if unknown id
+-- or the pool can't cover its memoryCost.
+function Interlude.buyRecollection(cardId)
+  local cost = Interlude.RECOLLECTION_COST[cardId]
+  if cost == nil then
+    return false
+  end
+  return CampaignState.purchaseRecollection(cost)
+end
+
+--- Level up a normal card: cost = the target card level (1-5). Returns success.
+function Interlude.buyUpgrade(cardLevel)
+  if type(cardLevel) ~= "number" or cardLevel < 1 or cardLevel > 5 then
+    return false
+  end
+  return CampaignState.purchaseUpgrade(cardLevel)
+end
+
+--------------------------------------------------------------- loop handoff --
+
+--- Begin the next loop's play: enforce the Memory soft cap (6 x investigators).
+-- Call at the end of the interlude, before loop setup.
+function Interlude.beginNextLoop()
+  return CampaignState.startLoop()
+end
+
+return Interlude

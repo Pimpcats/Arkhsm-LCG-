@@ -1,0 +1,8 @@
+{
+  "backend": "comfy",
+  "base_url": null,
+  "checkpoint": "SET_ME.safetensors",
+  "output_dir": "out/demo",
+  "style_positive": "gothic ink illustration, high contrast, stark shadows",
+  "style_negative": "text, watermark, color, photograph"
+}

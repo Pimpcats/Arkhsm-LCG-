@@ -1,0 +1,3561 @@
+{
+  "SaveName": "",
+  "Date": "",
+  "VersionNumber": "",
+  "GameMode": "",
+  "GameType": "",
+  "GameComplexity": "",
+  "Tags": [],
+  "Gravity": 0.5,
+  "PlayArea": 0.5,
+  "Table": "",
+  "Sky": "",
+  "Note": "",
+  "TabStates": {},
+  "LuaScript": "",
+  "LuaScriptState": "",
+  "XmlUI": "",
+  "ObjectStates": [
+    {
+      "GUID": "58c966",
+      "Name": "Custom_Model_Bag",
+      "Transform": {
+        "posX": 12.25,
+        "posY": 1.48149908,
+        "posZ": 36.0,
+        "rotX": -4.78252247E-08,
+        "rotY": 270.0,
+        "rotZ": 1.22197534E-07,
+        "scaleX": 2.21,
+        "scaleY": 0.46,
+        "scaleZ": 2.42
+      },
+      "Nickname": "One Last Job",
+      "Description": "",
+      "GMNotes": "{\n  \"id\": \"SB1101\",\n  \"type\": \"ScenarioBox\"\n}",
+      "AltLookAngle": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "ColorDiffuse": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0
+      },
+      "LayoutGroupSortIndex": 0,
+      "Value": 0,
+      "Locked": false,
+      "Grid": true,
+      "Snap": true,
+      "IgnoreFoW": false,
+      "MeasureMovement": false,
+      "DragSelectable": true,
+      "Autoraise": true,
+      "Sticky": true,
+      "Tooltip": true,
+      "GridProjection": false,
+      "HideWhenFaceDown": false,
+      "Hands": false,
+      "MaterialIndex": -1,
+      "MeshIndex": -1,
+      "CustomMesh": {
+        "MeshURL": "https://steamusercontent-a.akamaihd.net/ugc/62583916778515333/9F0BE0C211BE3BD1725B4B855F5D3C9C0D020394/",
+        "DiffuseURL": "https://steamusercontent-a.akamaihd.net/ugc/12293110201824981318/D1DB32A4127AD90494E12E979F4AE20AC0322859/",
+        "NormalURL": "",
+        "ColliderURL": "",
+        "Convex": true,
+        "MaterialIndex": 3,
+        "TypeIndex": 6,
+        "CustomShader": {
+          "SpecularColor": {
+            "r": 1.0,
+            "g": 1.0,
+            "b": 1.0
+          },
+          "SpecularIntensity": 0.0,
+          "SpecularSharpness": 2.0,
+          "FresnelStrength": 0.0
+        },
+        "CastShadows": true
+      },
+      "Bag": {
+        "Order": 0
+      },
+      "LuaScript": "-- Bundled by luabundle {\"version\":\"1.6.0\"}\nlocal __bundle_require, __bundle_loaded, __bundle_register, __bundle_modules = (function(superRequire)\n\tlocal loadingPlaceholder = {[{}] = true}\n\n\tlocal register\n\tlocal modules = {}\n\n\tlocal require\n\tlocal loaded = {}\n\n\tregister = function(name, body)\n\t\tif not modules[name] then\n\t\t\tmodules[name] = body\n\t\tend\n\tend\n\n\trequire = function(name)\n\t\tlocal loadedModule = loaded[name]\n\n\t\tif loadedModule then\n\t\t\tif loadedModule == loadingPlaceholder then\n\t\t\t\treturn nil\n\t\t\tend\n\t\telse\n\t\t\tif not modules[name] then\n\t\t\t\tif not superRequire then\n\t\t\t\t\tlocal identifier = type(name) == 'string' and '\\\"' .. name .. '\\\"' or tostring(name)\n\t\t\t\t\terror('Tried to require ' .. identifier .. ', but no such module has been registered')\n\t\t\t\telse\n\t\t\t\t\treturn superRequire(name)\n\t\t\t\tend\n\t\t\tend\n\n\t\t\tloaded[name] = loadingPlaceholder\n\t\t\tloadedModule = modules[name](require, loaded, register, modules)\n\t\t\tloaded[name] = loadedModule\n\t\tend\n\n\t\treturn loadedModule\n\tend\n\n\treturn require, loaded, register, modules\nend)(nil)\n__bundle_register(\"MemoryBag\", function(require, _LOADED, __bundle_register, __bundle_modules)\nfunction updateSave()\n  self.script_state = JSON.encode({ ml = memoryList, setupButton = setupButton })\nend\n\nfunction onLoad(savedData)\n  if savedData and savedData ~= \"\" then\n    local loadedData = JSON.decode(savedData)\n    memoryList       = loadedData.ml\n    setupButton      = loadedData.setupButton\n  end\n\n  memoryList = memoryList or {}\n  self.addContextMenuItem(\"Toggle setup button\", toggleSetupButton)\n\n  -- make sure the model is loaded so that we can use the bounds\n  Wait.condition(function()\n    Wait.frames(function()\n      generateButtonData()\n      createMemoryActionButtons()\n    end, 5)\n  end, function() return not self.loading_custom end)\nend\n\nfunction generateButtonData()\n  local selfScale  = self.getScale()\n  local selfBounds = self.getBoundsNormalized()\n  buttonScale      = Vector(1 / selfScale.x, 1, 1 / selfScale.z)\n\n  local buttonX    = math.max(selfBounds.size.x / 5, 1.5) / selfScale.x\n  local buttonY    = -(selfBounds.size.y / 2 + selfBounds.offset.y) / selfScale.y + 0.5\n  local buttonZ    = {}\n  for i = 1, 4 do\n    buttonZ[i] = (selfBounds.size.z / 2 + i * 1.15 - 0.15) / selfScale.z\n  end\n\n  local upperButtonMult = 1.1\n  buttonData = {\n    [\"Add\"]       = {\n      tooltip = \"Add highlighted objects to memory\",\n      pos     = { buttonX * upperButtonMult, buttonY, -buttonZ[1] },\n      fColor  = { 0.25, 1, 0.25 }\n    },\n    [\"Cancel\"]    = {\n      tooltip = \"Abort setup mode\",\n      pos     = { -buttonX * upperButtonMult, buttonY, -buttonZ[1] },\n    },\n    [\"Internal\"]  = {\n      tooltip = \"Copy memory from internal bags\",\n      pos     = { -buttonX * upperButtonMult, buttonY, -buttonZ[4] },\n    },\n    [\"Place\"]     = {\n      pos   = { buttonX, buttonY, buttonZ[1] },\n      fSize = 350,\n      w     = 1200\n    },\n    [\"Recall\"]    = {\n      pos   = { -buttonX, buttonY, buttonZ[1] },\n      fSize = 350,\n      w     = 1200\n    },\n    [\"Remove\"]    = {\n      tooltip = \"Remove highlighted objects from memory\",\n      pos     = { buttonX * upperButtonMult, buttonY, -buttonZ[2] },\n      fColor  = { 1, 0.25, 0.25 }\n    },\n    [\"Reset\"]     = {\n      tooltip = \"Completely reset memory\",\n      pos     = { -buttonX * upperButtonMult, buttonY, -buttonZ[3] },\n    },\n    [\"Selection\"] = {\n      tooltip = \"Add / Remove highlight for selected objects\",\n      pos     = { -buttonX * upperButtonMult, buttonY, -buttonZ[2] },\n    },\n    [\"Setup\"]     = {\n      pos   = { 0, buttonY, -buttonZ[1] },\n      fSize = 350\n    },\n    [\"Update\"]    = {\n      tooltip = \"Update memory for placed objects\",\n      pos     = { buttonX * upperButtonMult, buttonY, -buttonZ[3] },\n      fColor  = { 0.75, 0.75, 1 }\n    }\n  }\n  for label, data in pairs(buttonData) do\n    data.click = \"buttonClick_\" .. string.lower(string.gsub(label, \"%s+\", \"\"))\n  end\nend\n\nfunction createListofButtons(list)\n  for _, name in ipairs(list) do\n    createButtonByName(name)\n  end\nend\n\nfunction createButtonByName(label)\n  local bd = buttonData[label]\n  self.createButton({\n    label          = label,\n    tooltip        = bd.tooltip,\n    position       = bd.pos,\n    height         = bd.h or 500,\n    width          = bd.w or 1500,\n    font_size      = bd.fSize or 325,\n    font_color     = bd.fColor or { 1, 1, 1 },\n    click_function = bd.click,\n    function_owner = self,\n    color          = { 0, 0, 0 },\n    scale          = buttonScale\n  })\nend\n\n-- context menu function to toggle the setup button visibility\nfunction toggleSetupButton()\n  setupButton = not setupButton\n  broadcastToAll(\"Setup button \" .. (setupButton and \"en\" or \"dis\") .. \"abled\")\n  updateSave()\n  removeAllHighlights()\n  createMemoryActionButtons()\nend\n\nfunction buttonClick_setup()\n  tempList = {}\n  self.clearButtons()\n  createButtonsOnAllObjects()\n  createSetupActionButtons()\nend\n\nfunction broadcastFeedback(str1, count, name, str2, color)\n  local displayName = name .. (count ~= 1 and \"s\" or \"\")\n  local parts       = {}\n  local candidates  = { str1, count, displayName, str2 }\n  for i = 1, 4 do\n    local val = candidates[i]\n    if val and val ~= \"\" then\n      table.insert(parts, tostring(val))\n    end\n  end\n\n  broadcastToAll(table.concat(parts, \" \"), color or { 1, 1, 1 })\nend\n\nfunction createButtonsOnAllObjects()\n  buttonIndexMap = {}\n\n  local buttonCount = 0\n  for _, obj in ipairs(getObjects()) do\n    if obj ~= self and obj.type ~= \"Scripting\" and obj.type ~= \"Hand\" then\n      local globalPos = obj.getPosition() + Vector(0, obj.getBounds().size.y / 2 + 1, 0)\n      local buttonPos = self.positionToLocal(globalPos):scale(Vector(-1, 1, 1))\n      local fName     = \"selectButton_\" .. buttonCount\n      _G[fName]       = function() buttonClick_selectObject(obj) end\n      self.createButton({\n        click_function = fName,\n        function_owner = self,\n        position       = buttonPos,\n        height         = 600,\n        width          = 600,\n        color          = { 0.75, 0.25, 0.25, 0.75 },\n        scale          = buttonScale\n      })\n      buttonIndexMap[obj.getGUID()] = buttonCount\n      buttonCount = buttonCount + 1\n    end\n  end\nend\n\nfunction createSetupActionButtons()\n  createListofButtons({ \"Cancel\", \"Selection\", \"Reset\", \"Internal\", \"Add\" })\n  if next(memoryList) then\n    createListofButtons({ \"Remove\", \"Update\" })\n  end\nend\n\nfunction buttonClick_selectObject(obj)\n  local guid = obj.getGUID()\n  local index = buttonIndexMap[guid]\n  if not index then return end\n\n  if not tempList[guid] then\n    self.editButton({ index = index, color = { 0, 1, 0, 0.75 } })\n    tempList[guid] = {\n      pos  = roundVector(obj.getPosition(), 3),\n      rot  = roundVector(obj.getRotation(), 0),\n      lock = obj.getLock()\n    }\n    obj.highlightOn({ 0, 1, 0 })\n  else\n    self.editButton({ index = index, color = { 0.75, 0.25, 0.25, 0.75 } })\n    tempList[guid] = nil\n    obj.highlightOff()\n  end\nend\n\nfunction buttonClick_cancel()\n  broadcastToAll(\"Setup Canceled\")\n  removeAllHighlights()\n  createMemoryActionButtons()\nend\n\nfunction buttonClick_selection(_, playerColor)\n  local objList = Player[playerColor].getSelectedObjects()\n\n  if #objList == 0 then\n    broadcastToAll(\"No objects selected!\")\n    return\n  end\n\n  broadcastFeedback(\"Toggled selection for\", #objList, \"object\")\n  for _, obj in ipairs(objList) do\n    buttonClick_selectObject(obj)\n  end\nend\n\nfunction buttonClick_add()\n  local count = 0\n  for _ in pairs(tempList) do\n    count = count + 1\n  end\n  broadcastFeedback(\"Added\", count, \"object\", \"from selection\")\n\n  -- copy data from tempList to memoryList\n  for guid, entry in pairs(tempList) do\n    memoryList[guid] = entry\n  end\n\n  updateSave()\n  removeAllHighlights()\n  createMemoryActionButtons()\nend\n\nfunction buttonClick_update()\n  local count = 0\n  for guid in pairs(memoryList) do\n    local obj = getObjectFromGUID(guid)\n    if obj ~= nil then\n      count = count + 1\n      memoryList[guid] = {\n        pos  = roundVector(obj.getPosition(), 3),\n        rot  = roundVector(obj.getRotation(), 0),\n        lock = obj.getLock()\n      }\n    end\n  end\n  broadcastFeedback(\"Updated data for\", count, \"object\")\n  updateSave()\nend\n\nfunction buttonClick_remove()\n  local count = 0\n  for guid in pairs(tempList) do\n    count = count + 1\n    memoryList[guid] = nil\n  end\n  broadcastFeedback(nil, count, \"object\", \"removed\")\n\n  updateSave()\n  removeAllHighlights()\n  createMemoryActionButtons()\nend\n\nfunction buttonClick_setNew()\n  local count = 0\n  for _, obj in ipairs(getObjects()) do\n    if memoryList[obj.guid] then\n      count = count + 1\n      memoryList[obj.guid].pos = roundVector(obj.getPosition(), 3)\n      memoryList[obj.guid].rot = roundVector(obj.getRotation(), 0)\n      memoryList[obj.guid].lock = obj.getLock()\n    end\n  end\n  broadcastFeedback(\"Updated data for\", count, \"object\")\n  updateSave()\n  createMemoryActionButtons()\nend\n\nfunction buttonClick_reset()\n  memoryList = {}\n  updateSave()\n  removeAllHighlights()\n  broadcastToAll(\"Tool Reset\")\n  self.clearButtons()\n\n  if setupButton then\n    createButtonByName(\"Setup\")\n  end\nend\n\nfunction buttonClick_internal()\n  local count = 0\n  for _, objInfo in ipairs(self.getObjects()) do\n    local data = objInfo.lua_script_state\n    if data ~= nil then\n      local j = JSON.decode(data)\n      if j ~= nil and j.ml ~= nil then\n        count = count + 1\n        for guid, entry in pairs(j.ml) do\n          memoryList[guid] = entry\n        end\n      end\n    end\n  end\n\n  if count > 0 then\n    broadcastFeedback(\"Added\", count, \"internal bag\", \"to existing memory\")\n  end\nend\n\nfunction createMemoryActionButtons()\n  self.clearButtons()\n\n  if next(memoryList) then\n    createListofButtons({ \"Place\", \"Recall\" })\n  end\n\n  if setupButton then\n    createButtonByName(\"Setup\")\n  end\nend\n\n-- Sends objects from bag/table to their saved position/rotation\nfunction buttonClick_place()\n  -- get names of contained objects\n  local guidToName = {}\n  for _, bagObjData in ipairs(self.getData().ContainedObjects or {}) do\n    guidToName[bagObjData[\"GUID\"]] = bagObjData[\"Nickname\"]\n  end\n\n  local updateGuids = {}\n  local placeCount  = 0\n  local moveCount   = 0\n  for guid, entry in pairs(memoryList) do\n    local obj = getObjectFromGUID(guid)\n    if obj ~= nil and (obj.getName() == guidToName[guid] or guidToName[guid] == nil) then\n      -- If obj is out on the table and has the same name (or there's no contained copy), move it\n      moveCount = moveCount + 1\n      obj.setRotation(entry.rot)\n      obj.setPositionSmooth(entry.pos)\n      obj.setLock(entry.lock)\n    elseif guidToName[guid] then\n      -- If obj is inside of the bag\n      placeCount = placeCount + 1\n      local item = self.takeObject({\n        guid     = guid,\n        position = entry.pos,\n        rotation = entry.rot,\n        smooth   = false\n      })\n      item.setLock(entry.lock)\n\n      if obj ~= nil then\n        updateGuids[guid] = item.getGUID()\n      end\n    end\n  end\n\n  -- update memoryList if we placed an item that got a new GUID\n  if next(updateGuids) then\n    for oldGuid, newGuid in pairs(updateGuids) do\n      memoryList[newGuid] = memoryList[oldGuid]\n      memoryList[oldGuid] = nil\n    end\n    updateSave()\n  end\n\n  if placeCount > 0 then\n    broadcastFeedback(nil, placeCount, \"object\", \"placed\")\n  end\n\n  if moveCount > 0 then\n    broadcastFeedback(nil, moveCount, \"object\", \"moved\")\n  end\n\n  if placeCount == 0 and moveCount == 0 then\n    broadcastToAll(\"Bag is empty and no matching objects were found in play.\")\n  end\nend\n\nfunction buttonClick_recall()\n  local count = 0\n  for guid in pairs(memoryList) do\n    local obj = getObjectFromGUID(guid)\n    if obj ~= nil then\n      self.putObject(obj)\n      count = count + 1\n    end\n  end\n  broadcastFeedback(nil, count, \"object\", \"recalled\")\nend\n\nfunction removeAllHighlights()\n  -- Only clear objects we actually touched\n  for guid in pairs(tempList or {}) do\n    local obj = getObjectFromGUID(guid)\n    if obj then obj.highlightOff() end\n  end\n  tempList = {}\nend\n\n-- Round vector to the Nth decimal\nfunction roundVector(vec, dec)\n  local mult = 10 ^ (dec or 0)\n  return {\n    x = math.floor(vec.x * mult + 0.5) / mult,\n    y = math.floor(vec.y * mult + 0.5) / mult,\n    z = math.floor(vec.z * mult + 0.5) / mult\n  }\nend\nend)\n__bundle_register(\"__root\", function(require, _LOADED, __bundle_register, __bundle_modules)\nrequire(\"MemoryBag\")\nend)\nreturn __bundle_require(\"__root\")",
+      "LuaScriptState": "{\n  \"ml\": {\n    \"022a61\": {\n      \"lock\": false,\n      \"pos\": {\n        \"x\": -30.221,\n        \"y\": 1.534,\n        \"z\": 11.464\n      },\n      \"rot\": {\n        \"x\": 0,\n        \"y\": 270,\n        \"z\": 180\n      }\n    },\n    \"115884\": {\n      \"lock\": false,\n      \"pos\": {\n        \"x\": -23.64,\n        \"y\": 1.551,\n        \"z\": -3.83\n      },\n      \"rot\": {\n        \"x\": 0,\n        \"y\": 270,\n        \"z\": 0\n      }\n    },\n    \"1984fc\": {\n      \"lock\": false,\n      \"pos\": {\n        \"x\": -3.687,\n        \"y\": 1.583,\n        \"z\": -15.149\n      },\n      \"rot\": {\n        \"x\": 0,\n        \"y\": 270,\n        \"z\": 0\n      }\n    },\n    \"23b896\": {\n      \"lock\": false,\n      \"pos\": {\n        \"x\": -30.24,\n        \"y\": 1.534,\n        \"z\": 3.83\n      },\n      \"rot\": {\n        \"x\": 0,\n        \"y\": 270,\n        \"z\": 0\n      }\n    },\n    \"2f5524\": {\n      \"lock\": false,\n      \"pos\": {\n        \"x\": -3.85,\n        \"y\": 1.597,\n        \"z\": -10.39\n      },\n      \"rot\": {\n        \"x\": 0,\n        \"y\": 270,\n        \"z\": 0\n      }\n    },\n    \"692e5f\": {\n      \"lock\": false,\n      \"pos\": {\n        \"x\": -23.64,\n        \"y\": 1.534,\n        \"z\": -11.48\n      },\n      \"rot\": {\n        \"x\": 0,\n        \"y\": 270,\n        \"z\": 0\n      }\n    },\n    \"73abe1\": {\n      \"lock\": false,\n      \"pos\": {\n        \"x\": -12.225,\n        \"y\": 1.59,\n        \"z\": -8.903\n      },\n      \"rot\": {\n        \"x\": 0,\n        \"y\": 90,\n        \"z\": 0\n      }\n    },\n    \"85b452\": {\n      \"lock\": false,\n      \"pos\": {\n        \"x\": -2.941,\n        \"y\": 1.614,\n        \"z\": 0.364\n      },\n      \"rot\": {\n        \"x\": 0,\n        \"y\": 180,\n        \"z\": 0\n      }\n    },\n    \"a2419f\": {\n      \"lock\": false,\n      \"pos\": {\n        \"x\": -1.794,\n        \"y\": 1.398,\n        \"z\": -5.021\n      },\n      \"rot\": {\n        \"x\": 0,\n        \"y\": 0,\n        \"z\": 0\n      }\n    },\n    \"af8db2\": {\n      \"lock\": false,\n      \"pos\": {\n        \"x\": -30.24,\n        \"y\": 1.534,\n        \"z\": -3.83\n      },\n      \"rot\": {\n        \"x\": 0,\n        \"y\": 270,\n        \"z\": 0\n      }\n    },\n    \"b1ca3a\": {\n      \"lock\": false,\n      \"pos\": {\n        \"x\": -3.851,\n        \"y\": 1.753,\n        \"z\": 5.72\n      },\n      \"rot\": {\n        \"x\": 0,\n        \"y\": 270,\n        \"z\": 180\n      }\n    },\n    \"d2ad6e\": {\n      \"lock\": false,\n      \"pos\": {\n        \"x\": -23.64,\n        \"y\": 1.534,\n        \"z\": 3.83\n      },\n      \"rot\": {\n        \"x\": 0,\n        \"y\": 270,\n        \"z\": 0\n      }\n    },\n    \"dc25ea\": {\n      \"lock\": false,\n      \"pos\": {\n        \"x\": 1.694,\n        \"y\": 1.558,\n        \"z\": 14.242\n      },\n      \"rot\": {\n        \"x\": 0,\n        \"y\": 225,\n        \"z\": 0\n      }\n    }\n  }\n}",
+      "XmlUI": "",
+      "ContainedObjects": [
+        {
+          "GUID": "022a61",
+          "Name": "Card",
+          "Transform": {
+            "posX": 0.0,
+            "posY": 0.0,
+            "posZ": 0.0,
+            "rotX": 0.0,
+            "rotY": 270.0,
+            "rotZ": 180.0,
+            "scaleX": 1.0,
+            "scaleY": 1.0,
+            "scaleZ": 1.0
+          },
+          "Nickname": "Tillinghast Esoterica",
+          "Description": "Assorted Curiosities",
+          "GMNotes": "{\n  \"id\": \"11509\",\n  \"type\": \"Location\",\n  \"cycle\": \"The Drowned City\",\n  \"locationFront\": {\n    \"icons\": \"FromRight\",\n    \"connections\": \"Diamond\",\n    \"uses\": [\n      {\n        \"countPerInvestigator\": 1,\n        \"type\": \"Clue\",\n        \"token\": \"clue\"\n      }\n    ]\n  },\n  \"locationBack\": {\n    \"icons\": \"FromRight\",\n    \"connections\": \"Diamond\"\n  }\n}",
+          "AltLookAngle": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "Tags": [
+            "Location",
+            "ScenarioCard"
+          ],
+          "LayoutGroupSortIndex": 0,
+          "Value": 0,
+          "Locked": false,
+          "Grid": true,
+          "Snap": true,
+          "IgnoreFoW": false,
+          "MeasureMovement": false,
+          "DragSelectable": true,
+          "Autoraise": true,
+          "Sticky": true,
+          "Tooltip": true,
+          "GridProjection": false,
+          "CardID": 919908,
+          "CustomDeck": {
+            "9199": {
+              "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/17342530264458493993/E4030120AB11A08A48EFBB68E439C58B0379FCE3/",
+              "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/62595231163466130/1C82E4E7656361AFC59EFBFCDE3170B51DE36996/",
+              "NumWidth": 10,
+              "NumHeight": 6,
+              "BackIsHidden": true,
+              "UniqueBack": true,
+              "Type": 0
+            }
+          },
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "XmlUI": ""
+        },
+        {
+          "GUID": "115884",
+          "Name": "Deck",
+          "Transform": {
+            "posX": 0.0,
+            "posY": 0.0,
+            "posZ": 0.0,
+            "rotX": 0.0,
+            "rotY": 270.0,
+            "rotZ": 0.0,
+            "scaleX": 1.0,
+            "scaleY": 1.0,
+            "scaleZ": 1.0
+          },
+          "Nickname": "Downtowns",
+          "Description": "",
+          "GMNotes": "",
+          "AltLookAngle": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "Tags": [
+            "Location",
+            "ScenarioCard"
+          ],
+          "LayoutGroupSortIndex": 0,
+          "Value": 0,
+          "Locked": false,
+          "Grid": true,
+          "Snap": true,
+          "IgnoreFoW": false,
+          "MeasureMovement": false,
+          "DragSelectable": true,
+          "Autoraise": true,
+          "Sticky": true,
+          "Tooltip": true,
+          "GridProjection": false,
+          "Hands": false,
+          "DeckIDs": [
+            113100,
+            113000
+          ],
+          "CustomDeck": {
+            "1130": {
+              "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/12391068993312609883/794726CEC5B3756D1B5D3E3BE0E7F25561A47D16/",
+              "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/15638983872463623053/22974A3846D5A015F4AE9C7400A71C713E3D3339/",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "BackIsHidden": true,
+              "UniqueBack": false,
+              "Type": 0
+            },
+            "1131": {
+              "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/12391068993312609883/794726CEC5B3756D1B5D3E3BE0E7F25561A47D16/",
+              "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/10313752965353424707/B28B1361449F617FBBEC6B7D3458ECE5B398F5E1/",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "BackIsHidden": true,
+              "UniqueBack": false,
+              "Type": 0
+            }
+          },
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "XmlUI": "",
+          "ContainedObjects": [
+            {
+              "GUID": "1aa7cb",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Downtown",
+              "Description": "Arkham.",
+              "GMNotes": "{\n  \"id\": \"01131\",\n  \"type\": \"Location\",\n  \"traits\": \"Arkham.\",\n  \"cycle\": \"Core\",\n  \"locationFront\": {\n    \"icons\": \"Triangle\",\n    \"connections\": \"Crescent|Tee|FromDowntown\"\n  },\n  \"locationBack\": {\n    \"victory\": 1,\n    \"icons\": \"Triangle\",\n    \"connections\": \"Crescent|Tee|FromDowntown\",\n    \"uses\": [\n      {\n        \"countPerInvestigator\": 2,\n        \"type\": \"Clue\",\n        \"token\": \"clue\"\n      }\n    ]\n  }\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "Location",
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 113100,
+              "CustomDeck": {
+                "1131": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/12391068993312609883/794726CEC5B3756D1B5D3E3BE0E7F25561A47D16/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/10313752965353424707/B28B1361449F617FBBEC6B7D3458ECE5B398F5E1/",
+                  "NumWidth": 1,
+                  "NumHeight": 1,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "b5b8db",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Downtown",
+              "Description": "Arkham.",
+              "GMNotes": "{\n  \"id\": \"01130\",\n  \"type\": \"Location\",\n  \"traits\": \"Arkham.\",\n  \"cycle\": \"Core\",\n  \"locationFront\": {\n    \"icons\": \"Triangle\",\n    \"connections\": \"Crescent|Tee|FromDowntown\"\n  },\n  \"locationBack\": {\n    \"icons\": \"Triangle\",\n    \"connections\": \"Crescent|Tee|FromDowntown\",\n    \"uses\": [\n      {\n        \"countPerInvestigator\": 1,\n        \"type\": \"Clue\",\n        \"token\": \"clue\"\n      }\n    ]\n  }\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "Location",
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 113000,
+              "CustomDeck": {
+                "1130": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/12391068993312609883/794726CEC5B3756D1B5D3E3BE0E7F25561A47D16/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/15638983872463623053/22974A3846D5A015F4AE9C7400A71C713E3D3339/",
+                  "NumWidth": 1,
+                  "NumHeight": 1,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            }
+          ]
+        },
+        {
+          "GUID": "1984fc",
+          "Name": "Custom_Tile",
+          "Transform": {
+            "posX": 0.0,
+            "posY": 0.0,
+            "posZ": 0.0,
+            "rotX": 0.0,
+            "rotY": 270.0,
+            "rotZ": 0.0,
+            "scaleX": 2.2,
+            "scaleY": 1.0,
+            "scaleZ": 2.2
+          },
+          "Nickname": "Campaign Difficulty",
+          "Description": "click to set chaos token difficulty",
+          "GMNotes": "",
+          "AltLookAngle": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "ColorDiffuse": {
+            "r": 1.0,
+            "g": 1.0,
+            "b": 1.0
+          },
+          "LayoutGroupSortIndex": 0,
+          "Value": 0,
+          "Locked": false,
+          "Grid": true,
+          "Snap": true,
+          "IgnoreFoW": false,
+          "MeasureMovement": false,
+          "DragSelectable": true,
+          "Autoraise": true,
+          "Sticky": true,
+          "Tooltip": true,
+          "GridProjection": false,
+          "HideWhenFaceDown": false,
+          "Hands": false,
+          "CustomImage": {
+            "ImageURL": "https://steamusercontent-a.akamaihd.net/ugc/965354846165100486/3DC8FCEF364B30758B09EF96AF9458F2B8E64D56/",
+            "ImageSecondaryURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940352139/A2D42E7E5C43D045D72CE5CFC907E4F886C8C690/",
+            "ImageScalar": 1.0,
+            "WidthScale": 0.0,
+            "CustomTile": {
+              "Type": 3,
+              "Thickness": 0.1,
+              "Stackable": false,
+              "Stretch": true
+            }
+          },
+          "LuaScript": "-- Bundled by luabundle {\"version\":\"1.6.0\"}\nlocal __bundle_require, __bundle_loaded, __bundle_register, __bundle_modules = (function(superRequire)\n\tlocal loadingPlaceholder = {[{}] = true}\n\n\tlocal register\n\tlocal modules = {}\n\n\tlocal require\n\tlocal loaded = {}\n\n\tregister = function(name, body)\n\t\tif not modules[name] then\n\t\t\tmodules[name] = body\n\t\tend\n\tend\n\n\trequire = function(name)\n\t\tlocal loadedModule = loaded[name]\n\n\t\tif loadedModule then\n\t\t\tif loadedModule == loadingPlaceholder then\n\t\t\t\treturn nil\n\t\t\tend\n\t\telse\n\t\t\tif not modules[name] then\n\t\t\t\tif not superRequire then\n\t\t\t\t\tlocal identifier = type(name) == 'string' and '\\\"' .. name .. '\\\"' or tostring(name)\n\t\t\t\t\terror('Tried to require ' .. identifier .. ', but no such module has been registered')\n\t\t\t\telse\n\t\t\t\t\treturn superRequire(name)\n\t\t\t\tend\n\t\t\tend\n\n\t\t\tloaded[name] = loadingPlaceholder\n\t\t\tloadedModule = modules[name](require, loaded, register, modules)\n\t\t\tloaded[name] = loadedModule\n\t\tend\n\n\t\treturn loadedModule\n\tend\n\n\treturn require, loaded, register, modules\nend)(nil)\n__bundle_register(\"DifficultySelectorLibrary\", function(require, _LOADED, __bundle_register, __bundle_modules)\n-- Library file for Difficulty Selectors\n-- define the \"tokenData\" table and then require this file\n-- see \"SCED-downloads\\src\\DifficultySelectors\" for examples\n\nfunction onLoad()\n  local z_offset = -0.15\n  for difficulty, _ in pairs(tokenData) do\n    local clickFunction = difficulty:lower() .. \"Click\"\n    self.setVar(clickFunction, function() clickFun(difficulty) end)\n    self.createButton({\n      label          = difficulty,\n      function_owner = self,\n      click_function = clickFunction,\n      position       = { 0, 0.1, z_offset },\n      scale          = { 0.47, 1, 0.47 },\n      height         = 200,\n      width          = 1150,\n      color          = { 0.87, 0.8, 0.70 },\n    })\n    z_offset = z_offset + 0.225\n  end\nend\n\nfunction clickFun(difficulty)\n  local data = tokenData[difficulty]\n  if data.random then\n    -- handling for Carcosa standalone mode\n    local randomGroup = math.random(1, #data.random)\n    for _, tokenId in ipairs(data.random[randomGroup]) do\n      table.insert(data.token, tokenId)\n    end\n  end\n  Global.call(\"setChaosBagState\", data.token)\nend\nend)\n__bundle_register(\"DifficultySelectors/11-TDC-Base\", function(require, _LOADED, __bundle_register, __bundle_modules)\ntokenData = {\n  Easy     = { token = { 'p1', 'p1', '0', '0', '0', 'm1', 'm1', 'm1', 'm2', 'm2', 'skull', 'skull', 'tablet', 'elder', 'red', 'blue' } },\n  Standard = { token = { 'p1', '0', '0', 'm1', 'm1', 'm1', 'm2', 'm2', 'm3', 'm4', 'skull', 'skull', 'tablet', 'elder', 'red', 'blue' } },\n  Hard     = { token = { '0', '0', '0', 'm1', 'm1', 'm2', 'm2', 'm3', 'm3', 'm4', 'm5', 'skull', 'skull', 'tablet', 'elder', 'red', 'blue' } },\n  Expert   = { token = { '0', 'm1', 'm1', 'm2', 'm2', 'm3', 'm3', 'm4', 'm4', 'm5', 'm6', 'm8', 'skull', 'skull', 'tablet', 'elder', 'red', 'blue' } }\n}\n\nrequire(\"DifficultySelectorLibrary\")\nend)\n__bundle_register(\"__root\", function(require, _LOADED, __bundle_register, __bundle_modules)\nrequire(\"DifficultySelectors/11-TDC-Base\")\nend)\nreturn __bundle_require(\"__root\")",
+          "LuaScriptState": "",
+          "XmlUI": ""
+        },
+        {
+          "GUID": "23b896",
+          "Name": "Card",
+          "Transform": {
+            "posX": 0.0,
+            "posY": 0.0,
+            "posZ": 0.0,
+            "rotX": 0.0,
+            "rotY": 270.0,
+            "rotZ": 0.0,
+            "scaleX": 0.98,
+            "scaleY": 1.0,
+            "scaleZ": 0.98
+          },
+          "Nickname": "Miskatonic University",
+          "Description": "Arkham.",
+          "GMNotes": "{\n  \"id\": \"01129\",\n  \"type\": \"Location\",\n  \"traits\": \"Arkham.\",\n  \"cycle\": \"Core\",\n  \"locationFront\": {\n    \"icons\": \"Diamond\",\n    \"connections\": \"Tee|Plus|Circle|Square|FromRight\"\n  },\n  \"locationBack\": {\n    \"victory\": 1,\n    \"icons\": \"Diamond\",\n    \"connections\": \"Tee|Plus|Circle|Square|FromRight\",\n    \"uses\": [\n      {\n        \"countPerInvestigator\": 2,\n        \"type\": \"Clue\",\n        \"token\": \"clue\"\n      }\n    ]\n  }\n}",
+          "AltLookAngle": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "Tags": [
+            "Location",
+            "ScenarioCard"
+          ],
+          "LayoutGroupSortIndex": 0,
+          "Value": 0,
+          "Locked": false,
+          "Grid": true,
+          "Snap": true,
+          "IgnoreFoW": false,
+          "MeasureMovement": false,
+          "DragSelectable": true,
+          "Autoraise": true,
+          "Sticky": true,
+          "Tooltip": true,
+          "GridProjection": false,
+          "CardID": 112900,
+          "CustomDeck": {
+            "1129": {
+              "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/12423702360779241744/AE927954BF806B09116745640249DC9D7D2F1402/",
+              "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/10909145057120250562/EF7756AB8B37DD855E9753892CCFD1A4651987FF/",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "BackIsHidden": true,
+              "UniqueBack": false,
+              "Type": 0
+            }
+          },
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "XmlUI": ""
+        },
+        {
+          "GUID": "2f5524",
+          "Name": "Card",
+          "Transform": {
+            "posX": 0.0,
+            "posY": 0.0,
+            "posZ": 0.0,
+            "rotX": 0.0,
+            "rotY": 270.0,
+            "rotZ": 0.0,
+            "scaleX": 1.0,
+            "scaleY": 1.0,
+            "scaleZ": 1.0
+          },
+          "Nickname": "One Last Job",
+          "Description": "",
+          "GMNotes": "{\n  \"id\": \"11501\",\n  \"type\": \"ScenarioReference\",\n  \"class\": \"Mythos\",\n  \"cycle\": \"The Drowned City\",\n  \"tokens\": {\n    \"front\": {\n      \"Skull\": {\n        \"description\": \"-X. X is the number of Criminal enemies in play (to a maximum of 4).\",\n        \"modifier\": -999\n      },\n      \"Tablet\": {\n        \"description\": \"-2 (-4 instead of there is a Criminal enemy at your location).\",\n        \"modifier\": -2\n      },\n      \"Elder Thing\": {\n        \"description\": \"-3. If you fail, discard the top 3 cards of the encounter deck. Choose 1 Criminal enemy discarded by this effect and spawn it engaged with you.\",\n        \"modifier\": -3\n      }\n    },\n    \"back\": {\n      \"Skull\": {\n        \"description\": \"-X. X is 1 more than the number of Criminal enemies in play.\",\n        \"modifier\": -999\n      },\n      \"Tablet\": {\n        \"description\": \"-3 (-5 instead of there is a Criminal enemy at your location).\",\n        \"modifier\": -3\n      },\n      \"Elder Thing\": {\n        \"description\": \"-4. If you fail, discard the top 6 cards of the encounter deck. Choose 1 Criminal enemy discarded by this effect and spawn it engaged with you. It makes an immediate attack.\",\n        \"modifier\": -4\n      }\n    }\n  }\n}",
+          "AltLookAngle": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "Tags": [
+            "ScenarioCard"
+          ],
+          "LayoutGroupSortIndex": 0,
+          "Value": 0,
+          "Locked": false,
+          "Grid": true,
+          "Snap": true,
+          "IgnoreFoW": false,
+          "MeasureMovement": false,
+          "DragSelectable": true,
+          "Autoraise": true,
+          "Sticky": true,
+          "Tooltip": true,
+          "GridProjection": false,
+          "CardID": 919900,
+          "CustomDeck": {
+            "9199": {
+              "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/17342530264458493993/E4030120AB11A08A48EFBB68E439C58B0379FCE3/",
+              "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/62595231163466130/1C82E4E7656361AFC59EFBFCDE3170B51DE36996/",
+              "NumWidth": 10,
+              "NumHeight": 6,
+              "BackIsHidden": true,
+              "UniqueBack": true,
+              "Type": 0
+            }
+          },
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "XmlUI": ""
+        },
+        {
+          "GUID": "692e5f",
+          "Name": "Card",
+          "Transform": {
+            "posX": 0.0,
+            "posY": 0.0,
+            "posZ": 0.0,
+            "rotX": 0.0,
+            "rotY": 270.0,
+            "rotZ": 0.0,
+            "scaleX": 1.0,
+            "scaleY": 1.0,
+            "scaleZ": 1.0
+          },
+          "Nickname": "Easttown",
+          "Description": "Arkham.",
+          "GMNotes": "{\n  \"id\": \"01132\",\n  \"type\": \"Location\",\n  \"traits\": \"Arkham.\",\n  \"cycle\": \"Core\",\n  \"locationFront\": {\n    \"icons\": \"Crescent\",\n    \"connections\": \"Circle|Triangle|FromEasttown\"\n  },\n  \"locationBack\": {\n    \"icons\": \"Crescent\",\n    \"connections\": \"Circle|Triangle|FromEasttown\",\n    \"uses\": [\n      {\n        \"countPerInvestigator\": 1,\n        \"type\": \"Clue\",\n        \"token\": \"clue\"\n      }\n    ]\n  }\n}",
+          "AltLookAngle": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "Tags": [
+            "Location",
+            "ScenarioCard"
+          ],
+          "LayoutGroupSortIndex": 0,
+          "Value": 0,
+          "Locked": false,
+          "Grid": true,
+          "Snap": true,
+          "IgnoreFoW": false,
+          "MeasureMovement": false,
+          "DragSelectable": true,
+          "Autoraise": true,
+          "Sticky": true,
+          "Tooltip": true,
+          "GridProjection": false,
+          "CardID": 113200,
+          "CustomDeck": {
+            "1132": {
+              "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/11432955743395386026/FC8C14BB1F8DB4CCE60514824D931E603ACDFDD9/",
+              "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/12939569091458373917/A57AE9C70B5FB0C4FD9A29FE4DB6BC9E24F45EF7/",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "BackIsHidden": true,
+              "UniqueBack": false,
+              "Type": 0
+            }
+          },
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "XmlUI": ""
+        },
+        {
+          "GUID": "73abe1",
+          "Name": "Notecard",
+          "Transform": {
+            "posX": 0.0,
+            "posY": 0.0,
+            "posZ": 0.0,
+            "rotX": 0.0,
+            "rotY": 90.0,
+            "rotZ": 0.0,
+            "scaleX": 1.0,
+            "scaleY": 1.0,
+            "scaleZ": 1.0
+          },
+          "Nickname": "Setup Notes",
+          "Description": "Be sure to randomly select one each of the two Act Decks, as well as the two Downtown locations!",
+          "GMNotes": "{\n  \"id\": \"SN110101\",\n  \"type\": \"Notecard\"\n}",
+          "AltLookAngle": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "ColorDiffuse": {
+            "r": 1.0,
+            "g": 1.0,
+            "b": 1.0
+          },
+          "LayoutGroupSortIndex": 0,
+          "Value": 0,
+          "Locked": false,
+          "Grid": true,
+          "Snap": true,
+          "IgnoreFoW": false,
+          "MeasureMovement": false,
+          "DragSelectable": true,
+          "Autoraise": true,
+          "Sticky": true,
+          "Tooltip": true,
+          "GridProjection": false,
+          "HideWhenFaceDown": false,
+          "Hands": false,
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "XmlUI": ""
+        },
+        {
+          "GUID": "85b452",
+          "Name": "Deck",
+          "Transform": {
+            "posX": 0.0,
+            "posY": 0.0,
+            "posZ": 0.0,
+            "rotX": 0.0,
+            "rotY": 180.0,
+            "rotZ": 0.0,
+            "scaleX": 1.0,
+            "scaleY": 1.0,
+            "scaleZ": 1.0
+          },
+          "Nickname": "Agenda Deck",
+          "Description": "",
+          "GMNotes": "",
+          "AltLookAngle": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "Tags": [
+            "ScenarioCard"
+          ],
+          "LayoutGroupSortIndex": 0,
+          "Value": 0,
+          "Locked": false,
+          "Grid": true,
+          "Snap": true,
+          "IgnoreFoW": false,
+          "MeasureMovement": false,
+          "DragSelectable": true,
+          "Autoraise": true,
+          "Sticky": true,
+          "Tooltip": true,
+          "GridProjection": false,
+          "Hands": false,
+          "SidewaysCard": true,
+          "DeckIDs": [
+            919902,
+            919901
+          ],
+          "CustomDeck": {
+            "9199": {
+              "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/17342530264458493993/E4030120AB11A08A48EFBB68E439C58B0379FCE3/",
+              "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/62595231163466130/1C82E4E7656361AFC59EFBFCDE3170B51DE36996/",
+              "NumWidth": 10,
+              "NumHeight": 6,
+              "BackIsHidden": true,
+              "UniqueBack": true,
+              "Type": 0
+            }
+          },
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "XmlUI": "",
+          "ContainedObjects": [
+            {
+              "GUID": "da320f",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 180.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Long Night",
+              "Description": "Agenda 2",
+              "GMNotes": "{\n  \"id\": \"11503\",\n  \"type\": \"Agenda\",\n  \"class\": \"Mythos\",\n  \"doomThreshold\": 7,\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 919902,
+              "SidewaysCard": true,
+              "CustomDeck": {
+                "9199": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/17342530264458493993/E4030120AB11A08A48EFBB68E439C58B0379FCE3/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/62595231163466130/1C82E4E7656361AFC59EFBFCDE3170B51DE36996/",
+                  "NumWidth": 10,
+                  "NumHeight": 6,
+                  "BackIsHidden": true,
+                  "UniqueBack": true,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "ce4118",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 180.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Arkham Nightlife",
+              "Description": "Agenda 1",
+              "GMNotes": "{\n  \"id\": \"11502\",\n  \"type\": \"Agenda\",\n  \"class\": \"Mythos\",\n  \"doomThreshold\": 7,\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 919901,
+              "SidewaysCard": true,
+              "CustomDeck": {
+                "9199": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/17342530264458493993/E4030120AB11A08A48EFBB68E439C58B0379FCE3/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/62595231163466130/1C82E4E7656361AFC59EFBFCDE3170B51DE36996/",
+                  "NumWidth": 10,
+                  "NumHeight": 6,
+                  "BackIsHidden": true,
+                  "UniqueBack": true,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            }
+          ]
+        },
+        {
+          "GUID": "a2419f",
+          "Name": "Bag",
+          "Transform": {
+            "posX": 0.0,
+            "posY": 0.0,
+            "posZ": 0.0,
+            "rotX": 0.0,
+            "rotY": 0.0,
+            "rotZ": 0.0,
+            "scaleX": 1.0,
+            "scaleY": 1.0,
+            "scaleZ": 1.0
+          },
+          "Nickname": "Act Decks",
+          "Description": "Randomly Select One",
+          "GMNotes": "",
+          "AltLookAngle": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "ColorDiffuse": {
+            "r": 0.70588,
+            "g": 0.36652,
+            "b": 0.0
+          },
+          "LayoutGroupSortIndex": 0,
+          "Value": 0,
+          "Locked": false,
+          "Grid": true,
+          "Snap": true,
+          "IgnoreFoW": false,
+          "MeasureMovement": false,
+          "DragSelectable": true,
+          "Autoraise": true,
+          "Sticky": true,
+          "Tooltip": true,
+          "GridProjection": false,
+          "HideWhenFaceDown": false,
+          "Hands": false,
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "XmlUI": "",
+          "ContainedObjects": [
+            {
+              "GUID": "f4c920",
+              "Name": "Deck",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 180.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Act Deck",
+              "Description": "",
+              "GMNotes": "",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "Hands": false,
+              "SidewaysCard": true,
+              "DeckIDs": [
+                919907,
+                919905,
+                919903
+              ],
+              "CustomDeck": {
+                "9199": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/17342530264458493993/E4030120AB11A08A48EFBB68E439C58B0379FCE3/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/62595231163466130/1C82E4E7656361AFC59EFBFCDE3170B51DE36996/",
+                  "NumWidth": 10,
+                  "NumHeight": 6,
+                  "BackIsHidden": true,
+                  "UniqueBack": true,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": "",
+              "ContainedObjects": [
+                {
+                  "GUID": "57c714",
+                  "Name": "Card",
+                  "Transform": {
+                    "posX": 0.0,
+                    "posY": 0.0,
+                    "posZ": 0.0,
+                    "rotX": 0.0,
+                    "rotY": 180.0,
+                    "rotZ": 0.0,
+                    "scaleX": 1.0,
+                    "scaleY": 1.0,
+                    "scaleZ": 1.0
+                  },
+                  "Nickname": "Face the Music",
+                  "Description": "Act 3",
+                  "GMNotes": "{\"id\": \"11508\", \"cycle\": \"The Drowned City\", \"type\": \"Act\", \"class\": \"Mythos\"}",
+                  "AltLookAngle": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "Tags": [
+                    "ScenarioCard"
+                  ],
+                  "LayoutGroupSortIndex": 0,
+                  "Value": 0,
+                  "Locked": false,
+                  "Grid": true,
+                  "Snap": true,
+                  "IgnoreFoW": false,
+                  "MeasureMovement": false,
+                  "DragSelectable": true,
+                  "Autoraise": true,
+                  "Sticky": true,
+                  "Tooltip": true,
+                  "GridProjection": false,
+                  "CardID": 919907,
+                  "SidewaysCard": true,
+                  "CustomDeck": {
+                    "9199": {
+                      "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/17342530264458493993/E4030120AB11A08A48EFBB68E439C58B0379FCE3/",
+                      "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/62595231163466130/1C82E4E7656361AFC59EFBFCDE3170B51DE36996/",
+                      "NumWidth": 10,
+                      "NumHeight": 6,
+                      "BackIsHidden": true,
+                      "UniqueBack": true,
+                      "Type": 0
+                    }
+                  },
+                  "LuaScript": "",
+                  "LuaScriptState": "",
+                  "XmlUI": ""
+                },
+                {
+                  "GUID": "1d50d6",
+                  "Name": "Card",
+                  "Transform": {
+                    "posX": 0.0,
+                    "posY": 0.0,
+                    "posZ": 0.0,
+                    "rotX": 0.0,
+                    "rotY": 180.0,
+                    "rotZ": 0.0,
+                    "scaleX": 1.0,
+                    "scaleY": 1.0,
+                    "scaleZ": 1.0
+                  },
+                  "Nickname": "The Sheldon Gang",
+                  "Description": "Act 2",
+                  "GMNotes": "{\"id\": \"11506\", \"cycle\": \"The Drowned City\", \"type\": \"Act\", \"class\": \"Mythos\"}",
+                  "AltLookAngle": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "Tags": [
+                    "ScenarioCard"
+                  ],
+                  "LayoutGroupSortIndex": 0,
+                  "Value": 0,
+                  "Locked": false,
+                  "Grid": true,
+                  "Snap": true,
+                  "IgnoreFoW": false,
+                  "MeasureMovement": false,
+                  "DragSelectable": true,
+                  "Autoraise": true,
+                  "Sticky": true,
+                  "Tooltip": true,
+                  "GridProjection": false,
+                  "CardID": 919905,
+                  "SidewaysCard": true,
+                  "CustomDeck": {
+                    "9199": {
+                      "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/17342530264458493993/E4030120AB11A08A48EFBB68E439C58B0379FCE3/",
+                      "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/62595231163466130/1C82E4E7656361AFC59EFBFCDE3170B51DE36996/",
+                      "NumWidth": 10,
+                      "NumHeight": 6,
+                      "BackIsHidden": true,
+                      "UniqueBack": true,
+                      "Type": 0
+                    }
+                  },
+                  "LuaScript": "",
+                  "LuaScriptState": "",
+                  "XmlUI": ""
+                },
+                {
+                  "GUID": "39b276",
+                  "Name": "Card",
+                  "Transform": {
+                    "posX": 0.0,
+                    "posY": 0.0,
+                    "posZ": 0.0,
+                    "rotX": 0.0,
+                    "rotY": 180.0,
+                    "rotZ": 0.0,
+                    "scaleX": 1.0,
+                    "scaleY": 1.0,
+                    "scaleZ": 1.0
+                  },
+                  "Nickname": "Questioning the Gangs",
+                  "Description": "Act 1",
+                  "GMNotes": "{\n  \"id\": \"11504\",\n  \"type\": \"Location\",\n  \"traits\": \"Arkham. Front.\",\n  \"cycle\": \"The Drowned City\",\n  \"locationBack\": {\n    \"victory\": 1,\n    \"icons\": \"FromEasttown\",\n    \"connections\": \"Crescent\",\n    \"uses\": [\n      {\n        \"countPerInvestigator\": 2,\n        \"type\": \"Clue\",\n        \"token\": \"clue\"\n      }\n    ]\n  }\n}",
+                  "AltLookAngle": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "Tags": [
+                    "Location",
+                    "ScenarioCard"
+                  ],
+                  "LayoutGroupSortIndex": 0,
+                  "Value": 0,
+                  "Locked": false,
+                  "Grid": true,
+                  "Snap": true,
+                  "IgnoreFoW": false,
+                  "MeasureMovement": false,
+                  "DragSelectable": true,
+                  "Autoraise": true,
+                  "Sticky": true,
+                  "Tooltip": true,
+                  "GridProjection": false,
+                  "CardID": 919903,
+                  "CustomDeck": {
+                    "9199": {
+                      "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/17342530264458493993/E4030120AB11A08A48EFBB68E439C58B0379FCE3/",
+                      "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/62595231163466130/1C82E4E7656361AFC59EFBFCDE3170B51DE36996/",
+                      "NumWidth": 10,
+                      "NumHeight": 6,
+                      "BackIsHidden": true,
+                      "UniqueBack": true,
+                      "Type": 0
+                    }
+                  },
+                  "LuaScript": "",
+                  "LuaScriptState": "",
+                  "XmlUI": ""
+                }
+              ]
+            },
+            {
+              "GUID": "363328",
+              "Name": "Deck",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 180.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Act Deck",
+              "Description": "",
+              "GMNotes": "",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "Hands": false,
+              "SidewaysCard": true,
+              "DeckIDs": [
+                919907,
+                919906,
+                919904
+              ],
+              "CustomDeck": {
+                "9199": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/17342530264458493993/E4030120AB11A08A48EFBB68E439C58B0379FCE3/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/62595231163466130/1C82E4E7656361AFC59EFBFCDE3170B51DE36996/",
+                  "NumWidth": 10,
+                  "NumHeight": 6,
+                  "BackIsHidden": true,
+                  "UniqueBack": true,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": "",
+              "ContainedObjects": [
+                {
+                  "GUID": "2bf4a5",
+                  "Name": "Card",
+                  "Transform": {
+                    "posX": 0.0,
+                    "posY": 0.0,
+                    "posZ": 0.0,
+                    "rotX": 0.0,
+                    "rotY": 180.0,
+                    "rotZ": 0.0,
+                    "scaleX": 1.0,
+                    "scaleY": 1.0,
+                    "scaleZ": 1.0
+                  },
+                  "Nickname": "Face the Music",
+                  "Description": "Act 3",
+                  "GMNotes": "{\"id\": \"11508\", \"cycle\": \"The Drowned City\", \"type\": \"Act\", \"class\": \"Mythos\"}",
+                  "AltLookAngle": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "Tags": [
+                    "ScenarioCard"
+                  ],
+                  "LayoutGroupSortIndex": 0,
+                  "Value": 0,
+                  "Locked": false,
+                  "Grid": true,
+                  "Snap": true,
+                  "IgnoreFoW": false,
+                  "MeasureMovement": false,
+                  "DragSelectable": true,
+                  "Autoraise": true,
+                  "Sticky": true,
+                  "Tooltip": true,
+                  "GridProjection": false,
+                  "CardID": 919907,
+                  "SidewaysCard": true,
+                  "CustomDeck": {
+                    "9199": {
+                      "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/17342530264458493993/E4030120AB11A08A48EFBB68E439C58B0379FCE3/",
+                      "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/62595231163466130/1C82E4E7656361AFC59EFBFCDE3170B51DE36996/",
+                      "NumWidth": 10,
+                      "NumHeight": 6,
+                      "BackIsHidden": true,
+                      "UniqueBack": true,
+                      "Type": 0
+                    }
+                  },
+                  "LuaScript": "",
+                  "LuaScriptState": "",
+                  "XmlUI": ""
+                },
+                {
+                  "GUID": "897b67",
+                  "Name": "Card",
+                  "Transform": {
+                    "posX": 0.0,
+                    "posY": 0.0,
+                    "posZ": 0.0,
+                    "rotX": 0.0,
+                    "rotY": 180.0,
+                    "rotZ": 0.0,
+                    "scaleX": 1.0,
+                    "scaleY": 1.0,
+                    "scaleZ": 1.0
+                  },
+                  "Nickname": "The O'Bannion Gang",
+                  "Description": "Act 2",
+                  "GMNotes": "{\"id\": \"11507\", \"cycle\": \"The Drowned City\", \"type\": \"Act\", \"class\": \"Mythos\"}",
+                  "AltLookAngle": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "Tags": [
+                    "ScenarioCard"
+                  ],
+                  "LayoutGroupSortIndex": 0,
+                  "Value": 0,
+                  "Locked": false,
+                  "Grid": true,
+                  "Snap": true,
+                  "IgnoreFoW": false,
+                  "MeasureMovement": false,
+                  "DragSelectable": true,
+                  "Autoraise": true,
+                  "Sticky": true,
+                  "Tooltip": true,
+                  "GridProjection": false,
+                  "CardID": 919906,
+                  "SidewaysCard": true,
+                  "CustomDeck": {
+                    "9199": {
+                      "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/17342530264458493993/E4030120AB11A08A48EFBB68E439C58B0379FCE3/",
+                      "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/62595231163466130/1C82E4E7656361AFC59EFBFCDE3170B51DE36996/",
+                      "NumWidth": 10,
+                      "NumHeight": 6,
+                      "BackIsHidden": true,
+                      "UniqueBack": true,
+                      "Type": 0
+                    }
+                  },
+                  "LuaScript": "",
+                  "LuaScriptState": "",
+                  "XmlUI": ""
+                },
+                {
+                  "GUID": "e97086",
+                  "Name": "Card",
+                  "Transform": {
+                    "posX": 0.0,
+                    "posY": 0.0,
+                    "posZ": 0.0,
+                    "rotX": 0.0,
+                    "rotY": 180.0,
+                    "rotZ": 0.0,
+                    "scaleX": 1.0,
+                    "scaleY": 1.0,
+                    "scaleZ": 1.0
+                  },
+                  "Nickname": "Questioning the Gangs",
+                  "Description": "Act 1",
+                  "GMNotes": "{\n  \"id\": \"11505\",\n  \"type\": \"Location\",\n  \"traits\": \"Arkham. Front.\",\n  \"cycle\": \"The Drowned City\",\n  \"locationBack\": {\n    \"victory\": 1,\n    \"icons\": \"FromDowntown\",\n    \"connections\": \"Triangle\",\n    \"uses\": [\n      {\n        \"countPerInvestigator\": 2,\n        \"type\": \"Clue\",\n        \"token\": \"clue\"\n      }\n    ]\n  }\n}",
+                  "AltLookAngle": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "Tags": [
+                    "Location",
+                    "ScenarioCard"
+                  ],
+                  "LayoutGroupSortIndex": 0,
+                  "Value": 0,
+                  "Locked": false,
+                  "Grid": true,
+                  "Snap": true,
+                  "IgnoreFoW": false,
+                  "MeasureMovement": false,
+                  "DragSelectable": true,
+                  "Autoraise": true,
+                  "Sticky": true,
+                  "Tooltip": true,
+                  "GridProjection": false,
+                  "CardID": 919904,
+                  "CustomDeck": {
+                    "9199": {
+                      "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/17342530264458493993/E4030120AB11A08A48EFBB68E439C58B0379FCE3/",
+                      "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/62595231163466130/1C82E4E7656361AFC59EFBFCDE3170B51DE36996/",
+                      "NumWidth": 10,
+                      "NumHeight": 6,
+                      "BackIsHidden": true,
+                      "UniqueBack": true,
+                      "Type": 0
+                    }
+                  },
+                  "LuaScript": "",
+                  "LuaScriptState": "",
+                  "XmlUI": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "GUID": "af8db2",
+          "Name": "Card",
+          "Transform": {
+            "posX": 0.0,
+            "posY": 0.0,
+            "posZ": 0.0,
+            "rotX": 0.0,
+            "rotY": 270.0,
+            "rotZ": 0.0,
+            "scaleX": 1.0,
+            "scaleY": 1.0,
+            "scaleZ": 1.0
+          },
+          "Nickname": "Rivertown",
+          "Description": "Arkham. Central.",
+          "GMNotes": "{\n  \"id\": \"01125\",\n  \"type\": \"Location\",\n  \"traits\": \"Arkham. Central.\",\n  \"cycle\": \"Core\",\n  \"locationFront\": {\n    \"icons\": \"Circle\",\n    \"connections\": \"Crescent|Diamond|Square|Tilde|Hourglass\"\n  },\n  \"locationBack\": {\n    \"icons\": \"Circle\",\n    \"connections\": \"Crescent|Diamond|Square|Tilde|Hourglass\",\n    \"uses\": [\n      {\n        \"countPerInvestigator\": 1,\n        \"type\": \"Clue\",\n        \"token\": \"clue\"\n      }\n    ]\n  }\n}",
+          "AltLookAngle": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "Tags": [
+            "Location",
+            "ScenarioCard"
+          ],
+          "LayoutGroupSortIndex": 0,
+          "Value": 0,
+          "Locked": false,
+          "Grid": true,
+          "Snap": true,
+          "IgnoreFoW": false,
+          "MeasureMovement": false,
+          "DragSelectable": true,
+          "Autoraise": true,
+          "Sticky": true,
+          "Tooltip": true,
+          "GridProjection": false,
+          "CardID": 112500,
+          "CustomDeck": {
+            "1125": {
+              "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/15880137107443680826/1D59B455D33AE69AC93E14AEE419016C86FE4392/",
+              "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/9427387790762012200/5D18065D4AE7B679A37B4142BFAAA25F4932503E/",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "BackIsHidden": true,
+              "UniqueBack": false,
+              "Type": 0
+            }
+          },
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "XmlUI": ""
+        },
+        {
+          "GUID": "b1ca3a",
+          "Name": "Deck",
+          "Transform": {
+            "posX": 0.0,
+            "posY": 0.0,
+            "posZ": 0.0,
+            "rotX": 0.0,
+            "rotY": 270.0,
+            "rotZ": 180.0,
+            "scaleX": 1.0,
+            "scaleY": 1.0,
+            "scaleZ": 1.0
+          },
+          "Nickname": "Encounter Deck",
+          "Description": "",
+          "GMNotes": "",
+          "AltLookAngle": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "Tags": [
+            "ScenarioCard"
+          ],
+          "LayoutGroupSortIndex": 0,
+          "Value": 0,
+          "Locked": false,
+          "Grid": true,
+          "Snap": true,
+          "IgnoreFoW": false,
+          "MeasureMovement": false,
+          "DragSelectable": true,
+          "Autoraise": true,
+          "Sticky": true,
+          "Tooltip": true,
+          "GridProjection": false,
+          "Hands": false,
+          "DeckIDs": [
+            266906,
+            266906,
+            266905,
+            266905,
+            266904,
+            266904,
+            266902,
+            266902,
+            266902,
+            266829,
+            266829,
+            266829,
+            266828,
+            266828,
+            266828,
+            10017,
+            10017,
+            10011,
+            10011,
+            10010,
+            10010,
+            10008,
+            10008,
+            10007,
+            10007,
+            10006,
+            10006,
+            10006,
+            10002,
+            10002,
+            10002
+          ],
+          "CustomDeck": {
+            "100": {
+              "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/13243700374285212184/EA0A1926B70F720CDBC4EDC375FE76BD22E17389/",
+              "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+              "NumWidth": 7,
+              "NumHeight": 4,
+              "BackIsHidden": true,
+              "UniqueBack": false,
+              "Type": 0
+            },
+            "2668": {
+              "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072210519/EEFB1983C0F9A1B9F4F03BDAFA1404E01EF06BAD/",
+              "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+              "NumWidth": 8,
+              "NumHeight": 4,
+              "BackIsHidden": true,
+              "UniqueBack": false,
+              "Type": 0
+            },
+            "2669": {
+              "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072235388/CEDAE98319999B7BB3C3486D88D14A034CAE2312/",
+              "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+              "NumWidth": 10,
+              "NumHeight": 6,
+              "BackIsHidden": true,
+              "UniqueBack": false,
+              "Type": 0
+            }
+          },
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "XmlUI": "",
+          "ContainedObjects": [
+            {
+              "GUID": "3b9541",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "End of Negotiations",
+              "Description": "",
+              "GMNotes": "{\n  \"id\": \"11516\",\n  \"type\": \"Treachery\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Blunder.\",\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266906,
+              "CustomDeck": {
+                "2669": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072235388/CEDAE98319999B7BB3C3486D88D14A034CAE2312/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 10,
+                  "NumHeight": 6,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "3b9541",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "End of Negotiations",
+              "Description": "",
+              "GMNotes": "{\n  \"id\": \"11516\",\n  \"type\": \"Treachery\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Blunder.\",\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266906,
+              "CustomDeck": {
+                "2669": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072235388/CEDAE98319999B7BB3C3486D88D14A034CAE2312/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 10,
+                  "NumHeight": 6,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "2348f3",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Caught in the Crossfire",
+              "Description": "",
+              "GMNotes": "{\n  \"id\": \"11515\",\n  \"type\": \"Treachery\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Hazard.\",\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266905,
+              "CustomDeck": {
+                "2669": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072235388/CEDAE98319999B7BB3C3486D88D14A034CAE2312/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 10,
+                  "NumHeight": 6,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "2348f3",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Caught in the Crossfire",
+              "Description": "",
+              "GMNotes": "{\n  \"id\": \"11515\",\n  \"type\": \"Treachery\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Hazard.\",\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266905,
+              "CustomDeck": {
+                "2669": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072235388/CEDAE98319999B7BB3C3486D88D14A034CAE2312/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 10,
+                  "NumHeight": 6,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "95cba4",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Gang Informant",
+              "Description": "",
+              "GMNotes": "{\n  \"id\": \"11514\",\n  \"type\": \"Enemy\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Humanoid. Criminal. Syndicate.\",\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266904,
+              "CustomDeck": {
+                "2669": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072235388/CEDAE98319999B7BB3C3486D88D14A034CAE2312/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 10,
+                  "NumHeight": 6,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "95cba4",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Gang Informant",
+              "Description": "",
+              "GMNotes": "{\n  \"id\": \"11514\",\n  \"type\": \"Enemy\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Humanoid. Criminal. Syndicate.\",\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266904,
+              "CustomDeck": {
+                "2669": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072235388/CEDAE98319999B7BB3C3486D88D14A034CAE2312/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 10,
+                  "NumHeight": 6,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "58f812",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Gang Soldier",
+              "Description": "",
+              "GMNotes": "{\n  \"id\": \"11512\",\n  \"type\": \"Enemy\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Humanoid. Criminal. Syndicate.\",\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266902,
+              "CustomDeck": {
+                "2669": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072235388/CEDAE98319999B7BB3C3486D88D14A034CAE2312/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 10,
+                  "NumHeight": 6,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "58f812",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Gang Soldier",
+              "Description": "",
+              "GMNotes": "{\n  \"id\": \"11512\",\n  \"type\": \"Enemy\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Humanoid. Criminal. Syndicate.\",\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266902,
+              "CustomDeck": {
+                "2669": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072235388/CEDAE98319999B7BB3C3486D88D14A034CAE2312/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 10,
+                  "NumHeight": 6,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "58f812",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Gang Soldier",
+              "Description": "",
+              "GMNotes": "{\n  \"id\": \"11512\",\n  \"type\": \"Enemy\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Humanoid. Criminal. Syndicate.\",\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266902,
+              "CustomDeck": {
+                "2669": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072235388/CEDAE98319999B7BB3C3486D88D14A034CAE2312/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 10,
+                  "NumHeight": 6,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "28b3d4",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Drawn to Darkness",
+              "Description": "",
+              "GMNotes": "{\n  \"id\": \"11750\",\n  \"type\": \"Treachery\",\n  \"traits\": \"Power.\",\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266829,
+              "CustomDeck": {
+                "2668": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072210519/EEFB1983C0F9A1B9F4F03BDAFA1404E01EF06BAD/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 8,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "28b3d4",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Drawn to Darkness",
+              "Description": "",
+              "GMNotes": "{\n  \"id\": \"11750\",\n  \"type\": \"Treachery\",\n  \"traits\": \"Power.\",\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266829,
+              "CustomDeck": {
+                "2668": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072210519/EEFB1983C0F9A1B9F4F03BDAFA1404E01EF06BAD/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 8,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "28b3d4",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Drawn to Darkness",
+              "Description": "",
+              "GMNotes": "{\n  \"id\": \"11750\",\n  \"type\": \"Treachery\",\n  \"traits\": \"Power.\",\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266829,
+              "CustomDeck": {
+                "2668": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072210519/EEFB1983C0F9A1B9F4F03BDAFA1404E01EF06BAD/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 8,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "fad46e",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Tortured Visions",
+              "Description": "",
+              "GMNotes": "{\n  \"id\": \"11749\",\n  \"type\": \"Treachery\",\n  \"traits\": \"Terror.\",\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266828,
+              "CustomDeck": {
+                "2668": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072210519/EEFB1983C0F9A1B9F4F03BDAFA1404E01EF06BAD/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 8,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "fad46e",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Tortured Visions",
+              "Description": "",
+              "GMNotes": "{\n  \"id\": \"11749\",\n  \"type\": \"Treachery\",\n  \"traits\": \"Terror.\",\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266828,
+              "CustomDeck": {
+                "2668": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072210519/EEFB1983C0F9A1B9F4F03BDAFA1404E01EF06BAD/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 8,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "fad46e",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Tortured Visions",
+              "Description": "",
+              "GMNotes": "{\n  \"id\": \"11749\",\n  \"type\": \"Treachery\",\n  \"traits\": \"Terror.\",\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266828,
+              "CustomDeck": {
+                "2668": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072210519/EEFB1983C0F9A1B9F4F03BDAFA1404E01EF06BAD/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 8,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "4904d0",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Locked Door",
+              "Description": "Obstacle.",
+              "GMNotes": "{\n  \"id\": \"01174\",\n  \"type\": \"Treachery\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Obstacle.\",\n  \"cycle\": \"Core\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 10017,
+              "CustomDeck": {
+                "100": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/13243700374285212184/EA0A1926B70F720CDBC4EDC375FE76BD22E17389/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 7,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "4904d0",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Locked Door",
+              "Description": "Obstacle.",
+              "GMNotes": "{\n  \"id\": \"01174\",\n  \"type\": \"Treachery\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Obstacle.\",\n  \"cycle\": \"Core\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 10017,
+              "CustomDeck": {
+                "100": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/13243700374285212184/EA0A1926B70F720CDBC4EDC375FE76BD22E17389/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 7,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "50e716",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Obscuring Fog",
+              "Description": "Hazard.",
+              "GMNotes": "{\n  \"id\": \"01168\",\n  \"type\": \"Treachery\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Hazard.\",\n  \"cycle\": \"Core\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 10011,
+              "CustomDeck": {
+                "100": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/13243700374285212184/EA0A1926B70F720CDBC4EDC375FE76BD22E17389/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 7,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "50e716",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Obscuring Fog",
+              "Description": "Hazard.",
+              "GMNotes": "{\n  \"id\": \"01168\",\n  \"type\": \"Treachery\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Hazard.\",\n  \"cycle\": \"Core\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 10011,
+              "CustomDeck": {
+                "100": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/13243700374285212184/EA0A1926B70F720CDBC4EDC375FE76BD22E17389/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 7,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "16d6d6",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Crypt Chill",
+              "Description": "Hazard.",
+              "GMNotes": "{\n  \"id\": \"01167\",\n  \"type\": \"Treachery\",\n  \"traits\": \"Hazard.\",\n  \"cycle\": \"Core\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 10010,
+              "CustomDeck": {
+                "100": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/13243700374285212184/EA0A1926B70F720CDBC4EDC375FE76BD22E17389/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 7,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "16d6d6",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Crypt Chill",
+              "Description": "Hazard.",
+              "GMNotes": "{\n  \"id\": \"01167\",\n  \"type\": \"Treachery\",\n  \"traits\": \"Hazard.\",\n  \"cycle\": \"Core\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 10010,
+              "CustomDeck": {
+                "100": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/13243700374285212184/EA0A1926B70F720CDBC4EDC375FE76BD22E17389/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 7,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "97416f",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Dissonant Voices",
+              "Description": "Terror.",
+              "GMNotes": "{\n  \"id\": \"01165\",\n  \"type\": \"Treachery\",\n  \"traits\": \"Terror.\",\n  \"cycle\": \"Core\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 10008,
+              "CustomDeck": {
+                "100": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/13243700374285212184/EA0A1926B70F720CDBC4EDC375FE76BD22E17389/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 7,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "97416f",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Dissonant Voices",
+              "Description": "Terror.",
+              "GMNotes": "{\n  \"id\": \"01165\",\n  \"type\": \"Treachery\",\n  \"traits\": \"Terror.\",\n  \"cycle\": \"Core\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 10008,
+              "CustomDeck": {
+                "100": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/13243700374285212184/EA0A1926B70F720CDBC4EDC375FE76BD22E17389/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 7,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "0f4202",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Frozen in Fear",
+              "Description": "Terror.",
+              "GMNotes": "{\n  \"id\": \"01164\",\n  \"type\": \"Treachery\",\n  \"traits\": \"Terror.\",\n  \"cycle\": \"Core\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 10007,
+              "CustomDeck": {
+                "100": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/13243700374285212184/EA0A1926B70F720CDBC4EDC375FE76BD22E17389/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 7,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "0f4202",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Frozen in Fear",
+              "Description": "Terror.",
+              "GMNotes": "{\n  \"id\": \"01164\",\n  \"type\": \"Treachery\",\n  \"traits\": \"Terror.\",\n  \"cycle\": \"Core\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 10007,
+              "CustomDeck": {
+                "100": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/13243700374285212184/EA0A1926B70F720CDBC4EDC375FE76BD22E17389/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 7,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "435a47",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Rotting Remains",
+              "Description": "Terror.",
+              "GMNotes": "{\n  \"id\": \"01163\",\n  \"type\": \"Treachery\",\n  \"traits\": \"Terror.\",\n  \"cycle\": \"Core\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 10006,
+              "CustomDeck": {
+                "100": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/13243700374285212184/EA0A1926B70F720CDBC4EDC375FE76BD22E17389/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 7,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "435a47",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Rotting Remains",
+              "Description": "Terror.",
+              "GMNotes": "{\n  \"id\": \"01163\",\n  \"type\": \"Treachery\",\n  \"traits\": \"Terror.\",\n  \"cycle\": \"Core\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 10006,
+              "CustomDeck": {
+                "100": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/13243700374285212184/EA0A1926B70F720CDBC4EDC375FE76BD22E17389/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 7,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "435a47",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Rotting Remains",
+              "Description": "Terror.",
+              "GMNotes": "{\n  \"id\": \"01163\",\n  \"type\": \"Treachery\",\n  \"traits\": \"Terror.\",\n  \"cycle\": \"Core\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 10006,
+              "CustomDeck": {
+                "100": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/13243700374285212184/EA0A1926B70F720CDBC4EDC375FE76BD22E17389/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 7,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "a2cf85",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Swarm of Rats",
+              "Description": "Creature.",
+              "GMNotes": "{\n  \"id\": \"01159\",\n  \"type\": \"Enemy\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Creature.\",\n  \"cycle\": \"Core\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 10002,
+              "CustomDeck": {
+                "100": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/13243700374285212184/EA0A1926B70F720CDBC4EDC375FE76BD22E17389/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 7,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "a2cf85",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Swarm of Rats",
+              "Description": "Creature.",
+              "GMNotes": "{\n  \"id\": \"01159\",\n  \"type\": \"Enemy\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Creature.\",\n  \"cycle\": \"Core\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 10002,
+              "CustomDeck": {
+                "100": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/13243700374285212184/EA0A1926B70F720CDBC4EDC375FE76BD22E17389/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 7,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "a2cf85",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Swarm of Rats",
+              "Description": "Creature.",
+              "GMNotes": "{\n  \"id\": \"01159\",\n  \"type\": \"Enemy\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Creature.\",\n  \"cycle\": \"Core\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 10002,
+              "CustomDeck": {
+                "100": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/13243700374285212184/EA0A1926B70F720CDBC4EDC375FE76BD22E17389/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 7,
+                  "NumHeight": 4,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            }
+          ]
+        },
+        {
+          "GUID": "d2ad6e",
+          "Name": "Card",
+          "Transform": {
+            "posX": 0.0,
+            "posY": 0.0,
+            "posZ": 0.0,
+            "rotX": 0.0,
+            "rotY": 270.0,
+            "rotZ": 0.0,
+            "scaleX": 1.0,
+            "scaleY": 1.0,
+            "scaleZ": 1.0
+          },
+          "Nickname": "Northside",
+          "Description": "Arkham.",
+          "GMNotes": "{\n  \"id\": \"01134\",\n  \"type\": \"Location\",\n  \"traits\": \"Arkham.\",\n  \"cycle\": \"Core\",\n  \"locationFront\": {\n    \"icons\": \"Tee\",\n    \"connections\": \"Diamond|Triangle\"\n  },\n  \"locationBack\": {\n    \"victory\": 1,\n    \"icons\": \"Tee\",\n    \"connections\": \"Diamond|Triangle\",\n    \"uses\": [\n      {\n        \"countPerInvestigator\": 2,\n        \"type\": \"Clue\",\n        \"token\": \"clue\"\n      }\n    ]\n  }\n}",
+          "AltLookAngle": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "Tags": [
+            "Location",
+            "ScenarioCard"
+          ],
+          "LayoutGroupSortIndex": 0,
+          "Value": 0,
+          "Locked": false,
+          "Grid": true,
+          "Snap": true,
+          "IgnoreFoW": false,
+          "MeasureMovement": false,
+          "DragSelectable": true,
+          "Autoraise": true,
+          "Sticky": true,
+          "Tooltip": true,
+          "GridProjection": false,
+          "CardID": 113400,
+          "CustomDeck": {
+            "1134": {
+              "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/12936548610804325764/97E6DA0BEC90BAD15DB3CCFF01526E4F4E887877/",
+              "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/11361932330769021535/DD9C538898F769D7B702A9D7058CE8D051C92C22/",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "BackIsHidden": true,
+              "UniqueBack": false,
+              "Type": 0
+            }
+          },
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "XmlUI": ""
+        },
+        {
+          "GUID": "dc25ea",
+          "Name": "Custom_Model_Bag",
+          "Transform": {
+            "posX": 0.0,
+            "posY": 0.0,
+            "posZ": 0.0,
+            "rotX": 0.0,
+            "rotY": 225.0,
+            "rotZ": 0.0,
+            "scaleX": 2.0,
+            "scaleY": 2.0,
+            "scaleZ": 2.0
+          },
+          "Nickname": "Set-aside",
+          "Description": "",
+          "GMNotes": "",
+          "AltLookAngle": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "ColorDiffuse": {
+            "r": 0.0,
+            "g": 0.0,
+            "b": 0.0
+          },
+          "LayoutGroupSortIndex": 0,
+          "Value": 0,
+          "Locked": false,
+          "Grid": true,
+          "Snap": true,
+          "IgnoreFoW": false,
+          "MeasureMovement": false,
+          "DragSelectable": true,
+          "Autoraise": true,
+          "Sticky": true,
+          "Tooltip": true,
+          "GridProjection": false,
+          "HideWhenFaceDown": false,
+          "Hands": false,
+          "CustomMesh": {
+            "MeshURL": "https://steamusercontent-a.akamaihd.net/ugc/2038485431565955058/F72FECE5488594A28292C06997A2E28A8B8961C5/",
+            "DiffuseURL": "https://steamusercontent-a.akamaihd.net/ugc/764975951334960553/C518D80E31E27DB23EEAC8CF9253E59798865790/",
+            "NormalURL": "https://steamusercontent-a.akamaihd.net/ugc/764975951334960069/E70E4A58A1B7827F1E5E2AF9FF44DF0BD5DA33F7/",
+            "ColliderURL": "",
+            "Convex": true,
+            "MaterialIndex": 1,
+            "TypeIndex": 6,
+            "CastShadows": true
+          },
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "XmlUI": "",
+          "ContainedObjects": [
+            {
+              "GUID": "21dd64",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 225.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Ruby Standish",
+              "Description": "Master Thief",
+              "GMNotes": "{\n  \"id\": \"11765\",\n  \"type\": \"Asset\",\n  \"class\": \"Neutral\",\n  \"cost\": 4,\n  \"traits\": \"Ally. Criminal.\",\n  \"agilityIcons\": 2,\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "Asset",
+                "PlayerCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266707,
+              "CustomDeck": {
+                "2667": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072173481/D3B06D9B0AC5B5DA71755ADE9E540118F90E941A/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940352139/A2D42E7E5C43D045D72CE5CFC907E4F886C8C690/",
+                  "NumWidth": 5,
+                  "NumHeight": 2,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "95521c",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 225.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Andy Van Nortwick",
+              "Description": "Ambitious Journalist",
+              "GMNotes": "{\n  \"id\": \"11766\",\n  \"type\": \"Asset\",\n  \"class\": \"Neutral\",\n  \"cost\": 4,\n  \"traits\": \"Ally. Reporter.\",\n  \"intellectIcons\": 2,\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "Asset",
+                "PlayerCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266708,
+              "CustomDeck": {
+                "2667": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072173481/D3B06D9B0AC5B5DA71755ADE9E540118F90E941A/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940352139/A2D42E7E5C43D045D72CE5CFC907E4F886C8C690/",
+                  "NumWidth": 5,
+                  "NumHeight": 2,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "02e9a7",
+              "Name": "Deck",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Gang Enforcers",
+              "Description": "",
+              "GMNotes": "",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "Hands": false,
+              "DeckIDs": [
+                266903,
+                266903
+              ],
+              "CustomDeck": {
+                "2669": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072235388/CEDAE98319999B7BB3C3486D88D14A034CAE2312/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 10,
+                  "NumHeight": 6,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": "",
+              "ContainedObjects": [
+                {
+                  "GUID": "47defe",
+                  "Name": "Card",
+                  "Transform": {
+                    "posX": 0.0,
+                    "posY": 0.0,
+                    "posZ": 0.0,
+                    "rotX": 0.0,
+                    "rotY": 270.0,
+                    "rotZ": 0.0,
+                    "scaleX": 1.0,
+                    "scaleY": 1.0,
+                    "scaleZ": 1.0
+                  },
+                  "Nickname": "Gang Enforcer",
+                  "Description": "",
+                  "GMNotes": "{\n  \"id\": \"11513\",\n  \"type\": \"Enemy\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Humanoid. Criminal. Syndicate.\",\n  \"victory\": 1,\n  \"cycle\": \"The Drowned City\"\n}",
+                  "AltLookAngle": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "Tags": [
+                    "ScenarioCard"
+                  ],
+                  "LayoutGroupSortIndex": 0,
+                  "Value": 0,
+                  "Locked": false,
+                  "Grid": true,
+                  "Snap": true,
+                  "IgnoreFoW": false,
+                  "MeasureMovement": false,
+                  "DragSelectable": true,
+                  "Autoraise": true,
+                  "Sticky": true,
+                  "Tooltip": true,
+                  "GridProjection": false,
+                  "CardID": 266903,
+                  "CustomDeck": {
+                    "2669": {
+                      "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072235388/CEDAE98319999B7BB3C3486D88D14A034CAE2312/",
+                      "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                      "NumWidth": 10,
+                      "NumHeight": 6,
+                      "BackIsHidden": true,
+                      "UniqueBack": false,
+                      "Type": 0
+                    }
+                  },
+                  "LuaScript": "",
+                  "LuaScriptState": "",
+                  "XmlUI": ""
+                },
+                {
+                  "GUID": "47defe",
+                  "Name": "Card",
+                  "Transform": {
+                    "posX": 0.0,
+                    "posY": 0.0,
+                    "posZ": 0.0,
+                    "rotX": 0.0,
+                    "rotY": 270.0,
+                    "rotZ": 0.0,
+                    "scaleX": 1.0,
+                    "scaleY": 1.0,
+                    "scaleZ": 1.0
+                  },
+                  "Nickname": "Gang Enforcer",
+                  "Description": "",
+                  "GMNotes": "{\n  \"id\": \"11513\",\n  \"type\": \"Enemy\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Humanoid. Criminal. Syndicate.\",\n  \"victory\": 1,\n  \"cycle\": \"The Drowned City\"\n}",
+                  "AltLookAngle": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "Tags": [
+                    "ScenarioCard"
+                  ],
+                  "LayoutGroupSortIndex": 0,
+                  "Value": 0,
+                  "Locked": false,
+                  "Grid": true,
+                  "Snap": true,
+                  "IgnoreFoW": false,
+                  "MeasureMovement": false,
+                  "DragSelectable": true,
+                  "Autoraise": true,
+                  "Sticky": true,
+                  "Tooltip": true,
+                  "GridProjection": false,
+                  "CardID": 266903,
+                  "CustomDeck": {
+                    "2669": {
+                      "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072235388/CEDAE98319999B7BB3C3486D88D14A034CAE2312/",
+                      "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                      "NumWidth": 10,
+                      "NumHeight": 6,
+                      "BackIsHidden": true,
+                      "UniqueBack": false,
+                      "Type": 0
+                    }
+                  },
+                  "LuaScript": "",
+                  "LuaScriptState": "",
+                  "XmlUI": ""
+                }
+              ]
+            },
+            {
+              "GUID": "f3e7a3",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Naomi O'Bannion",
+              "Description": "Just Doing Business",
+              "GMNotes": "{\n  \"id\": \"11511\",\n  \"type\": \"Enemy\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Humanoid. Criminal. Syndicate. Elite.\",\n  \"victory\": 1,\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266901,
+              "CustomDeck": {
+                "2669": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072235388/CEDAE98319999B7BB3C3486D88D14A034CAE2312/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 10,
+                  "NumHeight": 6,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            },
+            {
+              "GUID": "25eeed",
+              "Name": "Card",
+              "Transform": {
+                "posX": 0.0,
+                "posY": 0.0,
+                "posZ": 0.0,
+                "rotX": 0.0,
+                "rotY": 270.0,
+                "rotZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0
+              },
+              "Nickname": "Sadie Sheldon",
+              "Description": "Runs this Town",
+              "GMNotes": "{\n  \"id\": \"11510\",\n  \"type\": \"Enemy\",\n  \"class\": \"Mythos\",\n  \"traits\": \"Humanoid. Criminal. Syndicate. Elite.\",\n  \"victory\": 1,\n  \"cycle\": \"The Drowned City\"\n}",
+              "AltLookAngle": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Tags": [
+                "ScenarioCard"
+              ],
+              "LayoutGroupSortIndex": 0,
+              "Value": 0,
+              "Locked": false,
+              "Grid": true,
+              "Snap": true,
+              "IgnoreFoW": false,
+              "MeasureMovement": false,
+              "DragSelectable": true,
+              "Autoraise": true,
+              "Sticky": true,
+              "Tooltip": true,
+              "GridProjection": false,
+              "CardID": 266900,
+              "CustomDeck": {
+                "2669": {
+                  "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/62595225072235388/CEDAE98319999B7BB3C3486D88D14A034CAE2312/",
+                  "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940351785/F64D8EFB75A9E15446D24343DA0A6EEF5B3E43DB/",
+                  "NumWidth": 10,
+                  "NumHeight": 6,
+                  "BackIsHidden": true,
+                  "UniqueBack": false,
+                  "Type": 0
+                }
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            }
+          ]
+        }
+      ],
+      "AttachedDecals": [
+        {
+          "Transform": {
+            "posX": 0.0,
+            "posY": -0.1,
+            "posZ": 0.0,
+            "rotX": 270.0,
+            "rotY": 0.0,
+            "rotZ": 0.0,
+            "scaleX": 2.0,
+            "scaleY": 2.0,
+            "scaleZ": 2.0
+          },
+          "CustomDecal": {
+            "Name": "dunwich_back",
+            "ImageURL": "https://steamusercontent-a.akamaihd.net/ugc/959719855119695911/931B9829687A20F4DEADB36DA57B7E6D76792231/",
+            "Size": 7.4
+          },
+          "OwnerSteamID": 0
+        }
+      ]
+    }
+  ]
+}

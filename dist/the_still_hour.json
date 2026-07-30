@@ -1,0 +1,1539 @@
+{
+  "ObjectStates": [
+    {
+      "Name": "Bag",
+      "Nickname": "THE STILL HOUR \u2014 Player Cards",
+      "Description": "",
+      "GUID": "d0cd5a",
+      "Tags": [
+        "StillHour"
+      ],
+      "Transform": {
+        "posX": 0,
+        "posY": 1.5,
+        "posZ": 0,
+        "rotX": 0,
+        "rotY": 180,
+        "rotZ": 0,
+        "scaleX": 1.15,
+        "scaleY": 1,
+        "scaleZ": 1.15
+      },
+      "ContainedObjects": [
+        {
+          "Name": "Card",
+          "Nickname": "Elias Warde",
+          "Description": "The Ninth Death",
+          "GUID": "57e75d",
+          "CardID": 9501000,
+          "SidewaysCard": true,
+          "Tags": [
+            "Investigator",
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": false,
+          "GMNotes": "{\"id\":\"sthr-elias\",\"type\":\"Investigator\",\"class\":\"Guardian\",\"traits\":\"Believer. Warden.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":2,\"combatIcons\":4,\"agilityIcons\":3,\"health\":9,\"sanity\":5,\"signatures\":[{\"sthr-lamp\":1,\"sthr-donebefore\":1,\"sthr-eighthgrave\":1}],\"elderSignEffect\":{\"description\":\"+1. If there are 3 or more Memory on Elias, this token is +3 instead, and heal 1 damage from Elias.\",\"modifier\":1}}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95010": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-elias.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-elias-back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": true,
+              "BackIsHidden": true
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "The Ambergrove Lamp",
+          "Description": "",
+          "GUID": "052059",
+          "CardID": 9501100,
+          "SidewaysCard": false,
+          "Tags": [
+            "Asset",
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-lamp\",\"type\":\"Asset\",\"class\":\"Guardian\",\"traits\":\"Item. Tool.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"slot\":\"Hand\"}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95011": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-lamp.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "I've Done This Before",
+          "Description": "",
+          "GUID": "9ab227",
+          "CardID": 9501200,
+          "SidewaysCard": false,
+          "Tags": [
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-donebefore\",\"type\":\"Skill\",\"class\":\"Guardian\",\"traits\":\"Innate. Recollection.\",\"cycle\":\"The Still Hour\",\"level\":0,\"wildIcons\":1}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95012": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-donebefore.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "The Eighth Grave",
+          "Description": "",
+          "GUID": "c0ab9a",
+          "CardID": 9501300,
+          "SidewaysCard": false,
+          "Tags": [
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-eighthgrave\",\"type\":\"Treachery\",\"class\":\"Neutral\",\"traits\":\"Curse. Memory.\",\"cycle\":\"The Still Hour\",\"weakness\":true}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95013": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-eighthgrave.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "Dr. Ayako S\u014dma",
+          "Description": "The Translator",
+          "GUID": "10fb04",
+          "CardID": 9501400,
+          "SidewaysCard": true,
+          "Tags": [
+            "Investigator",
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": false,
+          "GMNotes": "{\"id\":\"sthr-ayako\",\"type\":\"Investigator\",\"class\":\"Seeker\",\"traits\":\"Scholar. Chronicler.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":5,\"combatIcons\":1,\"agilityIcons\":3,\"health\":5,\"sanity\":8,\"signatures\":[{\"sthr-lexicon\":1,\"sthr-itmeanswait\":1,\"sthr-untranslatable\":1}],\"elderSignEffect\":{\"description\":\"+2. Draw 1 card. If it is a Recollection, it costs 2 less to play this turn.\",\"modifier\":2}}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95014": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-ayako.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-ayako-back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": true,
+              "BackIsHidden": true
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "The Lexicon of the Hour",
+          "Description": "",
+          "GUID": "13deed",
+          "CardID": 9501500,
+          "SidewaysCard": false,
+          "Tags": [
+            "Asset",
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-lexicon\",\"type\":\"Asset\",\"class\":\"Seeker\",\"traits\":\"Item. Tome.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"slot\":\"Hand\",\"uses\":[{\"count\":0,\"type\":\"Secret\",\"token\":\"secret\"}]}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95015": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-lexicon.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "It Means 'Wait'",
+          "Description": "",
+          "GUID": "28d53f",
+          "CardID": 9501600,
+          "SidewaysCard": false,
+          "Tags": [
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-itmeanswait\",\"type\":\"Event\",\"class\":\"Seeker\",\"traits\":\"Insight.\",\"cycle\":\"The Still Hour\",\"cost\":0}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95016": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-itmeanswait.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "Untranslatable",
+          "Description": "",
+          "GUID": "002602",
+          "CardID": 9501700,
+          "SidewaysCard": false,
+          "Tags": [
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-untranslatable\",\"type\":\"Treachery\",\"class\":\"Neutral\",\"traits\":\"Madness.\",\"cycle\":\"The Still Hour\",\"weakness\":true}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95017": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-untranslatable.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "Cass Lindqvist",
+          "Description": "The Card Counter",
+          "GUID": "7c1cd6",
+          "CardID": 9501800,
+          "SidewaysCard": true,
+          "Tags": [
+            "Investigator",
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": false,
+          "GMNotes": "{\"id\":\"sthr-cass\",\"type\":\"Investigator\",\"class\":\"Rogue\",\"traits\":\"Criminal. Drifter.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":2,\"intellectIcons\":3,\"combatIcons\":3,\"agilityIcons\":5,\"health\":7,\"sanity\":6,\"signatures\":[{\"sthr-markeddeck\":1,\"sthr-seenthishand\":1,\"sthr-housewins\":1}],\"elderSignEffect\":{\"description\":\"+1. Gain 1 resource for each Memory on Cass (maximum +3 resources).\",\"modifier\":1}}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95018": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-cass.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-cass-back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": true,
+              "BackIsHidden": true
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "Marked Deck",
+          "Description": "",
+          "GUID": "349136",
+          "CardID": 9501900,
+          "SidewaysCard": false,
+          "Tags": [
+            "Asset",
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-markeddeck\",\"type\":\"Asset\",\"class\":\"Rogue\",\"traits\":\"Item. Illicit.\",\"cycle\":\"The Still Hour\",\"cost\":1,\"level\":0,\"slot\":\"Hand\"}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95019": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-markeddeck.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "Seen This Hand Before",
+          "Description": "",
+          "GUID": "88bc0a",
+          "CardID": 9502000,
+          "SidewaysCard": false,
+          "Tags": [
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-seenthishand\",\"type\":\"Event\",\"class\":\"Rogue\",\"traits\":\"Fortune. Insight.\",\"cycle\":\"The Still Hour\",\"cost\":1}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95020": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-seenthishand.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "The House Always Wins",
+          "Description": "",
+          "GUID": "087b41",
+          "CardID": 9502100,
+          "SidewaysCard": false,
+          "Tags": [
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-housewins\",\"type\":\"Enemy\",\"class\":\"Neutral\",\"traits\":\"Humanoid. Criminal.\",\"cycle\":\"The Still Hour\",\"weakness\":true}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95021": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-housewins.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "Seraphine Vale",
+          "Description": "The Medium",
+          "GUID": "65d592",
+          "CardID": 9502200,
+          "SidewaysCard": true,
+          "Tags": [
+            "Investigator",
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": false,
+          "GMNotes": "{\"id\":\"sthr-seraphine\",\"type\":\"Investigator\",\"class\":\"Mystic\",\"traits\":\"Sorcerer. Cursed.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":5,\"intellectIcons\":3,\"combatIcons\":2,\"agilityIcons\":2,\"health\":6,\"sanity\":8,\"signatures\":[{\"sthr-bell\":1,\"sthr-rememberending\":1,\"sthr-debtofhours\":1}],\"elderSignEffect\":{\"description\":\"+X, where X = current Dissonance (maximum +5). After this skill test, reduce Dissonance by the amount this token added.\"}}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95022": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-seraphine.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-seraphine-back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": true,
+              "BackIsHidden": true
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "The Bell of Ambergrove",
+          "Description": "",
+          "GUID": "7b1c52",
+          "CardID": 9502300,
+          "SidewaysCard": false,
+          "Tags": [
+            "Asset",
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-bell\",\"type\":\"Asset\",\"class\":\"Mystic\",\"traits\":\"Relic.\",\"cycle\":\"The Still Hour\",\"cost\":3,\"level\":0,\"slot\":\"Accessory\",\"uses\":[{\"count\":3,\"type\":\"Charge\",\"token\":\"resource\"}]}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95023": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-bell.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "I Remember the Ending",
+          "Description": "",
+          "GUID": "786e12",
+          "CardID": 9502400,
+          "SidewaysCard": false,
+          "Tags": [
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-rememberending\",\"type\":\"Event\",\"class\":\"Mystic\",\"traits\":\"Spell. Insight.\",\"cycle\":\"The Still Hour\",\"cost\":2}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95024": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-rememberending.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "The Debt of Hours",
+          "Description": "",
+          "GUID": "256287",
+          "CardID": 9502500,
+          "SidewaysCard": false,
+          "Tags": [
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-debtofhours\",\"type\":\"Treachery\",\"class\":\"Neutral\",\"traits\":\"Curse.\",\"cycle\":\"The Still Hour\",\"weakness\":true}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95025": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-debtofhours.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "\"Birdie\" Okonkwo",
+          "Description": "The One Who Wandered",
+          "GUID": "3203de",
+          "CardID": 9502600,
+          "SidewaysCard": true,
+          "Tags": [
+            "Investigator",
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": false,
+          "GMNotes": "{\"id\":\"sthr-birdie\",\"type\":\"Investigator\",\"class\":\"Survivor\",\"traits\":\"Drifter. Wayward.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":3,\"combatIcons\":2,\"agilityIcons\":4,\"health\":6,\"sanity\":7,\"signatures\":[{\"sthr-compass\":1,\"sthr-igetout\":1,\"sthr-nobodybelieves\":1}],\"elderSignEffect\":{\"description\":\"+1. If you have already failed a skill test this round, this token is +3 instead.\",\"modifier\":1}}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95026": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-birdie.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-birdie-back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": true,
+              "BackIsHidden": true
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "Lucky Compass",
+          "Description": "",
+          "GUID": "25b6e7",
+          "CardID": 9502700,
+          "SidewaysCard": false,
+          "Tags": [
+            "Asset",
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-compass\",\"type\":\"Asset\",\"class\":\"Survivor\",\"traits\":\"Item. Charm.\",\"cycle\":\"The Still Hour\",\"cost\":1,\"level\":0,\"slot\":\"Accessory\"}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95027": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-compass.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "I Get Out",
+          "Description": "",
+          "GUID": "b1bb5b",
+          "CardID": 9502800,
+          "SidewaysCard": false,
+          "Tags": [
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-igetout\",\"type\":\"Event\",\"class\":\"Survivor\",\"traits\":\"Gambit.\",\"cycle\":\"The Still Hour\",\"cost\":0}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95028": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-igetout.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "Nobody Believes Her",
+          "Description": "",
+          "GUID": "d0ade3",
+          "CardID": 9502900,
+          "SidewaysCard": false,
+          "Tags": [
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-nobodybelieves\",\"type\":\"Treachery\",\"class\":\"Neutral\",\"traits\":\"Madness.\",\"cycle\":\"The Still Hour\",\"weakness\":true}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95029": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-nobodybelieves.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "Foreknowledge",
+          "Description": "",
+          "GUID": "865834",
+          "CardID": 9503000,
+          "SidewaysCard": false,
+          "Tags": [
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-foreknowledge\",\"type\":\"Skill\",\"class\":\"Neutral\",\"traits\":\"Innate. Recollection.\",\"cycle\":\"The Still Hour\",\"level\":0,\"wildIcons\":1,\"memoryCost\":3}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95030": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-foreknowledge.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "D\u00e9j\u00e0 Vu",
+          "Description": "",
+          "GUID": "b89ea4",
+          "CardID": 9503100,
+          "SidewaysCard": false,
+          "Tags": [
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-dejavu\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Insight. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":1,\"level\":0,\"memoryCost\":4}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95031": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-dejavu.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "Muscle Memory",
+          "Description": "",
+          "GUID": "bb8d14",
+          "CardID": 9503200,
+          "SidewaysCard": false,
+          "Tags": [
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-musclememory\",\"type\":\"Skill\",\"class\":\"Neutral\",\"traits\":\"Innate. Recollection.\",\"cycle\":\"The Still Hour\",\"level\":0,\"wildIcons\":1,\"memoryCost\":3}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95032": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-musclememory.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "Rehearsed Escape",
+          "Description": "",
+          "GUID": "fb0d38",
+          "CardID": 9503300,
+          "SidewaysCard": false,
+          "Tags": [
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-rehearsedescape\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Trick. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":0,\"level\":0,\"memoryCost\":3}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95033": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-rehearsedescape.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "The Long Way Round",
+          "Description": "",
+          "GUID": "d4a569",
+          "CardID": 9503400,
+          "SidewaysCard": false,
+          "Tags": [
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-longwayround\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Trick. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":1,\"level\":0,\"memoryCost\":2}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95034": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-longwayround.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "Borrowed Time",
+          "Description": "",
+          "GUID": "73f8bc",
+          "CardID": 9503500,
+          "SidewaysCard": false,
+          "Tags": [
+            "Asset",
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-borrowedtime\",\"type\":\"Asset\",\"class\":\"Neutral\",\"traits\":\"Item. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"uses\":[{\"count\":3,\"type\":\"Memory\",\"token\":\"resource\"}],\"memoryCost\":4}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95035": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-borrowedtime.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "This Time For Sure",
+          "Description": "",
+          "GUID": "4b8478",
+          "CardID": 9503600,
+          "SidewaysCard": false,
+          "Tags": [
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-thistimeforsure\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Insight. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"memoryCost\":4}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95036": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-thistimeforsure.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "Anchor Point",
+          "Description": "",
+          "GUID": "af4139",
+          "CardID": 9503700,
+          "SidewaysCard": false,
+          "Tags": [
+            "Asset",
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-anchorpoint\",\"type\":\"Asset\",\"class\":\"Neutral\",\"traits\":\"Talent. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":0,\"level\":0,\"permanent\":true,\"memoryCost\":3}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95037": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-anchorpoint.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "Cassandra's Notebook",
+          "Description": "",
+          "GUID": "f5d8ba",
+          "CardID": 9503800,
+          "SidewaysCard": false,
+          "Tags": [
+            "Asset",
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-cassandrasnotebook\",\"type\":\"Asset\",\"class\":\"Neutral\",\"traits\":\"Item. Tome. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"slot\":\"Hand\",\"memoryCost\":4}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95038": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-cassandrasnotebook.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        },
+        {
+          "Name": "Card",
+          "Nickname": "The Hour I Learned Your Name",
+          "Description": "",
+          "GUID": "78baa2",
+          "CardID": 9503900,
+          "SidewaysCard": false,
+          "Tags": [
+            "PlayerCard"
+          ],
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
+          "GMNotes": "{\"id\":\"sthr-hourlearnedname\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Spell. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":3,\"level\":0,\"memoryCost\":5}",
+          "Transform": {
+            "posX": 0,
+            "posY": 1.5,
+            "posZ": 0,
+            "rotX": 0,
+            "rotY": 180,
+            "rotZ": 0,
+            "scaleX": 1.15,
+            "scaleY": 1,
+            "scaleZ": 1.15
+          },
+          "CustomUIAssets": [
+            {
+              "Name": "font_arkhamicons",
+              "Type": 1,
+              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+            }
+          ],
+          "CustomDeck": {
+            "95039": {
+              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-hourlearnedname.png",
+              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "NumWidth": 1,
+              "NumHeight": 1,
+              "Type": 0,
+              "UniqueBack": false,
+              "BackIsHidden": false
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

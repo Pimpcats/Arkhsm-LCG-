@@ -1,0 +1,104 @@
+--- THE STILL HOUR — location fact-toggles (P6).
+--
+-- Ambergrove locations have a FRONT (this loop) and, for some, a BACK that a
+-- Knowledge fact flips to permanently — a calmer/more navigable version (design
+-- §3 "Unremembered"; guide §6). A few locations are SEALED until a fact opens
+-- them (the Flooded Crypt, the Sealed Study).
+--
+-- This module owns which face is active and whether a location is open, read off
+-- the Knowledge flags in campaign state. The board layer asks the module which
+-- face to show / whether the location is revealed; it never decides itself.
+--
+-- Fields per location:
+--   flipFact    -- fact id that flips FRONT -> BACK (nil = no back)
+--   sealedUntil -- list of fact ids ALL required to unseal (nil = always open)
+
+local CampaignState = require("StillHour/CampaignState")
+
+local Locations = {}
+
+Locations.LOCATIONS = {
+  -- The Lighthouse
+  ["lantern-room"]    = { name = "The Lantern Room",   district = "Lighthouse",  flipFact = "the-lamp-was-never-lit" },
+  ["winding-stair"]   = { name = "The Winding Stair",  district = "Lighthouse" },
+  ["keepers-quarters"] = { name = "The Keeper's Quarters", district = "Lighthouse" },
+  -- The Drowned Church
+  ["nave"]            = { name = "The Nave",           district = "Church" },
+  ["belfry"]          = { name = "The Belfry",         district = "Church" },
+  ["flooded-crypt"]   = { name = "The Flooded Crypt",  district = "Church", sealedUntil = { "the-thirteenth-toll" } },
+  ["vestry"]          = { name = "The Vestry",         district = "Church" },
+  -- The Sunken Road
+  ["milestones"]      = { name = "The Milestones",     district = "Sunken Road" },
+  ["low-bridge"]      = { name = "The Low Bridge",     district = "Sunken Road" },
+  ["the-turning"]     = { name = "The Turning",        district = "Sunken Road" },
+  -- The Square
+  ["town-hall-steps"] = { name = "The Town Hall Steps", district = "Square", flipFact = "the-sheriff-is-already-dead" },
+  ["records-office"]  = { name = "The Records Office", district = "Square" },
+  ["the-well"]        = { name = "The Well",           district = "Square" },
+  -- The Fairground
+  ["the-wheel"]       = { name = "The Wheel",          district = "Fairground" },
+  ["hall-of-mirrors"] = { name = "The Hall of Mirrors", district = "Fairground" },
+  ["ticket-booth"]    = { name = "The Ticket Booth",   district = "Fairground" },
+  -- The Almanac House
+  ["reading-room"]    = { name = "The Reading Room",   district = "Almanac" },
+  ["the-press"]       = { name = "The Press",          district = "Almanac" },
+  ["sealed-study"]    = { name = "The Sealed Study",   district = "Almanac",
+                          sealedUntil = { "what-the-almanac-hid", "the-vote-that-never-ends" } },
+}
+
+local function loc(id)
+  return assert(Locations.LOCATIONS[id], "unknown location: " .. tostring(id))
+end
+
+--- Which face is active: "back" once the flip fact is known, else "front".
+function Locations.activeFace(id)
+  local l = loc(id)
+  if l.flipFact and CampaignState.knows(l.flipFact) then
+    return "back"
+  end
+  return "front"
+end
+
+--- Sealed until every fact in sealedUntil is known.
+function Locations.isSealed(id)
+  local l = loc(id)
+  if not l.sealedUntil then
+    return false
+  end
+  for _, factId in ipairs(l.sealedUntil) do
+    if not CampaignState.knows(factId) then
+      return true
+    end
+  end
+  return false
+end
+
+function Locations.isOpen(id)
+  return not Locations.isSealed(id)
+end
+
+--- Convenience descriptor for the board layer / UI.
+function Locations.describe(id)
+  local l = loc(id)
+  return {
+    id = id,
+    name = l.name,
+    district = l.district,
+    face = Locations.activeFace(id),
+    sealed = Locations.isSealed(id),
+  }
+end
+
+--- All location ids in a district (for revealing a district on entry).
+function Locations.inDistrict(district)
+  local ids = {}
+  for id, l in pairs(Locations.LOCATIONS) do
+    if l.district == district then
+      ids[#ids + 1] = id
+    end
+  end
+  table.sort(ids)
+  return ids
+end
+
+return Locations

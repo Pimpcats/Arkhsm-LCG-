@@ -1,0 +1,38 @@
+--- THE STILL HOUR — loop bookkeeping (P4).
+--
+-- Semantic wrapper over CampaignState's once-per-loop flags and per-loop
+-- test-type record. These are the two flags the base game has no concept of:
+--   * "Limit once per loop" persists across NODE TRAVEL and clears only on reset
+--     (cards v0.2 §A) — CampaignState clears them in reset().
+--   * Muscle Memory reads whether a test type was performed the PREVIOUS loop.
+--
+-- Cards call through here; they never store loop state themselves.
+
+local CampaignState = require("StillHour/CampaignState")
+
+local LoopFlags = {}
+
+--- Try to use a once-per-loop ability keyed by `flagId`. Returns true if it is
+-- allowed to fire now (and marks it used), false if already used this loop.
+-- Use a stable, card-scoped id, e.g. "sthr-igetout:"..playerColor.
+function LoopFlags.use(flagId)
+  return CampaignState.setFlag(flagId)
+end
+
+--- Peek without consuming.
+function LoopFlags.isUsed(flagId)
+  return CampaignState.isFlagSet(flagId)
+end
+
+--- Record that this test type was performed this loop (call on any skill test).
+function LoopFlags.recordTest(testType)
+  CampaignState.recordTestType(testType)
+end
+
+--- Muscle Memory: true if the party performed this test type during the previous
+-- loop, meaning the card provides [wild][wild] and draws 1 instead of [wild].
+function LoopFlags.muscleMemoryUpgraded(testType)
+  return CampaignState.performedLastLoop(testType)
+end
+
+return LoopFlags

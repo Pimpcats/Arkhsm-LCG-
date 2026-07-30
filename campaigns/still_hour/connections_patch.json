@@ -1,0 +1,303 @@
+{
+ "campaign": "still_hour",
+ "cards": [
+  {
+   "id": "sthr-loc-square",
+   "icons": "star",
+   "color": "#1a605e",
+   "connections": [
+    {
+     "symbol": "quote",
+     "color": "#204884"
+    },
+    {
+     "symbol": "cross",
+     "color": "#aa8e46"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-longpier",
+   "icons": "quote",
+   "color": "#204884",
+   "connections": [
+    {
+     "symbol": "star",
+     "color": "#1a605e"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-almanacsteps",
+   "icons": "cross",
+   "color": "#aa8e46",
+   "connections": [
+    {
+     "symbol": "star",
+     "color": "#1a605e"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-windingstair",
+   "icons": "circle",
+   "color": "#5c246e",
+   "connections": [
+    {
+     "symbol": "diamond",
+     "color": "#b85418"
+    },
+    {
+     "symbol": "moon",
+     "color": "#960e12"
+    },
+    {
+     "symbol": "star",
+     "color": "#1a605e"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-lanternroom",
+   "icons": "diamond",
+   "color": "#b85418",
+   "connections": [
+    {
+     "symbol": "circle",
+     "color": "#5c246e"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-keepersquarters",
+   "icons": "moon",
+   "color": "#960e12",
+   "connections": [
+    {
+     "symbol": "circle",
+     "color": "#5c246e"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-nave",
+   "icons": "heart",
+   "color": "#2c663c",
+   "connections": [
+    {
+     "symbol": "triangle",
+     "color": "#be9428"
+    },
+    {
+     "symbol": "clover",
+     "color": "#4a7c46"
+    },
+    {
+     "symbol": "spade",
+     "color": "#1c2a52"
+    },
+    {
+     "symbol": "star",
+     "color": "#1a605e"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-belfry",
+   "icons": "triangle",
+   "color": "#be9428",
+   "connections": [
+    {
+     "symbol": "heart",
+     "color": "#2c663c"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-vestry",
+   "icons": "clover",
+   "color": "#4a7c46",
+   "connections": [
+    {
+     "symbol": "heart",
+     "color": "#2c663c"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-floodedcrypt",
+   "icons": "spade",
+   "color": "#1c2a52",
+   "connections": [
+    {
+     "symbol": "heart",
+     "color": "#2c663c"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-milestones",
+   "icons": "square",
+   "color": "#6c482e",
+   "connections": [
+    {
+     "symbol": "doubleslash",
+     "color": "#625e64"
+    },
+    {
+     "symbol": "star",
+     "color": "#1a605e"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-lowbridge",
+   "icons": "doubleslash",
+   "color": "#625e64",
+   "connections": [
+    {
+     "symbol": "square",
+     "color": "#6c482e"
+    },
+    {
+     "symbol": "slash",
+     "color": "#8a5a2e"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-turning",
+   "icons": "slash",
+   "color": "#8a5a2e",
+   "connections": [
+    {
+     "symbol": "doubleslash",
+     "color": "#625e64"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-townhallsteps",
+   "icons": "t",
+   "color": "#2c4a7c",
+   "connections": [
+    {
+     "symbol": "hourglass",
+     "color": "#7c5a2e"
+    },
+    {
+     "symbol": "circle",
+     "color": "#3a7c7a"
+    },
+    {
+     "symbol": "star",
+     "color": "#1a605e"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-recordsoffice",
+   "icons": "hourglass",
+   "color": "#7c5a2e",
+   "connections": [
+    {
+     "symbol": "t",
+     "color": "#2c4a7c"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-well",
+   "icons": "circle",
+   "color": "#3a7c7a",
+   "connections": [
+    {
+     "symbol": "t",
+     "color": "#2c4a7c"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-ticketbooth",
+   "icons": "moon",
+   "color": "#a83870",
+   "connections": [
+    {
+     "symbol": "spade",
+     "color": "#7c2a5c"
+    },
+    {
+     "symbol": "quote",
+     "color": "#6c2a4a"
+    },
+    {
+     "symbol": "star",
+     "color": "#1a605e"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-wheel",
+   "icons": "spade",
+   "color": "#7c2a5c",
+   "connections": [
+    {
+     "symbol": "moon",
+     "color": "#a83870"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-hallofmirrors",
+   "icons": "quote",
+   "color": "#6c2a4a",
+   "connections": [
+    {
+     "symbol": "moon",
+     "color": "#a83870"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-readingroom",
+   "icons": "diamond",
+   "color": "#2a5c7c",
+   "connections": [
+    {
+     "symbol": "triangle",
+     "color": "#4a3c6c"
+    },
+    {
+     "symbol": "spade",
+     "color": "#1c2a52"
+    },
+    {
+     "symbol": "star",
+     "color": "#1a605e"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-press",
+   "icons": "triangle",
+   "color": "#4a3c6c",
+   "connections": [
+    {
+     "symbol": "diamond",
+     "color": "#2a5c7c"
+    }
+   ]
+  },
+  {
+   "id": "sthr-loc-sealedstudy",
+   "icons": "spade",
+   "color": "#1c2a52",
+   "connections": [
+    {
+     "symbol": "diamond",
+     "color": "#2a5c7c"
+    }
+   ]
+  }
+ ]
+}

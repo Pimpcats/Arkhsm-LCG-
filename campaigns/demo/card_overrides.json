@@ -1,0 +1,54 @@
+{
+  "d-still": {
+    "name": "Still",
+    "shroud": 2,
+    "clues": 1,
+    "color": "#25807a",
+    "clues_per_investigator": false,
+    "icons": "circle",
+    "text": "The night is eery[action][reaction][fast]",
+    "traits": "[action][fast][reaction][wil]",
+    "connections": [
+      {
+        "symbol": "hourglass",
+        "color": "#ffff80"
+      }
+    ]
+  },
+  "d-treachary": {
+    "name": "treachary",
+    "class": "Mythos",
+    "encounter": "true"
+  },
+  "d-guy": {
+    "name": "Tobias",
+    "wil": 8,
+    "int": 1,
+    "com": 1,
+    "agi": 1,
+    "health": 9,
+    "sanity": 2,
+    "class": "Guardian",
+    "subtitle": "fdsaf",
+    "text": "hello",
+    "signatures": [
+      {
+        "d-treachary": 1
+      }
+    ]
+  },
+  "d-test": {
+    "name": "test",
+    "shroud": 2,
+    "clues": 1,
+    "icons": "hourglass",
+    "color": "#ffff80",
+    "clues_per_investigator": true,
+    "connections": [
+      {
+        "symbol": "circle",
+        "color": "#25807a"
+      }
+    ]
+  }
+}

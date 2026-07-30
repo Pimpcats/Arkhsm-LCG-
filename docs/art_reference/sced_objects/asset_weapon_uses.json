@@ -1,0 +1,82 @@
+{
+  "SaveName": "",
+  "Date": "",
+  "VersionNumber": "",
+  "GameMode": "",
+  "GameType": "",
+  "GameComplexity": "",
+  "Tags": [],
+  "Gravity": 0.5,
+  "PlayArea": 0.5,
+  "Table": "",
+  "Sky": "",
+  "Note": "",
+  "TabStates": {},
+  "LuaScript": "",
+  "LuaScriptState": "",
+  "XmlUI": "",
+  "ObjectStates": [
+    {
+      "GUID": "713556",
+      "Name": "Card",
+      "Transform": {
+        "posX": 40.474453,
+        "posY": 1.49510384,
+        "posZ": 46.7417068,
+        "rotX": -3.57736063E-09,
+        "rotY": 270.0,
+        "rotZ": -1.678786E-07,
+        "scaleX": 1.0,
+        "scaleY": 1.0,
+        "scaleZ": 1.0
+      },
+      "Nickname": "Becky",
+      "Description": "Custom Marlin Model 1894",
+      "GMNotes": "{\n  \"id\": \"06006\",\n  \"type\": \"Asset\",\n  \"slot\": \"Hand x2\",\n  \"class\": \"Neutral\",\n  \"cost\": 2,\n  \"traits\": \"Item. Weapon. Firearm.\",\n  \"combatIcons\": 1,\n  \"agilityIcons\": 1,\n  \"wildIcons\": 1,\n  \"uses\": [\n    {\n      \"count\": 2,\n      \"type\": \"Ammo\",\n      \"token\": \"resource\"\n    }\n  ],\n  \"cycle\": \"The Dream-Eaters\"\n}",
+      "AltLookAngle": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "ColorDiffuse": {
+        "r": 0.713235259,
+        "g": 0.713235259,
+        "b": 0.713235259
+      },
+      "Tags": [
+        "Asset",
+        "PlayerCard"
+      ],
+      "LayoutGroupSortIndex": 0,
+      "Value": 0,
+      "Locked": false,
+      "Grid": true,
+      "Snap": true,
+      "IgnoreFoW": false,
+      "MeasureMovement": false,
+      "DragSelectable": true,
+      "Autoraise": true,
+      "Sticky": true,
+      "Tooltip": true,
+      "GridProjection": false,
+      "HideWhenFaceDown": true,
+      "Hands": true,
+      "CardID": 581200,
+      "SidewaysCard": false,
+      "CustomDeck": {
+        "5812": {
+          "FaceURL": "https://steamusercontent-a.akamaihd.net/ugc/1011562618093846571/13C76218853EE87123267F8F6BE99206DB40470B/",
+          "BackURL": "https://steamusercontent-a.akamaihd.net/ugc/2342503777940352139/A2D42E7E5C43D045D72CE5CFC907E4F886C8C690/",
+          "NumWidth": 10,
+          "NumHeight": 7,
+          "BackIsHidden": true,
+          "UniqueBack": false,
+          "Type": 0
+        }
+      },
+      "LuaScript": "",
+      "LuaScriptState": "",
+      "XmlUI": ""
+    }
+  ]
+}
