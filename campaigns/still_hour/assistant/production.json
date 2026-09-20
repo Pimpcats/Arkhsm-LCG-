@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "campaign": "still_hour",
+  "stage": "repository_bridge_ready",
+  "owner_preferences": {
+    "minimal_manual_work": true,
+    "first_time_player": true,
+    "review_art_only": true,
+    "neutral_review_labels": true,
+    "visual_direction": "Closely match Arkham LCG painterly cosmic-horror art direction, adapted to the established campaign."
+  },
+  "validation": {
+    "bridge_tests_passed": 4,
+    "current_effective_cards": 99,
+    "existing_illustration_jobs": 36,
+    "registered_assistant_art": 0,
+    "full_renderer_run": false,
+    "tts_playtested": false
+  },
+  "next_actions": [
+    "Audit current content and later errata without exposing spoilers to the owner.",
+    "Extend illustration briefs to every card that requires art; distinguish text-only faces.",
+    "Prepare a spoiler-safe style sample against approved Arkham visual references.",
+    "Generate, inspect and register artwork in coherent batches with character continuity.",
+    "Render cards and validate scenario assembly before packaging a playable build."
+  ],
+  "connection": "GitHub handoff; no live connection to the owner's desktop or TTS."
+}
