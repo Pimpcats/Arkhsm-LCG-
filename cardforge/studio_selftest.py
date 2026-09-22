@@ -3,6 +3,7 @@
 full illustrate -> frame -> apply flow over HTTP (dry-run; no GPU/SE needed).
 Run from the repo root: python3 cardforge/studio_selftest.py
 """
+import copy
 import json
 import os
 import shutil
@@ -926,8 +927,22 @@ check("resetting a text area clears it back to the default stack",
       "sthr-bell" not in json.load(open(RP.FONT_OVERRIDES_PATH, encoding="utf-8")))
 # Phase 3: the campaign compiler
 r = requests.post(BASE + "/api/campaign_compile", json={}).json()
+# The Still Hour's boxes are content-complete and locked (see
+# pipeline/scenario_content.py), so the gate is exercised by unlocking one
+# scenario for the duration of the check and restoring the board after.
+_apath = os.path.join(ROOT, "campaigns", "still_hour", "scenario_assignments.json")
+_board = json.load(open(_apath, encoding="utf-8"))
+_open = copy.deepcopy(_board)
+for _sid in _open:
+    _open[_sid].pop("_locked", None)
+    break
+json.dump(_open, open(_apath, "w", encoding="utf-8"), indent=2)
+r_gated = requests.post(BASE + "/api/campaign_compile", json={}).json()
+json.dump(_board, open(_apath, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
 check("compile is gated until every scenario is locked in",
-      r.get("ok") is False and "locked" in r.get("message", ""))
+      r_gated.get("ok") is False and "locked" in r_gated.get("message", ""))
+check("a fully locked campaign compiles without force",
+      r.get("ok") is True or any(not v.get("_locked") for v in _board.values()))
 r = requests.post(BASE + "/api/campaign_compile", json={"force": True}).json()
 check("compile builds the campaign box (scenarios + cards)",
       r.get("ok") is True and r.get("scenarios", 0) >= 1 and r.get("cards", 0) >= 1)

@@ -1,9 +1,7 @@
 {
   "prologue": {
-    "locations": [
-      "sthr-loc-square",
-      "sthr-loc-longpier",
-      "sthr-loc-almanacsteps"
+    "reference": [
+      "sthr-scn-stillhour"
     ],
     "agenda_deck": [
       "sthr-hour-1",
@@ -16,26 +14,67 @@
       "sthr-hour-8",
       "sthr-hour-9"
     ],
+    "act_deck": [
+      "sthr-act-firsthour"
+    ],
+    "locations": [
+      "sthr-loc-square",
+      "sthr-loc-longpier",
+      "sthr-loc-almanacsteps"
+    ],
     "encounter": [
       "sthr-losthour",
+      "sthr-losthour",
+      "sthr-losthour",
+      "sthr-slippage",
       "sthr-slippage",
       "sthr-waitingcongregation",
+      "sthr-waitingcongregation",
+      "sthr-drownedchoir",
       "sthr-drownedchoir",
       "sthr-familiarface",
       "sthr-lamplighterecho",
       "sthr-wrongturn",
+      "sthr-wrongturn",
+      "sthr-rewind",
       "sthr-rewind",
       "sthr-deadair",
+      "sthr-deadair",
+      "sthr-loopnotices",
       "sthr-loopnotices",
       "sthr-yearinanight",
+      "sthr-yearinanight",
+      "sthr-forgotten",
       "sthr-forgotten",
       "sthr-oldbones"
     ],
-    "reference": [
-      "sthr-scn-stillhour"
-    ]
+    "setup_aside": [
+      "sthr-story-firstreset"
+    ],
+    "_map": {
+      "sthr-loc-longpier": [
+        1,
+        2
+      ],
+      "sthr-loc-square": [
+        2,
+        2
+      ],
+      "sthr-loc-almanacsteps": [
+        3,
+        2
+      ]
+    },
+    "_locked": true
   },
   "district_lighthouse": {
+    "reference": [
+      "sthr-scn-stillhour"
+    ],
+    "act_deck": [
+      "sthr-act-lamp",
+      "sthr-act-ninthdeath"
+    ],
     "locations": [
       "sthr-loc-lanternroom",
       "sthr-loc-windingstair",
@@ -44,9 +83,31 @@
     "encounter": [
       "sthr-darkthatwaits",
       "sthr-somethingonstair"
-    ]
+    ],
+    "_map": {
+      "sthr-loc-windingstair": [
+        2,
+        0
+      ],
+      "sthr-loc-keepersquarters": [
+        1,
+        0
+      ],
+      "sthr-loc-lanternroom": [
+        1,
+        1
+      ]
+    },
+    "_locked": true
   },
   "district_church": {
+    "reference": [
+      "sthr-scn-stillhour"
+    ],
+    "act_deck": [
+      "sthr-act-whythirteen",
+      "sthr-act-hourwaswrong"
+    ],
     "locations": [
       "sthr-loc-nave",
       "sthr-loc-belfry",
@@ -54,38 +115,159 @@
       "sthr-loc-vestry"
     ],
     "encounter": [
+      "sthr-drownedchoir",
       "sthr-thirteen",
       "sthr-risingwater"
     ],
     "named": [
-      "sthr-drownedchoir"
-    ]
+      "sthr-bellringer"
+    ],
+    "_map": {
+      "sthr-loc-nave": [
+        3,
+        2
+      ],
+      "sthr-loc-belfry": [
+        4,
+        2
+      ],
+      "sthr-loc-vestry": [
+        4,
+        1
+      ],
+      "sthr-loc-floodedcrypt": [
+        4,
+        3
+      ]
+    },
+    "_locked": true
   },
   "district_road": {
+    "reference": [
+      "sthr-scn-stillhour"
+    ],
+    "act_deck": [
+      "sthr-act-walkbackward",
+      "sthr-act-walksbeside"
+    ],
     "locations": [
       "sthr-loc-milestones",
       "sthr-loc-lowbridge",
       "sthr-loc-turning"
     ],
     "encounter": [
+      "sthr-waitingcongregation",
       "sthr-bridgeremembers"
     ],
-    "named": [
-      "sthr-waitingcongregation"
-    ]
+    "_map": {
+      "sthr-loc-milestones": [
+        2,
+        1
+      ],
+      "sthr-loc-lowbridge": [
+        3,
+        1
+      ],
+      "sthr-loc-turning": [
+        3,
+        0
+      ]
+    },
+    "_locked": true
   },
   "district_square": {
+    "reference": [
+      "sthr-scn-stillhour"
+    ],
+    "agenda_deck": [
+      "sthr-hour-1",
+      "sthr-hour-2",
+      "sthr-hour-3",
+      "sthr-hour-4",
+      "sthr-hour-5",
+      "sthr-hour-6",
+      "sthr-hour-7",
+      "sthr-hour-8",
+      "sthr-hour-9"
+    ],
+    "act_deck": [
+      "sthr-act-sheriffdead",
+      "sthr-act-vote"
+    ],
     "locations": [
+      "sthr-loc-hubsquare",
       "sthr-loc-townhallsteps",
       "sthr-loc-recordsoffice",
       "sthr-loc-well"
     ],
     "encounter": [
+      "sthr-losthour",
+      "sthr-losthour",
+      "sthr-losthour",
+      "sthr-slippage",
+      "sthr-slippage",
+      "sthr-waitingcongregation",
+      "sthr-waitingcongregation",
+      "sthr-drownedchoir",
+      "sthr-drownedchoir",
+      "sthr-familiarface",
+      "sthr-lamplighterecho",
+      "sthr-wrongturn",
+      "sthr-wrongturn",
+      "sthr-rewind",
+      "sthr-rewind",
+      "sthr-deadair",
+      "sthr-deadair",
+      "sthr-loopnotices",
+      "sthr-loopnotices",
+      "sthr-yearinanight",
+      "sthr-yearinanight",
+      "sthr-forgotten",
+      "sthr-forgotten",
+      "sthr-oldbones",
+      "sthr-crossing",
       "sthr-samespeech",
       "sthr-crowdturns"
-    ]
+    ],
+    "named": [
+      "sthr-wearssheriff"
+    ],
+    "setup_aside": [
+      "sthr-appointed",
+      "sthr-appointed-approach",
+      "sthr-appointedwhisper",
+      "sthr-appointedwhisper",
+      "sthr-story-firstdark",
+      "sthr-story-actii"
+    ],
+    "_map": {
+      "sthr-loc-hubsquare": [
+        2,
+        2
+      ],
+      "sthr-loc-townhallsteps": [
+        3,
+        3
+      ],
+      "sthr-loc-recordsoffice": [
+        3,
+        4
+      ],
+      "sthr-loc-well": [
+        4,
+        4
+      ]
+    },
+    "_locked": true
   },
   "district_fairground": {
+    "reference": [
+      "sthr-scn-stillhour"
+    ],
+    "act_deck": [
+      "sthr-act-wheelturns",
+      "sthr-act-bargain"
+    ],
     "locations": [
       "sthr-loc-wheel",
       "sthr-loc-hallofmirrors",
@@ -94,9 +276,34 @@
     "encounter": [
       "sthr-wheelsturn",
       "sthr-reflectionlies"
-    ]
+    ],
+    "named": [
+      "sthr-onewhorides"
+    ],
+    "_map": {
+      "sthr-loc-ticketbooth": [
+        1,
+        2
+      ],
+      "sthr-loc-wheel": [
+        0,
+        2
+      ],
+      "sthr-loc-hallofmirrors": [
+        0,
+        3
+      ]
+    },
+    "_locked": true
   },
   "district_almanac": {
+    "reference": [
+      "sthr-scn-stillhour"
+    ],
+    "act_deck": [
+      "sthr-act-almanachid",
+      "sthr-act-appointedname"
+    ],
     "locations": [
       "sthr-loc-readingroom",
       "sthr-loc-press",
@@ -106,14 +313,39 @@
       "sthr-pagethatwasnt",
       "sthr-inkrunsbackward",
       "sthr-studydoor"
-    ]
+    ],
+    "_map": {
+      "sthr-loc-readingroom": [
+        2,
+        3
+      ],
+      "sthr-loc-press": [
+        1,
+        3
+      ],
+      "sthr-loc-sealedstudy": [
+        2,
+        4
+      ]
+    },
+    "_locked": true
   },
   "finale": {
-    "setup_aside": [
-      "sthr-crossing"
-    ],
     "reference": [
       "sthr-scn-stillhour"
-    ]
+    ],
+    "act_deck": [
+      "sthr-act-lasthour"
+    ],
+    "setup_aside": [
+      "sthr-story-beforefinale",
+      "sthr-res-1",
+      "sthr-res-2",
+      "sthr-res-3",
+      "sthr-res-4",
+      "sthr-res-5",
+      "sthr-res-6"
+    ],
+    "_locked": true
   }
 }
