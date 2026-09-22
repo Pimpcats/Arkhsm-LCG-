@@ -158,10 +158,11 @@ step("card metadata", function(go)
       local md = decode(data.GMNotes)
       if not md or type(md.id) ~= "string" then
         bad[#bad + 1] = (data.Nickname or "?") .. ": GMNotes not SCED JSON"
-      elseif ids[md.id] then
-        bad[#bad + 1] = md.id .. ": duplicate id"
+      elseif ids[md.id] and not deepEqual(ids[md.id], md) then
+        -- copies of one card legitimately share an id; they must agree
+        bad[#bad + 1] = md.id .. ": copies disagree on metadata"
       else
-        ids[md.id] = true
+        ids[md.id] = md
       end
       for _, d in pairs(data.CustomDeck or {}) do
         for _, u in ipairs({ d.FaceURL or "", d.BackURL or "" }) do
@@ -173,7 +174,7 @@ step("card metadata", function(go)
   end
   for _, o in pairs(spawned) do scan(o.getData()) end
   check("spawned content contains cards", cards > 0, cards .. " card(s)")
-  check("every card has unique SCED metadata", #bad == 0,
+  check("every card has consistent SCED metadata", #bad == 0,
     #bad == 0 and nil or table.concat(bad, "; ", 1, math.min(#bad, 8)))
   check("no card image points at a local file:/// path", local_urls == 0,
     local_urls .. " local URL(s)")

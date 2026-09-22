@@ -304,6 +304,15 @@ def generate(spec, out_path, nickname):
     print(f"Wrote {out_path}  ({len(cards)} cards in a bag)\n")
 
 
+def with_overrides(spec):
+    """Apply the campaign's editor overrides (campaigns/still_hour/
+    card_overrides.json) exactly as compile_campaign.py does, so the player
+    bag, the encounter bag and the campaign box never disagree about a card."""
+    import compile_campaign as CC     # lazy: compile_campaign imports this module
+    effective = CC.load_cards(CC.campaign_paths("still_hour"))
+    return [dict(effective.get(c["id"], c)) for c in spec]
+
+
 def main():
     here = os.path.dirname(os.path.abspath(__file__))
     root = os.path.dirname(here)
@@ -314,7 +323,7 @@ def main():
                     help="Restrict output to these card ids (e.g. the Elias starter slice).")
     args = ap.parse_args()
 
-    spec = json.load(open(args.spec, encoding="utf-8"))
+    spec = with_overrides(json.load(open(args.spec, encoding="utf-8")))
     if args.only:
         wanted = set(args.only)
         spec = [c for c in spec if c["id"] in wanted]
@@ -330,7 +339,7 @@ def main():
              "THE STILL HOUR — Player Cards")
     enc_spec_path = os.path.join(here, "stillhour_encounter_spec.json")
     if args.out is None and os.path.exists(enc_spec_path):
-        generate(json.load(open(enc_spec_path, encoding="utf-8")),
+        generate(with_overrides(json.load(open(enc_spec_path, encoding="utf-8"))),
                  os.path.join(root, "dist", "the_still_hour_encounter.json"),
                  "THE STILL HOUR — The Appointed")
 

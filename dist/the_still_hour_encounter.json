@@ -139,7 +139,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-crossing\",\"type\":\"Treachery\",\"class\":\"Mythos\",\"traits\":\"\",\"cycle\":\"The Still Hour\",\"quantity\":1}",
+          "GMNotes": "{\"id\":\"sthr-crossing\",\"type\":\"Treachery\",\"class\":\"Mythos\",\"traits\":\"Omen.\",\"cycle\":\"The Still Hour\",\"quantity\":1}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,

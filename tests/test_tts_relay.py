@@ -24,7 +24,7 @@ from fake_tts import FakeTTS, LUA  # noqa: E402
 pytestmark = pytest.mark.skipif(LUA is None, reason="lua5.2 not installed")
 
 BRANCH = "relay-test"
-SNAPSHOT = ["dist/the_still_hour_mod.json", "tools/tts_relay/job.json",
+SNAPSHOT = ["dist/the_still_hour_mod.json", "dist/the_still_hour_campaign.json", "tools/tts_relay/job.json",
             "tools/tts_relay/ingame_runner.lua"]
 
 
@@ -77,7 +77,7 @@ def test_relay_runs_build_in_fake_tts_and_pushes_results(tmp_path, remote):
     assert failed == [], failed
     assert latest["verdict"] == "pass" and rc == 0
     names = {c["name"] for c in latest["checks"]}
-    for expected in ("every payload finished spawning", "every card has unique SCED metadata",
+    for expected in ("every payload finished spawning", "every card has consistent SCED metadata",
                      "in-engine rules tests all pass", "control token survives save+reload",
                      "state preserved across reload", "a card can be taken out and lands on the table"):
         assert expected in names

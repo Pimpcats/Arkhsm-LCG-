@@ -28,3 +28,24 @@ def test_job_payloads_exist():
     job = json.load(open(os.path.join(ROOT, "tools", "tts_relay", "job.json"), encoding="utf-8"))
     for p in job["payloads"]:
         assert os.path.exists(os.path.join(ROOT, p["file"])), p["file"]
+
+
+def test_card_copies_agree_across_builds():
+    """A card id means one card: every copy in every build carries the same
+    SCED metadata (the player/encounter bags once skipped editor overrides)."""
+    seen = {}
+
+    def walk(o, where):
+        if o.get("Name") in ("Card", "CardCustom"):
+            md = json.loads(o.get("GMNotes") or "{}")
+            seen.setdefault(md.get("id"), {}).setdefault(
+                json.dumps(md, sort_keys=True), set()).add(where)
+        for c in o.get("ContainedObjects") or []:
+            walk(c, where)
+
+    for rel in BUILT + ["dist/the_still_hour_campaign.json"]:
+        data = json.load(open(os.path.join(ROOT, rel), encoding="utf-8"))
+        for o in data.get("ObjectStates") or [data]:
+            walk(o, rel)
+    clash = {i: v for i, v in seen.items() if len(v) > 1}
+    assert not clash, clash
