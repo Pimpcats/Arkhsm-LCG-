@@ -29,6 +29,33 @@ def check(name, cond):
     PASS, FAIL = (PASS + 1, FAIL) if cond else (PASS, FAIL + 1)
 
 
+# Counts follow the campaign's manifest (it grows as content is authored), and
+# payload bodies follow the campaign's configured backend (a1111 or comfy).
+FACES_TOTAL = se_bridge.coverage("still_hour")["total"]
+
+
+def front_faces(cov):
+    return [f for f in cov["framed"] if not f.endswith("-back")]
+
+
+def payload_prompt(body):
+    if isinstance(body.get("prompt"), dict):      # comfy node graph
+        for node in body["prompt"].values():
+            if node.get("_meta", {}).get("title") == "CF_POSITIVE":
+                return node["inputs"]["text"]
+        return None
+    return body.get("prompt")
+
+
+def payload_seed(body):
+    if isinstance(body.get("prompt"), dict):
+        for node in body["prompt"].values():
+            if node.get("_meta", {}).get("title") == "CF_SAMPLER":
+                return node["inputs"]["seed"]
+        return None
+    return body.get("seed")
+
+
 def wait_idle(timeout=30):
     for _ in range(timeout * 4):
         if not requests.get(BASE + "/api/status").json()["busy"]:
@@ -194,7 +221,7 @@ r = requests.post(BASE + "/api/se_save_config",
                   json={"launch_command": "echo SE {script}", "classmap": cm}).json()
 check("SE config saves", r.get("ok"))
 r = requests.post(BASE + "/api/se_bundle", json={"campaign": "still_hour"}).json()
-check("bundle writes script + jobs (41 faces)", r.get("job_count") == 41
+check("bundle writes script + jobs ({} faces)".format(FACES_TOTAL), r.get("job_count") == FACES_TOTAL
       and os.path.exists(r["script"]) and os.path.exists(r["jobs"]))
 script = open(r["script"], encoding="utf-8").read()
 check("jobs embedded in the SE script (no file IO in SE)",
@@ -215,7 +242,7 @@ check("launch runs the configured command", r.get("ok"))
 s = requests.get(BASE + "/api/status?campaign=still_hour").json()
 check("coverage: only the click-composed card (front + investigator back)",
       set(s["se"]["coverage"]["framed"]) == {"sthrelias", "sthrelias-back"}
-      and s["se"]["coverage"]["total"] == 41)
+      and s["se"]["coverage"]["total"] == FACES_TOTAL)
 
 print("== GLYPHS: placeholder renderer through the app ==")
 from cardforge.glyphs import glyphify, statline_runs
@@ -229,8 +256,8 @@ r = requests.post(BASE + "/api/render_placeholders", json={}).json()
 check("render action accepted", r.get("started") or r.get("ok"))
 check("render completes", wait_idle(60))
 s = requests.get(BASE + "/api/status?campaign=still_hour").json()
-check("all 41 faces covered by glyph placeholders",
-      len(s["se"]["coverage"]["framed"]) == 41 and not s["se"]["coverage"]["missing"])
+check("all {} faces covered by glyph placeholders".format(FACES_TOTAL),
+      len(s["se"]["coverage"]["framed"]) == FACES_TOTAL and not s["se"]["coverage"]["missing"])
 from PIL import Image
 check("rendered investigator uses the SE plugin per-class frame at 2x",
       Image.open(os.path.join(faces_dir, "sthrelias.png")).size == (1050, 750))
@@ -445,7 +472,8 @@ check("auto-build chain completes (generate->index->compose->apply->rebuild)", w
 auto_urls = json.load(open(os.path.join(ROOT, "pipeline", "art_urls.json"), encoding="utf-8"))
 auto_cards = {k: v for k, v in auto_urls.items() if not k.startswith("_")}
 check("auto-build produced a fully-arted mod with zero curation",
-      len(auto_cards) == 36 and all(v["face"].startswith("file:///")
+      len(auto_cards) == len(front_faces(se_bridge.coverage("still_hour")))
+      and all(v["face"].startswith("file:///")
                                     for v in auto_cards.values()))
 check("campaign deck backs ride along in every apply",
       auto_urls.get("_player_back", "").endswith("player_back.png")
@@ -457,8 +485,8 @@ check("export chain accepted", r.get("started"))
 check("export chain completes", wait_idle(120))
 urls = json.load(open(os.path.join(ROOT, "pipeline", "art_urls.json"), encoding="utf-8"))
 url_cards = {k: v for k, v in urls.items() if not k.startswith("_")}
-check("all 36 cards exported with file:/// faces",
-      len(url_cards) == 36 and all(v["face"].startswith("file:///")
+check("all cards exported with file:/// faces",
+      len(url_cards) == len(front_faces(se_bridge.coverage("still_hour"))) and all(v["face"].startswith("file:///")
                                    for v in url_cards.values()))
 mod = json.load(open(os.path.join(ROOT, "dist", "the_still_hour_mod.json"), encoding="utf-8"))
 bags = [o for o in mod["ObjectStates"] if o.get("ContainedObjects")]
@@ -519,10 +547,13 @@ check("model_set survives a status round-trip",
 check("model_set rejects empty",
       requests.post(BASE + "/api/model_set", json={"checkpoint": " "}).json()
       .get("ok") is False)
-check("models reports the backend's ACTIVE checkpoint (dry)",
-      requests.post(BASE + "/api/models",
-                    json={"campaign": "still_hour", "dry_run": True}).json()
-      .get("active") == "dry-model-a.safetensors")
+_active = requests.post(BASE + "/api/models",
+                        json={"campaign": "still_hour", "dry_run": True}).json().get("active")
+if json.load(open(camp_path, encoding="utf-8")).get("backend") == "comfy":
+    # ComfyUI has no global loaded model: the workflow names its checkpoint
+    check("models reports no ACTIVE checkpoint for comfy (per-workflow)", _active is None)
+else:
+    check("models reports the backend's ACTIVE checkpoint (dry)", _active == "dry-model-a.safetensors")
 with open(camp_path, "w", encoding="utf-8") as f:
     f.write(camp_backup)
 check("zoom lightbox + refresh button + model picker in the UI",
@@ -564,7 +595,7 @@ wait_idle(30)
 pl = [json.load(open(os.path.join(pdir, f), encoding="utf-8"))
       for f in os.listdir(pdir) if f.startswith("sthr-appointed")]
 check("batch generation uses the override verbatim",
-      any(p.get("prompt") == "MY CUSTOM APPOINTED PROMPT" for p in pl))
+      any(payload_prompt(p) == "MY CUSTOM APPOINTED PROMPT" for p in pl))
 r = requests.post(BASE + "/api/prompt_save",
                   json={"campaign": "still_hour", "card": "sthr-appointed",
                         "positive": "", "negative": ""}).json()
@@ -587,7 +618,7 @@ requests.post(BASE + "/api/generate",
               json={"campaign": "still_hour", "only": "sthr-appointed",
                     "variants": 1, "dry_run": True, "reroll": True})
 wait_idle(30)
-seeds_seen = {json.load(open(os.path.join(pdir, f), encoding="utf-8"))["seed"]
+seeds_seen = {payload_seed(json.load(open(os.path.join(pdir, f), encoding="utf-8")))
               for f in os.listdir(pdir) if f.startswith("sthr-appointed")}
 check("reroll generates with a fresh seed (not the fixed one)",
       len(seeds_seen) > 1)
@@ -1499,7 +1530,7 @@ env = dict(os.environ, PYTHONUTF8="0", PYTHONCOERCECLOCALE="0", LC_ALL="C",
 r = subprocess.run(
     [sys.executable, "-c",
      "from cardforge import se_bridge, studio;"
-     "assert len(se_bridge.build_jobs()) == 41;"
+     "assert len(se_bridge.build_jobs()) == {};".format(FACES_TOTAL) +
      "s = studio.status('still_hour');"
      "assert len(s['cards']) >= 45 and s['campaigns']"],
     env=env, cwd=ROOT, capture_output=True, text=True)
