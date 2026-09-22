@@ -1,0 +1,563 @@
+--- THE STILL HOUR — board plumbing (BUILD_STATUS "path to the table" item 2).
+--
+-- Connects the logic modules to physical objects on the table. No rules live
+-- here: which face a location shows / whether it is sealed comes from
+-- Locations; when the Appointed is on the board, whether it hunts, and that it
+-- cannot leave play come from Appointed. This file only finds objects, reads
+-- their SCED metadata, and moves / flips / labels them.
+--
+-- Everything is keyed on card metadata (the SCED GMNotes JSON `id`, `type`,
+-- `locationFront` / `locationBack` {icons, connections}; see
+-- docs/art_reference/sced_objects/location_*.json), never on a content list.
+-- Investigators are located by their minicards (SCED Tags ["Minicard"]).
+--
+-- TTS API used (Berserk-Games/Tabletop-Simulator-API docs): getObjects,
+-- getObjectFromGUID, Object.getGMNotes/getPosition/getRotation/setPosition/
+-- setRotation/is_face_down/hasTag/getObjects/takeObject/createButton/
+-- getButtons/removeButton/clearButtons/getData, spawnObjectData, Wait.frames.
+-- SCED API (via SCED.ttslua): PlayAreaApi.isInPlayArea,
+-- TokenSpawnTrackerApi.mark/resetTokensSpawned, TokenManagerApi.spawnForCard.
+--
+-- All entry points are pcall-guarded by the host (control.lua); on a vanilla
+-- table they simply find fewer objects.
+
+local Appointed = require("StillHour/Appointed")
+local Locations = require("StillHour/Locations")
+local SCED = require("StillHour/SCED")
+
+local Board = {}
+
+Board.APPOINTED_ID = "sthr-appointed"
+Board.MINICARD_TAG = "Minicard"
+Board.SEALED_LABEL = "SEALED"
+Board.OCCUPY_RADIUS = 2.0       -- a minicard within this of a location's centre is "at" it
+Board.APPOINTED_OFFSET = { x = 0, y = 0.6, z = -0.9 }
+
+local host                       -- the object owning the button callbacks
+local say = function() end
+local st = {
+  flipped = {},        -- guid -> true: location we flipped to its back
+  sealedMarked = {},   -- guid -> true: SCED clue auto-spawn suppressed by us
+  sealedLabel = {},    -- guid -> true: we put a SEALED label on it
+  appointed = { guid = nil, placed = false, lastPos = nil, lastRot = nil },
+}
+local restoreScheduled = false
+local restoreData = nil
+
+------------------------------------------------------------------ utilities --
+
+local function safe(fn, ...)
+  local ok, v = pcall(fn, ...)
+  if ok then return v end
+  return nil
+end
+
+local function decode(s)
+  if type(s) ~= "string" or s == "" or JSON == nil then return nil end
+  local ok, v = pcall(JSON.decode, s)
+  if ok and type(v) == "table" then return v end
+  return nil
+end
+
+local function vec(p)
+  if p == nil then return nil end
+  return { x = p.x or p[1] or 0, y = p.y or p[2] or 0, z = p.z or p[3] or 0 }
+end
+
+local function dist2d(a, b)
+  local dx, dz = a.x - b.x, a.z - b.z
+  return math.sqrt(dx * dx + dz * dz)
+end
+
+local function topLevel()
+  return safe(function()
+    if type(getObjects) ~= "function" then return {} end
+    return getObjects()
+  end) or {}
+end
+
+local function guidOf(o)
+  return safe(function() return o.getGUID() end) or safe(function() return o.guid end)
+end
+
+local function metaOf(o)
+  return decode(safe(function() return o.getGMNotes() end))
+end
+
+local function isCard(o)
+  return safe(function() return o.type == "Card" end) == true
+end
+
+local function split(s)
+  local out = {}
+  for part in string.gmatch(tostring(s or ""), "[^|]+") do out[#out + 1] = part end
+  return out
+end
+
+------------------------------------------------------------------- lifecycle --
+
+function Board.init(hostObject, opts)
+  host = hostObject
+  opts = opts or {}
+  say = opts.log or say
+end
+
+function Board.save()
+  return st
+end
+
+function Board.load(t)
+  if type(t) ~= "table" then return end
+  st.flipped = t.flipped or {}
+  st.sealedMarked = t.sealedMarked or {}
+  st.sealedLabel = t.sealedLabel or {}
+  st.appointed = t.appointed or { placed = false }
+end
+
+------------------------------------------------------------------- scanning --
+
+--- Location cards on the table: {obj, md, guid, locId, side, pos}.
+-- locId is nil for locations this campaign does not define (still map nodes).
+function Board.locationCards()
+  local out = {}
+  for _, o in ipairs(topLevel()) do
+    if isCard(o) then
+      local md = metaOf(o)
+      if md and md.type == "Location" then
+        local down = safe(function() return o.is_face_down end) == true
+        local side = (down and md.locationBack or md.locationFront)
+          or md.locationFront or md.locationBack or {}
+        out[#out + 1] = { obj = o, md = md, guid = guidOf(o), locId = Locations.idForCard(md.id),
+                          side = side, pos = vec(safe(function() return o.getPosition() end)) }
+      end
+    end
+  end
+  return out
+end
+
+--- Graph keyed by guid, from each visible side's icons/connections (the same
+-- data SCED's PlayArea uses to draw connection lines). Undirected.
+function Board.graph(locs)
+  local graph, byIcon = {}, {}
+  for _, l in ipairs(locs) do
+    graph[l.guid] = {}
+    for _, icon in ipairs(split(l.side.icons)) do
+      byIcon[icon] = byIcon[icon] or {}
+      table.insert(byIcon[icon], l.guid)
+    end
+  end
+  local seen = {}
+  local function link(a, b)
+    if a == b then return end
+    local k = a < b and (a .. ">" .. b) or (b .. ">" .. a)
+    if seen[k] then return end
+    seen[k] = true
+    table.insert(graph[a], b)
+    table.insert(graph[b], a)
+  end
+  for _, l in ipairs(locs) do
+    for _, icon in ipairs(split(l.side.connections)) do
+      for _, other in ipairs(byIcon[icon] or {}) do link(l.guid, other) end
+    end
+  end
+  return graph
+end
+
+--- The location a position is at (nearest centre within radius), or nil.
+local function locationAt(locs, pos, radius)
+  if not pos then return nil end
+  local best, bestD
+  for _, l in ipairs(locs) do
+    if l.pos then
+      local d = dist2d(pos, l.pos)
+      if d <= (radius or Board.OCCUPY_RADIUS) and (bestD == nil or d < bestD) then
+        best, bestD = l, d
+      end
+    end
+  end
+  return best
+end
+
+--- Investigator minicards: {obj, pos}.
+function Board.minicards()
+  local out = {}
+  for _, o in ipairs(topLevel()) do
+    if safe(function() return o.hasTag(Board.MINICARD_TAG) end) then
+      out[#out + 1] = { obj = o, pos = vec(safe(function() return o.getPosition() end)) }
+    end
+  end
+  return out
+end
+
+--- Location guids that hold at least one investigator.
+function Board.occupied(locs)
+  local out, seen = {}, {}
+  for _, m in ipairs(Board.minicards()) do
+    local l = locationAt(locs, m.pos)
+    if l and not seen[l.guid] then seen[l.guid] = true ; out[#out + 1] = l.guid end
+  end
+  return out
+end
+
+------------------------------------------------------------------ locations --
+
+local function removeLabel(o, label)
+  local buttons = safe(function() return o.getButtons() end) or {}
+  for i = #buttons, 1, -1 do
+    local b = buttons[i]
+    if b.label == label then
+      safe(function() o.removeButton(b.index or (i - 1)) end)
+    end
+  end
+end
+
+local function addLabel(o, label, z)
+  if not host then return end
+  removeLabel(o, label)
+  safe(function()
+    o.createButton({
+      click_function = "shNoop", function_owner = host, label = label,
+      position = { 0, 0.3, z or 0 }, rotation = { 0, 0, 0 },
+      width = 0, height = 0, font_size = 260,
+      font_color = { 0.95, 0.25, 0.2 },
+    })
+  end)
+end
+
+local function setFaceDown(o, down)
+  local r = vec(safe(function() return o.getRotation() end)) or { x = 0, y = 180, z = 0 }
+  safe(function() o.setRotation({ r.x, r.y, down and 180 or 0 }) end)
+end
+
+--- Flip every known location to Locations.activeFace and gate clues on isOpen.
+-- Returns a report {flipped, unflipped, sealed, opened, seen}.
+function Board.syncLocations()
+  local rep = { flipped = 0, unflipped = 0, sealed = 0, opened = 0, seen = 0 }
+  for _, l in ipairs(Board.locationCards()) do
+    if l.locId then
+      rep.seen = rep.seen + 1
+      local o, g = l.obj, l.guid
+      -- face: only locations with a fact-flipped back are ever turned by us
+      if Locations.hasBack(l.locId) then
+        local want = Locations.activeFace(l.locId)
+        local down = safe(function() return o.is_face_down end) == true
+        if want == "back" and not down then
+          setFaceDown(o, true) ; st.flipped[g] = true ; rep.flipped = rep.flipped + 1
+        elseif want == "front" and down and st.flipped[g] then
+          setFaceDown(o, false) ; st.flipped[g] = nil ; rep.unflipped = rep.unflipped + 1
+        end
+      end
+      -- clues: a sealed location never auto-spawns its clues
+      if Locations.isSealed(l.locId) then
+        rep.sealed = rep.sealed + 1
+        if SCED.markTokensSpawned(g) then st.sealedMarked[g] = true end
+        if not st.sealedLabel[g] then addLabel(o, Board.SEALED_LABEL) ; st.sealedLabel[g] = true end
+      else
+        if st.sealedLabel[g] then removeLabel(o, Board.SEALED_LABEL) ; st.sealedLabel[g] = nil end
+        if st.sealedMarked[g] then
+          st.sealedMarked[g] = nil
+          SCED.resetTokensSpawned(g)
+          if SCED.isInPlayArea(o) then SCED.spawnForCard(o) end
+          rep.opened = rep.opened + 1
+        end
+      end
+    end
+  end
+  return rep
+end
+
+--------------------------------------------------------------- the Appointed --
+
+local function isAppointedMeta(md)
+  return md ~= nil and md.id == Board.APPOINTED_ID
+end
+
+function Board.isAppointedObject(o)
+  return isCard(o) and isAppointedMeta(metaOf(o))
+end
+
+--- The Appointed card if it lies loose on the table.
+function Board.findAppointed()
+  for _, o in ipairs(topLevel()) do
+    if Board.isAppointedObject(o) then return o end
+  end
+  return nil
+end
+
+--- A container holding the Appointed: container, entry.
+local function findAppointedInContainer(guid)
+  for _, o in ipairs(topLevel()) do
+    local t = safe(function() return o.type end)
+    if t == "Bag" or t == "Deck" then
+      for _, e in ipairs(safe(function() return o.getObjects() end) or {}) do
+        if (guid and e.guid == guid) or isAppointedMeta(decode(e.gm_notes)) then
+          return o, e
+        end
+      end
+    end
+  end
+  return nil
+end
+
+local function setAsidePos()
+  local p = host and vec(safe(function() return host.getPosition() end)) or { x = 0, y = 1, z = 0 }
+  return { x = p.x, y = p.y + 1.5, z = p.z + 4.5 }
+end
+
+local function placePosFor(l)
+  local p = l.pos or { x = 0, y = 1, z = 0 }
+  local off = Board.APPOINTED_OFFSET
+  return { x = p.x + off.x, y = p.y + off.y, z = p.z + off.z }
+end
+
+local function rotFor(l)
+  local r = l and vec(safe(function() return l.obj.getRotation() end)) or { x = 0, y = 180, z = 0 }
+  return { 0, r.y, 0 }
+end
+
+--- Move (or take out of its container) the Appointed to pos/rot, then call
+-- done(obj). Returns true if a card was found.
+local function bringAppointed(pos, rot, done)
+  local card = Board.findAppointed()
+  if card then
+    safe(function() card.setPosition({ pos.x, pos.y, pos.z }) end)
+    if rot then safe(function() card.setRotation(rot) end) end
+    st.appointed.guid = guidOf(card)
+    if done then done(card) end
+    return true
+  end
+  local c, e = findAppointedInContainer(st.appointed.guid)
+  if c then
+    local ok = pcall(function()
+      c.takeObject({
+        guid = e.guid, smooth = false,
+        position = { pos.x, pos.y, pos.z }, rotation = rot,
+        callback_function = function(o)
+          st.appointed.guid = guidOf(o)
+          if done then done(o) end
+        end,
+      })
+    end)
+    return ok
+  end
+  return false
+end
+
+local STAGE_BUTTONS = {
+  { fn = "shAppointedInfo", label = function() return "The Appointed: " .. Appointed.stageName() end,
+    z = 1.75, w = 1100, fs = 120, tip = "Approach stage (CO-002)" },
+  { fn = "shHoldBack", label = function() return "Hold Back (success)" end, z = 2.2, w = 1100, fs = 120,
+    tip = "Click after a SUCCESSFUL [willpower] or [combat] (4) test: back one stage, rewind one Hour." },
+}
+
+--- Put the Hold Back / Hunt buttons on the Appointed card (idempotent).
+function Board.refreshAppointedButtons(card)
+  card = card or Board.findAppointed()
+  if not card or not host then return false end
+  safe(function() card.clearButtons() end)   -- only our buttons live on this card
+  if not Appointed.isManifest() then return true end
+  local defs = {}
+  for _, b in ipairs(STAGE_BUTTONS) do defs[#defs + 1] = b end
+  if Appointed.isHunter() then
+    defs[#defs + 1] = { fn = "shHunt", label = function() return "Hunt (move toward prey)" end,
+                        z = 2.65, w = 1100, fs = 120, tip = "Hunter: move one location toward its prey." }
+  end
+  for _, b in ipairs(defs) do
+    safe(function()
+      card.createButton({
+        click_function = b.fn, function_owner = host, label = b.label(), tooltip = b.tip,
+        position = { 0, 0.3, b.z }, rotation = { 0, 0, 0 },
+        width = b.w, height = 200, font_size = b.fs,
+        color = { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
+      })
+    end)
+  end
+  return true
+end
+
+--- The board ctx the Appointed / Hourglass modules call back into.
+function Board.appointedCtx(extra)
+  local ctx = {}
+  for k, v in pairs(extra or {}) do ctx[k] = v end
+
+  function ctx.isOnBoard()
+    local card = Board.findAppointed()
+    if not card then return false end
+    if st.appointed.placed then return true end
+    return SCED.isInPlayArea(card) == true
+  end
+
+  function ctx.placeAtFarthest()
+    local locs = Board.locationCards()
+    if #locs == 0 then
+      -- nothing to place it on: tell the table once per stage, not per click
+      if st.appointed.noticeStage ~= Appointed.stage() then
+        st.appointed.noticeStage = Appointed.stage()
+        say("The Appointed manifests (" .. Appointed.stageName() .. "): place it at the location farthest from the investigators.")
+      end
+      return false
+    end
+    local graph = Board.graph(locs)
+    local occ = Board.occupied(locs)
+    local byGuid = {}
+    for _, l in ipairs(locs) do byGuid[l.guid] = l end
+    local minis = Board.minicards()
+    -- tie-break: farther (straight-line) from the nearest investigator wins
+    local function spread(g)
+      local p, best = byGuid[g].pos, nil
+      for _, m in ipairs(minis) do
+        if m.pos then
+          local d = dist2d(p, m.pos)
+          if best == nil or d < best then best = d end
+        end
+      end
+      return best or 0
+    end
+    local target = Locations.farthest(graph, occ, function(a, b) return spread(a) > spread(b) end)
+    local l = byGuid[target]
+    if not l then return false end
+    local ok = bringAppointed(placePosFor(l), rotFor(l), function(card)
+      Board.refreshAppointedButtons(card)
+    end)
+    if ok then
+      -- recorded now (not in the take-out callback) so a second sync in the
+      -- same frame sees it as placed
+      st.appointed.placed = true
+      st.appointed.lastPos = placePosFor(l)
+      st.appointed.lastRot = rotFor(l)
+      say("The Appointed manifests at " .. (safe(function() return l.obj.getName() end) or "a location")
+        .. " (" .. Appointed.stageName() .. ").")
+    else
+      say("The Appointed manifests: its card was not found on the table. Place it at "
+        .. (safe(function() return l.obj.getName() end) or "the farthest location") .. ".")
+    end
+    return ok
+  end
+
+  function ctx.removeFromBoard()
+    local p = setAsidePos()
+    local ok = bringAppointed(p, nil, function(card)
+      safe(function() card.clearButtons() end)
+    end)
+    st.appointed.placed = false
+    st.appointed.lastPos = nil
+    st.appointed.noticeStage = nil
+    say("The Appointed recedes into shadow (Unseen).")
+    return ok
+  end
+
+  function ctx.moveTowardPrey()
+    local card = Board.findAppointed()
+    if not card then return false end
+    local locs = Board.locationCards()
+    local graph = Board.graph(locs)
+    local byGuid = {}
+    for _, l in ipairs(locs) do byGuid[l.guid] = l end
+    local here = locationAt(locs, vec(safe(function() return card.getPosition() end)), 3.0)
+    local occ = Board.occupied(locs)
+    if #occ == 0 then say("The Appointed hunts, but no investigator minicard is on a location.") ; return false end
+    -- Prey = most on-card Memory (Appointed.prey); on-card Memory is not tracked
+    -- physically, so all investigators tie and the nearest one is hunted.
+    local target = occ[1]
+    if here then
+      local d = Locations.distances(graph, { here.guid })
+      local best
+      for _, g in ipairs(occ) do
+        local dg = d[g] or math.huge
+        if best == nil or dg < best then best, target = dg, g end
+      end
+    end
+    local nextKey = here and Locations.stepToward(graph, here.guid, target) or target
+    if nextKey == nil then say("The Appointed cannot reach its prey from here.") ; return false end
+    if here and nextKey == here.guid then say("The Appointed is already with its prey.") ; return false end
+    local l = byGuid[nextKey]
+    local pos, rot = placePosFor(l), rotFor(l)
+    safe(function() card.setPosition({ pos.x, pos.y, pos.z }) end)
+    safe(function() card.setRotation(rot) end)
+    st.appointed.placed = true
+    st.appointed.lastPos, st.appointed.lastRot = pos, rot
+    say("The Appointed moves to " .. (safe(function() return l.obj.getName() end) or "the next location") .. ".")
+    return true
+  end
+
+  function ctx.returnToPlay()
+    Board.scheduleRestore()
+  end
+
+  return ctx
+end
+
+--- Reconcile the Appointed's physical card with its Approach stage.
+function Board.syncAppointed(extra)
+  local ctx = Board.appointedCtx(extra)
+  Appointed.syncBoard(ctx)
+  Board.refreshAppointedButtons()
+  return ctx
+end
+
+------------------------------------------------- undefeatable: restore card --
+
+local function restoreNow()
+  restoreScheduled = false
+  if not Appointed.isManifest() then return end
+  local pos = st.appointed.lastPos or setAsidePos()
+  local rot = st.appointed.lastRot
+  if bringAppointed(pos, rot, function(card) Board.refreshAppointedButtons(card) end) then
+    say("The Appointed cannot be defeated. It does not leave play.")
+  elseif restoreData then
+    local data = restoreData
+    safe(function()
+      spawnObjectData({ data = data, position = { pos.x, pos.y, pos.z },
+        callback_function = function(o)
+          st.appointed.guid = guidOf(o)
+          Board.refreshAppointedButtons(o)
+        end })
+    end)
+    say("The Appointed cannot be defeated. It does not leave play.")
+  end
+  restoreData = nil
+end
+
+function Board.scheduleRestore()
+  if restoreScheduled then return end
+  restoreScheduled = true
+  local ok = pcall(function() Wait.frames(restoreNow, 5) end)
+  if not ok then restoreNow() end
+end
+
+--- Universal-event forwards from the host script.
+function Board.onEnterContainer(container, obj)
+  if Board.isAppointedObject(obj) then
+    Appointed.onRemovalAttempt(Board.appointedCtx())
+  end
+end
+
+function Board.onDestroy(obj)
+  if Board.isAppointedObject(obj) and Appointed.isManifest() then
+    restoreData = safe(function() return obj.getData() end)
+    Appointed.onRemovalAttempt(Board.appointedCtx())
+  end
+end
+
+function Board.onLeaveContainer(container, obj)
+  if Board.isAppointedObject(obj) then
+    pcall(function() Wait.frames(function() Board.refreshAppointedButtons() end, 3) end)
+  end
+end
+
+function Board.onDrop(obj)
+  if Board.isAppointedObject(obj) then
+    st.appointed.lastPos = vec(safe(function() return obj.getPosition() end))
+    local r = vec(safe(function() return obj.getRotation() end))
+    st.appointed.lastRot = r and { 0, r.y, 0 } or nil
+  end
+end
+
+--- Everything at once (load, after a reset / fact unlock).
+function Board.syncAll(extra)
+  local rep = Board.syncLocations()
+  Board.syncAppointed(extra)
+  return rep
+end
+
+return Board

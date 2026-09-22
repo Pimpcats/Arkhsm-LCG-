@@ -28,7 +28,26 @@ MODULES = [
     "Knowledge",
     "Locations",
     "Interlude",
+    "SCED",
+    "ChaosBag",
+    "Board",
 ]
+
+# The [static] chaos token image: the hosted URL publish_hosted.py writes to
+# pipeline/art_urls.json ("_static_token"), else a neutral placeholder.
+STATIC_TOKEN_PLACEHOLDER = "__STILLHOUR_STATIC_TOKEN_URL__"
+STATIC_TOKEN_FALLBACK = "https://placehold.co/512x512/14121e/e2ecf0.png?text=static"
+
+
+def static_token_url(root):
+    path = os.path.join(root, "pipeline", "art_urls.json")
+    if os.path.exists(path):
+        v = json.load(open(path, encoding="utf-8")).get("_static_token")
+        if isinstance(v, dict):
+            v = v.get("face")
+        if v:
+            return v
+    return STATIC_TOKEN_FALLBACK
 
 PREAMBLE = """-- ============================================================================
 -- THE STILL HOUR — generated bundle. DO NOT EDIT BY HAND.
@@ -63,9 +82,10 @@ def transform(x):
 
 def build_bundle(root):
     parts = [PREAMBLE]
+    token_url = static_token_url(root)
     for name in MODULES:
         path = os.path.join(root, "src", "StillHour", name + ".ttslua")
-        body = open(path, encoding="utf-8").read()
+        body = open(path, encoding="utf-8").read().replace(STATIC_TOKEN_PLACEHOLDER, token_url)
         parts.append('__modules["StillHour/%s"] = function()\n%s\nend\n' % (name, body))
     control = open(os.path.join(root, "src", "tts", "control.lua"), encoding="utf-8").read()
     parts.append("-- ===== control entry script =====\n" + control)
@@ -98,6 +118,27 @@ def build_save(root, bundle):
         "LuaScriptState": "",
     }
 
+    # One physical [static] chaos token (same data the control script spawns
+    # into the chaos bag; mirrors SCED Global.spawnChaosToken's token shape).
+    static_token = {
+        "Name": "Custom_Tile",
+        "Transform": dict(transform(6), scaleX=0.81, scaleY=1, scaleZ=0.81),
+        "Nickname": "Static",
+        "Description": "[static] chaos token (-3). When revealed, raise Dissonance by 1.",
+        "GUID": guid("sthr-static-token"),
+        "ColorDiffuse": {"r": 1, "g": 1, "b": 1},
+        "Tags": ["StillHourStatic"],
+        "Hands": False,
+        "HideWhenFaceDown": False,
+        "CustomImage": {
+            "ImageURL": static_token_url(root), "ImageSecondaryURL": "",
+            "ImageScalar": 1.0, "WidthScale": 0.0,
+            "CustomTile": {"Type": 2, "Thickness": 0.1, "Stretch": True, "Stackable": False},
+        },
+        "LuaScript": "",
+        "LuaScriptState": "",
+    }
+
     return {
         "SaveName": "THE STILL HOUR",
         "GameMode": "THE STILL HOUR",
@@ -115,7 +156,8 @@ def build_save(root, bundle):
         "Rules": "",
         "TabStates": {},
         "VersionNumber": "",
-        "ObjectStates": [o for o in (card_bag, encounter_bag, control) if o is not None],
+        "ObjectStates": [o for o in (card_bag, encounter_bag, control, static_token)
+                         if o is not None],
     }
 
 
@@ -139,6 +181,7 @@ def main():
     objs = reloaded["ObjectStates"]
     ctrl = next(o for o in objs if o.get("Nickname", "").endswith("Control"))
     assert "runStillHourTests" in ctrl["LuaScript"], "control script missing harness"
+    assert STATIC_TOKEN_PLACEHOLDER not in ctrl["LuaScript"], "static token URL not substituted"
     bags = [o for o in objs if o.get("ContainedObjects")]
     total_cards = sum(len(b["ContainedObjects"]) for b in bags)
     print("OK  bundle:   %s  (%d bytes Lua)" % (bundle_path, len(bundle)))

@@ -1,0 +1,152 @@
+--- THE STILL HOUR — thin, fail-safe adapter over SCED's public API.
+--
+-- Every call here mirrors a real SCED API wrapper, verified against the
+-- argonui/SCED source (src/chaosbag/ChaosBagApi.ttslua, src/core/
+-- GUIDReferenceApi.ttslua, src/playarea/PlayAreaApi.ttslua, src/tokens/
+-- TokenSpawnTrackerApi.ttslua, src/tokens/TokenManagerApi.ttslua). We call the
+-- same Global functions / reference-handler lookups those wrappers make, rather
+-- than requiring SCED's modules (they are not in this bundle).
+--
+-- Nothing here ever raises: each entry point is pcall-guarded and returns nil /
+-- false when SCED (or TTS itself) is absent, so the campaign runs on a vanilla
+-- table and inside the offline test harnesses.
+
+local SCED = {}
+
+-- SCED's GUIDReferenceHandler lives at this fixed GUID
+-- (GUIDReferenceApi.ttslua: getObjectFromGUID("123456").call(...)).
+SCED.REFERENCE_HANDLER_GUID = "123456"
+
+local function try(fn, ...)
+  local ok, v = pcall(fn, ...)
+  if ok then return v end
+  return nil
+end
+
+--- Global.call(name, param), or nil if Global/the function is unavailable.
+function SCED.globalCall(name, param)
+  return try(function()
+    if Global == nil then return nil end
+    return Global.call(name, param)
+  end)
+end
+
+local function handler()
+  return try(function()
+    if type(getObjectFromGUID) ~= "function" then return nil end
+    return getObjectFromGUID(SCED.REFERENCE_HANDLER_GUID)
+  end)
+end
+
+--- True when this table is running SCED: its Global publishes MOD_VERSION
+-- (core/Constants.ttslua, required by Global) and the GUID reference handler
+-- object exists.
+function SCED.isPresent()
+  local version = try(function()
+    if Global == nil then return nil end
+    return Global.getVar("MOD_VERSION")
+  end)
+  return type(version) == "string" and handler() ~= nil
+end
+
+function SCED.version()
+  return try(function() return Global.getVar("MOD_VERSION") end)
+end
+
+--- GUIDReferenceApi.getObjectByOwnerAndType(owner, type).
+function SCED.getObjectByOwnerAndType(owner, objType)
+  local h = handler()
+  if not h then return nil end
+  return try(function()
+    return h.call("getObjectByOwnerAndType", { owner = owner, type = objType })
+  end)
+end
+
+------------------------------------------------------------------ chaos bag --
+
+--- ChaosBagApi.findChaosBag() -> Global.findChaosBag().
+function SCED.findChaosBag()
+  if not SCED.isPresent() then return nil end
+  return SCED.globalCall("findChaosBag")
+end
+
+--- ChaosBagApi.canTouchChaosTokens(): false while someone searches the bag
+-- (SCED blocks bag edits then to dodge a TTS token-vanishing bug).
+function SCED.canTouchChaosTokens()
+  if not SCED.isPresent() then return true end
+  local v = SCED.globalCall("canTouchChaosTokens")
+  return v ~= false
+end
+
+--- ChaosBagApi.getTokensInPlay() -> Global.getChaosTokensinPlay() (drawn,
+-- not sealed). Returns a list of objects (possibly empty).
+function SCED.getTokensInPlay()
+  if not SCED.isPresent() then return {} end
+  local t = SCED.globalCall("getChaosTokensinPlay")
+  if type(t) ~= "table" then return {} end
+  return t
+end
+
+--- ChaosBagApi.getChaosBagState() -> list of SCED token ids in the bag.
+-- (Tokens SCED does not know — like [static] — are skipped by SCED itself.)
+function SCED.getChaosBagState()
+  if not SCED.isPresent() then return nil end
+  return SCED.globalCall("getChaosBagState")
+end
+
+------------------------------------------------------------------- play area --
+
+--- PlayAreaApi.isInPlayArea(object). nil when SCED is absent.
+function SCED.isInPlayArea(obj)
+  local pa = SCED.getObjectByOwnerAndType("Mythos", "PlayArea")
+  if not pa then return nil end
+  return try(function() return pa.call("isInPlayArea", obj) end)
+end
+
+--- PlayAreaApi.getInvestigatorCount() (the Mythos investigator counter's val).
+function SCED.getInvestigatorCount()
+  local counter = SCED.getObjectByOwnerAndType("Mythos", "InvestigatorCounter")
+  if not counter then return nil end
+  local v = try(function() return counter.getVar("val") end)
+  if type(v) == "number" and v >= 1 then return v end
+  return nil
+end
+
+--------------------------------------------------------------- token spawns --
+
+local function spawnTracker()
+  return SCED.getObjectByOwnerAndType("Mythos", "TokenSpawnTracker")
+end
+
+--- TokenSpawnTrackerApi.hasSpawnedTokens(objOrGuid).
+function SCED.hasSpawnedTokens(objOrGuid)
+  local t = spawnTracker()
+  if not t then return nil end
+  return try(function() return t.call("hasSpawnedTokens", objOrGuid) end)
+end
+
+--- TokenSpawnTrackerApi.markTokensSpawned(objOrGuid): SCED then skips the
+-- card's automatic clue/uses spawn (Global TokenManager.spawnForCard returns
+-- early when hasSpawnedTokens is true).
+function SCED.markTokensSpawned(objOrGuid)
+  local t = spawnTracker()
+  if not t then return false end
+  return try(function() t.call("markTokensSpawned", objOrGuid) ; return true end) or false
+end
+
+--- TokenSpawnTrackerApi.resetTokensSpawned(objOrGuid).
+function SCED.resetTokensSpawned(objOrGuid)
+  local t = spawnTracker()
+  if not t then return false end
+  return try(function() t.call("resetTokensSpawned", objOrGuid) ; return true end) or false
+end
+
+--- TokenManagerApi.spawnForCard(card): Global.callTable routing into
+-- TokenManager.spawnForCard (spawns the side's `uses`, e.g. location clues).
+function SCED.spawnForCard(card)
+  if not SCED.isPresent() then return false end
+  SCED.globalCall("callTable", { { "TokenManager", "spawnForCard" }, { card = card } })
+  return true
+end
+
+return SCED

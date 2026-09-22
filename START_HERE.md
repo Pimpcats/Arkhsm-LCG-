@@ -31,7 +31,8 @@ Manual equivalent: `python3 cardforge/studio.py`.
 - ✅ **Design frozen** — all docs below.
 - ✅ **P1–P8 all built & tested offline** (99-assertion suite + 39 in-bundle). Loadable mod at `dist/the_still_hour_mod.json`; download-box package in `dist/downloads/`.
 - ✅ **CO-001 applied** (contest `4 * n`, Memory-as-XP) and **CO-002 applied** (the staged Appointed, renamed from Latecomer).
-- ⏳ **Pending:** the real in-TTS load test · per-system board wiring (Appointed board callbacks, location card flips, interlude buy panel) · uploading the download-box release asset.
+- 🟡 **Board wiring + chaos bag built** (Appointed card buttons/placement, location flips/seals, touchable counters, interlude buy panel, physical `[static]` tokens in SCED's bag) — verified offline; the TTS relay run confirms it in the real engine.
+- ⏳ **Pending:** the real in-TTS run · location back art · uploading the download-box release asset.
 - 🎨 **Art:** not started. Pipeline speced (CardForge tool → ComfyUI/A1111/Krea → Strange Eons → sheets → CDN → `build_cards.py`).
 
 ## File map (this Project folder)

@@ -308,6 +308,153 @@ CampaignState.bankMemory(30)
 Interlude.beginNextLoop()
 check("beginNextLoop caps Memory at 18", CampaignState.getBankedMemory() == 18)
 
+print("== Board wiring: location cards resolve by metadata id ==")
+check("sthr-loc-lanternroom -> lantern-room", Locations.idForCard("sthr-loc-lanternroom") == "lantern-room")
+check("sthr-loc-townhallsteps -> town-hall-steps", Locations.idForCard("sthr-loc-townhallsteps") == "town-hall-steps")
+check("leading 'the' is ignored (sthr-loc-well -> the-well)", Locations.idForCard("sthr-loc-well") == "the-well")
+check("sealed study resolves", Locations.idForCard("sthr-loc-sealedstudy") == "sealed-study")
+check("a module id passes straight through", Locations.idForCard("flooded-crypt") == "flooded-crypt")
+check("a non-location Still Hour card is not a location", Locations.idForCard("sthr-elias") == nil)
+check("an unknown / foreign location is nil", Locations.idForCard("01129") == nil and Locations.idForCard(nil) == nil)
+check("hasBack only where a fact flips it", Locations.hasBack("lantern-room") and not Locations.hasBack("nave"))
+
+print("== Board wiring: farthest / toward on a location graph ==")
+--   A - B - C - D      E (unconnected)
+local g = { A = { "B" }, B = { "A", "C" }, C = { "B", "D" }, D = { "C" }, E = {} }
+local dist = Locations.distances(g, { "A" })
+check("BFS distances A->D = 3, E unreachable", dist.D == 3 and dist.B == 1 and dist.E == nil)
+check("farthest from A is D (unreachable E ignored)", Locations.farthest(g, { "A" }) == "D")
+check("farthest from B and C: A or D, tiebreak decides",
+  Locations.farthest(g, { "B", "C" }, function(a, b) return a == "D" end) == "D")
+check("no investigators: tiebreak picks among all", Locations.farthest(g, {}, function(a) return a == "E" end) == "E")
+check("step from A toward D is B", Locations.stepToward(g, "A", "D") == "B")
+check("step when already there is a no-op", Locations.stepToward(g, "C", "C") == "C")
+check("step toward an unreachable location is nil", Locations.stepToward(g, "A", "E") == nil)
+
+print("== Board wiring: Appointed hooks (hunt / undefeatable / card advance) ==")
+CampaignState.init(3)
+local moved = 0
+local hctx = { moveTowardPrey = function() moved = moved + 1 end }
+check("Unseen does not hunt", Appointed.hunt(hctx) == false and moved == 0)
+CampaignState.advanceAppointed(1)
+check("Sensed does not hunt", Appointed.hunt(hctx) == false and moved == 0)
+CampaignState.advanceAppointed(2)
+check("Emerging hunts (Hunter)", Appointed.hunt(hctx) == true and moved == 1)
+local back = 0
+check("removing it while manifest puts it back",
+  Appointed.onRemovalAttempt({ returnToPlay = function() back = back + 1 end }) == true and back == 1)
+CampaignState.init(3)
+check("at Unseen it may leave the board", Appointed.onRemovalAttempt({ returnToPlay = function() back = back + 1 end }) == false and back == 1)
+local placed = 0
+local actx = { isOnBoard = function() return placed > 0 end, placeAtFarthest = function() placed = placed + 1 end }
+check("a card advance from Unseen goes to Sensed and manifests", Appointed.advanceByCard(actx) == 1 and placed == 1)
+check("a second card advance -> Emerging", Appointed.advanceByCard(actx) == 2 and placed == 1)
+CampaignState.advanceAppointed(3)
+check("card advance never exceeds Arrived", Appointed.advanceByCard(actx) == 3)
+local removed = 0
+actx.removeFromBoard = function() removed = removed + 1 ; placed = 0 end
+CampaignState.init(3); CampaignState.advanceAppointed(1); CampaignState.setHour(5)
+Appointed.holdBack(actx)
+check("Hold Back to Unseen removes the figure from the board", removed == 1 and Appointed.stage() == 0)
+
+print("== Board wiring: SCED adapter is inert without SCED ==")
+local SCED = require("StillHour/SCED")
+check("SCED absent offline", SCED.isPresent() == false)
+check("no chaos bag offline", SCED.findChaosBag() == nil)
+check("tokens can be touched when SCED is absent", SCED.canTouchChaosTokens() == true)
+check("SCED spawn tracker calls are no-ops", SCED.markTokensSpawned("abc") == false and SCED.isInPlayArea({}) == nil)
+
+print("== Board wiring: real chaos-bag adapter ==")
+local ChaosBag = require("StillHour/ChaosBag")
+-- a virtual bag (no table) tracks the count only
+local vb = ChaosBag.new()
+vb.setBaselineStatic(1) ; vb.addStatic(2)
+check("virtual: baseline 1 + temporary 2 = 3", vb.count == 3 and vb.describe().mode == "virtual")
+vb.clearTemporary()
+check("virtual: temporary cleared at reset", vb.count == 1)
+
+-- a physical "Chaos Bag" on a table (vanilla: no SCED)
+local live = {}
+local guidN = 0
+local function fakeToken(data)
+  guidN = guidN + 1
+  local t = { guid = "tok" .. guidN, data = data }
+  t.getGUID = function() return t.guid end
+  t.hasTag = function(tag) for _, x in ipairs(data.Tags or {}) do if x == tag then return true end end return false end
+  t.destruct = function() live[t.guid] = nil end
+  live[t.guid] = t
+  return t
+end
+local contents = {}
+local chaos = { type = "Bag" }
+chaos.getName = function() return "Chaos Bag" end
+chaos.getDescription = function() return "" end
+chaos.getPosition = function() return { x = 1, y = 1, z = 1 } end
+chaos.getObjects = function()
+  local l = {}
+  for i, t in ipairs(contents) do l[i] = { guid = t.guid, name = "Static", index = i - 1, tags = t.data.Tags } end
+  return l
+end
+chaos.putObject = function(t) contents[#contents + 1] = t end
+chaos.takeObject = function(p)
+  for i, t in ipairs(contents) do
+    if t.guid == p.guid then
+      table.remove(contents, i)
+      if p.callback_function then p.callback_function(t) end
+      return t
+    end
+  end
+end
+getObjects = function() return { chaos } end
+getObjectFromGUID = function(g) return live[g] end
+spawnObjectData = function(p) local t = fakeToken(p.data) ; p.callback_function(t) ; return t end
+local pb = ChaosBag.new()
+pb.setBaselineStatic(2)
+check("table bag: 2 [static] spawned into the Chaos Bag", #contents == 2 and pb.describe().mode == "table")
+check("spawned token is the tagged Custom_Tile", contents[1].data.Name == "Custom_Tile"
+  and contents[1].data.CustomImage.CustomTile.Type == 2 and contents[1].hasTag("StillHourStatic"))
+pb.addStatic(1)
+check("temporary [static] adds a third", #contents == 3)
+pb.setBaselineStatic(0)
+check("band drop removes baseline tokens, keeps the temporary one", #contents == 1 and pb.physicalCount() == 1)
+-- a reveal: someone draws our token out of the bag
+local drawn = table.remove(contents, 1)
+check("drawing it from the Chaos Bag is a reveal", pb.onLeave(chaos, drawn) == true)
+check("our own removal is not a reveal", (function()
+  local t = fakeToken(ChaosBag.tokenData()) ; contents[#contents + 1] = t
+  pb.reconcile()  -- 1 target, 1 out + 1 in bag -> removes the in-bag one
+  return #contents == 0 and pb.physicalCount() == 1
+end)())
+pb.setBaselineStatic(1)
+check("a drawn token still counts (only the shortfall is added)", #contents == 1 and pb.physicalCount() == 2)
+pb.onEnter(chaos, drawn) ; contents[#contents + 1] = drawn
+check("returned token is counted once, in the bag", pb.physicalCount() == 2 and #contents == 2)
+check("other containers never count as the chaos bag",
+  pb.onLeave({ getName = function() return "Deck" end }, drawn) == false)
+
+-- SCED present: the bag comes from Global.findChaosBag; edits wait while searched
+local touchable = false
+local retries = 0
+Global = {
+  getVar = function(k) if k == "MOD_VERSION" then return "4.9.2" end end,
+  call = function(name)
+    if name == "findChaosBag" then return chaos end
+    if name == "canTouchChaosTokens" then return touchable end
+  end,
+}
+getObjectFromGUID = function(g) if g == "123456" then return { call = function() return nil end } end return live[g] end
+Wait = { time = function(fn) retries = retries + 1 end, frames = function(fn) fn() end }
+check("SCED detected via Global MOD_VERSION + reference handler", SCED.isPresent() == true)
+local sb = ChaosBag.new()
+local n0 = #contents
+sb.setBaselineStatic(n0 + 1)
+check("SCED: bag untouched while someone searches it; retry scheduled", #contents == n0 and retries == 1)
+touchable = true
+sb.reconcile()
+check("SCED: bag reconciled once touchable", #contents == n0 + 1 and sb.describe().mode == "sced")
+Global, getObjects, getObjectFromGUID, spawnObjectData, Wait = nil, nil, nil, nil, nil
+check("adapter falls back cleanly when the table goes away", ChaosBag.new().setBaselineStatic(2) == 2)
+
 print("")
 print(string.format("RESULT: %d passed, %d failed", passed, failed))
 os.exit(failed == 0 and 0 or 1)

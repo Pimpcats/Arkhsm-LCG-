@@ -94,22 +94,43 @@ Everything below the line is done and tested offline; the ordered gaps to an
 actual play session:
 
 1. **In-TTS load test** (~an evening, needs your PC): load
-   `dist/the_still_hour_mod.json`, click **Run Tests** (expect 39/39), poke the
-   demo buttons. First real-engine validation.
-2. **Board wiring** (the biggest remaining build item): connect the logic
-   modules to physical objects — the Appointed's manifest/move/Hold-Back button
-   on its card, location cards flipping per `Locations.activeFace` and gating
-   clues on `isOpen`, Memory/Dissonance/Hourglass counters players can touch,
-   and the interlude buy panel. All logic exists; this is TTS plumbing.
+   `dist/the_still_hour_mod.json`, click **Run Tests** (expect 45/45), poke the
+   counters. First real-engine validation. The TTS relay
+   (`docs/TTS_RELAY.md`) now also drives the board wiring below.
+2. **Board wiring** — 🟡 built, offline-verified; needs the real-TTS relay run.
+   `src/StillHour/Board.ttslua` + `src/tts/control.lua`: the Appointed's card
+   gets Hold Back / Hunt buttons and is taken out, placed at the farthest
+   location (by SCED `locationFront/Back` icons+connections from the
+   investigators' minicards), moved toward its prey, set aside at Unseen, and
+   put straight back if it is dropped in a container or destroyed while
+   manifest. Campaign location cards (matched by GMNotes id, e.g.
+   `sthr-loc-lanternroom`) flip to `Locations.activeFace`; sealed ones get a
+   SEALED label and, under SCED, their clue auto-spawn is held via
+   `TokenSpawnTrackerApi` until `isOpen`. The control token has touchable
+   Memory / Investigators / Dissonance / Hour / Appointed counters (left +1,
+   right −1) and an **Interlude** panel (Recollections from card metadata
+   `memoryCost`, level-ups 1–5, Begin Next Loop), all persisted in `onSave`.
+   Knowledge facts are recorded from the console (`shUnlock("<fact-id>")`),
+   deliberately with no on-table list (fact names are spoilers).
+   Open: the fact-flipped location *backs* have no art yet (a flipped card
+   shows the generic encounter back); on-card Memory per investigator is not
+   tracked physically, so the Appointed hunts the nearest investigator.
 3. **Playable content minimum**: the Prologue + district locations exist as
    *rules text* in the guide but not yet as location/objective **cards** in the
    spec (only the 33 player/boss cards are generated). Generating the ~25
    location cards + 6 district node sets + the 26-card shared encounter spine
    from `encounter v0.4` through the existing pipeline is data entry, not new
    code.
-4. **Chaos-bag integration**: wire `Dissonance.syncBag` to SCED's real bag
-   manager (adapter stub documented in INTEGRATION §3) and add a physical
-   `[static]` token.
+4. **Chaos-bag integration** — 🟡 built, offline-verified against a SCED
+   stand-in; needs the real-TTS relay run. `src/StillHour/ChaosBag.ttslua`
+   drives physical `[static]` tokens in the bag SCED's
+   `ChaosBagApi.findChaosBag()` returns (respecting `canTouchChaosTokens`),
+   else any table object named "Chaos Bag", else a virtual count (vanilla).
+   Drawing a `[static]` out of the bag raises Dissonance. Token face:
+   `pipeline/render_token.py` → `dist/cards/sthr-static-token.jpg` (hosted by
+   `publish_hosted.py`); one loose token ships in the mod save. SCED's
+   `getChaosBagState()` / campaign export skip it (and print "not
+   recognized"); the count is rebuilt from Dissonance on load.
 5. **Art** (cosmetic — placeholders load today): see **`docs/ART_HANDOFF.md`** —
    complete 41-face scene-mode manifest is ready; CardForge build + GPU batch +
    Strange Eons framing are the remaining (machine-side) work.

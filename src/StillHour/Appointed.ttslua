@@ -142,6 +142,45 @@ function Appointed.attemptDefeat()
   return false
 end
 
+--- Board hook for the defeat-replacement: the physical card was put into a
+-- container, discarded or destroyed. While it is manifest (stage >= 1) it
+-- "does not leave play": ctx.returnToPlay() puts it back. At Unseen (0) it is
+-- legitimately off the board, so nothing happens. Returns true if restored.
+function Appointed.onRemovalAttempt(ctx)
+  if Appointed.attemptDefeat() == false and Appointed.isManifest() then
+    if ctx and ctx.returnToPlay then ctx.returnToPlay() end
+    return true
+  end
+  return false
+end
+
+--------------------------------------------------------------- hunter move --
+
+--- While Emerging or Arrived it has Hunter and moves toward its prey (one
+-- location per hunter move). ctx.moveTowardPrey() does the board work.
+-- Returns true if it moved (i.e. it is a Hunter and the callback ran).
+function Appointed.hunt(ctx)
+  if not Appointed.isHunter() then
+    return false
+  end
+  if ctx and ctx.moveTowardPrey then
+    return ctx.moveTowardPrey() ~= false
+  end
+  return true
+end
+
+--------------------------------------------------------------- card effects --
+
+--- A card advances the Approach one stage, to a minimum of Sensed (CO-002 §2,
+-- the Crossing wording). Ratchets through CampaignState.advanceAppointed, then
+-- reconciles the board. Returns the new stage.
+function Appointed.advanceByCard(ctx)
+  local s = CampaignState.getAppointedStage()
+  local newStage = CampaignState.advanceAppointed(math.max(1, s + 1))
+  Appointed.syncBoard(ctx)
+  return newStage
+end
+
 --- It cannot be attacked or evaded either — expose these for callers/UX so the
 -- three "cannot" clauses live in one place.
 Appointed.canBeAttacked = false

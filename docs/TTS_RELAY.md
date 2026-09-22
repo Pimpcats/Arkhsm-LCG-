@@ -36,7 +36,13 @@ For each new commit on the watched branch:
    `tools/tts_relay/ingame_runner.lua` into TTS ("Execute Lua Code").
 3. The runner checks the build in the live game and reports each result back.
    It checks spawning, SCED card metadata, hosted image URLs, the control
-   token's rules tests, save/reload, and dealing a card. It also moves the
+   token's rules tests, save/reload, the board wiring (touchable counters and
+   their persistence; `[static]` tokens entering/leaving SCED's chaos bag and a
+   drawn one raising Dissonance; two test location cards flipping and
+   un-sealing; the Appointed card manifesting at the farthest location, Hold
+   Back, returning when put in a bag, hunting), and dealing a card. Best run on
+   a fresh SCED table: other locations/minicards already on the table take part
+   in "farthest" and "prey". It also moves the
    camera over each object so the relay can screenshot the TTS window.
 4. Commits `runs/<time>_<commit>/{results.json,log.txt,screenshots/}` plus
    `latest.json` to the `tts-results` branch and pushes it.
@@ -66,7 +72,9 @@ uses them automatically.
 ## Offline test of the relay itself
 
 `tests/test_tts_relay.py` drives the real relay against a fake TTS
-(`tests/tts_fake/`). The fake speaks the same socket protocol and runs the
+(`tests/tts_fake/`), once on a vanilla table and once on a minimal SCED stand-in
+(`tests/tts_fake/sced/`, built by `sced_fixture.py`: SCED's Global chaos-bag
+functions, the GUID reference handler and the Mythos objects its APIs use). The fake speaks the same socket protocol and runs the
 runner and the bundled control token under Lua 5.2 with a mocked TTS API. It
 uses a local bare repo in place of GitHub.
 

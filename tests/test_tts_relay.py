@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.join(ROOT, "tests", "tts_fake"))
 
 import relay  # noqa: E402
 from fake_tts import FakeTTS, LUA  # noqa: E402
+from sced_fixture import sced_table  # noqa: E402
 
 pytestmark = pytest.mark.skipif(LUA is None, reason="lua5.2 not installed")
 
@@ -88,6 +89,62 @@ def test_relay_runs_build_in_fake_tts_and_pushes_results(tmp_path, remote):
     assert "passed" in log
     # runner source was sent verbatim after the RELAY header
     assert "local RELAY = {" in fake.executed[0]
+
+
+BOARD_CHECKS = (
+    "control shows Memory / Dissonance / Hour counters",
+    "Memory counter +2",
+    "Hour counter advances the Hourglass",
+    "counters persist through save+reload",
+    "board finds both campaign locations by metadata id",
+    "a location with an unknown fact stays on its front",
+    "a sealed location is labelled SEALED",
+    "unlocking the flip fact turns the location to its back",
+    "the SEALED label comes off once every fact is known",
+    "it manifests at the location farthest from the investigators",
+    "its card carries a Hold Back button",
+    "Hold Back drops one stage and rewinds one Hour",
+    "at Unseen it leaves the board",
+    "it cannot be defeated: removed from play, it returns",
+    "Emerging adds a Hunt button",
+    "Hunt moves it one location toward its prey",
+)
+
+SCED_CHECKS = (
+    "SCED chaos bag found (ChaosBagApi.findChaosBag)",
+    "entering Glitch puts 1 [static] in the chaos bag",
+    "entering Noticed puts a 2nd [static] in the chaos bag",
+    "SCED's own bag state still reads (ChaosBagApi.getChaosBagState)",
+    "drawing a [static] from the bag raises Dissonance by 1",
+    "back to Calm removes the [static] tokens again",
+    "SCED clue spawn is held back while sealed (TokenSpawnTrackerApi)",
+    "SCED clue spawn is released for the opened location",
+)
+
+
+def _assert_clean_pass(latest):
+    failed = [c for c in latest["checks"] if not c["ok"]]
+    assert latest["lua_errors"] == [], latest["lua_errors"]
+    assert failed == [], failed
+    assert latest["verdict"] == "pass"
+    return {c["name"] for c in latest["checks"]}
+
+
+def test_board_wiring_on_a_vanilla_table(tmp_path, remote):
+    rc, latest, _ = run_relay(tmp_path, remote)
+    names = _assert_clean_pass(latest)
+    for expected in BOARD_CHECKS + ("vanilla table: [static] counted without touching any bag",):
+        assert expected in names, expected
+    assert not any(n in names for n in SCED_CHECKS)
+
+
+def test_board_wiring_on_an_sced_table(tmp_path, remote):
+    rc, latest, _ = run_relay(tmp_path, remote, preexisting=sced_table())
+    names = _assert_clean_pass(latest)
+    for expected in BOARD_CHECKS + SCED_CHECKS:
+        assert expected in names, expected
+    assert any("control sees SCED" in n for n in latest["notes"])
+    assert rc == 0
 
 
 def test_relay_only_removes_its_own_objects(tmp_path, remote):

@@ -1,0 +1,294 @@
+--- THE STILL HOUR — the real chaos-bag adapter for Dissonance (P3 board wiring).
+--
+-- Implements the adapter contract Dissonance.ttslua expects:
+--     bag.setBaselineStatic(n)            -- exactly n baseline [static] tokens
+--     bag.addStatic(n) / bag.removeStatic(n)  -- temporary extras (Hour VI)
+-- and drives PHYSICAL [static] tokens in the table's chaos bag.
+--
+-- Where the bag comes from (first match wins):
+--   1. SCED: ChaosBagApi.findChaosBag() (Global.findChaosBag, via SCED.ttslua).
+--   2. Any table: a top-level container named/described "Chaos Bag" (the same
+--      test SCED's own findChaosBag uses on the Mythos area).
+--   3. Neither: a virtual bag — the count is tracked, nothing is touched. This
+--      is the vanilla-table / offline fallback and never errors.
+--
+-- SCED's own spawnChaosToken/removeChaosToken only accept ids from its
+-- ID_URL_MAP (core/Constants.ttslua), so a custom token cannot go through them.
+-- Instead this adapter follows exactly what those Global functions do: it
+-- respects canTouchChaosTokens(), spawns a Custom_Tile token (same data shape as
+-- Global.spawnChaosToken) and puts it in the bag, and removes one by
+-- takeObject({guid}) + destruct (as Global.removeChaosToken does).
+-- Our tokens carry the tag below so they are recognised in and out of the bag.
+--
+-- Counting: tokens in the bag + our tokens that were drawn out of it and still
+-- exist (revealed, sitting on a playmat) + spawns/removals still in flight.
+-- SCED's getChaosBagState()/campaign export skips unknown token names, so the
+-- [static] count is never exported; syncBag() rebuilds it from Dissonance.
+
+local SCED = require("StillHour/SCED")
+
+local ChaosBag = {}
+
+ChaosBag.TOKEN_TAG = "StillHourStatic"
+ChaosBag.TOKEN_NAME = "Static"
+ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
+-- Replaced with the hosted image URL by pipeline/bundle_mod.py.
+ChaosBag.TOKEN_IMAGE_URL = "__STILLHOUR_STATIC_TOKEN_URL__"
+ChaosBag.BAG_NAME = "Chaos Bag"
+
+--- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
+-- tokenData (Custom_Tile, circular CustomTile Type 2, thickness 0.1, scale 0.81).
+function ChaosBag.tokenData(pos)
+  pos = pos or { x = 0, y = 2, z = 0 }
+  return {
+    Name = "Custom_Tile",
+    Nickname = ChaosBag.TOKEN_NAME,
+    Description = ChaosBag.TOKEN_DESCRIPTION,
+    Tags = { ChaosBag.TOKEN_TAG },
+    ColorDiffuse = { r = 1, g = 1, b = 1 },
+    Hands = false,
+    HideWhenFaceDown = false,
+    CustomImage = {
+      ImageURL = ChaosBag.TOKEN_IMAGE_URL,
+      ImageSecondaryURL = "",
+      ImageScalar = 1,
+      WidthScale = 0,
+      CustomTile = { Type = 2, Thickness = 0.1, Stretch = true, Stackable = false },
+    },
+    Transform = {
+      posX = pos.x, posY = pos.y, posZ = pos.z,
+      rotX = 0, rotY = 0, rotZ = 0,
+      scaleX = 0.81, scaleY = 1, scaleZ = 0.81,
+    },
+  }
+end
+
+local function safe(fn, ...)
+  local ok, v = pcall(fn, ...)
+  if ok then return v end
+  return nil
+end
+
+--- Is `obj` one of our [static] tokens?
+function ChaosBag.isStaticToken(obj)
+  if obj == nil then return false end
+  return safe(function()
+    if obj.hasTag and obj.hasTag(ChaosBag.TOKEN_TAG) then return true end
+    return false
+  end) or false
+end
+
+--- Is `container` a chaos bag? Same name/description test as SCED findChaosBag.
+function ChaosBag.isChaosBag(container)
+  if container == nil then return false end
+  return safe(function()
+    return container.getName() == ChaosBag.BAG_NAME
+      or (container.getDescription and container.getDescription() == ChaosBag.BAG_NAME)
+  end) or false
+end
+
+local function entryIsStatic(entry)
+  for _, t in ipairs(entry.tags or {}) do
+    if t == ChaosBag.TOKEN_TAG then return true end
+  end
+  return false
+end
+
+--- Build an adapter. opts.log(msg) receives notices (optional).
+function ChaosBag.new(opts)
+  opts = opts or {}
+  local log = opts.log or function() end
+
+  local a = {
+    baseline = 0,      -- band-driven baseline (Dissonance.syncBag)
+    extra = 0,         -- temporary extras (Hour VI) until the next reset
+    count = 0,         -- the target count (virtual bag's contents)
+    pendingAdd = 0,
+    pendingRemove = 0,
+    removing = {},     -- guid -> true while we take a token out to destroy it
+    out = {},          -- guid -> true: our tokens drawn out of the bag
+    retryScheduled = false,
+    lastMode = "virtual",
+  }
+
+  --- The chaos bag object, or nil (virtual mode).
+  function a.findBag()
+    if SCED.isPresent() then
+      local bag = SCED.findChaosBag()
+      if bag then a.lastMode = "sced" ; return bag end
+    end
+    local found = safe(function()
+      if type(getObjects) ~= "function" then return nil end
+      for _, o in ipairs(getObjects()) do
+        if o.type == "Bag" and ChaosBag.isChaosBag(o) then return o end
+      end
+      return nil
+    end)
+    a.lastMode = found and "table" or "virtual"
+    return found
+  end
+
+  function a.target()
+    return math.max(0, a.baseline + a.extra)
+  end
+
+  --- Tokens drawn out of the bag that still exist on the table.
+  local function outCount()
+    local n = 0
+    for guid in pairs(a.out) do
+      local o = safe(function() return getObjectFromGUID(guid) end)
+      if o ~= nil then n = n + 1 else a.out[guid] = nil end
+    end
+    return n
+  end
+
+  local function inBag(bag)
+    local list = {}
+    for _, e in ipairs(safe(function() return bag.getObjects() end) or {}) do
+      if entryIsStatic(e) and not a.removing[e.guid] then list[#list + 1] = e.guid end
+    end
+    return list
+  end
+
+  --- Physical count (nil when there is no bag).
+  function a.physicalCount()
+    local bag = a.findBag()
+    if not bag then return nil end
+    return #inBag(bag) + outCount() + a.pendingAdd
+  end
+
+  local function spawnOne(bag)
+    local p = safe(function() return bag.getPosition() end) or { x = 0, y = 1, z = 0 }
+    a.pendingAdd = a.pendingAdd + 1
+    local ok = pcall(spawnObjectData, {
+      data = ChaosBag.tokenData({ x = p.x, y = (p.y or 1) + 2, z = p.z }),
+      callback_function = function(o)
+        a.pendingAdd = math.max(0, a.pendingAdd - 1)
+        pcall(function() bag.putObject(o) end)
+      end,
+    })
+    if not ok then a.pendingAdd = math.max(0, a.pendingAdd - 1) end
+  end
+
+  local function removeOne(bag, guid)
+    a.removing[guid] = true
+    a.pendingRemove = a.pendingRemove + 1
+    local ok = pcall(function()
+      bag.takeObject({
+        guid = guid, smooth = false,
+        callback_function = function(o)
+          a.pendingRemove = math.max(0, a.pendingRemove - 1)
+          a.removing[guid] = nil
+          pcall(function() o.destruct() end)
+        end,
+      })
+    end)
+    if not ok then
+      a.removing[guid] = nil
+      a.pendingRemove = math.max(0, a.pendingRemove - 1)
+    end
+  end
+
+  local function scheduleRetry()
+    if a.retryScheduled then return end
+    a.retryScheduled = true
+    pcall(function()
+      Wait.time(function() a.retryScheduled = false ; a.reconcile() end, 2)
+    end)
+  end
+
+  --- Bring the physical bag to target(). Safe to call any time.
+  function a.reconcile()
+    a.count = a.target()
+    local bag = a.findBag()
+    if not bag then return a.count end
+    if not SCED.canTouchChaosTokens() then
+      scheduleRetry()
+      return a.count
+    end
+    local present = inBag(bag)
+    local have = #present + outCount() + a.pendingAdd
+    local delta = a.count - have
+    if delta > 0 then
+      for _ = 1, delta do spawnOne(bag) end
+      log(string.format("[static] +%d into the chaos bag (now %d)", delta, a.count))
+    elseif delta < 0 then
+      local n = math.min(-delta, #present)
+      for i = 1, n do removeOne(bag, present[i]) end
+      if n > 0 then log(string.format("[static] -%d from the chaos bag (now %d)", n, a.count)) end
+      if n < -delta then scheduleRetry() end  -- the rest are drawn; retry once returned
+    end
+    return a.count
+  end
+
+  -- Dissonance adapter contract --------------------------------------------
+  function a.setBaselineStatic(n)
+    a.baseline = math.max(0, math.floor(n or 0))
+    return a.reconcile()
+  end
+
+  function a.addStatic(n)
+    a.extra = a.extra + math.max(0, math.floor(n or 1))
+    return a.reconcile()
+  end
+
+  function a.removeStatic(n)
+    a.extra = math.max(0, a.extra - math.max(0, math.floor(n or 1)))
+    return a.reconcile()
+  end
+
+  --- Temporary [static] lasts "until the next reset" (Hour VI).
+  function a.clearTemporary()
+    a.extra = 0
+    return a.reconcile()
+  end
+
+  -- Event plumbing (forwarded by the host object's universal event handlers) ---
+
+  --- onObjectLeaveContainer: returns true if this is a REVEAL (one of our
+  -- tokens drawn out of the chaos bag by anyone but this adapter).
+  function a.onLeave(container, obj)
+    if not ChaosBag.isStaticToken(obj) or not ChaosBag.isChaosBag(container) then
+      return false
+    end
+    local guid = safe(function() return obj.getGUID() end) or obj.guid
+    if guid and a.removing[guid] then return false end
+    if guid then a.out[guid] = true end
+    return true
+  end
+
+  --- onObjectEnterContainer: a drawn token went back into the bag.
+  function a.onEnter(container, obj)
+    if ChaosBag.isStaticToken(obj) and ChaosBag.isChaosBag(container) then
+      local guid = safe(function() return obj.getGUID() end) or obj.guid
+      if guid then a.out[guid] = nil end
+    end
+  end
+
+  --- Cheap summary for labels (no bag lookup); pass true to also count the
+  -- physical tokens (looks the bag up).
+  function a.describe(withPhysical)
+    local phys = withPhysical and a.physicalCount() or nil
+    return { mode = a.lastMode, target = a.target(), baseline = a.baseline,
+             extra = a.extra, physical = phys }
+  end
+
+  function a.save()
+    local out = {}
+    for g in pairs(a.out) do out[#out + 1] = g end
+    return { baseline = a.baseline, extra = a.extra, out = out }
+  end
+
+  function a.load(t)
+    if type(t) ~= "table" then return end
+    a.baseline = tonumber(t.baseline) or 0
+    a.extra = tonumber(t.extra) or 0
+    a.out = {}
+    for _, g in ipairs(t.out or {}) do a.out[g] = true end
+    a.count = a.target()
+  end
+
+  return a
+end
+
+return ChaosBag
