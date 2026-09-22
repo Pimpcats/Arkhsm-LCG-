@@ -1154,6 +1154,45 @@ function Appointed.attemptDefeat()
   return false
 end
 
+--- Board hook for the defeat-replacement: the physical card was put into a
+-- container, discarded or destroyed. While it is manifest (stage >= 1) it
+-- "does not leave play": ctx.returnToPlay() puts it back. At Unseen (0) it is
+-- legitimately off the board, so nothing happens. Returns true if restored.
+function Appointed.onRemovalAttempt(ctx)
+  if Appointed.attemptDefeat() == false and Appointed.isManifest() then
+    if ctx and ctx.returnToPlay then ctx.returnToPlay() end
+    return true
+  end
+  return false
+end
+
+--------------------------------------------------------------- hunter move --
+
+--- While Emerging or Arrived it has Hunter and moves toward its prey (one
+-- location per hunter move). ctx.moveTowardPrey() does the board work.
+-- Returns true if it moved (i.e. it is a Hunter and the callback ran).
+function Appointed.hunt(ctx)
+  if not Appointed.isHunter() then
+    return false
+  end
+  if ctx and ctx.moveTowardPrey then
+    return ctx.moveTowardPrey() ~= false
+  end
+  return true
+end
+
+--------------------------------------------------------------- card effects --
+
+--- A card advances the Approach one stage, to a minimum of Sensed (CO-002 §2,
+-- the Crossing wording). Ratchets through CampaignState.advanceAppointed, then
+-- reconciles the board. Returns the new stage.
+function Appointed.advanceByCard(ctx)
+  local s = CampaignState.getAppointedStage()
+  local newStage = CampaignState.advanceAppointed(math.max(1, s + 1))
+  Appointed.syncBoard(ctx)
+  return newStage
+end
+
 --- It cannot be attacked or evaded either — expose these for callers/UX so the
 -- three "cannot" clauses live in one place.
 Appointed.canBeAttacked = false
@@ -1367,6 +1406,109 @@ function Locations.inDistrict(district)
   return ids
 end
 
+------------------------------------------------------------ card metadata --
+
+-- Physical location cards are keyed by their SCED GMNotes id, e.g.
+-- "sthr-loc-lanternroom". Resolve one to a location id here by a normalised
+-- match (prefix, case, hyphens and a leading "the" ignored) so the board never
+-- keeps its own list of cards. Returns nil for cards this module doesn't know.
+Locations.CARD_ID_PREFIX = "sthr-loc-"
+
+local function normalise(s)
+  s = string.lower(tostring(s or ""))
+  s = s:gsub("[^%a%d]", "")
+  s = s:gsub("^the", "")
+  return s
+end
+
+local byNormalised
+function Locations.idForCard(cardId)
+  if type(cardId) ~= "string" then return nil end
+  if Locations.LOCATIONS[cardId] then return cardId end
+  local stem = cardId
+  if stem:sub(1, #Locations.CARD_ID_PREFIX) == Locations.CARD_ID_PREFIX then
+    stem = stem:sub(#Locations.CARD_ID_PREFIX + 1)
+  elseif stem:sub(1, 5) == "sthr-" then
+    return nil  -- another Still Hour card type, not a location
+  end
+  if not byNormalised then
+    byNormalised = {}
+    for id in pairs(Locations.LOCATIONS) do byNormalised[normalise(id)] = id end
+  end
+  return byNormalised[normalise(stem)]
+end
+
+--- Does this location have a fact-flipped back at all?
+function Locations.hasBack(id)
+  return loc(id).flipFact ~= nil
+end
+
+------------------------------------------------------------- map geometry --
+
+-- Pure graph helpers for board effects that need "farthest" / "toward" (the
+-- Appointed's manifest and Hunter move, CO-002 §1). `graph` maps a node key to
+-- a list of neighbour keys; the board builds it from SCED location metadata.
+
+--- Breadth-first distances from every node in `sources` (a list of keys).
+function Locations.distances(graph, sources)
+  local dist, queue, head = {}, {}, 1
+  for _, s in ipairs(sources or {}) do
+    if graph[s] and dist[s] == nil then
+      dist[s] = 0
+      queue[#queue + 1] = s
+    end
+  end
+  while queue[head] do
+    local node = queue[head]
+    head = head + 1
+    for _, nb in ipairs(graph[node] or {}) do
+      if graph[nb] and dist[nb] == nil then
+        dist[nb] = dist[node] + 1
+        queue[#queue + 1] = nb
+      end
+    end
+  end
+  return dist
+end
+
+--- The node farthest (by connections) from all `sources`. Nodes unreachable
+-- from the sources are ignored while any reachable one exists. Ties go to
+-- `tiebreak(a, b)` (true when a should win) or else to the smaller key.
+-- With no sources, every node counts as distance 0 (tiebreak decides).
+function Locations.farthest(graph, sources, tiebreak)
+  local dist = Locations.distances(graph, sources)
+  local anyReachable = next(dist) ~= nil
+  local best, bestD
+  local keys = {}
+  for k in pairs(graph) do keys[#keys + 1] = k end
+  table.sort(keys, function(a, b) return tostring(a) < tostring(b) end)
+  for _, k in ipairs(keys) do
+    local d = dist[k]
+    if d == nil and not anyReachable then d = 0 end
+    if d ~= nil then
+      if best == nil or d > bestD or (d == bestD and tiebreak and tiebreak(k, best)) then
+        best, bestD = k, d
+      end
+    end
+  end
+  return best, bestD
+end
+
+--- One step from `from` along a shortest path toward `to`; returns `from`
+-- itself when already there and nil when `to` is unreachable.
+function Locations.stepToward(graph, from, to)
+  if from == to then return from end
+  local dist = Locations.distances(graph, { to })
+  if dist[from] == nil then return nil end
+  local nbs = {}
+  for _, nb in ipairs(graph[from] or {}) do nbs[#nbs + 1] = nb end
+  table.sort(nbs, function(a, b) return tostring(a) < tostring(b) end)
+  for _, nb in ipairs(nbs) do
+    if dist[nb] ~= nil and dist[nb] == dist[from] - 1 then return nb end
+  end
+  return nil
+end
+
 return Locations
 
 end
@@ -1471,11 +1613,1039 @@ return Interlude
 
 end
 
+__modules["StillHour/SCED"] = function()
+--- THE STILL HOUR — thin, fail-safe adapter over SCED's public API.
+--
+-- Every call here mirrors a real SCED API wrapper, verified against the
+-- argonui/SCED source (src/chaosbag/ChaosBagApi.ttslua, src/core/
+-- GUIDReferenceApi.ttslua, src/playarea/PlayAreaApi.ttslua, src/tokens/
+-- TokenSpawnTrackerApi.ttslua, src/tokens/TokenManagerApi.ttslua). We call the
+-- same Global functions / reference-handler lookups those wrappers make, rather
+-- than requiring SCED's modules (they are not in this bundle).
+--
+-- Nothing here ever raises: each entry point is pcall-guarded and returns nil /
+-- false when SCED (or TTS itself) is absent, so the campaign runs on a vanilla
+-- table and inside the offline test harnesses.
+
+local SCED = {}
+
+-- SCED's GUIDReferenceHandler lives at this fixed GUID
+-- (GUIDReferenceApi.ttslua: getObjectFromGUID("123456").call(...)).
+SCED.REFERENCE_HANDLER_GUID = "123456"
+
+local function try(fn, ...)
+  local ok, v = pcall(fn, ...)
+  if ok then return v end
+  return nil
+end
+
+--- Global.call(name, param), or nil if Global/the function is unavailable.
+function SCED.globalCall(name, param)
+  return try(function()
+    if Global == nil then return nil end
+    return Global.call(name, param)
+  end)
+end
+
+local function handler()
+  return try(function()
+    if type(getObjectFromGUID) ~= "function" then return nil end
+    return getObjectFromGUID(SCED.REFERENCE_HANDLER_GUID)
+  end)
+end
+
+--- True when this table is running SCED: its Global publishes MOD_VERSION
+-- (core/Constants.ttslua, required by Global) and the GUID reference handler
+-- object exists.
+function SCED.isPresent()
+  local version = try(function()
+    if Global == nil then return nil end
+    return Global.getVar("MOD_VERSION")
+  end)
+  return type(version) == "string" and handler() ~= nil
+end
+
+function SCED.version()
+  return try(function() return Global.getVar("MOD_VERSION") end)
+end
+
+--- GUIDReferenceApi.getObjectByOwnerAndType(owner, type).
+function SCED.getObjectByOwnerAndType(owner, objType)
+  local h = handler()
+  if not h then return nil end
+  return try(function()
+    return h.call("getObjectByOwnerAndType", { owner = owner, type = objType })
+  end)
+end
+
+------------------------------------------------------------------ chaos bag --
+
+--- ChaosBagApi.findChaosBag() -> Global.findChaosBag().
+function SCED.findChaosBag()
+  if not SCED.isPresent() then return nil end
+  return SCED.globalCall("findChaosBag")
+end
+
+--- ChaosBagApi.canTouchChaosTokens(): false while someone searches the bag
+-- (SCED blocks bag edits then to dodge a TTS token-vanishing bug).
+function SCED.canTouchChaosTokens()
+  if not SCED.isPresent() then return true end
+  local v = SCED.globalCall("canTouchChaosTokens")
+  return v ~= false
+end
+
+--- ChaosBagApi.getTokensInPlay() -> Global.getChaosTokensinPlay() (drawn,
+-- not sealed). Returns a list of objects (possibly empty).
+function SCED.getTokensInPlay()
+  if not SCED.isPresent() then return {} end
+  local t = SCED.globalCall("getChaosTokensinPlay")
+  if type(t) ~= "table" then return {} end
+  return t
+end
+
+--- ChaosBagApi.getChaosBagState() -> list of SCED token ids in the bag.
+-- (Tokens SCED does not know — like [static] — are skipped by SCED itself.)
+function SCED.getChaosBagState()
+  if not SCED.isPresent() then return nil end
+  return SCED.globalCall("getChaosBagState")
+end
+
+------------------------------------------------------------------- play area --
+
+--- PlayAreaApi.isInPlayArea(object). nil when SCED is absent.
+function SCED.isInPlayArea(obj)
+  local pa = SCED.getObjectByOwnerAndType("Mythos", "PlayArea")
+  if not pa then return nil end
+  return try(function() return pa.call("isInPlayArea", obj) end)
+end
+
+--- PlayAreaApi.getInvestigatorCount() (the Mythos investigator counter's val).
+function SCED.getInvestigatorCount()
+  local counter = SCED.getObjectByOwnerAndType("Mythos", "InvestigatorCounter")
+  if not counter then return nil end
+  local v = try(function() return counter.getVar("val") end)
+  if type(v) == "number" and v >= 1 then return v end
+  return nil
+end
+
+--------------------------------------------------------------- token spawns --
+
+local function spawnTracker()
+  return SCED.getObjectByOwnerAndType("Mythos", "TokenSpawnTracker")
+end
+
+--- TokenSpawnTrackerApi.hasSpawnedTokens(objOrGuid).
+function SCED.hasSpawnedTokens(objOrGuid)
+  local t = spawnTracker()
+  if not t then return nil end
+  return try(function() return t.call("hasSpawnedTokens", objOrGuid) end)
+end
+
+--- TokenSpawnTrackerApi.markTokensSpawned(objOrGuid): SCED then skips the
+-- card's automatic clue/uses spawn (Global TokenManager.spawnForCard returns
+-- early when hasSpawnedTokens is true).
+function SCED.markTokensSpawned(objOrGuid)
+  local t = spawnTracker()
+  if not t then return false end
+  return try(function() t.call("markTokensSpawned", objOrGuid) ; return true end) or false
+end
+
+--- TokenSpawnTrackerApi.resetTokensSpawned(objOrGuid).
+function SCED.resetTokensSpawned(objOrGuid)
+  local t = spawnTracker()
+  if not t then return false end
+  return try(function() t.call("resetTokensSpawned", objOrGuid) ; return true end) or false
+end
+
+--- TokenManagerApi.spawnForCard(card): Global.callTable routing into
+-- TokenManager.spawnForCard (spawns the side's `uses`, e.g. location clues).
+function SCED.spawnForCard(card)
+  if not SCED.isPresent() then return false end
+  SCED.globalCall("callTable", { { "TokenManager", "spawnForCard" }, { card = card } })
+  return true
+end
+
+return SCED
+
+end
+
+__modules["StillHour/ChaosBag"] = function()
+--- THE STILL HOUR — the real chaos-bag adapter for Dissonance (P3 board wiring).
+--
+-- Implements the adapter contract Dissonance.ttslua expects:
+--     bag.setBaselineStatic(n)            -- exactly n baseline [static] tokens
+--     bag.addStatic(n) / bag.removeStatic(n)  -- temporary extras (Hour VI)
+-- and drives PHYSICAL [static] tokens in the table's chaos bag.
+--
+-- Where the bag comes from (first match wins):
+--   1. SCED: ChaosBagApi.findChaosBag() (Global.findChaosBag, via SCED.ttslua).
+--   2. Any table: a top-level container named/described "Chaos Bag" (the same
+--      test SCED's own findChaosBag uses on the Mythos area).
+--   3. Neither: a virtual bag — the count is tracked, nothing is touched. This
+--      is the vanilla-table / offline fallback and never errors.
+--
+-- SCED's own spawnChaosToken/removeChaosToken only accept ids from its
+-- ID_URL_MAP (core/Constants.ttslua), so a custom token cannot go through them.
+-- Instead this adapter follows exactly what those Global functions do: it
+-- respects canTouchChaosTokens(), spawns a Custom_Tile token (same data shape as
+-- Global.spawnChaosToken) and puts it in the bag, and removes one by
+-- takeObject({guid}) + destruct (as Global.removeChaosToken does).
+-- Our tokens carry the tag below so they are recognised in and out of the bag.
+--
+-- Counting: tokens in the bag + our tokens that were drawn out of it and still
+-- exist (revealed, sitting on a playmat) + spawns/removals still in flight.
+-- SCED's getChaosBagState()/campaign export skips unknown token names, so the
+-- [static] count is never exported; syncBag() rebuilds it from Dissonance.
+
+local SCED = require("StillHour/SCED")
+
+local ChaosBag = {}
+
+ChaosBag.TOKEN_TAG = "StillHourStatic"
+ChaosBag.TOKEN_NAME = "Static"
+ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
+-- Replaced with the hosted image URL by pipeline/bundle_mod.py.
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-static-token.jpg?v=a556271511"
+ChaosBag.BAG_NAME = "Chaos Bag"
+
+--- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
+-- tokenData (Custom_Tile, circular CustomTile Type 2, thickness 0.1, scale 0.81).
+function ChaosBag.tokenData(pos)
+  pos = pos or { x = 0, y = 2, z = 0 }
+  return {
+    Name = "Custom_Tile",
+    Nickname = ChaosBag.TOKEN_NAME,
+    Description = ChaosBag.TOKEN_DESCRIPTION,
+    Tags = { ChaosBag.TOKEN_TAG },
+    ColorDiffuse = { r = 1, g = 1, b = 1 },
+    Hands = false,
+    HideWhenFaceDown = false,
+    CustomImage = {
+      ImageURL = ChaosBag.TOKEN_IMAGE_URL,
+      ImageSecondaryURL = "",
+      ImageScalar = 1,
+      WidthScale = 0,
+      CustomTile = { Type = 2, Thickness = 0.1, Stretch = true, Stackable = false },
+    },
+    Transform = {
+      posX = pos.x, posY = pos.y, posZ = pos.z,
+      rotX = 0, rotY = 0, rotZ = 0,
+      scaleX = 0.81, scaleY = 1, scaleZ = 0.81,
+    },
+  }
+end
+
+local function safe(fn, ...)
+  local ok, v = pcall(fn, ...)
+  if ok then return v end
+  return nil
+end
+
+--- Is `obj` one of our [static] tokens?
+function ChaosBag.isStaticToken(obj)
+  if obj == nil then return false end
+  return safe(function()
+    if obj.hasTag and obj.hasTag(ChaosBag.TOKEN_TAG) then return true end
+    return false
+  end) or false
+end
+
+--- Is `container` a chaos bag? Same name/description test as SCED findChaosBag.
+function ChaosBag.isChaosBag(container)
+  if container == nil then return false end
+  return safe(function()
+    return container.getName() == ChaosBag.BAG_NAME
+      or (container.getDescription and container.getDescription() == ChaosBag.BAG_NAME)
+  end) or false
+end
+
+local function entryIsStatic(entry)
+  for _, t in ipairs(entry.tags or {}) do
+    if t == ChaosBag.TOKEN_TAG then return true end
+  end
+  return false
+end
+
+--- Build an adapter. opts.log(msg) receives notices (optional).
+function ChaosBag.new(opts)
+  opts = opts or {}
+  local log = opts.log or function() end
+
+  local a = {
+    baseline = 0,      -- band-driven baseline (Dissonance.syncBag)
+    extra = 0,         -- temporary extras (Hour VI) until the next reset
+    count = 0,         -- the target count (virtual bag's contents)
+    pendingAdd = 0,
+    pendingRemove = 0,
+    removing = {},     -- guid -> true while we take a token out to destroy it
+    out = {},          -- guid -> true: our tokens drawn out of the bag
+    retryScheduled = false,
+    lastMode = "virtual",
+  }
+
+  --- The chaos bag object, or nil (virtual mode).
+  function a.findBag()
+    if SCED.isPresent() then
+      local bag = SCED.findChaosBag()
+      if bag then a.lastMode = "sced" ; return bag end
+    end
+    local found = safe(function()
+      if type(getObjects) ~= "function" then return nil end
+      for _, o in ipairs(getObjects()) do
+        if o.type == "Bag" and ChaosBag.isChaosBag(o) then return o end
+      end
+      return nil
+    end)
+    a.lastMode = found and "table" or "virtual"
+    return found
+  end
+
+  function a.target()
+    return math.max(0, a.baseline + a.extra)
+  end
+
+  --- Tokens drawn out of the bag that still exist on the table.
+  local function outCount()
+    local n = 0
+    for guid in pairs(a.out) do
+      local o = safe(function() return getObjectFromGUID(guid) end)
+      if o ~= nil then n = n + 1 else a.out[guid] = nil end
+    end
+    return n
+  end
+
+  local function inBag(bag)
+    local list = {}
+    for _, e in ipairs(safe(function() return bag.getObjects() end) or {}) do
+      if entryIsStatic(e) and not a.removing[e.guid] then list[#list + 1] = e.guid end
+    end
+    return list
+  end
+
+  --- Physical count (nil when there is no bag).
+  function a.physicalCount()
+    local bag = a.findBag()
+    if not bag then return nil end
+    return #inBag(bag) + outCount() + a.pendingAdd
+  end
+
+  local function spawnOne(bag)
+    local p = safe(function() return bag.getPosition() end) or { x = 0, y = 1, z = 0 }
+    a.pendingAdd = a.pendingAdd + 1
+    local ok = pcall(spawnObjectData, {
+      data = ChaosBag.tokenData({ x = p.x, y = (p.y or 1) + 2, z = p.z }),
+      callback_function = function(o)
+        a.pendingAdd = math.max(0, a.pendingAdd - 1)
+        pcall(function() bag.putObject(o) end)
+      end,
+    })
+    if not ok then a.pendingAdd = math.max(0, a.pendingAdd - 1) end
+  end
+
+  local function removeOne(bag, guid)
+    a.removing[guid] = true
+    a.pendingRemove = a.pendingRemove + 1
+    local ok = pcall(function()
+      bag.takeObject({
+        guid = guid, smooth = false,
+        callback_function = function(o)
+          a.pendingRemove = math.max(0, a.pendingRemove - 1)
+          a.removing[guid] = nil
+          pcall(function() o.destruct() end)
+        end,
+      })
+    end)
+    if not ok then
+      a.removing[guid] = nil
+      a.pendingRemove = math.max(0, a.pendingRemove - 1)
+    end
+  end
+
+  local function scheduleRetry()
+    if a.retryScheduled then return end
+    a.retryScheduled = true
+    pcall(function()
+      Wait.time(function() a.retryScheduled = false ; a.reconcile() end, 2)
+    end)
+  end
+
+  --- Bring the physical bag to target(). Safe to call any time.
+  function a.reconcile()
+    a.count = a.target()
+    local bag = a.findBag()
+    if not bag then return a.count end
+    if not SCED.canTouchChaosTokens() then
+      scheduleRetry()
+      return a.count
+    end
+    local present = inBag(bag)
+    local have = #present + outCount() + a.pendingAdd
+    local delta = a.count - have
+    if delta > 0 then
+      for _ = 1, delta do spawnOne(bag) end
+      log(string.format("[static] +%d into the chaos bag (now %d)", delta, a.count))
+    elseif delta < 0 then
+      local n = math.min(-delta, #present)
+      for i = 1, n do removeOne(bag, present[i]) end
+      if n > 0 then log(string.format("[static] -%d from the chaos bag (now %d)", n, a.count)) end
+      if n < -delta then scheduleRetry() end  -- the rest are drawn; retry once returned
+    end
+    return a.count
+  end
+
+  -- Dissonance adapter contract --------------------------------------------
+  function a.setBaselineStatic(n)
+    a.baseline = math.max(0, math.floor(n or 0))
+    return a.reconcile()
+  end
+
+  function a.addStatic(n)
+    a.extra = a.extra + math.max(0, math.floor(n or 1))
+    return a.reconcile()
+  end
+
+  function a.removeStatic(n)
+    a.extra = math.max(0, a.extra - math.max(0, math.floor(n or 1)))
+    return a.reconcile()
+  end
+
+  --- Temporary [static] lasts "until the next reset" (Hour VI).
+  function a.clearTemporary()
+    a.extra = 0
+    return a.reconcile()
+  end
+
+  -- Event plumbing (forwarded by the host object's universal event handlers) ---
+
+  --- onObjectLeaveContainer: returns true if this is a REVEAL (one of our
+  -- tokens drawn out of the chaos bag by anyone but this adapter).
+  function a.onLeave(container, obj)
+    if not ChaosBag.isStaticToken(obj) or not ChaosBag.isChaosBag(container) then
+      return false
+    end
+    local guid = safe(function() return obj.getGUID() end) or obj.guid
+    if guid and a.removing[guid] then return false end
+    if guid then a.out[guid] = true end
+    return true
+  end
+
+  --- onObjectEnterContainer: a drawn token went back into the bag.
+  function a.onEnter(container, obj)
+    if ChaosBag.isStaticToken(obj) and ChaosBag.isChaosBag(container) then
+      local guid = safe(function() return obj.getGUID() end) or obj.guid
+      if guid then a.out[guid] = nil end
+    end
+  end
+
+  --- Cheap summary for labels (no bag lookup); pass true to also count the
+  -- physical tokens (looks the bag up).
+  function a.describe(withPhysical)
+    local phys = withPhysical and a.physicalCount() or nil
+    return { mode = a.lastMode, target = a.target(), baseline = a.baseline,
+             extra = a.extra, physical = phys }
+  end
+
+  function a.save()
+    local out = {}
+    for g in pairs(a.out) do out[#out + 1] = g end
+    return { baseline = a.baseline, extra = a.extra, out = out }
+  end
+
+  function a.load(t)
+    if type(t) ~= "table" then return end
+    a.baseline = tonumber(t.baseline) or 0
+    a.extra = tonumber(t.extra) or 0
+    a.out = {}
+    for _, g in ipairs(t.out or {}) do a.out[g] = true end
+    a.count = a.target()
+  end
+
+  return a
+end
+
+return ChaosBag
+
+end
+
+__modules["StillHour/Board"] = function()
+--- THE STILL HOUR — board plumbing (BUILD_STATUS "path to the table" item 2).
+--
+-- Connects the logic modules to physical objects on the table. No rules live
+-- here: which face a location shows / whether it is sealed comes from
+-- Locations; when the Appointed is on the board, whether it hunts, and that it
+-- cannot leave play come from Appointed. This file only finds objects, reads
+-- their SCED metadata, and moves / flips / labels them.
+--
+-- Everything is keyed on card metadata (the SCED GMNotes JSON `id`, `type`,
+-- `locationFront` / `locationBack` {icons, connections}; see
+-- docs/art_reference/sced_objects/location_*.json), never on a content list.
+-- Investigators are located by their minicards (SCED Tags ["Minicard"]).
+--
+-- TTS API used (Berserk-Games/Tabletop-Simulator-API docs): getObjects,
+-- getObjectFromGUID, Object.getGMNotes/getPosition/getRotation/setPosition/
+-- setRotation/is_face_down/hasTag/getObjects/takeObject/createButton/
+-- getButtons/removeButton/clearButtons/getData, spawnObjectData, Wait.frames.
+-- SCED API (via SCED.ttslua): PlayAreaApi.isInPlayArea,
+-- TokenSpawnTrackerApi.mark/resetTokensSpawned, TokenManagerApi.spawnForCard.
+--
+-- All entry points are pcall-guarded by the host (control.lua); on a vanilla
+-- table they simply find fewer objects.
+
+local Appointed = require("StillHour/Appointed")
+local Locations = require("StillHour/Locations")
+local SCED = require("StillHour/SCED")
+
+local Board = {}
+
+Board.APPOINTED_ID = "sthr-appointed"
+Board.MINICARD_TAG = "Minicard"
+Board.SEALED_LABEL = "SEALED"
+Board.OCCUPY_RADIUS = 2.0       -- a minicard within this of a location's centre is "at" it
+Board.APPOINTED_OFFSET = { x = 0, y = 0.6, z = -0.9 }
+
+local host                       -- the object owning the button callbacks
+local say = function() end
+local st = {
+  flipped = {},        -- guid -> true: location we flipped to its back
+  sealedMarked = {},   -- guid -> true: SCED clue auto-spawn suppressed by us
+  sealedLabel = {},    -- guid -> true: we put a SEALED label on it
+  appointed = { guid = nil, placed = false, lastPos = nil, lastRot = nil },
+}
+local restoreScheduled = false
+local restoreData = nil
+
+------------------------------------------------------------------ utilities --
+
+local function safe(fn, ...)
+  local ok, v = pcall(fn, ...)
+  if ok then return v end
+  return nil
+end
+
+local function decode(s)
+  if type(s) ~= "string" or s == "" or JSON == nil then return nil end
+  local ok, v = pcall(JSON.decode, s)
+  if ok and type(v) == "table" then return v end
+  return nil
+end
+
+local function vec(p)
+  if p == nil then return nil end
+  return { x = p.x or p[1] or 0, y = p.y or p[2] or 0, z = p.z or p[3] or 0 }
+end
+
+local function dist2d(a, b)
+  local dx, dz = a.x - b.x, a.z - b.z
+  return math.sqrt(dx * dx + dz * dz)
+end
+
+local function topLevel()
+  return safe(function()
+    if type(getObjects) ~= "function" then return {} end
+    return getObjects()
+  end) or {}
+end
+
+local function guidOf(o)
+  return safe(function() return o.getGUID() end) or safe(function() return o.guid end)
+end
+
+local function metaOf(o)
+  return decode(safe(function() return o.getGMNotes() end))
+end
+
+local function isCard(o)
+  return safe(function() return o.type == "Card" end) == true
+end
+
+local function split(s)
+  local out = {}
+  for part in string.gmatch(tostring(s or ""), "[^|]+") do out[#out + 1] = part end
+  return out
+end
+
+------------------------------------------------------------------- lifecycle --
+
+function Board.init(hostObject, opts)
+  host = hostObject
+  opts = opts or {}
+  say = opts.log or say
+end
+
+function Board.save()
+  return st
+end
+
+function Board.load(t)
+  if type(t) ~= "table" then return end
+  st.flipped = t.flipped or {}
+  st.sealedMarked = t.sealedMarked or {}
+  st.sealedLabel = t.sealedLabel or {}
+  st.appointed = t.appointed or { placed = false }
+end
+
+------------------------------------------------------------------- scanning --
+
+--- Location cards on the table: {obj, md, guid, locId, side, pos}.
+-- locId is nil for locations this campaign does not define (still map nodes).
+function Board.locationCards()
+  local out = {}
+  for _, o in ipairs(topLevel()) do
+    if isCard(o) then
+      local md = metaOf(o)
+      if md and md.type == "Location" then
+        local down = safe(function() return o.is_face_down end) == true
+        local side = (down and md.locationBack or md.locationFront)
+          or md.locationFront or md.locationBack or {}
+        out[#out + 1] = { obj = o, md = md, guid = guidOf(o), locId = Locations.idForCard(md.id),
+                          side = side, pos = vec(safe(function() return o.getPosition() end)) }
+      end
+    end
+  end
+  return out
+end
+
+--- Graph keyed by guid, from each visible side's icons/connections (the same
+-- data SCED's PlayArea uses to draw connection lines). Undirected.
+function Board.graph(locs)
+  local graph, byIcon = {}, {}
+  for _, l in ipairs(locs) do
+    graph[l.guid] = {}
+    for _, icon in ipairs(split(l.side.icons)) do
+      byIcon[icon] = byIcon[icon] or {}
+      table.insert(byIcon[icon], l.guid)
+    end
+  end
+  local seen = {}
+  local function link(a, b)
+    if a == b then return end
+    local k = a < b and (a .. ">" .. b) or (b .. ">" .. a)
+    if seen[k] then return end
+    seen[k] = true
+    table.insert(graph[a], b)
+    table.insert(graph[b], a)
+  end
+  for _, l in ipairs(locs) do
+    for _, icon in ipairs(split(l.side.connections)) do
+      for _, other in ipairs(byIcon[icon] or {}) do link(l.guid, other) end
+    end
+  end
+  return graph
+end
+
+--- The location a position is at (nearest centre within radius), or nil.
+local function locationAt(locs, pos, radius)
+  if not pos then return nil end
+  local best, bestD
+  for _, l in ipairs(locs) do
+    if l.pos then
+      local d = dist2d(pos, l.pos)
+      if d <= (radius or Board.OCCUPY_RADIUS) and (bestD == nil or d < bestD) then
+        best, bestD = l, d
+      end
+    end
+  end
+  return best
+end
+
+--- Investigator minicards: {obj, pos}.
+function Board.minicards()
+  local out = {}
+  for _, o in ipairs(topLevel()) do
+    if safe(function() return o.hasTag(Board.MINICARD_TAG) end) then
+      out[#out + 1] = { obj = o, pos = vec(safe(function() return o.getPosition() end)) }
+    end
+  end
+  return out
+end
+
+--- Location guids that hold at least one investigator.
+function Board.occupied(locs)
+  local out, seen = {}, {}
+  for _, m in ipairs(Board.minicards()) do
+    local l = locationAt(locs, m.pos)
+    if l and not seen[l.guid] then seen[l.guid] = true ; out[#out + 1] = l.guid end
+  end
+  return out
+end
+
+------------------------------------------------------------------ locations --
+
+local function removeLabel(o, label)
+  local buttons = safe(function() return o.getButtons() end) or {}
+  for i = #buttons, 1, -1 do
+    local b = buttons[i]
+    if b.label == label then
+      safe(function() o.removeButton(b.index or (i - 1)) end)
+    end
+  end
+end
+
+local function addLabel(o, label, z)
+  if not host then return end
+  removeLabel(o, label)
+  safe(function()
+    o.createButton({
+      click_function = "shNoop", function_owner = host, label = label,
+      position = { 0, 0.3, z or 0 }, rotation = { 0, 0, 0 },
+      width = 0, height = 0, font_size = 260,
+      font_color = { 0.95, 0.25, 0.2 },
+    })
+  end)
+end
+
+local function setFaceDown(o, down)
+  local r = vec(safe(function() return o.getRotation() end)) or { x = 0, y = 180, z = 0 }
+  safe(function() o.setRotation({ r.x, r.y, down and 180 or 0 }) end)
+end
+
+--- Flip every known location to Locations.activeFace and gate clues on isOpen.
+-- Returns a report {flipped, unflipped, sealed, opened, seen}.
+function Board.syncLocations()
+  local rep = { flipped = 0, unflipped = 0, sealed = 0, opened = 0, seen = 0 }
+  for _, l in ipairs(Board.locationCards()) do
+    if l.locId then
+      rep.seen = rep.seen + 1
+      local o, g = l.obj, l.guid
+      -- face: only locations with a fact-flipped back are ever turned by us
+      if Locations.hasBack(l.locId) then
+        local want = Locations.activeFace(l.locId)
+        local down = safe(function() return o.is_face_down end) == true
+        if want == "back" and not down then
+          setFaceDown(o, true) ; st.flipped[g] = true ; rep.flipped = rep.flipped + 1
+        elseif want == "front" and down and st.flipped[g] then
+          setFaceDown(o, false) ; st.flipped[g] = nil ; rep.unflipped = rep.unflipped + 1
+        end
+      end
+      -- clues: a sealed location never auto-spawns its clues
+      if Locations.isSealed(l.locId) then
+        rep.sealed = rep.sealed + 1
+        if SCED.markTokensSpawned(g) then st.sealedMarked[g] = true end
+        if not st.sealedLabel[g] then addLabel(o, Board.SEALED_LABEL) ; st.sealedLabel[g] = true end
+      else
+        if st.sealedLabel[g] then removeLabel(o, Board.SEALED_LABEL) ; st.sealedLabel[g] = nil end
+        if st.sealedMarked[g] then
+          st.sealedMarked[g] = nil
+          SCED.resetTokensSpawned(g)
+          if SCED.isInPlayArea(o) then SCED.spawnForCard(o) end
+          rep.opened = rep.opened + 1
+        end
+      end
+    end
+  end
+  return rep
+end
+
+--------------------------------------------------------------- the Appointed --
+
+local function isAppointedMeta(md)
+  return md ~= nil and md.id == Board.APPOINTED_ID
+end
+
+function Board.isAppointedObject(o)
+  return isCard(o) and isAppointedMeta(metaOf(o))
+end
+
+--- The Appointed card if it lies loose on the table.
+function Board.findAppointed()
+  for _, o in ipairs(topLevel()) do
+    if Board.isAppointedObject(o) then return o end
+  end
+  return nil
+end
+
+--- A container holding the Appointed: container, entry.
+local function findAppointedInContainer(guid)
+  for _, o in ipairs(topLevel()) do
+    local t = safe(function() return o.type end)
+    if t == "Bag" or t == "Deck" then
+      for _, e in ipairs(safe(function() return o.getObjects() end) or {}) do
+        if (guid and e.guid == guid) or isAppointedMeta(decode(e.gm_notes)) then
+          return o, e
+        end
+      end
+    end
+  end
+  return nil
+end
+
+local function setAsidePos()
+  local p = host and vec(safe(function() return host.getPosition() end)) or { x = 0, y = 1, z = 0 }
+  return { x = p.x, y = p.y + 1.5, z = p.z + 4.5 }
+end
+
+local function placePosFor(l)
+  local p = l.pos or { x = 0, y = 1, z = 0 }
+  local off = Board.APPOINTED_OFFSET
+  return { x = p.x + off.x, y = p.y + off.y, z = p.z + off.z }
+end
+
+local function rotFor(l)
+  local r = l and vec(safe(function() return l.obj.getRotation() end)) or { x = 0, y = 180, z = 0 }
+  return { 0, r.y, 0 }
+end
+
+--- Move (or take out of its container) the Appointed to pos/rot, then call
+-- done(obj). Returns true if a card was found.
+local function bringAppointed(pos, rot, done)
+  local card = Board.findAppointed()
+  if card then
+    safe(function() card.setPosition({ pos.x, pos.y, pos.z }) end)
+    if rot then safe(function() card.setRotation(rot) end) end
+    st.appointed.guid = guidOf(card)
+    if done then done(card) end
+    return true
+  end
+  local c, e = findAppointedInContainer(st.appointed.guid)
+  if c then
+    local ok = pcall(function()
+      c.takeObject({
+        guid = e.guid, smooth = false,
+        position = { pos.x, pos.y, pos.z }, rotation = rot,
+        callback_function = function(o)
+          st.appointed.guid = guidOf(o)
+          if done then done(o) end
+        end,
+      })
+    end)
+    return ok
+  end
+  return false
+end
+
+local STAGE_BUTTONS = {
+  { fn = "shAppointedInfo", label = function() return "The Appointed: " .. Appointed.stageName() end,
+    z = 1.75, w = 1100, fs = 120, tip = "Approach stage (CO-002)" },
+  { fn = "shHoldBack", label = function() return "Hold Back (success)" end, z = 2.2, w = 1100, fs = 120,
+    tip = "Click after a SUCCESSFUL [willpower] or [combat] (4) test: back one stage, rewind one Hour." },
+}
+
+--- Put the Hold Back / Hunt buttons on the Appointed card (idempotent).
+function Board.refreshAppointedButtons(card)
+  card = card or Board.findAppointed()
+  if not card or not host then return false end
+  safe(function() card.clearButtons() end)   -- only our buttons live on this card
+  if not Appointed.isManifest() then return true end
+  local defs = {}
+  for _, b in ipairs(STAGE_BUTTONS) do defs[#defs + 1] = b end
+  if Appointed.isHunter() then
+    defs[#defs + 1] = { fn = "shHunt", label = function() return "Hunt (move toward prey)" end,
+                        z = 2.65, w = 1100, fs = 120, tip = "Hunter: move one location toward its prey." }
+  end
+  for _, b in ipairs(defs) do
+    safe(function()
+      card.createButton({
+        click_function = b.fn, function_owner = host, label = b.label(), tooltip = b.tip,
+        position = { 0, 0.3, b.z }, rotation = { 0, 0, 0 },
+        width = b.w, height = 200, font_size = b.fs,
+        color = { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
+      })
+    end)
+  end
+  return true
+end
+
+--- The board ctx the Appointed / Hourglass modules call back into.
+function Board.appointedCtx(extra)
+  local ctx = {}
+  for k, v in pairs(extra or {}) do ctx[k] = v end
+
+  function ctx.isOnBoard()
+    local card = Board.findAppointed()
+    if not card then return false end
+    if st.appointed.placed then return true end
+    return SCED.isInPlayArea(card) == true
+  end
+
+  function ctx.placeAtFarthest()
+    local locs = Board.locationCards()
+    if #locs == 0 then
+      -- nothing to place it on: tell the table once per stage, not per click
+      if st.appointed.noticeStage ~= Appointed.stage() then
+        st.appointed.noticeStage = Appointed.stage()
+        say("The Appointed manifests (" .. Appointed.stageName() .. "): place it at the location farthest from the investigators.")
+      end
+      return false
+    end
+    local graph = Board.graph(locs)
+    local occ = Board.occupied(locs)
+    local byGuid = {}
+    for _, l in ipairs(locs) do byGuid[l.guid] = l end
+    local minis = Board.minicards()
+    -- tie-break: farther (straight-line) from the nearest investigator wins
+    local function spread(g)
+      local p, best = byGuid[g].pos, nil
+      for _, m in ipairs(minis) do
+        if m.pos then
+          local d = dist2d(p, m.pos)
+          if best == nil or d < best then best = d end
+        end
+      end
+      return best or 0
+    end
+    local target = Locations.farthest(graph, occ, function(a, b) return spread(a) > spread(b) end)
+    local l = byGuid[target]
+    if not l then return false end
+    local ok = bringAppointed(placePosFor(l), rotFor(l), function(card)
+      Board.refreshAppointedButtons(card)
+    end)
+    if ok then
+      -- recorded now (not in the take-out callback) so a second sync in the
+      -- same frame sees it as placed
+      st.appointed.placed = true
+      st.appointed.lastPos = placePosFor(l)
+      st.appointed.lastRot = rotFor(l)
+      say("The Appointed manifests at " .. (safe(function() return l.obj.getName() end) or "a location")
+        .. " (" .. Appointed.stageName() .. ").")
+    else
+      say("The Appointed manifests: its card was not found on the table. Place it at "
+        .. (safe(function() return l.obj.getName() end) or "the farthest location") .. ".")
+    end
+    return ok
+  end
+
+  function ctx.removeFromBoard()
+    local p = setAsidePos()
+    local ok = bringAppointed(p, nil, function(card)
+      safe(function() card.clearButtons() end)
+    end)
+    st.appointed.placed = false
+    st.appointed.lastPos = nil
+    st.appointed.noticeStage = nil
+    say("The Appointed recedes into shadow (Unseen).")
+    return ok
+  end
+
+  function ctx.moveTowardPrey()
+    local card = Board.findAppointed()
+    if not card then return false end
+    local locs = Board.locationCards()
+    local graph = Board.graph(locs)
+    local byGuid = {}
+    for _, l in ipairs(locs) do byGuid[l.guid] = l end
+    local here = locationAt(locs, vec(safe(function() return card.getPosition() end)), 3.0)
+    local occ = Board.occupied(locs)
+    if #occ == 0 then say("The Appointed hunts, but no investigator minicard is on a location.") ; return false end
+    -- Prey = most on-card Memory (Appointed.prey); on-card Memory is not tracked
+    -- physically, so all investigators tie and the nearest one is hunted.
+    local target = occ[1]
+    if here then
+      local d = Locations.distances(graph, { here.guid })
+      local best
+      for _, g in ipairs(occ) do
+        local dg = d[g] or math.huge
+        if best == nil or dg < best then best, target = dg, g end
+      end
+    end
+    local nextKey = here and Locations.stepToward(graph, here.guid, target) or target
+    if nextKey == nil then say("The Appointed cannot reach its prey from here.") ; return false end
+    if here and nextKey == here.guid then say("The Appointed is already with its prey.") ; return false end
+    local l = byGuid[nextKey]
+    local pos, rot = placePosFor(l), rotFor(l)
+    safe(function() card.setPosition({ pos.x, pos.y, pos.z }) end)
+    safe(function() card.setRotation(rot) end)
+    st.appointed.placed = true
+    st.appointed.lastPos, st.appointed.lastRot = pos, rot
+    say("The Appointed moves to " .. (safe(function() return l.obj.getName() end) or "the next location") .. ".")
+    return true
+  end
+
+  function ctx.returnToPlay()
+    Board.scheduleRestore()
+  end
+
+  return ctx
+end
+
+--- Reconcile the Appointed's physical card with its Approach stage.
+function Board.syncAppointed(extra)
+  local ctx = Board.appointedCtx(extra)
+  Appointed.syncBoard(ctx)
+  Board.refreshAppointedButtons()
+  return ctx
+end
+
+------------------------------------------------- undefeatable: restore card --
+
+local function restoreNow()
+  restoreScheduled = false
+  if not Appointed.isManifest() then return end
+  local pos = st.appointed.lastPos or setAsidePos()
+  local rot = st.appointed.lastRot
+  if bringAppointed(pos, rot, function(card) Board.refreshAppointedButtons(card) end) then
+    say("The Appointed cannot be defeated. It does not leave play.")
+  elseif restoreData then
+    local data = restoreData
+    safe(function()
+      spawnObjectData({ data = data, position = { pos.x, pos.y, pos.z },
+        callback_function = function(o)
+          st.appointed.guid = guidOf(o)
+          Board.refreshAppointedButtons(o)
+        end })
+    end)
+    say("The Appointed cannot be defeated. It does not leave play.")
+  end
+  restoreData = nil
+end
+
+function Board.scheduleRestore()
+  if restoreScheduled then return end
+  restoreScheduled = true
+  local ok = pcall(function() Wait.frames(restoreNow, 5) end)
+  if not ok then restoreNow() end
+end
+
+--- Universal-event forwards from the host script.
+function Board.onEnterContainer(container, obj)
+  if Board.isAppointedObject(obj) then
+    Appointed.onRemovalAttempt(Board.appointedCtx())
+  end
+end
+
+function Board.onDestroy(obj)
+  if Board.isAppointedObject(obj) and Appointed.isManifest() then
+    restoreData = safe(function() return obj.getData() end)
+    Appointed.onRemovalAttempt(Board.appointedCtx())
+  end
+end
+
+function Board.onLeaveContainer(container, obj)
+  if Board.isAppointedObject(obj) then
+    pcall(function() Wait.frames(function() Board.refreshAppointedButtons() end, 3) end)
+  end
+end
+
+function Board.onDrop(obj)
+  if Board.isAppointedObject(obj) then
+    st.appointed.lastPos = vec(safe(function() return obj.getPosition() end))
+    local r = vec(safe(function() return obj.getRotation() end))
+    st.appointed.lastRot = r and { 0, r.y, 0 } or nil
+  end
+end
+
+--- Everything at once (load, after a reset / fact unlock).
+function Board.syncAll(extra)
+  local rep = Board.syncLocations()
+  Board.syncAppointed(extra)
+  return rep
+end
+
+return Board
+
+end
+
 -- ===== control entry script =====
 -- THE STILL HOUR — control object entry script.
 -- Appended by pipeline/bundle_mod.py AFTER the inlined module table, so the
 -- local require() defined in the bundle preamble is in scope here. This is the
 -- code that actually runs on the control token in Tabletop Simulator.
+--
+-- It is the campaign's one state host (docs/INTEGRATION.md §2) and the board
+-- wiring: touchable Memory / Dissonance / Hour counters, the [static] chaos-bag
+-- adapter, the Appointed's card buttons, location flips/seals and the interlude
+-- buy panel. Rules live in src/StillHour/*; this file only routes clicks and
+-- table events into them. Every entry point is guarded so a vanilla (non-SCED)
+-- table, or a missing object, never raises a script error.
 
 local Constants     = require("StillHour/Constants")
 local CampaignState = require("StillHour/CampaignState")
@@ -1487,79 +2657,538 @@ local Appointed     = require("StillHour/Appointed")
 local Knowledge     = require("StillHour/Knowledge")
 local Locations     = require("StillHour/Locations")
 local Interlude     = require("StillHour/Interlude")
+local SCED          = require("StillHour/SCED")
+local ChaosBag      = require("StillHour/ChaosBag")
+local Board         = require("StillHour/Board")
 
--- A no-op chaos-bag adapter so the demo buttons never error before the real
--- SCED chaos-bag wiring is in place (Dissonance also tolerates bag == nil).
-local demoBag = { count = 0 }
-demoBag.setBaselineStatic = function(n) demoBag.count = n end
+local SAVE_VERSION = 2
+
+local function note(msg)
+  pcall(print, "[Still Hour] " .. tostring(msg))
+end
+
+local function announce(msg, tint)
+  local ok = pcall(broadcastToAll, tostring(msg), tint or { 0.95, 0.85, 0.6 })
+  if not ok then note(msg) end
+end
+
+--- Run fn; report (never raise) a Lua error.
+local function guarded(what, fn, ...)
+  local ok, res = pcall(fn, ...)
+  if not ok then
+    note("board wiring skipped (" .. what .. "): " .. tostring(res))
+    return nil
+  end
+  return res
+end
+
+-- The real chaos-bag adapter (SCED bag / table "Chaos Bag" / virtual).
+local bag = ChaosBag.new({ log = note })
+
+local mode = "play"             -- "play" | "interlude"
+local recollectionList = nil    -- cached {id, name, cost} for the buy panel
+
+-------------------------------------------------------------- board contexts --
+
+local function hourLog(h, name, msg)
+  note(string.format("Hour %d — %s: %s", h, name or "?", msg or ""))
+end
+
+local refreshControl  -- forward
+
+local function syncBoard()
+  guarded("Appointed", Board.syncAppointed, { log = hourLog })
+end
+
+--- The ctx the Hourglass/Appointed modules call back into.
+local function playCtx()
+  return Board.appointedCtx({
+    dissonance = Dissonance,
+    bag = bag,
+    log = hourLog,
+    addStatic = function(n) bag.addStatic(n) end,
+    removeStatic = function(n) bag.removeStatic(n) end,
+    onAppointedAdvance = function() end,        -- reconciled once, after the action
+    onReset = function()
+      announce("The Appointed Hour: the night ends. Resolve the reset, then click Reset Loop.")
+    end,
+    onFinaleAttemptable = function()
+      announce("The Appointed Hour: you may attempt the finale.")
+    end,
+  })
+end
+
+local function afterChange()
+  syncBoard()
+  refreshControl()
+end
+
+-------------------------------------------------------------------- actions --
+-- Shared by the buttons (click functions) and the runner API (Object.call).
+
+local function changeMemory(delta)
+  CampaignState.bankMemory(delta)
+end
+
+local function changeInvestigators(delta)
+  local n = CampaignState.constants().investigators + delta
+  CampaignState.setInvestigatorCount(math.max(1, math.min(4, n)))
+  Dissonance.syncBag(bag)
+end
+
+local function changeDissonance(delta)
+  local before = Appointed.stage()
+  if delta > 0 then
+    local info = Dissonance.raise(delta, bag)
+    if info.appointedStage > before then
+      announce("The Appointed draws nearer: " .. Appointed.stageName() .. ".")
+    end
+    if info.reachedReset then
+      announce("Dissonance reached the reset threshold. Resolve the reset, then click Reset Loop.",
+        { 1, 0.4, 0.4 })
+    end
+  else
+    Dissonance.reduce(-delta, bag)
+  end
+end
+
+local function changeHour(delta)
+  if delta > 0 then
+    Hourglass.advance(delta, playCtx())
+  else
+    Hourglass.rewind(-delta, playCtx())
+  end
+end
+
+local function advanceAppointedByCard()
+  Appointed.advanceByCard(playCtx())
+  announce("The Appointed's Approach advances: " .. Appointed.stageName() .. ".")
+end
+
+local function holdBack()
+  local s = Appointed.holdBack(playCtx())
+  announce("Held back: the Appointed is " .. Appointed.stageName() .. "; the Hourglass rewinds to Hour "
+    .. CampaignState.getHour() .. ".")
+  return s
+end
+
+local function hunt()
+  local moved = Appointed.hunt(playCtx())
+  if not Appointed.isHunter() then note("The Appointed is not hunting yet (" .. Appointed.stageName() .. ").") end
+  return moved
+end
+
+local function resetLoop()
+  CampaignState.reset()
+  bag.clearTemporary()
+  Dissonance.syncBag(bag)
+  note("The night folds. Loop reset: Memory/Knowledge/Years kept; Dissonance dropped to the scar.")
+end
+
+local function unlockFact(id)
+  local ok, newly = pcall(Knowledge.unlock, id)
+  if not ok then
+    note("unknown fact id: " .. tostring(id))
+    return nil
+  end
+  local rep = guarded("locations", Board.syncLocations) or {}
+  return { newly = newly, report = rep }
+end
+
+--------------------------------------------------------------- interlude --
+
+local function readRecollections()
+  local list, seen = {}, {}
+  local function consider(id, name, md)
+    if type(id) ~= "string" or seen[id] then return end
+    local cost = Interlude.recollectionCost(id) or (md and tonumber(md.memoryCost))
+    if cost == nil then return end
+    seen[id] = true
+    list[#list + 1] = { id = id, name = name ~= "" and name or id, cost = cost }
+  end
+  -- metadata first: any card on the table (or in a bag/deck) carrying memoryCost
+  guarded("recollection scan", function()
+    if type(getObjects) ~= "function" then return end
+    for _, o in ipairs(getObjects()) do
+      local t = o.type
+      if t == "Bag" or t == "Deck" then
+        for _, e in ipairs(o.getObjects() or {}) do
+          local ok, md = pcall(JSON.decode, e.gm_notes or "")
+          if ok and type(md) == "table" and md.memoryCost ~= nil then consider(md.id, e.name or "", md) end
+        end
+      elseif t == "Card" then
+        local ok, md = pcall(JSON.decode, o.getGMNotes() or "")
+        if ok and type(md) == "table" and md.memoryCost ~= nil then consider(md.id, o.getName(), md) end
+      end
+    end
+  end)
+  -- then the rules table (so the panel works with no cards on the table)
+  local ids = {}
+  for id in pairs(Interlude.RECOLLECTION_COST) do ids[#ids + 1] = id end
+  table.sort(ids)
+  for _, id in ipairs(ids) do consider(id, id, nil) end
+  table.sort(list, function(a, b) return a.name < b.name end)
+  return list
+end
+
+local function buyRecollection(id)
+  local ok = Interlude.buyRecollection(id)
+  local cost = Interlude.recollectionCost(id)
+  local name = id
+  for _, r in ipairs(recollectionList or {}) do if r.id == id then name = r.name end end
+  if ok then
+    announce(string.format("Bought %s for %d Memory (%d banked).", name, cost, CampaignState.getBankedMemory()))
+  else
+    note("Cannot buy " .. tostring(id) .. " (unknown, or not enough Memory).")
+  end
+  return ok
+end
+
+local function buyLevel(level)
+  local ok = Interlude.buyUpgrade(level)
+  if ok then
+    announce(string.format("Level-%d upgrade bought for %d Memory (%d banked).", level, level,
+      CampaignState.getBankedMemory()))
+  else
+    note("Not enough Memory for a level-" .. tostring(level) .. " upgrade.")
+  end
+  return ok
+end
+
+local function beginNextLoop()
+  Interlude.beginNextLoop()
+  Dissonance.syncBag(bag)
+  mode = "play"
+  announce("A new night begins. Memory capped at " .. CampaignState.constants().memoryCap .. ".")
+end
+
+------------------------------------------------------------ control buttons --
+
+local BTN_COLOR = { 0.15, 0.13, 0.2 }
+local BTN_FONT = { 0.95, 0.9, 0.7 }
+
+local function button(fn, label, x, z, w, tooltip, fs)
+  pcall(function()
+    self.createButton({
+      click_function = fn, function_owner = self, label = label, tooltip = tooltip or "",
+      position = { x, 0.3, z }, rotation = { 0, 0, 0 },
+      width = w or 620, height = 300, font_size = fs or 100,
+      color = BTN_COLOR, font_color = BTN_FONT,
+    })
+  end)
+end
+
+local function header(label, z)
+  pcall(function()
+    self.createButton({
+      click_function = "shNoop", function_owner = self, label = label,
+      position = { 0, 0.3, z }, rotation = { 0, 0, 0 },
+      width = 0, height = 0, font_size = 120, font_color = BTN_FONT,
+    })
+  end)
+end
+
+local PLUS_MINUS = "Left-click +1 · Right-click -1"
+
+local function drawPlay()
+  local c = CampaignState.constants()
+  header(string.format("THE STILL HOUR · loop %d", CampaignState.getLoopsCompleted() + 1), -2.3)
+  button("shClickMemory", string.format("Memory %d / %d", CampaignState.getBankedMemory(), c.memoryCap),
+    -0.9, -1.7, 1000, "Banked Memory. " .. PLUS_MINUS)
+  button("shClickInvestigators", "Investigators " .. c.investigators, 0.9, -1.7, 1000,
+    "Sets every threshold. " .. PLUS_MINUS .. (SCED.getInvestigatorCount()
+      and (" (SCED counter: " .. SCED.getInvestigatorCount() .. ")") or ""))
+  button("shClickDissonance", string.format("Dissonance %d / %d · %s", CampaignState.getDissonance(),
+    c.resetThreshold, CampaignState.band()), -0.9, -1.1, 1000, "Left-click raise · Right-click reduce")
+  local d = bag.describe()
+  button("shClickStatic", string.format("[static] %d (%s)", d.target, d.mode), 0.9, -1.1, 1000,
+    "Baseline + temporary [static] this bag should hold. Click to re-sync the chaos bag.")
+  local h = CampaignState.getHour()
+  button("shClickHour", string.format("Hour %d · %s", h, Hourglass.HOUR_NAMES[h] or "?"), -0.9, -0.5, 1000,
+    "Left-click advance (resolves the Hour) · Right-click rewind")
+  button("shClickAppointed", "Appointed: " .. Appointed.stageName(), 0.9, -0.5, 1000,
+    "Left-click: a card advances its Approach one stage (min Sensed). Hold Back is on its card.")
+  button("runStillHourTests", "Run Tests", -1.1, 1.4)
+  button("shStatus", "Status", -0.55, 1.4)
+  button("shSyncBoard", "Sync Board", 0.0, 1.4, 620, "Re-apply location faces/seals, the Appointed and the chaos bag.")
+  button("shReset", "Reset Loop", 0.55, 1.4)
+  button("shOpenInterlude", "Interlude", 1.1, 1.4, 620, "Spend Memory: Recollections and level-ups.")
+  button("shKnowledgeStatus", "Knowledge", 0.0, 2.0)
+end
+
+local function drawInterlude()
+  local c = CampaignState.constants()
+  header("INTERLUDE · spend Memory", -2.3)
+  button("shClickMemory", string.format("Memory %d / %d", CampaignState.getBankedMemory(), c.memoryCap),
+    0, -1.7, 1400, "Bank on-card Memory. " .. PLUS_MINUS)
+  recollectionList = readRecollections()
+  for i, r in ipairs(recollectionList) do
+    if i > 16 then break end
+    local col = (i - 1) % 2
+    local row = math.floor((i - 1) / 2)
+    button("shBuyRec" .. i, string.format("%s (%d)", r.name, r.cost),
+      col == 0 and -0.9 or 0.9, -1.1 + row * 0.55, 1000, "Buy this Recollection for " .. r.cost .. " Memory.", 80)
+  end
+  local rows = math.ceil(math.min(#recollectionList, 16) / 2)
+  local z = -1.1 + rows * 0.55 + 0.1
+  for lvl = 1, 5 do
+    button("shBuyLvl" .. lvl, "Lvl " .. lvl .. " (" .. lvl .. ")", -1.3 + (lvl - 1) * 0.65, z, 560,
+      "Level a card up to level " .. lvl .. " for " .. lvl .. " Memory.", 90)
+  end
+  button("shBeginNextLoop", "Begin Next Loop", -0.6, z + 0.6, 1000, "Cap Memory and start the next night.")
+  button("shCloseInterlude", "Back", 0.9, z + 0.6, 620)
+end
+
+refreshControl = function()
+  pcall(function() self.clearButtons() end)
+  if mode == "interlude" then drawInterlude() else drawPlay() end
+end
+
+-- Click handlers: click_function(obj, player_color, alt_click) (TTS createButton).
+function shNoop() end
+
+function shClickMemory(_, _, alt) guarded("memory", changeMemory, alt and -1 or 1) ; refreshControl() end
+function shClickInvestigators(_, _, alt) guarded("investigators", changeInvestigators, alt and -1 or 1) ; afterChange() end
+function shClickDissonance(_, _, alt) guarded("dissonance", changeDissonance, alt and -1 or 1) ; afterChange() end
+function shClickHour(_, _, alt) guarded("hour", changeHour, alt and -1 or 1) ; afterChange() end
+function shClickStatic() guarded("chaos bag", Dissonance.syncBag, bag) ; refreshControl() end
+function shClickAppointed(_, _, alt)
+  if alt then note("The Appointed: " .. Appointed.stageName()) return end
+  guarded("appointed", advanceAppointedByCard) ; afterChange()
+end
+function shAppointedInfo() note("The Appointed: " .. Appointed.stageName() .. " (stage " .. Appointed.stage() .. ")") end
+function shHoldBack() guarded("hold back", holdBack) ; afterChange() end
+function shHunt() guarded("hunt", hunt) ; afterChange() end
+function shSyncBoard()
+  local rep = guarded("sync", Board.syncAll, { log = hourLog }) or {}
+  guarded("chaos bag", Dissonance.syncBag, bag)
+  refreshControl()
+  note(string.format("Board synced: %d campaign location(s), %d flipped, %d sealed.",
+    rep.seen or 0, rep.flipped or 0, rep.sealed or 0))
+  return rep
+end
+function shOpenInterlude() mode = "interlude" ; refreshControl() end
+function shCloseInterlude() mode = "play" ; refreshControl() end
+function shBeginNextLoop() guarded("next loop", beginNextLoop) ; afterChange() end
+
+local function buyRecAt(i)
+  local r = recollectionList and recollectionList[i]
+  if r then guarded("buy", buyRecollection, r.id) end
+  refreshControl()
+end
+function shBuyRec1() buyRecAt(1) end
+function shBuyRec2() buyRecAt(2) end
+function shBuyRec3() buyRecAt(3) end
+function shBuyRec4() buyRecAt(4) end
+function shBuyRec5() buyRecAt(5) end
+function shBuyRec6() buyRecAt(6) end
+function shBuyRec7() buyRecAt(7) end
+function shBuyRec8() buyRecAt(8) end
+function shBuyRec9() buyRecAt(9) end
+function shBuyRec10() buyRecAt(10) end
+function shBuyRec11() buyRecAt(11) end
+function shBuyRec12() buyRecAt(12) end
+function shBuyRec13() buyRecAt(13) end
+function shBuyRec14() buyRecAt(14) end
+function shBuyRec15() buyRecAt(15) end
+function shBuyRec16() buyRecAt(16) end
+function shBuyLvl1() guarded("buy", buyLevel, 1) ; refreshControl() end
+function shBuyLvl2() guarded("buy", buyLevel, 2) ; refreshControl() end
+function shBuyLvl3() guarded("buy", buyLevel, 3) ; refreshControl() end
+function shBuyLvl4() guarded("buy", buyLevel, 4) ; refreshControl() end
+function shBuyLvl5() guarded("buy", buyLevel, 5) ; refreshControl() end
 
 -------------------------------------------------------------------- lifecycle --
 
 function onSave()
-  return CampaignState.serialize()          -- TTS global JSON.encode
+  return JSON.encode({
+    v = SAVE_VERSION,
+    campaign = CampaignState.raw(),
+    bag = bag.save(),
+    board = Board.save(),
+    mode = mode,
+  })
+end
+
+local function restore(saved)
+  if saved == nil or saved == "" then return end
+  local ok, blob = pcall(JSON.decode, saved)
+  if ok and type(blob) == "table" and blob.campaign ~= nil then
+    CampaignState.deserialize(JSON.encode(blob.campaign))
+    bag.load(blob.bag)
+    Board.load(blob.board)
+    mode = blob.mode == "interlude" and "interlude" or "play"
+  else
+    CampaignState.deserialize(saved)          -- v1: the bare CampaignState blob
+  end
 end
 
 function onLoad(saved)
-  CampaignState.deserialize(saved)          -- empty/nil -> fresh state
-  Dissonance.syncBag(demoBag)
-
-  -- row 1: play controls; row 2: interlude/knowledge demo (z offset)
-  local defs = {
-    { "runStillHourTests", "Run Tests",    -1.1, 1.4 },
-    { "shStatus",          "Status",       -0.55, 1.4 },
-    { "shAdvanceHour",     "Advance Hour",  0.0, 1.4 },
-    { "shRaiseDissonance", "+1 Dissonance", 0.55, 1.4 },
-    { "shReset",           "Reset Loop",    1.1, 1.4 },
-    { "shInterludeDemo",   "Interlude Demo", -0.55, 2.3 },
-    { "shKnowledgeStatus", "Knowledge",     0.55, 2.3 },
-  }
-  for _, d in ipairs(defs) do
-    self.createButton({
-      click_function = d[1], function_owner = self, label = d[2],
-      position = { d[3], 0.3, d[4] }, rotation = { 0, 0, 0 },
-      width = 620, height = 360, font_size = 110,
-      color = { 0.15, 0.13, 0.2 }, font_color = { 0.95, 0.9, 0.7 },
-    })
-  end
+  guarded("load", restore, saved)
+  Board.init(self, { log = note })
+  bag.count = bag.target()
+  refreshControl()
+  -- let the table settle (SCED's own objects load too) before touching it
+  local ok = pcall(function()
+    Wait.frames(function()
+      guarded("chaos bag", Dissonance.syncBag, bag)
+      guarded("board", Board.syncAll, { log = hourLog })
+      refreshControl()
+    end, 60)
+  end)
+  if not ok then guarded("chaos bag", Dissonance.syncBag, bag) end
   print("THE STILL HOUR control ready. Investigators = " ..
-    CampaignState.constants().investigators .. ". Click 'Run Tests' to verify the build.")
+    CampaignState.constants().investigators .. (SCED.isPresent() and " (SCED detected)" or "")
+    .. ". Click 'Run Tests' to verify the build.")
 end
 
------------------------------------------------------------------- play/console --
+---------------------------------------------------- table events (universal) --
+
+function onObjectLeaveContainer(container, obj)
+  guarded("reveal", function()
+    if bag.onLeave(container, obj) then
+      local info = Dissonance.onStaticRevealed(bag)
+      announce(string.format("[static] revealed: Dissonance %d (%s).", info.value, info.band))
+      if info.reachedReset then
+        announce("Dissonance reached the reset threshold. Resolve the reset, then click Reset Loop.",
+          { 1, 0.4, 0.4 })
+      end
+      afterChange()
+    end
+    Board.onLeaveContainer(container, obj)
+  end)
+end
+
+function onObjectEnterContainer(container, obj)
+  guarded("container", function()
+    bag.onEnter(container, obj)
+    Board.onEnterContainer(container, obj)
+  end)
+end
+
+function onObjectDestroy(obj)
+  if obj == self then return end
+  guarded("destroy", Board.onDestroy, obj)
+end
+
+function onObjectDrop(_, obj)
+  guarded("drop", Board.onDrop, obj)
+end
+
+function onObjectSpawn(obj)
+  -- SCED respawns the chaos bag when its difficulty is set; re-add [static].
+  if ChaosBag.isChaosBag(obj) then
+    pcall(function() Wait.frames(function() guarded("chaos bag", bag.reconcile) ; refreshControl() end, 30) end)
+  end
+end
+
+------------------------------------------------------ runner / console API --
+-- Object.call(name, param) passes one table; these return plain tables.
+
+function shApiState()
+  local c = CampaignState.constants()
+  return {
+    memory = CampaignState.getBankedMemory(), dissonance = CampaignState.getDissonance(),
+    band = CampaignState.band(), hour = CampaignState.getHour(), stage = Appointed.stage(),
+    investigators = c.investigators, loops = CampaignState.getLoopsCompleted(),
+    static = bag.describe(), sced = SCED.isPresent(), mode = mode,
+  }
+end
+
+function shApiCounter(p)
+  p = p or {}
+  local d = tonumber(p.delta) or 1
+  local fns = { memory = changeMemory, investigators = changeInvestigators,
+                dissonance = changeDissonance, hour = changeHour }
+  if p.name == "appointed" then
+    guarded("appointed", advanceAppointedByCard)
+  elseif fns[p.name] then
+    guarded(p.name, fns[p.name], d)
+  end
+  afterChange()
+  return shApiState()
+end
+
+function shApiHoldBack() local s = guarded("hold back", holdBack) ; afterChange() ; return s end
+function shApiHunt() local m = guarded("hunt", hunt) ; afterChange() ; return m end
+function shApiReset() guarded("reset", resetLoop) ; afterChange() ; return shApiState() end
+function shApiSyncBoard() return shSyncBoard() end
+function shApiUnlockFact(p) local r = unlockFact(p and p.id) ; refreshControl() ; return r end
+function shApiSnapshot() return onSave() end
+--- Put back the campaign (and [static] extras) from a shApiSnapshot blob. The
+-- board's own tracking (what it placed / flipped) stays live, so the objects
+-- are reconciled to the restored state rather than forgotten.
+function shApiRestore(p)
+  CampaignState.init(CampaignState.constants().investigators)
+  guarded("restore", function()
+    local blob = JSON.decode(p.blob)
+    CampaignState.deserialize(JSON.encode(blob.campaign))
+    bag.load(blob.bag)
+  end)
+  guarded("chaos bag", Dissonance.syncBag, bag)
+  afterChange()
+  return shApiState()
+end
+function shApiInterlude(p)
+  mode = (p and p.open == false) and "play" or "interlude"
+  refreshControl()
+  local out = {}
+  for i, r in ipairs(recollectionList or {}) do out[i] = { id = r.id, name = r.name, cost = r.cost } end
+  return out
+end
+function shApiBuy(p)
+  p = p or {}
+  local ok
+  if p.recollection then ok = buyRecollection(p.recollection) end
+  if p.level then ok = buyLevel(tonumber(p.level)) end
+  refreshControl()
+  return { ok = ok == true, memory = CampaignState.getBankedMemory() }
+end
+function shApiBeginNextLoop() guarded("next loop", beginNextLoop) ; afterChange() ; return shApiState() end
+
+------------------------------------------------------------------ console --
 
 function shStatus()
   local c = CampaignState.constants()
   print(string.format(
-    "STILL HOUR | loop %d | Memory %d/%d | Dissonance %d/%d (%s) | Hour %s | Appointed: %s | contest %d",
+    "STILL HOUR | loop %d | Memory %d/%d | Dissonance %d/%d (%s) | Hour %s | Appointed: %s | contest %d | [static] %d (%s)%s",
     CampaignState.getLoopsCompleted(), CampaignState.getBankedMemory(), c.memoryCap,
     CampaignState.getDissonance(), c.resetThreshold, CampaignState.band(),
-    Hourglass.HOUR_NAMES[CampaignState.getHour()] or "?", Appointed.stageName(), c.contestTarget))
+    Hourglass.HOUR_NAMES[CampaignState.getHour()] or "?", Appointed.stageName(), c.contestTarget,
+    bag.target(), bag.describe().mode, SCED.isPresent() and (" | SCED " .. tostring(SCED.version())) or ""))
 end
 
 function shAdvanceHour()
-  Hourglass.advance(1, { log = function(h, name, msg)
-    print(string.format("  Hour %d — %s: %s", h, name, msg))
-  end, dissonance = Dissonance, bag = demoBag, onReset = function() shReset() end })
+  guarded("hour", changeHour, 1)
+  afterChange()
   shStatus()
 end
 
 function shRaiseDissonance()
   local before = Appointed.stage()
-  local info = Dissonance.raise(1, demoBag)
+  local info = Dissonance.raise(1, bag)
   print("Dissonance -> " .. info.value .. " (" .. info.band .. ")" ..
     (info.appointedStage > before and ("  ** the Appointed advances to " .. Appointed.stageName() .. " **") or ""))
   if info.reachedReset then print("  Dissonance hit the reset threshold — the loop ends.") ; shReset() end
+  afterChange()
 end
 
 function shReset()
-  CampaignState.reset()
-  Dissonance.syncBag(demoBag)
-  print("The night folds. Loop reset — Memory/Knowledge/Years kept; Dissonance dropped to the scar.")
+  guarded("reset", resetLoop)
+  afterChange()
   shStatus()
 end
 
--- P7 demo: run an interlude for a 3-investigator party with sample conditions,
--- print the aging outcome per investigator, then cap and hand off to the loop.
+--- Console: unlock a Knowledge fact by id when a card or the guide says so,
+-- then re-apply location faces/seals. e.g. shUnlock("fact-id")
+function shUnlock(id)
+  local r = unlockFact(id)
+  if r then note("Fact recorded. Locations re-synced.") end
+  refreshControl()
+end
+
+-- P7 demo (console only — it mutates the campaign): age a sample party, bank
+-- Memory, and hand off to the loop.
 function shInterludeDemo()
   print("── Interlude ──")
   local entries = {
@@ -1576,28 +3205,31 @@ function shInterludeDemo()
   Interlude.bank(17)  -- sample on-card Memory banked this loop
   Interlude.beginNextLoop()
   print("  banked +17 Memory (capped to " .. CampaignState.getBankedMemory() .. "). "
-    .. "Buy Recollections with shBuy(\"sthr-longwayround\") etc.")
+    .. "Buy Recollections with the Interlude panel or shBuy(\"sthr-longwayround\").")
+  refreshControl()
 end
 
 function shBuy(cardId)
-  if Interlude.buyRecollection(cardId) then
-    print("Bought " .. cardId .. " for " .. Interlude.recollectionCost(cardId)
-      .. " Memory. Banked now " .. CampaignState.getBankedMemory() .. ".")
-  else
-    print("Cannot buy " .. tostring(cardId) .. " (unknown id or not enough Memory).")
-  end
+  buyRecollection(cardId)
+  refreshControl()
 end
 
--- P6 demo: report Act/finale gates and any location whose face has flipped.
+-- P6: report Act/finale gates and the campaign locations on the table.
 function shKnowledgeStatus()
   print(string.format("Knowledge: %d surface, %d deep. Act II %s. Finale %s.",
     Knowledge.surfaceKnownCount(), Knowledge.deepKnownCount(),
     Knowledge.actIIOpen() and "OPEN" or "closed",
     Knowledge.finaleAttemptable() and "ATTEMPTABLE" or (Knowledge.canAssembleFinale() and "assemblable" or "locked")))
-  for _, id in ipairs({ "lantern-room", "town-hall-steps", "flooded-crypt", "sealed-study" }) do
-    local d = Locations.describe(id)
-    print(string.format("  %-16s face=%s%s", d.name, d.face, d.sealed and " (SEALED)" or ""))
+  local locs = guarded("scan", Board.locationCards) or {}
+  local n = 0
+  for _, l in ipairs(locs) do
+    if l.locId then
+      n = n + 1
+      local d = Locations.describe(l.locId)
+      print(string.format("  %-22s face=%s%s", d.name, d.face, d.sealed and " (SEALED)" or ""))
+    end
   end
+  if n == 0 then print("  (no campaign location cards on the table)") end
 end
 
 --------------------------------------------------------------------- harness --
@@ -1609,6 +3241,8 @@ end
 
 function runStillHourTests()
   local P, F = 0, 0
+  -- the harness drives the real modules; keep the live campaign and put it back
+  local snapshot = CampaignState.serialize()
   print("──────── THE STILL HOUR — in-engine tests ────────")
 
   local c3 = Constants.forCount(3)
@@ -1626,6 +3260,12 @@ function runStillHourTests()
   local before = CampaignState.getDissonance(); Dissonance.onStaticRevealed(bag)
   P, F = check("[static] reveal raises Dissonance", CampaignState.getDissonance() == before + 1, P, F)
 
+  -- the real adapter with no chaos bag reachable degrades to a virtual count
+  local vbag = ChaosBag.new()
+  vbag.findBag = function() return nil end
+  vbag.setBaselineStatic(2); vbag.addStatic(1)
+  P, F = check("virtual [static] bag tracks baseline + temporary", vbag.count == 3 and vbag.target() == 3, P, F)
+
   -- P5: staged Approach via the clock, Hold Back, undefeatable.
   CampaignState.init(3)
   Hourglass.advance(4, {})  -- reach Hour V -> Sensed
@@ -1641,8 +3281,12 @@ function runStillHourTests()
   P, F = check("Hold Back drops one stage and rewinds one Hour",
     newStage == 2 and CampaignState.getHour() == hourBefore - 1, P, F)
   P, F = check("Appointed cannot be defeated", Appointed.attemptDefeat() == false, P, F)
+  local restored = false
+  Appointed.onRemovalAttempt({ returnToPlay = function() restored = true end })
+  P, F = check("removing a manifest Appointed puts it back", restored, P, F)
   CampaignState.init(3); CampaignState.advanceAppointed(1)
   P, F = check("Sensed figure deals no attack damage", Appointed.onAttack({}).damage == 0, P, F)
+  P, F = check("a Sensed figure does not hunt", Appointed.hunt({ moveTowardPrey = function() return true end }) == false, P, F)
 
   CampaignState.init(3)
   P, F = check("once-per-loop free at node A", LoopFlags.use("igetout:White") == true, P, F)
@@ -1694,6 +3338,9 @@ function runStillHourTests()
   P, F = check("Sealed Study sealed until both facts", Locations.isSealed("sealed-study"), P, F)
   CampaignState.unlockFact("what-the-almanac-hid"); CampaignState.unlockFact("the-vote-that-never-ends")
   P, F = check("Sealed Study opens with both facts", Locations.isOpen("sealed-study"), P, F)
+  P, F = check("location cards resolve by metadata id",
+    Locations.idForCard("sthr-loc-lanternroom") == "lantern-room" and Locations.idForCard("sthr-loc-well") == "the-well"
+    and Locations.idForCard("sthr-elias") == nil, P, F)
   CampaignState.init(3)
   CampaignState.unlockFact("the-lamp-was-never-lit"); CampaignState.unlockFact("the-thirteenth-toll")
   CampaignState.unlockFact("the-road-remembers")
@@ -1726,11 +3373,12 @@ function runStillHourTests()
   P, F = check("Interlude rejects unaffordable purchase", Interlude.buyRecollection("sthr-hourlearnedname") == false, P, F)
 
   print(string.format("──────── RESULT: %d passed, %d failed ────────", P, F))
-  broadcastToAll(string.format("Still Hour tests: %d passed, %d failed", P, F),
+  pcall(broadcastToAll, string.format("Still Hour tests: %d passed, %d failed", P, F),
     F == 0 and { 0.2, 1, 0.2 } or { 1, 0.3, 0.3 })
-  -- Restore a clean, freshly-loaded state for play after testing.
+  -- Put the live campaign back exactly as it was before testing.
   CampaignState.init(CampaignState.constants().investigators)
-  Dissonance.syncBag(demoBag)
+  CampaignState.deserialize(snapshot)
+  refreshControl()
   -- returned to Object.call() so automated runs (tools/tts_relay) read the tally
   return { passed = P, failed = F }
 end

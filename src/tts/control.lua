@@ -2,6 +2,13 @@
 -- Appended by pipeline/bundle_mod.py AFTER the inlined module table, so the
 -- local require() defined in the bundle preamble is in scope here. This is the
 -- code that actually runs on the control token in Tabletop Simulator.
+--
+-- It is the campaign's one state host (docs/INTEGRATION.md §2) and the board
+-- wiring: touchable Memory / Dissonance / Hour counters, the [static] chaos-bag
+-- adapter, the Appointed's card buttons, location flips/seals and the interlude
+-- buy panel. Rules live in src/StillHour/*; this file only routes clicks and
+-- table events into them. Every entry point is guarded so a vanilla (non-SCED)
+-- table, or a missing object, never raises a script error.
 
 local Constants     = require("StillHour/Constants")
 local CampaignState = require("StillHour/CampaignState")
@@ -13,79 +20,538 @@ local Appointed     = require("StillHour/Appointed")
 local Knowledge     = require("StillHour/Knowledge")
 local Locations     = require("StillHour/Locations")
 local Interlude     = require("StillHour/Interlude")
+local SCED          = require("StillHour/SCED")
+local ChaosBag      = require("StillHour/ChaosBag")
+local Board         = require("StillHour/Board")
 
--- A no-op chaos-bag adapter so the demo buttons never error before the real
--- SCED chaos-bag wiring is in place (Dissonance also tolerates bag == nil).
-local demoBag = { count = 0 }
-demoBag.setBaselineStatic = function(n) demoBag.count = n end
+local SAVE_VERSION = 2
+
+local function note(msg)
+  pcall(print, "[Still Hour] " .. tostring(msg))
+end
+
+local function announce(msg, tint)
+  local ok = pcall(broadcastToAll, tostring(msg), tint or { 0.95, 0.85, 0.6 })
+  if not ok then note(msg) end
+end
+
+--- Run fn; report (never raise) a Lua error.
+local function guarded(what, fn, ...)
+  local ok, res = pcall(fn, ...)
+  if not ok then
+    note("board wiring skipped (" .. what .. "): " .. tostring(res))
+    return nil
+  end
+  return res
+end
+
+-- The real chaos-bag adapter (SCED bag / table "Chaos Bag" / virtual).
+local bag = ChaosBag.new({ log = note })
+
+local mode = "play"             -- "play" | "interlude"
+local recollectionList = nil    -- cached {id, name, cost} for the buy panel
+
+-------------------------------------------------------------- board contexts --
+
+local function hourLog(h, name, msg)
+  note(string.format("Hour %d — %s: %s", h, name or "?", msg or ""))
+end
+
+local refreshControl  -- forward
+
+local function syncBoard()
+  guarded("Appointed", Board.syncAppointed, { log = hourLog })
+end
+
+--- The ctx the Hourglass/Appointed modules call back into.
+local function playCtx()
+  return Board.appointedCtx({
+    dissonance = Dissonance,
+    bag = bag,
+    log = hourLog,
+    addStatic = function(n) bag.addStatic(n) end,
+    removeStatic = function(n) bag.removeStatic(n) end,
+    onAppointedAdvance = function() end,        -- reconciled once, after the action
+    onReset = function()
+      announce("The Appointed Hour: the night ends. Resolve the reset, then click Reset Loop.")
+    end,
+    onFinaleAttemptable = function()
+      announce("The Appointed Hour: you may attempt the finale.")
+    end,
+  })
+end
+
+local function afterChange()
+  syncBoard()
+  refreshControl()
+end
+
+-------------------------------------------------------------------- actions --
+-- Shared by the buttons (click functions) and the runner API (Object.call).
+
+local function changeMemory(delta)
+  CampaignState.bankMemory(delta)
+end
+
+local function changeInvestigators(delta)
+  local n = CampaignState.constants().investigators + delta
+  CampaignState.setInvestigatorCount(math.max(1, math.min(4, n)))
+  Dissonance.syncBag(bag)
+end
+
+local function changeDissonance(delta)
+  local before = Appointed.stage()
+  if delta > 0 then
+    local info = Dissonance.raise(delta, bag)
+    if info.appointedStage > before then
+      announce("The Appointed draws nearer: " .. Appointed.stageName() .. ".")
+    end
+    if info.reachedReset then
+      announce("Dissonance reached the reset threshold. Resolve the reset, then click Reset Loop.",
+        { 1, 0.4, 0.4 })
+    end
+  else
+    Dissonance.reduce(-delta, bag)
+  end
+end
+
+local function changeHour(delta)
+  if delta > 0 then
+    Hourglass.advance(delta, playCtx())
+  else
+    Hourglass.rewind(-delta, playCtx())
+  end
+end
+
+local function advanceAppointedByCard()
+  Appointed.advanceByCard(playCtx())
+  announce("The Appointed's Approach advances: " .. Appointed.stageName() .. ".")
+end
+
+local function holdBack()
+  local s = Appointed.holdBack(playCtx())
+  announce("Held back: the Appointed is " .. Appointed.stageName() .. "; the Hourglass rewinds to Hour "
+    .. CampaignState.getHour() .. ".")
+  return s
+end
+
+local function hunt()
+  local moved = Appointed.hunt(playCtx())
+  if not Appointed.isHunter() then note("The Appointed is not hunting yet (" .. Appointed.stageName() .. ").") end
+  return moved
+end
+
+local function resetLoop()
+  CampaignState.reset()
+  bag.clearTemporary()
+  Dissonance.syncBag(bag)
+  note("The night folds. Loop reset: Memory/Knowledge/Years kept; Dissonance dropped to the scar.")
+end
+
+local function unlockFact(id)
+  local ok, newly = pcall(Knowledge.unlock, id)
+  if not ok then
+    note("unknown fact id: " .. tostring(id))
+    return nil
+  end
+  local rep = guarded("locations", Board.syncLocations) or {}
+  return { newly = newly, report = rep }
+end
+
+--------------------------------------------------------------- interlude --
+
+local function readRecollections()
+  local list, seen = {}, {}
+  local function consider(id, name, md)
+    if type(id) ~= "string" or seen[id] then return end
+    local cost = Interlude.recollectionCost(id) or (md and tonumber(md.memoryCost))
+    if cost == nil then return end
+    seen[id] = true
+    list[#list + 1] = { id = id, name = name ~= "" and name or id, cost = cost }
+  end
+  -- metadata first: any card on the table (or in a bag/deck) carrying memoryCost
+  guarded("recollection scan", function()
+    if type(getObjects) ~= "function" then return end
+    for _, o in ipairs(getObjects()) do
+      local t = o.type
+      if t == "Bag" or t == "Deck" then
+        for _, e in ipairs(o.getObjects() or {}) do
+          local ok, md = pcall(JSON.decode, e.gm_notes or "")
+          if ok and type(md) == "table" and md.memoryCost ~= nil then consider(md.id, e.name or "", md) end
+        end
+      elseif t == "Card" then
+        local ok, md = pcall(JSON.decode, o.getGMNotes() or "")
+        if ok and type(md) == "table" and md.memoryCost ~= nil then consider(md.id, o.getName(), md) end
+      end
+    end
+  end)
+  -- then the rules table (so the panel works with no cards on the table)
+  local ids = {}
+  for id in pairs(Interlude.RECOLLECTION_COST) do ids[#ids + 1] = id end
+  table.sort(ids)
+  for _, id in ipairs(ids) do consider(id, id, nil) end
+  table.sort(list, function(a, b) return a.name < b.name end)
+  return list
+end
+
+local function buyRecollection(id)
+  local ok = Interlude.buyRecollection(id)
+  local cost = Interlude.recollectionCost(id)
+  local name = id
+  for _, r in ipairs(recollectionList or {}) do if r.id == id then name = r.name end end
+  if ok then
+    announce(string.format("Bought %s for %d Memory (%d banked).", name, cost, CampaignState.getBankedMemory()))
+  else
+    note("Cannot buy " .. tostring(id) .. " (unknown, or not enough Memory).")
+  end
+  return ok
+end
+
+local function buyLevel(level)
+  local ok = Interlude.buyUpgrade(level)
+  if ok then
+    announce(string.format("Level-%d upgrade bought for %d Memory (%d banked).", level, level,
+      CampaignState.getBankedMemory()))
+  else
+    note("Not enough Memory for a level-" .. tostring(level) .. " upgrade.")
+  end
+  return ok
+end
+
+local function beginNextLoop()
+  Interlude.beginNextLoop()
+  Dissonance.syncBag(bag)
+  mode = "play"
+  announce("A new night begins. Memory capped at " .. CampaignState.constants().memoryCap .. ".")
+end
+
+------------------------------------------------------------ control buttons --
+
+local BTN_COLOR = { 0.15, 0.13, 0.2 }
+local BTN_FONT = { 0.95, 0.9, 0.7 }
+
+local function button(fn, label, x, z, w, tooltip, fs)
+  pcall(function()
+    self.createButton({
+      click_function = fn, function_owner = self, label = label, tooltip = tooltip or "",
+      position = { x, 0.3, z }, rotation = { 0, 0, 0 },
+      width = w or 620, height = 300, font_size = fs or 100,
+      color = BTN_COLOR, font_color = BTN_FONT,
+    })
+  end)
+end
+
+local function header(label, z)
+  pcall(function()
+    self.createButton({
+      click_function = "shNoop", function_owner = self, label = label,
+      position = { 0, 0.3, z }, rotation = { 0, 0, 0 },
+      width = 0, height = 0, font_size = 120, font_color = BTN_FONT,
+    })
+  end)
+end
+
+local PLUS_MINUS = "Left-click +1 · Right-click -1"
+
+local function drawPlay()
+  local c = CampaignState.constants()
+  header(string.format("THE STILL HOUR · loop %d", CampaignState.getLoopsCompleted() + 1), -2.3)
+  button("shClickMemory", string.format("Memory %d / %d", CampaignState.getBankedMemory(), c.memoryCap),
+    -0.9, -1.7, 1000, "Banked Memory. " .. PLUS_MINUS)
+  button("shClickInvestigators", "Investigators " .. c.investigators, 0.9, -1.7, 1000,
+    "Sets every threshold. " .. PLUS_MINUS .. (SCED.getInvestigatorCount()
+      and (" (SCED counter: " .. SCED.getInvestigatorCount() .. ")") or ""))
+  button("shClickDissonance", string.format("Dissonance %d / %d · %s", CampaignState.getDissonance(),
+    c.resetThreshold, CampaignState.band()), -0.9, -1.1, 1000, "Left-click raise · Right-click reduce")
+  local d = bag.describe()
+  button("shClickStatic", string.format("[static] %d (%s)", d.target, d.mode), 0.9, -1.1, 1000,
+    "Baseline + temporary [static] this bag should hold. Click to re-sync the chaos bag.")
+  local h = CampaignState.getHour()
+  button("shClickHour", string.format("Hour %d · %s", h, Hourglass.HOUR_NAMES[h] or "?"), -0.9, -0.5, 1000,
+    "Left-click advance (resolves the Hour) · Right-click rewind")
+  button("shClickAppointed", "Appointed: " .. Appointed.stageName(), 0.9, -0.5, 1000,
+    "Left-click: a card advances its Approach one stage (min Sensed). Hold Back is on its card.")
+  button("runStillHourTests", "Run Tests", -1.1, 1.4)
+  button("shStatus", "Status", -0.55, 1.4)
+  button("shSyncBoard", "Sync Board", 0.0, 1.4, 620, "Re-apply location faces/seals, the Appointed and the chaos bag.")
+  button("shReset", "Reset Loop", 0.55, 1.4)
+  button("shOpenInterlude", "Interlude", 1.1, 1.4, 620, "Spend Memory: Recollections and level-ups.")
+  button("shKnowledgeStatus", "Knowledge", 0.0, 2.0)
+end
+
+local function drawInterlude()
+  local c = CampaignState.constants()
+  header("INTERLUDE · spend Memory", -2.3)
+  button("shClickMemory", string.format("Memory %d / %d", CampaignState.getBankedMemory(), c.memoryCap),
+    0, -1.7, 1400, "Bank on-card Memory. " .. PLUS_MINUS)
+  recollectionList = readRecollections()
+  for i, r in ipairs(recollectionList) do
+    if i > 16 then break end
+    local col = (i - 1) % 2
+    local row = math.floor((i - 1) / 2)
+    button("shBuyRec" .. i, string.format("%s (%d)", r.name, r.cost),
+      col == 0 and -0.9 or 0.9, -1.1 + row * 0.55, 1000, "Buy this Recollection for " .. r.cost .. " Memory.", 80)
+  end
+  local rows = math.ceil(math.min(#recollectionList, 16) / 2)
+  local z = -1.1 + rows * 0.55 + 0.1
+  for lvl = 1, 5 do
+    button("shBuyLvl" .. lvl, "Lvl " .. lvl .. " (" .. lvl .. ")", -1.3 + (lvl - 1) * 0.65, z, 560,
+      "Level a card up to level " .. lvl .. " for " .. lvl .. " Memory.", 90)
+  end
+  button("shBeginNextLoop", "Begin Next Loop", -0.6, z + 0.6, 1000, "Cap Memory and start the next night.")
+  button("shCloseInterlude", "Back", 0.9, z + 0.6, 620)
+end
+
+refreshControl = function()
+  pcall(function() self.clearButtons() end)
+  if mode == "interlude" then drawInterlude() else drawPlay() end
+end
+
+-- Click handlers: click_function(obj, player_color, alt_click) (TTS createButton).
+function shNoop() end
+
+function shClickMemory(_, _, alt) guarded("memory", changeMemory, alt and -1 or 1) ; refreshControl() end
+function shClickInvestigators(_, _, alt) guarded("investigators", changeInvestigators, alt and -1 or 1) ; afterChange() end
+function shClickDissonance(_, _, alt) guarded("dissonance", changeDissonance, alt and -1 or 1) ; afterChange() end
+function shClickHour(_, _, alt) guarded("hour", changeHour, alt and -1 or 1) ; afterChange() end
+function shClickStatic() guarded("chaos bag", Dissonance.syncBag, bag) ; refreshControl() end
+function shClickAppointed(_, _, alt)
+  if alt then note("The Appointed: " .. Appointed.stageName()) return end
+  guarded("appointed", advanceAppointedByCard) ; afterChange()
+end
+function shAppointedInfo() note("The Appointed: " .. Appointed.stageName() .. " (stage " .. Appointed.stage() .. ")") end
+function shHoldBack() guarded("hold back", holdBack) ; afterChange() end
+function shHunt() guarded("hunt", hunt) ; afterChange() end
+function shSyncBoard()
+  local rep = guarded("sync", Board.syncAll, { log = hourLog }) or {}
+  guarded("chaos bag", Dissonance.syncBag, bag)
+  refreshControl()
+  note(string.format("Board synced: %d campaign location(s), %d flipped, %d sealed.",
+    rep.seen or 0, rep.flipped or 0, rep.sealed or 0))
+  return rep
+end
+function shOpenInterlude() mode = "interlude" ; refreshControl() end
+function shCloseInterlude() mode = "play" ; refreshControl() end
+function shBeginNextLoop() guarded("next loop", beginNextLoop) ; afterChange() end
+
+local function buyRecAt(i)
+  local r = recollectionList and recollectionList[i]
+  if r then guarded("buy", buyRecollection, r.id) end
+  refreshControl()
+end
+function shBuyRec1() buyRecAt(1) end
+function shBuyRec2() buyRecAt(2) end
+function shBuyRec3() buyRecAt(3) end
+function shBuyRec4() buyRecAt(4) end
+function shBuyRec5() buyRecAt(5) end
+function shBuyRec6() buyRecAt(6) end
+function shBuyRec7() buyRecAt(7) end
+function shBuyRec8() buyRecAt(8) end
+function shBuyRec9() buyRecAt(9) end
+function shBuyRec10() buyRecAt(10) end
+function shBuyRec11() buyRecAt(11) end
+function shBuyRec12() buyRecAt(12) end
+function shBuyRec13() buyRecAt(13) end
+function shBuyRec14() buyRecAt(14) end
+function shBuyRec15() buyRecAt(15) end
+function shBuyRec16() buyRecAt(16) end
+function shBuyLvl1() guarded("buy", buyLevel, 1) ; refreshControl() end
+function shBuyLvl2() guarded("buy", buyLevel, 2) ; refreshControl() end
+function shBuyLvl3() guarded("buy", buyLevel, 3) ; refreshControl() end
+function shBuyLvl4() guarded("buy", buyLevel, 4) ; refreshControl() end
+function shBuyLvl5() guarded("buy", buyLevel, 5) ; refreshControl() end
 
 -------------------------------------------------------------------- lifecycle --
 
 function onSave()
-  return CampaignState.serialize()          -- TTS global JSON.encode
+  return JSON.encode({
+    v = SAVE_VERSION,
+    campaign = CampaignState.raw(),
+    bag = bag.save(),
+    board = Board.save(),
+    mode = mode,
+  })
+end
+
+local function restore(saved)
+  if saved == nil or saved == "" then return end
+  local ok, blob = pcall(JSON.decode, saved)
+  if ok and type(blob) == "table" and blob.campaign ~= nil then
+    CampaignState.deserialize(JSON.encode(blob.campaign))
+    bag.load(blob.bag)
+    Board.load(blob.board)
+    mode = blob.mode == "interlude" and "interlude" or "play"
+  else
+    CampaignState.deserialize(saved)          -- v1: the bare CampaignState blob
+  end
 end
 
 function onLoad(saved)
-  CampaignState.deserialize(saved)          -- empty/nil -> fresh state
-  Dissonance.syncBag(demoBag)
-
-  -- row 1: play controls; row 2: interlude/knowledge demo (z offset)
-  local defs = {
-    { "runStillHourTests", "Run Tests",    -1.1, 1.4 },
-    { "shStatus",          "Status",       -0.55, 1.4 },
-    { "shAdvanceHour",     "Advance Hour",  0.0, 1.4 },
-    { "shRaiseDissonance", "+1 Dissonance", 0.55, 1.4 },
-    { "shReset",           "Reset Loop",    1.1, 1.4 },
-    { "shInterludeDemo",   "Interlude Demo", -0.55, 2.3 },
-    { "shKnowledgeStatus", "Knowledge",     0.55, 2.3 },
-  }
-  for _, d in ipairs(defs) do
-    self.createButton({
-      click_function = d[1], function_owner = self, label = d[2],
-      position = { d[3], 0.3, d[4] }, rotation = { 0, 0, 0 },
-      width = 620, height = 360, font_size = 110,
-      color = { 0.15, 0.13, 0.2 }, font_color = { 0.95, 0.9, 0.7 },
-    })
-  end
+  guarded("load", restore, saved)
+  Board.init(self, { log = note })
+  bag.count = bag.target()
+  refreshControl()
+  -- let the table settle (SCED's own objects load too) before touching it
+  local ok = pcall(function()
+    Wait.frames(function()
+      guarded("chaos bag", Dissonance.syncBag, bag)
+      guarded("board", Board.syncAll, { log = hourLog })
+      refreshControl()
+    end, 60)
+  end)
+  if not ok then guarded("chaos bag", Dissonance.syncBag, bag) end
   print("THE STILL HOUR control ready. Investigators = " ..
-    CampaignState.constants().investigators .. ". Click 'Run Tests' to verify the build.")
+    CampaignState.constants().investigators .. (SCED.isPresent() and " (SCED detected)" or "")
+    .. ". Click 'Run Tests' to verify the build.")
 end
 
------------------------------------------------------------------- play/console --
+---------------------------------------------------- table events (universal) --
+
+function onObjectLeaveContainer(container, obj)
+  guarded("reveal", function()
+    if bag.onLeave(container, obj) then
+      local info = Dissonance.onStaticRevealed(bag)
+      announce(string.format("[static] revealed: Dissonance %d (%s).", info.value, info.band))
+      if info.reachedReset then
+        announce("Dissonance reached the reset threshold. Resolve the reset, then click Reset Loop.",
+          { 1, 0.4, 0.4 })
+      end
+      afterChange()
+    end
+    Board.onLeaveContainer(container, obj)
+  end)
+end
+
+function onObjectEnterContainer(container, obj)
+  guarded("container", function()
+    bag.onEnter(container, obj)
+    Board.onEnterContainer(container, obj)
+  end)
+end
+
+function onObjectDestroy(obj)
+  if obj == self then return end
+  guarded("destroy", Board.onDestroy, obj)
+end
+
+function onObjectDrop(_, obj)
+  guarded("drop", Board.onDrop, obj)
+end
+
+function onObjectSpawn(obj)
+  -- SCED respawns the chaos bag when its difficulty is set; re-add [static].
+  if ChaosBag.isChaosBag(obj) then
+    pcall(function() Wait.frames(function() guarded("chaos bag", bag.reconcile) ; refreshControl() end, 30) end)
+  end
+end
+
+------------------------------------------------------ runner / console API --
+-- Object.call(name, param) passes one table; these return plain tables.
+
+function shApiState()
+  local c = CampaignState.constants()
+  return {
+    memory = CampaignState.getBankedMemory(), dissonance = CampaignState.getDissonance(),
+    band = CampaignState.band(), hour = CampaignState.getHour(), stage = Appointed.stage(),
+    investigators = c.investigators, loops = CampaignState.getLoopsCompleted(),
+    static = bag.describe(), sced = SCED.isPresent(), mode = mode,
+  }
+end
+
+function shApiCounter(p)
+  p = p or {}
+  local d = tonumber(p.delta) or 1
+  local fns = { memory = changeMemory, investigators = changeInvestigators,
+                dissonance = changeDissonance, hour = changeHour }
+  if p.name == "appointed" then
+    guarded("appointed", advanceAppointedByCard)
+  elseif fns[p.name] then
+    guarded(p.name, fns[p.name], d)
+  end
+  afterChange()
+  return shApiState()
+end
+
+function shApiHoldBack() local s = guarded("hold back", holdBack) ; afterChange() ; return s end
+function shApiHunt() local m = guarded("hunt", hunt) ; afterChange() ; return m end
+function shApiReset() guarded("reset", resetLoop) ; afterChange() ; return shApiState() end
+function shApiSyncBoard() return shSyncBoard() end
+function shApiUnlockFact(p) local r = unlockFact(p and p.id) ; refreshControl() ; return r end
+function shApiSnapshot() return onSave() end
+--- Put back the campaign (and [static] extras) from a shApiSnapshot blob. The
+-- board's own tracking (what it placed / flipped) stays live, so the objects
+-- are reconciled to the restored state rather than forgotten.
+function shApiRestore(p)
+  CampaignState.init(CampaignState.constants().investigators)
+  guarded("restore", function()
+    local blob = JSON.decode(p.blob)
+    CampaignState.deserialize(JSON.encode(blob.campaign))
+    bag.load(blob.bag)
+  end)
+  guarded("chaos bag", Dissonance.syncBag, bag)
+  afterChange()
+  return shApiState()
+end
+function shApiInterlude(p)
+  mode = (p and p.open == false) and "play" or "interlude"
+  refreshControl()
+  local out = {}
+  for i, r in ipairs(recollectionList or {}) do out[i] = { id = r.id, name = r.name, cost = r.cost } end
+  return out
+end
+function shApiBuy(p)
+  p = p or {}
+  local ok
+  if p.recollection then ok = buyRecollection(p.recollection) end
+  if p.level then ok = buyLevel(tonumber(p.level)) end
+  refreshControl()
+  return { ok = ok == true, memory = CampaignState.getBankedMemory() }
+end
+function shApiBeginNextLoop() guarded("next loop", beginNextLoop) ; afterChange() ; return shApiState() end
+
+------------------------------------------------------------------ console --
 
 function shStatus()
   local c = CampaignState.constants()
   print(string.format(
-    "STILL HOUR | loop %d | Memory %d/%d | Dissonance %d/%d (%s) | Hour %s | Appointed: %s | contest %d",
+    "STILL HOUR | loop %d | Memory %d/%d | Dissonance %d/%d (%s) | Hour %s | Appointed: %s | contest %d | [static] %d (%s)%s",
     CampaignState.getLoopsCompleted(), CampaignState.getBankedMemory(), c.memoryCap,
     CampaignState.getDissonance(), c.resetThreshold, CampaignState.band(),
-    Hourglass.HOUR_NAMES[CampaignState.getHour()] or "?", Appointed.stageName(), c.contestTarget))
+    Hourglass.HOUR_NAMES[CampaignState.getHour()] or "?", Appointed.stageName(), c.contestTarget,
+    bag.target(), bag.describe().mode, SCED.isPresent() and (" | SCED " .. tostring(SCED.version())) or ""))
 end
 
 function shAdvanceHour()
-  Hourglass.advance(1, { log = function(h, name, msg)
-    print(string.format("  Hour %d — %s: %s", h, name, msg))
-  end, dissonance = Dissonance, bag = demoBag, onReset = function() shReset() end })
+  guarded("hour", changeHour, 1)
+  afterChange()
   shStatus()
 end
 
 function shRaiseDissonance()
   local before = Appointed.stage()
-  local info = Dissonance.raise(1, demoBag)
+  local info = Dissonance.raise(1, bag)
   print("Dissonance -> " .. info.value .. " (" .. info.band .. ")" ..
     (info.appointedStage > before and ("  ** the Appointed advances to " .. Appointed.stageName() .. " **") or ""))
   if info.reachedReset then print("  Dissonance hit the reset threshold — the loop ends.") ; shReset() end
+  afterChange()
 end
 
 function shReset()
-  CampaignState.reset()
-  Dissonance.syncBag(demoBag)
-  print("The night folds. Loop reset — Memory/Knowledge/Years kept; Dissonance dropped to the scar.")
+  guarded("reset", resetLoop)
+  afterChange()
   shStatus()
 end
 
--- P7 demo: run an interlude for a 3-investigator party with sample conditions,
--- print the aging outcome per investigator, then cap and hand off to the loop.
+--- Console: unlock a Knowledge fact by id when a card or the guide says so,
+-- then re-apply location faces/seals. e.g. shUnlock("fact-id")
+function shUnlock(id)
+  local r = unlockFact(id)
+  if r then note("Fact recorded. Locations re-synced.") end
+  refreshControl()
+end
+
+-- P7 demo (console only — it mutates the campaign): age a sample party, bank
+-- Memory, and hand off to the loop.
 function shInterludeDemo()
   print("── Interlude ──")
   local entries = {
@@ -102,28 +568,31 @@ function shInterludeDemo()
   Interlude.bank(17)  -- sample on-card Memory banked this loop
   Interlude.beginNextLoop()
   print("  banked +17 Memory (capped to " .. CampaignState.getBankedMemory() .. "). "
-    .. "Buy Recollections with shBuy(\"sthr-longwayround\") etc.")
+    .. "Buy Recollections with the Interlude panel or shBuy(\"sthr-longwayround\").")
+  refreshControl()
 end
 
 function shBuy(cardId)
-  if Interlude.buyRecollection(cardId) then
-    print("Bought " .. cardId .. " for " .. Interlude.recollectionCost(cardId)
-      .. " Memory. Banked now " .. CampaignState.getBankedMemory() .. ".")
-  else
-    print("Cannot buy " .. tostring(cardId) .. " (unknown id or not enough Memory).")
-  end
+  buyRecollection(cardId)
+  refreshControl()
 end
 
--- P6 demo: report Act/finale gates and any location whose face has flipped.
+-- P6: report Act/finale gates and the campaign locations on the table.
 function shKnowledgeStatus()
   print(string.format("Knowledge: %d surface, %d deep. Act II %s. Finale %s.",
     Knowledge.surfaceKnownCount(), Knowledge.deepKnownCount(),
     Knowledge.actIIOpen() and "OPEN" or "closed",
     Knowledge.finaleAttemptable() and "ATTEMPTABLE" or (Knowledge.canAssembleFinale() and "assemblable" or "locked")))
-  for _, id in ipairs({ "lantern-room", "town-hall-steps", "flooded-crypt", "sealed-study" }) do
-    local d = Locations.describe(id)
-    print(string.format("  %-16s face=%s%s", d.name, d.face, d.sealed and " (SEALED)" or ""))
+  local locs = guarded("scan", Board.locationCards) or {}
+  local n = 0
+  for _, l in ipairs(locs) do
+    if l.locId then
+      n = n + 1
+      local d = Locations.describe(l.locId)
+      print(string.format("  %-22s face=%s%s", d.name, d.face, d.sealed and " (SEALED)" or ""))
+    end
   end
+  if n == 0 then print("  (no campaign location cards on the table)") end
 end
 
 --------------------------------------------------------------------- harness --
@@ -135,6 +604,8 @@ end
 
 function runStillHourTests()
   local P, F = 0, 0
+  -- the harness drives the real modules; keep the live campaign and put it back
+  local snapshot = CampaignState.serialize()
   print("──────── THE STILL HOUR — in-engine tests ────────")
 
   local c3 = Constants.forCount(3)
@@ -152,6 +623,12 @@ function runStillHourTests()
   local before = CampaignState.getDissonance(); Dissonance.onStaticRevealed(bag)
   P, F = check("[static] reveal raises Dissonance", CampaignState.getDissonance() == before + 1, P, F)
 
+  -- the real adapter with no chaos bag reachable degrades to a virtual count
+  local vbag = ChaosBag.new()
+  vbag.findBag = function() return nil end
+  vbag.setBaselineStatic(2); vbag.addStatic(1)
+  P, F = check("virtual [static] bag tracks baseline + temporary", vbag.count == 3 and vbag.target() == 3, P, F)
+
   -- P5: staged Approach via the clock, Hold Back, undefeatable.
   CampaignState.init(3)
   Hourglass.advance(4, {})  -- reach Hour V -> Sensed
@@ -167,8 +644,12 @@ function runStillHourTests()
   P, F = check("Hold Back drops one stage and rewinds one Hour",
     newStage == 2 and CampaignState.getHour() == hourBefore - 1, P, F)
   P, F = check("Appointed cannot be defeated", Appointed.attemptDefeat() == false, P, F)
+  local restored = false
+  Appointed.onRemovalAttempt({ returnToPlay = function() restored = true end })
+  P, F = check("removing a manifest Appointed puts it back", restored, P, F)
   CampaignState.init(3); CampaignState.advanceAppointed(1)
   P, F = check("Sensed figure deals no attack damage", Appointed.onAttack({}).damage == 0, P, F)
+  P, F = check("a Sensed figure does not hunt", Appointed.hunt({ moveTowardPrey = function() return true end }) == false, P, F)
 
   CampaignState.init(3)
   P, F = check("once-per-loop free at node A", LoopFlags.use("igetout:White") == true, P, F)
@@ -220,6 +701,9 @@ function runStillHourTests()
   P, F = check("Sealed Study sealed until both facts", Locations.isSealed("sealed-study"), P, F)
   CampaignState.unlockFact("what-the-almanac-hid"); CampaignState.unlockFact("the-vote-that-never-ends")
   P, F = check("Sealed Study opens with both facts", Locations.isOpen("sealed-study"), P, F)
+  P, F = check("location cards resolve by metadata id",
+    Locations.idForCard("sthr-loc-lanternroom") == "lantern-room" and Locations.idForCard("sthr-loc-well") == "the-well"
+    and Locations.idForCard("sthr-elias") == nil, P, F)
   CampaignState.init(3)
   CampaignState.unlockFact("the-lamp-was-never-lit"); CampaignState.unlockFact("the-thirteenth-toll")
   CampaignState.unlockFact("the-road-remembers")
@@ -252,11 +736,12 @@ function runStillHourTests()
   P, F = check("Interlude rejects unaffordable purchase", Interlude.buyRecollection("sthr-hourlearnedname") == false, P, F)
 
   print(string.format("──────── RESULT: %d passed, %d failed ────────", P, F))
-  broadcastToAll(string.format("Still Hour tests: %d passed, %d failed", P, F),
+  pcall(broadcastToAll, string.format("Still Hour tests: %d passed, %d failed", P, F),
     F == 0 and { 0.2, 1, 0.2 } or { 1, 0.3, 0.3 })
-  -- Restore a clean, freshly-loaded state for play after testing.
+  -- Put the live campaign back exactly as it was before testing.
   CampaignState.init(CampaignState.constants().investigators)
-  Dissonance.syncBag(demoBag)
+  CampaignState.deserialize(snapshot)
+  refreshControl()
   -- returned to Object.call() so automated runs (tools/tts_relay) read the tally
   return { passed = P, failed = F }
 end

@@ -101,4 +101,107 @@ function Locations.inDistrict(district)
   return ids
 end
 
+------------------------------------------------------------ card metadata --
+
+-- Physical location cards are keyed by their SCED GMNotes id, e.g.
+-- "sthr-loc-lanternroom". Resolve one to a location id here by a normalised
+-- match (prefix, case, hyphens and a leading "the" ignored) so the board never
+-- keeps its own list of cards. Returns nil for cards this module doesn't know.
+Locations.CARD_ID_PREFIX = "sthr-loc-"
+
+local function normalise(s)
+  s = string.lower(tostring(s or ""))
+  s = s:gsub("[^%a%d]", "")
+  s = s:gsub("^the", "")
+  return s
+end
+
+local byNormalised
+function Locations.idForCard(cardId)
+  if type(cardId) ~= "string" then return nil end
+  if Locations.LOCATIONS[cardId] then return cardId end
+  local stem = cardId
+  if stem:sub(1, #Locations.CARD_ID_PREFIX) == Locations.CARD_ID_PREFIX then
+    stem = stem:sub(#Locations.CARD_ID_PREFIX + 1)
+  elseif stem:sub(1, 5) == "sthr-" then
+    return nil  -- another Still Hour card type, not a location
+  end
+  if not byNormalised then
+    byNormalised = {}
+    for id in pairs(Locations.LOCATIONS) do byNormalised[normalise(id)] = id end
+  end
+  return byNormalised[normalise(stem)]
+end
+
+--- Does this location have a fact-flipped back at all?
+function Locations.hasBack(id)
+  return loc(id).flipFact ~= nil
+end
+
+------------------------------------------------------------- map geometry --
+
+-- Pure graph helpers for board effects that need "farthest" / "toward" (the
+-- Appointed's manifest and Hunter move, CO-002 §1). `graph` maps a node key to
+-- a list of neighbour keys; the board builds it from SCED location metadata.
+
+--- Breadth-first distances from every node in `sources` (a list of keys).
+function Locations.distances(graph, sources)
+  local dist, queue, head = {}, {}, 1
+  for _, s in ipairs(sources or {}) do
+    if graph[s] and dist[s] == nil then
+      dist[s] = 0
+      queue[#queue + 1] = s
+    end
+  end
+  while queue[head] do
+    local node = queue[head]
+    head = head + 1
+    for _, nb in ipairs(graph[node] or {}) do
+      if graph[nb] and dist[nb] == nil then
+        dist[nb] = dist[node] + 1
+        queue[#queue + 1] = nb
+      end
+    end
+  end
+  return dist
+end
+
+--- The node farthest (by connections) from all `sources`. Nodes unreachable
+-- from the sources are ignored while any reachable one exists. Ties go to
+-- `tiebreak(a, b)` (true when a should win) or else to the smaller key.
+-- With no sources, every node counts as distance 0 (tiebreak decides).
+function Locations.farthest(graph, sources, tiebreak)
+  local dist = Locations.distances(graph, sources)
+  local anyReachable = next(dist) ~= nil
+  local best, bestD
+  local keys = {}
+  for k in pairs(graph) do keys[#keys + 1] = k end
+  table.sort(keys, function(a, b) return tostring(a) < tostring(b) end)
+  for _, k in ipairs(keys) do
+    local d = dist[k]
+    if d == nil and not anyReachable then d = 0 end
+    if d ~= nil then
+      if best == nil or d > bestD or (d == bestD and tiebreak and tiebreak(k, best)) then
+        best, bestD = k, d
+      end
+    end
+  end
+  return best, bestD
+end
+
+--- One step from `from` along a shortest path toward `to`; returns `from`
+-- itself when already there and nil when `to` is unreachable.
+function Locations.stepToward(graph, from, to)
+  if from == to then return from end
+  local dist = Locations.distances(graph, { to })
+  if dist[from] == nil then return nil end
+  local nbs = {}
+  for _, nb in ipairs(graph[from] or {}) do nbs[#nbs + 1] = nb end
+  table.sort(nbs, function(a, b) return tostring(a) < tostring(b) end)
+  for _, nb in ipairs(nbs) do
+    if dist[nb] ~= nil and dist[nb] == dist[from] - 1 then return nb end
+  end
+  return nil
+end
+
 return Locations
