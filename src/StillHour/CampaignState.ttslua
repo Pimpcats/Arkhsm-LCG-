@@ -45,6 +45,7 @@ local function freshState(n)
     appointedStage = 0,      -- The Appointed's Approach: 0 Unseen..3 Arrived (CO-002)
     victoryLog = {},         -- enemyId -> true (Victory claimed; once per campaign)
     onCardMemory = {},       -- investigatorId -> Memory on that investigator's cards (this loop)
+    loopTallies = {},        -- investigatorId -> {raises, spent}: Aging's "leaned on the loop" inputs
     lastLoopEndDissonance = nil, -- Dissonance when the last loop ended (Aging "ended in danger")
   }
 end
@@ -97,6 +98,7 @@ function CampaignState.deserialize(saved, decoder)
     state.appointedStage = state.appointedStage or 0
     state.victoryLog = state.victoryLog or {}
     state.onCardMemory = state.onCardMemory or {}
+    state.loopTallies = state.loopTallies or {}
   end
   return state
 end
@@ -186,6 +188,32 @@ function CampaignState.bankOnCardMemory()
   state.onCardMemory = {}
   CampaignState.bankMemory(total)
   return total
+end
+
+------------------------------------------------------- leaned-on-the-loop --
+
+-- Per investigator, this loop (aging v0.3 §1.1): how many times THEY raised
+-- Dissonance, and how much Memory they spent on loop-power effects
+-- (Recollections, foreknowledge abilities). Kept through the reset so the
+-- interlude can age with them; cleared when the next loop begins.
+CampaignState.TALLY_KINDS = { raises = true, spent = true }
+
+function CampaignState.getTallies(investigatorId)
+  local t = state.loopTallies[investigatorId] or {}
+  return { raises = t.raises or 0, spent = t.spent or 0 }
+end
+
+--- Add `delta` (may be negative; floors at 0) to one tally. Returns the new value.
+function CampaignState.addTally(investigatorId, kind, delta)
+  if not CampaignState.TALLY_KINDS[kind] or type(investigatorId) ~= "string" then return nil end
+  local t = state.loopTallies[investigatorId] or { raises = 0, spent = 0 }
+  t[kind] = math.max(0, (t[kind] or 0) + math.floor(delta or 1))
+  state.loopTallies[investigatorId] = t
+  return t[kind]
+end
+
+function CampaignState.clearTallies()
+  state.loopTallies = {}
 end
 
 ----------------------------------------------------------------- dissonance --

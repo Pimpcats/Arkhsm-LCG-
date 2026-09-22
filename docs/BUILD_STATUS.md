@@ -94,7 +94,7 @@ Everything below the line is done and tested offline; the ordered gaps to an
 actual play session:
 
 1. **In-TTS load test** (~an evening, needs your PC): load
-   `dist/the_still_hour_mod.json`, click **Run Tests** (expect 47/47), poke the
+   `dist/the_still_hour_mod.json`, click **Run Tests** (expect 48/48), poke the
    counters. First real-engine validation. The TTS relay
    (`docs/TTS_RELAY.md`) now also drives the board wiring below.
 2. **Board wiring** — 🟡 built, offline-verified; needs the real-TTS relay run.
@@ -122,8 +122,13 @@ actual play session:
    `getActiveInvestigatorData`. The interlude banks on-card Memory; Elder+
    start each loop with 1 on their card.
    **Aging on the table:** the interlude panel ages each investigator once
-   (Defeated / Leaned toggles, "ended in danger" from the Dissonance recorded
-   at the reset, locked physical/mental choice). Years + bracket (and changed
+   (a Defeated toggle, "ended in danger" from the Dissonance recorded at the
+   reset, locked physical/mental choice). "Leaned on the loop" is derived,
+   with no override (aging v0.3 §1.1): each investigator card has two
+   clickable tallies, "Dissonance raised" and "Loop-power Memory" (left +1,
+   right −1, mirrored as Raised / Spent on the interlude rows); 3+ raises or
+   4+ Memory = leaned (+1 Year). Tallies survive the reset for the interlude
+   and clear at Begin Next Loop. Years + bracket (and changed
    max health/sanity) show on the investigator card; under SCED the aged
    skills go to that mat's skill tracker (`InvestigatorSkillTracker.
    updateStats`, as Playermat does). SCED has no max-health/sanity setter, so

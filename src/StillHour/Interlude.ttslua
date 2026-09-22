@@ -37,8 +37,13 @@ Interlude.RECOLLECTION_COST = {
 --- Age one investigator this interlude. `cond` = {defeated, endedInDanger,
 -- leanedOnLoop}; `lockedChoice` = {physical, mental} (needed the first time they
 -- enter Weathered). Returns the Aging result (years, bracket, drift, agedOut...).
+-- When cond.leanedOnLoop is not given it is derived from the investigator's
+-- loop tallies (Interlude.leanedOnLoop).
 function Interlude.age(investigatorId, cond, lockedChoice)
-  return Aging.applyInterlude(investigatorId, cond, lockedChoice)
+  cond = cond or {}
+  local c = { defeated = cond.defeated, endedInDanger = cond.endedInDanger, leanedOnLoop = cond.leanedOnLoop }
+  if c.leanedOnLoop == nil then c.leanedOnLoop = Interlude.leanedOnLoop(investigatorId) end
+  return Aging.applyInterlude(investigatorId, c, lockedChoice)
 end
 
 --- Age a whole party. `entries` = list of {id, cond, lockedChoice}. Returns a
@@ -63,6 +68,13 @@ end
 -- Returns the amount moved.
 function Interlude.bankOnCard()
   return CampaignState.bankOnCardMemory()
+end
+
+--- "Leaned on the loop" for Aging, derived from the investigator's own tallies
+-- (raised Dissonance 3+ times OR spent 4+ Memory on loop powers). No override.
+function Interlude.leanedOnLoop(investigatorId)
+  local t = CampaignState.getTallies(investigatorId)
+  return Aging.leanedOnLoop(t.raises, t.spent)
 end
 
 --- "Ended in danger" for Aging, from the Dissonance recorded when the loop ended.
@@ -104,6 +116,7 @@ end
 -- Call at the end of the interlude, before loop setup.
 function Interlude.beginNextLoop()
   local s = CampaignState.startLoop()
+  CampaignState.clearTallies()     -- the new loop starts its own tallies
   -- Elder/Ancient: "begin each loop with 1 Memory on your investigator card".
   for id in pairs(s.years or {}) do
     local drift = Aging.driftFor(id)

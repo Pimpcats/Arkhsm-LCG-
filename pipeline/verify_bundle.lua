@@ -219,15 +219,31 @@ expect("banking moves on-card Memory to the bank", env.shApiState().memory == me
 env.shApiCounter({ name = "memory", delta = 0 })
 local b = hasLabel("Birdie · Years 0")
 expect("aging row per investigator", b ~= nil and hasLabel("Defeated: no") ~= nil)
--- Birdie is row 1 or 2 depending on sort; find its index
-local bi = investigatorIndex and investigatorIndex("sthrbirdie")
-local r = env.shApiAge({ id = "sthrbirdie", defeated = true, leaned = true, physical = "agility", mental = "willpower" })
+-- "leaned on the loop" is derived from Birdie's own tallies (no toggle)
+expect("no Leaned toggle any more (derived label only)", hasLabel("Leaned: no") ~= nil
+  and hasLabel("Leaned: no").click_function == "shNoop")
+expect("interlude rows show both tallies", hasLabel("Raised 0") ~= nil and hasLabel("Spent 0") ~= nil)
+env.shCardRaised(birdie, "White", false) ; env.shCardRaised(birdie, "White", false)
+expect("the card's Dissonance-raised tally counts", cardLabel(birdie, "Dissonance raised 2") ~= nil)
+expect("the interlude row mirrors it", hasLabel("Raised 2") ~= nil)
+expect("two raises are not leaning", not env.shApiTally({ id = "sthrbirdie", kind = "spent", delta = 3 }).leaned)
+expect("the spend tally shows on the card", cardLabel(birdie, "Loop-power Memory 3") ~= nil)
+env.shCardSpent(birdie, "White", true)
+expect("right-click lowers a tally", cardLabel(birdie, "Loop-power Memory 2") ~= nil)
+local ri
+for i, x in ipairs(env.shApiInvestigators()) do if x.id == "sthrbirdie" then ri = i end end
+env["shTalRaised" .. ri](nil, "White", false)
+expect("3 raises (control row click) -> Leaned: yes", hasLabel("Leaned: yes") ~= nil
+  and cardLabel(birdie, "Dissonance raised 3") ~= nil)
+local r = env.shApiAge({ id = "sthrbirdie", defeated = true, physical = "agility", mental = "willpower" })
 expect("Age applies Years (1 + defeated + danger + leaned = 4)", r ~= nil and r.years == 4 and r.gained == 4)
 expect("aging only once per interlude", env.shApiAge({ id = "sthrbirdie" }) == nil)
 env.shApiAge({ id = "sthrelias" })
 local r2 = env.shApiAge({ id = "sthrbirdie" })
 expect("Birdie's card shows her Years", cardLabel(birdie, "Years 4 · Prime") ~= nil)
 env.shBeginNextLoop()
+expect("Begin Next Loop clears the tallies", cardLabel(birdie, "Dissonance raised 0") ~= nil
+  and cardLabel(birdie, "Loop-power Memory 0") ~= nil)
 env.shApiAge({ id = "sthrbirdie", physical = "agility", mental = "willpower" })   -- 4 -> 5 Weathered
 expect("the card shows the new bracket", cardLabel(birdie, "Years 6 · Weathered") ~= nil)
 -- a fresh control token adopts the newer state from the campaign log (SCED export/import path)
