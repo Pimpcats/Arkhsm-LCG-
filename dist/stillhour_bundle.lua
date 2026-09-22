@@ -143,6 +143,8 @@ local function freshState(n)
     brackets = {},           -- investigatorId -> {bracket, physical, mental}
     appointedStage = 0,      -- The Appointed's Approach: 0 Unseen..3 Arrived (CO-002)
     victoryLog = {},         -- enemyId -> true (Victory claimed; once per campaign)
+    onCardMemory = {},       -- investigatorId -> Memory on that investigator's cards (this loop)
+    lastLoopEndDissonance = nil, -- Dissonance when the last loop ended (Aging "ended in danger")
   }
 end
 
@@ -193,6 +195,7 @@ function CampaignState.deserialize(saved, decoder)
     state.brackets = state.brackets or {}
     state.appointedStage = state.appointedStage or 0
     state.victoryLog = state.victoryLog or {}
+    state.onCardMemory = state.onCardMemory or {}
   end
   return state
 end
@@ -246,6 +249,42 @@ end
 --- Buy a Recollection into a deck: cost = its listed memoryCost. Returns success bool.
 function CampaignState.purchaseRecollection(memoryCost)
   return CampaignState.spendMemory(memoryCost or 0)
+end
+
+----------------------------------------------------------- on-card Memory --
+
+-- Memory on an investigator's cards (cards v0.2 §A: "tokens on investigator/
+-- asset cards"). It persists between nodes of a loop, drives the Appointed's
+-- Prey ("the investigator with the most Memory on their cards"), and is moved to
+-- banked Memory at the interlude (guide §4 step 2).
+
+function CampaignState.getOnCardMemory(investigatorId)
+  return state.onCardMemory[investigatorId] or 0
+end
+
+function CampaignState.setOnCardMemory(investigatorId, n)
+  state.onCardMemory[investigatorId] = math.max(0, math.floor(n or 0))
+  return state.onCardMemory[investigatorId]
+end
+
+function CampaignState.addOnCardMemory(investigatorId, n)
+  return CampaignState.setOnCardMemory(investigatorId, CampaignState.getOnCardMemory(investigatorId) + (n or 1))
+end
+
+--- Copy of the investigatorId -> on-card Memory map.
+function CampaignState.onCardMemoryMap()
+  local out = {}
+  for id, n in pairs(state.onCardMemory) do out[id] = n end
+  return out
+end
+
+--- Interlude: move all on-card Memory to banked Memory. Returns the amount moved.
+function CampaignState.bankOnCardMemory()
+  local total = 0
+  for _, n in pairs(state.onCardMemory) do total = total + n end
+  state.onCardMemory = {}
+  CampaignState.bankMemory(total)
+  return total
 end
 
 ----------------------------------------------------------------- dissonance --
@@ -442,6 +481,8 @@ end
 -- bank Memory, per guide §4.
 function CampaignState.reset()
   state.loopsCompleted = state.loopsCompleted + 1
+  -- Aging reads this at the interlude ("ended in danger"), after the drop below.
+  state.lastLoopEndDissonance = state.dissonance
 
   -- Scar floor: completed loops, capped by scarCap.
   local c = CampaignState.constants()
@@ -460,6 +501,11 @@ end
 function CampaignState.startLoop()
   CampaignState.capMemory()
   return state
+end
+
+--- Dissonance at the end of the last loop (nil before the first reset).
+function CampaignState.getLastLoopEndDissonance()
+  return state.lastLoopEndDissonance
 end
 
 function CampaignState.getLoopsCompleted()
@@ -943,6 +989,30 @@ function Aging.applyInterlude(investigatorId, cond, lockedChoice)
   }
 end
 
+--- Record the Weathered drift choice later than applyInterlude (e.g. from the
+-- interlude panel). Only the first choice sticks — it is LOCKED thereafter.
+-- Returns true if the choice was recorded now.
+function Aging.lockChoice(investigatorId, physical, mental)
+  if not Aging.PHYSICAL_SKILLS[physical] or not Aging.MENTAL_SKILLS[mental] then
+    return false
+  end
+  local record = CampaignState.getBracket(investigatorId) or {}
+  if record.physical then
+    return false
+  end
+  record.physical, record.mental = physical, mental
+  record.bracket = record.bracket or Aging.bracketForYears(CampaignState.getYears(investigatorId))
+  CampaignState.setBracket(investigatorId, record)
+  return true
+end
+
+--- Does this investigator still need a locked drift choice (Weathered+ without one)?
+function Aging.needsChoice(investigatorId)
+  local bracket = Aging.bracketForYears(CampaignState.getYears(investigatorId))
+  local record = CampaignState.getBracket(investigatorId) or {}
+  return bracket ~= Aging.PRIME and not record.physical
+end
+
 --- The cumulative stat drift for an investigator's current bracket.
 -- Deltas are relative to the printed base stat line; the host applies them with
 -- a floor of 1 on skills. Returns nil for Prime (no change).
@@ -1063,17 +1133,26 @@ end
 
 --------------------------------------------------------------------- targeting --
 
---- Prey = the investigator with the most on-card Memory. Pass a map
--- { investigatorId = memoryCount }. Ties resolve to the first max seen.
-function Appointed.prey(memoryByInvestigator)
-  local best, bestId
-  for id, m in pairs(memoryByInvestigator or {}) do
-    if best == nil or m > best then
-      best = m
-      bestId = id
-    end
+--- Every investigator tied for the most on-card Memory (sorted ids). Pass a
+-- map { investigatorId = memoryCount }. The design gives no tie-break, so the
+-- Arkham rule applies: among tied prey the Hunter goes for the nearest, and the
+-- lead investigator decides a remaining tie (the board layer does both).
+function Appointed.preyCandidates(memoryByInvestigator)
+  local best
+  for _, m in pairs(memoryByInvestigator or {}) do
+    if best == nil or m > best then best = m end
   end
-  return bestId
+  local out = {}
+  for id, m in pairs(memoryByInvestigator or {}) do
+    if m == best then out[#out + 1] = id end
+  end
+  table.sort(out, function(a, b) return tostring(a) < tostring(b) end)
+  return out, best
+end
+
+--- Prey = the investigator with the most on-card Memory (first tied id, sorted).
+function Appointed.prey(memoryByInvestigator)
+  return (Appointed.preyCandidates(memoryByInvestigator))[1]
 end
 
 ------------------------------------------------------------- board manifest --
@@ -1575,6 +1654,19 @@ function Interlude.bank(amount)
   return CampaignState.bankMemory(amount)
 end
 
+--- Guide §4 step 2: move every investigator's on-card Memory to the bank.
+-- Returns the amount moved.
+function Interlude.bankOnCard()
+  return CampaignState.bankOnCardMemory()
+end
+
+--- "Ended in danger" for Aging, from the Dissonance recorded when the loop ended.
+function Interlude.loopEndedInDanger()
+  local d = CampaignState.getLastLoopEndDissonance()
+  if d == nil then return false end
+  return Aging.loopEndedInDanger(d, CampaignState.constants().investigators)
+end
+
 function Interlude.recollectionCost(cardId)
   return Interlude.RECOLLECTION_COST[cardId]
 end
@@ -1606,7 +1698,15 @@ end
 --- Begin the next loop's play: enforce the Memory soft cap (6 x investigators).
 -- Call at the end of the interlude, before loop setup.
 function Interlude.beginNextLoop()
-  return CampaignState.startLoop()
+  local s = CampaignState.startLoop()
+  -- Elder/Ancient: "begin each loop with 1 Memory on your investigator card".
+  for id in pairs(s.years or {}) do
+    local drift = Aging.driftFor(id)
+    if drift and drift.startLoopMemory > 0 and CampaignState.getOnCardMemory(id) < drift.startLoopMemory then
+      CampaignState.setOnCardMemory(id, drift.startLoopMemory)
+    end
+  end
+  return s
 end
 
 return Interlude
@@ -1763,6 +1863,34 @@ function SCED.spawnForCard(card)
   if not SCED.isPresent() then return false end
   SCED.globalCall("callTable", { { "TokenManager", "spawnForCard" }, { card = card } })
   return true
+end
+
+------------------------------------------------------------------ playmats --
+
+-- SCED's four mat colours (core/GUIDReferenceHandler.ttslua owners).
+SCED.MAT_COLORS = { "White", "Orange", "Green", "Red" }
+
+--- The playermat object for a mat colour (GUIDReferenceApi owner/type lookup).
+function SCED.playermat(matColor)
+  return SCED.getObjectByOwnerAndType(matColor, "Playermat")
+end
+
+--- PlayermatApi.getActiveInvestigatorData(matColor) -> {id, class, miniId, ...}.
+-- Playermat.ttslua fills it when an investigator card lands on the mat.
+function SCED.activeInvestigatorData(matColor)
+  local mat = SCED.playermat(matColor)
+  if not mat then return nil end
+  local d = try(function() return mat.call("getActiveInvestigatorData") end)
+  if type(d) == "table" then return d end
+  return nil
+end
+
+--- Set a mat's skill tracker the way Playermat.maybeUpdateActiveInvestigator
+-- does: ownedObjects.InvestigatorSkillTracker.call("updateStats", {wil, int, com, agi}).
+function SCED.setSkillTracker(matColor, wil, int, com, agi)
+  local tracker = SCED.getObjectByOwnerAndType(matColor, "InvestigatorSkillTracker")
+  if not tracker then return false end
+  return try(function() tracker.call("updateStats", { wil, int, com, agi }) ; return true end) or false
 end
 
 return SCED
@@ -2091,7 +2219,9 @@ __modules["StillHour/Board"] = function()
 -- All entry points are pcall-guarded by the host (control.lua); on a vanilla
 -- table they simply find fewer objects.
 
+local Aging = require("StillHour/Aging")
 local Appointed = require("StillHour/Appointed")
+local CampaignState = require("StillHour/CampaignState")
 local Locations = require("StillHour/Locations")
 local SCED = require("StillHour/SCED")
 
@@ -2267,6 +2397,190 @@ function Board.occupied(locs)
     if l and not seen[l.guid] then seen[l.guid] = true ; out[#out + 1] = l.guid end
   end
   return out
+end
+
+------------------------------------------------------------- investigators --
+
+-- An investigator is known by its card metadata id (e.g. "sthr-elias"). Its
+-- minicard carries the SCED minicard id "<id>-m" (docs/art_reference/
+-- sced_objects/minicard.json). Under SCED the mat colour comes from
+-- PlayermatApi.getActiveInvestigatorData(matColor).id. We match minicards by
+-- stripping "-m" rather than trusting SCED's miniId: Global.getMiniId keeps
+-- only the first five characters of a short hyphenated id, which for
+-- "sthr-..." ids gives "sthr--m" for everyone.
+
+local function minicardInvestigatorId(md)
+  if not md or type(md.id) ~= "string" then return nil end
+  local base = md.id:match("^(.*)%-m$")
+  return base
+end
+
+--- Investigators in play: list of {id, name, matColor, card, md, minicard}.
+function Board.investigators()
+  local cards, minis = {}, {}
+  for _, o in ipairs(topLevel()) do
+    if isCard(o) then
+      local md = metaOf(o)
+      if md and md.type == "Investigator" and type(md.id) == "string" and not cards[md.id] then
+        cards[md.id] = { obj = o, md = md }
+      end
+      local hasMini = safe(function() return o.hasTag(Board.MINICARD_TAG) end)
+      local mid = hasMini and minicardInvestigatorId(md)
+      if mid and not minis[mid] then minis[mid] = o end
+    end
+  end
+  local out, seen = {}, {}
+  local function add(id, matColor)
+    if seen[id] then return end
+    seen[id] = true
+    local c = cards[id]
+    out[#out + 1] = {
+      id = id, matColor = matColor,
+      name = c and (safe(function() return c.obj.getName() end) or id) or id,
+      card = c and c.obj, md = c and c.md, minicard = minis[id],
+    }
+  end
+  if SCED.isPresent() then
+    for _, colour in ipairs(SCED.MAT_COLORS) do
+      local d = SCED.activeInvestigatorData(colour)
+      if d and type(d.id) == "string" and d.id ~= "" and d.id ~= "00000" then add(d.id, colour) end
+    end
+  end
+  local rest = {}
+  for id in pairs(cards) do if not seen[id] then rest[#rest + 1] = id end end
+  table.sort(rest)
+  for _, id in ipairs(rest) do add(id, nil) end
+  return out
+end
+
+--- Where the Appointed hunts: the location (guid) of its prey, and a short
+-- reason. Prey = most on-card Memory (Appointed.preyCandidates); among tied
+-- prey it goes for the nearest; a tie that remains is the lead investigator's
+-- call (Arkham rules), so the first by id is used and the table is told.
+function Board.preyLocation(locs, graph, here)
+  local memory, locOf, nameOf = {}, {}, {}
+  for _, inv in ipairs(Board.investigators()) do
+    local p = inv.minicard and vec(safe(function() return inv.minicard.getPosition() end))
+    local l = p and locationAt(locs, p)
+    if l then
+      memory[inv.id] = CampaignState.getOnCardMemory(inv.id)
+      locOf[inv.id], nameOf[inv.id] = l.guid, inv.name
+    end
+  end
+  local dist = here and Locations.distances(graph, { here.guid }) or {}
+  local function nearest(guids)
+    local best, bestD, ties = nil, nil, 0
+    for _, g in ipairs(guids) do
+      local d = dist[g] or math.huge
+      if bestD == nil or d < bestD then best, bestD, ties = g, d, 1
+      elseif d == bestD and g ~= best then ties = ties + 1 end
+    end
+    return best, ties
+  end
+  if next(memory) == nil then
+    -- no minicard can be tied to an investigator: nearest investigator
+    local occ = Board.occupied(locs)
+    if #occ == 0 then return nil end
+    return (nearest(occ)), "nearest investigator"
+  end
+  local cands, most = Appointed.preyCandidates(memory)
+  local guids, byGuid = {}, {}
+  for _, id in ipairs(cands) do
+    guids[#guids + 1] = locOf[id]
+    byGuid[locOf[id]] = byGuid[locOf[id]] or id
+  end
+  local g, ties = nearest(guids)
+  local id = byGuid[g]
+  local why
+  if #cands == 1 then
+    why = string.format("prey: %s, most Memory (%d)", nameOf[id], most)
+  elseif ties <= 1 then
+    why = string.format("prey: %s, nearest of those tied at %d Memory", nameOf[id], most)
+  else
+    why = string.format("prey: %s; tied at %d Memory and distance, lead investigator may choose", nameOf[id], most)
+  end
+  return g, why
+end
+
+local function removeByPrefix(o, prefixes)
+  local buttons = safe(function() return o.getButtons() end) or {}
+  for i = #buttons, 1, -1 do
+    local label = buttons[i].label or ""
+    for _, p in ipairs(prefixes) do
+      if label:sub(1, #p) == p then
+        safe(function() o.removeButton(buttons[i].index or (i - 1)) end)
+        break
+      end
+    end
+  end
+end
+
+Board.INV_PREFIXES = { "Memory ", "Years " }
+
+--- The printed stat line from investigator metadata (SCED GMNotes keys).
+function Board.baseStats(md)
+  if not md then return nil end
+  return { wil = md.willpowerIcons or 1, int = md.intellectIcons or 1, com = md.combatIcons or 1,
+           agi = md.agilityIcons or 1, health = md.health or 1, sanity = md.sanity or 1 }
+end
+
+--- Apply Aging to one investigator in play: the SCED skill tracker on their mat
+-- gets the drifted skills; the card shows Years / bracket / drifted maxima.
+-- Returns the effective stat line (or nil without metadata).
+function Board.applyAging(inv, toTracker)
+  local base = Board.baseStats(inv.md)
+  if not base then return nil end
+  local eff = Aging.applyDriftToStats(base, inv.id)
+  if toTracker and inv.matColor then
+    SCED.setSkillTracker(inv.matColor, eff.wil, eff.int, eff.com, eff.agi)
+  end
+  return eff
+end
+
+--- Memory / Years buttons on every investigator card (idempotent). With
+-- applyStats, also push the aged skills to the SCED skill trackers — only done
+-- on purpose (Age, Begin Next Loop, Sync Board) so a player's own tracker
+-- adjustments are not overwritten on every click.
+function Board.refreshInvestigators(applyStats)
+  local out = {}
+  for _, inv in ipairs(Board.investigators()) do
+    local eff = Board.applyAging(inv, applyStats)
+    local card = inv.card
+    if card and host then
+      removeByPrefix(card, Board.INV_PREFIXES)
+      local years = CampaignState.getYears(inv.id)
+      local yearsLabel = string.format("Years %d · %s", years, Aging.bracketForYears(years))
+      if eff and inv.md and (eff.health ~= inv.md.health or eff.sanity ~= inv.md.sanity) then
+        yearsLabel = yearsLabel .. string.format(" · max %d/%d", eff.health, eff.sanity)
+      end
+      safe(function()
+        card.createButton({
+          click_function = "shCardMemory", function_owner = host,
+          label = "Memory " .. CampaignState.getOnCardMemory(inv.id),
+          tooltip = "Memory on this investigator's cards. Left-click +1 · Right-click -1",
+          position = { -0.75, 0.3, 1.25 }, rotation = { 0, 0, 0 },
+          width = 620, height = 200, font_size = 120,
+          color = { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
+        })
+        card.createButton({
+          click_function = "shNoop", function_owner = host, label = yearsLabel,
+          tooltip = "Years lived in the loop (Aging). Skills on the playmat tracker include the drift.",
+          position = { 0.65, 0.3, 1.25 }, rotation = { 0, 0, 0 },
+          width = 0, height = 0, font_size = 90, font_color = { 0.95, 0.85, 0.6 },
+        })
+      end)
+    end
+    out[#out + 1] = { id = inv.id, name = inv.name, matColor = inv.matColor, stats = eff,
+                      hasCard = card ~= nil, hasMinicard = inv.minicard ~= nil }
+  end
+  return out
+end
+
+--- Investigator id for an investigator card object (for its button clicks).
+function Board.investigatorIdOf(o)
+  local md = metaOf(o)
+  if md and md.type == "Investigator" then return md.id end
+  return nil
 end
 
 ------------------------------------------------------------------ locations --
@@ -2524,19 +2838,8 @@ function Board.appointedCtx(extra)
     local byGuid = {}
     for _, l in ipairs(locs) do byGuid[l.guid] = l end
     local here = locationAt(locs, vec(safe(function() return card.getPosition() end)), 3.0)
-    local occ = Board.occupied(locs)
-    if #occ == 0 then say("The Appointed hunts, but no investigator minicard is on a location.") ; return false end
-    -- Prey = most on-card Memory (Appointed.prey); on-card Memory is not tracked
-    -- physically, so all investigators tie and the nearest one is hunted.
-    local target = occ[1]
-    if here then
-      local d = Locations.distances(graph, { here.guid })
-      local best
-      for _, g in ipairs(occ) do
-        local dg = d[g] or math.huge
-        if best == nil or dg < best then best, target = dg, g end
-      end
-    end
+    local target, why = Board.preyLocation(locs, graph, here)
+    if not target then say("The Appointed hunts, but no investigator minicard is on a location.") ; return false end
     local nextKey = here and Locations.stepToward(graph, here.guid, target) or target
     if nextKey == nil then say("The Appointed cannot reach its prey from here.") ; return false end
     if here and nextKey == here.guid then say("The Appointed is already with its prey.") ; return false end
@@ -2546,7 +2849,8 @@ function Board.appointedCtx(extra)
     safe(function() card.setRotation(rot) end)
     st.appointed.placed = true
     st.appointed.lastPos, st.appointed.lastRot = pos, rot
-    say("The Appointed moves to " .. (safe(function() return l.obj.getName() end) or "the next location") .. ".")
+    say("The Appointed moves to " .. (safe(function() return l.obj.getName() end) or "the next location")
+      .. " (" .. why .. ").")
     return true
   end
 
@@ -2627,7 +2931,48 @@ end
 function Board.syncAll(extra)
   local rep = Board.syncLocations()
   Board.syncAppointed(extra)
+  rep.investigators = Board.refreshInvestigators(extra and extra.applyStats)
   return rep
+end
+
+------------------------------------------------ SCED campaign export carry --
+
+-- SCED's Campaign Importer/Exporter has no hook for third-party data, but its
+-- export stores the one object tagged "CampaignLog" whole (getData()) inside
+-- the save coin and respawns it on import (core/CampaignImporterExporter.ttslua
+-- exportToToken / importFromToken). TTS saves an object's `memo` string with it
+-- (Object.memo, "persist user-data"), so the control token mirrors its state
+-- into the campaign log's memo; SCED then carries it through export/import.
+
+Board.CAMPAIGN_LOG_TAG = "CampaignLog"
+Board.MEMO_KEY = "stillHour"
+
+function Board.campaignLog()
+  local list = safe(function() return getObjectsWithTag(Board.CAMPAIGN_LOG_TAG) end) or {}
+  if #list == 1 then return list[1] end
+  return nil
+end
+
+--- Write `blob` (a JSON string) with sequence `seq` into the log's memo.
+function Board.mirrorToLog(blob, seq)
+  local log = Board.campaignLog()
+  if not log or JSON == nil then return false end
+  return safe(function()
+    log.memo = JSON.encode({ [Board.MEMO_KEY] = blob, seq = seq })
+    return true
+  end) or false
+end
+
+--- The mirrored {blob, seq} in a campaign log object's memo, or nil.
+function Board.readLogMirror(log)
+  log = log or Board.campaignLog()
+  if not log then return nil end
+  local memo = safe(function() return log.memo end)
+  local t = decode(memo)
+  if t and type(t[Board.MEMO_KEY]) == "string" then
+    return { blob = t[Board.MEMO_KEY], seq = tonumber(t.seq) or 0 }
+  end
+  return nil
 end
 
 return Board
@@ -2687,6 +3032,9 @@ local bag = ChaosBag.new({ log = note })
 
 local mode = "play"             -- "play" | "interlude"
 local recollectionList = nil    -- cached {id, name, cost} for the buy panel
+local investigatorList = {}     -- cached Board.investigators() for the row buttons
+local aging = {}                -- investigatorId -> interlude aging inputs {defeated, leaned, physical, mental, aged}
+local saveSeq = 0               -- bumps on every change; newest copy wins (control vs campaign log)
 
 -------------------------------------------------------------- board contexts --
 
@@ -2720,6 +3068,7 @@ end
 
 local function afterChange()
   syncBoard()
+  guarded("investigators", Board.refreshInvestigators, false)
   refreshControl()
 end
 
@@ -2858,8 +3207,48 @@ end
 local function beginNextLoop()
   Interlude.beginNextLoop()
   Dissonance.syncBag(bag)
+  aging = {}
   mode = "play"
+  guarded("aging", Board.refreshInvestigators, true)
   announce("A new night begins. Memory capped at " .. CampaignState.constants().memoryCap .. ".")
+end
+
+----------------------------------------------------- investigators / Aging --
+
+local function changeOnCardMemory(id, delta)
+  if type(id) ~= "string" then return nil end
+  return CampaignState.addOnCardMemory(id, delta)
+end
+
+local function bankOnCard()
+  local n = Interlude.bankOnCard()
+  announce(string.format("Banked %d on-card Memory (%d banked).", n, CampaignState.getBankedMemory()))
+  return n
+end
+
+local function agingFor(id)
+  aging[id] = aging[id] or {}
+  local a = aging[id]
+  local rec = CampaignState.getBracket(id) or {}
+  a.physical = rec.physical or a.physical or "combat"
+  a.mental = rec.mental or a.mental or "intellect"
+  return a
+end
+
+--- Age one investigator this interlude (once). Conditions come from the panel
+-- toggles; "ended in danger" from the Dissonance recorded when the loop ended.
+local function ageInvestigator(id)
+  local a = agingFor(id)
+  if a.aged then return nil end
+  local r = Interlude.age(id, { defeated = a.defeated, leanedOnLoop = a.leaned,
+    endedInDanger = Interlude.loopEndedInDanger() }, { physical = a.physical, mental = a.mental })
+  a.aged = r.yearsGained
+  guarded("aging", Board.refreshInvestigators, true)
+  local name = id
+  for _, inv in ipairs(investigatorList) do if inv.id == id then name = inv.name end end
+  announce(string.format("%s ages %d year(s): %d (%s)%s", name, r.yearsGained, r.years, r.bracket,
+    r.agedOut and " — aged out of the campaign" or ""))
+  return r
 end
 
 ------------------------------------------------------------ control buttons --
@@ -2908,6 +3297,13 @@ local function drawPlay()
     "Left-click advance (resolves the Hour) · Right-click rewind")
   button("shClickAppointed", "Appointed: " .. Appointed.stageName(), 0.9, -0.5, 1000,
     "Left-click: a card advances its Approach one stage (min Sensed). Hold Back is on its card.")
+  investigatorList = guarded("investigators", Board.investigators) or {}
+  for i, inv in ipairs(investigatorList) do
+    if i > 4 then break end
+    button("shInvMem" .. i, string.format("%s · Memory %d", inv.name, CampaignState.getOnCardMemory(inv.id)),
+      (i % 2 == 1) and -0.9 or 0.9, 0.1 + math.floor((i - 1) / 2) * 0.55, 1000,
+      "Memory on this investigator's cards (prey = most). " .. PLUS_MINUS, 80)
+  end
   button("runStillHourTests", "Run Tests", -1.1, 1.4)
   button("shStatus", "Status", -0.55, 1.4)
   button("shSyncBoard", "Sync Board", 0.0, 1.4, 620, "Re-apply location faces/seals, the Appointed and the chaos bag.")
@@ -2937,11 +3333,58 @@ local function drawInterlude()
   end
   button("shBeginNextLoop", "Begin Next Loop", -0.6, z + 0.6, 1000, "Cap Memory and start the next night.")
   button("shCloseInterlude", "Back", 0.9, z + 0.6, 620)
+  -- Aging + banking, in a column to the right of the token
+  local onCard = 0
+  for _, n in pairs(CampaignState.onCardMemoryMap()) do onCard = onCard + n end
+  local X = 3.4
+  header("AGING", -2.3)
+  button("shBankOnCard", "Bank on-card Memory (" .. onCard .. ")", X, -1.7, 1400,
+    "Guide interlude step 2: move all Memory on cards to banked Memory.", 90)
+  local danger = Interlude.loopEndedInDanger()
+  button("shNoop", "Loop ended in danger: " .. (danger and "yes (+1)" or "no"), X, -1.2, 1400,
+    "From the Dissonance when the loop ended.", 80)
+  investigatorList = guarded("investigators", Board.investigators) or {}
+  for i, inv in ipairs(investigatorList) do
+    if i > 4 then break end
+    local a = agingFor(inv.id)
+    local zi = -0.65 + (i - 1) * 0.95
+    local yrs = CampaignState.getYears(inv.id)
+    button("shNoop", string.format("%s · Years %d · %s", inv.name, yrs, Aging.bracketForYears(yrs)),
+      X, zi, 1400, "", 80)
+    local locked = (CampaignState.getBracket(inv.id) or {}).physical ~= nil
+    button("shAgeDef" .. i, "Defeated: " .. (a.defeated and "yes" or "no"), X - 1.05, zi + 0.42, 500, "", 70)
+    button("shAgeLean" .. i, "Leaned: " .. (a.leaned and "yes" or "no"), X - 0.35, zi + 0.42, 500,
+      "Raised Dissonance 3+ times or spent 4+ Memory on loop powers this loop.", 70)
+    button("shAgePhys" .. i, "-" .. a.physical .. (locked and " (locked)" or ""), X + 0.35, zi + 0.42, 500,
+      "Physical skill that drifts down (chosen once, locked).", 60)
+    button("shAgeMent" .. i, "+" .. a.mental .. (locked and " (locked)" or ""), X + 1.05, zi + 0.42, 500,
+      "Mental skill that drifts up (chosen once, locked).", 60)
+    button("shAge" .. i, a.aged and ("Aged +" .. a.aged) or "Age", X + 1.75, zi + 0.42, 300,
+      "Apply this interlude's Years.", 70)
+  end
+end
+
+-- The campaign content that decides "newer": the sequence number only moves
+-- when this changes (so a plain reload or a button redraw is not a change).
+local lastBody = nil
+local function body()
+  local ok, s = pcall(JSON.encode, { c = CampaignState.raw(), b = bag.save(), a = aging, m = mode })
+  return ok and s or nil
+end
+
+local function persist()
+  local b = body()
+  if b ~= lastBody then
+    if lastBody ~= nil then saveSeq = saveSeq + 1 end
+    lastBody = b
+  end
+  guarded("campaign log", function() Board.mirrorToLog(onSave(), saveSeq) end)
 end
 
 refreshControl = function()
   pcall(function() self.clearButtons() end)
   if mode == "interlude" then drawInterlude() else drawPlay() end
+  persist()
 end
 
 -- Click handlers: click_function(obj, player_color, alt_click) (TTS createButton).
@@ -2960,13 +3403,62 @@ function shAppointedInfo() note("The Appointed: " .. Appointed.stageName() .. " 
 function shHoldBack() guarded("hold back", holdBack) ; afterChange() end
 function shHunt() guarded("hunt", hunt) ; afterChange() end
 function shSyncBoard()
-  local rep = guarded("sync", Board.syncAll, { log = hourLog }) or {}
+  local rep = guarded("sync", Board.syncAll, { log = hourLog, applyStats = true }) or {}
   guarded("chaos bag", Dissonance.syncBag, bag)
   refreshControl()
   note(string.format("Board synced: %d campaign location(s), %d flipped, %d sealed.",
     rep.seen or 0, rep.flipped or 0, rep.sealed or 0))
   return rep
 end
+local function invAt(i) return investigatorList[i] and investigatorList[i].id end
+local function clickInvMem(i, alt) guarded("memory", changeOnCardMemory, invAt(i), alt and -1 or 1) ; afterChange() end
+function shInvMem1(_, _, alt) clickInvMem(1, alt) end
+function shInvMem2(_, _, alt) clickInvMem(2, alt) end
+function shInvMem3(_, _, alt) clickInvMem(3, alt) end
+function shInvMem4(_, _, alt) clickInvMem(4, alt) end
+--- The Memory button on an investigator card itself.
+function shCardMemory(obj, _, alt)
+  guarded("memory", changeOnCardMemory, Board.investigatorIdOf(obj), alt and -1 or 1)
+  afterChange()
+end
+function shBankOnCard() guarded("bank", bankOnCard) ; afterChange() end
+
+local function toggleAging(i, field)
+  local id = invAt(i)
+  if not id then return end
+  local a = agingFor(id)
+  local locked = (CampaignState.getBracket(id) or {}).physical ~= nil
+  if field == "physical" then
+    if not locked then a.physical = (a.physical == "combat") and "agility" or "combat" end
+  elseif field == "mental" then
+    if not locked then a.mental = (a.mental == "intellect") and "willpower" or "intellect" end
+  elseif not a.aged then
+    a[field] = not a[field]
+  end
+  refreshControl()
+end
+local function ageAt(i) if invAt(i) then guarded("age", ageInvestigator, invAt(i)) end ; afterChange() end
+function shAgeDef1() toggleAging(1, "defeated") end
+function shAgeDef2() toggleAging(2, "defeated") end
+function shAgeDef3() toggleAging(3, "defeated") end
+function shAgeDef4() toggleAging(4, "defeated") end
+function shAgeLean1() toggleAging(1, "leaned") end
+function shAgeLean2() toggleAging(2, "leaned") end
+function shAgeLean3() toggleAging(3, "leaned") end
+function shAgeLean4() toggleAging(4, "leaned") end
+function shAgePhys1() toggleAging(1, "physical") end
+function shAgePhys2() toggleAging(2, "physical") end
+function shAgePhys3() toggleAging(3, "physical") end
+function shAgePhys4() toggleAging(4, "physical") end
+function shAgeMent1() toggleAging(1, "mental") end
+function shAgeMent2() toggleAging(2, "mental") end
+function shAgeMent3() toggleAging(3, "mental") end
+function shAgeMent4() toggleAging(4, "mental") end
+function shAge1() ageAt(1) end
+function shAge2() ageAt(2) end
+function shAge3() ageAt(3) end
+function shAge4() ageAt(4) end
+
 function shOpenInterlude() mode = "interlude" ; refreshControl() end
 function shCloseInterlude() mode = "play" ; refreshControl() end
 function shBeginNextLoop() guarded("next loop", beginNextLoop) ; afterChange() end
@@ -3007,6 +3499,8 @@ function onSave()
     bag = bag.save(),
     board = Board.save(),
     mode = mode,
+    aging = aging,
+    seq = saveSeq,
   })
 end
 
@@ -3018,14 +3512,30 @@ local function restore(saved)
     bag.load(blob.bag)
     Board.load(blob.board)
     mode = blob.mode == "interlude" and "interlude" or "play"
+    aging = type(blob.aging) == "table" and blob.aging or {}
+    saveSeq = tonumber(blob.seq) or 0
+    lastBody = body()
   else
     CampaignState.deserialize(saved)          -- v1: the bare CampaignState blob
   end
 end
 
+--- Adopt the copy SCED carried in the campaign log (its export/import) when it
+-- is newer than ours. Returns true if adopted.
+local function adoptLogMirror(log)
+  local m = Board.readLogMirror(log)
+  if not m or m.seq <= saveSeq then return false end
+  restore(m.blob)
+  saveSeq = m.seq
+  Dissonance.syncBag(bag)
+  announce("Still Hour campaign state restored from the campaign log.")
+  return true
+end
+
 function onLoad(saved)
   guarded("load", restore, saved)
   Board.init(self, { log = note })
+  guarded("campaign log", adoptLogMirror)
   bag.count = bag.target()
   refreshControl()
   -- let the table settle (SCED's own objects load too) before touching it
@@ -3080,6 +3590,15 @@ function onObjectSpawn(obj)
   if ChaosBag.isChaosBag(obj) then
     pcall(function() Wait.frames(function() guarded("chaos bag", bag.reconcile) ; refreshControl() end, 30) end)
   end
+  -- SCED's campaign import respawns the campaign log (with our mirrored state)
+  local isLog = pcall(function() return obj.hasTag(Board.CAMPAIGN_LOG_TAG) end) and obj.hasTag(Board.CAMPAIGN_LOG_TAG)
+  if isLog then
+    pcall(function()
+      Wait.frames(function()
+        if guarded("campaign log", adoptLogMirror, obj) then afterChange() end
+      end, 10)
+    end)
+  end
 end
 
 ------------------------------------------------------ runner / console API --
@@ -3108,6 +3627,34 @@ function shApiCounter(p)
   afterChange()
   return shApiState()
 end
+
+function shApiInvestigators()
+  local out = {}
+  for i, inv in ipairs(guarded("investigators", Board.refreshInvestigators, false) or {}) do
+    out[i] = inv
+    out[i].memory = CampaignState.getOnCardMemory(inv.id)
+    out[i].years = CampaignState.getYears(inv.id)
+  end
+  return out
+end
+function shApiOnCardMemory(p)
+  guarded("memory", changeOnCardMemory, p and p.id, tonumber(p and p.delta) or 1)
+  afterChange()
+  return CampaignState.getOnCardMemory(p and p.id)
+end
+function shApiBankOnCard() local n = guarded("bank", bankOnCard) ; afterChange() ; return n end
+--- p = {id, defeated, leaned, physical, mental}
+function shApiAge(p)
+  p = p or {}
+  local a = agingFor(p.id)
+  a.defeated, a.leaned = p.defeated and true or nil, p.leaned and true or nil
+  if p.physical then a.physical = p.physical end
+  if p.mental then a.mental = p.mental end
+  local r = guarded("age", ageInvestigator, p.id)
+  afterChange()
+  return r and { years = r.years, bracket = r.bracket, gained = r.yearsGained } or nil
+end
+function shApiLogMirror() local m = Board.readLogMirror() ; return m and { seq = m.seq, bytes = #m.blob } or nil end
 
 function shApiHoldBack() local s = guarded("hold back", holdBack) ; afterChange() ; return s end
 function shApiHunt() local m = guarded("hunt", hunt) ; afterChange() ; return m end
@@ -3371,6 +3918,13 @@ function runStillHourTests()
   P, F = check("Interlude buys level-3 upgrade (=3)",
     Interlude.buyUpgrade(3) and CampaignState.getBankedMemory() == 1, P, F)
   P, F = check("Interlude rejects unaffordable purchase", Interlude.buyRecollection("sthr-hourlearnedname") == false, P, F)
+
+  -- Prey + on-card Memory
+  CampaignState.init(3)
+  CampaignState.addOnCardMemory("sthr-cass", 2); CampaignState.addOnCardMemory("sthr-elias", 3)
+  P, F = check("prey is the investigator with the most on-card Memory",
+    Appointed.prey(CampaignState.onCardMemoryMap()) == "sthr-elias", P, F)
+  P, F = check("interlude banks on-card Memory", Interlude.bankOnCard() == 5 and CampaignState.getBankedMemory() == 5, P, F)
 
   print(string.format("──────── RESULT: %d passed, %d failed ────────", P, F))
   pcall(broadcastToAll, string.format("Still Hour tests: %d passed, %d failed", P, F),

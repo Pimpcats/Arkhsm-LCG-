@@ -21,7 +21,9 @@
 -- All entry points are pcall-guarded by the host (control.lua); on a vanilla
 -- table they simply find fewer objects.
 
+local Aging = require("StillHour/Aging")
 local Appointed = require("StillHour/Appointed")
+local CampaignState = require("StillHour/CampaignState")
 local Locations = require("StillHour/Locations")
 local SCED = require("StillHour/SCED")
 
@@ -197,6 +199,190 @@ function Board.occupied(locs)
     if l and not seen[l.guid] then seen[l.guid] = true ; out[#out + 1] = l.guid end
   end
   return out
+end
+
+------------------------------------------------------------- investigators --
+
+-- An investigator is known by its card metadata id (e.g. "sthr-elias"). Its
+-- minicard carries the SCED minicard id "<id>-m" (docs/art_reference/
+-- sced_objects/minicard.json). Under SCED the mat colour comes from
+-- PlayermatApi.getActiveInvestigatorData(matColor).id. We match minicards by
+-- stripping "-m" rather than trusting SCED's miniId: Global.getMiniId keeps
+-- only the first five characters of a short hyphenated id, which for
+-- "sthr-..." ids gives "sthr--m" for everyone.
+
+local function minicardInvestigatorId(md)
+  if not md or type(md.id) ~= "string" then return nil end
+  local base = md.id:match("^(.*)%-m$")
+  return base
+end
+
+--- Investigators in play: list of {id, name, matColor, card, md, minicard}.
+function Board.investigators()
+  local cards, minis = {}, {}
+  for _, o in ipairs(topLevel()) do
+    if isCard(o) then
+      local md = metaOf(o)
+      if md and md.type == "Investigator" and type(md.id) == "string" and not cards[md.id] then
+        cards[md.id] = { obj = o, md = md }
+      end
+      local hasMini = safe(function() return o.hasTag(Board.MINICARD_TAG) end)
+      local mid = hasMini and minicardInvestigatorId(md)
+      if mid and not minis[mid] then minis[mid] = o end
+    end
+  end
+  local out, seen = {}, {}
+  local function add(id, matColor)
+    if seen[id] then return end
+    seen[id] = true
+    local c = cards[id]
+    out[#out + 1] = {
+      id = id, matColor = matColor,
+      name = c and (safe(function() return c.obj.getName() end) or id) or id,
+      card = c and c.obj, md = c and c.md, minicard = minis[id],
+    }
+  end
+  if SCED.isPresent() then
+    for _, colour in ipairs(SCED.MAT_COLORS) do
+      local d = SCED.activeInvestigatorData(colour)
+      if d and type(d.id) == "string" and d.id ~= "" and d.id ~= "00000" then add(d.id, colour) end
+    end
+  end
+  local rest = {}
+  for id in pairs(cards) do if not seen[id] then rest[#rest + 1] = id end end
+  table.sort(rest)
+  for _, id in ipairs(rest) do add(id, nil) end
+  return out
+end
+
+--- Where the Appointed hunts: the location (guid) of its prey, and a short
+-- reason. Prey = most on-card Memory (Appointed.preyCandidates); among tied
+-- prey it goes for the nearest; a tie that remains is the lead investigator's
+-- call (Arkham rules), so the first by id is used and the table is told.
+function Board.preyLocation(locs, graph, here)
+  local memory, locOf, nameOf = {}, {}, {}
+  for _, inv in ipairs(Board.investigators()) do
+    local p = inv.minicard and vec(safe(function() return inv.minicard.getPosition() end))
+    local l = p and locationAt(locs, p)
+    if l then
+      memory[inv.id] = CampaignState.getOnCardMemory(inv.id)
+      locOf[inv.id], nameOf[inv.id] = l.guid, inv.name
+    end
+  end
+  local dist = here and Locations.distances(graph, { here.guid }) or {}
+  local function nearest(guids)
+    local best, bestD, ties = nil, nil, 0
+    for _, g in ipairs(guids) do
+      local d = dist[g] or math.huge
+      if bestD == nil or d < bestD then best, bestD, ties = g, d, 1
+      elseif d == bestD and g ~= best then ties = ties + 1 end
+    end
+    return best, ties
+  end
+  if next(memory) == nil then
+    -- no minicard can be tied to an investigator: nearest investigator
+    local occ = Board.occupied(locs)
+    if #occ == 0 then return nil end
+    return (nearest(occ)), "nearest investigator"
+  end
+  local cands, most = Appointed.preyCandidates(memory)
+  local guids, byGuid = {}, {}
+  for _, id in ipairs(cands) do
+    guids[#guids + 1] = locOf[id]
+    byGuid[locOf[id]] = byGuid[locOf[id]] or id
+  end
+  local g, ties = nearest(guids)
+  local id = byGuid[g]
+  local why
+  if #cands == 1 then
+    why = string.format("prey: %s, most Memory (%d)", nameOf[id], most)
+  elseif ties <= 1 then
+    why = string.format("prey: %s, nearest of those tied at %d Memory", nameOf[id], most)
+  else
+    why = string.format("prey: %s; tied at %d Memory and distance, lead investigator may choose", nameOf[id], most)
+  end
+  return g, why
+end
+
+local function removeByPrefix(o, prefixes)
+  local buttons = safe(function() return o.getButtons() end) or {}
+  for i = #buttons, 1, -1 do
+    local label = buttons[i].label or ""
+    for _, p in ipairs(prefixes) do
+      if label:sub(1, #p) == p then
+        safe(function() o.removeButton(buttons[i].index or (i - 1)) end)
+        break
+      end
+    end
+  end
+end
+
+Board.INV_PREFIXES = { "Memory ", "Years " }
+
+--- The printed stat line from investigator metadata (SCED GMNotes keys).
+function Board.baseStats(md)
+  if not md then return nil end
+  return { wil = md.willpowerIcons or 1, int = md.intellectIcons or 1, com = md.combatIcons or 1,
+           agi = md.agilityIcons or 1, health = md.health or 1, sanity = md.sanity or 1 }
+end
+
+--- Apply Aging to one investigator in play: the SCED skill tracker on their mat
+-- gets the drifted skills; the card shows Years / bracket / drifted maxima.
+-- Returns the effective stat line (or nil without metadata).
+function Board.applyAging(inv, toTracker)
+  local base = Board.baseStats(inv.md)
+  if not base then return nil end
+  local eff = Aging.applyDriftToStats(base, inv.id)
+  if toTracker and inv.matColor then
+    SCED.setSkillTracker(inv.matColor, eff.wil, eff.int, eff.com, eff.agi)
+  end
+  return eff
+end
+
+--- Memory / Years buttons on every investigator card (idempotent). With
+-- applyStats, also push the aged skills to the SCED skill trackers — only done
+-- on purpose (Age, Begin Next Loop, Sync Board) so a player's own tracker
+-- adjustments are not overwritten on every click.
+function Board.refreshInvestigators(applyStats)
+  local out = {}
+  for _, inv in ipairs(Board.investigators()) do
+    local eff = Board.applyAging(inv, applyStats)
+    local card = inv.card
+    if card and host then
+      removeByPrefix(card, Board.INV_PREFIXES)
+      local years = CampaignState.getYears(inv.id)
+      local yearsLabel = string.format("Years %d · %s", years, Aging.bracketForYears(years))
+      if eff and inv.md and (eff.health ~= inv.md.health or eff.sanity ~= inv.md.sanity) then
+        yearsLabel = yearsLabel .. string.format(" · max %d/%d", eff.health, eff.sanity)
+      end
+      safe(function()
+        card.createButton({
+          click_function = "shCardMemory", function_owner = host,
+          label = "Memory " .. CampaignState.getOnCardMemory(inv.id),
+          tooltip = "Memory on this investigator's cards. Left-click +1 · Right-click -1",
+          position = { -0.75, 0.3, 1.25 }, rotation = { 0, 0, 0 },
+          width = 620, height = 200, font_size = 120,
+          color = { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
+        })
+        card.createButton({
+          click_function = "shNoop", function_owner = host, label = yearsLabel,
+          tooltip = "Years lived in the loop (Aging). Skills on the playmat tracker include the drift.",
+          position = { 0.65, 0.3, 1.25 }, rotation = { 0, 0, 0 },
+          width = 0, height = 0, font_size = 90, font_color = { 0.95, 0.85, 0.6 },
+        })
+      end)
+    end
+    out[#out + 1] = { id = inv.id, name = inv.name, matColor = inv.matColor, stats = eff,
+                      hasCard = card ~= nil, hasMinicard = inv.minicard ~= nil }
+  end
+  return out
+end
+
+--- Investigator id for an investigator card object (for its button clicks).
+function Board.investigatorIdOf(o)
+  local md = metaOf(o)
+  if md and md.type == "Investigator" then return md.id end
+  return nil
 end
 
 ------------------------------------------------------------------ locations --
@@ -454,19 +640,8 @@ function Board.appointedCtx(extra)
     local byGuid = {}
     for _, l in ipairs(locs) do byGuid[l.guid] = l end
     local here = locationAt(locs, vec(safe(function() return card.getPosition() end)), 3.0)
-    local occ = Board.occupied(locs)
-    if #occ == 0 then say("The Appointed hunts, but no investigator minicard is on a location.") ; return false end
-    -- Prey = most on-card Memory (Appointed.prey); on-card Memory is not tracked
-    -- physically, so all investigators tie and the nearest one is hunted.
-    local target = occ[1]
-    if here then
-      local d = Locations.distances(graph, { here.guid })
-      local best
-      for _, g in ipairs(occ) do
-        local dg = d[g] or math.huge
-        if best == nil or dg < best then best, target = dg, g end
-      end
-    end
+    local target, why = Board.preyLocation(locs, graph, here)
+    if not target then say("The Appointed hunts, but no investigator minicard is on a location.") ; return false end
     local nextKey = here and Locations.stepToward(graph, here.guid, target) or target
     if nextKey == nil then say("The Appointed cannot reach its prey from here.") ; return false end
     if here and nextKey == here.guid then say("The Appointed is already with its prey.") ; return false end
@@ -476,7 +651,8 @@ function Board.appointedCtx(extra)
     safe(function() card.setRotation(rot) end)
     st.appointed.placed = true
     st.appointed.lastPos, st.appointed.lastRot = pos, rot
-    say("The Appointed moves to " .. (safe(function() return l.obj.getName() end) or "the next location") .. ".")
+    say("The Appointed moves to " .. (safe(function() return l.obj.getName() end) or "the next location")
+      .. " (" .. why .. ").")
     return true
   end
 
@@ -557,7 +733,48 @@ end
 function Board.syncAll(extra)
   local rep = Board.syncLocations()
   Board.syncAppointed(extra)
+  rep.investigators = Board.refreshInvestigators(extra and extra.applyStats)
   return rep
+end
+
+------------------------------------------------ SCED campaign export carry --
+
+-- SCED's Campaign Importer/Exporter has no hook for third-party data, but its
+-- export stores the one object tagged "CampaignLog" whole (getData()) inside
+-- the save coin and respawns it on import (core/CampaignImporterExporter.ttslua
+-- exportToToken / importFromToken). TTS saves an object's `memo` string with it
+-- (Object.memo, "persist user-data"), so the control token mirrors its state
+-- into the campaign log's memo; SCED then carries it through export/import.
+
+Board.CAMPAIGN_LOG_TAG = "CampaignLog"
+Board.MEMO_KEY = "stillHour"
+
+function Board.campaignLog()
+  local list = safe(function() return getObjectsWithTag(Board.CAMPAIGN_LOG_TAG) end) or {}
+  if #list == 1 then return list[1] end
+  return nil
+end
+
+--- Write `blob` (a JSON string) with sequence `seq` into the log's memo.
+function Board.mirrorToLog(blob, seq)
+  local log = Board.campaignLog()
+  if not log or JSON == nil then return false end
+  return safe(function()
+    log.memo = JSON.encode({ [Board.MEMO_KEY] = blob, seq = seq })
+    return true
+  end) or false
+end
+
+--- The mirrored {blob, seq} in a campaign log object's memo, or nil.
+function Board.readLogMirror(log)
+  log = log or Board.campaignLog()
+  if not log then return nil end
+  local memo = safe(function() return log.memo end)
+  local t = decode(memo)
+  if t and type(t[Board.MEMO_KEY]) == "string" then
+    return { blob = t[Board.MEMO_KEY], seq = tonumber(t.seq) or 0 }
+  end
+  return nil
 end
 
 return Board

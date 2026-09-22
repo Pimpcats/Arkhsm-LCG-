@@ -50,6 +50,9 @@ local bag = ChaosBag.new({ log = note })
 
 local mode = "play"             -- "play" | "interlude"
 local recollectionList = nil    -- cached {id, name, cost} for the buy panel
+local investigatorList = {}     -- cached Board.investigators() for the row buttons
+local aging = {}                -- investigatorId -> interlude aging inputs {defeated, leaned, physical, mental, aged}
+local saveSeq = 0               -- bumps on every change; newest copy wins (control vs campaign log)
 
 -------------------------------------------------------------- board contexts --
 
@@ -83,6 +86,7 @@ end
 
 local function afterChange()
   syncBoard()
+  guarded("investigators", Board.refreshInvestigators, false)
   refreshControl()
 end
 
@@ -221,8 +225,48 @@ end
 local function beginNextLoop()
   Interlude.beginNextLoop()
   Dissonance.syncBag(bag)
+  aging = {}
   mode = "play"
+  guarded("aging", Board.refreshInvestigators, true)
   announce("A new night begins. Memory capped at " .. CampaignState.constants().memoryCap .. ".")
+end
+
+----------------------------------------------------- investigators / Aging --
+
+local function changeOnCardMemory(id, delta)
+  if type(id) ~= "string" then return nil end
+  return CampaignState.addOnCardMemory(id, delta)
+end
+
+local function bankOnCard()
+  local n = Interlude.bankOnCard()
+  announce(string.format("Banked %d on-card Memory (%d banked).", n, CampaignState.getBankedMemory()))
+  return n
+end
+
+local function agingFor(id)
+  aging[id] = aging[id] or {}
+  local a = aging[id]
+  local rec = CampaignState.getBracket(id) or {}
+  a.physical = rec.physical or a.physical or "combat"
+  a.mental = rec.mental or a.mental or "intellect"
+  return a
+end
+
+--- Age one investigator this interlude (once). Conditions come from the panel
+-- toggles; "ended in danger" from the Dissonance recorded when the loop ended.
+local function ageInvestigator(id)
+  local a = agingFor(id)
+  if a.aged then return nil end
+  local r = Interlude.age(id, { defeated = a.defeated, leanedOnLoop = a.leaned,
+    endedInDanger = Interlude.loopEndedInDanger() }, { physical = a.physical, mental = a.mental })
+  a.aged = r.yearsGained
+  guarded("aging", Board.refreshInvestigators, true)
+  local name = id
+  for _, inv in ipairs(investigatorList) do if inv.id == id then name = inv.name end end
+  announce(string.format("%s ages %d year(s): %d (%s)%s", name, r.yearsGained, r.years, r.bracket,
+    r.agedOut and " — aged out of the campaign" or ""))
+  return r
 end
 
 ------------------------------------------------------------ control buttons --
@@ -271,6 +315,13 @@ local function drawPlay()
     "Left-click advance (resolves the Hour) · Right-click rewind")
   button("shClickAppointed", "Appointed: " .. Appointed.stageName(), 0.9, -0.5, 1000,
     "Left-click: a card advances its Approach one stage (min Sensed). Hold Back is on its card.")
+  investigatorList = guarded("investigators", Board.investigators) or {}
+  for i, inv in ipairs(investigatorList) do
+    if i > 4 then break end
+    button("shInvMem" .. i, string.format("%s · Memory %d", inv.name, CampaignState.getOnCardMemory(inv.id)),
+      (i % 2 == 1) and -0.9 or 0.9, 0.1 + math.floor((i - 1) / 2) * 0.55, 1000,
+      "Memory on this investigator's cards (prey = most). " .. PLUS_MINUS, 80)
+  end
   button("runStillHourTests", "Run Tests", -1.1, 1.4)
   button("shStatus", "Status", -0.55, 1.4)
   button("shSyncBoard", "Sync Board", 0.0, 1.4, 620, "Re-apply location faces/seals, the Appointed and the chaos bag.")
@@ -300,11 +351,58 @@ local function drawInterlude()
   end
   button("shBeginNextLoop", "Begin Next Loop", -0.6, z + 0.6, 1000, "Cap Memory and start the next night.")
   button("shCloseInterlude", "Back", 0.9, z + 0.6, 620)
+  -- Aging + banking, in a column to the right of the token
+  local onCard = 0
+  for _, n in pairs(CampaignState.onCardMemoryMap()) do onCard = onCard + n end
+  local X = 3.4
+  header("AGING", -2.3)
+  button("shBankOnCard", "Bank on-card Memory (" .. onCard .. ")", X, -1.7, 1400,
+    "Guide interlude step 2: move all Memory on cards to banked Memory.", 90)
+  local danger = Interlude.loopEndedInDanger()
+  button("shNoop", "Loop ended in danger: " .. (danger and "yes (+1)" or "no"), X, -1.2, 1400,
+    "From the Dissonance when the loop ended.", 80)
+  investigatorList = guarded("investigators", Board.investigators) or {}
+  for i, inv in ipairs(investigatorList) do
+    if i > 4 then break end
+    local a = agingFor(inv.id)
+    local zi = -0.65 + (i - 1) * 0.95
+    local yrs = CampaignState.getYears(inv.id)
+    button("shNoop", string.format("%s · Years %d · %s", inv.name, yrs, Aging.bracketForYears(yrs)),
+      X, zi, 1400, "", 80)
+    local locked = (CampaignState.getBracket(inv.id) or {}).physical ~= nil
+    button("shAgeDef" .. i, "Defeated: " .. (a.defeated and "yes" or "no"), X - 1.05, zi + 0.42, 500, "", 70)
+    button("shAgeLean" .. i, "Leaned: " .. (a.leaned and "yes" or "no"), X - 0.35, zi + 0.42, 500,
+      "Raised Dissonance 3+ times or spent 4+ Memory on loop powers this loop.", 70)
+    button("shAgePhys" .. i, "-" .. a.physical .. (locked and " (locked)" or ""), X + 0.35, zi + 0.42, 500,
+      "Physical skill that drifts down (chosen once, locked).", 60)
+    button("shAgeMent" .. i, "+" .. a.mental .. (locked and " (locked)" or ""), X + 1.05, zi + 0.42, 500,
+      "Mental skill that drifts up (chosen once, locked).", 60)
+    button("shAge" .. i, a.aged and ("Aged +" .. a.aged) or "Age", X + 1.75, zi + 0.42, 300,
+      "Apply this interlude's Years.", 70)
+  end
+end
+
+-- The campaign content that decides "newer": the sequence number only moves
+-- when this changes (so a plain reload or a button redraw is not a change).
+local lastBody = nil
+local function body()
+  local ok, s = pcall(JSON.encode, { c = CampaignState.raw(), b = bag.save(), a = aging, m = mode })
+  return ok and s or nil
+end
+
+local function persist()
+  local b = body()
+  if b ~= lastBody then
+    if lastBody ~= nil then saveSeq = saveSeq + 1 end
+    lastBody = b
+  end
+  guarded("campaign log", function() Board.mirrorToLog(onSave(), saveSeq) end)
 end
 
 refreshControl = function()
   pcall(function() self.clearButtons() end)
   if mode == "interlude" then drawInterlude() else drawPlay() end
+  persist()
 end
 
 -- Click handlers: click_function(obj, player_color, alt_click) (TTS createButton).
@@ -323,13 +421,62 @@ function shAppointedInfo() note("The Appointed: " .. Appointed.stageName() .. " 
 function shHoldBack() guarded("hold back", holdBack) ; afterChange() end
 function shHunt() guarded("hunt", hunt) ; afterChange() end
 function shSyncBoard()
-  local rep = guarded("sync", Board.syncAll, { log = hourLog }) or {}
+  local rep = guarded("sync", Board.syncAll, { log = hourLog, applyStats = true }) or {}
   guarded("chaos bag", Dissonance.syncBag, bag)
   refreshControl()
   note(string.format("Board synced: %d campaign location(s), %d flipped, %d sealed.",
     rep.seen or 0, rep.flipped or 0, rep.sealed or 0))
   return rep
 end
+local function invAt(i) return investigatorList[i] and investigatorList[i].id end
+local function clickInvMem(i, alt) guarded("memory", changeOnCardMemory, invAt(i), alt and -1 or 1) ; afterChange() end
+function shInvMem1(_, _, alt) clickInvMem(1, alt) end
+function shInvMem2(_, _, alt) clickInvMem(2, alt) end
+function shInvMem3(_, _, alt) clickInvMem(3, alt) end
+function shInvMem4(_, _, alt) clickInvMem(4, alt) end
+--- The Memory button on an investigator card itself.
+function shCardMemory(obj, _, alt)
+  guarded("memory", changeOnCardMemory, Board.investigatorIdOf(obj), alt and -1 or 1)
+  afterChange()
+end
+function shBankOnCard() guarded("bank", bankOnCard) ; afterChange() end
+
+local function toggleAging(i, field)
+  local id = invAt(i)
+  if not id then return end
+  local a = agingFor(id)
+  local locked = (CampaignState.getBracket(id) or {}).physical ~= nil
+  if field == "physical" then
+    if not locked then a.physical = (a.physical == "combat") and "agility" or "combat" end
+  elseif field == "mental" then
+    if not locked then a.mental = (a.mental == "intellect") and "willpower" or "intellect" end
+  elseif not a.aged then
+    a[field] = not a[field]
+  end
+  refreshControl()
+end
+local function ageAt(i) if invAt(i) then guarded("age", ageInvestigator, invAt(i)) end ; afterChange() end
+function shAgeDef1() toggleAging(1, "defeated") end
+function shAgeDef2() toggleAging(2, "defeated") end
+function shAgeDef3() toggleAging(3, "defeated") end
+function shAgeDef4() toggleAging(4, "defeated") end
+function shAgeLean1() toggleAging(1, "leaned") end
+function shAgeLean2() toggleAging(2, "leaned") end
+function shAgeLean3() toggleAging(3, "leaned") end
+function shAgeLean4() toggleAging(4, "leaned") end
+function shAgePhys1() toggleAging(1, "physical") end
+function shAgePhys2() toggleAging(2, "physical") end
+function shAgePhys3() toggleAging(3, "physical") end
+function shAgePhys4() toggleAging(4, "physical") end
+function shAgeMent1() toggleAging(1, "mental") end
+function shAgeMent2() toggleAging(2, "mental") end
+function shAgeMent3() toggleAging(3, "mental") end
+function shAgeMent4() toggleAging(4, "mental") end
+function shAge1() ageAt(1) end
+function shAge2() ageAt(2) end
+function shAge3() ageAt(3) end
+function shAge4() ageAt(4) end
+
 function shOpenInterlude() mode = "interlude" ; refreshControl() end
 function shCloseInterlude() mode = "play" ; refreshControl() end
 function shBeginNextLoop() guarded("next loop", beginNextLoop) ; afterChange() end
@@ -370,6 +517,8 @@ function onSave()
     bag = bag.save(),
     board = Board.save(),
     mode = mode,
+    aging = aging,
+    seq = saveSeq,
   })
 end
 
@@ -381,14 +530,30 @@ local function restore(saved)
     bag.load(blob.bag)
     Board.load(blob.board)
     mode = blob.mode == "interlude" and "interlude" or "play"
+    aging = type(blob.aging) == "table" and blob.aging or {}
+    saveSeq = tonumber(blob.seq) or 0
+    lastBody = body()
   else
     CampaignState.deserialize(saved)          -- v1: the bare CampaignState blob
   end
 end
 
+--- Adopt the copy SCED carried in the campaign log (its export/import) when it
+-- is newer than ours. Returns true if adopted.
+local function adoptLogMirror(log)
+  local m = Board.readLogMirror(log)
+  if not m or m.seq <= saveSeq then return false end
+  restore(m.blob)
+  saveSeq = m.seq
+  Dissonance.syncBag(bag)
+  announce("Still Hour campaign state restored from the campaign log.")
+  return true
+end
+
 function onLoad(saved)
   guarded("load", restore, saved)
   Board.init(self, { log = note })
+  guarded("campaign log", adoptLogMirror)
   bag.count = bag.target()
   refreshControl()
   -- let the table settle (SCED's own objects load too) before touching it
@@ -443,6 +608,15 @@ function onObjectSpawn(obj)
   if ChaosBag.isChaosBag(obj) then
     pcall(function() Wait.frames(function() guarded("chaos bag", bag.reconcile) ; refreshControl() end, 30) end)
   end
+  -- SCED's campaign import respawns the campaign log (with our mirrored state)
+  local isLog = pcall(function() return obj.hasTag(Board.CAMPAIGN_LOG_TAG) end) and obj.hasTag(Board.CAMPAIGN_LOG_TAG)
+  if isLog then
+    pcall(function()
+      Wait.frames(function()
+        if guarded("campaign log", adoptLogMirror, obj) then afterChange() end
+      end, 10)
+    end)
+  end
 end
 
 ------------------------------------------------------ runner / console API --
@@ -471,6 +645,34 @@ function shApiCounter(p)
   afterChange()
   return shApiState()
 end
+
+function shApiInvestigators()
+  local out = {}
+  for i, inv in ipairs(guarded("investigators", Board.refreshInvestigators, false) or {}) do
+    out[i] = inv
+    out[i].memory = CampaignState.getOnCardMemory(inv.id)
+    out[i].years = CampaignState.getYears(inv.id)
+  end
+  return out
+end
+function shApiOnCardMemory(p)
+  guarded("memory", changeOnCardMemory, p and p.id, tonumber(p and p.delta) or 1)
+  afterChange()
+  return CampaignState.getOnCardMemory(p and p.id)
+end
+function shApiBankOnCard() local n = guarded("bank", bankOnCard) ; afterChange() ; return n end
+--- p = {id, defeated, leaned, physical, mental}
+function shApiAge(p)
+  p = p or {}
+  local a = agingFor(p.id)
+  a.defeated, a.leaned = p.defeated and true or nil, p.leaned and true or nil
+  if p.physical then a.physical = p.physical end
+  if p.mental then a.mental = p.mental end
+  local r = guarded("age", ageInvestigator, p.id)
+  afterChange()
+  return r and { years = r.years, bracket = r.bracket, gained = r.yearsGained } or nil
+end
+function shApiLogMirror() local m = Board.readLogMirror() ; return m and { seq = m.seq, bytes = #m.blob } or nil end
 
 function shApiHoldBack() local s = guarded("hold back", holdBack) ; afterChange() ; return s end
 function shApiHunt() local m = guarded("hunt", hunt) ; afterChange() ; return m end
@@ -734,6 +936,13 @@ function runStillHourTests()
   P, F = check("Interlude buys level-3 upgrade (=3)",
     Interlude.buyUpgrade(3) and CampaignState.getBankedMemory() == 1, P, F)
   P, F = check("Interlude rejects unaffordable purchase", Interlude.buyRecollection("sthr-hourlearnedname") == false, P, F)
+
+  -- Prey + on-card Memory
+  CampaignState.init(3)
+  CampaignState.addOnCardMemory("sthr-cass", 2); CampaignState.addOnCardMemory("sthr-elias", 3)
+  P, F = check("prey is the investigator with the most on-card Memory",
+    Appointed.prey(CampaignState.onCardMemoryMap()) == "sthr-elias", P, F)
+  P, F = check("interlude banks on-card Memory", Interlude.bankOnCard() == 5 and CampaignState.getBankedMemory() == 5, P, F)
 
   print(string.format("──────── RESULT: %d passed, %d failed ────────", P, F))
   pcall(broadcastToAll, string.format("Still Hour tests: %d passed, %d failed", P, F),

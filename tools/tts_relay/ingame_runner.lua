@@ -341,7 +341,7 @@ step("board: [static] in the chaos bag", function(go)
 end)
 
 -- two connected campaign locations, off to the side of the control token
-local LOC_A, LOC_B, MINI = {}, {}, nil
+local LOC_A, LOC_B, LOC_C, MINI = {}, {}, nil, nil
 local function locationJSON(id, name, icon, conn, x, z)
   return JSON.encode({
     Name = "Card", Nickname = name, Tags = { "Location", "ScenarioCard", TAG },
@@ -475,6 +475,164 @@ step("board: the Appointed", function(go)
       end, 10)
     end, 10)
   end)
+end)
+
+local function investigatorJSON(id, name, stats, x, z)
+  return JSON.encode({
+    Name = "Card", Nickname = name, Tags = { "Investigator", "PlayerCard", TAG }, SidewaysCard = true,
+    Transform = { posX = x, posY = 1.5, posZ = z, rotX = 0, rotY = 180, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
+    GMNotes = JSON.encode({ id = id, type = "Investigator", cycle = "The Still Hour",
+      willpowerIcons = stats[1], intellectIcons = stats[2], combatIcons = stats[3], agilityIcons = stats[4],
+      health = stats[5], sanity = stats[6] }),
+    CardID = 990200, CustomDeck = { ["9902"] = {
+      FaceURL = "https://placehold.co/1050x750/2b2233/e8d9a8.png?text=investigator",
+      BackURL = "https://placehold.co/1050x750/1b1622/e8d9a8.png?text=back",
+      NumWidth = 1, NumHeight = 1, BackIsHidden = true, UniqueBack = true, Type = 0 } },
+  })
+end
+
+local function minicardJSON(id, pos)
+  return JSON.encode({ Name = "CardCustom", Nickname = "Relay minicard " .. id, Tags = { "Minicard", TAG },
+    GMNotes = JSON.encode({ id = id, type = "Minicard" }),
+    Transform = { posX = pos.x, posY = pos.y + 1, posZ = pos.z, rotX = 0, rotY = 180, rotZ = 0,
+                  scaleX = 0.6, scaleY = 1, scaleZ = 0.6 } })
+end
+
+local function appointedAt(loc)
+  local c = findAppointedCard()
+  return c ~= nil and loc ~= nil and dist(c.getPosition(), loc.getPosition()) < 2
+end
+
+local INV = {}
+step("board: prey follows on-card Memory", function(go)
+  local ctl = findControl()
+  if not ctl or not LOC_A.obj or not LOC_B.obj then check("locations available for the prey step", false) ; return go() end
+  ctl.call("shApiRestore", { blob = snapshot })
+  -- the earlier step's minicard would count as a nearer investigator; move it off the map
+  if MINI then MINI.destruct() ; MINI = nil end
+  local base = ctl.getPosition()
+  local pending = 5
+  local function one() pending = pending - 1 end
+  spawnJSON(investigatorJSON("sthr-elias", "Relay Investigator E", { 3, 2, 4, 3, 9, 5 }, base.x - 3, base.z - 7),
+    function(o) INV.elias = o ; one() end)
+  spawnJSON(investigatorJSON("sthr-birdie", "Relay Investigator B", { 2, 3, 3, 5, 6, 7 }, base.x + 3, base.z - 7),
+    function(o) INV.birdie = o ; one() end)
+  spawnJSON(minicardJSON("sthr-elias-m", LOC_A.obj.getPosition()), one)
+  spawnJSON(minicardJSON("sthr-birdie-m", LOC_B.obj.getPosition()), one)
+  -- a third location joined to both, so "toward the prey" has two directions
+  spawnJSON(locationJSON("sthr-loc-nave", "Relay Location C", "Moon", "Diamond|Circle", base.x, base.z + 14),
+    function(o) LOC_C = o ; one() end)
+  waitFor(function() return pending <= 0 end, 20, function(ok)
+    check("investigator cards, minicards and a third location spawned", ok)
+    if not ok then return go() end
+    local list = ctl.call("shApiInvestigators")
+    local seen = {}
+    for _, i in ipairs(list or {}) do if i.hasCard then seen[i.id] = i end end
+    check("both investigators are found by card metadata", seen["sthr-elias"] ~= nil and seen["sthr-birdie"] ~= nil)
+    check("each investigator card has a Memory button", hasButton(INV.elias, "Memory ")
+      and hasButton(INV.birdie, "Memory "), labelsOf(INV.elias))
+    check("each investigator card shows Years", hasButton(INV.birdie, "Years 0"), labelsOf(INV.birdie))
+    ctl.call("shApiOnCardMemory", { id = "sthr-birdie", delta = 3 })
+    ctl.call("shApiOnCardMemory", { id = "sthr-elias", delta = 1 })
+    check("the card's Memory button follows the count", hasButton(INV.birdie, "Memory 3"), labelsOf(INV.birdie))
+    ctl.call("shApiCounter", { name = "appointed" })
+    ctl.call("shApiCounter", { name = "appointed" })      -- Emerging: a Hunter
+    Wait.frames(function()
+      check("it manifests at the location away from both investigators", appointedAt(LOC_C))
+      ctl.call("shApiHunt")
+      check("it hunts the investigator with the most Memory (not merely the nearest)", appointedAt(LOC_B.obj))
+      ctl.call("shApiOnCardMemory", { id = "sthr-elias", delta = 4 })
+      ctl.call("shApiHunt")
+      check("when another investigator has more Memory, the prey changes", appointedAt(LOC_A.obj))
+      go()
+    end, 20)
+  end)
+end)
+
+local function trackerStats(matColor)
+  local t = scedObject(matColor, "InvestigatorSkillTracker")
+  if not t then return nil end
+  return decode(t.script_state)
+end
+
+step("board: Aging on the investigator", function(go)
+  local ctl = findControl()
+  if not ctl or not INV.elias then return go() end
+  ctl.call("shApiRestore", { blob = snapshot })
+  ctl.call("shApiCounter", { name = "dissonance", delta = 12 })
+  ctl.call("shApiReset")                                   -- the loop ends in danger
+  local r1 = ctl.call("shApiAge", { id = "sthr-elias", defeated = true, leaned = true,
+    physical = "combat", mental = "willpower" })
+  check("Age adds Years for defeat, danger and leaning (4)", r1 ~= nil and r1.years == 4,
+    r1 and ("years " .. r1.years) or "no result")
+  check("a second Age in the same interlude is refused", ctl.call("shApiAge", { id = "sthr-elias" }) == nil)
+  ctl.call("shApiBeginNextLoop")
+  ctl.call("shApiReset")
+  local r2 = ctl.call("shApiAge", { id = "sthr-elias", defeated = true, physical = "combat", mental = "willpower" })
+  check("the next interlude reaches Weathered", r2 ~= nil and r2.bracket == "Weathered",
+    r2 and (r2.years .. " " .. r2.bracket) or "no result")
+  check("the investigator card shows Years and bracket", hasButton(INV.elias, "Years 6 · Weathered"),
+    labelsOf(INV.elias))
+  local seatedMat
+  for _, i in ipairs(ctl.call("shApiInvestigators") or {}) do
+    if i.id == "sthr-elias" and i.matColor then seatedMat = i.matColor end
+  end
+  if scedHere and seatedMat then
+    local stats = trackerStats(seatedMat)
+    check("SCED skill tracker shows the aged skills (wil +1, com -1)",
+      type(stats) == "table" and stats[1] == 4 and stats[2] == 2 and stats[3] == 3 and stats[4] == 3,
+      type(stats) == "table" and table.concat(stats, "/") or tostring(stats))
+  else
+    info("no Still Hour investigator seated on a SCED mat: skill tracker not exercised")
+  end
+  -- persistence: save + reload keeps Years
+  local fresh = ctl.reload()
+  Wait.frames(function()
+    local list = fresh and fresh.call("shApiInvestigators") or {}
+    local years
+    for _, i in ipairs(list) do if i.id == "sthr-elias" then years = i.years end end
+    check("Years persist through save+reload", years == 6, tostring(years))
+    for name, o in pairs(spawned) do if o == ctl then spawned[name] = fresh end end
+    go()
+  end, 90)
+end)
+
+step("board: SCED campaign export carries the state", function(go)
+  local ctl = findControl()
+  if not ctl then return go() end
+  local logs = getObjectsWithTag("CampaignLog")
+  if #logs ~= 1 then
+    info(#logs .. " campaign log(s) on the table: export mirror not exercised (needs exactly one)")
+    ctl.call("shApiRestore", { blob = snapshot })
+    ctl.call("shApiSyncBoard")
+    return go()
+  end
+  local m = ctl.call("shApiLogMirror")
+  check("state is mirrored into the campaign log", m ~= nil and m.bytes > 0)
+  -- SCED's export stores the log's getData() in the save coin (import respawns
+  -- it); the log belongs to the owner's table, so it is read, never replaced
+  local data = logs[1].getData()
+  check("the campaign log's saved data (what SCED exports) carries the state",
+    (data.Memo or ""):find("stillHour", 1, true) ~= nil)
+  -- a freshly loaded control token (empty state) adopts it
+  local cdata = ctl.getData()
+  cdata.LuaScriptState = ""
+  cdata.GUID = nil
+  cdata.Transform.posZ = cdata.Transform.posZ - 8
+  spawnObjectData({ data = cdata, callback_function = function(copy)
+    copy.addTag(TAG)
+    Wait.frames(function()
+      local s = copy.call("shApiState")
+      local years
+      for _, i in ipairs(copy.call("shApiInvestigators") or {}) do if i.id == "sthr-elias" then years = i.years end end
+      check("a fresh control token adopts the imported state", years == 6 and s.loops >= 2,
+        "years " .. tostring(years) .. ", loops " .. tostring(s.loops))
+      copy.destruct()
+      ctl.call("shApiRestore", { blob = snapshot })
+      ctl.call("shApiSyncBoard")                        -- trackers back to the restored Years
+      go()
+    end, 30)
+  end })
 end)
 
 step("deal a card", function(go)

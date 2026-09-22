@@ -28,6 +28,18 @@ adjust the `require` prefixes to match (they must all share one prefix).
 
 ## 2. The state host object (P2 persistence)
 
+**Built:** the control token is that host (`src/tts/control.lua`, `onSave` v2:
+campaign + `[static]` bag + board tracking + interlude inputs + a change
+sequence number). SCED's Campaign Importer/Exporter
+(`core/CampaignImporterExporter.ttslua`) has no hook for third-party data, but
+its export stores the single object tagged `CampaignLog` whole (`getData()`)
+in the save coin and respawns it on import. The control token therefore
+mirrors its state into the campaign log's `memo` (TTS's saved user-data field)
+on every change; after an import (or on a new table), a control token whose
+own state is older adopts the log's copy. With no campaign log, or more than
+one, state lives on the control token only (it survives TTS save/load but not
+a SCED export/import).
+
 `CampaignState` is a pure module holding an in-memory `state` table. It needs one
 **owner object** in the scene (a token/tile) whose lifecycle hooks persist it:
 

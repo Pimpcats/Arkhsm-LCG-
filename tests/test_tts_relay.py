@@ -108,6 +108,18 @@ BOARD_CHECKS = (
     "it cannot be defeated: removed from play, it returns",
     "Emerging adds a Hunt button",
     "Hunt moves it one location toward its prey",
+    "both investigators are found by card metadata",
+    "each investigator card has a Memory button",
+    "each investigator card shows Years",
+    "the card's Memory button follows the count",
+    "it manifests at the location away from both investigators",
+    "it hunts the investigator with the most Memory (not merely the nearest)",
+    "when another investigator has more Memory, the prey changes",
+    "Age adds Years for defeat, danger and leaning (4)",
+    "a second Age in the same interlude is refused",
+    "the next interlude reaches Weathered",
+    "the investigator card shows Years and bracket",
+    "Years persist through save+reload",
 )
 
 SCED_CHECKS = (
@@ -119,6 +131,10 @@ SCED_CHECKS = (
     "back to Calm removes the [static] tokens again",
     "SCED clue spawn is held back while sealed (TokenSpawnTrackerApi)",
     "SCED clue spawn is released for the opened location",
+    "SCED skill tracker shows the aged skills (wil +1, com -1)",
+    "state is mirrored into the campaign log",
+    "the campaign log's saved data (what SCED exports) carries the state",
+    "a fresh control token adopts the imported state",
 )
 
 

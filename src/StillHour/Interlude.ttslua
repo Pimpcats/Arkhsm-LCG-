@@ -59,6 +59,19 @@ function Interlude.bank(amount)
   return CampaignState.bankMemory(amount)
 end
 
+--- Guide §4 step 2: move every investigator's on-card Memory to the bank.
+-- Returns the amount moved.
+function Interlude.bankOnCard()
+  return CampaignState.bankOnCardMemory()
+end
+
+--- "Ended in danger" for Aging, from the Dissonance recorded when the loop ended.
+function Interlude.loopEndedInDanger()
+  local d = CampaignState.getLastLoopEndDissonance()
+  if d == nil then return false end
+  return Aging.loopEndedInDanger(d, CampaignState.constants().investigators)
+end
+
 function Interlude.recollectionCost(cardId)
   return Interlude.RECOLLECTION_COST[cardId]
 end
@@ -90,7 +103,15 @@ end
 --- Begin the next loop's play: enforce the Memory soft cap (6 x investigators).
 -- Call at the end of the interlude, before loop setup.
 function Interlude.beginNextLoop()
-  return CampaignState.startLoop()
+  local s = CampaignState.startLoop()
+  -- Elder/Ancient: "begin each loop with 1 Memory on your investigator card".
+  for id in pairs(s.years or {}) do
+    local drift = Aging.driftFor(id)
+    if drift and drift.startLoopMemory > 0 and CampaignState.getOnCardMemory(id) < drift.startLoopMemory then
+      CampaignState.setOnCardMemory(id, drift.startLoopMemory)
+    end
+  end
+  return s
 end
 
 return Interlude

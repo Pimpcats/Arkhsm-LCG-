@@ -44,6 +44,8 @@ local function freshState(n)
     brackets = {},           -- investigatorId -> {bracket, physical, mental}
     appointedStage = 0,      -- The Appointed's Approach: 0 Unseen..3 Arrived (CO-002)
     victoryLog = {},         -- enemyId -> true (Victory claimed; once per campaign)
+    onCardMemory = {},       -- investigatorId -> Memory on that investigator's cards (this loop)
+    lastLoopEndDissonance = nil, -- Dissonance when the last loop ended (Aging "ended in danger")
   }
 end
 
@@ -94,6 +96,7 @@ function CampaignState.deserialize(saved, decoder)
     state.brackets = state.brackets or {}
     state.appointedStage = state.appointedStage or 0
     state.victoryLog = state.victoryLog or {}
+    state.onCardMemory = state.onCardMemory or {}
   end
   return state
 end
@@ -147,6 +150,42 @@ end
 --- Buy a Recollection into a deck: cost = its listed memoryCost. Returns success bool.
 function CampaignState.purchaseRecollection(memoryCost)
   return CampaignState.spendMemory(memoryCost or 0)
+end
+
+----------------------------------------------------------- on-card Memory --
+
+-- Memory on an investigator's cards (cards v0.2 §A: "tokens on investigator/
+-- asset cards"). It persists between nodes of a loop, drives the Appointed's
+-- Prey ("the investigator with the most Memory on their cards"), and is moved to
+-- banked Memory at the interlude (guide §4 step 2).
+
+function CampaignState.getOnCardMemory(investigatorId)
+  return state.onCardMemory[investigatorId] or 0
+end
+
+function CampaignState.setOnCardMemory(investigatorId, n)
+  state.onCardMemory[investigatorId] = math.max(0, math.floor(n or 0))
+  return state.onCardMemory[investigatorId]
+end
+
+function CampaignState.addOnCardMemory(investigatorId, n)
+  return CampaignState.setOnCardMemory(investigatorId, CampaignState.getOnCardMemory(investigatorId) + (n or 1))
+end
+
+--- Copy of the investigatorId -> on-card Memory map.
+function CampaignState.onCardMemoryMap()
+  local out = {}
+  for id, n in pairs(state.onCardMemory) do out[id] = n end
+  return out
+end
+
+--- Interlude: move all on-card Memory to banked Memory. Returns the amount moved.
+function CampaignState.bankOnCardMemory()
+  local total = 0
+  for _, n in pairs(state.onCardMemory) do total = total + n end
+  state.onCardMemory = {}
+  CampaignState.bankMemory(total)
+  return total
 end
 
 ----------------------------------------------------------------- dissonance --
@@ -343,6 +382,8 @@ end
 -- bank Memory, per guide §4.
 function CampaignState.reset()
   state.loopsCompleted = state.loopsCompleted + 1
+  -- Aging reads this at the interlude ("ended in danger"), after the drop below.
+  state.lastLoopEndDissonance = state.dissonance
 
   -- Scar floor: completed loops, capped by scarCap.
   local c = CampaignState.constants()
@@ -361,6 +402,11 @@ end
 function CampaignState.startLoop()
   CampaignState.capMemory()
   return state
+end
+
+--- Dissonance at the end of the last loop (nil before the first reset).
+function CampaignState.getLastLoopEndDissonance()
+  return state.lastLoopEndDissonance
 end
 
 function CampaignState.getLoopsCompleted()
