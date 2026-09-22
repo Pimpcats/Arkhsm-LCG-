@@ -13,9 +13,12 @@ concepts simply don't exist here and are adapted rather than passed through:
                    image. Re-rolling a variant works; pinning one doesn't.
   steps/cfg/sampler
                    diffusion knobs with no equivalent; ignored on purpose.
-  checkpoint       replaced by the model choice (gpt-image-1 / dall-e-3), and
-                   the "look" comes from the campaign's style text instead of
-                   a .safetensors file.
+  checkpoint       replaced by the model choice (gpt-image-2 / gpt-image-1 /
+                   dall-e-3), and the "look" comes from the campaign's style
+                   text instead of a .safetensors file.
+  character refs   the job's reference images go to /v1/images/edits, which
+                   takes them as visual input — the stand-in for IPAdapter, so
+                   an investigator keeps one face across cards.
 
 The API key is NOT a ChatGPT subscription — it is a separate, pay-per-image
 credit balance from platform.openai.com.
@@ -84,11 +87,31 @@ def build_prompt(positive, negative):
     return text
 
 
+# up to this many reference images ride along; more adds cost, not likeness
+MAX_REFS = 4
+
+REF_CLAUSE = ("The reference image shows this character. Keep their face, age, "
+              "build, hair and costume exactly; take nothing else from it — "
+              "paint a new scene, pose and composition as described below.\n\n")
+
+
+def resolve_refs(refs):
+    """Reference paths (repo-relative, as characters.json stores them) that
+    actually exist on disk, capped at MAX_REFS."""
+    from .. import runner
+    out = []
+    for r in refs or []:
+        p = r if os.path.isabs(r) else os.path.join(runner.repo_root(), r)
+        if os.path.isfile(p):
+            out.append(p)
+    return out[:MAX_REFS]
+
+
 class OpenAIBackend(Backend):
     name = "openai"
     DEFAULT_URL = "https://api.openai.com"
-    DEFAULT_MODEL = "gpt-image-1"
-    MODELS = ["gpt-image-1", "dall-e-3"]
+    DEFAULT_MODEL = "gpt-image-2"
+    MODELS = ["gpt-image-2", "gpt-image-1", "dall-e-3"]
 
     def __init__(self, base_url=None, dry_run=False, payload_dir=None,
                  timeout=300, api_key=None, model=None):
@@ -117,6 +140,11 @@ class OpenAIBackend(Backend):
             payload["response_format"] = "b64_json"
         else:
             payload["quality"] = params.get("quality") or "high"
+        # dall-e-3 has no edits/reference path; only the gpt-image family does
+        refs = [] if model.lower().startswith("dall-e") else resolve_refs(params.get("refs"))
+        if refs:
+            payload["prompt"] = REF_CLAUSE + payload["prompt"]
+            payload["refs"] = [os.path.basename(r) for r in refs]
         if self.dry_run:
             self._write_payload(job_key, payload)
             return [STUB_PNG]
@@ -125,9 +153,22 @@ class OpenAIBackend(Backend):
                 "no OpenAI API key — paste one in 2 · Illustrate → Backend, or "
                 "set OPENAI_API_KEY. Get it from platform.openai.com → API keys "
                 "(a ChatGPT subscription does not include API access).")
-        r = requests.post(self.base_url + "/v1/images/generations",
-                          json=payload, headers=self._headers(),
-                          timeout=self.timeout)
+        if refs:
+            payload.pop("refs")
+            files = [("image[]", (os.path.basename(p), open(p, "rb"), "image/png"))
+                     for p in refs]
+            try:
+                r = requests.post(self.base_url + "/v1/images/edits",
+                                  data={k: str(v) for k, v in payload.items()},
+                                  files=files, timeout=self.timeout,
+                                  headers={"Authorization": "Bearer " + self.api_key})
+            finally:
+                for _, (_, fh, _) in files:
+                    fh.close()
+        else:
+            r = requests.post(self.base_url + "/v1/images/generations",
+                              json=payload, headers=self._headers(),
+                              timeout=self.timeout)
         if r.status_code >= 400:
             raise RuntimeError(self._explain(r))
         return [base64.b64decode(d["b64_json"]) for d in r.json().get("data", [])

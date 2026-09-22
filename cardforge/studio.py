@@ -1314,7 +1314,7 @@ def act_campaign_new(p):
         # it takes, versus installing and running Stable Diffusion locally
         "backend": base.get("backend", "openai"),
         "base_url": base.get("base_url"),
-        "checkpoint": base.get("checkpoint", "gpt-image-1"),
+        "checkpoint": base.get("checkpoint", "gpt-image-2"),
         "output_dir": "out/" + cid,
         "name": name,
         # inherit the locked house style so a new campaign looks like the rest
@@ -3202,7 +3202,7 @@ title="OpenAI needs only an API key. The two local options require you to instal
 <button class="btn primary" onclick=oaiSave()>Save key</button>
 <span id=oai_state class=hint></span>
 <label>model</label>
-<input type=text id=oai_model size=20 list=oai_models placeholder="gpt-image-1" onchange=modelSet2()
+<input type=text id=oai_model size=20 list=oai_models placeholder="gpt-image-2" onchange=modelSet2()
 title="type any model name your account has — the list is only a shortcut">
 <datalist id=oai_models></datalist>
 <button class=btn onclick=oaiModels() title="ask your account which image models it can use">&#8635; List my models</button>

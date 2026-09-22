@@ -49,6 +49,10 @@ def compose(job, campaign, profiles, character=None):
             # no LoRA yet: trigger words still anchor the look; refs are the
             # backend's problem (Comfy IPAdapter) or skipped (A1111 v1).
             lora_tok = "{}, ".format(char["trigger"])
+        if not char.get("lora") and char.get("description"):
+            # without a LoRA the trigger is just an unknown word to the model;
+            # the written character bible is what actually carries the look
+            lora_tok += "{}, ".format(char["description"])
 
     # campaign-wide style LoRA: applies to EVERY card so the whole set matches
     # ({"style_lora": "name", "style_lora_weight": 0.8, "style_trigger": "..."})
