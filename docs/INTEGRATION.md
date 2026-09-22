@@ -55,8 +55,19 @@ your fork), register this object with it so it is included in campaign exports.
 
 ## 3. Chaos-bag adapter (P3)
 
-`Dissonance` never touches the bag directly. Provide a thin adapter over SCED's
-existing chaos-bag / bless-curse manager implementing at minimum:
+**Built:** `src/StillHour/ChaosBag.ttslua` (`ChaosBag.new()`), used by the
+control token. It finds the bag through SCED's `ChaosBagApi.findChaosBag()`
+(Global `findChaosBag`), falls back to any table object named "Chaos Bag", and
+otherwise keeps a virtual count, so it never errors on a vanilla table. SCED's
+`spawnChaosToken`/`removeChaosToken` only accept its own `ID_URL_MAP` ids, so
+the adapter mirrors what they do for a custom `Custom_Tile` token tagged
+`StillHourStatic` (spawn + `putObject`; `takeObject({guid})` + destruct),
+honouring `canTouchChaosTokens()`. The host forwards
+`onObjectLeaveContainer`/`onObjectEnterContainer` so a drawn `[static]` raises
+Dissonance. `src/StillHour/SCED.ttslua` is the fail-safe wrapper over the SCED
+calls (all mirrored from SCED's `*Api.ttslua` wrappers).
+
+The contract any adapter implements:
 
 ```lua
 local bag = {

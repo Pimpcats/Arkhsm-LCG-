@@ -5,7 +5,8 @@ Tabletop Simulator on the owner's PC cannot read file:/// paths from whatever
 machine produced the build, so a shareable build needs hosted image URLs. This:
 
   1. renders every card face (pipeline/render_placeholders.py) unless --no-render
-  2. converts the Still Hour faces/backs + deck backs to JPEG in dist/cards/
+  2. converts the Still Hour faces/backs + deck backs (and the [static] chaos
+     token face, pipeline/render_token.py) to JPEG in dist/cards/
   3. writes pipeline/art_urls.json in hosted mode, pointing at
        https://raw.githubusercontent.com/<repo>/<ref>/dist/cards/<id>.jpg?v=<hash>
      (the ?v=<content hash> changes whenever the image does, so TTS's URL-keyed
@@ -26,6 +27,9 @@ import sys
 
 from PIL import Image
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from render_token import render_static_token  # noqa: E402
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 FACES = os.path.join(ROOT, "art", "faces")
@@ -33,6 +37,7 @@ OUT = os.path.join(ROOT, "dist", "cards")
 REPO = "Pimpcats/Arkhsm-LCG-"
 PREFIX = "sthr-"
 JPEG_QUALITY = 88
+STATIC_TOKEN = "sthr-static-token"
 
 REBUILD = ("build_cards.py", "bundle_mod.py", "package_download.py")
 
@@ -79,6 +84,13 @@ def publish(ref, render=True):
         if os.path.exists(src):
             urls[key] = url(fname, to_jpeg(src, fname))
             written.add(fname)
+
+    # the [static] chaos token face (pipeline/render_token.py); bundle_mod.py
+    # reads "_static_token" to give the control script and token object its URL
+    token_png = os.path.join(ROOT, "art", "tokens", STATIC_TOKEN + ".png")
+    render_static_token(token_png)
+    urls["_static_token"] = url(STATIC_TOKEN, to_jpeg(token_png, STATIC_TOKEN))
+    written.add(STATIC_TOKEN)
 
     # drop images from earlier builds that no longer belong to any card
     for old in glob.glob(os.path.join(OUT, "*.jpg")):

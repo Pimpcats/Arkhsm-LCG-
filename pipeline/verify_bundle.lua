@@ -1,13 +1,15 @@
 -- Loads dist/stillhour_bundle.lua inside a stubbed Tabletop Simulator
 -- environment and drives it exactly as TTS would: onLoad -> harness -> play
--- buttons. Proves the inlined require + all six modules + the control script
--- compose correctly. Run: lua5.4 pipeline/verify_bundle.lua
+-- buttons -> interlude panel -> save/load. The stub is a *vanilla* table: no
+-- SCED, no Global, no getObjects — so this also proves the board wiring
+-- degrades without errors. Run: lua5.2 pipeline/verify_bundle.lua
 
 -- ---- Lua-literal JSON standing in for TTS's global JSON ----
 local function encode(v)
   local t = type(v)
   if t == "number" or t == "boolean" then return tostring(v) end
   if t == "string" then return string.format("%q", v) end
+  if t == "nil" then return "nil" end
   if t == "table" then
     local parts = {}
     for k, val in pairs(v) do
@@ -20,40 +22,141 @@ local function encode(v)
   error("cannot encode " .. t)
 end
 
+local failures = 0
+local function expect(name, cond)
+  print((cond and "  ok    " or "  FAIL  ") .. name)
+  if not cond then failures = failures + 1 end
+end
+
 local buttons = {}
+local errors = {}
+local selfObj = {
+  createButton = function(def) buttons[#buttons + 1] = def ; return true end,
+  clearButtons = function() buttons = {} ; return true end,
+  getPosition = function() return { x = 3, y = 1, z = 0 } end,
+}
 local env = setmetatable({
   JSON = { encode = encode, decode = function(s) return assert(load("return " .. s))() end },
-  print = print,
+  print = function(...)
+    local s = table.concat({ ... }, "\t")
+    if s:find("board wiring skipped", 1, true) then errors[#errors + 1] = s end
+    print(s)
+  end,
   broadcastToAll = function(msg) print("  (broadcast) " .. msg) end,
-  self = { createButton = function(_, def)
-    -- TTS calls self.createButton{...}; with method syntax `self.createButton({..})`
-    -- the table is the first arg here.
-    buttons[#buttons + 1] = def
-  end },
+  self = selfObj,
 }, { __index = _G })
-
--- control.lua calls self.createButton({...}) as a dot-call (one arg = the def).
-env.self.createButton = function(def) buttons[#buttons + 1] = def end
 
 local chunk = assert(loadfile("dist/stillhour_bundle.lua", "t", env))
 chunk()
 
+local function labels()
+  local n = {}
+  for _, b in ipairs(buttons) do n[#n + 1] = b.label end
+  return n
+end
+local function hasLabel(prefix)
+  for _, b in ipairs(buttons) do
+    if b.label:sub(1, #prefix) == prefix then return b end
+  end
+  return nil
+end
+
 print("== driving the bundle as TTS would ==")
 env.onLoad(nil)
-assert(#buttons == 7, "expected 7 control buttons, got " .. #buttons)
-print("  created " .. #buttons .. " buttons: " ..
-  (function() local n = {} for _, b in ipairs(buttons) do n[#n + 1] = b.label end return table.concat(n, ", ") end)())
+print("  created " .. #buttons .. " buttons: " .. table.concat(labels(), ", "))
+for _, p in ipairs({ "Memory ", "Dissonance ", "Hour ", "Appointed: ", "[static] ", "Investigators ",
+                     "Run Tests", "Reset Loop", "Interlude", "Sync Board" }) do
+  expect("control has a '" .. p .. "' button", hasLabel(p) ~= nil)
+end
+for _, b in ipairs(buttons) do
+  expect("button '" .. b.label .. "' has a click function",
+    b.click_function and type(env[b.click_function]) == "function")
+end
 
 print("\n== runStillHourTests() ==")
-env.runStillHourTests()
+local res = env.runStillHourTests()
+expect("in-bundle tests all pass (" .. res.passed .. ")", res.failed == 0 and res.passed > 0)
 
-print("\n== play sequence (buttons) ==")
+print("\n== touch counters (left / right click) ==")
+env.shClickMemory(nil, "White", false) ; env.shClickMemory(nil, "White", false)
+expect("Memory +2 by clicks", env.shApiState().memory == 2)
+env.shClickMemory(nil, "White", true)
+expect("Memory right-click -1", env.shApiState().memory == 1)
+for _ = 1, 6 do env.shClickDissonance(nil, "White", false) end
+local s = env.shApiState()
+expect("Dissonance 6 -> Glitch, Appointed Sensed, 1 [static] (virtual bag)",
+  s.dissonance == 6 and s.band == "Glitch" and s.stage == 1 and s.static.target == 1 and s.static.mode == "virtual")
+env.shClickDissonance(nil, "White", true)
+expect("Dissonance right-click reduces", env.shApiState().dissonance == 5)
+env.shClickHour(nil, "White", false)
+expect("Hour left-click advances", env.shApiState().hour == 2)
+env.shClickHour(nil, "White", true)
+expect("Hour right-click rewinds", env.shApiState().hour == 1)
+expect("Dissonance button label tracks state", hasLabel("Dissonance 5 / 18") ~= nil)
+env.shClickAppointed(nil, "White", false)
+expect("Appointed card-advance ratchets up a stage", env.shApiState().stage == 2)
+env.shHoldBack()
+expect("Hold Back drops a stage (no card on a vanilla table: no error)", env.shApiState().stage == 1)
+env.shHunt() ; env.shSyncBoard() ; env.shClickStatic()
+env.shClickInvestigators(nil, "White", false)
+expect("Investigators +1 -> 4 (Memory cap 24)", env.shApiState().investigators == 4)
+env.shClickInvestigators(nil, "White", true)
+
+print("\n== [static] reveal from a chaos bag (table event) ==")
+local fakeBag = { getName = function() return "Chaos Bag" end, getDescription = function() return "" end }
+local token = { hasTag = function(t) return t == "StillHourStatic" end, getGUID = function() return "abc123" end }
+local d0 = env.shApiState().dissonance
+env.onObjectLeaveContainer(fakeBag, token)
+expect("revealing [static] raises Dissonance by 1", env.shApiState().dissonance == d0 + 1)
+env.onObjectLeaveContainer({ getName = function() return "Deck" end }, token)
+expect("leaving another container is not a reveal", env.shApiState().dissonance == d0 + 1)
+env.onObjectEnterContainer(fakeBag, token)
+env.onObjectDestroy({ type = "Card", getGMNotes = function() return "" end })
+env.onObjectDrop("White", token)
+
+print("\n== interlude buy panel ==")
+env.shApiCounter({ name = "memory", delta = 9 })
+env.shOpenInterlude()
+print("  panel: " .. table.concat(labels(), ", "))
+expect("panel lists Recollections with prices", hasLabel("sthr-longwayround (2)") ~= nil)
+expect("panel has level-up buttons", hasLabel("Lvl 3 (3)") ~= nil and hasLabel("Lvl 5 (5)") ~= nil)
+local m0 = env.shApiState().memory
+local rb = hasLabel("sthr-longwayround (2)")
+env[rb.click_function](nil, "White", false)
+expect("clicking a Recollection spends its memoryCost", env.shApiState().memory == m0 - 2)
+env.shBuyLvl3(nil, "White", false)
+expect("clicking Lvl 3 spends 3", env.shApiState().memory == m0 - 5)
+expect("unaffordable purchase is refused", env.shApiBuy({ level = 5 }).ok == (m0 - 5 >= 5))
+env.shBeginNextLoop()
+expect("Begin Next Loop returns to the play panel", env.shApiState().mode == "play" and hasLabel("Run Tests") ~= nil)
+
+print("\n== play sequence (console helpers) ==")
 env.shRaiseDissonance()
 env.shAdvanceHour()
 env.shStatus()
+env.shKnowledgeStatus()
+env.shUnlock("no-such-fact")
 
--- onSave must return a decodable blob.
+print("\n== onSave -> onLoad round trip ==")
+local before = env.shApiState()
 local blob = env.onSave()
 assert(type(blob) == "string" and #blob > 0, "onSave produced no state")
-print("\n== onSave -> LuaScriptState (" .. #blob .. " bytes) ==")
+env.shApiCounter({ name = "memory", delta = 5 })
+env.onLoad(blob)
+local after = env.shApiState()
+expect("state restored from LuaScriptState (" .. #blob .. " bytes)",
+  after.memory == before.memory and after.dissonance == before.dissonance and after.stage == before.stage
+  and after.hour == before.hour)
+-- a v1 save (bare CampaignState blob) still loads
+env.onLoad(encode({ version = 1, investigators = 3, loopsCompleted = 2, bankedMemory = 7, dissonance = 2,
+  hourglass = 1, knowledge = {}, oncePerLoopFlags = {}, testTypesThisLoop = {}, testTypesLastLoop = {},
+  years = {}, brackets = {}, appointedStage = 0, victoryLog = {} }))
+expect("legacy v1 save loads", env.shApiState().memory == 7 and env.shApiState().loops == 2)
+
+expect("no board-wiring errors on a vanilla table", #errors == 0)
+for _, e in ipairs(errors) do print("    " .. e) end
+if failures > 0 then
+  print("verify_bundle: " .. failures .. " FAILURE(S)")
+  os.exit(1)
+end
 print("verify_bundle: OK")
