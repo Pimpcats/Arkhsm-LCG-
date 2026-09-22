@@ -8,7 +8,9 @@ machine produced the build, so a shareable build needs hosted image URLs. This:
   2. converts the Still Hour faces/backs + deck backs (and the [static] chaos
      token face, pipeline/render_token.py) to JPEG in dist/cards/
   3. writes pipeline/art_urls.json in hosted mode, pointing at
-       https://raw.githubusercontent.com/<repo>/<ref>/dist/cards/<id>.jpg?v=<hash>
+       https://raw.githubusercontent.com/<repo>/<commit>/dist/cards/<id>.jpg?v=<hash>
+     where <commit> holds exactly these files (committed first if changed), so a
+     merged-and-deleted branch never blanks the faces
      (the ?v=<content hash> changes whenever the image does, so TTS's URL-keyed
      image cache never shows a stale face)
   4. typesets the campaign guide PDF (pipeline/build_guide_pdf.py, when
@@ -17,9 +19,9 @@ machine produced the build, so a shareable build needs hosted image URLs. This:
   5. rebuilds every dist/ artifact (cards, mod, table presence, download box)
      and fails if any file:/// URL survives
 
-Commit dist/ afterwards; the URLs resolve once that commit is pushed to <ref>.
+Commit dist/ afterwards; the URLs resolve once the pinned commit is pushed.
 
-Run: python3 pipeline/publish_hosted.py [--ref BRANCH] [--no-render]
+Run: python3 pipeline/publish_hosted.py [--ref REF] [--no-render]
 """
 import argparse
 import glob
@@ -49,12 +51,6 @@ REBUILD = (("build_cards.py",), ("build_cards.py", "--only") + STARTER,
            ("bundle_mod.py",), ("table_presence.py",),
            ("package_download.py", "--require-hosted"))
 GUIDE = os.path.join(ROOT, "dist", "guide", "the_still_hour_campaign_guide.pdf")
-
-
-def current_branch():
-    out = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=ROOT,
-                         capture_output=True, text=True, check=True)
-    return out.stdout.strip()
 
 
 def to_jpeg(src, name):
@@ -95,43 +91,53 @@ def publish(ref, render=True):
         subprocess.run([sys.executable, os.path.join(HERE, "render_placeholders.py")],
                        cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
     os.makedirs(OUT, exist_ok=True)
-    base = "https://raw.githubusercontent.com/{}/{}/dist/cards".format(REPO, ref)
 
-    def url(name, h):
-        return "{}/{}.jpg?v={}".format(base, name, h)
-
-    written = set()
-    urls = {}
+    # phase 1: write every hosted file, remembering its content hash
+    hashes = {}                      # image name -> content hash
+    plan = {}                        # art_urls key -> image name or {face, back}
     for png in sorted(glob.glob(os.path.join(FACES, PREFIX + "*.png"))):
         name = os.path.splitext(os.path.basename(png))[0]
         if name.endswith("-back"):
             continue
-        urls[name] = {"face": url(name, to_jpeg(png, name))}
-        written.add(name)
+        hashes[name] = to_jpeg(png, name)
+        plan[name] = {"face": name}
         back = os.path.join(FACES, name + "-back.png")
         if os.path.exists(back):
-            urls[name]["back"] = url(name + "-back", to_jpeg(back, name + "-back"))
-            written.add(name + "-back")
+            hashes[name + "-back"] = to_jpeg(back, name + "-back")
+            plan[name]["back"] = name + "-back"
     for key, fname in (("_player_back", "player_back"),
                        ("_encounter_back", "encounter_back")):
         src = os.path.join(ROOT, "assets", "backs", fname + ".png")
         if os.path.exists(src):
-            urls[key] = url(fname, to_jpeg(src, fname))
-            written.add(fname)
+            hashes[fname] = to_jpeg(src, fname)
+            plan[key] = fname
 
     # the [static] chaos token face (pipeline/render_token.py); bundle_mod.py
     # reads "_static_token" to give the control script and token object its URL
     token_png = os.path.join(ROOT, "art", "tokens", STATIC_TOKEN + ".png")
     render_static_token(token_png)
-    urls["_static_token"] = url(STATIC_TOKEN, to_jpeg(token_png, STATIC_TOKEN))
-    written.add(STATIC_TOKEN)
+    hashes[STATIC_TOKEN] = to_jpeg(token_png, STATIC_TOKEN)
+    plan["_static_token"] = STATIC_TOKEN
+    written = set(hashes)
 
     # drop images from earlier builds that no longer belong to any card
     for old in glob.glob(os.path.join(OUT, "*.jpg")):
         if os.path.splitext(os.path.basename(old))[0] not in written:
             os.remove(old)
+    build_guide()
 
-    guide = publish_guide(ref)
+    # phase 2: pin to the commit holding exactly these files (see pin_ref)
+    if ref is None:
+        ref = pin_ref()
+    base = "https://raw.githubusercontent.com/{}/{}/dist/cards".format(REPO, ref)
+
+    def url(name):
+        return "{}/{}.jpg?v={}".format(base, name, hashes[name])
+
+    urls = {}
+    for key, v in plan.items():
+        urls[key] = {k: url(n) for k, n in v.items()} if isinstance(v, dict) else url(v)
+    guide = guide_url(ref)
     if guide:
         urls["_campaign_guide"] = guide
 
@@ -158,22 +164,46 @@ def publish(ref, render=True):
         "local_urls_left": bad}
 
 
-def publish_guide(ref):
-    """(Re)typeset the guide PDF if reportlab is available, then return its
-    hosted URL (content-hashed like the card images), or None if absent."""
+def build_guide():
+    """(Re)typeset the guide PDF when reportlab is available."""
     try:
         import reportlab  # noqa: F401
-        can_build = True
     except ImportError:
-        can_build = False
-    if can_build:
-        subprocess.run([sys.executable, os.path.join(HERE, "build_guide_pdf.py")],
-                       cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
+        return
+    subprocess.run([sys.executable, os.path.join(HERE, "build_guide_pdf.py")],
+                   cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
+
+
+def guide_url(ref):
+    """The guide PDF's hosted URL (content-hashed like the images), or None."""
     if not os.path.exists(GUIDE):
         return None
     h = hashlib.sha1(open(GUIDE, "rb").read()).hexdigest()[:10]
     rel = os.path.relpath(GUIDE, ROOT).replace(os.sep, "/")
     return "https://raw.githubusercontent.com/{}/{}/{}?v={}".format(REPO, ref, rel, h)
+
+
+HOSTED_PATHS = ["dist/cards", "dist/guide"]
+
+
+def pin_ref():
+    """The commit that holds exactly the hosted files now on disk.
+
+    Branch URLs break the moment a branch is merged and deleted (every face in
+    TTS goes blank), so URLs name a commit instead: immutable, and still
+    reachable after a normal merge. Changed hosted files are committed first
+    (message: "Publish hosted card images", plus $PUBLISH_COMMIT_TRAILER), and
+    the URLs resolve once that commit is pushed."""
+    def git(*a):
+        return subprocess.run(["git"] + list(a), cwd=ROOT, check=True,
+                              capture_output=True, text=True).stdout
+    git("add", "-A", "--", *HOSTED_PATHS)
+    if git("diff", "--cached", "--name-only", "--", *HOSTED_PATHS).strip():
+        msg = "Publish hosted card images"
+        if os.environ.get("PUBLISH_COMMIT_TRAILER"):
+            msg += "\n\n" + os.environ["PUBLISH_COMMIT_TRAILER"]
+        git("commit", "-q", "-m", msg, "--", *HOSTED_PATHS)
+    return git("log", "-1", "--format=%H", "--", *HOSTED_PATHS).strip()
 
 
 def local_urls():
@@ -187,11 +217,12 @@ def local_urls():
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--ref", help="branch the URLs point at (default: current)")
+    ap.add_argument("--ref", help="branch/commit the URLs point at (default: pin to the "
+                                  "commit holding the hosted files, committing them if changed)")
     ap.add_argument("--no-render", action="store_true",
                     help="reuse art/faces as-is instead of re-rendering")
     a = ap.parse_args()
-    res = publish(a.ref or current_branch(), render=not a.no_render)
+    res = publish(a.ref, render=not a.no_render)
     print(json.dumps(res, indent=2))
     if res["local_urls_left"]:
         print("FAIL: local file:/// URLs remain in " + ", ".join(res["local_urls_left"]))

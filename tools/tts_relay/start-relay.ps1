@@ -37,6 +37,13 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 $Relay = Join-Path $Dir 'relay.py'
-Invoke-WebRequest -ErrorAction Stop -UseBasicParsing -Uri ("{0}?t={1}" -f $Raw, [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()) -OutFile $Relay
+$Stamp = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+try {
+    Invoke-WebRequest -ErrorAction Stop -UseBasicParsing -Uri ("{0}?t={1}" -f $Raw, $Stamp) -OutFile $Relay
+} catch {
+    # the work branch is deleted once merged: fall back to main
+    $Main = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/tools/tts_relay/relay.py"
+    Invoke-WebRequest -ErrorAction Stop -UseBasicParsing -Uri ("{0}?t={1}" -f $Main, $Stamp) -OutFile $Relay
+}
 Write-Host "Relay downloaded to $Relay"
 & $Py $Relay --branch $Branch @args

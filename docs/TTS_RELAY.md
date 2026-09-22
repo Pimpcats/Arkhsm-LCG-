@@ -53,6 +53,11 @@ For each new commit on the watched branch:
 4. Commits `runs/<time>_<commit>/{results.json,log.txt,screenshots/}` plus
    `latest.json` to the `tts-results` branch and pushes it.
 
+If the watched branch no longer exists (merged and deleted), the relay and its
+launcher fall back to `main`. Card images and the guide are hosted at the
+commit that holds them (`pipeline/publish_hosted.py`), so deleting a branch
+never blanks the faces in TTS.
+
 Only objects tagged `StillHourRelay` (the ones the relay spawned) are ever
 removed. Only Lua from the watched commit is sent to TTS. The relay never runs
 repository code on the PC itself.

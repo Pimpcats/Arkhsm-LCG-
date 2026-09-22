@@ -220,3 +220,10 @@ def test_lua_long_string_never_terminates_early():
 def test_lua_quote_keeps_utf8_for_lua52():
     q = relay.lua_quote('THE STILL HOUR — "Control"\n')
     assert "\\u" not in q and "—" in q and '\\"' in q and "\\n" in q
+
+
+def test_relay_falls_back_to_main_when_the_branch_is_merged_and_deleted(tmp_path, remote):
+    sh("git", "branch", "-m", BRANCH, relay.FALLBACK_BRANCH, cwd=remote)
+    rc, latest, _ = run_relay(tmp_path, remote)
+    assert latest["branch"] == relay.FALLBACK_BRANCH
+    assert latest["verdict"] == "pass" and rc == 0
