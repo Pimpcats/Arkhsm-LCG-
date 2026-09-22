@@ -2401,7 +2401,7 @@ end
 
 ------------------------------------------------------------- investigators --
 
--- An investigator is known by its card metadata id (e.g. "sthr-elias"). Its
+-- An investigator is known by its card metadata id (e.g. "sthrelias"). Its
 -- minicard carries the SCED minicard id "<id>-m" (docs/art_reference/
 -- sced_objects/minicard.json). Under SCED the mat colour comes from
 -- PlayermatApi.getActiveInvestigatorData(matColor).id. We match minicards by
@@ -3739,9 +3739,9 @@ end
 function shInterludeDemo()
   print("── Interlude ──")
   local entries = {
-    { id = "sthr-elias",   cond = { defeated = true }, lockedChoice = { physical = "combat", mental = "willpower" } },
-    { id = "sthr-ayako",   cond = { leanedOnLoop = true }, lockedChoice = { physical = "combat", mental = "intellect" } },
-    { id = "sthr-birdie",  cond = {} },
+    { id = "sthrelias",   cond = { defeated = true }, lockedChoice = { physical = "combat", mental = "willpower" } },
+    { id = "sthrayako",   cond = { leanedOnLoop = true }, lockedChoice = { physical = "combat", mental = "intellect" } },
+    { id = "sthrbirdie",  cond = {} },
   }
   local results = Interlude.ageAll(entries)
   for _, e in ipairs(entries) do
@@ -3840,11 +3840,11 @@ function runStillHourTests()
   P, F = check("blocked on reuse", LoopFlags.use("igetout:White") == false, P, F)
 
   CampaignState.bankMemory(14); CampaignState.unlockFact("the-thirteenth-toll")
-  CampaignState.addYears("sthr-elias", 3); CampaignState.raiseDissonance(11); CampaignState.setHour(7)
+  CampaignState.addYears("sthrelias", 3); CampaignState.raiseDissonance(11); CampaignState.setHour(7)
   LoopFlags.recordTest("combat"); CampaignState.reset()
   P, F = check("Memory persists across reset", CampaignState.getBankedMemory() == 14, P, F)
   P, F = check("Knowledge persists across reset", CampaignState.knows("the-thirteenth-toll"), P, F)
-  P, F = check("Years persist across reset", CampaignState.getYears("sthr-elias") == 3, P, F)
+  P, F = check("Years persist across reset", CampaignState.getYears("sthrelias") == 3, P, F)
   P, F = check("Dissonance dropped to scar (1)", CampaignState.getDissonance() == 1, P, F)
   P, F = check("Hourglass reset to Hour I", CampaignState.getHour() == 1, P, F)
   P, F = check("once-per-loop flags cleared", not CampaignState.isFlagSet("igetout:White"), P, F)
@@ -3887,7 +3887,7 @@ function runStillHourTests()
   P, F = check("Sealed Study opens with both facts", Locations.isOpen("sealed-study"), P, F)
   P, F = check("location cards resolve by metadata id",
     Locations.idForCard("sthr-loc-lanternroom") == "lantern-room" and Locations.idForCard("sthr-loc-well") == "the-well"
-    and Locations.idForCard("sthr-elias") == nil, P, F)
+    and Locations.idForCard("sthrelias") == nil, P, F)
   CampaignState.init(3)
   CampaignState.unlockFact("the-lamp-was-never-lit"); CampaignState.unlockFact("the-thirteenth-toll")
   CampaignState.unlockFact("the-road-remembers")
@@ -3906,10 +3906,10 @@ function runStillHourTests()
 
   -- P7: aging stat drift + interlude spend.
   local base = { wil = 5, int = 5, com = 1, agi = 3, health = 5, sanity = 8 }
-  CampaignState.init(3); CampaignState.addYears("sthr-ayako", 14)
+  CampaignState.init(3); CampaignState.addYears("sthrayako", 14)
   -- interlude pushes 14 -> 15 (Ancient) and locks the drift choice
-  Aging.applyInterlude("sthr-ayako", {}, { physical = "combat", mental = "intellect" })
-  local st = Aging.applyDriftToStats(base, "sthr-ayako")
+  Aging.applyInterlude("sthrayako", {}, { physical = "combat", mental = "intellect" })
+  local st = Aging.applyDriftToStats(base, "sthrayako")
   P, F = check("Ancient drift: int 5->7, health/sanity -1, com floored at 1",
     st.int == 7 and st.health == 4 and st.sanity == 7 and st.com == 1, P, F)
   CampaignState.init(3); CampaignState.bankMemory(6)
@@ -3921,9 +3921,9 @@ function runStillHourTests()
 
   -- Prey + on-card Memory
   CampaignState.init(3)
-  CampaignState.addOnCardMemory("sthr-cass", 2); CampaignState.addOnCardMemory("sthr-elias", 3)
+  CampaignState.addOnCardMemory("sthrcass", 2); CampaignState.addOnCardMemory("sthrelias", 3)
   P, F = check("prey is the investigator with the most on-card Memory",
-    Appointed.prey(CampaignState.onCardMemoryMap()) == "sthr-elias", P, F)
+    Appointed.prey(CampaignState.onCardMemoryMap()) == "sthrelias", P, F)
   P, F = check("interlude banks on-card Memory", Interlude.bankOnCard() == 5 and CampaignState.getBankedMemory() == 5, P, F)
 
   print(string.format("──────── RESULT: %d passed, %d failed ────────", P, F))

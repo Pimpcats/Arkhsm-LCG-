@@ -10,7 +10,7 @@ Usage:
     python3 build_cards.py                      # full deck -> dist/the_still_hour.json
     python3 build_cards.py --spec my.json       # alternate spec
     python3 build_cards.py --out path.json      # alternate output
-    python3 build_cards.py --only sthr-elias sthr-lamp sthr-donebefore sthr-eighthgrave
+    python3 build_cards.py --only sthrelias sthr-lamp sthr-donebefore sthr-eighthgrave
                                                 # Elias vertical slice -> dist/stillhour_starter.json
 
 Structure verified against Arkham SCE 4.8.0:

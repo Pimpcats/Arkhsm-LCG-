@@ -2,7 +2,7 @@
 """CardForge CLI — reusable overnight card-art batch tool.
 
     python3 -m cardforge.cardforge generate --campaign still_hour
-    python3 -m cardforge.cardforge generate --campaign still_hour --only sthr-elias
+    python3 -m cardforge.cardforge generate --campaign still_hour --only sthrelias
     python3 -m cardforge.cardforge generate --campaign still_hour --starter --dry-run
     python3 -m cardforge.cardforge seeds    --campaign still_hour --variants 4
     python3 -m cardforge.cardforge contact  --campaign still_hour

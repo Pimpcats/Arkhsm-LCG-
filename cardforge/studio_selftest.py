@@ -150,40 +150,40 @@ s = requests.get(BASE + "/api/status?campaign=still_hour").json()
 check("report shows generated faces", s["report"]["generated"] >= 5 and s["report"]["dry_run"])
 check("gallery lists cards with variants",
       any(g["id"] == "sthr-appointed" and g["variants"] for g in s["gallery"]))
-gal = next(g for g in s["gallery"] if g["id"] == "sthr-elias")
+gal = next(g for g in s["gallery"] if g["id"] == "sthrelias")
 r = requests.post(BASE + "/api/choose",
-                  json={"campaign": "still_hour", "card": "sthr-elias",
+                  json={"campaign": "still_hour", "card": "sthrelias",
                         "file": gal["variants"][-1]}).json()
 s = requests.get(BASE + "/api/status?campaign=still_hour").json()
 check("variant curation sticks (chosen.txt)",
-      next(g for g in s["gallery"] if g["id"] == "sthr-elias")["chosen"] == gal["variants"][-1])
+      next(g for g in s["gallery"] if g["id"] == "sthrelias")["chosen"] == gal["variants"][-1])
 check("choosing a variant instantly composes the card face",
-      r.get("composed") and next(g for g in s["gallery"] if g["id"] == "sthr-elias")["face"]
-      and os.path.exists(os.path.join(faces_dir, "sthr-elias.png")))
+      r.get("composed") and next(g for g in s["gallery"] if g["id"] == "sthrelias")["face"]
+      and os.path.exists(os.path.join(faces_dir, "sthrelias.png")))
 check("composed face serves from /art",
-      requests.get(BASE + "/art?p=art/faces/sthr-elias.png").status_code == 200)
+      requests.get(BASE + "/art?p=art/faces/sthrelias.png").status_code == 200)
 check("gallery carries art-window geometry + placement for the editor",
-      "artbox" in next(g for g in s["gallery"] if g["id"] == "sthr-elias")
-      and next(g for g in s["gallery"] if g["id"] == "sthr-elias")["placement"]["scale"] == 1.0)
+      "artbox" in next(g for g in s["gallery"] if g["id"] == "sthrelias")
+      and next(g for g in s["gallery"] if g["id"] == "sthrelias")["placement"]["scale"] == 1.0)
 # stub art is uniform grey (placement would be invisible) — swap in a gradient
 from PIL import Image as _Img
 grad = _Img.new("RGB", (400, 300))
 grad.putdata([(x % 256, (x * 7) % 256, (x * 13) % 256) for x in range(400 * 300)])
-grad.save(os.path.join(ROOT, "out", "still_hour", "sthr-elias", gal["variants"][-1]))
+grad.save(os.path.join(ROOT, "out", "still_hour", "sthrelias", gal["variants"][-1]))
 requests.post(BASE + "/api/choose",
-              json={"campaign": "still_hour", "card": "sthr-elias", "file": gal["variants"][-1]})
-size_before = os.path.getsize(os.path.join(faces_dir, "sthr-elias.png"))
+              json={"campaign": "still_hour", "card": "sthrelias", "file": gal["variants"][-1]})
+size_before = os.path.getsize(os.path.join(faces_dir, "sthrelias.png"))
 r = requests.post(BASE + "/api/place",
-                  json={"card": "sthr-elias", "scale": 1.8, "ox": 30, "oy": -12}).json()
+                  json={"card": "sthrelias", "scale": 1.8, "ox": 30, "oy": -12}).json()
 check("drag/zoom placement saves and recomposes", r.get("composed"))
 placements = json.load(open(os.path.join(ROOT, "out", "still_hour", "placements.json"), encoding="utf-8"))
 check("placement stored as data (scale 1.8, pan 30/-12)",
-      placements["sthr-elias"]["scale"] == 1.8 and placements["sthr-elias"]["ox"] == 30)
+      placements["sthrelias"]["scale"] == 1.8 and placements["sthrelias"]["ox"] == 30)
 check("recomposite actually changed the face",
-      os.path.getsize(os.path.join(faces_dir, "sthr-elias.png")) != size_before)
+      os.path.getsize(os.path.join(faces_dir, "sthrelias.png")) != size_before)
 requests.post(BASE + "/api/index", json={"campaign": "still_hour"})
 wait_idle()
-img = requests.get(BASE + "/art?p=out/still_hour/sthr-elias/" + gal["variants"][0])
+img = requests.get(BASE + "/art?p=out/still_hour/sthrelias/" + gal["variants"][0])
 check("gallery image serves", img.status_code == 200 and img.content[:4] == b"\x89PNG")
 check("art endpoint refuses paths outside out/",
       requests.get(BASE + "/art?p=pipeline/build_cards.py").status_code == 404)
@@ -201,7 +201,7 @@ check("jobs embedded in the SE script (no file IO in SE)",
       '"sthr-appointed"' in script and "createDefaultSheets" in script)
 jobs = json.load(open(r["jobs"], encoding="utf-8"))
 appointed = next(j for j in jobs if j["id"] == "sthr-appointed")
-elias_back = next(j for j in jobs if j["id"] == "sthr-elias-back")
+elias_back = next(j for j in jobs if j["id"] == "sthrelias-back")
 check("jobs carry the print layer (rules text, enemy stats, back text)",
       "Hold Back" in appointed["text"] and appointed.get("fight") == 4
       and appointed.get("damage") == 2
@@ -214,7 +214,7 @@ r = requests.post(BASE + "/api/se_launch", json={}).json()
 check("launch runs the configured command", r.get("ok"))
 s = requests.get(BASE + "/api/status?campaign=still_hour").json()
 check("coverage: only the click-composed card (front + investigator back)",
-      set(s["se"]["coverage"]["framed"]) == {"sthr-elias", "sthr-elias-back"}
+      set(s["se"]["coverage"]["framed"]) == {"sthrelias", "sthrelias-back"}
       and s["se"]["coverage"]["total"] == 41)
 
 print("== GLYPHS: placeholder renderer through the app ==")
@@ -233,14 +233,14 @@ check("all 41 faces covered by glyph placeholders",
       len(s["se"]["coverage"]["framed"]) == 41 and not s["se"]["coverage"]["missing"])
 from PIL import Image
 check("rendered investigator uses the SE plugin per-class frame at 2x",
-      Image.open(os.path.join(faces_dir, "sthr-elias.png")).size == (1050, 750))
+      Image.open(os.path.join(faces_dir, "sthrelias.png")).size == (1050, 750))
 
 print("== APPLY: framed faces -> art_urls.json -> rebuilt mod ==")
 # reset to just three faces so the apply-count assertions below stay exact
 shutil.rmtree(faces_dir)
 os.makedirs(faces_dir, exist_ok=True)
 from cardforge.backends.base import STUB_PNG
-for fid in ("sthr-elias", "sthr-elias-back", "sthr-lamp"):
+for fid in ("sthrelias", "sthrelias-back", "sthr-lamp"):
     with open(os.path.join(faces_dir, fid + ".png"), "wb") as f:
         f.write(STUB_PNG)
 s = requests.get(BASE + "/api/status?campaign=still_hour").json()
@@ -250,8 +250,8 @@ check("apply accepted ({} cards)".format(r.get("cards")), r.get("ok") and r.get(
 check("rebuild completes", wait_idle(60))
 urls = json.load(open(os.path.join(ROOT, "pipeline", "art_urls.json"), encoding="utf-8"))
 check("art_urls.json: face + back for elias, face for lamp",
-      urls["sthr-elias"]["face"].startswith("file:///")
-      and "back" in urls["sthr-elias"] and "sthr-lamp" in urls)
+      urls["sthrelias"]["face"].startswith("file:///")
+      and "back" in urls["sthrelias"] and "sthr-lamp" in urls)
 mod = json.load(open(os.path.join(ROOT, "dist", "the_still_hour_mod.json"), encoding="utf-8"))
 bags = [o for o in mod["ObjectStates"] if o.get("ContainedObjects")]
 elias = next(c for b in bags for c in b["ContainedObjects"] if c["Nickname"] == "Elias Warde")
@@ -413,7 +413,7 @@ check("scenario faces render on the real plugin frames (portrait + landscape)",
       and _Iscn.open(os.path.join(faces_dir, "sthr-hour-1.png")).size == (1050, 750))
 # HARD RULE (docs/design/FIDELITY_AUDIT.md): every card type must match the
 # official printed aspect — portrait 0.714, landscape 1.400 (agenda/act).
-_ASPECT = {"sthr-elias": 1.400, "sthr-appointed": 0.714, "sthr-lamp": 0.714,
+_ASPECT = {"sthrelias": 1.400, "sthr-appointed": 0.714, "sthr-lamp": 0.714,
            "sthr-loc-keepersquarters": 0.714, "sthr-scn-stillhour": 0.714,
            "sthr-story-firstdark": 0.714, "sthr-hour-1": 1.400,
            "sthr-act-ninthdeath": 1.400}
@@ -437,7 +437,7 @@ print("== SPOILER SHIELD + AUTO-BUILD ==")
 s = requests.get(BASE + "/api/status?campaign=still_hour").json()
 check("encounter cards flagged as spoilers",
       next(g for g in s["gallery"] if g["id"] == "sthr-appointed")["spoiler"] is True
-      and next(g for g in s["gallery"] if g["id"] == "sthr-elias")["spoiler"] is False)
+      and next(g for g in s["gallery"] if g["id"] == "sthrelias")["spoiler"] is False)
 check("spoiler shield present in the UI", "spoiler shield" in page and "Auto-build ALL" in page)
 r = requests.post(BASE + "/api/auto", json={"campaign": "still_hour", "dry_run": True}).json()
 check("auto-build accepted", r.get("started"))
@@ -467,8 +467,8 @@ check("every card in the mod carries a composed face",
       all(c["CustomDeck"][list(c["CustomDeck"])[0]]["FaceURL"].startswith("file:///")
           for c in allcards))
 check("chosen art composited into the exported elias face",
-      "sthr-elias" in urls and os.path.getsize(
-          os.path.join(faces_dir, "sthr-elias.png")) > 8000)
+      "sthrelias" in urls and os.path.getsize(
+          os.path.join(faces_dir, "sthrelias.png")) > 8000)
 
 print("== SEED PICKER: Step-0 portraits in the app ==")
 chars_path = os.path.join(ROOT, "campaigns", "still_hour", "characters.json")
@@ -543,7 +543,7 @@ check("prompt_get returns the composed prompt (scene + house style)",
       and "painterly" in r["positive"] and "watermark" in r["negative"])
 check("prompt_get refuses text-only faces",
       requests.post(BASE + "/api/prompt_get",
-                    json={"card": "sthr-elias-back"}).json().get("ok") is False)
+                    json={"card": "sthrelias-back"}).json().get("ok") is False)
 r = requests.post(BASE + "/api/prompt_save",
                   json={"campaign": "still_hour", "card": "sthr-appointed",
                         "positive": "MY CUSTOM APPOINTED PROMPT",
@@ -811,7 +811,7 @@ pay = json.load(open(os.path.join(ROOT, "out", "still_hour", "payloads",
 check("img2img payload carries mask + blend settings",
       "bytes>" in pay["mask"] and pay["inpainting_fill"] == 1
       and pay["denoising_strength"] > 0 and "no text" in pay["prompt"])
-r = requests.post(BASE + "/api/compose_one", json={"card": "sthr-elias"}).json()
+r = requests.post(BASE + "/api/compose_one", json={"card": "sthrelias"}).json()
 T.open_template("treachery")   # module state is per-process; probe directly
 check("faces recompose on the blank base (BLANK_MODE)",
       r.get("composed") and T.BLANK_MODE is True)
@@ -819,7 +819,7 @@ check("mask boxes exclude the art window",
       all(k != "art" for k, _ in T.inpaint_regions("enemy", 419, 600)))
 check("Rebuild blank frames button in the UI", "inpaint_frames" in page)
 _sh.rmtree(os.path.join(ROOT, "vendor"), ignore_errors=True)
-requests.post(BASE + "/api/compose_one", json={"card": "sthr-elias"})
+requests.post(BASE + "/api/compose_one", json={"card": "sthrelias"})
 
 print("== FONTS: official stack (Teutonic titles, Arno Pro body) ==")
 import render_placeholders as RP
@@ -1451,7 +1451,7 @@ def _fake_tts():
     conn.close(); srv.close()
 _t = threading.Thread(target=_fake_tts, daemon=True); _t.start()
 time.sleep(0.3)
-r = requests.post(BASE + "/api/tts_spawn", json={"card": "sthr-elias"}).json()
+r = requests.post(BASE + "/api/tts_spawn", json={"card": "sthrelias"}).json()
 _t.join(timeout=5)
 msg = json.loads(_captured[0].decode()) if _captured else {}
 check("one-click drop sends spawnObjectJSON to the live TTS socket",
@@ -1459,8 +1459,8 @@ check("one-click drop sends spawnObjectJSON to the live TTS socket",
       and "spawnObjectJSON" in msg.get("script", "")
       and "Elias Warde" in msg["script"])
 check("card sent with the CURRENT composed face (file:/// URL)",
-      'file:///' in msg.get("script", "") and "sthr-elias.png" in msg["script"])
-r = requests.post(BASE + "/api/tts_spawn", json={"card": "sthr-elias"}).json()
+      'file:///' in msg.get("script", "") and "sthrelias.png" in msg["script"])
+r = requests.post(BASE + "/api/tts_spawn", json={"card": "sthrelias"}).json()
 check("graceful message when TTS is not running",
       r.get("ok") is False and "Tabletop Simulator" in r.get("message", ""))
 r = requests.post(BASE + "/api/plugin_update", json={}).json()
@@ -1470,7 +1470,7 @@ check("templates present after refresh",
       os.path.exists(os.path.join(ROOT, "assets", "frames", "se",
                                   "templates", "AHLCG-Investigator-G.png")))
 from PIL import Image as _I2
-ay = _I2.open(os.path.join(faces_dir, "sthr-ayako.png")).convert("RGB")
+ay = _I2.open(os.path.join(faces_dir, "sthrayako.png")).convert("RGB")
 check("no black placeholder box on art-less investigators",
       ay.getpixel((100, 300)) not in ((34, 31, 42), (24, 22, 28)))
 

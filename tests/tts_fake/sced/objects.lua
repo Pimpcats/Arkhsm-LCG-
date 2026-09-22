@@ -62,7 +62,7 @@ function updateVal(v) val = v end
 -- fixture starts with a Still Hour investigator seated on White.
 matColor = "White"
 playerColor = "White"
-local activeInvestigatorData = { id = "sthr-elias", class = "Guardian", miniId = "sthr--m" }
+local activeInvestigatorData = { id = "sthrelias", class = "Guardian", miniId = "sthr--m" }
 function getActiveInvestigatorData() return activeInvestigatorData end
 function setActiveInvestigatorData(newData) activeInvestigatorData = newData end
 

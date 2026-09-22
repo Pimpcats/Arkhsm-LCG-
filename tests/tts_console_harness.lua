@@ -112,20 +112,20 @@ function runStillHourTests()
   print("···· live loop walkthrough ····")
   CampaignState.bankMemory(14)
   CampaignState.unlockFact("the-thirteenth-toll")
-  CampaignState.addYears("sthr-elias", 3)
+  CampaignState.addYears("sthrelias", 3)
   CampaignState.raiseDissonance(11)
   CampaignState.setHour(7)
   LoopFlags.recordTest("combat")
   print(string.format("  before reset: Memory=%d Dissonance=%d Hour=%d Years(elias)=%d",
     CampaignState.getBankedMemory(), CampaignState.getDissonance(),
-    CampaignState.getHour(), CampaignState.getYears("sthr-elias")))
+    CampaignState.getHour(), CampaignState.getYears("sthrelias")))
   CampaignState.reset()
   print(string.format("  after  reset: Memory=%d Dissonance=%d Hour=%d Years(elias)=%d",
     CampaignState.getBankedMemory(), CampaignState.getDissonance(),
-    CampaignState.getHour(), CampaignState.getYears("sthr-elias")))
+    CampaignState.getHour(), CampaignState.getYears("sthrelias")))
   check("Memory persists across reset", CampaignState.getBankedMemory() == 14)
   check("Knowledge persists across reset", CampaignState.knows("the-thirteenth-toll"))
-  check("Years persist across reset", CampaignState.getYears("sthr-elias") == 3)
+  check("Years persist across reset", CampaignState.getYears("sthrelias") == 3)
   check("Dissonance dropped to scar (1)", CampaignState.getDissonance() == 1)
   check("Hourglass reset to Hour I", CampaignState.getHour() == 1)
   check("once-per-loop flags cleared", not CampaignState.isFlagSet("igetout:White"))
@@ -188,9 +188,9 @@ function runStillHourTests()
 
   -- 10. Aging stat drift + interlude spend (P7).
   CampaignState.init(3)
-  CampaignState.addYears("sthr-ayako", 14)
-  Aging.applyInterlude("sthr-ayako", {}, { physical = "combat", mental = "intellect" }) -- -> 15 Ancient
-  local st = Aging.applyDriftToStats({ wil = 5, int = 5, com = 1, agi = 3, health = 5, sanity = 8 }, "sthr-ayako")
+  CampaignState.addYears("sthrayako", 14)
+  Aging.applyInterlude("sthrayako", {}, { physical = "combat", mental = "intellect" }) -- -> 15 Ancient
+  local st = Aging.applyDriftToStats({ wil = 5, int = 5, com = 1, agi = 3, health = 5, sanity = 8 }, "sthrayako")
   check("Ancient drift: int 7, health 4, sanity 7, com floored 1",
     st.int == 7 and st.health == 4 and st.sanity == 7 and st.com == 1)
   CampaignState.init(3)

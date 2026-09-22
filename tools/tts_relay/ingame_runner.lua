@@ -513,12 +513,12 @@ step("board: prey follows on-card Memory", function(go)
   local base = ctl.getPosition()
   local pending = 5
   local function one() pending = pending - 1 end
-  spawnJSON(investigatorJSON("sthr-elias", "Relay Investigator E", { 3, 2, 4, 3, 9, 5 }, base.x - 3, base.z - 7),
+  spawnJSON(investigatorJSON("sthrelias", "Relay Investigator E", { 3, 2, 4, 3, 9, 5 }, base.x - 3, base.z - 7),
     function(o) INV.elias = o ; one() end)
-  spawnJSON(investigatorJSON("sthr-birdie", "Relay Investigator B", { 2, 3, 3, 5, 6, 7 }, base.x + 3, base.z - 7),
+  spawnJSON(investigatorJSON("sthrbirdie", "Relay Investigator B", { 2, 3, 3, 5, 6, 7 }, base.x + 3, base.z - 7),
     function(o) INV.birdie = o ; one() end)
-  spawnJSON(minicardJSON("sthr-elias-m", LOC_A.obj.getPosition()), one)
-  spawnJSON(minicardJSON("sthr-birdie-m", LOC_B.obj.getPosition()), one)
+  spawnJSON(minicardJSON("sthrelias-m", LOC_A.obj.getPosition()), one)
+  spawnJSON(minicardJSON("sthrbirdie-m", LOC_B.obj.getPosition()), one)
   -- a third location joined to both, so "toward the prey" has two directions
   spawnJSON(locationJSON("sthr-loc-nave", "Relay Location C", "Moon", "Diamond|Circle", base.x, base.z + 14),
     function(o) LOC_C = o ; one() end)
@@ -528,12 +528,12 @@ step("board: prey follows on-card Memory", function(go)
     local list = ctl.call("shApiInvestigators")
     local seen = {}
     for _, i in ipairs(list or {}) do if i.hasCard then seen[i.id] = i end end
-    check("both investigators are found by card metadata", seen["sthr-elias"] ~= nil and seen["sthr-birdie"] ~= nil)
+    check("both investigators are found by card metadata", seen["sthrelias"] ~= nil and seen["sthrbirdie"] ~= nil)
     check("each investigator card has a Memory button", hasButton(INV.elias, "Memory ")
       and hasButton(INV.birdie, "Memory "), labelsOf(INV.elias))
     check("each investigator card shows Years", hasButton(INV.birdie, "Years 0"), labelsOf(INV.birdie))
-    ctl.call("shApiOnCardMemory", { id = "sthr-birdie", delta = 3 })
-    ctl.call("shApiOnCardMemory", { id = "sthr-elias", delta = 1 })
+    ctl.call("shApiOnCardMemory", { id = "sthrbirdie", delta = 3 })
+    ctl.call("shApiOnCardMemory", { id = "sthrelias", delta = 1 })
     check("the card's Memory button follows the count", hasButton(INV.birdie, "Memory 3"), labelsOf(INV.birdie))
     ctl.call("shApiCounter", { name = "appointed" })
     ctl.call("shApiCounter", { name = "appointed" })      -- Emerging: a Hunter
@@ -541,7 +541,7 @@ step("board: prey follows on-card Memory", function(go)
       check("it manifests at the location away from both investigators", appointedAt(LOC_C))
       ctl.call("shApiHunt")
       check("it hunts the investigator with the most Memory (not merely the nearest)", appointedAt(LOC_B.obj))
-      ctl.call("shApiOnCardMemory", { id = "sthr-elias", delta = 4 })
+      ctl.call("shApiOnCardMemory", { id = "sthrelias", delta = 4 })
       ctl.call("shApiHunt")
       check("when another investigator has more Memory, the prey changes", appointedAt(LOC_A.obj))
       go()
@@ -561,21 +561,21 @@ step("board: Aging on the investigator", function(go)
   ctl.call("shApiRestore", { blob = snapshot })
   ctl.call("shApiCounter", { name = "dissonance", delta = 12 })
   ctl.call("shApiReset")                                   -- the loop ends in danger
-  local r1 = ctl.call("shApiAge", { id = "sthr-elias", defeated = true, leaned = true,
+  local r1 = ctl.call("shApiAge", { id = "sthrelias", defeated = true, leaned = true,
     physical = "combat", mental = "willpower" })
   check("Age adds Years for defeat, danger and leaning (4)", r1 ~= nil and r1.years == 4,
     r1 and ("years " .. r1.years) or "no result")
-  check("a second Age in the same interlude is refused", ctl.call("shApiAge", { id = "sthr-elias" }) == nil)
+  check("a second Age in the same interlude is refused", ctl.call("shApiAge", { id = "sthrelias" }) == nil)
   ctl.call("shApiBeginNextLoop")
   ctl.call("shApiReset")
-  local r2 = ctl.call("shApiAge", { id = "sthr-elias", defeated = true, physical = "combat", mental = "willpower" })
+  local r2 = ctl.call("shApiAge", { id = "sthrelias", defeated = true, physical = "combat", mental = "willpower" })
   check("the next interlude reaches Weathered", r2 ~= nil and r2.bracket == "Weathered",
     r2 and (r2.years .. " " .. r2.bracket) or "no result")
   check("the investigator card shows Years and bracket", hasButton(INV.elias, "Years 6 · Weathered"),
     labelsOf(INV.elias))
   local seatedMat
   for _, i in ipairs(ctl.call("shApiInvestigators") or {}) do
-    if i.id == "sthr-elias" and i.matColor then seatedMat = i.matColor end
+    if i.id == "sthrelias" and i.matColor then seatedMat = i.matColor end
   end
   if scedHere and seatedMat then
     local stats = trackerStats(seatedMat)
@@ -590,7 +590,7 @@ step("board: Aging on the investigator", function(go)
   Wait.frames(function()
     local list = fresh and fresh.call("shApiInvestigators") or {}
     local years
-    for _, i in ipairs(list) do if i.id == "sthr-elias" then years = i.years end end
+    for _, i in ipairs(list) do if i.id == "sthrelias" then years = i.years end end
     check("Years persist through save+reload", years == 6, tostring(years))
     for name, o in pairs(spawned) do if o == ctl then spawned[name] = fresh end end
     go()
@@ -624,7 +624,7 @@ step("board: SCED campaign export carries the state", function(go)
     Wait.frames(function()
       local s = copy.call("shApiState")
       local years
-      for _, i in ipairs(copy.call("shApiInvestigators") or {}) do if i.id == "sthr-elias" then years = i.years end end
+      for _, i in ipairs(copy.call("shApiInvestigators") or {}) do if i.id == "sthrelias" then years = i.years end end
       check("a fresh control token adopts the imported state", years == 6 and s.loops >= 2,
         "years " .. tostring(years) .. ", loops " .. tostring(s.loops))
       copy.destruct()

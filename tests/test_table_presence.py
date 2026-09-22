@@ -348,8 +348,8 @@ def test_log_script_syncs_from_campaign_state(tmp_path):
              "dissonance": 2, "hourglass": 1,
              "knowledge": {"you-are-unstuck": True, "the-lamp-was-never-lit": True,
                            "the-thirteenth-toll": True, "the-road-remembers": True},
-             "years": {"sthr-elias": 7},
-             "brackets": {"sthr-elias": {"bracket": "Weathered", "physical": "combat",
+             "years": {"sthrelias": 7},
+             "brackets": {"sthrelias": {"bracket": "Weathered", "physical": "combat",
                                          "mental": "willpower"}},
              "victoryLog": {"sthr-bellringer": True}}
     chunk = SYNC_CHUNK % (relay.lua_long_string(json.dumps(T.build_log(), ensure_ascii=False)),
@@ -371,3 +371,38 @@ def test_log_script_syncs_from_campaign_state(tmp_path):
     assert out["p2"] == {"ok": True, "unstuck": True, "lamp": True, "bell": True,
                          "banked": True, "wheel": False}
     assert out["group"] == {"standard": False, "hard": True, "loops": 4}
+
+
+def sced_mini_id(base_id):
+    """Port of SCED's Global.getMiniId (argonui/SCED src/Global/Global.ttslua)."""
+    if "-" not in base_id:
+        return base_id + "-m"
+    if len(base_id) < 16:
+        return base_id[:5] + "-m"
+    return base_id + "-m"
+
+
+def test_sced_derives_each_investigators_own_minicard_id():
+    """SCED finds, moves and cleans up minicards by getMiniId(investigator id);
+    a short hyphenated id would collapse every investigator to one miniId."""
+    import json as _json
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    spec = _json.load(open(os.path.join(root, "pipeline", "stillhour_cards_spec.json"), encoding="utf-8"))
+    invs = [c["id"] for c in spec if c["type"] == "Investigator"]
+    assert len(invs) == 5
+    minis = {}
+
+    def walk(o):
+        md = _json.loads(o.get("GMNotes") or "{}")
+        if md.get("type") == "Minicard":
+            minis[md["id"]] = o
+        for c in o.get("ContainedObjects") or []:
+            walk(c)
+    for rel in ("dist/the_still_hour_table.json", "dist/the_still_hour_campaign.json"):
+        data = _json.load(open(os.path.join(root, rel), encoding="utf-8"))
+        for o in data.get("ObjectStates") or [data]:
+            walk(o)
+    derived = [sced_mini_id(i) for i in invs]
+    assert len(set(derived)) == len(invs), derived
+    for d in derived:
+        assert d in minis, "no minicard with SCED's id " + d

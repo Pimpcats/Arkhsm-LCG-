@@ -41,21 +41,21 @@ NO_ART = {"CampaignLog"}
 
 # ---- which cards render with a character LoRA/reference (art_profiles allow_character) ----
 CHARACTER = {
-    "sthr-elias": "elias", "sthr-donebefore": "elias",
-    "sthr-ayako": "ayako", "sthr-itmeanswait": "ayako",
-    "sthr-cass": "cass", "sthr-seenthishand": "cass",
-    "sthr-seraphine": "sera", "sthr-rememberending": "sera",
-    "sthr-birdie": "birdie", "sthr-igetout": "birdie",
+    "sthrelias": "elias", "sthr-donebefore": "elias",
+    "sthrayako": "ayako", "sthr-itmeanswait": "ayako",
+    "sthrcass": "cass", "sthr-seenthishand": "cass",
+    "sthrseraphine": "sera", "sthr-rememberending": "sera",
+    "sthrbirdie": "birdie", "sthr-igetout": "birdie",
 }
 
 # ---- the scenes (subject only — style/type framing is CardForge's job) ----
 SCENES = {
     # investigators
-    "sthr-elias": "standing before a dark unlit lighthouse at night, salt wind pulling at his coat",
-    "sthr-ayako": "in a lamplit reading room past midnight, surrounded by open books, one page glowing faintly wrong",
-    "sthr-cass": "alone at a card table, dealing the same hand again, smoke hanging motionless in the air",
-    "sthr-seraphine": "mid-seance, reaching toward a darkness that reaches back, candle flames bending sideways",
-    "sthr-birdie": "on an empty night road at the edge of town, glancing back over her shoulder, distant lit windows",
+    "sthrelias": "standing before a dark unlit lighthouse at night, salt wind pulling at his coat",
+    "sthrayako": "in a lamplit reading room past midnight, surrounded by open books, one page glowing faintly wrong",
+    "sthrcass": "alone at a card table, dealing the same hand again, smoke hanging motionless in the air",
+    "sthrseraphine": "mid-seance, reaching toward a darkness that reaches back, candle flames bending sideways",
+    "sthrbirdie": "on an empty night road at the edge of town, glancing back over her shoulder, distant lit windows",
     # Elias signatures/weakness
     "sthr-lamp": "an old brass storm-lantern glowing faint amber in fog, close-up still life",
     "sthr-donebefore": "hands gripping a rail, knuckles white, ghostly repeated afterimages of the same gesture",
@@ -260,7 +260,7 @@ def main():
     json.dump(manifest, open(os.path.join(camp, "manifest.json"), "w", encoding="utf-8"), indent=2)
 
     # first-milestone subset (ART_PIPELINE_BRIEF Part D): the Elias slice + the boss
-    starter_ids = {"sthr-elias", "sthr-elias-back", "sthr-lamp", "sthr-donebefore",
+    starter_ids = {"sthrelias", "sthrelias-back", "sthr-lamp", "sthr-donebefore",
                    "sthr-eighthgrave", "sthr-appointed"}
     starter = [j for j in manifest if j["id"] in starter_ids]
     json.dump(starter, open(os.path.join(HERE, "art_manifest_starter.json"), "w", encoding="utf-8"), indent=2)

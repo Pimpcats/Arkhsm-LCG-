@@ -6,7 +6,7 @@ import os
 import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BUILT = ["dist/the_still_hour.json", "dist/the_still_hour_mod.json",
+BUILT = ["dist/stillhour_starter.json", "dist/the_still_hour.json", "dist/the_still_hour_mod.json",
          "dist/the_still_hour_encounter.json", "dist/downloads/the_still_hour.json",
          "dist/the_still_hour_table.json"]
 HOSTED = re.compile(r"https://raw\.githubusercontent\.com/[^\"]+?/dist/cards/([^\"?/]+\.jpg)")

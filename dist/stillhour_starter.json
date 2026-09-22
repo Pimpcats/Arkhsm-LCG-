@@ -24,7 +24,7 @@
           "Name": "Card",
           "Nickname": "Elias Warde",
           "Description": "The Ninth Death",
-          "GUID": "57e75d",
+          "GUID": "ef2890",
           "CardID": 9501000,
           "SidewaysCard": true,
           "Tags": [
@@ -33,7 +33,14 @@
           ],
           "LuaScript": "",
           "LuaScriptState": "",
-          "GMNotes": "{\"id\":\"sthr-elias\",\"type\":\"Investigator\",\"class\":\"Guardian\",\"traits\":\"Believer. Warden.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":2,\"combatIcons\":4,\"agilityIcons\":3,\"health\":9,\"sanity\":5,\"signatures\":[{\"sthr-lamp\":1,\"sthr-donebefore\":1,\"sthr-eighthgrave\":1}],\"elderSignEffect\":{\"description\":\"+1. If there are 3 or more Memory on Elias, this token is +3 instead, and heal 1 damage from Elias.\"}}",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": false,
+          "GMNotes": "{\"id\":\"sthrelias\",\"type\":\"Investigator\",\"class\":\"Guardian\",\"traits\":\"Believer. Warden.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":2,\"combatIcons\":4,\"agilityIcons\":3,\"health\":9,\"sanity\":5,\"signatures\":[{\"sthr-lamp\":1,\"sthr-donebefore\":1,\"sthr-eighthgrave\":1}],\"elderSignEffect\":{\"description\":\"+1. If there are 3 or more Memory on Elias, this token is +3 instead, and heal 1 damage from Elias.\",\"modifier\":1}}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -54,8 +61,8 @@
           ],
           "CustomDeck": {
             "95010": {
-              "FaceURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Elias+Warde",
-              "BackURL": "https://placehold.co/750x523/141428/e8b24a/png?text=Elias+Warde+(Deckbuilding)",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthrelias.jpg?v=545b2727ac",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthrelias-back.jpg?v=db9820eab7",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -77,6 +84,13 @@
           ],
           "LuaScript": "",
           "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
           "GMNotes": "{\"id\":\"sthr-lamp\",\"type\":\"Asset\",\"class\":\"Guardian\",\"traits\":\"Item. Tool.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"slot\":\"Hand\"}",
           "Transform": {
             "posX": 0,
@@ -98,8 +112,8 @@
           ],
           "CustomDeck": {
             "95011": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Ambergrove+Lamp",
-              "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-lamp.jpg?v=bb5f74819b",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -116,11 +130,17 @@
           "CardID": 9501200,
           "SidewaysCard": false,
           "Tags": [
-            "Skill",
             "PlayerCard"
           ],
           "LuaScript": "",
           "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
           "GMNotes": "{\"id\":\"sthr-donebefore\",\"type\":\"Skill\",\"class\":\"Guardian\",\"traits\":\"Innate. Recollection.\",\"cycle\":\"The Still Hour\",\"level\":0,\"wildIcons\":1}",
           "Transform": {
             "posX": 0,
@@ -142,8 +162,8 @@
           ],
           "CustomDeck": {
             "95012": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=I've+Done+This+Before",
-              "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-donebefore.jpg?v=5852b361ec",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -160,11 +180,17 @@
           "CardID": 9501300,
           "SidewaysCard": false,
           "Tags": [
-            "Treachery",
             "PlayerCard"
           ],
           "LuaScript": "",
           "LuaScriptState": "",
+          "ColorDiffuse": {
+            "r": 0.713235259,
+            "g": 0.713235259,
+            "b": 0.713235259
+          },
+          "Hands": true,
+          "HideWhenFaceDown": true,
           "GMNotes": "{\"id\":\"sthr-eighthgrave\",\"type\":\"Treachery\",\"class\":\"Neutral\",\"traits\":\"Curse. Memory.\",\"cycle\":\"The Still Hour\",\"weakness\":true}",
           "Transform": {
             "posX": 0,
@@ -186,8 +212,8 @@
           ],
           "CustomDeck": {
             "95013": {
-              "FaceURL": "https://placehold.co/419x600/141428/e8b24a/png?text=The+Eighth+Grave",
-              "BackURL": "https://placehold.co/419x600/0c0c14/8a8a99/png?text=The+Still+Hour",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-eighthgrave.jpg?v=a7a3a60014",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,

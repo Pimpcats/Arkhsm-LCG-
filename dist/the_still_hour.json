@@ -24,7 +24,7 @@
           "Name": "Card",
           "Nickname": "Elias Warde",
           "Description": "The Ninth Death",
-          "GUID": "57e75d",
+          "GUID": "ef2890",
           "CardID": 9501000,
           "SidewaysCard": true,
           "Tags": [
@@ -40,7 +40,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": false,
-          "GMNotes": "{\"id\":\"sthr-elias\",\"type\":\"Investigator\",\"class\":\"Guardian\",\"traits\":\"Believer. Warden.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":2,\"combatIcons\":4,\"agilityIcons\":3,\"health\":9,\"sanity\":5,\"signatures\":[{\"sthr-lamp\":1,\"sthr-donebefore\":1,\"sthr-eighthgrave\":1}],\"elderSignEffect\":{\"description\":\"+1. If there are 3 or more Memory on Elias, this token is +3 instead, and heal 1 damage from Elias.\",\"modifier\":1}}",
+          "GMNotes": "{\"id\":\"sthrelias\",\"type\":\"Investigator\",\"class\":\"Guardian\",\"traits\":\"Believer. Warden.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":2,\"combatIcons\":4,\"agilityIcons\":3,\"health\":9,\"sanity\":5,\"signatures\":[{\"sthr-lamp\":1,\"sthr-donebefore\":1,\"sthr-eighthgrave\":1}],\"elderSignEffect\":{\"description\":\"+1. If there are 3 or more Memory on Elias, this token is +3 instead, and heal 1 damage from Elias.\",\"modifier\":1}}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -61,8 +61,8 @@
           ],
           "CustomDeck": {
             "95010": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-elias.jpg?v=f5aaa45d27",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-elias-back.jpg?v=aa9af5750f",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthrelias.jpg?v=545b2727ac",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthrelias-back.jpg?v=db9820eab7",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -112,7 +112,7 @@
           ],
           "CustomDeck": {
             "95011": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-lamp.jpg?v=5516523693",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-lamp.jpg?v=bb5f74819b",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -162,7 +162,7 @@
           ],
           "CustomDeck": {
             "95012": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-donebefore.jpg?v=66887abd46",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-donebefore.jpg?v=5852b361ec",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -212,7 +212,7 @@
           ],
           "CustomDeck": {
             "95013": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-eighthgrave.jpg?v=b6ceb7f302",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-eighthgrave.jpg?v=a7a3a60014",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -226,7 +226,7 @@
           "Name": "Card",
           "Nickname": "Dr. Ayako S\u014dma",
           "Description": "The Translator",
-          "GUID": "10fb04",
+          "GUID": "5049a7",
           "CardID": 9501400,
           "SidewaysCard": true,
           "Tags": [
@@ -242,7 +242,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": false,
-          "GMNotes": "{\"id\":\"sthr-ayako\",\"type\":\"Investigator\",\"class\":\"Seeker\",\"traits\":\"Scholar. Chronicler.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":5,\"combatIcons\":1,\"agilityIcons\":3,\"health\":5,\"sanity\":8,\"signatures\":[{\"sthr-lexicon\":1,\"sthr-itmeanswait\":1,\"sthr-untranslatable\":1}],\"elderSignEffect\":{\"description\":\"+2. Draw 1 card. If it is a Recollection, it costs 2 less to play this turn.\",\"modifier\":2}}",
+          "GMNotes": "{\"id\":\"sthrayako\",\"type\":\"Investigator\",\"class\":\"Seeker\",\"traits\":\"Scholar. Chronicler.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":5,\"combatIcons\":1,\"agilityIcons\":3,\"health\":5,\"sanity\":8,\"signatures\":[{\"sthr-lexicon\":1,\"sthr-itmeanswait\":1,\"sthr-untranslatable\":1}],\"elderSignEffect\":{\"description\":\"+2. Draw 1 card. If it is a Recollection, it costs 2 less to play this turn.\",\"modifier\":2}}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -263,8 +263,8 @@
           ],
           "CustomDeck": {
             "95014": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-ayako.jpg?v=5ac4242547",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-ayako-back.jpg?v=5537a8acd6",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthrayako.jpg?v=5ac4242547",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthrayako-back.jpg?v=5537a8acd6",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -428,7 +428,7 @@
           "Name": "Card",
           "Nickname": "Cass Lindqvist",
           "Description": "The Card Counter",
-          "GUID": "7c1cd6",
+          "GUID": "7f1e9f",
           "CardID": 9501800,
           "SidewaysCard": true,
           "Tags": [
@@ -444,7 +444,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": false,
-          "GMNotes": "{\"id\":\"sthr-cass\",\"type\":\"Investigator\",\"class\":\"Rogue\",\"traits\":\"Criminal. Drifter.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":2,\"intellectIcons\":3,\"combatIcons\":3,\"agilityIcons\":5,\"health\":7,\"sanity\":6,\"signatures\":[{\"sthr-markeddeck\":1,\"sthr-seenthishand\":1,\"sthr-housewins\":1}],\"elderSignEffect\":{\"description\":\"+1. Gain 1 resource for each Memory on Cass (maximum +3 resources).\",\"modifier\":1}}",
+          "GMNotes": "{\"id\":\"sthrcass\",\"type\":\"Investigator\",\"class\":\"Rogue\",\"traits\":\"Criminal. Drifter.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":2,\"intellectIcons\":3,\"combatIcons\":3,\"agilityIcons\":5,\"health\":7,\"sanity\":6,\"signatures\":[{\"sthr-markeddeck\":1,\"sthr-seenthishand\":1,\"sthr-housewins\":1}],\"elderSignEffect\":{\"description\":\"+1. Gain 1 resource for each Memory on Cass (maximum +3 resources).\",\"modifier\":1}}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -465,8 +465,8 @@
           ],
           "CustomDeck": {
             "95018": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-cass.jpg?v=a42b3f93eb",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-cass-back.jpg?v=7b499e1bbc",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthrcass.jpg?v=a42b3f93eb",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthrcass-back.jpg?v=7b499e1bbc",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -630,7 +630,7 @@
           "Name": "Card",
           "Nickname": "Seraphine Vale",
           "Description": "The Medium",
-          "GUID": "65d592",
+          "GUID": "13481d",
           "CardID": 9502200,
           "SidewaysCard": true,
           "Tags": [
@@ -646,7 +646,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": false,
-          "GMNotes": "{\"id\":\"sthr-seraphine\",\"type\":\"Investigator\",\"class\":\"Mystic\",\"traits\":\"Sorcerer. Cursed.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":5,\"intellectIcons\":3,\"combatIcons\":2,\"agilityIcons\":2,\"health\":6,\"sanity\":8,\"signatures\":[{\"sthr-bell\":1,\"sthr-rememberending\":1,\"sthr-debtofhours\":1}],\"elderSignEffect\":{\"description\":\"+X, where X = current Dissonance (maximum +5). After this skill test, reduce Dissonance by the amount this token added.\"}}",
+          "GMNotes": "{\"id\":\"sthrseraphine\",\"type\":\"Investigator\",\"class\":\"Mystic\",\"traits\":\"Sorcerer. Cursed.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":5,\"intellectIcons\":3,\"combatIcons\":2,\"agilityIcons\":2,\"health\":6,\"sanity\":8,\"signatures\":[{\"sthr-bell\":1,\"sthr-rememberending\":1,\"sthr-debtofhours\":1}],\"elderSignEffect\":{\"description\":\"+X, where X = current Dissonance (maximum +5). After this skill test, reduce Dissonance by the amount this token added.\"}}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -667,8 +667,8 @@
           ],
           "CustomDeck": {
             "95022": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-seraphine.jpg?v=9d6e11949e",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-seraphine-back.jpg?v=a9c2049bc7",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthrseraphine.jpg?v=9d6e11949e",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthrseraphine-back.jpg?v=a9c2049bc7",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -832,7 +832,7 @@
           "Name": "Card",
           "Nickname": "\"Birdie\" Okonkwo",
           "Description": "The One Who Wandered",
-          "GUID": "3203de",
+          "GUID": "b6a013",
           "CardID": 9502600,
           "SidewaysCard": true,
           "Tags": [
@@ -848,7 +848,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": false,
-          "GMNotes": "{\"id\":\"sthr-birdie\",\"type\":\"Investigator\",\"class\":\"Survivor\",\"traits\":\"Drifter. Wayward.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":3,\"combatIcons\":2,\"agilityIcons\":4,\"health\":6,\"sanity\":7,\"signatures\":[{\"sthr-compass\":1,\"sthr-igetout\":1,\"sthr-nobodybelieves\":1}],\"elderSignEffect\":{\"description\":\"+1. If you have already failed a skill test this round, this token is +3 instead.\",\"modifier\":1}}",
+          "GMNotes": "{\"id\":\"sthrbirdie\",\"type\":\"Investigator\",\"class\":\"Survivor\",\"traits\":\"Drifter. Wayward.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":3,\"combatIcons\":2,\"agilityIcons\":4,\"health\":6,\"sanity\":7,\"signatures\":[{\"sthr-compass\":1,\"sthr-igetout\":1,\"sthr-nobodybelieves\":1}],\"elderSignEffect\":{\"description\":\"+1. If you have already failed a skill test this round, this token is +3 instead.\",\"modifier\":1}}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -869,8 +869,8 @@
           ],
           "CustomDeck": {
             "95026": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-birdie.jpg?v=7a6e02b044",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-birdie-back.jpg?v=f7784a9142",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthrbirdie.jpg?v=7a6e02b044",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthrbirdie-back.jpg?v=f7784a9142",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,

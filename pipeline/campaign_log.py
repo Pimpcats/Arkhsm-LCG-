@@ -43,9 +43,9 @@ RULE = (128, 108, 86)
 
 # The five investigators (ids used by CampaignState.years / brackets).
 INVESTIGATORS = [
-    ("sthr-elias", "Elias Warde"), ("sthr-ayako", "Dr. Ayako Sōma"),
-    ("sthr-cass", "Cass Lindqvist"), ("sthr-seraphine", "Seraphine Vale"),
-    ("sthr-birdie", "\"Birdie\" Okonkwo"),
+    ("sthrelias", "Elias Warde"), ("sthrayako", "Dr. Ayako Sōma"),
+    ("sthrcass", "Cass Lindqvist"), ("sthrseraphine", "Seraphine Vale"),
+    ("sthrbirdie", "\"Birdie\" Okonkwo"),
 ]
 
 # The Knowledge Track, in log-sheet order. Ids match src/StillHour/Knowledge.ttslua.

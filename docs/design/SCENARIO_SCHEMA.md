@@ -26,7 +26,7 @@ Arkham LCG scenario anatomy (and validated against real SCED campaigns).
   "campaign": {
     "id": "still_hour",
     "name": "The Still Hour",
-    "investigators": ["sthr-elias", ...],          // player-side, already built
+    "investigators": ["sthrelias", ...],          // player-side, already built
     "encounter_sets": {                             // reusable card bundles
       "set_id": {
         "name": "Static",

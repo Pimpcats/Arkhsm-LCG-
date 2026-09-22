@@ -203,7 +203,7 @@ end
 
 ------------------------------------------------------------- investigators --
 
--- An investigator is known by its card metadata id (e.g. "sthr-elias"). Its
+-- An investigator is known by its card metadata id (e.g. "sthrelias"). Its
 -- minicard carries the SCED minicard id "<id>-m" (docs/art_reference/
 -- sced_objects/minicard.json). Under SCED the mat colour comes from
 -- PlayermatApi.getActiveInvestigatorData(matColor).id. We match minicards by

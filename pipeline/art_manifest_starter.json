@@ -1,13 +1,13 @@
 [
   {
-    "id": "sthr-elias",
+    "id": "sthrelias",
     "art_type": "investigator_portrait",
     "scene": "standing before a dark unlit lighthouse at night, salt wind pulling at his coat",
-    "seed": 7240,
+    "seed": 6925,
     "character": "elias"
   },
   {
-    "id": "sthr-elias-back",
+    "id": "sthrelias-back",
     "art_type": "investigator_portrait",
     "no_art": true,
     "frame": "investigator_back"

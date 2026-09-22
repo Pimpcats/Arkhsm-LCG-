@@ -110,13 +110,13 @@ check("combat not yet 'last loop'", LoopFlags.muscleMemoryUpgraded("combat") == 
 print("== P2: reset persists Memory/Knowledge/Years, drops Dissonance to scar, clears flags ==")
 CampaignState.bankMemory(14)
 CampaignState.unlockFact("the-thirteenth-toll")
-CampaignState.addYears("sthr-elias", 3)
+CampaignState.addYears("sthrelias", 3)
 CampaignState.raiseDissonance(11)
 CampaignState.setHour(7)
 CampaignState.reset() -- loop 1 completed
 check("Memory persists across reset", CampaignState.getBankedMemory() == 14)
 check("Knowledge persists across reset", CampaignState.knows("the-thirteenth-toll") == true)
-check("Years persist across reset", CampaignState.getYears("sthr-elias") == 3)
+check("Years persist across reset", CampaignState.getYears("sthrelias") == 3)
 check("Dissonance dropped to scar (1)", CampaignState.getDissonance() == 1)
 check("Hourglass reset to Hour I", CampaignState.getHour() == 1)
 check("once-per-loop flags cleared", CampaignState.isFlagSet("igetout:White") == false)
@@ -134,7 +134,7 @@ check("wiped Memory is 0", CampaignState.getBankedMemory() == 0)
 CampaignState.deserialize(blob)
 check("restored Memory = 18", CampaignState.getBankedMemory() == 18)
 check("restored Knowledge", CampaignState.knows("the-thirteenth-toll") == true)
-check("restored Years", CampaignState.getYears("sthr-elias") == 3)
+check("restored Years", CampaignState.getYears("sthrelias") == 3)
 
 print("== CO-001: Memory is experience — level-ups (=level) and Recollections (memoryCost) ==")
 CampaignState.init(3)
@@ -168,16 +168,16 @@ check("years 10 -> Elder", Aging.bracketForYears(10) == "Elder")
 check("years 15 -> Ancient", Aging.bracketForYears(15) == "Ancient")
 check("clean+defeated+leaned = +3 years", Aging.computeYearsGained({ defeated = true, leanedOnLoop = true }) == 3)
 CampaignState.init(3)
-CampaignState.addYears("sthr-ayako", 4) -- start this interlude at Prime edge (4)
+CampaignState.addYears("sthrayako", 4) -- start this interlude at Prime edge (4)
 -- Interlude pushes 4 -> 7 (Weathered); the locked drift choice is applied now.
-local r = Aging.applyInterlude("sthr-ayako", { defeated = true, leanedOnLoop = true },
+local r = Aging.applyInterlude("sthrayako", { defeated = true, leanedOnLoop = true },
   { physical = "combat", mental = "intellect" })
 check("crossed into Weathered", r.bracket == "Weathered" and r.bracketChanged == true)
 check("locked mental skill = intellect", r.drift.mentalSkill == "intellect")
 check("locked physical skill = combat", r.drift.physicalSkill == "combat")
 check("Weathered mental delta +1", r.drift.skillDeltas.mental == 1)
-CampaignState.addYears("sthr-ayako", 4) -- push 7 -> 11 (Elder)
-local drift = Aging.driftFor("sthr-ayako")
+CampaignState.addYears("sthrayako", 4) -- push 7 -> 11 (Elder)
+local drift = Aging.driftFor("sthrayako")
 check("Elder mental delta +2", drift.skillDeltas.mental == 2)
 check("Elder max health -1", drift.maxHealthDelta == -1)
 check("Elder starts loop with 1 Memory", drift.startLoopMemory == 1)
@@ -281,15 +281,15 @@ check("assembleFinale is idempotent", Knowledge.assembleFinale() == false)
 print("== P7: aging stat drift + interlude spend ==")
 local base = { wil = 5, int = 5, com = 1, agi = 3, health = 5, sanity = 8 } -- Ayako-ish
 CampaignState.init(3)
-local prime = Aging.applyDriftToStats(base, "sthr-ayako")
+local prime = Aging.applyDriftToStats(base, "sthrayako")
 check("Prime: no stat drift", prime.int == 5 and prime.com == 1 and prime.health == 5)
-CampaignState.addYears("sthr-ayako", 4)
-Aging.applyInterlude("sthr-ayako", { defeated = true, leanedOnLoop = true }, { physical = "combat", mental = "intellect" }) -- ->7 Weathered
-local weathered = Aging.applyDriftToStats(base, "sthr-ayako")
+CampaignState.addYears("sthrayako", 4)
+Aging.applyInterlude("sthrayako", { defeated = true, leanedOnLoop = true }, { physical = "combat", mental = "intellect" }) -- ->7 Weathered
+local weathered = Aging.applyDriftToStats(base, "sthrayako")
 check("Weathered: mental +1 (int 5->6)", weathered.int == 6)
 check("Weathered: physical -1 floored (com 1 stays 1)", weathered.com == 1)
-CampaignState.addYears("sthr-ayako", 8) -- ->15 Ancient
-local ancient = Aging.applyDriftToStats(base, "sthr-ayako")
+CampaignState.addYears("sthrayako", 8) -- ->15 Ancient
+local ancient = Aging.applyDriftToStats(base, "sthrayako")
 check("Ancient: mental +2 (int 5->7)", ancient.int == 7)
 check("Ancient: -1 max health and -1 max sanity", ancient.health == 4 and ancient.sanity == 7)
 -- Interlude spend (Memory as experience)
@@ -314,7 +314,7 @@ check("sthr-loc-townhallsteps -> town-hall-steps", Locations.idForCard("sthr-loc
 check("leading 'the' is ignored (sthr-loc-well -> the-well)", Locations.idForCard("sthr-loc-well") == "the-well")
 check("sealed study resolves", Locations.idForCard("sthr-loc-sealedstudy") == "sealed-study")
 check("a module id passes straight through", Locations.idForCard("flooded-crypt") == "flooded-crypt")
-check("a non-location Still Hour card is not a location", Locations.idForCard("sthr-elias") == nil)
+check("a non-location Still Hour card is not a location", Locations.idForCard("sthrelias") == nil)
 check("an unknown / foreign location is nil", Locations.idForCard("01129") == nil and Locations.idForCard(nil) == nil)
 check("hasBack only where a fact flips it", Locations.hasBack("lantern-room") and not Locations.hasBack("nave"))
 
@@ -359,42 +359,42 @@ check("Hold Back to Unseen removes the figure from the board", removed == 1 and 
 
 print("== Prey: on-card Memory per investigator ==")
 CampaignState.init(3)
-CampaignState.addOnCardMemory("sthr-elias", 2)
-CampaignState.addOnCardMemory("sthr-ayako", 3)
-CampaignState.addOnCardMemory("sthr-cass", 3)
-check("on-card Memory is per investigator", CampaignState.getOnCardMemory("sthr-ayako") == 3
-  and CampaignState.getOnCardMemory("sthr-birdie") == 0)
-check("on-card Memory never goes below 0", CampaignState.addOnCardMemory("sthr-elias", -9) == 0)
+CampaignState.addOnCardMemory("sthrelias", 2)
+CampaignState.addOnCardMemory("sthrayako", 3)
+CampaignState.addOnCardMemory("sthrcass", 3)
+check("on-card Memory is per investigator", CampaignState.getOnCardMemory("sthrayako") == 3
+  and CampaignState.getOnCardMemory("sthrbirdie") == 0)
+check("on-card Memory never goes below 0", CampaignState.addOnCardMemory("sthrelias", -9) == 0)
 local cands, most = Appointed.preyCandidates(CampaignState.onCardMemoryMap())
-check("prey candidates = everyone tied for most", #cands == 2 and cands[1] == "sthr-ayako"
-  and cands[2] == "sthr-cass" and most == 3)
-CampaignState.addOnCardMemory("sthr-cass", 1)
-check("a single most-Memory investigator is the prey", Appointed.prey(CampaignState.onCardMemoryMap()) == "sthr-cass")
+check("prey candidates = everyone tied for most", #cands == 2 and cands[1] == "sthrayako"
+  and cands[2] == "sthrcass" and most == 3)
+CampaignState.addOnCardMemory("sthrcass", 1)
+check("a single most-Memory investigator is the prey", Appointed.prey(CampaignState.onCardMemoryMap()) == "sthrcass")
 local blob2 = CampaignState.serialize()
 CampaignState.init(3) ; CampaignState.deserialize(blob2)
-check("on-card Memory survives save/load (node travel)", CampaignState.getOnCardMemory("sthr-cass") == 4)
+check("on-card Memory survives save/load (node travel)", CampaignState.getOnCardMemory("sthrcass") == 4)
 CampaignState.raiseDissonance(13) ; CampaignState.reset()
-check("a reset keeps on-card Memory until the interlude banks it", CampaignState.getOnCardMemory("sthr-cass") == 4)
+check("a reset keeps on-card Memory until the interlude banks it", CampaignState.getOnCardMemory("sthrcass") == 4)
 check("the loop-end Dissonance is recorded for Aging", CampaignState.getLastLoopEndDissonance() == 13)
 check("...and reads as ended in danger (>= 12 at 3p)", Interlude.loopEndedInDanger() == true)
 local banked0 = CampaignState.getBankedMemory()
 check("interlude banks all on-card Memory", Interlude.bankOnCard() == 7
-  and CampaignState.getBankedMemory() == banked0 + 7 and CampaignState.getOnCardMemory("sthr-cass") == 0)
+  and CampaignState.getBankedMemory() == banked0 + 7 and CampaignState.getOnCardMemory("sthrcass") == 0)
 
 print("== Aging: locked choice + Elder start-of-loop Memory ==")
-CampaignState.init(3) ; CampaignState.addYears("sthr-birdie", 5)
-check("Weathered without a choice needs one", Aging.needsChoice("sthr-birdie") == true)
-check("lockChoice rejects a non-physical skill", Aging.lockChoice("sthr-birdie", "intellect", "willpower") == false)
-check("lockChoice records the first choice", Aging.lockChoice("sthr-birdie", "agility", "willpower") == true
-  and not Aging.needsChoice("sthr-birdie"))
-check("the choice is locked", Aging.lockChoice("sthr-birdie", "combat", "intellect") == false
-  and CampaignState.getBracket("sthr-birdie").physical == "agility")
-local bs = Aging.applyDriftToStats({ wil = 2, int = 3, com = 3, agi = 5, health = 6, sanity = 7 }, "sthr-birdie")
+CampaignState.init(3) ; CampaignState.addYears("sthrbirdie", 5)
+check("Weathered without a choice needs one", Aging.needsChoice("sthrbirdie") == true)
+check("lockChoice rejects a non-physical skill", Aging.lockChoice("sthrbirdie", "intellect", "willpower") == false)
+check("lockChoice records the first choice", Aging.lockChoice("sthrbirdie", "agility", "willpower") == true
+  and not Aging.needsChoice("sthrbirdie"))
+check("the choice is locked", Aging.lockChoice("sthrbirdie", "combat", "intellect") == false
+  and CampaignState.getBracket("sthrbirdie").physical == "agility")
+local bs = Aging.applyDriftToStats({ wil = 2, int = 3, com = 3, agi = 5, health = 6, sanity = 7 }, "sthrbirdie")
 check("locked drift applies (agi 5->4, wil 2->3)", bs.agi == 4 and bs.wil == 3 and bs.com == 3)
-CampaignState.addYears("sthr-birdie", 5)   -- Elder
+CampaignState.addYears("sthrbirdie", 5)   -- Elder
 Interlude.beginNextLoop()
-check("Elder begins the loop with 1 Memory on their card", CampaignState.getOnCardMemory("sthr-birdie") == 1)
-check("a Prime investigator does not", CampaignState.getOnCardMemory("sthr-elias") == 0)
+check("Elder begins the loop with 1 Memory on their card", CampaignState.getOnCardMemory("sthrbirdie") == 1)
+check("a Prime investigator does not", CampaignState.getOnCardMemory("sthrelias") == 0)
 
 print("== Board wiring: SCED adapter is inert without SCED ==")
 local SCED = require("StillHour/SCED")

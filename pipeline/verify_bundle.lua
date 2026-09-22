@@ -174,11 +174,11 @@ local function stubCard(nick, md, tags)
   o.removeButton = function(i) table.remove(o.buttons, i + 1) ; return true end
   return o
 end
-local elias = stubCard("Elias Warde", { id = "sthr-elias", type = "Investigator", willpowerIcons = 3,
+local elias = stubCard("Elias Warde", { id = "sthrelias", type = "Investigator", willpowerIcons = 3,
   intellectIcons = 2, combatIcons = 4, agilityIcons = 3, health = 9, sanity = 5 })
-local birdie = stubCard("Birdie", { id = "sthr-birdie", type = "Investigator", willpowerIcons = 2,
+local birdie = stubCard("Birdie", { id = "sthrbirdie", type = "Investigator", willpowerIcons = 2,
   intellectIcons = 3, combatIcons = 3, agilityIcons = 5, health = 6, sanity = 7 })
-local mini = stubCard("Elias mini", { id = "sthr-elias-m", type = "Minicard" }, { "Minicard" })
+local mini = stubCard("Elias mini", { id = "sthrelias-m", type = "Minicard" }, { "Minicard" })
 local log = stubCard("Campaign Log", { id = "STHR-LOG", type = "CampaignLog" }, { "CampaignLog" })
 log.type = "Generic"
 local table_ = { elias, birdie, mini, log }
@@ -220,15 +220,15 @@ env.shApiCounter({ name = "memory", delta = 0 })
 local b = hasLabel("Birdie · Years 0")
 expect("aging row per investigator", b ~= nil and hasLabel("Defeated: no") ~= nil)
 -- Birdie is row 1 or 2 depending on sort; find its index
-local bi = investigatorIndex and investigatorIndex("sthr-birdie")
-local r = env.shApiAge({ id = "sthr-birdie", defeated = true, leaned = true, physical = "agility", mental = "willpower" })
+local bi = investigatorIndex and investigatorIndex("sthrbirdie")
+local r = env.shApiAge({ id = "sthrbirdie", defeated = true, leaned = true, physical = "agility", mental = "willpower" })
 expect("Age applies Years (1 + defeated + danger + leaned = 4)", r ~= nil and r.years == 4 and r.gained == 4)
-expect("aging only once per interlude", env.shApiAge({ id = "sthr-birdie" }) == nil)
-env.shApiAge({ id = "sthr-elias" })
-local r2 = env.shApiAge({ id = "sthr-birdie" })
+expect("aging only once per interlude", env.shApiAge({ id = "sthrbirdie" }) == nil)
+env.shApiAge({ id = "sthrelias" })
+local r2 = env.shApiAge({ id = "sthrbirdie" })
 expect("Birdie's card shows her Years", cardLabel(birdie, "Years 4 · Prime") ~= nil)
 env.shBeginNextLoop()
-env.shApiAge({ id = "sthr-birdie", physical = "agility", mental = "willpower" })   -- 4 -> 5 Weathered
+env.shApiAge({ id = "sthrbirdie", physical = "agility", mental = "willpower" })   -- 4 -> 5 Weathered
 expect("the card shows the new bracket", cardLabel(birdie, "Years 6 · Weathered") ~= nil)
 -- a fresh control token adopts the newer state from the campaign log (SCED export/import path)
 local before2 = env.shApiState()

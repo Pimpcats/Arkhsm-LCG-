@@ -133,7 +133,7 @@ actual play session:
    shows the generic encounter back). SCED's `Global.getMiniId` turns any
    short hyphenated id into its first five characters + "-m", so for
    `sthr-...` investigators SCED expects the minicard id `sthr--m` (its
-   minicard highlight will not match `sthr-elias-m`); our board matches by
+   minicard highlight will not match `sthrelias-m`); our board matches by
    stripping `-m` and is unaffected.
 3. **Playable content minimum**: the Prologue + district locations exist as
    *rules text* in the guide but not yet as location/objective **cards** in the

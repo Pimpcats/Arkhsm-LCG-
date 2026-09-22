@@ -1,6 +1,6 @@
 [
   {
-    "deck": 95010, "id": "sthr-elias", "type": "Investigator", "name": "Elias Warde",
+    "deck": 95010, "id": "sthrelias", "type": "Investigator", "name": "Elias Warde",
     "subtitle": "The Ninth Death", "class": "Guardian", "traits": "Believer. Warden.",
     "wil": 3, "int": 2, "com": 4, "agi": 3, "health": 9, "sanity": 5,
     "signatures": [{ "sthr-lamp": 1, "sthr-donebefore": 1, "sthr-eighthgrave": 1 }],
@@ -20,7 +20,7 @@
   },
 
   {
-    "deck": 95014, "id": "sthr-ayako", "type": "Investigator", "name": "Dr. Ayako Sōma",
+    "deck": 95014, "id": "sthrayako", "type": "Investigator", "name": "Dr. Ayako Sōma",
     "subtitle": "The Translator", "class": "Seeker", "traits": "Scholar. Chronicler.",
     "wil": 3, "int": 5, "com": 1, "agi": 3, "health": 5, "sanity": 8,
     "signatures": [{ "sthr-lexicon": 1, "sthr-itmeanswait": 1, "sthr-untranslatable": 1 }],
@@ -41,7 +41,7 @@
   },
 
   {
-    "deck": 95018, "id": "sthr-cass", "type": "Investigator", "name": "Cass Lindqvist",
+    "deck": 95018, "id": "sthrcass", "type": "Investigator", "name": "Cass Lindqvist",
     "subtitle": "The Card Counter", "class": "Rogue", "traits": "Criminal. Drifter.",
     "wil": 2, "int": 3, "com": 3, "agi": 5, "health": 7, "sanity": 6,
     "signatures": [{ "sthr-markeddeck": 1, "sthr-seenthishand": 1, "sthr-housewins": 1 }],
@@ -61,7 +61,7 @@
   },
 
   {
-    "deck": 95022, "id": "sthr-seraphine", "type": "Investigator", "name": "Seraphine Vale",
+    "deck": 95022, "id": "sthrseraphine", "type": "Investigator", "name": "Seraphine Vale",
     "subtitle": "The Medium", "class": "Mystic", "traits": "Sorcerer. Cursed.",
     "wil": 5, "int": 3, "com": 2, "agi": 2, "health": 6, "sanity": 8,
     "signatures": [{ "sthr-bell": 1, "sthr-rememberending": 1, "sthr-debtofhours": 1 }],
@@ -82,7 +82,7 @@
   },
 
   {
-    "deck": 95026, "id": "sthr-birdie", "type": "Investigator", "name": "\"Birdie\" Okonkwo",
+    "deck": 95026, "id": "sthrbirdie", "type": "Investigator", "name": "\"Birdie\" Okonkwo",
     "subtitle": "The One Who Wandered", "class": "Survivor", "traits": "Drifter. Wayward.",
     "wil": 3, "int": 3, "com": 2, "agi": 4, "health": 6, "sanity": 7,
     "signatures": [{ "sthr-compass": 1, "sthr-igetout": 1, "sthr-nobodybelieves": 1 }],

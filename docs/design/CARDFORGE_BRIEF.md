@@ -66,7 +66,7 @@ Optional per profile: hires/upscale (Comfy node or A1111 `/sdapi/v1/extra-single
 ## 8. CLI
 ```
 cardforge generate --campaign still_hour                 # full batch (respects ledger)
-cardforge generate --campaign still_hour --only sthr-elias
+cardforge generate --campaign still_hour --only sthrelias
 cardforge generate --campaign still_hour --resume        # continue overnight run
 cardforge generate --campaign still_hour --art-type enemy --variants 4   # tune one type
 cardforge contact  --campaign still_hour                 # build contact sheets for QA
@@ -85,7 +85,7 @@ CardForge **replaces Stage 1** (illustration batch) in `ART_PIPELINE_BRIEF.md` a
 ## 12. Build phases (each with an acceptance test)
 - **P0** — Backends: `A1111Backend` and `ComfyBackend` each generate one image from a hardcoded prompt. *Accept:* a PNG lands on disk from both.
 - **P1** — Profiles + composition: load `art_profiles.json`, compose prompts per `cardforge_stub`. *Accept:* dry-run prints correct per-type prompts/params (the stub already does this).
-- **P2** — Character resolver: wrap your character-select tool; names resolve to LoRA/trigger/refs. *Accept:* `sthr-elias` renders with the Elias LoRA.
+- **P2** — Character resolver: wrap your character-select tool; names resolve to LoRA/trigger/refs. *Accept:* `sthrelias` renders with the Elias LoRA.
 - **P3** — Runner + ledger: batch the starter manifest; kill mid-run; resume. *Accept:* no completed card re-generates; the run finishes.
 - **P4** — Variants + report + contact sheets. *Accept:* `report.json` + a contact sheet per art type.
 - **P5** — Post-processing (upscale/crop) + `index.json`. *Accept:* `index.json` feeds a Strange Eons dry-run.

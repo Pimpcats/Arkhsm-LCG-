@@ -7,11 +7,11 @@
     "box_id": "CB-STHR",
     "structure": "loop-horror: Prologue -> 6 repeating Districts (Act I surface / Act II deep) -> Finale",
     "investigators": [
-      "sthr-elias",
-      "sthr-ayako",
-      "sthr-cass",
-      "sthr-seraphine",
-      "sthr-birdie"
+      "sthrelias",
+      "sthrayako",
+      "sthrcass",
+      "sthrseraphine",
+      "sthrbirdie"
     ],
     "loop_hub": {
       "scenario": "district_square",

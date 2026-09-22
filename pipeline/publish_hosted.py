@@ -39,11 +39,14 @@ ROOT = os.path.dirname(HERE)
 FACES = os.path.join(ROOT, "art", "faces")
 OUT = os.path.join(ROOT, "dist", "cards")
 REPO = "Pimpcats/Arkhsm-LCG-"
-PREFIX = "sthr-"
+PREFIX = "sthr"   # sthr-* cards and the hyphen-free investigator ids (sthrelias)
 JPEG_QUALITY = 88
 STATIC_TOKEN = "sthr-static-token"
 
-REBUILD = (("build_cards.py",), ("bundle_mod.py",), ("table_presence.py",),
+# the one-investigator starter slice (dist/stillhour_starter.json) rebuilds too
+STARTER = ("sthrelias", "sthr-lamp", "sthr-donebefore", "sthr-eighthgrave")
+REBUILD = (("build_cards.py",), ("build_cards.py", "--only") + STARTER,
+           ("bundle_mod.py",), ("table_presence.py",),
            ("package_download.py", "--require-hosted"))
 GUIDE = os.path.join(ROOT, "dist", "guide", "the_still_hour_campaign_guide.pdf")
 

@@ -1,13 +1,13 @@
 [
   {
-    "id": "sthr-elias",
+    "id": "sthrelias",
     "art_type": "investigator_portrait",
     "scene": "standing before a dark unlit lighthouse at night, salt wind pulling at his coat",
-    "seed": 7240,
+    "seed": 6925,
     "character": "elias"
   },
   {
-    "id": "sthr-elias-back",
+    "id": "sthrelias-back",
     "art_type": "investigator_portrait",
     "no_art": true,
     "frame": "investigator_back"
@@ -32,14 +32,14 @@
     "seed": 3720
   },
   {
-    "id": "sthr-ayako",
+    "id": "sthrayako",
     "art_type": "investigator_portrait",
     "scene": "in a lamplit reading room past midnight, surrounded by open books, one page glowing faintly wrong",
-    "seed": 7289,
+    "seed": 6974,
     "character": "ayako"
   },
   {
-    "id": "sthr-ayako-back",
+    "id": "sthrayako-back",
     "art_type": "investigator_portrait",
     "no_art": true,
     "frame": "investigator_back"
@@ -64,14 +64,14 @@
     "seed": 6086
   },
   {
-    "id": "sthr-cass",
+    "id": "sthrcass",
     "art_type": "investigator_portrait",
     "scene": "alone at a card table, dealing the same hand again, smoke hanging motionless in the air",
-    "seed": 6540,
+    "seed": 6225,
     "character": "cass"
   },
   {
-    "id": "sthr-cass-back",
+    "id": "sthrcass-back",
     "art_type": "investigator_portrait",
     "no_art": true,
     "frame": "investigator_back"
@@ -96,14 +96,14 @@
     "seed": 2537
   },
   {
-    "id": "sthr-seraphine",
+    "id": "sthrseraphine",
     "art_type": "investigator_portrait",
     "scene": "mid-seance, reaching toward a darkness that reaches back, candle flames bending sideways",
-    "seed": 2271,
+    "seed": 1956,
     "character": "sera"
   },
   {
-    "id": "sthr-seraphine-back",
+    "id": "sthrseraphine-back",
     "art_type": "investigator_portrait",
     "no_art": true,
     "frame": "investigator_back"
@@ -128,14 +128,14 @@
     "seed": 3881
   },
   {
-    "id": "sthr-birdie",
+    "id": "sthrbirdie",
     "art_type": "investigator_portrait",
     "scene": "on an empty night road at the edge of town, glancing back over her shoulder, distant lit windows",
-    "seed": 7919,
+    "seed": 7604,
     "character": "birdie"
   },
   {
-    "id": "sthr-birdie-back",
+    "id": "sthrbirdie-back",
     "art_type": "investigator_portrait",
     "no_art": true,
     "frame": "investigator_back"

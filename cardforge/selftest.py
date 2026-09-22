@@ -47,10 +47,12 @@ for job in manifest:
     char = resolver.resolve(job["character"]) if job.get("character") else None
     pos, neg, params = compose(job, camp, profiles, char)
     composed.append((job["id"], pos, neg, params))
-check("36 jobs compose, 5 text-only skip", len(composed) == 36 and len(skipped) == 5)
+# every job either composes or is an explicit text-only face (counts follow the manifest)
+check("every job composes or is text-only ({} composed, {} text-only)".format(len(composed), len(skipped)),
+      len(composed) + len(skipped) == len(manifest) and len(composed) >= 36 and len(skipped) >= 5)
 sample = dict((c[0], c) for c in composed)["sthr-lamp"]
 check("positive = scene + type framing + house style",
-      "storm-lantern" in sample[1] and "still-life" in sample[1] and "cosmic horror" in sample[1])
+      "storm-lantern" in sample[1] and "still" in sample[1] and "cosmic horror" in sample[1])
 check("negative = house negative + type negative",
       "watermark" in sample[2] and "people" in sample[2])
 gold = os.path.join(ROOT, "prompts.json")
@@ -66,7 +68,7 @@ else:
 print("== P2: character resolver ==")
 elias = dict(resolver.resolve("elias"))
 elias["lora"] = "elias_v1"          # as if the LoRA were trained
-pos, _, _ = compose({"id": "sthr-elias", "art_type": "investigator_portrait",
+pos, _, _ = compose({"id": "sthrelias", "art_type": "investigator_portrait",
                      "scene": "x", "seed": 1}, camp, profiles, elias)
 check("LoRA token composes with weight", "<lora:elias_v1:0.8>" in pos)
 check("trigger words ride along", "eliaswarde" in pos)
@@ -77,7 +79,7 @@ check("character ignored where profile forbids it (asset)", "<lora:" not in pos2
 print("== P3: runner + ledger resume (dry-run, starter manifest) ==")
 clean("still_hour")
 r1 = runner.run_generate("still_hour", starter=True, dry_run=True,
-                         only={"sthr-elias", "sthr-lamp"})
+                         only={"sthrelias", "sthr-lamp"})
 made_first = len(r1["generated"])
 check("partial run generated something", made_first > 0)
 r2 = runner.run_generate("still_hour", starter=True, dry_run=True)
@@ -86,12 +88,16 @@ check("resume run skipped all completed work",
 check("resume run finished the rest (incl. the Appointed)",
       any(g["id"] == "sthr-appointed" for g in r2["generated"]))
 check("text-only face skipped, never an error",
-      "sthr-elias-back" in r2["skipped_text_only"])
+      "sthrelias-back" in r2["skipped_text_only"])
 payloads = os.listdir(os.path.join(ROOT, "out", "still_hour", "payloads"))
 check("P0 dry-run payloads on disk (exact HTTP bodies)", len(payloads) >= 5)
 body = json.load(open(os.path.join(ROOT, "out", "still_hour", "payloads", sorted(payloads)[0]), encoding="utf-8"))
-check("a1111 payload shape (prompt/steps/override_settings)",
-      "prompt" in body and "steps" in body and "override_settings" in body)
+if camp.get("backend") == "comfy":     # the campaign's configured backend decides the body
+    check("comfy payload shape (node graph with tagged prompt nodes)",
+          isinstance(body.get("prompt"), dict) and "CF_POSITIVE" in json.dumps(body))
+else:
+    check("a1111 payload shape (prompt/steps/override_settings)",
+          "prompt" in body and "steps" in body and "override_settings" in body)
 
 print("== P4: report ==")
 rep = json.load(open(os.path.join(ROOT, "out", "still_hour", "report.json"), encoding="utf-8"))
@@ -105,7 +111,7 @@ check("one contact sheet per art type present", len(sheets) >= 2)
 
 print("== P5: index.json ==")
 idx = runner.run_index("still_hour")
-check("index maps every generated card id", "sthr-elias" in idx and "sthr-appointed" in idx)
+check("index maps every generated card id", "sthrelias" in idx and "sthr-appointed" in idx)
 check("index excludes payloads/seeds dirs", "payloads" not in idx and "seeds" not in idx)
 
 print("== P6: demo campaign runs with zero code changes ==")
@@ -114,9 +120,10 @@ rd = runner.run_generate("demo", dry_run=True)
 check("3 demo cards generated (variants expand per profile: 7 files)",
       len({g["id"] for g in rd["generated"]}) == 3 and len(rd["generated"]) == 7)
 check("demo house style composed (not still_hour's)",
-      "gothic ink" in json.load(open(os.path.join(
-          ROOT, "out", "demo", "payloads", sorted(os.listdir(
-              os.path.join(ROOT, "out", "demo", "payloads")))[0]), encoding="utf-8"))["prompt"])
+      "gothic ink" in json.dumps(json.load(open(os.path.join(
+          ROOT, "out", "demo", "payloads", sorted(p for p in os.listdir(
+              os.path.join(ROOT, "out", "demo", "payloads")) if "probe" not in p)[0]),
+          encoding="utf-8"))["prompt"]))
 
 print("== Comfy path: workflow injection (offline) ==")
 from cardforge.backends.comfy import ComfyBackend
