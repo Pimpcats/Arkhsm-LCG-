@@ -1,0 +1,1105 @@
+{
+ "campaign": "still_hour",
+ "setup": "You are illustrating a custom Arkham Horror: The Card Game campaign, \"The Still Hour\" (1920s New England coastal town, cosmic horror, uncanny rather than gory). I will send card briefs one at a time. Each starts with a number like #007. For each brief, generate exactly ONE image in the stated shape. Don't ask questions, don't offer variations, and never add text, letters, numbers, captions, borders or frames to the image.\n\nHOUSE STYLE (every image): 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, slightly rough finish, restrained muted color, clearly hand-painted by a working commercial illustrator. Painted by hand, so nothing is uniform: every brick, cobble, wave, window, leaf and fold is a different size and shape, spacing drifts, edges wander, some areas are overworked and others left thin or unfinished, stray marks and small blemishes remain. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.\n\nCOMPOSITION (every image): detail concentrated on the focal point, background loosely suggested, soft painterly falloff toward the edges, crisp confident brushwork on the subject. Keep the main subject away from the outer edges; the card frame crops the image.\n\nLIGHTING AND PALETTE: vary them from card to card to suit each scene. Muted and desaturated overall, with warm lamplight as a rare, fragile note. Don't reuse the same lighting setup every time.\n\nAVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, depth of field, bokeh, motion blur, film grain, 3d render, octane, cgi, plastic, waxy skin, subsurface scattering, text, watermark, signature, logo, border, frame, ui, caption, anime, cartoon, comic, cel shading, neon, candy colors, oversaturated, pastel, cheerful, twee, modern clothing, smartphone, car, contemporary setting, deformed hands, extra fingers, extra limbs, mutated, bad anatomy, repeating pattern, tiled texture, stamped texture, copy-pasted elements, cloned identical figures, identical repeated shapes, evenly spaced rows, uniform brushstrokes, perfect symmetry, overly clean, uniform detail everywhere, digital painting, airbrushed, rim light.\n\nTHE INVESTIGATORS (keep their looks identical whenever they appear; if I attach a portrait, match that face exactly):\n- Elias Warde: weathered lighthouse keeper, late fifties, grey-streaked beard, deep-set tired resolute eyes, heavy dark oilcloth coat, holding a lantern\n- Dr. Ayako Sōma: Japanese woman, thirties, sharp intelligent gaze, wire spectacles, ink-stained fingers, dark travelling coat, notebook\n- Cass Lindqvist: sharp-featured woman, late twenties, short slicked hair, worn pinstripe waistcoat, a deck of cards, wary confident half-smile\n- Seraphine Vale: pale spiritualist woman, forties, dark loose hair, haunted distant eyes, layered dark shawls, faint occult jewelry\n- Birdie Okonkwo: young Black woman, early twenties, patched practical coat, alert scrappy expression, small brass compass on a cord\n\nReply to this message with only \"Ready.\"",
+ "batches": [
+  [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  [
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15
+  ],
+  [
+   16,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22,
+   23,
+   24,
+   25
+  ],
+  [
+   26,
+   27,
+   28,
+   29,
+   30,
+   31,
+   32,
+   33,
+   34,
+   35
+  ],
+  [
+   36,
+   37,
+   38,
+   39,
+   40,
+   41,
+   42,
+   43,
+   44,
+   45
+  ],
+  [
+   46,
+   47,
+   48,
+   49,
+   50,
+   51,
+   52,
+   53,
+   54,
+   55
+  ],
+  [
+   56,
+   57,
+   58,
+   59,
+   60,
+   61,
+   62,
+   63,
+   64,
+   65
+  ],
+  [
+   66,
+   67,
+   68,
+   69,
+   70,
+   71,
+   72,
+   73,
+   74,
+   75
+  ],
+  [
+   76,
+   77,
+   78,
+   79,
+   80,
+   81,
+   82,
+   83,
+   84,
+   85
+  ],
+  [
+   86,
+   87,
+   88,
+   89,
+   90,
+   91,
+   92,
+   93,
+   94,
+   95
+  ],
+  [
+   96,
+   97,
+   98,
+   99,
+   100,
+   101,
+   102,
+   103,
+   104,
+   105
+  ],
+  [
+   106,
+   107,
+   108,
+   109,
+   110,
+   111,
+   112,
+   113,
+   114,
+   115
+  ],
+  [
+   116,
+   117,
+   118,
+   119
+  ]
+ ],
+ "cards": [
+  {
+   "n": 1,
+   "id": "sthrelias",
+   "art_type": "investigator_portrait",
+   "aspect": "square 1:1",
+   "character": "elias",
+   "brief": "#001 · sthrelias · square 1:1\nScene: standing before a dark unlit lighthouse at night, salt wind pulling at his coat.\nCharacter: Elias Warde — weathered lighthouse keeper, late fifties, grey-streaked beard, deep-set tired resolute eyes, heavy dark oilcloth coat, holding a lantern.\nFraming: an investigator in a place that tells their story, three-quarter view, waist-up, holding a period prop, character to one side of frame, environmental background with depth.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 2,
+   "id": "sthrayako",
+   "art_type": "investigator_portrait",
+   "aspect": "square 1:1",
+   "character": "ayako",
+   "brief": "#002 · sthrayako · square 1:1\nScene: in a lamplit reading room past midnight, surrounded by open books, one page glowing faintly wrong.\nCharacter: Dr. Ayako Sōma — Japanese woman, thirties, sharp intelligent gaze, wire spectacles, ink-stained fingers, dark travelling coat, notebook.\nFraming: an investigator in a place that tells their story, three-quarter view, waist-up, holding a period prop, character to one side of frame, environmental background with depth.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 3,
+   "id": "sthrcass",
+   "art_type": "investigator_portrait",
+   "aspect": "square 1:1",
+   "character": "cass",
+   "brief": "#003 · sthrcass · square 1:1\nScene: alone at a card table, dealing the same hand again, smoke hanging motionless in the air.\nCharacter: Cass Lindqvist — sharp-featured woman, late twenties, short slicked hair, worn pinstripe waistcoat, a deck of cards, wary confident half-smile.\nFraming: an investigator in a place that tells their story, three-quarter view, waist-up, holding a period prop, character to one side of frame, environmental background with depth.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 4,
+   "id": "sthrseraphine",
+   "art_type": "investigator_portrait",
+   "aspect": "square 1:1",
+   "character": "sera",
+   "brief": "#004 · sthrseraphine · square 1:1\nScene: mid-seance, reaching toward a darkness that reaches back, candle flames bending sideways.\nCharacter: Seraphine Vale — pale spiritualist woman, forties, dark loose hair, haunted distant eyes, layered dark shawls, faint occult jewelry.\nFraming: an investigator in a place that tells their story, three-quarter view, waist-up, holding a period prop, character to one side of frame, environmental background with depth.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 5,
+   "id": "sthrbirdie",
+   "art_type": "investigator_portrait",
+   "aspect": "square 1:1",
+   "character": "birdie",
+   "brief": "#005 · sthrbirdie · square 1:1\nScene: on an empty night road at the edge of town, glancing back over her shoulder, distant lit windows.\nCharacter: Birdie Okonkwo — young Black woman, early twenties, patched practical coat, alert scrappy expression, small brass compass on a cord.\nFraming: an investigator in a place that tells their story, three-quarter view, waist-up, holding a period prop, character to one side of frame, environmental background with depth.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 6,
+   "id": "sthr-itmeanswait",
+   "art_type": "event",
+   "aspect": "landscape 3:2",
+   "character": "ayako",
+   "brief": "#006 · sthr-itmeanswait · landscape 3:2\nScene: a raised hand in a stillness gesture toward an unseen presence, dust motes frozen mid-air.\nCharacter: Dr. Ayako Sōma — Japanese woman, thirties, sharp intelligent gaze, wire spectacles, ink-stained fingers, dark travelling coat, notebook. Match the attached approved portrait of Dr. Ayako Sōma exactly.\nFraming: a single dramatic moment of impact, close composition filling the frame, motion.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 7,
+   "id": "sthr-seenthishand",
+   "art_type": "event",
+   "aspect": "landscape 3:2",
+   "character": "cass",
+   "brief": "#007 · sthr-seenthishand · landscape 3:2\nScene: catching a falling card mid-air without looking at it, barroom blur behind.\nCharacter: Cass Lindqvist — sharp-featured woman, late twenties, short slicked hair, worn pinstripe waistcoat, a deck of cards, wary confident half-smile. Match the attached approved portrait of Cass Lindqvist exactly.\nFraming: a single dramatic moment of impact, close composition filling the frame, motion.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 8,
+   "id": "sthr-rememberending",
+   "art_type": "event",
+   "aspect": "landscape 3:2",
+   "character": "sera",
+   "brief": "#008 · sthr-rememberending · landscape 3:2\nScene: her eyes reflecting a scene that has not happened yet, the room around her dissolving.\nCharacter: Seraphine Vale — pale spiritualist woman, forties, dark loose hair, haunted distant eyes, layered dark shawls, faint occult jewelry. Match the attached approved portrait of Seraphine Vale exactly.\nFraming: a single dramatic moment of impact, close composition filling the frame, motion.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 9,
+   "id": "sthr-igetout",
+   "art_type": "event",
+   "aspect": "landscape 3:2",
+   "character": "birdie",
+   "brief": "#009 · sthr-igetout · landscape 3:2\nScene: slipping through a closing door of light, reaching hands just missing her coat.\nCharacter: Birdie Okonkwo — young Black woman, early twenties, patched practical coat, alert scrappy expression, small brass compass on a cord. Match the attached approved portrait of Birdie Okonkwo exactly.\nFraming: a single dramatic moment of impact, close composition filling the frame, motion.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 10,
+   "id": "sthr-dejavu",
+   "art_type": "event",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#010 · sthr-dejavu · landscape 3:2\nScene: the same doorway twice in one image, mirrored, a single figure entering both.\nFraming: a single dramatic moment of impact, close composition filling the frame, motion.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 11,
+   "id": "sthr-rehearsedescape",
+   "art_type": "event",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#011 · sthr-rehearsedescape · landscape 3:2\nScene: a night alley with an escape route chalk-marked in glowing lines only the viewer can see.\nFraming: a single dramatic moment of impact, close composition filling the frame, motion.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 12,
+   "id": "sthr-longwayround",
+   "art_type": "event",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#012 · sthr-longwayround · landscape 3:2\nScene: a street map with one path burned through it, footsteps skipping impossible distances.\nFraming: a single dramatic moment of impact, close composition filling the frame, motion.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 13,
+   "id": "sthr-thistimeforsure",
+   "art_type": "event",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#013 · sthr-thistimeforsure · landscape 3:2\nScene: the same die frozen mid-tumble at five angles at once, one face beginning to glow.\nFraming: a single dramatic moment of impact, close composition filling the frame, motion.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 14,
+   "id": "sthr-hourlearnedname",
+   "art_type": "event",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#014 · sthr-hourlearnedname · landscape 3:2\nScene: a name spoken as visible frost in the air, a vast shadow flinching back from it.\nFraming: a single dramatic moment of impact, close composition filling the frame, motion.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 15,
+   "id": "sthr-donebefore",
+   "art_type": "skill",
+   "aspect": "landscape 3:2",
+   "character": "elias",
+   "brief": "#015 · sthr-donebefore · landscape 3:2\nScene: hands gripping a rail, knuckles white, ghostly repeated afterimages of the same gesture.\nCharacter: Elias Warde — weathered lighthouse keeper, late fifties, grey-streaked beard, deep-set tired resolute eyes, heavy dark oilcloth coat, holding a lantern. Match the attached approved portrait of Elias Warde exactly.\nFraming: hands mid-gesture, intimate crop, tension in the pose.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 16,
+   "id": "sthr-foreknowledge",
+   "art_type": "skill",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#016 · sthr-foreknowledge · landscape 3:2\nScene: a chess move played before the opponent's hand has left the piece, afterimages of futures.\nFraming: hands mid-gesture, intimate crop, tension in the pose.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 17,
+   "id": "sthr-musclememory",
+   "art_type": "skill",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#017 · sthr-musclememory · landscape 3:2\nScene: hands performing a delicate task in total darkness, perfect and sure, faint motion trails.\nFraming: hands mid-gesture, intimate crop, tension in the pose.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 18,
+   "id": "sthr-lamp",
+   "art_type": "asset",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#018 · sthr-lamp · landscape 3:2\nScene: an old brass storm-lantern glowing faint amber in fog, close-up still life.\nFraming: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 19,
+   "id": "sthr-lexicon",
+   "art_type": "asset",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#019 · sthr-lexicon · landscape 3:2\nScene: a battered journal filled with spiraling unreadable script, annotations crowding the margins, candlelight.\nFraming: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 20,
+   "id": "sthr-markeddeck",
+   "art_type": "asset",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#020 · sthr-markeddeck · landscape 3:2\nScene: a worn deck of playing cards fanned on green felt, tiny scratches on the backs catching lamplight.\nFraming: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 21,
+   "id": "sthr-bell",
+   "art_type": "asset",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#021 · sthr-bell · landscape 3:2\nScene: a small bronze hand-bell on dark velvet, its surface etched with hour markings, faint blue afterglow.\nFraming: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 22,
+   "id": "sthr-compass",
+   "art_type": "asset",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#022 · sthr-compass · landscape 3:2\nScene: a small brass compass in an open palm, needle pointing at nothing on the map beneath.\nFraming: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 23,
+   "id": "sthr-borrowedtime",
+   "art_type": "asset",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#023 · sthr-borrowedtime · landscape 3:2\nScene: an hourglass with sand flowing upward into the top bulb, cradled in careful hands.\nFraming: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 24,
+   "id": "sthr-anchorpoint",
+   "art_type": "asset",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#024 · sthr-anchorpoint · landscape 3:2\nScene: a single fixed lit window on a street where everything else blurs with motion.\nFraming: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 25,
+   "id": "sthr-cassandrasnotebook",
+   "art_type": "asset",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#025 · sthr-cassandrasnotebook · landscape 3:2\nScene: a notebook whose ink writes itself, the pages ahead already filled, pen hovering unheld.\nFraming: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 26,
+   "id": "sthr-housewins",
+   "art_type": "enemy",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#026 · sthr-housewins · landscape 3:2\nScene: a debt collector in a long coat at the end of a hallway, ledger in hand, face in shadow, patient.\nFraming: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 27,
+   "id": "sthr-appointed",
+   "art_type": "enemy",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#027 · sthr-appointed · landscape 3:2\nScene: a tall wrong silhouette at the far end of an empty street, too many angles, not quite arriving, featureless, dread, negative space.\nFraming: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 28,
+   "id": "sthr-bellringer",
+   "art_type": "enemy",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#028 · sthr-bellringer · landscape 3:2\nScene: a drowned figure in sodden vestments hauling a bell rope in a flooded belfry, water past its waist, the bell mid-swing.\nFraming: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 29,
+   "id": "sthr-wearssheriff",
+   "art_type": "enemy",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#029 · sthr-wearssheriff · landscape 3:2\nScene: a sheriff on courthouse steps frozen mid-speech, seams of pale light splitting his silhouette, the crowd not noticing.\nFraming: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 30,
+   "id": "sthr-onewhorides",
+   "art_type": "enemy",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#030 · sthr-onewhorides · landscape 3:2\nScene: a lone rider on a carousel horse at night, motion-blurred at the edges, face perfectly still and smiling.\nFraming: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 31,
+   "id": "sthr-waitingcongregation",
+   "art_type": "enemy",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#031 · sthr-waitingcongregation · landscape 3:2\nScene: townsfolk in their Sunday best standing in a line in the fog, all facing the same direction, eyes closed, patient.\nFraming: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 32,
+   "id": "sthr-drownedchoir",
+   "art_type": "enemy",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#032 · sthr-drownedchoir · landscape 3:2\nScene: a choir in waterlogged robes singing with no sound, lake weed in their hair, lit from below by cold water-light.\nFraming: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 33,
+   "id": "sthr-familiarface",
+   "art_type": "enemy",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#033 · sthr-familiarface · landscape 3:2\nScene: a stranger in a doorway whose face is almost someone you know, the features blurred as though remembered badly.\nFraming: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 34,
+   "id": "sthr-lamplighterecho",
+   "art_type": "enemy",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#034 · sthr-lamplighterecho · landscape 3:2\nScene: a lamplighter frozen mid-reach with his pole to a streetlamp, his outline repeated faintly behind him.\nFraming: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 35,
+   "id": "sthr-somethingonstair",
+   "art_type": "enemy",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#035 · sthr-somethingonstair · landscape 3:2\nScene: a hunched figure sitting on a spiral stair in the dark, knees drawn up, head turned away.\nFraming: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 36,
+   "id": "sthr-eighthgrave",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#036 · sthr-eighthgrave · landscape 3:2\nScene: eight identical fresh graves in a row under a folding starless sky, one open and empty.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 37,
+   "id": "sthr-untranslatable",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#037 · sthr-untranslatable · landscape 3:2\nScene: a page of writhing script that hurts to look at, the letters casting shadows in the wrong direction.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 38,
+   "id": "sthr-debtofhours",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#038 · sthr-debtofhours · landscape 3:2\nScene: a grandfather clock with its hands spinning backward, shadow spilling from the open case like water.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 39,
+   "id": "sthr-nobodybelieves",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#039 · sthr-nobodybelieves · landscape 3:2\nScene: a crowd of townsfolk looking straight through the viewer, one empty space where a person should be.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 40,
+   "id": "sthr-appointedwhisper",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#040 · sthr-appointedwhisper · landscape 3:2\nScene: an ear-shaped ripple in the air over a sleeping town, words visible as thin black threads.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 41,
+   "id": "sthr-crossing",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#041 · sthr-crossing · landscape 3:2\nScene: a freestanding doorway in the town square, its far side showing the same square one hour later.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 42,
+   "id": "sthr-losthour",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#042 · sthr-losthour · landscape 3:2\nScene: a pocket watch lying in the street, its hands missing, a scattering of numerals on the cobbles like dropped coins.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 43,
+   "id": "sthr-slippage",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#043 · sthr-slippage · landscape 3:2\nScene: a street reflected in a puddle that is a few seconds behind the street above it.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 44,
+   "id": "sthr-wrongturn",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#044 · sthr-wrongturn · landscape 3:2\nScene: a crossroads where the signposts point to the same town four times.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 45,
+   "id": "sthr-rewind",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#045 · sthr-rewind · landscape 3:2\nScene: footprints in wet sand leading backward into a figure that is walking forward.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 46,
+   "id": "sthr-deadair",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#046 · sthr-deadair · landscape 3:2\nScene: a radio set on a kitchen table with its dial glowing and the air around it visibly still, dust hanging motionless.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 47,
+   "id": "sthr-loopnotices",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#047 · sthr-loopnotices · landscape 3:2\nScene: a hundred lit windows across a dark street, a silhouette standing in every one, all turned toward the viewer.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 48,
+   "id": "sthr-yearinanight",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#048 · sthr-yearinanight · landscape 3:2\nScene: a hand on a table aging from young to old across a single candle's burn.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 49,
+   "id": "sthr-forgotten",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#049 · sthr-forgotten · landscape 3:2\nScene: a photograph whose faces are fading out while the room in it stays sharp.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 50,
+   "id": "sthr-oldbones",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#050 · sthr-oldbones · landscape 3:2\nScene: a walking cane and a pair of worn boots at the foot of a long steep stair.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 51,
+   "id": "sthr-darkthatwaits",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#051 · sthr-darkthatwaits · landscape 3:2\nScene: darkness pooled at the top of a lighthouse stair, thick as water, the lens above it unlit.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 52,
+   "id": "sthr-thirteen",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#052 · sthr-thirteen · landscape 3:2\nScene: a church clock face with thirteen hour marks, the hands pointing to the extra one.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 53,
+   "id": "sthr-risingwater",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#053 · sthr-risingwater · landscape 3:2\nScene: black water climbing a flight of stone stairs one step at a time.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 54,
+   "id": "sthr-bridgeremembers",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#054 · sthr-bridgeremembers · landscape 3:2\nScene: wet footprints crossing a low stone bridge that begin and end in the middle.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 55,
+   "id": "sthr-samespeech",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#055 · sthr-samespeech · landscape 3:2\nScene: a crowd in a square listening to a speech, their faces lit identically, their mouths moving with the speaker's.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 56,
+   "id": "sthr-crowdturns",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#056 · sthr-crowdturns · landscape 3:2\nScene: a crowd of townsfolk all turning their heads at once toward the viewer.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 57,
+   "id": "sthr-wheelsturn",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#057 · sthr-wheelsturn · landscape 3:2\nScene: the gears and axle of a Ferris wheel turning in the dark, the hub bolt shaped like a clock hand.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 58,
+   "id": "sthr-reflectionlies",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#058 · sthr-reflectionlies · landscape 3:2\nScene: a funhouse mirror whose reflection is smiling while the room is empty.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 59,
+   "id": "sthr-pagethatwasnt",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#059 · sthr-pagethatwasnt · landscape 3:2\nScene: a single loose page lying on a library floor, printed in fresh ink that the rest of the book never had.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 60,
+   "id": "sthr-inkrunsbackward",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#060 · sthr-inkrunsbackward · landscape 3:2\nScene: ink lifting off a written page back up into the nib of a hovering pen.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 61,
+   "id": "sthr-studydoor",
+   "art_type": "treachery",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#061 · sthr-studydoor · landscape 3:2\nScene: a brass keyhole in a dark wooden door, a thread of pale light leaking out and bending the wrong way.\nFraming: one ominous symbolic beat, surreal wrongness, a figure caught in it.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 62,
+   "id": "sthr-loc-lanternroom",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#062 · sthr-loc-lanternroom · landscape 3:2\nScene: the glass lantern room at the top of a lighthouse, the great lens dark and cold, salt on the panes, night beyond.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 63,
+   "id": "sthr-loc-windingstair",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#063 · sthr-loc-windingstair · landscape 3:2\nScene: a spiral iron stair climbing the inside of a lighthouse tower, rust and damp, the steps vanishing upward into shadow.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 64,
+   "id": "sthr-loc-keepersquarters",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#064 · sthr-loc-keepersquarters · landscape 3:2\nScene: a lighthouse keeper's cramped room, a narrow cot, oilcloth coat on a hook, a logbook open on the desk.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 65,
+   "id": "sthr-loc-square",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#065 · sthr-loc-square · landscape 3:2\nScene: Ambergrove's town square at night, bunting and paper lanterns for the occultation, a bandstand, the sky wrong overhead.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 66,
+   "id": "sthr-loc-longpier",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#066 · sthr-loc-longpier · landscape 3:2\nScene: a long wooden pier running out over black still water into mist, lanterns at intervals, the far end lost.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 67,
+   "id": "sthr-loc-almanacsteps",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#067 · sthr-loc-almanacsteps · landscape 3:2\nScene: broad stone steps up to a narrow printing house door, a painted sign reading nothing legible, handbills scattered on the steps.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 68,
+   "id": "sthr-loc-nave",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#068 · sthr-loc-nave · landscape 3:2\nScene: a church nave half flooded, pews standing in black water, candles still burning on the altar above the waterline.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 69,
+   "id": "sthr-loc-belfry",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#069 · sthr-loc-belfry · landscape 3:2\nScene: a belfry with a great bell hanging motionless, its rope dripping, the town far below through the louvres.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 70,
+   "id": "sthr-loc-floodedcrypt",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#070 · sthr-loc-floodedcrypt · landscape 3:2\nScene: a vaulted crypt under dark water, tomb lids just visible, a faint shape of paper drifting near the ceiling.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 71,
+   "id": "sthr-loc-vestry",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#071 · sthr-loc-vestry · landscape 3:2\nScene: a small vestry with robes on pegs and a heavy parish register open on a lectern by candlelight.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 72,
+   "id": "sthr-loc-milestones",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#072 · sthr-loc-milestones · landscape 3:2\nScene: a sunken lane between high banks, old milestones along the verge counting down to a town that is behind you.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 73,
+   "id": "sthr-loc-lowbridge",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#073 · sthr-loc-lowbridge · landscape 3:2\nScene: a low stone bridge barely above a slow river, water lapping over the cobbles, fog on both banks.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 74,
+   "id": "sthr-loc-turning",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#074 · sthr-loc-turning · landscape 3:2\nScene: a bend in a sunken road where the lane doubles back on itself, a lighthouse beam that never sweeps visible over the trees.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 75,
+   "id": "sthr-loc-townhallsteps",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#075 · sthr-loc-townhallsteps · landscape 3:2\nScene: the wide steps of a small town hall draped in occultation bunting, a speaker's podium at the top, papers blowing.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 76,
+   "id": "sthr-loc-recordsoffice",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#076 · sthr-loc-recordsoffice · landscape 3:2\nScene: a records office of tall wooden drawers and ledgers, a single green-shaded lamp over a desk.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 77,
+   "id": "sthr-loc-well",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#077 · sthr-loc-well · landscape 3:2\nScene: an old stone well in a small yard behind the town hall, a bucket rope pulled taut into the dark.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 78,
+   "id": "sthr-loc-wheel",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#078 · sthr-loc-wheel · landscape 3:2\nScene: a Ferris wheel lit with bulbs against the black sky, one carriage swinging at the very top.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 79,
+   "id": "sthr-loc-hallofmirrors",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#079 · sthr-loc-hallofmirrors · landscape 3:2\nScene: a hall of warped mirrors under strings of bulbs, reflections not quite matching one another.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 80,
+   "id": "sthr-loc-ticketbooth",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#080 · sthr-loc-ticketbooth · landscape 3:2\nScene: a painted ticket booth at the fairground gate, a roll of tickets unspooling across the counter, the window dark.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 81,
+   "id": "sthr-loc-readingroom",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#081 · sthr-loc-readingroom · landscape 3:2\nScene: a reading room of floor-to-ceiling shelves, ladders and green lamps, one book lying open on the floor.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 82,
+   "id": "sthr-loc-press",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#082 · sthr-loc-press · landscape 3:2\nScene: a hand-cranked printing press with a half-set page of type, ink gleaming, almanac sheets hung to dry.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 83,
+   "id": "sthr-loc-sealedstudy",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#083 · sthr-loc-sealedstudy · landscape 3:2\nScene: a locked study door at the end of a book-lined corridor, light and a faint murmur coming from under it.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 84,
+   "id": "sthr-loc-hubsquare",
+   "art_type": "location",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#084 · sthr-loc-hubsquare · landscape 3:2\nScene: the town square seen from its centre, four streets leading off into fog toward a church, a fairground, a road and a tall house of books.\nFraming: the place itself, empty of people, wrong-feeling stillness.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 85,
+   "id": "sthr-hour-1",
+   "art_type": "agenda",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#085 · sthr-hour-1 · portrait 2:3\nScene: the town square at eleven o'clock, lamps lit, townsfolk looking up at a sky where the stars are sliding behind something without an edge.\nFraming: wide establishing scene, escalating dread.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 86,
+   "id": "sthr-hour-2",
+   "art_type": "agenda",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#086 · sthr-hour-2 · portrait 2:3\nScene: a lake shore where the water is drawing back unnaturally fast under a dark sky, moored boats settling crooked on the mud.\nFraming: wide establishing scene, escalating dread.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 87,
+   "id": "sthr-hour-3",
+   "art_type": "agenda",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#087 · sthr-hour-3 · portrait 2:3\nScene: a half-drowned church tower against the night, the bell swinging, thirteen faint rings of sound rippling the air.\nFraming: wide establishing scene, escalating dread.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 88,
+   "id": "sthr-hour-4",
+   "art_type": "agenda",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#088 · sthr-hour-4 · portrait 2:3\nScene: a sunken road collapsing into black water, milestones tilting, a lantern on the far side going out.\nFraming: wide establishing scene, escalating dread.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 89,
+   "id": "sthr-hour-5",
+   "art_type": "agenda",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#089 · sthr-hour-5 · portrait 2:3\nScene: empty streets at midnight, every door open, a single chair still rocking on a porch.\nFraming: wide establishing scene, escalating dread.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 90,
+   "id": "sthr-hour-6",
+   "art_type": "agenda",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#090 · sthr-hour-6 · portrait 2:3\nScene: the sky over the rooftops cracked like glaze, wrong constellations showing through the seams.\nFraming: wide establishing scene, escalating dread.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 91,
+   "id": "sthr-hour-7",
+   "art_type": "agenda",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#091 · sthr-hour-7 · portrait 2:3\nScene: a long street seen from its far end, lamps going dark one by one toward the viewer, something tall at the vanishing point.\nFraming: wide establishing scene, escalating dread.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 92,
+   "id": "sthr-hour-8",
+   "art_type": "agenda",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#092 · sthr-hour-8 · portrait 2:3\nScene: the whole town seen from above at the last minute before the hour, clocks on every building pointing the same wrong time.\nFraming: wide establishing scene, escalating dread.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 93,
+   "id": "sthr-hour-9",
+   "art_type": "agenda",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#093 · sthr-hour-9 · portrait 2:3\nScene: a black occulted sun-like disc filling the sky over Ambergrove, the town below perfectly still, a seam of pale light down the middle of the night.\nFraming: wide establishing scene, escalating dread.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 94,
+   "id": "sthr-act-ninthdeath",
+   "art_type": "act",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#094 · sthr-act-ninthdeath · portrait 2:3\nScene: an open lighthouse logbook by lamplight, the same hand filling page after page, the ink of the latest entry still wet.\nFraming: the scene the investigators are working toward, a place mid-event, no central portrait.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 95,
+   "id": "sthr-act-firsthour",
+   "art_type": "act",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#095 · sthr-act-firsthour · portrait 2:3\nScene: the almanac house steps at eleven, handbills announcing the occultation at midnight, the sky already darkening at the edges.\nFraming: the scene the investigators are working toward, a place mid-event, no central portrait.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 96,
+   "id": "sthr-act-lamp",
+   "art_type": "act",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#096 · sthr-act-lamp · portrait 2:3\nScene: the great lighthouse lens catching its first flame, light beginning to pour out over the dark water.\nFraming: the scene the investigators are working toward, a place mid-event, no central portrait.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 97,
+   "id": "sthr-act-whythirteen",
+   "art_type": "act",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#097 · sthr-act-whythirteen · portrait 2:3\nScene: a parish register open under a candle, a column of tally marks for the bell, one mark too many.\nFraming: the scene the investigators are working toward, a place mid-event, no central portrait.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 98,
+   "id": "sthr-act-hourwaswrong",
+   "art_type": "act",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#098 · sthr-act-hourwaswrong · portrait 2:3\nScene: a waterlogged almanac page held up out of dark crypt water, the printed time smeared.\nFraming: the scene the investigators are working toward, a place mid-event, no central portrait.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 99,
+   "id": "sthr-act-walkbackward",
+   "art_type": "act",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#099 · sthr-act-walkbackward · portrait 2:3\nScene: a sunken road seen looking back toward town, footsteps in the mud pointing the other way.\nFraming: the scene the investigators are working toward, a place mid-event, no central portrait.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 100,
+   "id": "sthr-act-walksbeside",
+   "art_type": "act",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#100 · sthr-act-walksbeside · portrait 2:3\nScene: a hooded walker on a fog-bound road, the hood beginning to lift in the lamplight.\nFraming: the scene the investigators are working toward, a place mid-event, no central portrait.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 101,
+   "id": "sthr-act-sheriffdead",
+   "art_type": "act",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#101 · sthr-act-sheriffdead · portrait 2:3\nScene: a sheriff's star and hat lying on the stone lip of a well at night.\nFraming: the scene the investigators are working toward, a place mid-event, no central portrait.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 102,
+   "id": "sthr-act-vote",
+   "art_type": "act",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#102 · sthr-act-vote · portrait 2:3\nScene: a town ledger open to a page of signatures and a tally, a pen resting across it.\nFraming: the scene the investigators are working toward, a place mid-event, no central portrait.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 103,
+   "id": "sthr-act-wheelturns",
+   "art_type": "act",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#103 · sthr-act-wheelturns · portrait 2:3\nScene: the view from the top of a Ferris wheel over the whole lamplit town at once.\nFraming: the scene the investigators are working toward, a place mid-event, no central portrait.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 104,
+   "id": "sthr-act-bargain",
+   "art_type": "act",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#104 · sthr-act-bargain · portrait 2:3\nScene: a fairground ticket held out through a booth window by a gloved hand, the face behind it in shadow.\nFraming: the scene the investigators are working toward, a place mid-event, no central portrait.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 105,
+   "id": "sthr-act-almanachid",
+   "art_type": "act",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#105 · sthr-act-almanachid · portrait 2:3\nScene: a printing press mid-stroke, a fresh almanac sheet coming off it with a different time printed.\nFraming: the scene the investigators are working toward, a place mid-event, no central portrait.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 106,
+   "id": "sthr-act-appointedname",
+   "art_type": "act",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#106 · sthr-act-appointedname · portrait 2:3\nScene: a study desk with a single word written again and again on every paper, the word itself illegible.\nFraming: the scene the investigators are working toward, a place mid-event, no central portrait.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 107,
+   "id": "sthr-act-lasthour",
+   "art_type": "act",
+   "aspect": "portrait 2:3",
+   "character": null,
+   "brief": "#107 · sthr-act-lasthour · portrait 2:3\nScene: the town square at the edge of midnight, a freestanding doorway at its centre, figures holding it shut against the dark.\nFraming: the scene the investigators are working toward, a place mid-event, no central portrait.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 108,
+   "id": "sthr-story-firstdark",
+   "art_type": "story",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#108 · sthr-story-firstdark · landscape 3:2\nScene: a figure waking on a bench in the square at dusk, salt on the lips, the same lanterns being lit again.\nFraming: a quiet narrative beat, an interlude moment, restrained composition.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 109,
+   "id": "sthr-appointed-approach",
+   "art_type": "story",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#109 · sthr-appointed-approach · landscape 3:2\nScene: a long empty street of four lamp posts receding into darkness, each farther lamp dimmer, the last one out.\nFraming: a quiet narrative beat, an interlude moment, restrained composition.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 110,
+   "id": "sthr-story-firstreset",
+   "art_type": "story",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#110 · sthr-story-firstreset · landscape 3:2\nScene: dawn that is not dawn over the town square, lanterns relit, the night folding back into eleven o'clock.\nFraming: a quiet narrative beat, an interlude moment, restrained composition.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 111,
+   "id": "sthr-res-1",
+   "art_type": "story",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#111 · sthr-res-1 · landscape 3:2\nScene: a lone lit window in a lighthouse at dawn, the town below waking, one figure keeping watch.\nFraming: a quiet narrative beat, an interlude moment, restrained composition.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 112,
+   "id": "sthr-res-2",
+   "art_type": "story",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#112 · sthr-res-2 · landscape 3:2\nScene: a heavy door closing on a darkness, the town square in first morning light, the lanterns burnt out.\nFraming: a quiet narrative beat, an interlude moment, restrained composition.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 113,
+   "id": "sthr-res-3",
+   "art_type": "story",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#113 · sthr-res-3 · landscape 3:2\nScene: figures walking out of the town along the sunken road at dawn, the fog behind them not quite lifting.\nFraming: a quiet narrative beat, an interlude moment, restrained composition.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 114,
+   "id": "sthr-res-4",
+   "art_type": "story",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#114 · sthr-res-4 · landscape 3:2\nScene: a door sealed with iron bands and wax in the middle of the square, one chair empty beside it.\nFraming: a quiet narrative beat, an interlude moment, restrained composition.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 115,
+   "id": "sthr-res-5",
+   "art_type": "story",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#115 · sthr-res-5 · landscape 3:2\nScene: eleven o'clock in the square again, but the sky has fewer stars missing than before.\nFraming: a quiet narrative beat, an interlude moment, restrained composition.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 116,
+   "id": "sthr-res-6",
+   "art_type": "story",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#116 · sthr-res-6 · landscape 3:2\nScene: hooded figures walking the sunken road in fog, all in the same direction, never arriving.\nFraming: a quiet narrative beat, an interlude moment, restrained composition.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 117,
+   "id": "sthr-story-actii",
+   "art_type": "story",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#117 · sthr-story-actii · landscape 3:2\nScene: the edge of the square at night, a tall shape at the end of a street that was not there a moment ago.\nFraming: a quiet narrative beat, an interlude moment, restrained composition.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 118,
+   "id": "sthr-story-beforefinale",
+   "art_type": "story",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#118 · sthr-story-beforefinale · landscape 3:2\nScene: an almanac house window lit late at night, the rest of the town dark and still.\nFraming: a quiet narrative beat, an interlude moment, restrained composition.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  },
+  {
+   "n": 119,
+   "id": "sthr-res-bargain",
+   "art_type": "story",
+   "aspect": "landscape 3:2",
+   "character": null,
+   "brief": "#119 · sthr-res-bargain · landscape 3:2\nScene: a fairground gate at first light, a punched ticket on the ground, a tall shadow walking out into the morning.\nFraming: a quiet narrative beat, an interlude moment, restrained composition.\nHand-painted and uneven: no repeated or stamped shapes, no text."
+  }
+ ]
+}

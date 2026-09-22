@@ -27,6 +27,41 @@ def check(name, cond):
     PASS, FAIL = (PASS + 1, FAIL) if cond else (PASS, FAIL + 1)
 
 
+# the owner's real output and resume ledgers are moved aside before the first
+# wipe and put back on exit (pass, fail or crash) — a selftest must never cost
+# generated art
+import atexit
+
+_BACKUPS = []
+
+
+def _sideline(path):
+    if os.path.exists(path) and path not in [p for p, _ in _BACKUPS]:
+        bak = path + ".pretest-backup"
+        shutil.rmtree(bak, ignore_errors=True)
+        if os.path.isfile(bak):
+            os.remove(bak)
+        os.rename(path, bak)
+        _BACKUPS.append((path, bak))
+
+
+def _restore():
+    for path, bak in _BACKUPS:
+        if os.path.isdir(path):
+            shutil.rmtree(path, ignore_errors=True)
+        elif os.path.isfile(path):
+            os.remove(path)
+        os.rename(bak, path)
+    if _BACKUPS:
+        print("owner state restored ({} path(s))".format(len(_BACKUPS)))
+
+
+atexit.register(_restore)
+for _c in ("still_hour", "demo"):
+    _sideline(os.path.join(ROOT, "out", _c))
+    _sideline(os.path.join(ROOT, "state", _c + ".ledger.json"))
+
+
 def clean(campaign):
     shutil.rmtree(os.path.join(ROOT, "out", campaign), ignore_errors=True)
     ledger = os.path.join(ROOT, "state", campaign + ".ledger.json")
