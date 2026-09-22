@@ -47,6 +47,16 @@ def payload_prompt(body):
     return body.get("prompt")
 
 
+def payload_sampler(body):
+    """(steps, cfg) from either backend's request body."""
+    if isinstance(body.get("prompt"), dict):
+        for node in body["prompt"].values():
+            if node.get("_meta", {}).get("title") == "CF_SAMPLER":
+                return node["inputs"]["steps"], node["inputs"]["cfg"]
+        return None
+    return body.get("steps"), body.get("cfg_scale")
+
+
 def payload_seed(body):
     if isinstance(body.get("prompt"), dict):
         for node in body["prompt"].values():
@@ -653,7 +663,7 @@ pay = [json.load(open(os.path.join(pdir, f), encoding="utf-8"))
        for f in os.listdir(pdir) if f.startswith("sthr-bell")]
 check("campaign defaults + one-off settings reach the payload "
       "(steps=7 default, cfg=9 override)",
-      any(p["steps"] == 7 and p["cfg_scale"] == 9.0 for p in pay))
+      any(payload_sampler(p) == (7, 9.0) for p in pay))
 r = requests.post(BASE + "/api/lora_save",
                   json={"campaign": "still_hour",
                         "characters": {"elias": {"lora": "elias_v1",

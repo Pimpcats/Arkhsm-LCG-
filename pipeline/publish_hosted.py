@@ -65,7 +65,32 @@ def to_jpeg(src, name):
     return hashlib.sha1(open(dest, "rb").read()).hexdigest()[:10]
 
 
+def placeholder_art():
+    """Chosen illustrations (CardForge's out/still_hour/index.json) that are
+    dry-run stubs (1x1 PNGs) rather than real art. A test or dry-run leaves
+    these behind; they must never be composited into a published face."""
+    idx = os.path.join(ROOT, "out", "still_hour", "index.json")
+    if not os.path.exists(idx):
+        return []
+    bad = []
+    for cid, rel in json.load(open(idx, encoding="utf-8")).items():
+        path = os.path.join(ROOT, rel)
+        try:
+            w, h = Image.open(path).size
+        except (OSError, ValueError):
+            bad.append(cid)
+            continue
+        if w < 64 or h < 64:
+            bad.append(cid)
+    return sorted(bad)
+
+
 def publish(ref, render=True):
+    stubs = placeholder_art()
+    if stubs:
+        raise SystemExit("refusing to publish: chosen art for {} is a dry-run stub "
+                         "(out/still_hour/index.json). Remove out/still_hour or choose real "
+                         "art first.".format(", ".join(stubs)))
     if render:
         subprocess.run([sys.executable, os.path.join(HERE, "render_placeholders.py")],
                        cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
