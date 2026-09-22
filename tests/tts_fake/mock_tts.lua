@@ -1,14 +1,16 @@
 -- Fake Tabletop Simulator scripting environment (tests only).
 --
 -- Executes one "Execute Lua Code" chunk the way TTS would in Global, with the
--- slice of the TTS API the relay runner and the Still Hour control token use:
--- spawnObjectJSON/spawnObjectData, getObjectFromGUID, object scripts with
--- onLoad/onSave/buttons/call/reload/getVar/setVar, transforms + flip,
--- bags/decks with takeObject/putObject, tags, universal table events
--- (onObjectEnterContainer / onObjectLeaveContainer / onObjectDestroy /
--- onObjectSpawn), a `Global` object, Wait.time/frames/condition on a virtual
--- clock, Player.lookAt, sendExternalMessage. Signatures follow the official
--- API docs (Berserk-Games/Tabletop-Simulator-API).
+-- slice of the TTS API the relay runner, the Still Hour control token, the
+-- board wiring, the campaign log and SCED's memory bag use:
+-- spawnObjectJSON/spawnObjectData (GUIDs kept, like TTS), getObjectFromGUID,
+-- object scripts with onLoad/onSave/script_state/buttons/inputs/context menu/
+-- call/reload/getVar/setVar, States (setState), transforms + flip, bounds,
+-- bags/decks with takeObject (index or guid)/putObject, tags, universal table
+-- events (onObjectEnterContainer / onObjectLeaveContainer / onObjectDestroy /
+-- onObjectSpawn), a `Global` object, Vector, Wait.time/frames/condition on a
+-- virtual clock, Player.lookAt, sendExternalMessage. Signatures follow the
+-- official API docs (Berserk-Games/Tabletop-Simulator-API).
 --
 -- A preexisting object named "__Global__" supplies the Global script: the SCED
 -- fixture (tests/tts_fake/sced/) uses it to stand in for SCED's Global.
@@ -63,6 +65,21 @@ local byGuid = {}
 local G  -- Global env, filled below
 local globalEnv  -- the Global script's env (SCED fixture), if any
 
+local function guidInUse(g)
+  for _, x in ipairs(objects) do if x.guid == g then return true end end
+  return false
+end
+
+local function Vector(x, y, z)
+  if type(x) == "table" then x, y, z = x.x or x[1], x.y or x[2], x.z or x[3] end
+  local v = { x = x or 0, y = y or 0, z = z or 0 }
+  v[1], v[2], v[3] = v.x, v.y, v.z
+  return setmetatable(v, {
+    __add = function(a, b) return Vector(a.x + b.x, a.y + b.y, a.z + b.z) end,
+    __index = { scale = function(a, b) return Vector(a.x * b.x, a.y * b.y, a.z * b.z) end },
+  })
+end
+
 local function deepcopy(v)
   if type(v) ~= "table" then return v end
   local t = {}
@@ -111,15 +128,19 @@ local function newGuid(want)
   return want
 end
 
-function makeObject(data)
+function makeObject(data, stateId)
   local o = {}
-  local st = { data = data, buttons = {}, tags = {}, env = nil, destroyed = false,
-               guid = newGuid(data.GUID) }
+  local st = { data = data, buttons = {}, inputs = {}, menu = {}, tags = {}, env = nil,
+               destroyed = false, guid = newGuid(data.GUID), locked = data.Locked == true }
   data.GUID = st.guid
   for _, t in ipairs(data.Tags or {}) do st.tags[t] = true end
   local t = data.Transform or {}
   st.pos = { x = t.posX or 0, y = t.posY or 1, z = t.posZ or 0 }
   st.rot = { x = t.rotX or 0, y = t.rotY or 0, z = t.rotZ or 0 }
+  st.scale = { x = t.scaleX or 1, y = t.scaleY or 1, z = t.scaleZ or 1 }
+  local states = data.States
+  data.States = nil
+  st.stateId = states and (stateId or 1) or -1
   local contained = deepcopy(data.ContainedObjects or {})
   data.ContainedObjects = nil
 
@@ -145,7 +166,11 @@ function makeObject(data)
         return z > 90 and z < 270
       end
       if k == "__env" then return st.env end
+      if k == "loading_custom" then return false end
       return fields[k]
+    end,
+    __newindex = function(_, k, v)
+      if k == "script_state" then data.LuaScriptState = v else rawset(o, k, v) end
     end,
   })
   local function tags()
@@ -158,14 +183,65 @@ function makeObject(data)
   o.setDescription = method(o, function(s) data.Description = s ; return true end)
   o.getGMNotes = method(o, function() return data.GMNotes or "" end)
   o.getLuaScript = method(o, function() return data.LuaScript or "" end)
-  o.getPosition = method(o, function() return { x = st.pos.x, y = st.pos.y, z = st.pos.z } end)
-  o.setPosition = method(o, function(p) st.pos = vecOf(p) ; return true end)
-  o.setPositionSmooth = method(o, function(p) st.pos = vecOf(p) ; return true end)
-  o.getRotation = method(o, function() return { x = st.rot.x, y = st.rot.y, z = st.rot.z } end)
-  o.setRotation = method(o, function(r) st.rot = vecOf(r) ; return true end)
-  o.flip = method(o, function() st.rot.z = (st.rot.z + 180) % 360 ; return true end)
-  o.setLock = method(o, function(v) data.Locked = v and true or false ; return true end)
-  o.getLock = method(o, function() return data.Locked == true end)
+  o.getPosition = method(o, function() return Vector(st.pos) end)
+  o.setPosition = method(o, function(p) st.pos = Vector(p) ; return true end)
+  o.setPositionSmooth = o.setPosition
+  o.getRotation = method(o, function() return Vector(st.rot) end)
+  o.setRotation = method(o, function(r) st.rot = Vector(r) ; return true end)
+  o.getScale = method(o, function() return Vector(st.scale) end)
+  o.getLock = method(o, function() return st.locked end)
+  o.setLock = method(o, function(v) st.locked = v and true or false ; return true end)
+  o.highlightOn = method(o, function() return true end)
+  o.highlightOff = method(o, function() return true end)
+  -- a 2 x 2.6 local footprint (a page-shaped token) scaled like TTS does
+  o.getBoundsNormalized = method(o, function()
+    return { center = Vector(st.pos), offset = Vector(0, 0.1 * st.scale.y, 0),
+             size = Vector(2 * st.scale.x, 0.2 * st.scale.y, 2.6 * st.scale.z) }
+  end)
+  o.getBounds = o.getBoundsNormalized
+  o.getGUID = method(o, function() return st.guid end)
+  o.getInputs = method(o, function()
+    if #st.inputs == 0 then return nil end
+    return deepcopy(st.inputs)
+  end)
+  o.createInput = method(o, function(def) st.inputs[#st.inputs + 1] = deepcopy(def) ; return true end)
+  o.clearInputs = method(o, function() st.inputs = {} ; return true end)
+  o.editInput = method(o, function(p)
+    local b = st.inputs[(p.index or 0) + 1]
+    if not b then error("editInput: no input " .. tostring(p.index)) end
+    for k, v in pairs(p) do if k ~= "index" then b[k] = v end end
+    return true
+  end)
+  o.editButton = method(o, function(p)
+    local b = st.buttons[(p.index or 0) + 1]
+    if not b then error("editButton: no button " .. tostring(p.index)) end
+    for k, v in pairs(p) do if k ~= "index" then b[k] = v end end
+    return true
+  end)
+  o.addContextMenuItem = method(o, function(label, fn) st.menu[#st.menu + 1] = { label, fn } ; return true end)
+  o.setVar = method(o, function(k, v) if st.env then st.env[k] = v end ; return true end)
+  o.getVar = method(o, function(k) return st.env and st.env[k] end)
+  o.getStateId = method(o, function() return st.stateId end)
+  o.getStates = method(o, function()
+    local l = {}
+    for id, d in pairs(states or {}) do
+      l[#l + 1] = { id = tonumber(id), name = d.Nickname or "", guid = d.GUID or "" }
+    end
+    return l
+  end)
+  o.setState = method(o, function(id)
+    if not states or not states[tostring(id)] then error("setState: no state " .. tostring(id)) end
+    local cur = o.getData()
+    cur.States = nil
+    local nxt = deepcopy(states[tostring(id)])
+    nxt.States = {}
+    for k, d in pairs(states) do if k ~= tostring(id) then nxt.States[k] = deepcopy(d) end end
+    nxt.States[tostring(st.stateId)] = cur
+    nxt.Transform = cur.Transform
+    o.destruct()
+    return makeObject(nxt, id)
+  end)
+  o.flip = method(o, function() st.rot = Vector(st.rot.x, st.rot.y, (st.rot.z + 180) % 360) ; return true end)
   o.isDestroyed = method(o, function() return st.destroyed end)
   o.getButtons = method(o, function()
     if #st.buttons == 0 then return nil end
@@ -187,7 +263,7 @@ function makeObject(data)
     for i, c in ipairs(contained) do
       l[i] = { index = i - 1, name = c.Nickname or "", nickname = c.Nickname or "", guid = c.GUID or "",
                gm_notes = c.GMNotes or "", description = c.Description or "", memo = c.Memo or "",
-               tags = deepcopy(c.Tags or {}) }
+               tags = deepcopy(c.Tags or {}), lua_script_state = c.LuaScriptState or "" }
     end
     return l
   end)
@@ -196,10 +272,12 @@ function makeObject(data)
     local d = deepcopy(data)
     d.ContainedObjects = deepcopy(contained)
     d.LuaScriptState = state()
-    d.Tags = tags()
+    d.Tags = o.getTags()
+    d.Locked = st.locked
     d.Transform = { posX = st.pos.x, posY = st.pos.y, posZ = st.pos.z,
                     rotX = st.rot.x, rotY = st.rot.y, rotZ = st.rot.z,
-                    scaleX = t.scaleX or 1, scaleY = t.scaleY or 1, scaleZ = t.scaleZ or 1 }
+                    scaleX = st.scale.x, scaleY = st.scale.y, scaleZ = st.scale.z }
+    if states then d.States = deepcopy(states) end
     return d
   end)
   o.call = method(o, function(name, param)
@@ -251,7 +329,7 @@ function makeObject(data)
   o.reload = method(o, function()
     local d = o.getData()
     o.destruct()
-    return makeObject(d)
+    return makeObject(d, st.stateId > 0 and st.stateId or nil)
   end)
 
   byGuid[st.guid] = o
@@ -315,6 +393,7 @@ G = setmetatable({
   sendExternalMessage = function(t) emit({ messageID = 4, customMessage = t }) ; return true end,
   getObjects = function() local l = {} for i, o in ipairs(objects) do l[i] = o end return l end,
   getObjectFromGUID = function(g) return byGuid[g] end,
+  Vector = Vector,
   getObjectsWithTag = function(tag)
     local l = {}
     for _, o in ipairs(objects) do if o.hasTag(tag) then l[#l + 1] = o end end

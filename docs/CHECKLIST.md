@@ -20,9 +20,17 @@
   (9 Hour agendas, ~25 locations, node sets) still to be entered/arted
 - ✅ Scenario requirements captured: docs/design/SCENARIO_SCHEMA.md +
   campaigns/still_hour/scenario_manifest.json (what each scenario needs)
-- ⬜ Table presence (schemas all in hand from your examples): investigator
-  minicards, campaign guide as PDF object, interactive campaign-log token,
-  scenario/campaign boxes with Place/Recall
+- 🔶 Table presence — built and tested offline + in the fake TTS; needs one
+  real-TTS relay run (pipeline/table_presence.py -> dist/the_still_hour_table.json):
+  - investigator minicards (plugin MiniInvestigator template, id `<inv>-m`,
+    Tag Minicard, hosted faces)
+  - campaign guide as a Custom_PDF (typeset on the plugin's guide pages by
+    pipeline/build_guide_pdf.py, hosted from dist/guide/, Tag CampaignGuide)
+  - interactive campaign log (Custom_Token, 3 page States, every log-sheet
+    field clickable/typeable, saves via onSave, "Sync from campaign" reads the
+    campaign-state token)
+  - campaign + scenario boxes on SCED's box mesh with SCED's own MemoryBag
+    script (Place / Recall); the download release asset is now that box
 
 ## CardForge Studio (the app)
 

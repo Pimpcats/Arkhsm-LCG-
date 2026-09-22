@@ -26,6 +26,7 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 
 import build_cards as B  # noqa: E402  (card object builder, ground-truth aligned)
+import table_presence as T  # noqa: E402  (boxes, log, guide, minicards)
 
 def campaign_paths(campaign="still_hour"):
     """Every path this compiler reads for ONE campaign, so any campaign - not
@@ -225,65 +226,20 @@ def build_scenario_box(sc, assign, cards, campaign_name="Campaign"):
                              "pos": {"x": round(x, 3), "y": round(y, 3),
                                      "z": round(z, 3)},
                              "rot": {"x": 0, "y": rot, "z": 0}}
-    return {
-        "Name": "Custom_Model_Bag",
-        "Nickname": sc.get("name", sid),
-        "Description": campaign_name or "Campaign",
-        "GUID": guid("scenariobox:" + sid),
-        "Tags": ["ScenarioBox"],
-        "GMNotes": json.dumps({"id": sid, "type": "ScenarioBox",
-                               "cycle": campaign_name}),
-        "Transform": transform(scale=1.0),
-        "ColorDiffuse": dict(B.COLOR_DIFFUSE),
-        # SCED's memory bag reads exactly two keys back out of this — ml and
-        # setupButton (see its onLoad) — so ml is all there is to write. It
-        # draws no lines of its own; connections travel on the cards, in the
-        # locationFront/locationBack metadata the game actually reads.
-        "LuaScriptState": json.dumps({"ml": ml}),
-        "ContainedObjects": contained,
-    }
+    # SCED's scenario book: small box mesh + the MemoryBag script (Place /
+    # Recall) reading ml. Connections travel on the cards' locationFront /
+    # locationBack metadata, not in the box.
+    return T.scenario_box(sc.get("name", sid), sid, contained, ml)
 
 
-def build_log_token(cards, campaign_name=None):
-    """The campaign log as SCED's Custom_Token (GMNotes type CampaignLog)."""
-    log = cards.get("sthr-campaign-log")
-    art = B.ART_URLS.get("sthr-campaign-log", {})
-    url = art.get("face") or B.face_ph("Campaign Log")
-    return {
-        "Name": "Custom_Token",
-        "Nickname": "{} — Campaign Log".format(campaign_name or "Campaign"),
-        "Description": "Page 1",
-        "GUID": guid("campaignlog:" + (campaign_name or "c")),
-        "Tags": ["CampaignLog"],
-        "GMNotes": json.dumps({"id": "STHR-LOG", "type": "CampaignLog"}),
-        "Transform": transform(9.0, 0.0, scale=1.0),
-        "ColorDiffuse": dict(B.COLOR_DIFFUSE),
-        "Locked": False, "Grid": True, "Snap": True, "Sticky": True,
-        "CustomImage": {
-            "ImageURL": url, "ImageSecondaryURL": "", "ImageScalar": 1.0,
-            "WidthScale": 0.0,
-            "CustomToken": {"Thickness": 0.2, "MergeDistancePixels": 15.0,
-                            "StandUp": False, "Stackable": False},
-        },
-        "_note": "log fields: {}".format(
-            ", ".join(k for k in ("player", "investigator1", "investigator2",
-                                  "investigator3") if (log or {}).get(k))) if log else "",
-    }
+def build_log_token(cards=None, campaign_name=None):
+    """The campaign log: SCED's CampaignLog Custom_Token (table_presence)."""
+    return T.build_log(T.PLACE_LOG)
 
 
 def build_guide_pdf(campaign_name=None):
-    return {
-        "Name": "Custom_PDF",
-        "Nickname": "{} — Campaign Guide".format(campaign_name or "Campaign"),
-        "Description": "fan content",
-        "GUID": guid("guide:" + (campaign_name or "c")),
-        "Tags": ["CampaignGuide"],
-        "GMNotes": json.dumps({"id": "STHR-GUIDE", "type": "CampaignGuide"}),
-        "Transform": transform(12.0, 0.0, scale=1.0),
-        "ColorDiffuse": dict(B.COLOR_DIFFUSE),
-        "CustomPDF": {"PDFUrl": "", "PDFPassword": "", "PDFPage": 0,
-                      "PDFPageOffset": 0},
-    }
+    """The campaign guide: SCED's CampaignGuide Custom_PDF (table_presence)."""
+    return T.build_guide(T.PLACE_GUIDE)
 
 
 def compile_campaign(out_path, require_locked=True, campaign="still_hour"):
@@ -306,41 +262,21 @@ def compile_campaign(out_path, require_locked=True, campaign="still_hour"):
                            + ", ".join(unlocked),
                 "unlocked": unlocked}
 
-    contained, ml, placed = [], {}, 0
-    for i, sc in enumerate(scenarios):
+    boxes, placed = [], 0
+    for sc in scenarios:
         assign = assignments.get(sc["id"], {}) or {}
         box = build_scenario_box(sc, assign, cards, paths["name"])
         if not box["ContainedObjects"]:
             continue
-        x = -14.0 + (i * 4.0)
-        contained.append(box)
-        ml[box["GUID"]] = {"lock": False,
-                           "pos": {"x": round(x, 3), "y": 1.5, "z": 12.0},
-                           "rot": {"x": 0, "y": 270, "z": 0}}
+        boxes.append(box)
         placed += 1
-    log_tok = build_log_token(cards, paths["name"])
-    guide = build_guide_pdf(paths["name"])
-    contained += [log_tok, guide]
-    ml[log_tok["GUID"]] = {"lock": False,
-                           "pos": {"x": 9.0, "y": 1.5, "z": -6.0},
-                           "rot": {"x": 0, "y": 180, "z": 0}}
-    ml[guide["GUID"]] = {"lock": False,
-                         "pos": {"x": 12.5, "y": 1.5, "z": -6.0},
-                         "rot": {"x": 0, "y": 180, "z": 0}}
-
-    box = {
-        "Name": "Custom_Model_Bag",
-        "Nickname": paths["name"],
-        "Description": "fan content — not for sale",
-        "GUID": guid("campaignbox:" + campaign),
-        "Tags": ["CampaignBox", "Reloadable"],
-        "GMNotes": json.dumps({"filename": campaign, "id": "CB-" + campaign[:8].upper(),
-                               "type": "CampaignBox"}),
-        "Transform": transform(scale=1.0),
-        "ColorDiffuse": dict(B.COLOR_DIFFUSE),
-        "LuaScriptState": json.dumps({"ml": ml}),
-        "ContainedObjects": contained,
-    }
+    # the campaign box carries the scenario books plus (for The Still Hour)
+    # the investigator minicards, the campaign log and the campaign guide
+    still = campaign == "still_hour"
+    box = T.campaign_box(boxes, name=paths["name"],
+                         filename=T.FILENAME if still else campaign,
+                         box_id="CB-STHR" if still else "CB-" + campaign[:8].upper(),
+                         table=still)
     save = {"SaveName": paths["name"], "GameMode": paths["name"],
             "ObjectStates": [box]}
     os.makedirs(os.path.dirname(out_path), exist_ok=True)

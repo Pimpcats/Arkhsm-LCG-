@@ -2100,6 +2100,49 @@ def s_campaign_log(c, pt, dest, art_path=None, placement=None):
 
 
 
+def minicard_id(card_id):
+    """SCED's minicard id convention: the investigator's id + "-m"
+    (docs/art_reference/sced_objects/minicard.json: "10001-m")."""
+    return card_id + "-m"
+
+
+def s_minicard(c, dest, back_dest, art_path=None, placement=None):
+    """Investigator minicard, exactly as the plugin's MiniInvestigator.js
+    paints it: the AHLCG-MiniInvestigator template, the investigator portrait
+    over the whole Portrait clip region (0,0,244,375), the artist line in its
+    Artist region; the back is the same portrait in greyscale. With no
+    portrait yet, the investigator's name is set on the template so the mini
+    is identifiable on the table (placeholder only — the plugin has no name
+    field, the portrait is the identity)."""
+    tpl = _se_img("templates", "AHLCG-MiniInvestigator")
+    if tpl is None:
+        return False
+    W, H = 244 * SE_SCALE, 375 * SE_SCALE
+    base = tpl.resize((W, H), Image.LANCZOS).convert("RGB")
+    reg = se_reg("MiniInvestigator", "Portrait-portrait-clip") or (0, 0, W, H)
+    artist = se_reg("MiniInvestigator", "Artist")
+    for grey, out in ((False, dest), (True, back_dest)):
+        img = base.copy()
+        if art_path and paste_cover(img, art_path, reg, placement):
+            if grey:
+                img = img.convert("L").convert("RGB")
+            d = ImageDraw.Draw(img)
+            if artist and not grey:
+                _box_text(d, _wm(art_path), artist, fill=(230, 226, 214),
+                          max_size=16, min_size=10)
+        else:
+            d = ImageDraw.Draw(img)
+            name = c.get("name", "")
+            _box_text(d, name, (18, H - 150, W - 18, H - 90), title=True,
+                      fill=(150, 150, 150) if grey else (236, 230, 212),
+                      grow=1.0, max_size=46, min_size=18)
+            if c.get("class") and not grey:
+                _box_text(d, c["class"], (18, H - 84, W - 18, H - 52),
+                          italic=True, fill=(196, 188, 170), max_size=26)
+        img.save(out)
+    return True
+
+
 SCENARIO_RENDERERS = {"Location": s_location, "Agenda": s_agenda,
                       "CampaignLog": s_campaign_log,
                       "Act": s_act, "Scenario": s_scenario_ref,
@@ -2247,6 +2290,12 @@ def main():
             if has_se_frames():
                 s_investigator_front(c, pt, dest, art_path=art, placement=place)
                 s_investigator_back(c, pt, back_dest, art_path=art)
+                if not (FURNITURE or BLANK):
+                    mid = minicard_id(c["id"])
+                    s_minicard(c, os.path.join(FACES_DIR, mid + ".png"),
+                               os.path.join(FACES_DIR, mid + "-back.png"),
+                               art_path=art_index.get(mid) or art,
+                               placement=placements.get(mid))
             elif has_psd("character_card_front"):
                 p_investigator_front(c, pt, dest, art_path=art, placement=place)
                 (t_investigator_back if use_tpl else render_investigator_back)(
@@ -2271,6 +2320,13 @@ def main():
             SCENARIO_RENDERERS[c["type"]](c, pt, dest, art_path=art, placement=place)
         else:
             render_player_card(c, pt, dest, art_path=art, placement=place)
+    if not (FURNITURE or BLANK or args.only):
+        # table presence: the campaign-log pages and the box texture
+        import campaign_log
+        import table_presence
+        campaign_log.render_pages(FACES_DIR)
+        table_presence.render_box_texture(
+            os.path.join(FACES_DIR, table_presence.BOX_TEXTURE_ID + ".png"))
     n = len([f for f in os.listdir(FACES_DIR) if f.endswith(".png")])
     print("rendered {} face(s) ({} with chosen art composited) -> {}".format(
         n, composed, os.path.relpath(FACES_DIR, ROOT)))

@@ -6,9 +6,12 @@
     },
     {
       "file": "dist/the_still_hour_campaign.json"
+    },
+    {
+      "file": "dist/the_still_hour_table.json"
     }
   ],
   "runner": "tools/tts_relay/ingame_runner.lua",
-  "timeout_s": 240,
+  "timeout_s": 360,
   "screenshot_pause_s": 2
 }

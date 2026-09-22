@@ -163,7 +163,9 @@ class ScenarioContentTests(unittest.TestCase):
             self.assertTrue(r["ok"], r)
             self.assertEqual(r["scenarios"], 8)
             top = json.load(open(out, encoding="utf-8"))["ObjectStates"][0]
-        boxes = [o for o in top["ContainedObjects"] if "ScenarioBox" in (o.get("Tags") or [])]
+        # real SCED scenario boxes carry no tag; their GMNotes type identifies them
+        boxes = [o for o in top["ContainedObjects"]
+                 if json.loads(o.get("GMNotes") or "{}").get("type") == "ScenarioBox"]
         self.assertEqual(len(boxes), 8)
         seen = collections.Counter()
 
