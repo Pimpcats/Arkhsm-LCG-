@@ -656,9 +656,16 @@ step("campaign log", function(go)
           return (o.getLuaScript() or ""):find("function runStillHourTests", 1, true) ~= nil
         end)
         if ctl then
+          -- give the campaign a known fact so the sync has something real to copy
+          local snap = ctl.call("shApiSnapshot")
+          pcall(function() ctl.call("shApiUnlockFact", { id = "the-hour-was-wrong" }) end)
           local oks, r = pcall(function() return p2.call("syncFromCampaignState") end)
-          check("log syncs from the campaign-state token", oks and type(r) == "table" and r.ok == true,
+          check("log syncs from the campaign-state token",
+            oks and type(r) == "table" and r.ok == true and (tonumber(r.updated) or 0) > 0,
             (oks and type(r) == "table") and ("updated " .. tostring(r.updated)) or tostring(r))
+          local v5 = logValues(p2)
+          check("synced fact is ticked on the log", v5 and v5.values["k:the-hour-was-wrong"] == true)
+          pcall(function() ctl.call("shApiRestore", { blob = snap }) end)
         end
         local ok5, p1 = pcall(function() return p2.setState(1) end)
         waitFor(function() return ok5 and p1 and #(p1.getButtons() or {}) >= 20 end, 30, function(ok6)
