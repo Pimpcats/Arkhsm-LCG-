@@ -798,9 +798,11 @@ check("rig controls in the UI", "Launch backend" in page and "rig_cwd" in page)
 r = requests.post(BASE + "/api/rig_save",
                   json={"campaign": "still_hour", "cwd": "/tmp/xyz",
                         "command": "run.bat --api"}).json()
+# rig_save writes the entry for the campaign's configured backend
+_kind = json.load(open(camp_path, encoding="utf-8")).get("backend", "a1111")
 check("rig_save persists via the API",
       r.get("ok") and json.load(open(rig.rig_path(), encoding="utf-8"))
-      ["a1111"]["cwd"] == "/tmp/xyz")
+      [_kind]["cwd"] == "/tmp/xyz")
 check("rig_save keeps the config note",
       "_note" in json.load(open(rig.rig_path(), encoding="utf-8")))
 # full auto-launch loop against a fake A1111 API (stdlib server, self-exits)
@@ -1364,7 +1366,12 @@ _boxes = []
 
 def _find_boxes(o):
     if isinstance(o, dict):
-        if "ScenarioBox" in (o.get("Tags") or []):
+        # real SCED scenario boxes carry no tag: GMNotes type identifies them
+        try:
+            _bt = json.loads(o.get("GMNotes") or "{}").get("type")
+        except (ValueError, AttributeError):
+            _bt = None
+        if _bt == "ScenarioBox" or "ScenarioBox" in (o.get("Tags") or []):
             _boxes.append(o)
         for _v in o.values():
             _find_boxes(_v)
@@ -1446,8 +1453,9 @@ finally:
     os.rename(_tmp, _fd)
 check("Spawn campaign box wired in the UI",
       "campCompile" in page and "campaign_compile" in page)
-check("typography panel (font/size/bold/italic per area) in the UI",
-      "ed_typebar" in page and "tyBind" in page and "ty_bold" in page
+# the panel became on-card editing (commit 5b8ca7b); the controls remain
+check("typography controls (font/size/bold/italic per area) in the UI",
+      "tyBind" in page and "ty_bold" in page
       and "ty_italic" in page and "ty_size" in page)
 # symbol palette: insert Arkham glyph tokens into the text areas
 check("symbol palette + insert wiring in the UI",
