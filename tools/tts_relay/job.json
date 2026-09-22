@@ -1,9 +1,14 @@
 {
   "_doc": "What the TTS relay spawns and runs on each push. payloads: dist files (a TTS save with ObjectStates, or one object). runner: Lua sent into the live game. See docs/TTS_RELAY.md.",
   "payloads": [
-    { "file": "dist/the_still_hour_mod.json" }
+    {
+      "file": "dist/the_still_hour_mod.json"
+    },
+    {
+      "file": "dist/the_still_hour_table.json"
+    }
   ],
   "runner": "tools/tts_relay/ingame_runner.lua",
-  "timeout_s": 240,
+  "timeout_s": 360,
   "screenshot_pause_s": 2
 }

@@ -12,6 +12,7 @@ This tool unpacks that into renderer-ready form:
 
   assets/frames/se/templates/<name>.png     converted frames (player set)
   assets/frames/se/regions.json             {settings-file: {key: [x,y,w,h]}}
+  assets/frames/se/guide/…                  campaign-guide pages + box overlays
   assets/frames/se/overlays/… icons/…       the overlay/icon PNGs we use
 
 Usage: python3 tools/extract_se_plugin.py [path/to/ArkhamHorrorLCG.seext]
@@ -54,7 +55,18 @@ TEMPLATES = [
     "AHLCG-Scenario", "AHLCG-Story",
     # the scenario-reference / chaos card (chaos-token modifier rows)
     "AHLCG-Chaos",
+    # investigator minicard (MiniInvestigator.js: template + full-bleed portrait)
+    "AHLCG-MiniInvestigator",
+    # campaign / scenario box texture (BoxCover.js: the lid + base of the
+    # box mesh SCED's placeholders use) and its tintable band
+    "AHLCG-BoxCover", "AHLCG-BoxCoverTintable",
 ]
+# the campaign-guide pages (GuideLetter.js: 1275x1650 = US Letter at 150 dpi)
+# and the guide's story/resolution/interlude box overlays -> assets/frames/se/guide/
+GUIDE_TEMPLATES = ["AHLCG-GuideLetterEmpty", "AHLCG-GuideLetterTitle"]
+GUIDE_OVERLAYS = ["AHLCG-BoxSA", "AHLCG-BoxSABracket", "AHLCG-BoxSALine",
+                  "AHLCG-BoxRes", "AHLCG-BoxResBracket", "AHLCG-BoxResLine",
+                  "AHLCG-BoxInt", "AHLCG-BoxIntLine"]
 OVERLAY_PREFIXES = ("AHLCG-SkillBox-", "AHLCG-SkillIcon-", "AHLCG-NoLevel",
                     "AHLCG-Slot-", "AHLCG-Damage", "AHLCG-Horror",
                     "AHLCG-StaminaBase", "AHLCG-SanityBase",
@@ -68,8 +80,31 @@ REGION_RE = re.compile(r"^\s*([A-Za-z0-9#_.-]+)-region\s*=\s*"
                        r"(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)")
 
 
+def extract_guide(z):
+    """Guide page templates (stored as JPEG: they are opaque full pages) and
+    the box overlays (PNG, alpha) the plugin's drawGuideBody paints."""
+    out = os.path.join(OUT, "guide")
+    os.makedirs(out, exist_ok=True)
+    names = set(z.namelist())
+    n = 0
+    for t in GUIDE_TEMPLATES:
+        path = "resources/ArkhamHorrorLCG/templates/" + t + ".jp2"
+        if path in names:
+            img = Image.open(BytesIO(z.read(path))).convert("RGB")
+            img.save(os.path.join(out, t + ".jpg"), "JPEG", quality=90)
+            n += 1
+    for t in GUIDE_OVERLAYS:
+        path = "resources/ArkhamHorrorLCG/overlays/" + t + ".png"
+        if path in names:
+            Image.open(BytesIO(z.read(path))).convert("RGBA").save(
+                os.path.join(out, t + ".png"))
+            n += 1
+    print("guide templates/overlays:", n)
+
+
 def main(seext):
     z = zipfile.ZipFile(seext)
+    extract_guide(z)
     names = z.namelist()
     os.makedirs(os.path.join(OUT, "templates"), exist_ok=True)
     os.makedirs(os.path.join(OUT, "overlays"), exist_ok=True)

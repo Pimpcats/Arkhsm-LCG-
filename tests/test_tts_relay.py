@@ -24,8 +24,9 @@ from fake_tts import FakeTTS, LUA  # noqa: E402
 pytestmark = pytest.mark.skipif(LUA is None, reason="lua5.2 not installed")
 
 BRANCH = "relay-test"
-SNAPSHOT = ["dist/the_still_hour_mod.json", "tools/tts_relay/job.json",
-            "tools/tts_relay/ingame_runner.lua"]
+JOB = json.load(open(os.path.join(ROOT, "tools", "tts_relay", "job.json"), encoding="utf-8"))
+SNAPSHOT = [p["file"] for p in JOB["payloads"]] + ["tools/tts_relay/job.json",
+                                                   "tools/tts_relay/ingame_runner.lua"]
 
 
 def free_port():
@@ -81,7 +82,18 @@ def test_relay_runs_build_in_fake_tts_and_pushes_results(tmp_path, remote):
                      "in-engine rules tests all pass", "control token survives save+reload",
                      "state preserved across reload", "a card can be taken out and lands on the table"):
         assert expected in names
-    assert latest["passed"] >= 12
+    for expected in ("campaign box shows Place and Recall", "Place lays out every remembered object",
+                     "each lands on its remembered spot",
+                     "every minicard follows SCED's minicard schema",
+                     "guide is a Custom_PDF with GMNotes type CampaignGuide",
+                     "log draws its checkboxes, counters and write-in fields",
+                     "clicking a checkbox and a counter records them",
+                     "log survives save+reload with its fields", "page 2 draws the Knowledge Track",
+                     "log syncs from the campaign-state token",
+                     "page 1 kept its fields across the page turn",
+                     "Recall puts everything back in the box"):
+        assert expected in names, expected
+    assert latest["passed"] >= 30
     # results reached the "GitHub" remote on their own branch
     log = subprocess.run(["git", "log", "--oneline", relay.RESULTS_BRANCH], cwd=remote,
                          capture_output=True, text=True, check=True).stdout

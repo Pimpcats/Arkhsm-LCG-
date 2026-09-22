@@ -59,9 +59,14 @@ python3 pipeline/build_cards.py && python3 pipeline/bundle_mod.py
 python3 pipeline/package_download.py    # -> dist/downloads/
 ```
 
-- `dist/downloads/the_still_hour.json` — the **release asset**: one campaign box
-  holding the card bags + Control token. Upload it as a GitHub release asset at a
-  URL the mod's `SOURCE_REPO` resolves (`{SOURCE_REPO}/the_still_hour.json`).
+- `dist/downloads/the_still_hour.json` — the **release asset**: ONE object (SCED
+  spawns the downloaded text directly), the campaign box — SCED's box mesh +
+  MemoryBag script (Place / Recall) holding the scenario books once all are
+  locked in, the investigator minicards, the campaign log, the campaign guide
+  PDF, the card bags and the Control token. Upload it as a GitHub release asset
+  at a URL the mod's `SOURCE_REPO` resolves (`{SOURCE_REPO}/the_still_hour.json`).
+  `publish_hosted.py` builds it with `--require-hosted`, so no machine-local
+  file:/// URL can ship.
 - `dist/downloads/the_still_hour_box.json` — the **placeholder box**: add this
   object to the SCED game; its GMNotes is `{"filename":"the_still_hour"}` and its
   Lua calls `GlobalApi.placeholderDownload("the_still_hour")` to fetch and spawn

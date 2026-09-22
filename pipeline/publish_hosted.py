@@ -10,7 +10,11 @@ machine produced the build, so a shareable build needs hosted image URLs. This:
        https://raw.githubusercontent.com/<repo>/<ref>/dist/cards/<id>.jpg?v=<hash>
      (the ?v=<content hash> changes whenever the image does, so TTS's URL-keyed
      image cache never shows a stale face)
-  4. rebuilds every dist/ artifact and fails if any file:/// URL survives
+  4. typesets the campaign guide PDF (pipeline/build_guide_pdf.py, when
+     reportlab is installed; otherwise the committed dist/guide PDF is kept)
+     and hosts it the same way (art_urls.json "_campaign_guide")
+  5. rebuilds every dist/ artifact (cards, mod, table presence, download box)
+     and fails if any file:/// URL survives
 
 Commit dist/ afterwards; the URLs resolve once that commit is pushed to <ref>.
 
@@ -34,7 +38,9 @@ REPO = "Pimpcats/Arkhsm-LCG-"
 PREFIX = "sthr-"
 JPEG_QUALITY = 88
 
-REBUILD = ("build_cards.py", "bundle_mod.py", "package_download.py")
+REBUILD = (("build_cards.py",), ("bundle_mod.py",), ("table_presence.py",),
+           ("package_download.py", "--require-hosted"))
+GUIDE = os.path.join(ROOT, "dist", "guide", "the_still_hour_campaign_guide.pdf")
 
 
 def current_branch():
@@ -85,11 +91,15 @@ def publish(ref, render=True):
         if os.path.splitext(os.path.basename(old))[0] not in written:
             os.remove(old)
 
+    guide = publish_guide(ref)
+    if guide:
+        urls["_campaign_guide"] = guide
+
     with open(os.path.join(HERE, "art_urls.json"), "w", encoding="utf-8") as f:
         json.dump(urls, f, indent=2)
 
-    for script in REBUILD:
-        subprocess.run([sys.executable, os.path.join(HERE, script)], cwd=ROOT,
+    for script, *args in REBUILD:
+        subprocess.run([sys.executable, os.path.join(HERE, script)] + args, cwd=ROOT,
                        check=True, stdout=subprocess.DEVNULL)
     # the campaign box compiles only once every scenario is locked in; a refusal
     # leaves the previous dist/the_still_hour_campaign.json untouched
@@ -101,11 +111,29 @@ def publish(ref, render=True):
     stale = "dist/the_still_hour_campaign.json"
     if not compiled and stale in bad:
         bad.remove(stale)       # not rebuilt this run; reported, not judged
-    return {"ref": ref, "images": len(written), "cards": len(
+    return {"ref": ref, "images": len(written), "guide": guide, "cards": len(
         [k for k in urls if not k.startswith("_")]), "campaign_compiled": compiled,
         "campaign_note": None if compiled else
         "campaign box not rebuilt (scenarios not all locked); " + stale + " is stale",
         "local_urls_left": bad}
+
+
+def publish_guide(ref):
+    """(Re)typeset the guide PDF if reportlab is available, then return its
+    hosted URL (content-hashed like the card images), or None if absent."""
+    try:
+        import reportlab  # noqa: F401
+        can_build = True
+    except ImportError:
+        can_build = False
+    if can_build:
+        subprocess.run([sys.executable, os.path.join(HERE, "build_guide_pdf.py")],
+                       cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
+    if not os.path.exists(GUIDE):
+        return None
+    h = hashlib.sha1(open(GUIDE, "rb").read()).hexdigest()[:10]
+    rel = os.path.relpath(GUIDE, ROOT).replace(os.sep, "/")
+    return "https://raw.githubusercontent.com/{}/{}/{}?v={}".format(REPO, ref, rel, h)
 
 
 def local_urls():

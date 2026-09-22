@@ -36,7 +36,11 @@ For each new commit on the watched branch:
    `tools/tts_relay/ingame_runner.lua` into TTS ("Execute Lua Code").
 3. The runner checks the build in the live game and reports each result back.
    It checks spawning, SCED card metadata, hosted image URLs, the control
-   token's rules tests, save/reload, and dealing a card. It also moves the
+   token's rules tests, save/reload, and dealing a card. With the table
+   payload (`dist/the_still_hour_table.json`) it also presses the campaign
+   box's Place, checks the minicards / campaign guide / campaign log it lays
+   out (log clicks, save+reload, page turn, sync from the campaign state),
+   screenshots the log, and presses Recall. It also moves the
    camera over each object so the relay can screenshot the TTS window.
 4. Commits `runs/<time>_<commit>/{results.json,log.txt,screenshots/}` plus
    `latest.json` to the `tts-results` branch and pushes it.
