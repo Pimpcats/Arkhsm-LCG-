@@ -370,6 +370,38 @@ class ContentGapTests(unittest.TestCase):
             if j.get("character"):
                 self.assertIn(j["character"], chars)
 
+    def test_flipped_locations_have_their_side_as_a_hosted_back(self):
+        """Every location Locations.ttslua can flip (flipFact / hasBack) is
+        built with its own rendered, hosted back face, so the board's flip
+        shows the authored side instead of the generic encounter back."""
+        import re
+        lua = open(os.path.join(ROOT, "src", "StillHour", "Locations.ttslua"),
+                   encoding="utf-8").read()
+        flips = re.findall(r'name\s*=\s*"([^"]+)"[^}]*flipFact\s*=', lua)
+        self.assertEqual(sorted(flips), ["The Lantern Room", "The Town Hall Steps"])
+        loop = {CARDS[c]["name"]: c for sc in MANIFEST["scenarios"] if sc.get("map") == "loop"
+                for c in ASSIGN[sc["id"]].get("locations", [])}
+        box = json.load(open(os.path.join(ROOT, "dist", "the_still_hour_campaign.json"),
+                             encoding="utf-8"))
+        objs = {}
+
+        def walk(o):
+            if o.get("Name") == "Card":
+                objs.setdefault(json.loads(o["GMNotes"])["id"], o)
+            for c in o.get("ContainedObjects") or []:
+                walk(c)
+        for o in box["ObjectStates"]:
+            walk(o)
+        for name in flips:
+            cid = loop[name]
+            with self.subTest(location=cid):
+                self.assertTrue(CARDS[cid].get("back_text"))
+                deck = next(iter(objs[cid]["CustomDeck"].values()))
+                self.assertTrue(deck["UniqueBack"])
+                self.assertIn("/dist/cards/{}-back.jpg".format(cid), deck["BackURL"])
+                self.assertTrue(os.path.exists(os.path.join(ROOT, "dist", "cards", cid + "-back.jpg")))
+                self.assertNotEqual(deck["BackURL"], deck["FaceURL"])
+
 
 if __name__ == "__main__":
     unittest.main()

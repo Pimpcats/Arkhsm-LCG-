@@ -285,19 +285,23 @@ def build_card(c):
     else:
         back = deck_back("_player_back", PLAYER_BACK)
     art = ART_URLS.get(c["id"], {})
+    # a card with a printed second side of its own (investigators; locations a
+    # Knowledge fact flips, src/StillHour/Locations.ttslua) carries that side
+    # as a unique back, readable when the board flips it
+    own_back = is_inv or bool(art.get("back"))
     return {
         "Name": "Card", "Nickname": c["name"], "Description": c.get("subtitle", ""),
         "GUID": guid(c["id"]), "CardID": int(deck_id + "00"), "SidewaysCard": sideways,
         "Tags": tags_for(c), "LuaScript": "", "LuaScriptState": "",
         "ColorDiffuse": dict(COLOR_DIFFUSE), "Hands": True,
-        "HideWhenFaceDown": not sideways,
+        "HideWhenFaceDown": not (sideways or own_back),
         "GMNotes": build_gmnotes(c), "Transform": transform(),
         "CustomUIAssets": [ARKHAM_ICONS],
         "CustomDeck": {deck_id: {
             "FaceURL": art.get("face") or face_ph(c["name"], land=sideways),
             "BackURL": art.get("back") or back,
             "NumWidth": 1, "NumHeight": 1, "Type": 0,
-            "UniqueBack": is_inv, "BackIsHidden": is_inv}},
+            "UniqueBack": own_back, "BackIsHidden": is_inv}},
     }
 
 

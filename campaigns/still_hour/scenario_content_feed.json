@@ -188,7 +188,8 @@
    ],
    "back_shroud": 3,
    "back_text": "Calm side: use it from setup once the log shows \"The Lamp Was Never Lit.\"\n[action] Light the lamp (no test). While it is lit this loop, Echoes at connected districts stay Sleepwalking one band longer, and The Dark That Waits treats investigators here as not at the Lantern Room.",
-   "back_flavor": "You know how to light it now. Some part of you always did."
+   "back_flavor": "You know how to light it now. Some part of you always did.",
+   "text": "Objective — With 4+ clues discovered in this district, test [com] or [wil] (3) here to light the lamp. Success: record \"The Lamp Was Never Lit.\"\nWhen the log shows \"The Lamp Was Never Lit,\" place this location calm side up."
   },
   {
    "id": "sthr-loc-windingstair",
@@ -348,7 +349,7 @@
    "index": "1a",
    "number": "1/2",
    "clues": 5,
-   "text": "Objective — Once 5 clues have been discovered in the Square district, an investigator at the Well may examine the body. Record \"The Sheriff Is Already Dead.\"\nFrom now on, once per loop, an investigator at the Town Hall Steps may look at the top card of the Occultation.",
+   "text": "Objective — Once 5 clues have been discovered in the Square district, an investigator at the Well may examine the body. Record \"The Sheriff Is Already Dead.\"\nIn every later loop, place the Town Hall Steps with its other side up: once per loop, an investigator there may look at the top card of the Occultation.",
    "flavor": "He has been dead since ten o'clock. No one has noticed but you."
   },
   {
@@ -509,6 +510,14 @@
   {
    "id": "sthr-loc-hallofmirrors",
    "flavor": "The occultation fair, mid-celebration, forever."
+  },
+  {
+   "id": "sthr-loc-townhallsteps",
+   "text": "When the log shows \"The Sheriff Is Already Dead,\" place this location with its other side up.",
+   "flavor": "The sheriff gives the same speech to the same crowd. He has been giving it since ten o'clock.",
+   "back_shroud": 2,
+   "back_text": "Other side: use it from setup once the log shows \"The Sheriff Is Already Dead.\"\nOnce per loop, an investigator here may look at the top card of the Occultation.",
+   "back_flavor": "The records let you read the night ahead."
   }
  ]
 }

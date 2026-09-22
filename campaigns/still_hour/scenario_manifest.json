@@ -876,7 +876,11 @@
               "id": "sthr-loc-townhallsteps",
               "name": "The Town Hall Steps",
               "shroud": 2,
-              "clues": 2
+              "clues": 2,
+              "back": {
+                "flip_fact": "The Sheriff Is Already Dead",
+                "shroud": 2
+              }
             },
             {
               "id": "sthr-loc-recordsoffice",

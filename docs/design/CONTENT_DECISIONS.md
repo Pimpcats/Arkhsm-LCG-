@@ -187,10 +187,17 @@ note for it; the others are not measured against a guide value.
 
 ## Resolved gaps
 
-**D14 — The Lantern Room's calm side** (guide §6.1 "flips to its calmer back";
-`Locations.ttslua` `flipFact = "the-lamp-was-never-lit"`, the only fact-flip
-with a physical side — the Town Hall Steps' flip is printed on its front). The
-card now has a real second face, rendered as its back: shroud 3 (the guide's
+**D14 — Fact-flipped locations print their other side as the card back.**
+`Locations.ttslua` flips two locations (`hasBack`): the Lantern Room and the Town
+Hall Steps. Each now has a real second face, rendered on the official location
+template as `<id>-back`, hosted with the faces and built as the card's
+`UniqueBack` (with `HideWhenFaceDown` off so the side can be read when the board
+flips it). Each front says to place the location with its other side up once the
+log shows its fact. **Town Hall Steps** (guide §6.4 "flip to a back that lets you
+draw the top Occultation card once per loop"): same shroud 2 and clues, "Once per
+loop, an investigator here may look at the top card of the Occultation" (D11).
+
+**The Lantern Room's calm side** (guide §6.1 "flips to its calmer back"): shroud 3 (the guide's
 value, calmer than the front's 4), same clues and connections, and "[action]
 Light the lamp (no test)" with the lit-lamp edit from §6.1, plus The Dark That
 Waits treating investigators there as not at the Lantern Room (its node
