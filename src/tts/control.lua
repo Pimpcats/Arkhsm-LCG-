@@ -51,7 +51,7 @@ local bag = ChaosBag.new({ log = note })
 local mode = "play"             -- "play" | "interlude"
 local recollectionList = nil    -- cached {id, name, cost} for the buy panel
 local investigatorList = {}     -- cached Board.investigators() for the row buttons
-local aging = {}                -- investigatorId -> interlude aging inputs {defeated, leaned, physical, mental, aged}
+local aging = {}                -- investigatorId -> interlude aging inputs {defeated, physical, mental, aged}
 local saveSeq = 0               -- bumps on every change; newest copy wins (control vs campaign log)
 
 -------------------------------------------------------------- board contexts --
@@ -238,6 +238,11 @@ local function changeOnCardMemory(id, delta)
   return CampaignState.addOnCardMemory(id, delta)
 end
 
+--- kind = "raises" | "spent"
+local function changeTally(id, kind, delta)
+  return CampaignState.addTally(id, kind, delta)
+end
+
 local function bankOnCard()
   local n = Interlude.bankOnCard()
   announce(string.format("Banked %d on-card Memory (%d banked).", n, CampaignState.getBankedMemory()))
@@ -253,13 +258,16 @@ local function agingFor(id)
   return a
 end
 
---- Age one investigator this interlude (once). Conditions come from the panel
--- toggles; "ended in danger" from the Dissonance recorded when the loop ended.
+--- Age one investigator this interlude (once). "Defeated" comes from the panel
+-- toggle; "ended in danger" from the Dissonance recorded when the loop ended;
+-- "leaned on the loop" is derived from the investigator's own tallies
+-- (Interlude.leanedOnLoop: raised Dissonance 3+ times or spent 4+ Memory on
+-- loop powers) — the design has no override, so neither does the panel.
 local function ageInvestigator(id)
   local a = agingFor(id)
   if a.aged then return nil end
-  local r = Interlude.age(id, { defeated = a.defeated, leanedOnLoop = a.leaned,
-    endedInDanger = Interlude.loopEndedInDanger() }, { physical = a.physical, mental = a.mental })
+  local r = Interlude.age(id, { defeated = a.defeated, endedInDanger = Interlude.loopEndedInDanger() },
+    { physical = a.physical, mental = a.mental })
   a.aged = r.yearsGained
   guarded("aging", Board.refreshInvestigators, true)
   local name = id
@@ -368,11 +376,16 @@ local function drawInterlude()
     local zi = -0.65 + (i - 1) * 0.95
     local yrs = CampaignState.getYears(inv.id)
     button("shNoop", string.format("%s · Years %d · %s", inv.name, yrs, Aging.bracketForYears(yrs)),
-      X, zi, 1400, "", 80)
+      X - 0.55, zi, 1000, "", 80)
+    local t = CampaignState.getTallies(inv.id)
+    button("shTalRaised" .. i, "Raised " .. t.raises, X + 0.95, zi, 380,
+      "Times this investigator raised Dissonance this loop. " .. PLUS_MINUS, 70)
+    button("shTalSpent" .. i, "Spent " .. t.spent, X + 1.75, zi, 380,
+      "Memory this investigator spent on loop powers (Recollections, foreknowledge) this loop. " .. PLUS_MINUS, 70)
     local locked = (CampaignState.getBracket(inv.id) or {}).physical ~= nil
     button("shAgeDef" .. i, "Defeated: " .. (a.defeated and "yes" or "no"), X - 1.05, zi + 0.42, 500, "", 70)
-    button("shAgeLean" .. i, "Leaned: " .. (a.leaned and "yes" or "no"), X - 0.35, zi + 0.42, 500,
-      "Raised Dissonance 3+ times or spent 4+ Memory on loop powers this loop.", 70)
+    button("shNoop", "Leaned: " .. (Interlude.leanedOnLoop(inv.id) and "yes" or "no"), X - 0.35, zi + 0.42, 500,
+      "Derived: raised Dissonance 3+ times or spent 4+ Memory on loop powers this loop.", 70)
     button("shAgePhys" .. i, "-" .. a.physical .. (locked and " (locked)" or ""), X + 0.35, zi + 0.42, 500,
       "Physical skill that drifts down (chosen once, locked).", 60)
     button("shAgeMent" .. i, "+" .. a.mental .. (locked and " (locked)" or ""), X + 1.05, zi + 0.42, 500,
@@ -460,10 +473,24 @@ function shAgeDef1() toggleAging(1, "defeated") end
 function shAgeDef2() toggleAging(2, "defeated") end
 function shAgeDef3() toggleAging(3, "defeated") end
 function shAgeDef4() toggleAging(4, "defeated") end
-function shAgeLean1() toggleAging(1, "leaned") end
-function shAgeLean2() toggleAging(2, "leaned") end
-function shAgeLean3() toggleAging(3, "leaned") end
-function shAgeLean4() toggleAging(4, "leaned") end
+local function clickTally(i, kind, alt) guarded("tally", changeTally, invAt(i), kind, alt and -1 or 1) ; afterChange() end
+function shTalRaised1(_, _, alt) clickTally(1, "raises", alt) end
+function shTalRaised2(_, _, alt) clickTally(2, "raises", alt) end
+function shTalRaised3(_, _, alt) clickTally(3, "raises", alt) end
+function shTalRaised4(_, _, alt) clickTally(4, "raises", alt) end
+function shTalSpent1(_, _, alt) clickTally(1, "spent", alt) end
+function shTalSpent2(_, _, alt) clickTally(2, "spent", alt) end
+function shTalSpent3(_, _, alt) clickTally(3, "spent", alt) end
+function shTalSpent4(_, _, alt) clickTally(4, "spent", alt) end
+--- The tally buttons on an investigator card itself.
+function shCardRaised(obj, _, alt)
+  guarded("tally", changeTally, Board.investigatorIdOf(obj), "raises", alt and -1 or 1)
+  afterChange()
+end
+function shCardSpent(obj, _, alt)
+  guarded("tally", changeTally, Board.investigatorIdOf(obj), "spent", alt and -1 or 1)
+  afterChange()
+end
 function shAgePhys1() toggleAging(1, "physical") end
 function shAgePhys2() toggleAging(2, "physical") end
 function shAgePhys3() toggleAging(3, "physical") end
@@ -661,11 +688,19 @@ function shApiOnCardMemory(p)
   return CampaignState.getOnCardMemory(p and p.id)
 end
 function shApiBankOnCard() local n = guarded("bank", bankOnCard) ; afterChange() ; return n end
---- p = {id, defeated, leaned, physical, mental}
+--- p = {id, kind = "raises"|"spent", delta}
+function shApiTally(p)
+  p = p or {}
+  guarded("tally", changeTally, p.id, p.kind, tonumber(p.delta) or 1)
+  afterChange()
+  local t = CampaignState.getTallies(p.id)
+  return { raises = t.raises, spent = t.spent, leaned = Interlude.leanedOnLoop(p.id) }
+end
+--- p = {id, defeated, physical, mental}; "leaned" is derived from the tallies
 function shApiAge(p)
   p = p or {}
   local a = agingFor(p.id)
-  a.defeated, a.leaned = p.defeated and true or nil, p.leaned and true or nil
+  a.defeated = p.defeated and true or nil
   if p.physical then a.physical = p.physical end
   if p.mental then a.mental = p.mental end
   local r = guarded("age", ageInvestigator, p.id)
@@ -936,6 +971,12 @@ function runStillHourTests()
   P, F = check("Interlude buys level-3 upgrade (=3)",
     Interlude.buyUpgrade(3) and CampaignState.getBankedMemory() == 1, P, F)
   P, F = check("Interlude rejects unaffordable purchase", Interlude.buyRecollection("sthr-hourlearnedname") == false, P, F)
+
+  -- Aging: leaning derived from the investigator's own tallies
+  CampaignState.init(3)
+  CampaignState.addTally("sthrcass", "raises", 3)
+  P, F = check("3 Dissonance raises = leaned on the loop (+1 Year)",
+    Interlude.leanedOnLoop("sthrcass") and Interlude.age("sthrcass", {}).yearsGained == 2, P, F)
 
   -- Prey + on-card Memory
   CampaignState.init(3)

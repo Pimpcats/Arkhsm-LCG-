@@ -561,12 +561,22 @@ step("board: Aging on the investigator", function(go)
   ctl.call("shApiRestore", { blob = snapshot })
   ctl.call("shApiCounter", { name = "dissonance", delta = 12 })
   ctl.call("shApiReset")                                   -- the loop ends in danger
-  local r1 = ctl.call("shApiAge", { id = "sthrelias", defeated = true, leaned = true,
-    physical = "combat", mental = "willpower" })
+  -- leaning is derived from the investigator's own tallies, clicked on the card
+  local card = INV.elias
+  check("the investigator card has both leaning tallies",
+    hasButton(card, "Dissonance raised 0") and hasButton(card, "Loop-power Memory 0"), labelsOf(card))
+  local t = ctl.call("shApiTally", { id = "sthrelias", kind = "raises", delta = 2 })
+  check("two Dissonance raises are not leaning", t ~= nil and t.leaned == false)
+  t = ctl.call("shApiTally", { id = "sthrelias", kind = "spent", delta = 4 })
+  check("4 Memory on loop powers is leaning", t ~= nil and t.leaned == true)
+  check("the card shows the tallies", hasButton(card, "Dissonance raised 2") and hasButton(card, "Loop-power Memory 4"),
+    labelsOf(card))
+  local r1 = ctl.call("shApiAge", { id = "sthrelias", defeated = true, physical = "combat", mental = "willpower" })
   check("Age adds Years for defeat, danger and leaning (4)", r1 ~= nil and r1.years == 4,
     r1 and ("years " .. r1.years) or "no result")
   check("a second Age in the same interlude is refused", ctl.call("shApiAge", { id = "sthrelias" }) == nil)
   ctl.call("shApiBeginNextLoop")
+  check("the tallies clear when the next loop begins", hasButton(card, "Loop-power Memory 0"), labelsOf(card))
   ctl.call("shApiReset")
   local r2 = ctl.call("shApiAge", { id = "sthrelias", defeated = true, physical = "combat", mental = "willpower" })
   check("the next interlude reaches Weathered", r2 ~= nil and r2.bracket == "Weathered",

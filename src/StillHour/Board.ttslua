@@ -317,7 +317,7 @@ local function removeByPrefix(o, prefixes)
   end
 end
 
-Board.INV_PREFIXES = { "Memory ", "Years " }
+Board.INV_PREFIXES = { "Memory ", "Years ", "Dissonance raised ", "Loop-power Memory " }
 
 --- The printed stat line from investigator metadata (SCED GMNotes keys).
 function Board.baseStats(md)
@@ -370,10 +370,32 @@ function Board.refreshInvestigators(applyStats)
           position = { 0.65, 0.3, 1.25 }, rotation = { 0, 0, 0 },
           width = 0, height = 0, font_size = 90, font_color = { 0.95, 0.85, 0.6 },
         })
+        -- "leaned on the loop" tallies (aging v0.3 §1.1), this investigator's own
+        local t = CampaignState.getTallies(inv.id)
+        card.createButton({
+          click_function = "shCardRaised", function_owner = host,
+          label = "Dissonance raised " .. t.raises,
+          tooltip = "Times THIS investigator raised Dissonance this loop (3+ = leaned on the loop). "
+            .. "Left-click +1 · Right-click -1",
+          position = { -0.75, 0.3, 1.65 }, rotation = { 0, 0, 0 },
+          width = 760, height = 180, font_size = 90,
+          color = { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
+        })
+        card.createButton({
+          click_function = "shCardSpent", function_owner = host,
+          label = "Loop-power Memory " .. t.spent,
+          tooltip = "Memory THIS investigator spent on loop powers (Recollections, foreknowledge) "
+            .. "this loop (4+ = leaned on the loop). Left-click +1 · Right-click -1",
+          position = { 0.75, 0.3, 1.65 }, rotation = { 0, 0, 0 },
+          width = 760, height = 180, font_size = 90,
+          color = { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
+        })
       end)
     end
+    local t = CampaignState.getTallies(inv.id)
     out[#out + 1] = { id = inv.id, name = inv.name, matColor = inv.matColor, stats = eff,
-                      hasCard = card ~= nil, hasMinicard = inv.minicard ~= nil }
+                      hasCard = card ~= nil, hasMinicard = inv.minicard ~= nil,
+                      raises = t.raises, spent = t.spent }
   end
   return out
 end
