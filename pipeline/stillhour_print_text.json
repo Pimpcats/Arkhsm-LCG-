@@ -192,15 +192,9 @@
     "text": "The Square is always the loop's start location. Investigators begin here each loop.",
     "flavor": "You wake with the taste of salt and the certainty you have done this before."
   },
-  "sthr-agenda-hour1": {
-    "text": "The night is young and already wrong.\nWhen Doom reaches 3: advance. Set the Hourglass to Hour II."
-  },
   "sthr-act-ninthdeath": {
     "text": "Objective \u2014 Recover the keeper's logbook from the Keeper's Quarters (2 clues), then read the ninth death.",
     "flavor": "You have died in this night more times than anyone."
-  },
-  "sthr-scenario-lighthouse": {
-    "text": "Setup \u2014 Place The Lantern Room, The Winding Stair, and The Keeper's Quarters in a row. Investigators begin at The Square. Encounter deck: shared spine + the Lighthouse node set. Set the Appointed aside at Unseen."
   },
   "sthr-story-firstdark": {
     "text": "You wake at First Dark with the taste of salt and the certainty you have done this before. The others feel it too. No one in Ambergrove will believe you."

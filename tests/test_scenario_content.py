@@ -25,11 +25,8 @@ import compile_campaign as CC  # noqa: E402
 CARDS, ASSIGN, MANIFEST = SC.load("still_hour")
 SCENARIOS = [s["id"] for s in MANIFEST["scenarios"]]
 
-# stat differences from the guide that are deliberate/inherited and recorded
-# in docs/design/CONTENT_DECISIONS.md — anything else is a regression
-KNOWN_NOTES = {
-    "district_lighthouse": ["sthr-loc-lanternroom: shroud 4 differs from the guide's 3"],
-}
+# deliberate deviations are recorded as "accepted" in the manifest (see
+# docs/design/CONTENT_DECISIONS.md), so the audit raises no notes at all
 
 
 def audit_with(cards=None, assign=None, manifest=None):
@@ -67,10 +64,8 @@ class ScenarioContentTests(unittest.TestCase):
                 self.assertEqual(self.rep.errors.get(sid, []), [])
         self.assertEqual(self.rep.errors.get("_campaign", []), [])
 
-    def test_only_documented_deviations(self):
-        for sid in SCENARIOS:
-            with self.subTest(scenario=sid):
-                self.assertEqual(self.rep.warnings.get(sid, []), KNOWN_NOTES.get(sid, []))
+    def test_no_unaccepted_deviations(self):
+        self.assertEqual(dict(self.rep.warnings), {})
 
     def test_locks_reflect_complete_content(self):
         for sid in SCENARIOS:
@@ -247,6 +242,167 @@ class ScenarioContentTests(unittest.TestCase):
         cards["sthr-act-lamp"]["text"] += " [combat]"
         rep = audit_with(cards=cards)
         self.assertTrue(any("not card markup" in e for e in rep.errors["district_lighthouse"]))
+
+
+
+class ContentGapTests(unittest.TestCase):
+    """Every element complete: feasibility at every table size, SCED lines,
+    the fact-flipped location, the resolution set, no dead cards, art briefs."""
+
+    def test_every_objective_is_achievable_at_1_to_4_investigators(self):
+        for n in (1, 2, 3, 4):
+            with self.subTest(investigators=n):
+                self.assertEqual(SC.objective_feasibility(CARDS, ASSIGN, MANIFEST, n), [])
+        acts = [a for s in MANIFEST["scenarios"]
+                for a in (s.get("stacks", {}).get("act_deck") or {}).get("cards", [])]
+        self.assertEqual(len(acts), 14)
+        self.assertTrue(all(a.get("needs") for a in acts))
+
+    def test_feasibility_catches_a_solo_dead_end(self):
+        cards = copy.deepcopy(CARDS)
+        cards["sthr-act-almanachid"].update(clues=6, clues_per_investigator=False)
+        probs = SC.objective_feasibility(cards, ASSIGN, MANIFEST, 1)
+        self.assertTrue(any("almanachid" in m for _, m in probs), probs)
+        self.assertEqual(SC.objective_feasibility(cards, ASSIGN, MANIFEST, 3), [])
+
+    def test_contest_target_matches_the_engine(self):
+        lua = open(os.path.join(ROOT, "src", "StillHour", "Constants.ttslua"),
+                   encoding="utf-8").read()
+        self.assertIn("contestTarget = 4 * n", lua)
+        need = next(a for s in MANIFEST["scenarios"] if s["id"] == "finale"
+                    for a in s["stacks"]["act_deck"]["cards"])["needs"]["contest"]
+        self.assertEqual(need["per_investigator"], 4)
+        text = CARDS["sthr-act-lasthour"]["text"]
+        for part in ("4 ×", "Hold Back", "Sealed Study", "Hour V", "R1b"):
+            self.assertIn(part, text)
+
+    def test_sced_draws_only_the_printed_lines(self):
+        """Replay SCED's own matcher (PlayArea.ttslua: icons/connections split
+        on letters, a connection links every card with that icon) over every
+        loop location placed at once: no extra line between districts, none
+        missing, all bidirectional."""
+        import re
+        import build_cards as B
+        locs = [c for sc in MANIFEST["scenarios"] if sc.get("map") == "loop"
+                for c in ASSIGN[sc["id"]].get("locations", [])]
+        meta = {cid: json.loads(B.build_card(CC.normalize(CARDS[cid]))["GMNotes"])["locationFront"]
+                for cid in locs}
+        by_icon = collections.defaultdict(list)
+        for cid, m in meta.items():
+            for k in re.findall(r"%a+".replace("%a", "[A-Za-z]"), m["icons"]):
+                by_icon[k].append(cid)
+        self.assertTrue(all(len(v) == 1 for v in by_icon.values()), dict(by_icon))
+        drawn = set()
+        for cid, m in meta.items():
+            for k in re.findall(r"[A-Za-z]+", m["connections"]):
+                self.assertIn(k, by_icon, "{} -> {}".format(cid, k))
+                for other in by_icon[k]:
+                    drawn.add((cid, other))
+        printed = set()
+        key = {(CARDS[c]["icons"].lower(), CARDS[c]["color"].lower()): c for c in locs}
+        for cid in locs:
+            for con in CARDS[cid]["connections"]:
+                printed.add((cid, key[(con["symbol"].lower(), con["color"].lower())]))
+        self.assertEqual(drawn, printed)
+        self.assertTrue(all((b, a) in drawn for a, b in drawn))
+
+    def test_lantern_room_has_its_calm_side(self):
+        c = CARDS["sthr-loc-lanternroom"]
+        self.assertEqual(c["back_shroud"], 3)
+        self.assertIn("The Lamp Was Never Lit", c["back_text"])
+        lua = open(os.path.join(ROOT, "src", "StillHour", "Locations.ttslua"),
+                   encoding="utf-8").read()
+        self.assertIn('"lantern-room"', lua)
+        self.assertIn('flipFact = "the-lamp-was-never-lit"', lua)
+        # Town Hall Steps is the only other flip; its side is printed on the front
+        self.assertIn("The Sheriff Is Already Dead", CARDS["sthr-loc-townhallsteps"]["text"])
+
+    def test_resolutions_complete_and_in_order(self):
+        order = [r["card"] for r in MANIFEST["campaign"]["resolutions"]]
+        self.assertEqual([r["id"] for r in MANIFEST["campaign"]["resolutions"]],
+                         ["R1", "R1b", "R2", "R3", "R4", "R5", "R6"])
+        aside = [c for c in ASSIGN["finale"]["setup_aside"] if c in order]
+        self.assertEqual(aside, order)
+        self.assertIn("Who Walks Beside You", CARDS["sthr-res-1"]["text"])
+        self.assertIn("instead", CARDS["sthr-res-1"]["text"])
+        self.assertIn("The Ticket-Taker's Bargain", CARDS["sthr-res-bargain"]["text"])
+        for cid in order:
+            # every row opens with the condition it is checked against
+            self.assertTrue(CARDS[cid]["text"].startswith("Contest "), cid)
+
+    def test_hold_is_defined_where_it_is_used(self):
+        text = CARDS["sthr-act-walksbeside"]["text"]
+        self.assertIn("[action] Hold", text)
+        self.assertIn("[wil] or [com]", text)
+
+    def test_no_dead_cards_in_the_pool(self):
+        """Every Still Hour card is played: in a scenario stack, in the player
+        or encounter bag, or the campaign log token the compiler builds."""
+        bagged = set()
+        for name in ("stillhour_cards_spec.json", "stillhour_encounter_spec.json"):
+            bagged |= {c["id"] for c in json.load(open(os.path.join(ROOT, "pipeline", name),
+                                                        encoding="utf-8"))}
+        boxed = {cid for box in ASSIGN.values() for st, ids in box.items()
+                 if not st.startswith("_") for cid in ids}
+        dead = sorted(set(CARDS) - bagged - boxed - {"sthr-campaign-log"})
+        self.assertEqual(dead, [])
+
+    def test_every_card_is_briefed_or_text_only(self):
+        jobs = json.load(open(os.path.join(ROOT, "campaigns", "still_hour", "manifest.json"),
+                              encoding="utf-8"))
+        self.assertEqual(jobs, json.load(open(os.path.join(ROOT, "pipeline", "art_manifest.json"),
+                                              encoding="utf-8")))
+        by = {j["id"]: j for j in jobs}
+        for cid, c in CARDS.items():
+            with self.subTest(card=cid):
+                self.assertIn(cid, by)
+                j = by[cid]
+                if j.get("no_art"):
+                    self.assertTrue(j.get("reason"))
+                else:
+                    self.assertGreater(len(j.get("scene", "")), 20)
+                    self.assertTrue(j.get("art_type"))
+                if c["type"] == "Investigator":
+                    self.assertTrue(by[cid + "-back"]["no_art"])
+        extra = {i for i in by if i not in CARDS and not i.endswith("-back")}
+        self.assertEqual(extra, set())
+        chars = json.load(open(os.path.join(ROOT, "campaigns", "still_hour", "characters.json"),
+                               encoding="utf-8"))
+        for j in jobs:
+            if j.get("character"):
+                self.assertIn(j["character"], chars)
+
+    def test_flipped_locations_have_their_side_as_a_hosted_back(self):
+        """Every location Locations.ttslua can flip (flipFact / hasBack) is
+        built with its own rendered, hosted back face, so the board's flip
+        shows the authored side instead of the generic encounter back."""
+        import re
+        lua = open(os.path.join(ROOT, "src", "StillHour", "Locations.ttslua"),
+                   encoding="utf-8").read()
+        flips = re.findall(r'name\s*=\s*"([^"]+)"[^}]*flipFact\s*=', lua)
+        self.assertEqual(sorted(flips), ["The Lantern Room", "The Town Hall Steps"])
+        loop = {CARDS[c]["name"]: c for sc in MANIFEST["scenarios"] if sc.get("map") == "loop"
+                for c in ASSIGN[sc["id"]].get("locations", [])}
+        box = json.load(open(os.path.join(ROOT, "dist", "the_still_hour_campaign.json"),
+                             encoding="utf-8"))
+        objs = {}
+
+        def walk(o):
+            if o.get("Name") == "Card":
+                objs.setdefault(json.loads(o["GMNotes"])["id"], o)
+            for c in o.get("ContainedObjects") or []:
+                walk(c)
+        for o in box["ObjectStates"]:
+            walk(o)
+        for name in flips:
+            cid = loop[name]
+            with self.subTest(location=cid):
+                self.assertTrue(CARDS[cid].get("back_text"))
+                deck = next(iter(objs[cid]["CustomDeck"].values()))
+                self.assertTrue(deck["UniqueBack"])
+                self.assertIn("/dist/cards/{}-back.jpg".format(cid), deck["BackURL"])
+                self.assertTrue(os.path.exists(os.path.join(ROOT, "dist", "cards", cid + "-back.jpg")))
+                self.assertNotEqual(deck["BackURL"], deck["FaceURL"])
 
 
 if __name__ == "__main__":

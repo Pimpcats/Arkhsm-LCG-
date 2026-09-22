@@ -6,183 +6,1230 @@
     "name": "The Still Hour",
     "box_id": "CB-STHR",
     "structure": "loop-horror: Prologue -> 6 repeating Districts (Act I surface / Act II deep) -> Finale",
-    "investigators": ["sthr-elias", "sthr-ayako", "sthr-cass", "sthr-seraphine", "sthr-birdie"],
-    "loop_hub": {"scenario": "district_square", "note": "Every loop starts at The Square (guide section 2 step 5, section 6.4). The Square's box carries the loop's shared components once: the hub location, the Occultation clock, the shared spine + The Crossing, and the set-aside Appointed set. District boxes add their locations, objectives, node set and Named to that board. See CONTENT_DECISIONS.md D1."},
-    "encounter_sets": {
-      "occultation_skips": {"name": "The Occultation (Skip treacheries)", "source": "encounter v0.4 §2",
-        "cards": [{"id": "sthr-losthour", "name": "LOST HOUR", "type": "Treachery", "qty": 3}, {"id": "sthr-slippage", "name": "SLIPPAGE", "type": "Treachery", "keywords": ["Surge"], "qty": 2}]},
-      "echoes": {"name": "Echoes of Ambergrove (Echo enemies)", "source": "encounter v0.4 §3",
-        "cards": [{"id": "sthr-waitingcongregation", "name": "THE WAITING CONGREGATION", "type": "Enemy", "traits": "Echo. Humanoid.", "qty": 2}, {"id": "sthr-drownedchoir", "name": "THE DROWNED CHOIR", "type": "Enemy", "traits": "Echo. Monster.", "qty": 2}, {"id": "sthr-familiarface", "name": "FAMILIAR FACE", "type": "Enemy", "traits": "Echo. Humanoid.", "qty": 1}, {"id": "sthr-lamplighterecho", "name": "THE LAMPLIGHTER'S ECHO", "type": "Enemy", "traits": "Echo. Humanoid.", "qty": 1}]},
-      "static": {"name": "Static (reality-glitch treacheries)", "source": "encounter v0.4 §4",
-        "cards": [{"id": "sthr-wrongturn", "name": "WRONG TURN", "type": "Treachery", "qty": 2}, {"id": "sthr-rewind", "name": "REWIND", "type": "Treachery", "keywords": ["Peril"], "qty": 2}, {"id": "sthr-deadair", "name": "DEAD AIR", "type": "Treachery", "qty": 2}, {"id": "sthr-loopnotices", "name": "THE LOOP NOTICES YOU", "type": "Treachery", "qty": 2}]},
-      "weight_of_years": {"name": "The Weight of Years (aging treacheries)", "source": "encounter v0.4 §6",
-        "cards": [{"id": "sthr-yearinanight", "name": "A YEAR IN A NIGHT", "type": "Treachery", "keywords": ["Peril"], "qty": 2}, {"id": "sthr-forgotten", "name": "WHAT YOU'VE FORGOTTEN", "type": "Treachery", "qty": 2}, {"id": "sthr-oldbones", "name": "OLD BONES", "type": "Treachery", "keywords": ["Peril"], "qty": 1}]},
-      "appointed": {"name": "The Appointed (boss set)", "source": "encounter v0.4 §5 / §7, CO-002",
-        "cards": [{"id": "sthr-appointed", "name": "THE APPOINTED", "type": "Enemy", "traits": "Monster.", "elite": true, "unique": true, "qty": 1, "placement": "aside", "status": "authored"}, {"id": "sthr-appointed-approach", "name": "THE APPOINTED'S APPROACH", "type": "Story", "qty": 1, "placement": "aside", "note": "stage reference the Appointed's printed text points to", "status": "authored"}, {"id": "sthr-crossing", "name": "THE CROSSING", "type": "Treachery", "qty": 1, "placement": "encounter", "note": "shuffled in every loop so it can advance the Approach (CO-002); CONTENT_DECISIONS D4", "status": "authored"}, {"id": "sthr-appointedwhisper", "name": "THE APPOINTED'S WHISPER", "type": "Treachery", "keywords": ["Peril"], "qty": 2, "act_gate": "II", "placement": "aside", "status": "authored"}]},
-      "named": {"name": "The Named of Ambergrove (Victory elites)", "source": "encounter v0.4 §5b",
-        "cards": [{"id": "sthr-bellringer", "name": "THE BELL-RINGER BENEATH", "type": "Enemy", "traits": "Monster.", "elite": true, "named": true, "district": "district_church", "qty": 1, "status": "authored"}, {"id": "sthr-wearssheriff", "name": "WHAT WEARS THE SHERIFF", "type": "Enemy", "traits": "Humanoid. Monster.", "elite": true, "named": true, "victory": 3, "district": "district_square", "qty": 1, "status": "authored"}, {"id": "sthr-onewhorides", "name": "THE ONE WHO RIDES FOREVER", "type": "Enemy", "traits": "Humanoid.", "elite": true, "named": true, "district": "district_fairground", "qty": 1, "status": "authored"}]},
-      "node_lighthouse": {"name": "Lighthouse node set", "source": "guide §6.1",
-        "cards": [{"id": "sthr-darkthatwaits", "name": "The Dark That Waits", "type": "Treachery", "qty": 1}, {"id": "sthr-somethingonstair", "name": "Something on the Stair", "type": "Enemy", "qty": 1}]},
-      "node_church": {"name": "Drowned Church node set", "source": "guide §6.2",
-        "cards": [{"id": "sthr-drownedchoir", "name": "The Congregation Kneels (a Drowned Choir Echo)", "type": "Enemy", "qty": 1}, {"id": "sthr-thirteen", "name": "Thirteen", "type": "Treachery", "qty": 1}, {"id": "sthr-risingwater", "name": "Rising Water", "type": "Treachery", "qty": 1}]},
-      "node_road": {"name": "Sunken Road node set", "source": "guide §6.3",
-        "cards": [{"id": "sthr-waitingcongregation", "name": "Those Who Walk (a Waiting Congregation Echo)", "type": "Enemy", "qty": 1}, {"id": "sthr-bridgeremembers", "name": "The Bridge Remembers", "type": "Treachery", "qty": 1}]},
-      "node_square": {"name": "Square node set", "source": "guide §6.4",
-        "cards": [{"id": "sthr-samespeech", "name": "The Same Speech", "type": "Treachery", "qty": 1}, {"id": "sthr-crowdturns", "name": "The Crowd Turns", "type": "Treachery", "qty": 1}]},
-      "node_fairground": {"name": "Fairground node set", "source": "guide §6.5",
-        "cards": [{"id": "sthr-wheelsturn", "name": "The Wheel's Turn", "type": "Treachery", "qty": 1}, {"id": "sthr-reflectionlies", "name": "Your Reflection Lies", "type": "Treachery", "qty": 1}]},
-      "node_almanac": {"name": "Almanac House node set", "source": "guide §6.6",
-        "cards": [{"id": "sthr-pagethatwasnt", "name": "The Page That Wasn't", "type": "Treachery", "qty": 1}, {"id": "sthr-inkrunsbackward", "name": "Ink Runs Backward", "type": "Treachery", "qty": 1}, {"id": "sthr-studydoor", "name": "The Study Door", "type": "Treachery", "qty": 1}]}
+    "investigators": [
+      "sthr-elias",
+      "sthr-ayako",
+      "sthr-cass",
+      "sthr-seraphine",
+      "sthr-birdie"
+    ],
+    "loop_hub": {
+      "scenario": "district_square",
+      "note": "Every loop starts at The Square (guide section 2 step 5, section 6.4). The Square's box carries the loop's shared components once: the hub location, the Occultation clock, the shared spine + The Crossing, and the set-aside Appointed set. District boxes add their locations, objectives, node set and Named to that board. See CONTENT_DECISIONS.md D1."
     },
-    "shared_spine": ["occultation_skips", "echoes", "static", "weight_of_years"],
+    "encounter_sets": {
+      "occultation_skips": {
+        "name": "The Occultation (Skip treacheries)",
+        "source": "encounter v0.4 §2",
+        "cards": [
+          {
+            "id": "sthr-losthour",
+            "name": "LOST HOUR",
+            "type": "Treachery",
+            "qty": 3
+          },
+          {
+            "id": "sthr-slippage",
+            "name": "SLIPPAGE",
+            "type": "Treachery",
+            "keywords": [
+              "Surge"
+            ],
+            "qty": 2
+          }
+        ]
+      },
+      "echoes": {
+        "name": "Echoes of Ambergrove (Echo enemies)",
+        "source": "encounter v0.4 §3",
+        "cards": [
+          {
+            "id": "sthr-waitingcongregation",
+            "name": "THE WAITING CONGREGATION",
+            "type": "Enemy",
+            "traits": "Echo. Humanoid.",
+            "qty": 2
+          },
+          {
+            "id": "sthr-drownedchoir",
+            "name": "THE DROWNED CHOIR",
+            "type": "Enemy",
+            "traits": "Echo. Monster.",
+            "qty": 2
+          },
+          {
+            "id": "sthr-familiarface",
+            "name": "FAMILIAR FACE",
+            "type": "Enemy",
+            "traits": "Echo. Humanoid.",
+            "qty": 1
+          },
+          {
+            "id": "sthr-lamplighterecho",
+            "name": "THE LAMPLIGHTER'S ECHO",
+            "type": "Enemy",
+            "traits": "Echo. Humanoid.",
+            "qty": 1
+          }
+        ]
+      },
+      "static": {
+        "name": "Static (reality-glitch treacheries)",
+        "source": "encounter v0.4 §4",
+        "cards": [
+          {
+            "id": "sthr-wrongturn",
+            "name": "WRONG TURN",
+            "type": "Treachery",
+            "qty": 2
+          },
+          {
+            "id": "sthr-rewind",
+            "name": "REWIND",
+            "type": "Treachery",
+            "keywords": [
+              "Peril"
+            ],
+            "qty": 2
+          },
+          {
+            "id": "sthr-deadair",
+            "name": "DEAD AIR",
+            "type": "Treachery",
+            "qty": 2
+          },
+          {
+            "id": "sthr-loopnotices",
+            "name": "THE LOOP NOTICES YOU",
+            "type": "Treachery",
+            "qty": 2
+          }
+        ]
+      },
+      "weight_of_years": {
+        "name": "The Weight of Years (aging treacheries)",
+        "source": "encounter v0.4 §6",
+        "cards": [
+          {
+            "id": "sthr-yearinanight",
+            "name": "A YEAR IN A NIGHT",
+            "type": "Treachery",
+            "keywords": [
+              "Peril"
+            ],
+            "qty": 2
+          },
+          {
+            "id": "sthr-forgotten",
+            "name": "WHAT YOU'VE FORGOTTEN",
+            "type": "Treachery",
+            "qty": 2
+          },
+          {
+            "id": "sthr-oldbones",
+            "name": "OLD BONES",
+            "type": "Treachery",
+            "keywords": [
+              "Peril"
+            ],
+            "qty": 1
+          }
+        ]
+      },
+      "appointed": {
+        "name": "The Appointed (boss set)",
+        "source": "encounter v0.4 §5 / §7, CO-002",
+        "cards": [
+          {
+            "id": "sthr-appointed",
+            "name": "THE APPOINTED",
+            "type": "Enemy",
+            "traits": "Monster.",
+            "elite": true,
+            "unique": true,
+            "qty": 1,
+            "placement": "aside",
+            "status": "authored"
+          },
+          {
+            "id": "sthr-appointed-approach",
+            "name": "THE APPOINTED'S APPROACH",
+            "type": "Story",
+            "qty": 1,
+            "placement": "aside",
+            "note": "stage reference the Appointed's printed text points to",
+            "status": "authored"
+          },
+          {
+            "id": "sthr-crossing",
+            "name": "THE CROSSING",
+            "type": "Treachery",
+            "qty": 1,
+            "placement": "encounter",
+            "note": "shuffled in every loop so it can advance the Approach (CO-002); CONTENT_DECISIONS D4",
+            "status": "authored"
+          },
+          {
+            "id": "sthr-appointedwhisper",
+            "name": "THE APPOINTED'S WHISPER",
+            "type": "Treachery",
+            "keywords": [
+              "Peril"
+            ],
+            "qty": 2,
+            "act_gate": "II",
+            "placement": "aside",
+            "status": "authored"
+          }
+        ]
+      },
+      "named": {
+        "name": "The Named of Ambergrove (Victory elites)",
+        "source": "encounter v0.4 §5b",
+        "cards": [
+          {
+            "id": "sthr-bellringer",
+            "name": "THE BELL-RINGER BENEATH",
+            "type": "Enemy",
+            "traits": "Monster.",
+            "elite": true,
+            "named": true,
+            "district": "district_church",
+            "qty": 1,
+            "status": "authored"
+          },
+          {
+            "id": "sthr-wearssheriff",
+            "name": "WHAT WEARS THE SHERIFF",
+            "type": "Enemy",
+            "traits": "Humanoid. Monster.",
+            "elite": true,
+            "named": true,
+            "victory": 3,
+            "district": "district_square",
+            "qty": 1,
+            "status": "authored"
+          },
+          {
+            "id": "sthr-onewhorides",
+            "name": "THE ONE WHO RIDES FOREVER",
+            "type": "Enemy",
+            "traits": "Humanoid.",
+            "elite": true,
+            "named": true,
+            "district": "district_fairground",
+            "qty": 1,
+            "status": "authored"
+          }
+        ]
+      },
+      "node_lighthouse": {
+        "name": "Lighthouse node set",
+        "source": "guide §6.1",
+        "cards": [
+          {
+            "id": "sthr-darkthatwaits",
+            "name": "The Dark That Waits",
+            "type": "Treachery",
+            "qty": 1
+          },
+          {
+            "id": "sthr-somethingonstair",
+            "name": "Something on the Stair",
+            "type": "Enemy",
+            "qty": 1
+          }
+        ]
+      },
+      "node_church": {
+        "name": "Drowned Church node set",
+        "source": "guide §6.2",
+        "cards": [
+          {
+            "id": "sthr-drownedchoir",
+            "name": "The Congregation Kneels (a Drowned Choir Echo)",
+            "type": "Enemy",
+            "qty": 1
+          },
+          {
+            "id": "sthr-thirteen",
+            "name": "Thirteen",
+            "type": "Treachery",
+            "qty": 1
+          },
+          {
+            "id": "sthr-risingwater",
+            "name": "Rising Water",
+            "type": "Treachery",
+            "qty": 1
+          }
+        ]
+      },
+      "node_road": {
+        "name": "Sunken Road node set",
+        "source": "guide §6.3",
+        "cards": [
+          {
+            "id": "sthr-waitingcongregation",
+            "name": "Those Who Walk (a Waiting Congregation Echo)",
+            "type": "Enemy",
+            "qty": 1
+          },
+          {
+            "id": "sthr-bridgeremembers",
+            "name": "The Bridge Remembers",
+            "type": "Treachery",
+            "qty": 1
+          }
+        ]
+      },
+      "node_square": {
+        "name": "Square node set",
+        "source": "guide §6.4",
+        "cards": [
+          {
+            "id": "sthr-samespeech",
+            "name": "The Same Speech",
+            "type": "Treachery",
+            "qty": 1
+          },
+          {
+            "id": "sthr-crowdturns",
+            "name": "The Crowd Turns",
+            "type": "Treachery",
+            "qty": 1
+          }
+        ]
+      },
+      "node_fairground": {
+        "name": "Fairground node set",
+        "source": "guide §6.5",
+        "cards": [
+          {
+            "id": "sthr-wheelsturn",
+            "name": "The Wheel's Turn",
+            "type": "Treachery",
+            "qty": 1
+          },
+          {
+            "id": "sthr-reflectionlies",
+            "name": "Your Reflection Lies",
+            "type": "Treachery",
+            "qty": 1
+          }
+        ]
+      },
+      "node_almanac": {
+        "name": "Almanac House node set",
+        "source": "guide §6.6",
+        "cards": [
+          {
+            "id": "sthr-pagethatwasnt",
+            "name": "The Page That Wasn't",
+            "type": "Treachery",
+            "qty": 1
+          },
+          {
+            "id": "sthr-inkrunsbackward",
+            "name": "Ink Runs Backward",
+            "type": "Treachery",
+            "qty": 1
+          },
+          {
+            "id": "sthr-studydoor",
+            "name": "The Study Door",
+            "type": "Treachery",
+            "qty": 1
+          }
+        ]
+      }
+    },
+    "shared_spine": [
+      "occultation_skips",
+      "echoes",
+      "static",
+      "weight_of_years"
+    ],
     "clocks": [
-      {"id": "occultation", "name": "The Occultation", "kind": "agenda-like (the Hour clock, ordered I->IX, never shuffled)", "template": "Agenda", "status": "authored",
-       "stages": [{"id": "sthr-hour-1", "name": "Hour I"}, {"id": "sthr-hour-2", "name": "Hour II"}, {"id": "sthr-hour-3", "name": "Hour III"}, {"id": "sthr-hour-4", "name": "Hour IV"}, {"id": "sthr-hour-5", "name": "Hour V"}, {"id": "sthr-hour-6", "name": "Hour VI"}, {"id": "sthr-hour-7", "name": "Hour VII", "text": "The Guest Approaches"}, {"id": "sthr-hour-8", "name": "Hour VIII"}, {"id": "sthr-hour-9", "name": "Hour IX", "text": "The Appointed Hour", "final": true}]}
+      {
+        "id": "occultation",
+        "name": "The Occultation",
+        "kind": "agenda-like (the Hour clock, ordered I->IX, never shuffled)",
+        "template": "Agenda",
+        "status": "authored",
+        "stages": [
+          {
+            "id": "sthr-hour-1",
+            "name": "Hour I"
+          },
+          {
+            "id": "sthr-hour-2",
+            "name": "Hour II"
+          },
+          {
+            "id": "sthr-hour-3",
+            "name": "Hour III"
+          },
+          {
+            "id": "sthr-hour-4",
+            "name": "Hour IV"
+          },
+          {
+            "id": "sthr-hour-5",
+            "name": "Hour V"
+          },
+          {
+            "id": "sthr-hour-6",
+            "name": "Hour VI"
+          },
+          {
+            "id": "sthr-hour-7",
+            "name": "Hour VII",
+            "text": "The Guest Approaches"
+          },
+          {
+            "id": "sthr-hour-8",
+            "name": "Hour VIII"
+          },
+          {
+            "id": "sthr-hour-9",
+            "name": "Hour IX",
+            "text": "The Appointed Hour",
+            "final": true
+          }
+        ]
+      }
     ],
-    "knowledge_track": {"source": "campaign guide §7", "status": "authored", "note": "You Are Unstuck (Prologue) + one fact per district objective; each fact is recorded by the act (or story) card that grants it; the assembled fact is recorded on The Appointed's Name act and gates the finale act"},
+    "knowledge_track": {
+      "source": "campaign guide §7",
+      "status": "authored",
+      "note": "You Are Unstuck (Prologue) + one fact per district objective; each fact is recorded by the act (or story) card that grants it; the assembled fact is recorded on The Appointed's Name act and gates the finale act"
+    },
     "resolutions": [
-      {"id": "R1", "card": "sthr-res-1", "source": "campaign guide §9", "name": "Take Its Place"},
-      {"id": "R2", "card": "sthr-res-2", "source": "campaign guide §9", "name": "Close the Door"},
-      {"id": "R3", "card": "sthr-res-3", "source": "campaign guide §9", "name": "Break Through"},
-      {"id": "R4", "card": "sthr-res-4", "source": "campaign guide §9", "name": "Seal by Force"},
-      {"id": "R5", "card": "sthr-res-5", "source": "campaign guide §9", "name": "Next Time"},
-      {"id": "R6", "card": "sthr-res-6", "source": "campaign guide §9", "name": "The Loop Wins"}
+      {
+        "id": "R1",
+        "card": "sthr-res-1",
+        "source": "campaign guide §9",
+        "name": "Take Its Place"
+      },
+      {
+        "id": "R1b",
+        "card": "sthr-res-bargain",
+        "source": "campaign guide §6.5 / design v0.1 §2",
+        "name": "Let It In, On Your Terms"
+      },
+      {
+        "id": "R2",
+        "card": "sthr-res-2",
+        "source": "campaign guide §9",
+        "name": "Close the Door"
+      },
+      {
+        "id": "R3",
+        "card": "sthr-res-3",
+        "source": "campaign guide §9",
+        "name": "Break Through"
+      },
+      {
+        "id": "R4",
+        "card": "sthr-res-4",
+        "source": "campaign guide §9",
+        "name": "Seal by Force"
+      },
+      {
+        "id": "R5",
+        "card": "sthr-res-5",
+        "source": "campaign guide §9",
+        "name": "Next Time"
+      },
+      {
+        "id": "R6",
+        "card": "sthr-res-6",
+        "source": "campaign guide §9",
+        "name": "The Loop Wins"
+      }
     ],
-    "campaign_log": {"template": "Custom_Token", "status": "todo"},
-    "campaign_guide": {"template": "Custom_PDF", "status": "todo"}
+    "campaign_log": {
+      "template": "Custom_Token",
+      "status": "todo"
+    },
+    "campaign_guide": {
+      "template": "Custom_PDF",
+      "status": "todo"
+    },
+    "resolutions_order": [
+      "R1",
+      "R1b",
+      "R2",
+      "R3",
+      "R4",
+      "R5",
+      "R6"
+    ]
   },
   "scenarios": [
     {
-      "id": "prologue", "name": "The First Hour", "order": 0, "map": "prologue",
-      "reference": {"id": "sthr-scn-stillhour", "status": "authored"},
-      "stacks": {
-        "locations": {"template": "Location", "status": "authored", "cards": [
-          {"id": "sthr-loc-square", "name": "The Square", "starting": true, "shroud": 1, "clues": 2},
-          {"id": "sthr-loc-longpier", "name": "The Long Pier", "shroud": 2, "clues": 2},
-          {"id": "sthr-loc-almanacsteps", "name": "The Almanac Steps", "shroud": 2, "clues": 3}]},
-        "agenda_deck": {"template": "Agenda", "ref": "occultation"},
-        "act_deck": {"template": "Act", "status": "authored", "cards": [
-          {"id": "sthr-act-firsthour", "name": "The First Hour", "at": "The Almanac Steps"}]},
-        "encounter": {"sets": ["occultation_skips", "echoes", "static", "weight_of_years"], "aside": [], "note": "shared spine only — no Whispers, no Appointed"},
-        "setup_aside": {"cards": [{"id": "sthr-story-firstreset", "name": "The First Reset", "role": "scripted ending"}]}
+      "id": "prologue",
+      "name": "The First Hour",
+      "order": 0,
+      "map": "prologue",
+      "reference": {
+        "id": "sthr-scn-stillhour",
+        "status": "authored"
       },
-      "setup": {"starting_location": "The Square", "chaos_bag": "Calm band", "hourglass": "Hour I", "dissonance": 0},
-      "grants": ["You Are Unstuck"]
+      "stacks": {
+        "locations": {
+          "template": "Location",
+          "status": "authored",
+          "cards": [
+            {
+              "id": "sthr-loc-square",
+              "name": "The Square",
+              "starting": true,
+              "shroud": 1,
+              "clues": 2
+            },
+            {
+              "id": "sthr-loc-longpier",
+              "name": "The Long Pier",
+              "shroud": 2,
+              "clues": 2
+            },
+            {
+              "id": "sthr-loc-almanacsteps",
+              "name": "The Almanac Steps",
+              "shroud": 2,
+              "clues": 3
+            }
+          ]
+        },
+        "agenda_deck": {
+          "template": "Agenda",
+          "ref": "occultation"
+        },
+        "act_deck": {
+          "template": "Act",
+          "status": "authored",
+          "cards": [
+            {
+              "id": "sthr-act-firsthour",
+              "name": "The First Hour",
+              "at": "The Almanac Steps",
+              "needs": {
+                "clues": "card",
+                "from": [
+                  "The Square",
+                  "The Long Pier",
+                  "The Almanac Steps"
+                ]
+              }
+            }
+          ]
+        },
+        "encounter": {
+          "sets": [
+            "occultation_skips",
+            "echoes",
+            "static",
+            "weight_of_years"
+          ],
+          "aside": [],
+          "note": "shared spine only — no Whispers, no Appointed"
+        },
+        "setup_aside": {
+          "cards": [
+            {
+              "id": "sthr-story-firstreset",
+              "name": "The First Reset",
+              "role": "scripted ending"
+            }
+          ]
+        }
+      },
+      "setup": {
+        "starting_location": "The Square",
+        "chaos_bag": "Calm band",
+        "hourglass": "Hour I",
+        "dissonance": 0
+      },
+      "grants": [
+        "You Are Unstuck"
+      ]
     },
     {
-      "id": "district_lighthouse", "name": "The Lighthouse", "order": 1, "map": "loop", "shared_from": "district_square",
-      "reference": {"id": "sthr-scn-stillhour", "status": "authored"},
-      "stacks": {
-        "locations": {"template": "Location", "status": "authored", "cards": [
-          {"id": "sthr-loc-lanternroom", "name": "The Lantern Room", "shroud": 3, "clues": 2},
-          {"id": "sthr-loc-windingstair", "name": "The Winding Stair", "shroud": 2, "clues": 1},
-          {"id": "sthr-loc-keepersquarters", "name": "The Keeper's Quarters", "shroud": 2, "clues": 2}]},
-        "act_deck": {"template": "Act", "status": "authored", "cards": [
-          {"id": "sthr-act-lamp", "name": "Light the Lamp", "act": "I", "at": "The Lantern Room"}, {"id": "sthr-act-ninthdeath", "name": "The Ninth Death", "act": "II", "clues_at": "The Keeper's Quarters"}]},
-        "encounter": {"sets": ["#spine", "node_lighthouse"], "aside": ["appointed"]},
-        "node_set": {"id": "node_lighthouse", "size": "2-4", "status": "authored", "note": "ships with the node objective"}
+      "id": "district_lighthouse",
+      "name": "The Lighthouse",
+      "order": 1,
+      "map": "loop",
+      "shared_from": "district_square",
+      "reference": {
+        "id": "sthr-scn-stillhour",
+        "status": "authored"
       },
-      "setup": {"starting_location": "The Square", "note": "reached from the Square by way of the Sunken Road"},
-      "grants": ["The Lamp Was Never Lit", "The Keeper's Ninth Death"]
+      "stacks": {
+        "locations": {
+          "template": "Location",
+          "status": "authored",
+          "cards": [
+            {
+              "id": "sthr-loc-lanternroom",
+              "name": "The Lantern Room",
+              "shroud": 3,
+              "clues": 2,
+              "accepted": {
+                "shroud": 4,
+                "decision": "CONTENT_DECISIONS A1 (owner's own edit)"
+              },
+              "back": {
+                "flip_fact": "The Lamp Was Never Lit",
+                "shroud": 3
+              }
+            },
+            {
+              "id": "sthr-loc-windingstair",
+              "name": "The Winding Stair",
+              "shroud": 2,
+              "clues": 1
+            },
+            {
+              "id": "sthr-loc-keepersquarters",
+              "name": "The Keeper's Quarters",
+              "shroud": 2,
+              "clues": 2
+            }
+          ]
+        },
+        "act_deck": {
+          "template": "Act",
+          "status": "authored",
+          "cards": [
+            {
+              "id": "sthr-act-lamp",
+              "name": "Light the Lamp",
+              "act": "I",
+              "at": "The Lantern Room",
+              "needs": {
+                "clues": "card",
+                "from": [
+                  "The Lantern Room",
+                  "The Winding Stair",
+                  "The Keeper's Quarters"
+                ]
+              }
+            },
+            {
+              "id": "sthr-act-ninthdeath",
+              "name": "The Ninth Death",
+              "act": "II",
+              "clues_at": "The Keeper's Quarters",
+              "needs": {
+                "clues": "card",
+                "from": [
+                  "The Keeper's Quarters"
+                ]
+              }
+            }
+          ]
+        },
+        "encounter": {
+          "sets": [
+            "#spine",
+            "node_lighthouse"
+          ],
+          "aside": [
+            "appointed"
+          ]
+        },
+        "node_set": {
+          "id": "node_lighthouse",
+          "size": "2-4",
+          "status": "authored",
+          "note": "ships with the node objective"
+        }
+      },
+      "setup": {
+        "starting_location": "The Square",
+        "note": "reached from the Square by way of the Sunken Road"
+      },
+      "grants": [
+        "The Lamp Was Never Lit",
+        "The Keeper's Ninth Death"
+      ]
     },
     {
-      "id": "district_church", "name": "The Drowned Church", "order": 2, "map": "loop", "shared_from": "district_square",
-      "reference": {"id": "sthr-scn-stillhour", "status": "authored"},
-      "stacks": {
-        "locations": {"template": "Location", "status": "authored", "cards": [
-          {"id": "sthr-loc-nave", "name": "The Nave", "shroud": 2, "clues": 3},
-          {"id": "sthr-loc-belfry", "name": "The Belfry", "shroud": 3, "clues": 2},
-          {"id": "sthr-loc-floodedcrypt", "name": "The Flooded Crypt", "shroud": 4, "clues": 3, "sealed_until_fact": true},
-          {"id": "sthr-loc-vestry", "name": "The Vestry", "shroud": 2, "clues": 2}]},
-        "act_deck": {"template": "Act", "status": "authored", "cards": [
-          {"id": "sthr-act-whythirteen", "name": "Why Thirteen?", "act": "I", "at": "The Vestry"}, {"id": "sthr-act-hourwaswrong", "name": "The Hour Was Wrong", "act": "II", "clues_at": "The Flooded Crypt"}]},
-        "encounter": {"sets": ["#spine", "node_church"], "aside": ["appointed"]},
-        "node_set": {"id": "node_church", "size": "2-4", "status": "authored"},
-        "enemies_named": {"template": "Enemy", "cards": [{"ref": "sthr-bellringer", "act": "II"}]}
+      "id": "district_church",
+      "name": "The Drowned Church",
+      "order": 2,
+      "map": "loop",
+      "shared_from": "district_square",
+      "reference": {
+        "id": "sthr-scn-stillhour",
+        "status": "authored"
       },
-      "setup": {"starting_location": "The Square"},
-      "grants": ["The Thirteenth Toll", "The Hour Was Wrong"]
+      "stacks": {
+        "locations": {
+          "template": "Location",
+          "status": "authored",
+          "cards": [
+            {
+              "id": "sthr-loc-nave",
+              "name": "The Nave",
+              "shroud": 2,
+              "clues": 3
+            },
+            {
+              "id": "sthr-loc-belfry",
+              "name": "The Belfry",
+              "shroud": 3,
+              "clues": 2
+            },
+            {
+              "id": "sthr-loc-floodedcrypt",
+              "name": "The Flooded Crypt",
+              "shroud": 4,
+              "clues": 3,
+              "sealed_until_fact": true
+            },
+            {
+              "id": "sthr-loc-vestry",
+              "name": "The Vestry",
+              "shroud": 2,
+              "clues": 2
+            }
+          ]
+        },
+        "act_deck": {
+          "template": "Act",
+          "status": "authored",
+          "cards": [
+            {
+              "id": "sthr-act-whythirteen",
+              "name": "Why Thirteen?",
+              "act": "I",
+              "at": "The Vestry",
+              "needs": {
+                "clues": "card",
+                "from": [
+                  "The Nave",
+                  "The Belfry",
+                  "The Vestry"
+                ],
+                "note": "the Flooded Crypt is sealed until this fact"
+              }
+            },
+            {
+              "id": "sthr-act-hourwaswrong",
+              "name": "The Hour Was Wrong",
+              "act": "II",
+              "clues_at": "The Flooded Crypt",
+              "needs": {
+                "clues": "card",
+                "from": [
+                  "The Flooded Crypt"
+                ]
+              }
+            }
+          ]
+        },
+        "encounter": {
+          "sets": [
+            "#spine",
+            "node_church"
+          ],
+          "aside": [
+            "appointed"
+          ]
+        },
+        "node_set": {
+          "id": "node_church",
+          "size": "2-4",
+          "status": "authored"
+        },
+        "enemies_named": {
+          "template": "Enemy",
+          "cards": [
+            {
+              "ref": "sthr-bellringer",
+              "act": "II"
+            }
+          ]
+        }
+      },
+      "setup": {
+        "starting_location": "The Square"
+      },
+      "grants": [
+        "The Thirteenth Toll",
+        "The Hour Was Wrong"
+      ]
     },
     {
-      "id": "district_road", "name": "The Sunken Road", "order": 3, "map": "loop", "shared_from": "district_square",
-      "reference": {"id": "sthr-scn-stillhour", "status": "authored"},
-      "stacks": {
-        "locations": {"template": "Location", "status": "authored", "cards": [
-          {"id": "sthr-loc-milestones", "name": "The Milestones", "shroud": 1, "clues": 2},
-          {"id": "sthr-loc-lowbridge", "name": "The Low Bridge", "shroud": 3, "clues": 2},
-          {"id": "sthr-loc-turning", "name": "The Turning", "shroud": 2, "clues": 3}]},
-        "act_deck": {"template": "Act", "status": "authored", "cards": [
-          {"id": "sthr-act-walkbackward", "name": "Walk It Backward", "act": "I", "at": "The Milestones"}, {"id": "sthr-act-walksbeside", "name": "Who Walks Beside You", "act": "II", "at": "The Turning"}]},
-        "encounter": {"sets": ["#spine", "node_road"], "aside": ["appointed"]},
-        "node_set": {"id": "node_road", "size": "2-4", "status": "authored"}
+      "id": "district_road",
+      "name": "The Sunken Road",
+      "order": 3,
+      "map": "loop",
+      "shared_from": "district_square",
+      "reference": {
+        "id": "sthr-scn-stillhour",
+        "status": "authored"
       },
-      "setup": {"starting_location": "The Square"},
-      "grants": ["The Road Remembers", "Who Walks Beside You"]
+      "stacks": {
+        "locations": {
+          "template": "Location",
+          "status": "authored",
+          "cards": [
+            {
+              "id": "sthr-loc-milestones",
+              "name": "The Milestones",
+              "shroud": 1,
+              "clues": 2
+            },
+            {
+              "id": "sthr-loc-lowbridge",
+              "name": "The Low Bridge",
+              "shroud": 3,
+              "clues": 2
+            },
+            {
+              "id": "sthr-loc-turning",
+              "name": "The Turning",
+              "shroud": 2,
+              "clues": 3
+            }
+          ]
+        },
+        "act_deck": {
+          "template": "Act",
+          "status": "authored",
+          "cards": [
+            {
+              "id": "sthr-act-walkbackward",
+              "name": "Walk It Backward",
+              "act": "I",
+              "at": "The Milestones",
+              "needs": {
+                "each": 1,
+                "from": [
+                  "The Turning",
+                  "The Low Bridge",
+                  "The Milestones"
+                ]
+              }
+            },
+            {
+              "id": "sthr-act-walksbeside",
+              "name": "Who Walks Beside You",
+              "act": "II",
+              "at": "The Turning",
+              "needs": {
+                "test": "evade or Hold an awakened Echo at The Turning"
+              }
+            }
+          ]
+        },
+        "encounter": {
+          "sets": [
+            "#spine",
+            "node_road"
+          ],
+          "aside": [
+            "appointed"
+          ]
+        },
+        "node_set": {
+          "id": "node_road",
+          "size": "2-4",
+          "status": "authored"
+        }
+      },
+      "setup": {
+        "starting_location": "The Square"
+      },
+      "grants": [
+        "The Road Remembers",
+        "Who Walks Beside You"
+      ]
     },
     {
-      "id": "district_square", "name": "The Square (Town Hall)", "order": 4, "map": "loop",
-      "reference": {"id": "sthr-scn-stillhour", "status": "authored"},
-      "stacks": {
-        "locations": {"template": "Location", "status": "authored", "cards": [
-          {"id": "sthr-loc-hubsquare", "name": "The Square", "starting": true, "role": "loop hub", "shroud": 1, "clues": 2},
-          {"id": "sthr-loc-townhallsteps", "name": "The Town Hall Steps", "shroud": 2, "clues": 2},
-          {"id": "sthr-loc-recordsoffice", "name": "The Records Office", "shroud": 3, "clues": 3},
-          {"id": "sthr-loc-well", "name": "The Well", "shroud": 2, "clues": 2}]},
-        "agenda_deck": {"template": "Agenda", "ref": "occultation"},
-        "act_deck": {"template": "Act", "status": "authored", "cards": [
-          {"id": "sthr-act-sheriffdead", "name": "The Sheriff Is Already Dead", "act": "I", "at": "The Well"}, {"id": "sthr-act-vote", "name": "The Vote That Never Ends", "act": "II", "clues_at": "The Records Office"}]},
-        "encounter": {"sets": ["#spine", "node_square"], "aside": ["appointed"]},
-        "node_set": {"id": "node_square", "size": "2-4", "status": "authored"},
-        "enemies_named": {"template": "Enemy", "cards": [{"ref": "sthr-wearssheriff", "act": "II"}]},
-        "setup_aside": {"cards": [{"id": "sthr-story-firstdark", "name": "First Dark", "role": "interlude beat after Loop 1"}, {"id": "sthr-story-actii", "name": "The Shape of the Hour", "role": "interlude beat entering Act II"}]}
+      "id": "district_square",
+      "name": "The Square (Town Hall)",
+      "order": 4,
+      "map": "loop",
+      "reference": {
+        "id": "sthr-scn-stillhour",
+        "status": "authored"
       },
-      "setup": {"starting_location": "The Square", "note": "The Square is always the loop's start location; this box is the loop hub"},
-      "grants": ["The Sheriff Is Already Dead", "The Vote That Never Ends"]
+      "stacks": {
+        "locations": {
+          "template": "Location",
+          "status": "authored",
+          "cards": [
+            {
+              "id": "sthr-loc-hubsquare",
+              "name": "The Square",
+              "starting": true,
+              "role": "loop hub",
+              "shroud": 1,
+              "clues": 2
+            },
+            {
+              "id": "sthr-loc-townhallsteps",
+              "name": "The Town Hall Steps",
+              "shroud": 2,
+              "clues": 2,
+              "back": {
+                "flip_fact": "The Sheriff Is Already Dead",
+                "shroud": 2
+              }
+            },
+            {
+              "id": "sthr-loc-recordsoffice",
+              "name": "The Records Office",
+              "shroud": 3,
+              "clues": 3
+            },
+            {
+              "id": "sthr-loc-well",
+              "name": "The Well",
+              "shroud": 2,
+              "clues": 2
+            }
+          ]
+        },
+        "agenda_deck": {
+          "template": "Agenda",
+          "ref": "occultation"
+        },
+        "act_deck": {
+          "template": "Act",
+          "status": "authored",
+          "cards": [
+            {
+              "id": "sthr-act-sheriffdead",
+              "name": "The Sheriff Is Already Dead",
+              "act": "I",
+              "at": "The Well",
+              "needs": {
+                "clues": "card",
+                "from": [
+                  "The Town Hall Steps",
+                  "The Records Office",
+                  "The Well"
+                ]
+              }
+            },
+            {
+              "id": "sthr-act-vote",
+              "name": "The Vote That Never Ends",
+              "act": "II",
+              "clues_at": "The Records Office",
+              "needs": {
+                "clues": "card",
+                "from": [
+                  "The Records Office"
+                ]
+              }
+            }
+          ]
+        },
+        "encounter": {
+          "sets": [
+            "#spine",
+            "node_square"
+          ],
+          "aside": [
+            "appointed"
+          ]
+        },
+        "node_set": {
+          "id": "node_square",
+          "size": "2-4",
+          "status": "authored"
+        },
+        "enemies_named": {
+          "template": "Enemy",
+          "cards": [
+            {
+              "ref": "sthr-wearssheriff",
+              "act": "II"
+            }
+          ]
+        },
+        "setup_aside": {
+          "cards": [
+            {
+              "id": "sthr-story-firstdark",
+              "name": "First Dark",
+              "role": "interlude beat after Loop 1"
+            },
+            {
+              "id": "sthr-story-actii",
+              "name": "The Shape of the Hour",
+              "role": "interlude beat entering Act II"
+            }
+          ]
+        }
+      },
+      "setup": {
+        "starting_location": "The Square",
+        "note": "The Square is always the loop's start location; this box is the loop hub"
+      },
+      "grants": [
+        "The Sheriff Is Already Dead",
+        "The Vote That Never Ends"
+      ]
     },
     {
-      "id": "district_fairground", "name": "The Fairground", "order": 5, "map": "loop", "shared_from": "district_square",
-      "reference": {"id": "sthr-scn-stillhour", "status": "authored"},
-      "stacks": {
-        "locations": {"template": "Location", "status": "authored", "cards": [
-          {"id": "sthr-loc-wheel", "name": "The Wheel", "shroud": 3, "clues": 2},
-          {"id": "sthr-loc-hallofmirrors", "name": "The Hall of Mirrors", "shroud": 2, "clues": 3},
-          {"id": "sthr-loc-ticketbooth", "name": "The Ticket Booth", "shroud": 2, "clues": 2}]},
-        "act_deck": {"template": "Act", "status": "authored", "cards": [
-          {"id": "sthr-act-wheelturns", "name": "The Wheel Still Turns", "act": "I", "at": "The Wheel"}, {"id": "sthr-act-bargain", "name": "The Ticket-Taker's Bargain", "act": "II", "at": "The Ticket Booth"}]},
-        "encounter": {"sets": ["#spine", "node_fairground"], "aside": ["appointed"]},
-        "node_set": {"id": "node_fairground", "size": "2-4", "status": "authored"},
-        "enemies_named": {"template": "Enemy", "cards": [{"ref": "sthr-onewhorides", "act": "II"}]}
+      "id": "district_fairground",
+      "name": "The Fairground",
+      "order": 5,
+      "map": "loop",
+      "shared_from": "district_square",
+      "reference": {
+        "id": "sthr-scn-stillhour",
+        "status": "authored"
       },
-      "setup": {"starting_location": "The Square"},
-      "grants": ["The Wheel Still Turns", "The Ticket-Taker's Bargain"]
+      "stacks": {
+        "locations": {
+          "template": "Location",
+          "status": "authored",
+          "cards": [
+            {
+              "id": "sthr-loc-wheel",
+              "name": "The Wheel",
+              "shroud": 3,
+              "clues": 2
+            },
+            {
+              "id": "sthr-loc-hallofmirrors",
+              "name": "The Hall of Mirrors",
+              "shroud": 2,
+              "clues": 3
+            },
+            {
+              "id": "sthr-loc-ticketbooth",
+              "name": "The Ticket Booth",
+              "shroud": 2,
+              "clues": 2
+            }
+          ]
+        },
+        "act_deck": {
+          "template": "Act",
+          "status": "authored",
+          "cards": [
+            {
+              "id": "sthr-act-wheelturns",
+              "name": "The Wheel Still Turns",
+              "act": "I",
+              "at": "The Wheel",
+              "needs": {
+                "fixed": 2,
+                "from": [
+                  "The Wheel",
+                  "The Hall of Mirrors",
+                  "The Ticket Booth"
+                ]
+              }
+            },
+            {
+              "id": "sthr-act-bargain",
+              "name": "The Ticket-Taker's Bargain",
+              "act": "II",
+              "at": "The Ticket Booth",
+              "needs": {
+                "test": "speak with the ticket-taker at The Ticket Booth"
+              }
+            }
+          ]
+        },
+        "encounter": {
+          "sets": [
+            "#spine",
+            "node_fairground"
+          ],
+          "aside": [
+            "appointed"
+          ]
+        },
+        "node_set": {
+          "id": "node_fairground",
+          "size": "2-4",
+          "status": "authored"
+        },
+        "enemies_named": {
+          "template": "Enemy",
+          "cards": [
+            {
+              "ref": "sthr-onewhorides",
+              "act": "II"
+            }
+          ]
+        }
+      },
+      "setup": {
+        "starting_location": "The Square"
+      },
+      "grants": [
+        "The Wheel Still Turns",
+        "The Ticket-Taker's Bargain"
+      ]
     },
     {
-      "id": "district_almanac", "name": "The Almanac House", "order": 6, "map": "loop", "shared_from": "district_square",
-      "reference": {"id": "sthr-scn-stillhour", "status": "authored"},
-      "stacks": {
-        "locations": {"template": "Location", "status": "authored", "cards": [
-          {"id": "sthr-loc-readingroom", "name": "The Reading Room", "shroud": 2, "clues": 2},
-          {"id": "sthr-loc-press", "name": "The Press", "shroud": 3, "clues": 3},
-          {"id": "sthr-loc-sealedstudy", "name": "The Sealed Study", "shroud": 4, "clues": 3, "opens_with_fact": true}]},
-        "act_deck": {"template": "Act", "status": "authored", "cards": [
-          {"id": "sthr-act-almanachid", "name": "What the Almanac Hid", "act": "I", "at": "The Press"}, {"id": "sthr-act-appointedname", "name": "The Appointed's Name", "act": "II", "at": "The Sealed Study", "requires": ["What the Almanac Hid", "The Vote That Never Ends"]}]},
-        "encounter": {"sets": ["#spine", "node_almanac"], "aside": ["appointed"]},
-        "node_set": {"id": "node_almanac", "size": "2-4", "status": "authored"}
+      "id": "district_almanac",
+      "name": "The Almanac House",
+      "order": 6,
+      "map": "loop",
+      "shared_from": "district_square",
+      "reference": {
+        "id": "sthr-scn-stillhour",
+        "status": "authored"
       },
-      "setup": {"starting_location": "The Square"},
-      "grants": ["What the Almanac Hid", "The Appointed's Name", "The Way the Night Breaks"]
+      "stacks": {
+        "locations": {
+          "template": "Location",
+          "status": "authored",
+          "cards": [
+            {
+              "id": "sthr-loc-readingroom",
+              "name": "The Reading Room",
+              "shroud": 2,
+              "clues": 2
+            },
+            {
+              "id": "sthr-loc-press",
+              "name": "The Press",
+              "shroud": 3,
+              "clues": 3
+            },
+            {
+              "id": "sthr-loc-sealedstudy",
+              "name": "The Sealed Study",
+              "shroud": 4,
+              "clues": 3,
+              "opens_with_fact": true
+            }
+          ]
+        },
+        "act_deck": {
+          "template": "Act",
+          "status": "authored",
+          "cards": [
+            {
+              "id": "sthr-act-almanachid",
+              "name": "What the Almanac Hid",
+              "act": "I",
+              "at": "The Press",
+              "needs": {
+                "clues": "card",
+                "from": [
+                  "The Reading Room",
+                  "The Press"
+                ],
+                "note": "the Sealed Study is sealed until this fact"
+              }
+            },
+            {
+              "id": "sthr-act-appointedname",
+              "name": "The Appointed's Name",
+              "act": "II",
+              "at": "The Sealed Study",
+              "requires": [
+                "What the Almanac Hid",
+                "The Vote That Never Ends"
+              ],
+              "needs": {
+                "clues": "card",
+                "from": [
+                  "The Sealed Study"
+                ]
+              }
+            }
+          ]
+        },
+        "encounter": {
+          "sets": [
+            "#spine",
+            "node_almanac"
+          ],
+          "aside": [
+            "appointed"
+          ]
+        },
+        "node_set": {
+          "id": "node_almanac",
+          "size": "2-4",
+          "status": "authored"
+        }
+      },
+      "setup": {
+        "starting_location": "The Square"
+      },
+      "grants": [
+        "What the Almanac Hid",
+        "The Appointed's Name",
+        "The Way the Night Breaks"
+      ]
     },
     {
-      "id": "finale", "name": "The Last Hour", "order": 7, "map": "loop", "shared_from": "district_square",
-      "reference": {"id": "sthr-scn-stillhour", "status": "authored"},
-      "stacks": {
-        "act_deck": {"template": "Act", "status": "authored", "cards": [
-          {"id": "sthr-act-lasthour", "name": "Contest the Crossing", "at": "The Sealed Study"}]},
-        "encounter": {"sets": ["#spine"], "aside": ["appointed"], "note": "Appointed's Approach advances immediately to Arrived; played on the loop's board (declared at the Sealed Study during a loop)"},
-        "resolutions": {"ref": "campaign.resolutions"},
-        "setup_aside": {"cards": [{"id": "sthr-story-beforefinale", "name": "The Last Hour", "role": "interlude beat before the finale"}]}
+      "id": "finale",
+      "name": "The Last Hour",
+      "order": 7,
+      "map": "loop",
+      "shared_from": "district_square",
+      "reference": {
+        "id": "sthr-scn-stillhour",
+        "status": "authored"
       },
-      "setup": {"note": "Dissonance does not reset; contest = 4 x investigators before Hour IX", "chaos_bag": "per campaign log", "requires_fact": "The Way the Night Breaks"}
+      "stacks": {
+        "act_deck": {
+          "template": "Act",
+          "status": "authored",
+          "cards": [
+            {
+              "id": "sthr-act-lasthour",
+              "name": "Contest the Crossing",
+              "at": "The Sealed Study",
+              "needs": {
+                "contest": {
+                  "per_investigator": 4,
+                  "sources": [
+                    "Hold Back success (repeatable)",
+                    "deep fact spent (max 6)",
+                    "first visit to the Sealed Study (1 per investigator)"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "encounter": {
+          "sets": [
+            "#spine"
+          ],
+          "aside": [
+            "appointed"
+          ],
+          "note": "Appointed's Approach advances immediately to Arrived; played on the loop's board (declared at the Sealed Study during a loop)"
+        },
+        "resolutions": {
+          "ref": "campaign.resolutions"
+        },
+        "setup_aside": {
+          "cards": [
+            {
+              "id": "sthr-story-beforefinale",
+              "name": "The Last Hour",
+              "role": "interlude beat before the finale"
+            }
+          ]
+        }
+      },
+      "setup": {
+        "note": "Dissonance does not reset; contest = 4 x investigators before Hour IX",
+        "chaos_bag": "per campaign log",
+        "requires_fact": "The Way the Night Breaks"
+      }
     }
   ]
 }

@@ -833,7 +833,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-square\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove. Central.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"Star\",\"connections\":\"Quote|Plus\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Star\",\"connections\":\"Quote|Plus\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
+              "GMNotes": "{\"id\":\"sthr-loc-square\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove. Central.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"StarBkgafo\",\"connections\":\"QuoteCaeiie|PlusKkioeg\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"StarBkgafo\",\"connections\":\"QuoteCaeiie|PlusKkioeg\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
               "Transform": {
                 "posX": -17.04,
                 "posY": 1.53,
@@ -884,7 +884,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-longpier\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove. Coastal.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"Quote\",\"connections\":\"Star\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Quote\",\"connections\":\"Star\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
+              "GMNotes": "{\"id\":\"sthr-loc-longpier\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove. Coastal.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"QuoteCaeiie\",\"connections\":\"StarBkgafo\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"QuoteCaeiie\",\"connections\":\"StarBkgafo\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
               "Transform": {
                 "posX": -23.64,
                 "posY": 1.53,
@@ -905,7 +905,7 @@
               ],
               "CustomDeck": {
                 "96293": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-longpier.jpg?v=e7811841a6",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-longpier.jpg?v=52254e1fe6",
                   "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -935,7 +935,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-almanacsteps\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"Plus\",\"connections\":\"Star\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Plus\",\"connections\":\"Star\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
+              "GMNotes": "{\"id\":\"sthr-loc-almanacsteps\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"PlusKkioeg\",\"connections\":\"StarBkgafo\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"PlusKkioeg\",\"connections\":\"StarBkgafo\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
               "Transform": {
                 "posX": -10.440000000000001,
                 "posY": 1.53,
@@ -2540,7 +2540,7 @@
               ],
               "CustomDeck": {
                 "95103": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-act-lamp.jpg?v=c6a6fc877b",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-act-lamp.jpg?v=e720dd535e",
                   "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -2599,7 +2599,7 @@
                   ],
                   "CustomDeck": {
                     "95103": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-act-lamp.jpg?v=c6a6fc877b",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-act-lamp.jpg?v=e720dd535e",
                       "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
                       "NumWidth": 1,
                       "NumHeight": 1,
@@ -2680,8 +2680,8 @@
                 "b": 0.713235259
               },
               "Hands": true,
-              "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-lanternroom\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Lighthouse.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"Quote\",\"connections\":\"Plus\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Quote\",\"connections\":\"Plus\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
+              "HideWhenFaceDown": false,
+              "GMNotes": "{\"id\":\"sthr-loc-lanternroom\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Lighthouse.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"QuoteLifebi\",\"connections\":\"PlusFmcego\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"QuoteLifebi\",\"connections\":\"PlusFmcego\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
               "Transform": {
                 "posX": -23.64,
                 "posY": 1.53,
@@ -2702,12 +2702,12 @@
               ],
               "CustomDeck": {
                 "98438": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-lanternroom.jpg?v=bc072b158b",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-lanternroom.jpg?v=0d6ed66228",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-lanternroom-back.jpg?v=da465ae66c",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "Type": 0,
-                  "UniqueBack": false,
+                  "UniqueBack": true,
                   "BackIsHidden": false
                 }
               }
@@ -2732,7 +2732,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-windingstair\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Lighthouse.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"Plus\",\"connections\":\"Quote|Clover|Slash\",\"uses\":[{\"countPerInvestigator\":1,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Plus\",\"connections\":\"Quote|Clover|Slash\",\"uses\":[{\"countPerInvestigator\":1,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
+              "GMNotes": "{\"id\":\"sthr-loc-windingstair\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Lighthouse.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"PlusFmcego\",\"connections\":\"QuoteLifebi|CloverJgaobc|SlashIkfkco\",\"uses\":[{\"countPerInvestigator\":1,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"PlusFmcego\",\"connections\":\"QuoteLifebi|CloverJgaobc|SlashIkfkco\",\"uses\":[{\"countPerInvestigator\":1,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
               "Transform": {
                 "posX": -17.04,
                 "posY": 1.53,
@@ -2783,7 +2783,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-keepersquarters\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Lighthouse.\",\"cycle\":\"The Still Hour\",\"victory\":1,\"locationFront\":{\"icons\":\"Clover\",\"connections\":\"Plus\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Clover\",\"connections\":\"Plus\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}],\"victory\":1}}",
+              "GMNotes": "{\"id\":\"sthr-loc-keepersquarters\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Lighthouse.\",\"cycle\":\"The Still Hour\",\"victory\":1,\"locationFront\":{\"icons\":\"CloverJgaobc\",\"connections\":\"PlusFmcego\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"CloverJgaobc\",\"connections\":\"PlusFmcego\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}],\"victory\":1}}",
               "Transform": {
                 "posX": -23.64,
                 "posY": 1.53,
@@ -3258,7 +3258,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-nave\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Church.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"Heart\",\"connections\":\"Triangle|Clover|Spade|Star\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Heart\",\"connections\":\"Triangle|Clover|Spade|Star\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
+              "GMNotes": "{\"id\":\"sthr-loc-nave\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Church.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"HeartCmggdm\",\"connections\":\"TriangleLojeci|CloverEkhmeg|SpadeBmckfc|StarBkgafo\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"HeartCmggdm\",\"connections\":\"TriangleLojeci|CloverEkhmeg|SpadeBmckfc|StarBkgafo\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
               "Transform": {
                 "posX": -10.440000000000001,
                 "posY": 1.53,
@@ -3279,7 +3279,7 @@
               ],
               "CustomDeck": {
                 "97294": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-nave.jpg?v=53c1cd647f",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-nave.jpg?v=72bfc829ee",
                   "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -3309,7 +3309,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-belfry\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Church.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"Triangle\",\"connections\":\"Heart\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Triangle\",\"connections\":\"Heart\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
+              "GMNotes": "{\"id\":\"sthr-loc-belfry\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Church.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"TriangleLojeci\",\"connections\":\"HeartCmggdm\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"TriangleLojeci\",\"connections\":\"HeartCmggdm\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
               "Transform": {
                 "posX": -3.84,
                 "posY": 1.53,
@@ -3360,7 +3360,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-floodedcrypt\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Church. Sunken.\",\"cycle\":\"The Still Hour\",\"victory\":1,\"locationFront\":{\"icons\":\"Spade\",\"connections\":\"Heart\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Spade\",\"connections\":\"Heart\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}],\"victory\":1}}",
+              "GMNotes": "{\"id\":\"sthr-loc-floodedcrypt\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Church. Sunken.\",\"cycle\":\"The Still Hour\",\"victory\":1,\"locationFront\":{\"icons\":\"SpadeBmckfc\",\"connections\":\"HeartCmggdm\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"SpadeBmckfc\",\"connections\":\"HeartCmggdm\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}],\"victory\":1}}",
               "Transform": {
                 "posX": -3.84,
                 "posY": 1.53,
@@ -3411,7 +3411,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-vestry\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Church.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"Clover\",\"connections\":\"Heart\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Clover\",\"connections\":\"Heart\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
+              "GMNotes": "{\"id\":\"sthr-loc-vestry\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Church.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"CloverEkhmeg\",\"connections\":\"HeartCmggdm\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"CloverEkhmeg\",\"connections\":\"HeartCmggdm\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
               "Transform": {
                 "posX": -3.84,
                 "posY": 1.53,
@@ -3864,7 +3864,7 @@
                   "BackIsHidden": false
                 },
                 "95107": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-act-walksbeside.jpg?v=151394cb81",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-act-walksbeside.jpg?v=edf968e5b4",
                   "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -3964,7 +3964,7 @@
                   ],
                   "CustomDeck": {
                     "95107": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-act-walksbeside.jpg?v=151394cb81",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-act-walksbeside.jpg?v=edf968e5b4",
                       "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
                       "NumWidth": 1,
                       "NumHeight": 1,
@@ -3996,7 +3996,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-milestones\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Road.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"Square\",\"connections\":\"DoubleSlash|Star\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Square\",\"connections\":\"DoubleSlash|Star\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
+              "GMNotes": "{\"id\":\"sthr-loc-milestones\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Road.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"SquareGmeico\",\"connections\":\"DoubleSlashGcfoge|StarBkgafo\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"SquareGmeico\",\"connections\":\"DoubleSlashGcfoge|StarBkgafo\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
               "Transform": {
                 "posX": -17.04,
                 "posY": 1.53,
@@ -4017,7 +4017,7 @@
               ],
               "CustomDeck": {
                 "98892": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-milestones.jpg?v=b9242d5f6d",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-milestones.jpg?v=8cf3cfb2a6",
                   "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -4047,7 +4047,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-lowbridge\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Road.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"DoubleSlash\",\"connections\":\"Square|Slash\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"DoubleSlash\",\"connections\":\"Square|Slash\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
+              "GMNotes": "{\"id\":\"sthr-loc-lowbridge\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Road.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"DoubleSlashGcfoge\",\"connections\":\"SquareGmeico|SlashIkfkco\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"DoubleSlashGcfoge\",\"connections\":\"SquareGmeico|SlashIkfkco\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
               "Transform": {
                 "posX": -10.440000000000001,
                 "posY": 1.53,
@@ -4068,7 +4068,7 @@
               ],
               "CustomDeck": {
                 "96747": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-lowbridge.jpg?v=ac0e892575",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-lowbridge.jpg?v=ffce29c72a",
                   "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -4098,7 +4098,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-turning\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Road.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"Slash\",\"connections\":\"DoubleSlash|Plus\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Slash\",\"connections\":\"DoubleSlash|Plus\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
+              "GMNotes": "{\"id\":\"sthr-loc-turning\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Road.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"SlashIkfkco\",\"connections\":\"DoubleSlashGcfoge|PlusFmcego\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"SlashIkfkco\",\"connections\":\"DoubleSlashGcfoge|PlusFmcego\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
               "Transform": {
                 "posX": -10.440000000000001,
                 "posY": 1.53,
@@ -5003,7 +5003,7 @@
               ],
               "CustomDeck": {
                 "95108": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-act-sheriffdead.jpg?v=eb4198c26c",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-act-sheriffdead.jpg?v=95795ddc89",
                   "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -5062,7 +5062,7 @@
                   ],
                   "CustomDeck": {
                     "95108": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-act-sheriffdead.jpg?v=eb4198c26c",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-act-sheriffdead.jpg?v=95795ddc89",
                       "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
                       "NumWidth": 1,
                       "NumHeight": 1,
@@ -5144,7 +5144,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-hubsquare\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove. Central.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"Star\",\"connections\":\"Heart|Square|Tee|Moon|Diamond\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Star\",\"connections\":\"Heart|Square|Tee|Moon|Diamond\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
+              "GMNotes": "{\"id\":\"sthr-loc-hubsquare\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove. Central.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"StarBkgafo\",\"connections\":\"HeartCmggdm|SquareGmeico|TeeCmekhm|MoonKidiha|DiamondCkfmhm\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"StarBkgafo\",\"connections\":\"HeartCmggdm|SquareGmeico|TeeCmekhm|MoonKidiha|DiamondCkfmhm\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
               "Transform": {
                 "posX": -17.04,
                 "posY": 1.53,
@@ -5194,8 +5194,8 @@
                 "b": 0.713235259
               },
               "Hands": true,
-              "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-townhallsteps\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove. Central.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"Tee\",\"connections\":\"Hourglass|Circle|Star\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Tee\",\"connections\":\"Hourglass|Circle|Star\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
+              "HideWhenFaceDown": false,
+              "GMNotes": "{\"id\":\"sthr-loc-townhallsteps\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove. Central.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"TeeCmekhm\",\"connections\":\"HourglassHmfkco|CircleDkhmhk|StarBkgafo\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"TeeCmekhm\",\"connections\":\"HourglassHmfkco|CircleDkhmhk|StarBkgafo\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
               "Transform": {
                 "posX": -10.440000000000001,
                 "posY": 1.53,
@@ -5216,12 +5216,12 @@
               ],
               "CustomDeck": {
                 "96782": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-townhallsteps.jpg?v=0dff651995",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-townhallsteps.jpg?v=89feabc1ad",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-townhallsteps-back.jpg?v=debf0a0bf0",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "Type": 0,
-                  "UniqueBack": false,
+                  "UniqueBack": true,
                   "BackIsHidden": false
                 }
               }
@@ -5246,7 +5246,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-recordsoffice\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove.\",\"cycle\":\"The Still Hour\",\"victory\":1,\"locationFront\":{\"icons\":\"Hourglass\",\"connections\":\"Tee\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Hourglass\",\"connections\":\"Tee\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}],\"victory\":1}}",
+              "GMNotes": "{\"id\":\"sthr-loc-recordsoffice\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove.\",\"cycle\":\"The Still Hour\",\"victory\":1,\"locationFront\":{\"icons\":\"HourglassHmfkco\",\"connections\":\"TeeCmekhm\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"HourglassHmfkco\",\"connections\":\"TeeCmekhm\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}],\"victory\":1}}",
               "Transform": {
                 "posX": -10.440000000000001,
                 "posY": 1.53,
@@ -5297,7 +5297,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-well\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"Circle\",\"connections\":\"Tee\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Circle\",\"connections\":\"Tee\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
+              "GMNotes": "{\"id\":\"sthr-loc-well\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Ambergrove.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"CircleDkhmhk\",\"connections\":\"TeeCmekhm\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"CircleDkhmhk\",\"connections\":\"TeeCmekhm\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
               "Transform": {
                 "posX": -3.84,
                 "posY": 1.53,
@@ -7605,7 +7605,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-wheel\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Fairground.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"Spade\",\"connections\":\"Moon\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Spade\",\"connections\":\"Moon\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
+              "GMNotes": "{\"id\":\"sthr-loc-wheel\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Fairground.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"SpadeHmckfm\",\"connections\":\"MoonKidiha\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"SpadeHmckfm\",\"connections\":\"MoonKidiha\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
               "Transform": {
                 "posX": -30.24,
                 "posY": 1.53,
@@ -7656,7 +7656,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-hallofmirrors\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Fairground.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"Quote\",\"connections\":\"Moon\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Quote\",\"connections\":\"Moon\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
+              "GMNotes": "{\"id\":\"sthr-loc-hallofmirrors\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Fairground.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"QuoteGmckek\",\"connections\":\"MoonKidiha\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"QuoteGmckek\",\"connections\":\"MoonKidiha\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
               "Transform": {
                 "posX": -30.24,
                 "posY": 1.53,
@@ -7677,7 +7677,7 @@
               ],
               "CustomDeck": {
                 "97293": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-hallofmirrors.jpg?v=47050d4f5b",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-hallofmirrors.jpg?v=c33810a065",
                   "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -7707,7 +7707,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-ticketbooth\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Fairground.\",\"cycle\":\"The Still Hour\",\"victory\":1,\"locationFront\":{\"icons\":\"Moon\",\"connections\":\"Spade|Quote|Star\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Moon\",\"connections\":\"Spade|Quote|Star\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}],\"victory\":1}}",
+              "GMNotes": "{\"id\":\"sthr-loc-ticketbooth\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Fairground.\",\"cycle\":\"The Still Hour\",\"victory\":1,\"locationFront\":{\"icons\":\"MoonKidiha\",\"connections\":\"SpadeHmckfm|QuoteGmckek|StarBkgafo\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"MoonKidiha\",\"connections\":\"SpadeHmckfm|QuoteGmckek|StarBkgafo\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}],\"victory\":1}}",
               "Transform": {
                 "posX": -23.64,
                 "posY": 1.53,
@@ -8091,7 +8091,7 @@
               ],
               "CustomDeck": {
                 "95112": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-act-almanachid.jpg?v=b985291f18",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-act-almanachid.jpg?v=d523063182",
                   "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -8150,7 +8150,7 @@
                   ],
                   "CustomDeck": {
                     "95112": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-act-almanachid.jpg?v=b985291f18",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-act-almanachid.jpg?v=d523063182",
                       "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
                       "NumWidth": 1,
                       "NumHeight": 1,
@@ -8232,7 +8232,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-readingroom\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Almanac House.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"Diamond\",\"connections\":\"Triangle|DoubleSlash|Star\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Diamond\",\"connections\":\"Triangle|DoubleSlash|Star\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
+              "GMNotes": "{\"id\":\"sthr-loc-readingroom\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Almanac House.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"DiamondCkfmhm\",\"connections\":\"TriangleEkdmgm|DoubleSlashFmekck|StarBkgafo\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"DiamondCkfmhm\",\"connections\":\"TriangleEkdmgm|DoubleSlashFmekck|StarBkgafo\",\"uses\":[{\"countPerInvestigator\":2,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
               "Transform": {
                 "posX": -17.04,
                 "posY": 1.53,
@@ -8253,7 +8253,7 @@
               ],
               "CustomDeck": {
                 "97491": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-readingroom.jpg?v=48e618be9b",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-readingroom.jpg?v=3aeb48e6cc",
                   "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -8283,7 +8283,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-press\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Almanac House.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"Triangle\",\"connections\":\"Diamond\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"Triangle\",\"connections\":\"Diamond\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
+              "GMNotes": "{\"id\":\"sthr-loc-press\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Almanac House.\",\"cycle\":\"The Still Hour\",\"locationFront\":{\"icons\":\"TriangleEkdmgm\",\"connections\":\"DiamondCkfmhm\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"TriangleEkdmgm\",\"connections\":\"DiamondCkfmhm\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]}}",
               "Transform": {
                 "posX": -23.64,
                 "posY": 1.53,
@@ -8304,7 +8304,7 @@
               ],
               "CustomDeck": {
                 "98151": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-press.jpg?v=174244083d",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-loc-press.jpg?v=fce7529c23",
                   "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -8334,7 +8334,7 @@
               },
               "Hands": true,
               "HideWhenFaceDown": true,
-              "GMNotes": "{\"id\":\"sthr-loc-sealedstudy\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Almanac House.\",\"cycle\":\"The Still Hour\",\"victory\":1,\"locationFront\":{\"icons\":\"DoubleSlash\",\"connections\":\"Diamond\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"DoubleSlash\",\"connections\":\"Diamond\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}],\"victory\":1}}",
+              "GMNotes": "{\"id\":\"sthr-loc-sealedstudy\",\"type\":\"Location\",\"class\":\"Mythos\",\"traits\":\"Almanac House.\",\"cycle\":\"The Still Hour\",\"victory\":1,\"locationFront\":{\"icons\":\"DoubleSlashFmekck\",\"connections\":\"DiamondCkfmhm\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}]},\"locationBack\":{\"icons\":\"DoubleSlashFmekck\",\"connections\":\"DiamondCkfmhm\",\"uses\":[{\"countPerInvestigator\":3,\"type\":\"Clue\",\"token\":\"clue\"}],\"victory\":1}}",
               "Transform": {
                 "posX": -17.04,
                 "posY": 1.53,
@@ -8738,7 +8738,7 @@
               ],
               "CustomDeck": {
                 "95114": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-act-lasthour.jpg?v=ae02a3b8f8",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-act-lasthour.jpg?v=7ab15af27e",
                   "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -8775,6 +8775,7 @@
               "DeckIDs": [
                 9512200,
                 9511500,
+                9512300,
                 9511600,
                 9511700,
                 9511800,
@@ -8792,7 +8793,16 @@
                   "BackIsHidden": false
                 },
                 "95115": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-res-1.jpg?v=447804a434",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-res-1.jpg?v=de766442c0",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
+                  "NumWidth": 1,
+                  "NumHeight": 1,
+                  "Type": 0,
+                  "UniqueBack": false,
+                  "BackIsHidden": false
+                },
+                "95123": {
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-res-bargain.jpg?v=8a7ab555b8",
                   "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
                   "NumWidth": 1,
                   "NumHeight": 1,
@@ -8937,7 +8947,57 @@
                   ],
                   "CustomDeck": {
                     "95115": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-res-1.jpg?v=447804a434",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-res-1.jpg?v=de766442c0",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
+                      "NumWidth": 1,
+                      "NumHeight": 1,
+                      "Type": 0,
+                      "UniqueBack": false,
+                      "BackIsHidden": false
+                    }
+                  }
+                },
+                {
+                  "Name": "Card",
+                  "Nickname": "Let It In, On Your Terms",
+                  "Description": "",
+                  "GUID": "9ae45a",
+                  "CardID": 9512300,
+                  "SidewaysCard": false,
+                  "Tags": [
+                    "ScenarioCard"
+                  ],
+                  "LuaScript": "",
+                  "LuaScriptState": "",
+                  "ColorDiffuse": {
+                    "r": 0.713235259,
+                    "g": 0.713235259,
+                    "b": 0.713235259
+                  },
+                  "Hands": true,
+                  "HideWhenFaceDown": true,
+                  "GMNotes": "{\"id\":\"sthr-res-bargain\",\"type\":\"Story\",\"class\":\"Mythos\",\"traits\":\"Resolution 1b.\",\"cycle\":\"The Still Hour\"}",
+                  "Transform": {
+                    "posX": 0,
+                    "posY": 1.5,
+                    "posZ": 0,
+                    "rotX": 0,
+                    "rotY": 180,
+                    "rotZ": 0,
+                    "scaleX": 1.15,
+                    "scaleY": 1,
+                    "scaleZ": 1.15
+                  },
+                  "CustomUIAssets": [
+                    {
+                      "Name": "font_arkhamicons",
+                      "Type": 1,
+                      "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
+                    }
+                  ],
+                  "CustomDeck": {
+                    "95123": {
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-res-bargain.jpg?v=8a7ab555b8",
                       "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
                       "NumWidth": 1,
                       "NumHeight": 1,

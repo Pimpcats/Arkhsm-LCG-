@@ -406,16 +406,16 @@ requests.post(BASE + "/api/card_save", json={"card": "sthr-loc-keepersquarters"}
 from PIL import Image as _Iscn
 # APPLY wiped art/faces earlier; compose the two on demand to check the frames
 requests.post(BASE + "/api/compose_one", json={"card": "sthr-loc-keepersquarters"})
-requests.post(BASE + "/api/compose_one", json={"card": "sthr-agenda-hour1"})
+requests.post(BASE + "/api/compose_one", json={"card": "sthr-hour-1"})
 wait_idle()
 check("scenario faces render on the real plugin frames (portrait + landscape)",
       _Iscn.open(os.path.join(faces_dir, "sthr-loc-keepersquarters.png")).size == (750, 1050)
-      and _Iscn.open(os.path.join(faces_dir, "sthr-agenda-hour1.png")).size == (1050, 750))
+      and _Iscn.open(os.path.join(faces_dir, "sthr-hour-1.png")).size == (1050, 750))
 # HARD RULE (docs/design/FIDELITY_AUDIT.md): every card type must match the
 # official printed aspect — portrait 0.714, landscape 1.400 (agenda/act).
 _ASPECT = {"sthr-elias": 1.400, "sthr-appointed": 0.714, "sthr-lamp": 0.714,
-           "sthr-loc-keepersquarters": 0.714, "sthr-scenario-lighthouse": 0.714,
-           "sthr-story-firstdark": 0.714, "sthr-agenda-hour1": 1.400,
+           "sthr-loc-keepersquarters": 0.714, "sthr-scn-stillhour": 0.714,
+           "sthr-story-firstdark": 0.714, "sthr-hour-1": 1.400,
            "sthr-act-ninthdeath": 1.400}
 for _cid in _ASPECT:
     requests.post(BASE + "/api/compose_one", json={"card": _cid})
