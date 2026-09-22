@@ -1731,4 +1731,6 @@ function runStillHourTests()
   -- Restore a clean, freshly-loaded state for play after testing.
   CampaignState.init(CampaignState.constants().investigators)
   Dissonance.syncBag(demoBag)
+  -- returned to Object.call() so automated runs (tools/tts_relay) read the tally
+  return { passed = P, failed = F }
 end

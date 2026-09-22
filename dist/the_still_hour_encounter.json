@@ -60,8 +60,8 @@
           ],
           "CustomDeck": {
             "95040": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-appointed.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-appointed.jpg?v=40a29514f3",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -110,8 +110,8 @@
           ],
           "CustomDeck": {
             "95041": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-appointedwhisper.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-appointedwhisper.jpg?v=e391f833c7",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -160,8 +160,8 @@
           ],
           "CustomDeck": {
             "95042": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-crossing.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-crossing.jpg?v=16a3d49e3b",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -210,8 +210,8 @@
           ],
           "CustomDeck": {
             "95043": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-bellringer.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-bellringer.jpg?v=405b7111e7",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -260,8 +260,8 @@
           ],
           "CustomDeck": {
             "95044": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-wearssheriff.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-wearssheriff.jpg?v=f5ed7cdc40",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -310,8 +310,8 @@
           ],
           "CustomDeck": {
             "95045": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-onewhorides.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/sthr-onewhorides.jpg?v=0bff221412",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/dist/cards/encounter_back.jpg?v=8f98d69b44",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
