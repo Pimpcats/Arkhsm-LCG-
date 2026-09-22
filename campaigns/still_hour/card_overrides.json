@@ -1,35 +1,43 @@
 {
   "sthr-hour-1": {
     "name": "Hour I — First Dark",
-    "text": "The night begins."
+    "text": "The night begins.",
+    "doom": 1
   },
   "sthr-hour-2": {
     "name": "Hour II — Low Water",
-    "text": "When reached: each investigator draws 1 encounter card."
+    "text": "When reached: each investigator draws 1 encounter card.",
+    "doom": 1
   },
   "sthr-hour-3": {
     "name": "Hour III — The Thirteenth Toll",
-    "text": "When reached: raise Dissonance by 1. If any investigator is at a Church location, raise it by 2 instead. If the log shows \"The Thirteenth Toll,\" skip the extra +1."
+    "text": "When reached: raise Dissonance by 1. If any investigator is at a Church location, raise it by 2 instead. If the log shows \"The Thirteenth Toll,\" skip the extra +1.",
+    "doom": 1
   },
   "sthr-hour-4": {
     "name": "Hour IV — The Road Gives Way",
-    "text": "When reached: the location with the fewest clues becomes impassable until the next Hour; investigators there move to a connecting location (that move is a Skip). If the log shows \"The Hour Was Wrong,\" remove this Hour from the Occultation entirely."
+    "text": "When reached: the location with the fewest clues becomes impassable until the next Hour; investigators there move to a connecting location (that move is a Skip). If the log shows \"The Hour Was Wrong,\" remove this Hour from the Occultation entirely.",
+    "doom": 1
   },
   "sthr-hour-5": {
     "name": "Hour V — The Streets Empty",
-    "text": "When reached: each Sleepwalking Echo awakens if Dissonance is in the Glitch band or higher. The Appointed's Approach advances to at least Sensed."
+    "text": "When reached: each Sleepwalking Echo awakens if Dissonance is in the Glitch band or higher. The Appointed's Approach advances to at least Sensed.",
+    "doom": 1
   },
   "sthr-hour-6": {
     "name": "Hour VI — The Wrong Sky",
-    "text": "When reached: add 1 [skull] Static token to the chaos bag until the next reset. If the log shows \"What the Almanac Hid,\" instead each investigator removes 1 Static token."
+    "text": "When reached: add 1 Static token to the chaos bag until the next reset. If the log shows \"What the Almanac Hid,\" instead each investigator removes 1 Static token.",
+    "doom": 1
   },
   "sthr-hour-7": {
     "name": "Hour VII — The Guest Approaches",
-    "text": "When reached: the Appointed's Approach advances to at least Emerging. If the log shows \"The Latecomer's Name,\" it enters play exhausted."
+    "text": "When reached: the Appointed's Approach advances to at least Emerging (Hour VIII advances it to Arrived). If the log shows \"The Appointed's Name,\" it arrives exhausted.",
+    "doom": 1
   },
   "sthr-hour-8": {
     "name": "Hour VIII — Almost",
-    "text": "When reached: raise Dissonance by 2. The Appointed's Approach advances to Arrived. All enemies get +1 fight until the next reset."
+    "text": "When reached: raise Dissonance by 2. The Appointed's Approach advances to Arrived. All enemies get +1 fight until the next reset.",
+    "doom": 1
   },
   "sthr-hour-9": {
     "name": "Hour IX — The Appointed Hour",
@@ -38,12 +46,14 @@
   "sthr-losthour": {
     "name": "Lost Hour",
     "traits": "Static.",
-    "text": "Revelation — Skip: advance the Hourglass by 1 Hour. If the Hourglass is at Hour VI or later, advance it by 2 instead."
+    "text": "Revelation — Skip: advance the Hourglass by 1 Hour. If the Hourglass is at Hour VI or later, advance it by 2 instead.",
+    "quantity": 3
   },
   "sthr-slippage": {
     "name": "Slippage",
     "traits": "Static.",
-    "text": "Revelation — Add 1 Static token to the chaos bag until the end of the round. Surge."
+    "text": "Revelation — Add 1 Static token to the chaos bag until the end of the round. Surge.",
+    "quantity": 2
   },
   "sthr-waitingcongregation": {
     "name": "The Waiting Congregation",
@@ -53,7 +63,8 @@
     "fight": 2,
     "evade": 2,
     "damage": 1,
-    "horror": 1
+    "horror": 1,
+    "quantity": 2
   },
   "sthr-drownedchoir": {
     "name": "The Drowned Choir",
@@ -63,7 +74,8 @@
     "fight": 1,
     "evade": 1,
     "damage": 0,
-    "horror": 2
+    "horror": 2,
+    "quantity": 2
   },
   "sthr-familiarface": {
     "name": "Familiar Face",
@@ -74,7 +86,8 @@
     "fight": 3,
     "evade": 3,
     "damage": 1,
-    "horror": 1
+    "horror": 1,
+    "quantity": 1
   },
   "sthr-lamplighterecho": {
     "name": "The Lamplighter's Echo",
@@ -85,50 +98,59 @@
     "fight": 2,
     "evade": 2,
     "damage": 1,
-    "horror": 1
+    "horror": 1,
+    "quantity": 1
   },
   "sthr-wrongturn": {
     "name": "Wrong Turn",
     "traits": "Static.",
     "text": "Revelation — Each investigator moves to a connecting location of the lead investigator's choice. This move is not a Skip and does not provoke attacks of opportunity.",
-    "flavor": "The map is not where you left it."
+    "flavor": "The map is not where you left it.",
+    "quantity": 2
   },
   "sthr-rewind": {
     "name": "Rewind",
     "traits": "Static. Peril.",
     "text": "Revelation — Return the most recent clue you discovered this round to its location. If you have discovered no clues this round, instead take 2 horror.",
-    "flavor": "The loop stutters backward."
+    "flavor": "The loop stutters backward.",
+    "quantity": 2
   },
   "sthr-deadair": {
     "name": "Dead Air",
     "traits": "Static.",
-    "text": "Revelation — Add 1 Static token to the chaos bag until the end of your next turn. Until then, Static tokens are treated as -4 instead of -3."
+    "text": "Revelation — Add 1 Static token to the chaos bag until the end of your next turn. Until then, Static tokens are treated as -4 instead of -3.",
+    "quantity": 2
   },
   "sthr-loopnotices": {
     "name": "The Loop Notices You",
     "traits": "Static.",
-    "text": "Revelation — Raise Dissonance by 1. If you have played a Recollection or triggered a foreknowledge ability this round, raise it by 2 instead."
+    "text": "Revelation — Raise Dissonance by 1. If you have played a Recollection or triggered a foreknowledge ability this round, raise it by 2 instead.",
+    "quantity": 2
   },
   "sthr-yearinanight": {
     "name": "A Year in a Night",
     "traits": "Hex. Peril.",
-    "text": "Revelation — Test [wil] (3). For each point you fail by, take 1 horror. If you fail, increase your Years by 1 (apply any bracket change at the next interlude)."
+    "text": "Revelation — Test [wil] (3). For each point you fail by, take 1 horror. If you fail, increase your Years by 1 (apply any bracket change at the next interlude).",
+    "quantity": 2
   },
   "sthr-forgotten": {
     "name": "What You've Forgotten",
     "traits": "Hex.",
-    "text": "Revelation — Remove 2 Memory from among your cards. For each Memory you cannot remove, take 1 horror instead."
+    "text": "Revelation — Remove 2 Memory from among your cards. For each Memory you cannot remove, take 1 horror instead.",
+    "quantity": 2
   },
   "sthr-oldbones": {
     "name": "Old Bones",
     "traits": "Hex. Peril.",
     "text": "Revelation — If you are Elder or Ancient, take 2 damage; otherwise take 1 damage. If you are Elder or Ancient and have no [com] or [agi] icons in hand to commit, take 1 additional horror.",
-    "flavor": "Your body remembers what your mind won't."
+    "flavor": "Your body remembers what your mind won't.",
+    "quantity": 1
   },
   "sthr-crossing": {
     "name": "The Crossing",
     "traits": "Omen.",
-    "text": "Revelation — Advance the Appointed's Approach by 1 stage (to a minimum of Sensed). Then raise Dissonance by 1."
+    "text": "Revelation — Advance the Appointed's Approach by 1 stage (to a minimum of Sensed). Then raise Dissonance by 1.",
+    "quantity": 1
   },
   "sthr-loc-square": {
     "name": "The Square",
@@ -210,11 +232,11 @@
     "clues": 2,
     "text": "Objective — With 4+ clues discovered in this district, test [com] or [wil] (3) here to light the lamp. Success: record \"The Lamp Was Never Lit.\"",
     "clues_per_investigator": true,
-    "icons": "diamond",
+    "icons": "quote",
     "color": "#b85418",
     "connections": [
       {
-        "symbol": "circle",
+        "symbol": "cross",
         "color": "#5c246e"
       }
     ],
@@ -226,18 +248,23 @@
     "shroud": 2,
     "clues": 1,
     "clues_per_investigator": true,
-    "icons": "circle",
+    "icons": "cross",
     "color": "#5c246e",
     "connections": [
       {
-        "symbol": "diamond",
+        "symbol": "quote",
         "color": "#b85418"
       },
       {
-        "symbol": "moon",
+        "symbol": "clover",
         "color": "#960e12"
+      },
+      {
+        "symbol": "slash",
+        "color": "#8a5a2e"
       }
-    ]
+    ],
+    "text": "[action] Test [agi] (2) to climb. If you fail, take 1 damage."
   },
   "sthr-loc-keepersquarters": {
     "name": "The Keeper's Quarters",
@@ -247,11 +274,11 @@
     "clues": 2,
     "text": "Deep objective (Act II, lamp lit) — Spend 2 clues from here to read the keeper's logbook. Record \"The Keeper's Ninth Death.\"",
     "clues_per_investigator": true,
-    "icons": "moon",
+    "icons": "clover",
     "color": "#960e12",
     "connections": [
       {
-        "symbol": "circle",
+        "symbol": "cross",
         "color": "#5c246e"
       }
     ]
@@ -259,7 +286,8 @@
   "sthr-darkthatwaits": {
     "name": "The Dark That Waits",
     "traits": "Terror.",
-    "text": "Revelation — If you are at the Lantern Room, take 2 horror; otherwise take 1 horror."
+    "text": "Revelation — If you are at the Lantern Room, take 2 horror; otherwise take 1 horror.",
+    "quantity": 1
   },
   "sthr-somethingonstair": {
     "name": "Something on the Stair",
@@ -269,7 +297,8 @@
     "fight": 1,
     "evade": 2,
     "damage": 0,
-    "horror": 1
+    "horror": 1,
+    "quantity": 1
   },
   "sthr-loc-nave": {
     "name": "The Nave",
@@ -350,12 +379,14 @@
   "sthr-thirteen": {
     "name": "Thirteen",
     "traits": "Omen.",
-    "text": "Revelation — Skip: advance the Hourglass by 1 Hour. If you are at a Church location, also raise Dissonance by 1."
+    "text": "Revelation — Skip: advance the Hourglass by 1 Hour. If you are at a Church location, also raise Dissonance by 1.",
+    "quantity": 1
   },
   "sthr-risingwater": {
     "name": "Rising Water",
     "traits": "Hazard.",
-    "text": "Revelation — The location you are at gets +1 shroud until the end of the round."
+    "text": "Revelation — The location you are at gets +1 shroud until the end of the round.",
+    "quantity": 1
   },
   "sthr-loc-milestones": {
     "name": "The Milestones",
@@ -408,13 +439,18 @@
       {
         "symbol": "doubleslash",
         "color": "#625e64"
+      },
+      {
+        "symbol": "cross",
+        "color": "#5c246e"
       }
     ]
   },
   "sthr-bridgeremembers": {
     "name": "The Bridge Remembers",
     "traits": "Omen.",
-    "text": "Revelation — If you crossed the Low Bridge this round, Skip: advance the Hourglass by 1 Hour. Otherwise, draw 1 encounter card."
+    "text": "Revelation — If you crossed the Low Bridge this round, Skip: advance the Hourglass by 1 Hour. Otherwise, draw 1 encounter card.",
+    "quantity": 1
   },
   "sthr-loc-townhallsteps": {
     "name": "The Town Hall Steps",
@@ -477,12 +513,14 @@
     "name": "The Same Speech",
     "traits": "Terror. Peril.",
     "text": "Revelation — Take 1 horror, plus 1 more for every 3 completed loops (max +3).",
-    "flavor": "He has been dead since ten o'clock. No one has noticed but you."
+    "flavor": "He has been dead since ten o'clock. No one has noticed but you.",
+    "quantity": 1
   },
   "sthr-crowdturns": {
     "name": "The Crowd Turns",
     "traits": "Terror.",
-    "text": "Revelation — Each Echo in play readies. If no Echo is in play, this gains Surge."
+    "text": "Revelation — Each Echo in play readies. If no Echo is in play, this gains Surge.",
+    "quantity": 1
   },
   "sthr-loc-wheel": {
     "name": "The Wheel",
@@ -543,12 +581,14 @@
   "sthr-wheelsturn": {
     "name": "The Wheel's Turn",
     "traits": "Omen.",
-    "text": "Revelation — Skip: advance the Hourglass by 1 Hour. Then each investigator gains 1 resource."
+    "text": "Revelation — Skip: advance the Hourglass by 1 Hour. Then each investigator gains 1 resource.",
+    "quantity": 1
   },
   "sthr-reflectionlies": {
     "name": "Your Reflection Lies",
     "traits": "Terror.",
-    "text": "Revelation — If you are at the Hall of Mirrors, take 2 horror and add 1 Static token to the chaos bag until the end of the round; otherwise take 1 horror."
+    "text": "Revelation — If you are at the Hall of Mirrors, take 2 horror and add 1 Static token to the chaos bag until the end of the round; otherwise take 1 horror.",
+    "quantity": 1
   },
   "sthr-loc-readingroom": {
     "name": "The Reading Room",
@@ -564,8 +604,8 @@
         "color": "#4a3c6c"
       },
       {
-        "symbol": "spade",
-        "color": "#1c2a52"
+        "symbol": "doubleslash",
+        "color": "#5c4a2a"
       },
       {
         "symbol": "star",
@@ -595,10 +635,10 @@
     "victory": 1,
     "shroud": 4,
     "clues": 3,
-    "text": "Sealed until the log shows \"What the Almanac Hid\" and \"The Vote That Never Ends.\" Deep objective — Recover the name (3 clues here). Record \"The Latecomer's Name.\" The finale is declared here.",
+    "text": "Sealed until the log shows \"What the Almanac Hid\" and \"The Vote That Never Ends.\" Deep objective — Recover the name (3 clues here). Record \"The Appointed's Name.\" The finale is declared here.",
     "clues_per_investigator": true,
-    "icons": "spade",
-    "color": "#1c2a52",
+    "icons": "doubleslash",
+    "color": "#5c4a2a",
     "connections": [
       {
         "symbol": "diamond",
@@ -610,16 +650,226 @@
     "name": "The Page That Wasn't",
     "traits": "Hex. Peril.",
     "text": "Revelation — Take 1 horror for every 6 banked Memory (round up, max 3).",
-    "flavor": "In one loop she found a page that was not there in the others."
+    "flavor": "In one loop she found a page that was not there in the others.",
+    "quantity": 1
   },
   "sthr-inkrunsbackward": {
     "name": "Ink Runs Backward",
     "traits": "Hex.",
-    "text": "Revelation — Cancel the next clue that would be discovered this round at your location."
+    "text": "Revelation — Cancel the next clue that would be discovered this round at your location.",
+    "quantity": 1
   },
   "sthr-studydoor": {
     "name": "The Study Door",
     "traits": "Omen.",
-    "text": "Revelation — While the Sealed Study is sealed, add 1 Static token to the chaos bag until the end of the round. Otherwise, this gains Surge."
+    "text": "Revelation — While the Sealed Study is sealed, add 1 Static token to the chaos bag until the end of the round. Otherwise, this gains Surge.",
+    "quantity": 1
+  },
+  "sthr-loc-hubsquare": {
+    "name": "The Square",
+    "traits": "Ambergrove. Central.",
+    "shroud": 1,
+    "clues": 2,
+    "text": "Every loop begins here. Travel between districts along a connection costs 1 Hour (a Skip).",
+    "flavor": "Everyone is out for the occultation. None of them will look at you twice — not this time, not ever.",
+    "icons": "star",
+    "color": "#1a605e",
+    "clues_per_investigator": true,
+    "connections": [
+      {
+        "symbol": "heart",
+        "color": "#2c663c"
+      },
+      {
+        "symbol": "square",
+        "color": "#6c482e"
+      },
+      {
+        "symbol": "t",
+        "color": "#2c4a7c"
+      },
+      {
+        "symbol": "moon",
+        "color": "#a83870"
+      },
+      {
+        "symbol": "diamond",
+        "color": "#2a5c7c"
+      }
+    ],
+    "deck": 95100
+  },
+  "sthr-act-firsthour": {
+    "name": "The First Hour",
+    "clues": 5,
+    "text": "Objective — Once 5 clues have been gathered in total, an investigator at the Almanac Steps may resolve the Occultation (no test). When they do, read \"The First Reset\" (the objective was completed).\nIf the Hourglass reaches Hour IX first, read \"The First Reset\" anyway.",
+    "flavor": "The almanac promised the occultation at midnight. It is eleven, and the sky is already wrong.",
+    "deck": 95101,
+    "index": "1a",
+    "number": "1/1"
+  },
+  "sthr-story-firstreset": {
+    "name": "The First Reset",
+    "text": "Each investigator gains 2 banked Memory. If the objective was completed, gain 1 more banked Memory.\nRecord \"You Are Unstuck\" in the campaign log. Act I begins.\nNo Years are gained from the Prologue. Proceed to the first interlude, then Loop 1.",
+    "flavor": "The occultation completes. Something reaches through — and does not finish reaching. The night folds. You are standing in the Square again at eleven o'clock, salt on your tongue, and you are the only ones who feel the seam.",
+    "deck": 95102
+  },
+  "sthr-act-lamp": {
+    "name": "Light the Lamp",
+    "clues": 4,
+    "text": "Objective — Once 4 clues have been discovered in the Lighthouse district, an investigator at the Lantern Room may test [com] or [wil] (3) to light the lamp. If they succeed, record \"The Lamp Was Never Lit.\"\nWhile the lamp is lit this loop, Echoes at connected districts stay Sleepwalking one band longer. For all future loops, the Lantern Room flips to its calmer side.",
+    "flavor": "The lamp is dark. It has never, in any loop, been lit.",
+    "deck": 95103,
+    "index": "1a",
+    "number": "1/2"
+  },
+  "sthr-act-ninthdeath": {
+    "clues": 2,
+    "text": "Act II only, once the log shows \"The Lamp Was Never Lit.\"\nObjective — With the lamp lit this loop, search the Keeper's Quarters (2 clues there) for the keeper's logbook. Record \"The Keeper's Ninth Death.\"\nElias's elder-sign heal also removes 1 horror.",
+    "index": "2a",
+    "number": "2/2"
+  },
+  "sthr-act-whythirteen": {
+    "name": "Why Thirteen?",
+    "clues": 6,
+    "text": "Objective — Once 6 clues have been discovered in the Drowned Church, an investigator at the Vestry may read the register. Record \"The Thirteenth Toll.\"\nHour III no longer adds the Church's extra Dissonance.",
+    "flavor": "The bell tolled thirteen times at the first occultation. It should toll twelve.",
+    "deck": 95104,
+    "index": "1a",
+    "number": "1/2"
+  },
+  "sthr-act-hourwaswrong": {
+    "name": "The Hour Was Wrong",
+    "clues": 3,
+    "text": "Act II only, once the log shows \"The Thirteenth Toll.\" The Flooded Crypt opens; the Bell-Ringer Beneath spawns there.\nObjective — Recover the drowned almanac-page (3 clues in the Flooded Crypt). Record \"The Hour Was Wrong.\"\nRemove Hour IV from the Occultation for all future loops.",
+    "deck": 95105,
+    "index": "2a",
+    "number": "2/2"
+  },
+  "sthr-act-walkbackward": {
+    "name": "Walk It Backward",
+    "text": "Objective — Move through all three locations in reverse of the Echoes' direction (the Turning, then the Low Bridge, then the Milestones), discovering at least 1 clue at each. Record \"The Road Remembers.\"\nOnce per loop, travel to or from the Lighthouse via the Sunken Road costs 0 Hours.",
+    "flavor": "The same figures walk it every loop, in the same direction, never arriving.",
+    "deck": 95106,
+    "index": "1a",
+    "number": "1/2"
+  },
+  "sthr-act-walksbeside": {
+    "name": "Who Walks Beside You",
+    "text": "Act II only, once the log shows \"The Road Remembers.\"\nObjective — At the Turning, evade or Hold an awakened Echo and read the face beneath the hood. Record \"Who Walks Beside You.\"\nEchoes get -1 fight against investigators who have this fact.",
+    "flavor": "Some of them turn to look at you now.",
+    "deck": 95107,
+    "index": "2a",
+    "number": "2/2"
+  },
+  "sthr-act-sheriffdead": {
+    "name": "The Sheriff Is Already Dead",
+    "clues": 5,
+    "text": "Objective — Once 5 clues have been discovered in the Square district, an investigator at the Well may examine the body. Record \"The Sheriff Is Already Dead.\"\nFrom now on, once per loop, an investigator at the Town Hall Steps may look at the top card of the Occultation.",
+    "flavor": "He has been dead since ten o'clock. No one has noticed but you.",
+    "deck": 95108,
+    "index": "1a",
+    "number": "1/2"
+  },
+  "sthr-act-vote": {
+    "name": "The Vote That Never Ends",
+    "clues": 3,
+    "text": "Act II only, once the log shows \"The Sheriff Is Already Dead.\" When this objective is attempted, What Wears the Sheriff spawns at the Records Office.\nObjective — Find the ledger in the Records Office (3 clues there). Record \"The Vote That Never Ends\" and advance Seraphine's thread, \"Who Opened the Door.\"",
+    "flavor": "Ending the loop cleanly requires a cost the town agreed to pay.",
+    "deck": 95109,
+    "index": "2a",
+    "number": "2/2"
+  },
+  "sthr-act-wheelturns": {
+    "name": "The Wheel Still Turns",
+    "text": "Objective — An investigator at the Wheel may test [agi] (3) to ride it. If they succeed, they discover 2 clues from a height (from any location in the Fairground). Record \"The Wheel Still Turns.\"\nOnce per loop, from the Wheel, you may look at the top 2 encounter cards and reorder them.",
+    "flavor": "You see the whole town at once.",
+    "deck": 95110,
+    "index": "1a",
+    "number": "1/2"
+  },
+  "sthr-act-bargain": {
+    "name": "The Ticket-Taker's Bargain",
+    "text": "Act II only, once the log shows \"The Wheel Still Turns.\"\nObjective — An investigator at the Ticket Booth may speak with the ticket-taker. He offers a way to end the night that is not free. Record \"The Ticket-Taker's Bargain\" and mark on the log that the bargain was heard.",
+    "flavor": "He smiles at you like he's been expecting you for a very long time.",
+    "deck": 95111,
+    "index": "2a",
+    "number": "2/2"
+  },
+  "sthr-act-almanachid": {
+    "name": "What the Almanac Hid",
+    "clues": 6,
+    "text": "Objective — Once 6 clues have been discovered in the Almanac House, an investigator at the Press may set it to reprint the true occultation time. Record \"What the Almanac Hid.\"\nAt Hour VI, investigators remove a Static token instead of adding one.",
+    "flavor": "Where the wrong almanac was printed.",
+    "deck": 95112,
+    "index": "1a",
+    "number": "1/2"
+  },
+  "sthr-act-appointedname": {
+    "name": "The Appointed's Name",
+    "clues": 3,
+    "text": "Act II only, once the log shows \"What the Almanac Hid\" and \"The Vote That Never Ends.\" The Sealed Study opens.\nObjective — Recover the name inside the Sealed Study (3 clues there). Record \"The Appointed's Name\"; this completes \"Who Opened the Door.\" The Appointed now arrives exhausted at Hour VII.\nOnce you know \"The Appointed's Name,\" \"The Vote That Never Ends,\" and any one other deep fact, record \"The Way the Night Breaks.\" The finale may now be attempted.",
+    "flavor": "Inside is the name the town spoke to call the thing through.",
+    "deck": 95113,
+    "index": "2a",
+    "number": "2/2"
+  },
+  "sthr-act-lasthour": {
+    "name": "Contest the Crossing",
+    "text": "Only once the log shows \"The Way the Night Breaks\": declared at the Sealed Study, or when the Hourglass reaches Hour IX. The Appointed's Approach advances to Arrived; it manifests at the location farthest from the investigators if not already on the board. Dissonance does not reset.\nObjective — Before the Hourglass reaches Hour IX, gain contest progress equal to 4 × the number of investigators (12 at three players) by Holding Back the Appointed, spending Knowledge, and reaching the Study. Each Hold Back success and each deep fact spent adds 1.\nWhen the finale ends, read the first resolution that qualifies, R1 to R6.",
+    "flavor": "An appointment made in ink and never kept. All that's left is to keep it.",
+    "deck": 95114,
+    "index": "1a",
+    "number": "1/1"
+  },
+  "sthr-res-1": {
+    "name": "Take Its Place",
+    "traits": "Resolution 1.",
+    "text": "Contest reached and an Ancient investigator is present.\nOne Ancient becomes the night's new anchor — kept behind, decades older, so the loop ends for everyone else. The town wakes for the first time in a hundred years.\nSoftened if \"Who Walks Beside You\" is known.",
+    "deck": 95115
+  },
+  "sthr-res-2": {
+    "name": "Close the Door",
+    "traits": "Resolution 2.",
+    "text": "Contest reached and you know \"The Vote That Never Ends\" and \"The Appointed's Name.\"\nYou pay the price the town agreed to and never paid: everyone present ages +3 Years at once, and the door closes. The cleanest true ending — bought with years.",
+    "deck": 95116
+  },
+  "sthr-res-3": {
+    "name": "Break Through",
+    "traits": "Resolution 3.",
+    "text": "Contest reached and \"The Keeper's Ninth Death\" is known.\nYou force the night open and all survivors escape — but the loop is only paused. Was it really ended?",
+    "deck": 95117
+  },
+  "sthr-res-4": {
+    "name": "Seal by Force",
+    "traits": "Resolution 4.",
+    "text": "Contest reached.\nThe door is sealed but not closed; one investigator (chosen) ages out doing it.",
+    "deck": 95118
+  },
+  "sthr-res-5": {
+    "name": "Next Time",
+    "traits": "Resolution 5.",
+    "text": "Contest not reached, but banked Memory is 12 or more.\nThe loop wins tonight — but you wake at First Dark closer than ever. Begin a new loop; the finale may be re-attempted.",
+    "deck": 95119
+  },
+  "sthr-res-6": {
+    "name": "The Loop Wins",
+    "traits": "Resolution 6.",
+    "text": "Contest not reached and banked Memory is below 12.\nThe night takes you. The campaign ends.",
+    "flavor": "The town keeps repeating — and somewhere on the Sunken Road, walking the same direction and never arriving, there are new faces beneath the hoods.",
+    "deck": 95120
+  },
+  "sthr-story-actii": {
+    "name": "The Shape of the Hour",
+    "traits": "Interlude.",
+    "text": "Read at the interlude when Act II begins (3 or more surface facts known, or after Loop 3).\nThe town has begun to notice that you notice. Somewhere past the edge of the Square, something that has been waiting politely decides to stop waiting.\nFrom the next loop: deep objectives open and the Appointed's Whispers join the encounter deck.",
+    "deck": 95121
+  },
+  "sthr-story-beforefinale": {
+    "name": "The Last Hour",
+    "traits": "Interlude.",
+    "text": "You know the shape of the night now. You know what it costs to end it. The only question left is who pays.",
+    "flavor": "You have lived this night more times than you can hold.",
+    "deck": 95122
   }
 }

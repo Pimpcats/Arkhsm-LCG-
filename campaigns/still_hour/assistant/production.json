@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "campaign": "still_hour",
-  "stage": "tts_relay_ready",
+  "stage": "scenario_content_complete",
   "owner_preferences": {
     "minimal_manual_work": true,
     "first_time_player": true,
@@ -11,20 +11,32 @@
   },
   "validation": {
     "bridge_tests_passed": 4,
-    "current_effective_cards": 99,
+    "scenario_content_tests_passed": 17,
+    "current_effective_cards": 122,
+    "scenarios_locked": 8,
+    "scenario_readiness_errors": 0,
+    "campaign_box_compiles_without_force": true,
     "existing_illustration_jobs": 36,
     "registered_assistant_art": 0,
-    "full_renderer_run": false,
+    "full_renderer_run": true,
     "tts_playtested": false,
     "tts_relay_offline_tests_passed": 6,
     "hosted_card_images": 106,
     "tts_relay_runs_on_owner_pc": 0
   },
+  "evidence": [
+    "python3 pipeline/scenario_content.py: 8/8 scenarios, 0 errors (notes: one inherited stat deviation, five cross-district symbol repeats in distinct colours)",
+    "python3 -m pytest -q tests: 21 passed",
+    "python3 pipeline/compile_campaign.py: ok, 8 scenario boxes, 143 cards",
+    "Design decisions and open flags: docs/design/CONTENT_DECISIONS.md (spoilers)"
+  ],
   "next_actions": [
-    "Owner starts the TTS relay; read tts-results and fix anything failing in real TTS.",
-    "Complete scenario content so compile_campaign.py locks all scenarios; add the campaign box to the relay job.",
-    "Wire remaining board systems (Appointed callbacks, location flips, interlude panel, SCED chaos bag).",
-    "Art: needs api.openai.com allowed + OPENAI_API_KEY in the cloud environment; then style sample, batches, render."
+    "Merge board wiring and table-presence tracks; add campaign box to the relay job.",
+    "Owner starts the TTS relay; fix anything failing in real TTS.",
+    "Owner decisions flagged in CONTENT_DECISIONS.md (inherited Lantern Room shroud, location Victory values, undefined calmer side) - ask only the ones that change play, spoiler-free.",
+    "Extend illustration briefs to the new scenario cards (acts, resolutions, hub location) or mark them text-only.",
+    "Generate, inspect and register artwork in coherent batches with character continuity.",
+    "Load dist/the_still_hour_campaign.json in TTS and playtest the Prologue and one loop."
   ],
   "connection": "GitHub handoff; no live connection to the owner's desktop or TTS.",
   "tts_relay": {
