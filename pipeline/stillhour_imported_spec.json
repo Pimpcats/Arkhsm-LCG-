@@ -658,5 +658,14 @@
     "text": "You know the shape of the night now. You know what it costs to end it. The only question left is who pays.",
     "flavor": "You have lived this night more times than you can hold.",
     "deck": 95122
+  },
+  {
+    "id": "sthr-res-bargain",
+    "type": "Story",
+    "name": "Let It In, On Your Terms",
+    "traits": "Resolution 1b.",
+    "text": "Contest reached, \"The Ticket-Taker's Bargain\" is known, and banked Memory is 12 or more. The party may decline this and read on to R2.\nYou take the ticket-taker's offer: the door opens on your terms, not the town's, and the night finally ends. The fare is everything you carried — banked Memory drops to 0 — and each investigator present ages +2 Years. Ambergrove wakes to a morning with one more guest in it.",
+    "flavor": "He punches your ticket without looking. He has been expecting you for a very long time.",
+    "deck": 95123
   }
 ]

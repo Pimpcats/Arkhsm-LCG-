@@ -142,14 +142,15 @@ def build_gmnotes(c):
             # icons is this location's own symbol and whose connections is a
             # pipe-separated list of the symbols printed along its bottom edge.
             # This is how SCED itself knows a map is connected.
+            # A printed symbol can repeat across districts in a different
+            # colour, so the key SCED matches on is the symbol *and* colour
+            # (location_key): SCED pairs any letters-only icon strings
+            # (PlayArea.ttslua gmatch "%a+"; cf. "FromDowntown").
             side = {}
             if c.get("icons"):
-                side["icons"] = LOC_SYMBOL_META.get(
-                    str(c["icons"]).strip().lower(), str(c["icons"]).title())
-            conns = [LOC_SYMBOL_META.get(
-                     str(x.get("symbol") if isinstance(x, dict) else x
-                         ).strip().lower(),
-                     str(x.get("symbol") if isinstance(x, dict) else x).title())
+                side["icons"] = location_key(c["icons"], c.get("color"))
+            conns = [location_key(x.get("symbol"), x.get("color"))
+                     if isinstance(x, dict) else location_key(x, None)
                      for x in (c.get("connections") or [])]
             conns = [x for x in conns if x]
             if conns:
@@ -163,6 +164,29 @@ def build_gmnotes(c):
                 m["locationBack"] = dict(
                     side, **({"victory": c["victory"]} if "victory" in c else {}))
     return json.dumps(m, separators=(",", ":"))
+
+
+def location_key(symbol, color):
+    """The SCED connection key for a printed symbol in a colour: the symbol's
+    SCED name followed by the colour spelled in letters (hex digits 0-f ->
+    a-p; a named colour as itself), e.g. Star + #1a605e -> "StarBkgagpo".
+    SCED splits icon strings on non-letters, so the key must be letters only.
+    With no colour the plain symbol name is used, as official cards do."""
+    name = str(symbol or "").strip().lower()
+    base = LOC_SYMBOL_META.get(name, str(symbol or "").strip().title())
+    if not base:
+        return ""
+    col = str(color or "").strip().lower()
+    if not col:
+        return base
+    if col.startswith("#"):
+        hx = col[1:]
+        if not re.fullmatch(r"[0-9a-f]+", hx):
+            return base
+        spelled = "".join("abcdefghijklmnop"[int(ch, 16)] for ch in hx)
+    else:
+        spelled = re.sub(r"[^a-z]", "", col)
+    return base + spelled[:1].upper() + spelled[1:]
 
 
 SCENARIO_SIDE_TYPES = ("Agenda", "Act", "Scenario", "Story")

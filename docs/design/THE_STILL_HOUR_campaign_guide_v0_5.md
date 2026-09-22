@@ -257,6 +257,7 @@ Each district has a **surface objective** (Act I) and a **deep objective** (Act 
 | # | Condition | Resolution |
 |---|---|---|
 | R1 | Contest reached **and** an **Ancient** investigator is present | **Take Its Place.** One Ancient becomes the night's new anchor — kept behind, decades older, so the loop ends for everyone else. The town wakes for the first time in a hundred years. *(Softened if "Who Walks Beside You" is known.)* |
+| R1b | Contest reached **and** you know **The Ticket-Taker's Bargain** **and** banked Memory ≥ 12 (may be declined) | **Let It In, On Your Terms.** The door opens on your terms; banked Memory drops to 0 and everyone present ages **+2 Years**. *(Added in the content pass — CONTENT_DECISIONS D17.)* |
 | R2 | Contest reached **and** you know **The Vote That Never Ends** + **The Appointed's Name** | **Close the Door.** You pay the price the town agreed to and never paid: everyone present ages **+3 Years at once**, and the door closes. The cleanest true ending — bought with years. |
 | R3 | Contest reached **and** **The Keeper's Ninth Death** is known | **Break Through.** You force the night open and all survivors escape — but the loop is only *paused*. Bittersweet epilogue: was it really ended? |
 | R4 | Contest reached (no special facts) | **Seal by Force.** The door is sealed but not closed; one investigator (chosen) ages out doing it. |

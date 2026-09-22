@@ -186,7 +186,8 @@
         "symbol": "star",
         "color": "#1a605e"
       }
-    ]
+    ],
+    "flavor": "You came to Ambergrove for your own reasons. You will not remember why, soon."
   },
   "sthr-loc-almanacsteps": {
     "name": "The Almanac Steps",
@@ -240,7 +241,10 @@
         "color": "#5c246e"
       }
     ],
-    "flavor": "The light remembers a path the dark has forgotten."
+    "flavor": "The light remembers a path the dark has forgotten.",
+    "back_shroud": 3,
+    "back_text": "Calm side: use it from setup once the log shows \"The Lamp Was Never Lit.\"\n[action] Light the lamp (no test). While it is lit this loop, Echoes at connected districts stay Sleepwalking one band longer, and The Dark That Waits treats investigators here as not at the Lantern Room.",
+    "back_flavor": "You know how to light it now. Some part of you always did."
   },
   "sthr-loc-windingstair": {
     "name": "The Winding Stair",
@@ -325,7 +329,8 @@
         "symbol": "star",
         "color": "#1a605e"
       }
-    ]
+    ],
+    "flavor": "The congregation is still here. They have been kneeling since the first toll."
   },
   "sthr-loc-belfry": {
     "name": "The Belfry",
@@ -405,7 +410,8 @@
         "symbol": "star",
         "color": "#1a605e"
       }
-    ]
+    ],
+    "flavor": "The road between the town and the shore, counted out in stones that never change."
   },
   "sthr-loc-lowbridge": {
     "name": "The Low Bridge",
@@ -424,7 +430,8 @@
         "symbol": "slash",
         "color": "#8a5a2e"
       }
-    ]
+    ],
+    "flavor": "The water never quite reaches the top. It never quite goes down."
   },
   "sthr-loc-turning": {
     "name": "The Turning",
@@ -551,7 +558,8 @@
         "symbol": "moon",
         "color": "#a83870"
       }
-    ]
+    ],
+    "flavor": "The occultation fair, mid-celebration, forever."
   },
   "sthr-loc-ticketbooth": {
     "name": "The Ticket Booth",
@@ -611,14 +619,15 @@
         "symbol": "star",
         "color": "#1a605e"
       }
-    ]
+    ],
+    "flavor": "Ayako has read every book in it a hundred times."
   },
   "sthr-loc-press": {
     "name": "The Press",
     "traits": "Almanac House.",
     "shroud": 3,
     "clues": 3,
-    "text": "Objective — With 6+ clues discovered in this district, set the Press to reprint the true time. Record \"What the Almanac Hid.\"",
+    "text": "Objective — With 2 [perinv] or more clues discovered in this district, set the Press to reprint the true time. Record \"What the Almanac Hid.\"",
     "clues_per_investigator": true,
     "icons": "triangle",
     "color": "#4a3c6c",
@@ -717,7 +726,7 @@
   "sthr-act-lamp": {
     "name": "Light the Lamp",
     "clues": 4,
-    "text": "Objective — Once 4 clues have been discovered in the Lighthouse district, an investigator at the Lantern Room may test [com] or [wil] (3) to light the lamp. If they succeed, record \"The Lamp Was Never Lit.\"\nWhile the lamp is lit this loop, Echoes at connected districts stay Sleepwalking one band longer. For all future loops, the Lantern Room flips to its calmer side.",
+    "text": "Objective — Once 4 clues have been discovered in the Lighthouse district, an investigator at the Lantern Room may test [com] or [wil] (3) to light the lamp. If they succeed, record \"The Lamp Was Never Lit.\"\nWhile the lamp is lit this loop, Echoes at connected districts stay Sleepwalking one band longer. In every later loop, place the Lantern Room calm side up.",
     "flavor": "The lamp is dark. It has never, in any loop, been lit.",
     "deck": 95103,
     "index": "1a",
@@ -756,7 +765,7 @@
   },
   "sthr-act-walksbeside": {
     "name": "Who Walks Beside You",
-    "text": "Act II only, once the log shows \"The Road Remembers.\"\nObjective — At the Turning, evade or Hold an awakened Echo and read the face beneath the hood. Record \"Who Walks Beside You.\"\nEchoes get -1 fight against investigators who have this fact.",
+    "text": "Act II only, once the log shows \"The Road Remembers.\"\nObjective — At the Turning, evade an awakened Echo or hold it ([action] Hold: test [wil] or [com] (X), where X is its fight; if you succeed, exhaust it — like Hold Back, this pushes it back without harming it). Then read the face beneath the hood. Record \"Who Walks Beside You.\"\nEchoes get -1 fight against investigators who have this fact.",
     "flavor": "Some of them turn to look at you now.",
     "deck": 95107,
     "index": "2a",
@@ -798,12 +807,13 @@
   },
   "sthr-act-almanachid": {
     "name": "What the Almanac Hid",
-    "clues": 6,
-    "text": "Objective — Once 6 clues have been discovered in the Almanac House, an investigator at the Press may set it to reprint the true occultation time. Record \"What the Almanac Hid.\"\nAt Hour VI, investigators remove a Static token instead of adding one.",
+    "clues": 2,
+    "text": "Objective — Once 2 [perinv] clues have been discovered in the Almanac House, an investigator at the Press may set it to reprint the true occultation time. Record \"What the Almanac Hid.\"\nAt Hour VI, investigators remove a Static token instead of adding one.",
     "flavor": "Where the wrong almanac was printed.",
     "deck": 95112,
     "index": "1a",
-    "number": "1/2"
+    "number": "1/2",
+    "clues_per_investigator": true
   },
   "sthr-act-appointedname": {
     "name": "The Appointed's Name",
@@ -816,8 +826,8 @@
   },
   "sthr-act-lasthour": {
     "name": "Contest the Crossing",
-    "text": "Only once the log shows \"The Way the Night Breaks\": declared at the Sealed Study, or when the Hourglass reaches Hour IX. The Appointed's Approach advances to Arrived; it manifests at the location farthest from the investigators if not already on the board. Dissonance does not reset.\nObjective — Before the Hourglass reaches Hour IX, gain contest progress equal to 4 × the number of investigators (12 at three players) by Holding Back the Appointed, spending Knowledge, and reaching the Study. Each Hold Back success and each deep fact spent adds 1.\nWhen the finale ends, read the first resolution that qualifies, R1 to R6.",
-    "flavor": "An appointment made in ink and never kept. All that's left is to keep it.",
+    "text": "Only once the log shows \"The Way the Night Breaks\": declared by an investigator at the Sealed Study, or when the Hourglass reaches Hour IX (then set it back to Hour V instead of resetting; no Hour resolves). The Appointed's Approach advances to Arrived; it manifests at the location farthest from the investigators if not already on the board. Dissonance does not reset.\nObjective — Before the Hourglass reaches Hour IX, gain contest progress equal to 4 × the number of investigators (12 at three players): 1 for each Hold Back success, 1 for each deep fact spent, and 1 the first time each investigator is at the Sealed Study during the finale.\nWhen the finale ends, read the first resolution that qualifies: R1, R1b, then R2 to R6.",
+    "flavor": "An appointment made in ink and never kept.",
     "deck": 95114,
     "index": "1a",
     "number": "1/1"
@@ -825,7 +835,7 @@
   "sthr-res-1": {
     "name": "Take Its Place",
     "traits": "Resolution 1.",
-    "text": "Contest reached and an Ancient investigator is present.\nOne Ancient becomes the night's new anchor — kept behind, decades older, so the loop ends for everyone else. The town wakes for the first time in a hundred years.\nSoftened if \"Who Walks Beside You\" is known.",
+    "text": "Contest reached and an Ancient investigator is present.\nOne Ancient becomes the night's new anchor — kept behind, decades older, so the loop ends for everyone else. Mark them kept as anchor. The town wakes for the first time in a hundred years.\nIf \"Who Walks Beside You\" is known, instead: the ones who walk the Sunken Road take the anchor's weight with you. At dawn the Ancient walks out with the others — +3 Years, but free and not kept.",
     "deck": 95115
   },
   "sthr-res-2": {
@@ -871,5 +881,12 @@
     "text": "You know the shape of the night now. You know what it costs to end it. The only question left is who pays.",
     "flavor": "You have lived this night more times than you can hold.",
     "deck": 95122
+  },
+  "sthr-res-bargain": {
+    "name": "Let It In, On Your Terms",
+    "traits": "Resolution 1b.",
+    "text": "Contest reached, \"The Ticket-Taker's Bargain\" is known, and banked Memory is 12 or more. The party may decline this and read on to R2.\nYou take the ticket-taker's offer: the door opens on your terms, not the town's, and the night finally ends. The fare is everything you carried — banked Memory drops to 0 — and each investigator present ages +2 Years. Ambergrove wakes to a morning with one more guest in it.",
+    "flavor": "He punches your ticket without looking. He has been expecting you for a very long time.",
+    "deck": 95123
   }
 }

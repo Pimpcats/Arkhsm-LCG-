@@ -92,7 +92,7 @@ Current banked Memory: **______**  (soft cap **18** — reduce to 18 at each loo
 ## FINALE RECORD
 Attempted on loop: ____   Contest reached: ☐ yes ☐ no   Banked Memory at finale: ____
 Resolution reached:
-- ☐ **R1 Take Its Place** ☐ **R2 Close the Door** ☐ **R3 Break Through**
+- ☐ **R1 Take Its Place** ☐ **R1b Let It In, On Your Terms** ☐ **R2 Close the Door** ☐ **R3 Break Through**
 - ☐ **R4 Seal by Force** ☐ **R5 Next Time** (continue) ☐ **R6 The Loop Wins** (end)
 
 Anchor left behind: ______________________  Aged +3 (R2): ______________________

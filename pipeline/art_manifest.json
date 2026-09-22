@@ -254,5 +254,517 @@
     "art_type": "enemy",
     "scene": "a lone rider on a carousel horse at night, motion-blurred at the edges, face perfectly still and smiling",
     "seed": 3895
+  },
+  {
+    "id": "sthr-loc-lanternroom",
+    "art_type": "location",
+    "scene": "the glass lantern room at the top of a lighthouse, the great lens dark and cold, salt on the panes, night beyond",
+    "seed": 6506
+  },
+  {
+    "id": "sthr-loc-windingstair",
+    "art_type": "location",
+    "scene": "a spiral iron stair climbing the inside of a lighthouse tower, rust and damp, the steps vanishing upward into shadow",
+    "seed": 7192
+  },
+  {
+    "id": "sthr-loc-keepersquarters",
+    "art_type": "location",
+    "scene": "a lighthouse keeper's cramped room, a narrow cot, oilcloth coat on a hook, a logbook open on the desk",
+    "seed": 1565
+  },
+  {
+    "id": "sthr-loc-square",
+    "art_type": "location",
+    "scene": "Ambergrove's town square at night, bunting and paper lanterns for the occultation, a bandstand, the sky wrong overhead",
+    "seed": 2698
+  },
+  {
+    "id": "sthr-act-ninthdeath",
+    "art_type": "act",
+    "scene": "an open lighthouse logbook by lamplight, the same hand filling page after page, the ink of the latest entry still wet",
+    "seed": 5498
+  },
+  {
+    "id": "sthr-story-firstdark",
+    "art_type": "story",
+    "scene": "a figure waking on a bench in the square at dusk, salt on the lips, the same lanterns being lit again",
+    "seed": 6702
+  },
+  {
+    "id": "sthr-appointed-approach",
+    "art_type": "story",
+    "scene": "a long empty street of four lamp posts receding into darkness, each farther lamp dimmer, the last one out",
+    "seed": 543
+  },
+  {
+    "id": "sthr-campaign-log",
+    "art_type": "story",
+    "no_art": true,
+    "frame": "text_only",
+    "reason": "campaign log: a fillable form"
+  },
+  {
+    "id": "sthr-hour-1",
+    "art_type": "agenda",
+    "scene": "the town square at eleven o'clock, lamps lit, townsfolk looking up at a sky where the stars are sliding behind something without an edge",
+    "seed": 7338
+  },
+  {
+    "id": "sthr-hour-2",
+    "art_type": "agenda",
+    "scene": "a lake shore where the water is drawing back unnaturally fast under a dark sky, moored boats settling crooked on the mud",
+    "seed": 7345
+  },
+  {
+    "id": "sthr-hour-3",
+    "art_type": "agenda",
+    "scene": "a half-drowned church tower against the night, the bell swinging, thirteen faint rings of sound rippling the air",
+    "seed": 7352
+  },
+  {
+    "id": "sthr-hour-4",
+    "art_type": "agenda",
+    "scene": "a sunken road collapsing into black water, milestones tilting, a lantern on the far side going out",
+    "seed": 7359
+  },
+  {
+    "id": "sthr-hour-5",
+    "art_type": "agenda",
+    "scene": "empty streets at midnight, every door open, a single chair still rocking on a porch",
+    "seed": 7366
+  },
+  {
+    "id": "sthr-hour-6",
+    "art_type": "agenda",
+    "scene": "the sky over the rooftops cracked like glaze, wrong constellations showing through the seams",
+    "seed": 7373
+  },
+  {
+    "id": "sthr-hour-7",
+    "art_type": "agenda",
+    "scene": "a long street seen from its far end, lamps going dark one by one toward the viewer, something tall at the vanishing point",
+    "seed": 7380
+  },
+  {
+    "id": "sthr-hour-8",
+    "art_type": "agenda",
+    "scene": "the whole town seen from above at the last minute before the hour, clocks on every building pointing the same wrong time",
+    "seed": 7387
+  },
+  {
+    "id": "sthr-hour-9",
+    "art_type": "agenda",
+    "scene": "a black occulted sun-like disc filling the sky over Ambergrove, the town below perfectly still, a seam of pale light down the middle of the night",
+    "seed": 7394
+  },
+  {
+    "id": "sthr-losthour",
+    "art_type": "treachery",
+    "scene": "a pocket watch lying in the street, its hands missing, a scattering of numerals on the cobbles like dropped coins",
+    "seed": 1830
+  },
+  {
+    "id": "sthr-slippage",
+    "art_type": "treachery",
+    "scene": "a street reflected in a puddle that is a few seconds behind the street above it",
+    "seed": 1529
+  },
+  {
+    "id": "sthr-waitingcongregation",
+    "art_type": "enemy",
+    "scene": "townsfolk in their Sunday best standing in a line in the fog, all facing the same direction, eyes closed, patient",
+    "seed": 1803
+  },
+  {
+    "id": "sthr-drownedchoir",
+    "art_type": "enemy",
+    "scene": "a choir in waterlogged robes singing with no sound, lake weed in their hair, lit from below by cold water-light",
+    "seed": 4574
+  },
+  {
+    "id": "sthr-familiarface",
+    "art_type": "enemy",
+    "scene": "a stranger in a doorway whose face is almost someone you know, the features blurred as though remembered badly",
+    "seed": 4210
+  },
+  {
+    "id": "sthr-lamplighterecho",
+    "art_type": "enemy",
+    "scene": "a lamplighter frozen mid-reach with his pole to a streetlamp, his outline repeated faintly behind him",
+    "seed": 6702
+  },
+  {
+    "id": "sthr-wrongturn",
+    "art_type": "treachery",
+    "scene": "a crossroads where the signposts point to the same town four times",
+    "seed": 2656
+  },
+  {
+    "id": "sthr-rewind",
+    "art_type": "treachery",
+    "scene": "footprints in wet sand leading backward into a figure that is walking forward",
+    "seed": 101
+  },
+  {
+    "id": "sthr-deadair",
+    "art_type": "treachery",
+    "scene": "a radio set on a kitchen table with its dial glowing and the air around it visibly still, dust hanging motionless",
+    "seed": 556
+  },
+  {
+    "id": "sthr-loopnotices",
+    "art_type": "treachery",
+    "scene": "a hundred lit windows across a dark street, a silhouette standing in every one, all turned toward the viewer",
+    "seed": 3951
+  },
+  {
+    "id": "sthr-yearinanight",
+    "art_type": "treachery",
+    "scene": "a hand on a table aging from young to old across a single candle's burn",
+    "seed": 4539
+  },
+  {
+    "id": "sthr-forgotten",
+    "art_type": "treachery",
+    "scene": "a photograph whose faces are fading out while the room in it stays sharp",
+    "seed": 2446
+  },
+  {
+    "id": "sthr-oldbones",
+    "art_type": "treachery",
+    "scene": "a walking cane and a pair of worn boots at the foot of a long steep stair",
+    "seed": 1536
+  },
+  {
+    "id": "sthr-loc-longpier",
+    "art_type": "location",
+    "scene": "a long wooden pier running out over black still water into mist, lanterns at intervals, the far end lost",
+    "seed": 4147
+  },
+  {
+    "id": "sthr-loc-almanacsteps",
+    "art_type": "location",
+    "scene": "broad stone steps up to a narrow printing house door, a painted sign reading nothing legible, handbills scattered on the steps",
+    "seed": 7031
+  },
+  {
+    "id": "sthr-scn-stillhour",
+    "art_type": "scenario",
+    "no_art": true,
+    "frame": "text_only",
+    "reason": "scenario reference: chaos-token template, no art window"
+  },
+  {
+    "id": "sthr-darkthatwaits",
+    "art_type": "treachery",
+    "scene": "darkness pooled at the top of a lighthouse stair, thick as water, the lens above it unlit",
+    "seed": 5379
+  },
+  {
+    "id": "sthr-somethingonstair",
+    "art_type": "enemy",
+    "scene": "a hunched figure sitting on a spiral stair in the dark, knees drawn up, head turned away",
+    "seed": 7752
+  },
+  {
+    "id": "sthr-loc-nave",
+    "art_type": "location",
+    "scene": "a church nave half flooded, pews standing in black water, candles still burning on the altar above the waterline",
+    "seed": 1081
+  },
+  {
+    "id": "sthr-loc-belfry",
+    "art_type": "location",
+    "scene": "a belfry with a great bell hanging motionless, its rope dripping, the town far below through the louvres",
+    "seed": 2607
+  },
+  {
+    "id": "sthr-loc-floodedcrypt",
+    "art_type": "location",
+    "scene": "a vaulted crypt under dark water, tomb lids just visible, a faint shape of paper drifting near the ceiling",
+    "seed": 7164
+  },
+  {
+    "id": "sthr-loc-vestry",
+    "art_type": "location",
+    "scene": "a small vestry with robes on pegs and a heavy parish register open on a lectern by candlelight",
+    "seed": 2894
+  },
+  {
+    "id": "sthr-thirteen",
+    "art_type": "treachery",
+    "scene": "a church clock face with thirteen hour marks, the hands pointing to the extra one",
+    "seed": 1627
+  },
+  {
+    "id": "sthr-risingwater",
+    "art_type": "treachery",
+    "scene": "black water climbing a flight of stone stairs one step at a time",
+    "seed": 3951
+  },
+  {
+    "id": "sthr-loc-milestones",
+    "art_type": "location",
+    "scene": "a sunken lane between high banks, old milestones along the verge counting down to a town that is behind you",
+    "seed": 5736
+  },
+  {
+    "id": "sthr-loc-lowbridge",
+    "art_type": "location",
+    "scene": "a low stone bridge barely above a slow river, water lapping over the cobbles, fog on both banks",
+    "seed": 4812
+  },
+  {
+    "id": "sthr-loc-turning",
+    "art_type": "location",
+    "scene": "a bend in a sunken road where the lane doubles back on itself, a lighthouse beam that never sweeps visible over the trees",
+    "seed": 3524
+  },
+  {
+    "id": "sthr-bridgeremembers",
+    "art_type": "treachery",
+    "scene": "wet footprints crossing a low stone bridge that begin and end in the middle",
+    "seed": 6639
+  },
+  {
+    "id": "sthr-loc-townhallsteps",
+    "art_type": "location",
+    "scene": "the wide steps of a small town hall draped in occultation bunting, a speaker's podium at the top, papers blowing",
+    "seed": 123
+  },
+  {
+    "id": "sthr-loc-recordsoffice",
+    "art_type": "location",
+    "scene": "a records office of tall wooden drawers and ledgers, a single green-shaded lamp over a desk",
+    "seed": 7717
+  },
+  {
+    "id": "sthr-loc-well",
+    "art_type": "location",
+    "scene": "an old stone well in a small yard behind the town hall, a bucket rope pulled taut into the dark",
+    "seed": 1151
+  },
+  {
+    "id": "sthr-samespeech",
+    "art_type": "treachery",
+    "scene": "a crowd in a square listening to a speech, their faces lit identically, their mouths moving with the speaker's",
+    "seed": 2936
+  },
+  {
+    "id": "sthr-crowdturns",
+    "art_type": "treachery",
+    "scene": "a crowd of townsfolk all turning their heads at once toward the viewer",
+    "seed": 3363
+  },
+  {
+    "id": "sthr-loc-wheel",
+    "art_type": "location",
+    "scene": "a Ferris wheel lit with bulbs against the black sky, one carriage swinging at the very top",
+    "seed": 1830
+  },
+  {
+    "id": "sthr-loc-hallofmirrors",
+    "art_type": "location",
+    "scene": "a hall of warped mirrors under strings of bulbs, reflections not quite matching one another",
+    "seed": 7983
+  },
+  {
+    "id": "sthr-loc-ticketbooth",
+    "art_type": "location",
+    "scene": "a painted ticket booth at the fairground gate, a roll of tickets unspooling across the counter, the window dark",
+    "seed": 6387
+  },
+  {
+    "id": "sthr-wheelsturn",
+    "art_type": "treachery",
+    "scene": "the gears and axle of a Ferris wheel turning in the dark, the hub bolt shaped like a clock hand",
+    "seed": 3293
+  },
+  {
+    "id": "sthr-reflectionlies",
+    "art_type": "treachery",
+    "scene": "a funhouse mirror whose reflection is smiling while the room is empty",
+    "seed": 6030
+  },
+  {
+    "id": "sthr-loc-readingroom",
+    "art_type": "location",
+    "scene": "a reading room of floor-to-ceiling shelves, ladders and green lamps, one book lying open on the floor",
+    "seed": 6324
+  },
+  {
+    "id": "sthr-loc-press",
+    "art_type": "location",
+    "scene": "a hand-cranked printing press with a half-set page of type, ink gleaming, almanac sheets hung to dry",
+    "seed": 1998
+  },
+  {
+    "id": "sthr-loc-sealedstudy",
+    "art_type": "location",
+    "scene": "a locked study door at the end of a book-lined corridor, light and a faint murmur coming from under it",
+    "seed": 6436
+  },
+  {
+    "id": "sthr-pagethatwasnt",
+    "art_type": "treachery",
+    "scene": "a single loose page lying on a library floor, printed in fresh ink that the rest of the book never had",
+    "seed": 5379
+  },
+  {
+    "id": "sthr-inkrunsbackward",
+    "art_type": "treachery",
+    "scene": "ink lifting off a written page back up into the nib of a hovering pen",
+    "seed": 6821
+  },
+  {
+    "id": "sthr-studydoor",
+    "art_type": "treachery",
+    "scene": "a brass keyhole in a dark wooden door, a thread of pale light leaking out and bending the wrong way",
+    "seed": 2593
+  },
+  {
+    "id": "sthr-loc-hubsquare",
+    "art_type": "location",
+    "scene": "the town square seen from its centre, four streets leading off into fog toward a church, a fairground, a road and a tall house of books",
+    "seed": 4931
+  },
+  {
+    "id": "sthr-act-firsthour",
+    "art_type": "act",
+    "scene": "the almanac house steps at eleven, handbills announcing the occultation at midnight, the sky already darkening at the edges",
+    "seed": 5043
+  },
+  {
+    "id": "sthr-story-firstreset",
+    "art_type": "story",
+    "scene": "dawn that is not dawn over the town square, lanterns relit, the night folding back into eleven o'clock",
+    "seed": 7605
+  },
+  {
+    "id": "sthr-act-lamp",
+    "art_type": "act",
+    "scene": "the great lighthouse lens catching its first flame, light beginning to pour out over the dark water",
+    "seed": 1039
+  },
+  {
+    "id": "sthr-act-whythirteen",
+    "art_type": "act",
+    "scene": "a parish register open under a candle, a column of tally marks for the bell, one mark too many",
+    "seed": 6534
+  },
+  {
+    "id": "sthr-act-hourwaswrong",
+    "art_type": "act",
+    "scene": "a waterlogged almanac page held up out of dark crypt water, the printed time smeared",
+    "seed": 7395
+  },
+  {
+    "id": "sthr-act-walkbackward",
+    "art_type": "act",
+    "scene": "a sunken road seen looking back toward town, footsteps in the mud pointing the other way",
+    "seed": 6891
+  },
+  {
+    "id": "sthr-act-walksbeside",
+    "art_type": "act",
+    "scene": "a hooded walker on a fog-bound road, the hood beginning to lift in the lamplight",
+    "seed": 6219
+  },
+  {
+    "id": "sthr-act-sheriffdead",
+    "art_type": "act",
+    "scene": "a sheriff's star and hat lying on the stone lip of a well at night",
+    "seed": 6044
+  },
+  {
+    "id": "sthr-act-vote",
+    "art_type": "act",
+    "scene": "a town ledger open to a page of signatures and a tally, a pen resting across it",
+    "seed": 1179
+  },
+  {
+    "id": "sthr-act-wheelturns",
+    "art_type": "act",
+    "scene": "the view from the top of a Ferris wheel over the whole lamplit town at once",
+    "seed": 5792
+  },
+  {
+    "id": "sthr-act-bargain",
+    "art_type": "act",
+    "scene": "a fairground ticket held out through a booth window by a gloved hand, the face behind it in shadow",
+    "seed": 3125
+  },
+  {
+    "id": "sthr-act-almanachid",
+    "art_type": "act",
+    "scene": "a printing press mid-stroke, a fresh almanac sheet coming off it with a different time printed",
+    "seed": 5239
+  },
+  {
+    "id": "sthr-act-appointedname",
+    "art_type": "act",
+    "scene": "a study desk with a single word written again and again on every paper, the word itself illegible",
+    "seed": 7724
+  },
+  {
+    "id": "sthr-act-lasthour",
+    "art_type": "act",
+    "scene": "the town square at the edge of midnight, a freestanding doorway at its centre, figures holding it shut against the dark",
+    "seed": 4231
+  },
+  {
+    "id": "sthr-res-1",
+    "art_type": "story",
+    "scene": "a lone lit window in a lighthouse at dawn, the town below waking, one figure keeping watch",
+    "seed": 6526
+  },
+  {
+    "id": "sthr-res-2",
+    "art_type": "story",
+    "scene": "a heavy door closing on a darkness, the town square in first morning light, the lanterns burnt out",
+    "seed": 6533
+  },
+  {
+    "id": "sthr-res-3",
+    "art_type": "story",
+    "scene": "figures walking out of the town along the sunken road at dawn, the fog behind them not quite lifting",
+    "seed": 6540
+  },
+  {
+    "id": "sthr-res-4",
+    "art_type": "story",
+    "scene": "a door sealed with iron bands and wax in the middle of the square, one chair empty beside it",
+    "seed": 6547
+  },
+  {
+    "id": "sthr-res-5",
+    "art_type": "story",
+    "scene": "eleven o'clock in the square again, but the sky has fewer stars missing than before",
+    "seed": 6554
+  },
+  {
+    "id": "sthr-res-6",
+    "art_type": "story",
+    "scene": "hooded figures walking the sunken road in fog, all in the same direction, never arriving",
+    "seed": 6561
+  },
+  {
+    "id": "sthr-story-actii",
+    "art_type": "story",
+    "scene": "the edge of the square at night, a tall shape at the end of a street that was not there a moment ago",
+    "seed": 3566
+  },
+  {
+    "id": "sthr-story-beforefinale",
+    "art_type": "story",
+    "scene": "an almanac house window lit late at night, the rest of the town dark and still",
+    "seed": 662
+  },
+  {
+    "id": "sthr-res-bargain",
+    "art_type": "story",
+    "scene": "a fairground gate at first light, a punched ticket on the ground, a tall shadow walking out into the morning",
+    "seed": 3251
   }
 ]

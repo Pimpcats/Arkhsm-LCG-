@@ -71,7 +71,7 @@ CARD_OVERRIDES_PATH = overrides_path()      # the default campaign's file
 # owner-editable fields, routed to the spec dict vs the print layer
 OV_SPEC_KEYS = ("name", "subtitle", "traits", "cost", "level", "victory",
                 "wil", "int", "com", "agi", "slot", "health", "sanity",
-                "shroud", "clues", "doom")
+                "shroud", "clues", "doom", "back_shroud")
 OV_PT_KEYS = ("text", "flavor", "back_text", "back_flavor", "fight", "evade",
               "damage", "horror", "player", "investigator1", "xp1",
               "investigator2", "xp2", "investigator3", "xp3")
@@ -79,7 +79,7 @@ OV_PT_KEYS = ("text", "flavor", "back_text", "back_flavor", "fight", "evade",
 # is legal, so these aren't forced to int)…
 OV_NUMERIC_KEYS = ("cost", "level", "victory", "wil", "int", "com", "agi",
                    "health", "sanity", "fight", "evade",
-                   "shroud", "clues", "doom")
+                   "shroud", "clues", "doom", "back_shroud")
 # …vs pip counts, which feed range() in the renderers and MUST be small ints
 OV_PIP_KEYS = ("damage", "horror")
 # location "element" fields — the own symbol, its colour, whether clues are per
@@ -1957,8 +1957,21 @@ def s_act(c, pt, dest, art_path=None, placement=None):
               fill=(74, 60, 46), align="left")
     _box_text(d, c["name"], se_reg("Act", "Name"), title=True, grow=1.15, key="name")
     if c.get("clues") not in (None, ""):
-        _box_text(d, str(c["clues"]), se_reg("Act", "Clues"),
-                  stat=True, grow=1.0, fill=(238, 232, 216), pos_key="clues")
+        cb = se_reg("Act", "Clues")
+        if c.get("clues_per_investigator") and cb:
+            # a per-investigator threshold: numeral left of centre and the
+            # plugin's own per-investigator mark beside it, as on locations
+            w = cb[2] - cb[0]
+            _box_text(d, str(c["clues"]), (cb[0] - w // 8, cb[1], cb[2] - w // 8, cb[3]),
+                      stat=True, grow=1.0, max_size=int((cb[3] - cb[1]) * 0.75),
+                      fill=(238, 232, 216), pos_key="clues")
+            hat = _tint_icon(_se_img("icons", "AHLCG-PerInvestigator"), (238, 232, 216))
+            cx, cy = cb[2] - w // 6, (cb[1] + cb[3]) // 2 - (cb[3] - cb[1]) // 6
+            hw, hh = int(w * 0.22), int(w * 0.18)
+            _paste_icon_fit(img, hat, (cx - hw, cy - hh, cx + hw, cy + hh))
+        else:
+            _box_text(d, str(c["clues"]), cb,
+                      stat=True, grow=1.0, fill=(238, 232, 216), pos_key="clues")
     _scenario_body(d, "Act", c, pt)
     _scenario_footer(d, "Act", c, art_path)
     img.save(dest)
@@ -2269,6 +2282,16 @@ def main():
             s_player_card(c["type"], c, pt, dest, art_path=art, placement=place)
         elif c["type"] in SCENARIO_RENDERERS and has_se_frames():
             SCENARIO_RENDERERS[c["type"]](c, pt, dest, art_path=art, placement=place)
+            if c["type"] == "Location" and (pt.get("back_text")
+                                            or c.get("back_shroud") not in (None, "")):
+                # a location a Knowledge fact flips (src/StillHour/Locations.ttslua
+                # flipFact) prints its flipped side as the card's back: same
+                # frame, its own shroud/rules/flavour
+                bc = dict(c, shroud=c.get("back_shroud", c.get("shroud")))
+                bpt = dict(pt, text=pt.get("back_text", ""),
+                           flavor=pt.get("back_flavor", ""))
+                SCENARIO_RENDERERS["Location"](bc, bpt, back_dest, art_path=art,
+                                               placement=place)
         else:
             render_player_card(c, pt, dest, art_path=art, placement=place)
     n = len([f for f in os.listdir(FACES_DIR) if f.endswith(".png")])

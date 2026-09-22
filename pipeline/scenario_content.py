@@ -16,7 +16,9 @@ emits, and reports:
   * the map — each location's connections resolve to exactly one real
     location of the same map (by printed symbol + colour), every link is
     symmetric, no symbol repeats inside a box (or a box plus the loop hub it
-    is placed onto) and no two locations of one map share a grid slot;
+    is placed onto), every SCED connection key is unique on its map (so SCED
+    draws exactly the printed lines) and no two locations share a grid slot;
+  * feasibility — every objective can be met at 1, 2, 3 and 4 investigators;
   * card data — the fields a card type needs to be played are present, and
     the compiled GMNotes carry SCED's own shape for them.
 
@@ -145,6 +147,10 @@ MARKUP = {"action", "fast", "reaction", "wil", "int", "com", "agi", "wild",
           "elder", "autofail", "codex"}
 
 
+def owner_of(members, cid):
+    return next((s for s, c in members if c == cid), "_map")
+
+
 def check_card_fields(rep, sid, cid, c):
     t = c.get("type")
     for field in ("text", "flavor"):
@@ -218,6 +224,62 @@ def check_gmnotes(rep, sid, cid, c):
         rep.err(sid, "{}: scenario-side card not tagged ScenarioCard".format(cid))
 
 
+PLAYER_COUNTS = (1, 2, 3, 4)
+
+
+def objective_feasibility(cards, assign, manifest, n):
+    """[(scenario, problem)] for any objective that cannot be met with n
+    investigators. Each act's manifest entry says what it consumes (needs):
+    its printed clue threshold from named locations, a fixed number of clues,
+    at least k clues at each named location, a non-clue test, or the finale
+    contest. Clue values and thresholds scale when printed per investigator."""
+    out = []
+    groups = map_groups(manifest)
+    for sc in manifest["scenarios"]:
+        sid = sc["id"]
+        pool = [x for g in groups[sc.get("map", sid)] for x in _locs(assign, g, cards)]
+
+        def clues_at(name):
+            hit = [cid for cid in pool if _norm(cards[cid]["name"]) == _norm(name)]
+            if len(hit) != 1:
+                return None
+            c = cards[hit[0]]
+            return int(c.get("clues") or 0) * (n if c.get("clues_per_investigator") else 1)
+
+        for a in (sc.get("stacks", {}).get("act_deck") or {}).get("cards", []):
+            need = a.get("needs")
+            card = cards.get(a["id"], {})
+            if not need:
+                out.append((sid, "act {} does not say what it needs".format(a["id"])))
+                continue
+            where = need.get("from", [])
+            got = [clues_at(w) for w in where]
+            if None in got:
+                out.append((sid, "act {}: a clue source does not resolve".format(a["id"])))
+                continue
+            label = "act {} at {} investigator(s)".format(a["id"], n)
+            if need.get("clues") == "card":
+                want = int(card.get("clues") or 0) * (n if card.get("clues_per_investigator") else 1)
+                if not want:
+                    out.append((sid, "act {} prints no clue threshold".format(a["id"])))
+                elif sum(got) < want:
+                    out.append((sid, "{}: needs {} clues, only {} exist".format(label, want, sum(got))))
+            elif "fixed" in need:
+                if sum(got) < need["fixed"]:
+                    out.append((sid, "{}: needs {} clues, only {} exist".format(
+                        label, need["fixed"], sum(got))))
+            elif "each" in need:
+                if min(got) < need["each"]:
+                    out.append((sid, "{}: a location has fewer than {} clue(s)".format(label, need["each"])))
+            elif "contest" in need:
+                con = need["contest"]
+                if not any("repeatable" in s for s in con.get("sources", [])):
+                    out.append((sid, "{}: the contest has no repeatable source".format(label)))
+            elif "test" not in need:
+                out.append((sid, "act {}: unknown need {}".format(a["id"], need)))
+    return out
+
+
 def audit(campaign="still_hour"):
     cards, assign, manifest = load(campaign)
     rep = Report()
@@ -288,10 +350,23 @@ def audit(campaign="still_hour"):
                 if _norm(c.get("name")) != _norm(entry.get("name")):
                     rep.err(sid, "{} is named '{}', manifest says '{}'".format(
                         cid, c.get("name"), entry.get("name")))
+                accepted = entry.get("accepted") or {}
                 for f in ("shroud", "clues"):
                     if f in entry and str(c.get(f)) != str(entry[f]):
+                        if f in accepted and str(accepted[f]) == str(c.get(f)):
+                            continue        # a deliberate, documented deviation
                         rep.warn(sid, "{}: {} {} differs from the guide's {}".format(
                             cid, f, c.get(f), entry[f]))
+                back = entry.get("back")
+                if back:
+                    # a fact-flipped location prints its other side as the back
+                    if not c.get("back_text"):
+                        rep.err(sid, "{}: flips on a fact but has no back text".format(cid))
+                    elif _norm(back.get("flip_fact")) not in _norm(c.get("back_text")):
+                        rep.err(sid, "{}: back does not name its fact".format(cid))
+                    if str(c.get("back_shroud")) != str(back.get("shroud")):
+                        rep.err(sid, "{}: back shroud {} != {}".format(
+                            cid, c.get("back_shroud"), back.get("shroud")))
             extra = [c for c in own_locs if c not in want]
             if extra:
                 rep.err(sid, "locations not in the manifest: {}".format(extra))
@@ -477,15 +552,30 @@ def audit(campaign="still_hour"):
             for s, ids in seen.items():
                 if len(ids) > 1:
                     rep.err(sid, "symbol {} repeats on {}".format(s, ids))
-        # districts that share a printed symbol (only matters if both are placed
-        # in the same loop) - reported, not failed: 15 symbols, 20 loop locations
-        bysym = collections.defaultdict(list)
+        # what SCED itself matches on: the GMNotes icon keys. A printed symbol
+        # may repeat across districts in another colour, but the key never may,
+        # or SCED would draw lines between districts placed in the same loop.
+        keys = collections.defaultdict(list)
+        meta = {}
         for sid, cid in members:
-            bysym[_sym(cards[cid].get("icons"))].append((sid, cid))
-        for s, hits in sorted(bysym.items()):
-            if len({h[0] for h in hits}) > 1:
-                rep.warn("_map:" + group, "symbol {} is printed on {} (different colours)".format(
-                    s, [h[1] for h in hits]))
+            m = json.loads(B.build_card(CC.normalize(cards[cid]))["GMNotes"])
+            front = m.get("locationFront") or {}
+            meta[cid] = front
+            for k in re.findall(r"[A-Za-z]+", front.get("icons", "")):
+                keys[k].append(cid)
+        for k, ids in keys.items():
+            if len(ids) > 1:
+                rep.err(owner_of(members, ids[0]), "SCED icon key {} shared by {}".format(k, ids))
+        for cid, front in meta.items():
+            for k in re.findall(r"[A-Za-z]+", front.get("connections", "")):
+                hits = keys.get(k, [])
+                if len(hits) != 1:
+                    rep.err(owner_of(members, cid), "{}: SCED connection {} matches {}".format(
+                        cid, k, hits))
+                elif not any(kk in re.findall(r"[A-Za-z]+", meta[hits[0]].get("connections", ""))
+                             for kk in re.findall(r"[A-Za-z]+", front.get("icons", ""))):
+                    rep.err(owner_of(members, cid), "{}: SCED line to {} is one-way".format(
+                        cid, hits[0]))
         slots = collections.defaultdict(list)
         for sid, cid in members:
             slot = (_box(assign, sid).get("_map") or {}).get(cid)
@@ -497,6 +587,10 @@ def audit(campaign="still_hour"):
         for slot, ids in slots.items():
             if len(ids) > 1:
                 rep.err(owner[ids[0]], "map '{}': {} share slot {}".format(group, ids, slot))
+    # ---- every objective can be met at every supported table size -----------
+    for n in PLAYER_COUNTS:
+        for sid, msg in objective_feasibility(cards, assign, manifest, n):
+            rep.err(sid, msg)
     return rep, assign, manifest
 
 
