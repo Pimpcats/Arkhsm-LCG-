@@ -51,17 +51,26 @@ end
 
 --------------------------------------------------------------------- targeting --
 
---- Prey = the investigator with the most on-card Memory. Pass a map
--- { investigatorId = memoryCount }. Ties resolve to the first max seen.
-function Appointed.prey(memoryByInvestigator)
-  local best, bestId
-  for id, m in pairs(memoryByInvestigator or {}) do
-    if best == nil or m > best then
-      best = m
-      bestId = id
-    end
+--- Every investigator tied for the most on-card Memory (sorted ids). Pass a
+-- map { investigatorId = memoryCount }. The design gives no tie-break, so the
+-- Arkham rule applies: among tied prey the Hunter goes for the nearest, and the
+-- lead investigator decides a remaining tie (the board layer does both).
+function Appointed.preyCandidates(memoryByInvestigator)
+  local best
+  for _, m in pairs(memoryByInvestigator or {}) do
+    if best == nil or m > best then best = m end
   end
-  return bestId
+  local out = {}
+  for id, m in pairs(memoryByInvestigator or {}) do
+    if m == best then out[#out + 1] = id end
+  end
+  table.sort(out, function(a, b) return tostring(a) < tostring(b) end)
+  return out, best
+end
+
+--- Prey = the investigator with the most on-card Memory (first tied id, sorted).
+function Appointed.prey(memoryByInvestigator)
+  return (Appointed.preyCandidates(memoryByInvestigator))[1]
 end
 
 ------------------------------------------------------------- board manifest --

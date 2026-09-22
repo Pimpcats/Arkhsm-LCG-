@@ -23,6 +23,7 @@ local function encode(v)
 end
 
 local failures = 0
+local encodeJSON  -- set below
 local function expect(name, cond)
   print((cond and "  ok    " or "  FAIL  ") .. name)
   if not cond then failures = failures + 1 end
@@ -35,6 +36,7 @@ local selfObj = {
   clearButtons = function() buttons = {} ; return true end,
   getPosition = function() return { x = 3, y = 1, z = 0 } end,
 }
+encodeJSON = encode
 local env = setmetatable({
   JSON = { encode = encode, decode = function(s) return assert(load("return " .. s))() end },
   print = function(...)
@@ -152,6 +154,94 @@ env.onLoad(encode({ version = 1, investigators = 3, loopsCompleted = 2, bankedMe
   hourglass = 1, knowledge = {}, oncePerLoopFlags = {}, testTypesThisLoop = {}, testTypesLastLoop = {},
   years = {}, brackets = {}, appointedStage = 0, victoryLog = {} }))
 expect("legacy v1 save loads", env.shApiState().memory == 7 and env.shApiState().loops == 2)
+
+print("\n== investigators on a vanilla table: on-card Memory, Aging, log mirror ==")
+-- a tiny table: two investigator cards, one minicard, a campaign log
+local function stubCard(nick, md, tags)
+  local o = { type = "Card", buttons = {}, tags = {}, memo = "" }
+  for _, t in ipairs(tags or {}) do o.tags[t] = true end
+  o.getName = function() return nick end
+  o.getGMNotes = function() return encodeJSON(md) end
+  o.getGUID = function() return nick end
+  o.getPosition = function() return { x = 0, y = 1, z = 0 } end
+  o.hasTag = function(t) return o.tags[t] == true end
+  o.createButton = function(def) o.buttons[#o.buttons + 1] = def ; return true end
+  o.getButtons = function()
+    local l = {}
+    for i, b in ipairs(o.buttons) do l[i] = { label = b.label, index = i - 1 } end
+    return l
+  end
+  o.removeButton = function(i) table.remove(o.buttons, i + 1) ; return true end
+  return o
+end
+local elias = stubCard("Elias Warde", { id = "sthr-elias", type = "Investigator", willpowerIcons = 3,
+  intellectIcons = 2, combatIcons = 4, agilityIcons = 3, health = 9, sanity = 5 })
+local birdie = stubCard("Birdie", { id = "sthr-birdie", type = "Investigator", willpowerIcons = 2,
+  intellectIcons = 3, combatIcons = 3, agilityIcons = 5, health = 6, sanity = 7 })
+local mini = stubCard("Elias mini", { id = "sthr-elias-m", type = "Minicard" }, { "Minicard" })
+local log = stubCard("Campaign Log", { id = "STHR-LOG", type = "CampaignLog" }, { "CampaignLog" })
+log.type = "Generic"
+local table_ = { elias, birdie, mini, log }
+env.getObjects = function() return table_ end
+env.getObjectsWithTag = function(t)
+  local l = {}
+  for _, o in ipairs(table_) do if o.hasTag(t) then l[#l + 1] = o end end
+  return l
+end
+env.shSyncBoard()
+local function cardLabel(o, prefix)
+  for _, b in ipairs(o.buttons) do if b.label:sub(1, #prefix) == prefix then return b end end
+end
+expect("each investigator card gets a Memory button", cardLabel(elias, "Memory 0") and cardLabel(birdie, "Memory 0"))
+expect("each investigator card shows its Years", cardLabel(elias, "Years 0 · Prime") ~= nil)
+expect("control lists investigator Memory rows", hasLabel("Birdie · Memory 0") and hasLabel("Elias Warde · Memory 0"))
+env.shCardMemory(elias, "White", false) ; env.shCardMemory(elias, "White", false)
+expect("clicking the card's Memory button adds on-card Memory", cardLabel(elias, "Memory 2") ~= nil
+  and hasLabel("Elias Warde · Memory 2") ~= nil)
+local row = hasLabel("Birdie · Memory")
+env[row.click_function](nil, "White", false)
+env.shCardMemory(birdie, "White", true) ; env.shCardMemory(birdie, "White", true)
+expect("right-click lowers it, never below 0", cardLabel(birdie, "Memory 0") ~= nil)
+local inv = env.shApiInvestigators()
+expect("runner API reports investigators with Memory", #inv == 2 and inv[1].memory + inv[2].memory == 2)
+local mirror = env.shApiLogMirror()
+expect("state is mirrored into the campaign log memo", mirror ~= nil and mirror.bytes > 0)
+
+-- interlude: bank, age with a locked choice, visible Years
+env.shApiCounter({ name = "dissonance", delta = 12 })
+env.shApiReset()
+env.shOpenInterlude()
+expect("interlude shows Bank on-card Memory (2)", hasLabel("Bank on-card Memory (2)") ~= nil)
+expect("loop ended in danger is shown", hasLabel("Loop ended in danger: yes") ~= nil)
+local mem0 = env.shApiState().memory
+env.shBankOnCard()
+expect("banking moves on-card Memory to the bank", env.shApiState().memory == mem0 + 2)
+env.shApiCounter({ name = "memory", delta = 0 })
+local b = hasLabel("Birdie · Years 0")
+expect("aging row per investigator", b ~= nil and hasLabel("Defeated: no") ~= nil)
+-- Birdie is row 1 or 2 depending on sort; find its index
+local bi = investigatorIndex and investigatorIndex("sthr-birdie")
+local r = env.shApiAge({ id = "sthr-birdie", defeated = true, leaned = true, physical = "agility", mental = "willpower" })
+expect("Age applies Years (1 + defeated + danger + leaned = 4)", r ~= nil and r.years == 4 and r.gained == 4)
+expect("aging only once per interlude", env.shApiAge({ id = "sthr-birdie" }) == nil)
+env.shApiAge({ id = "sthr-elias" })
+local r2 = env.shApiAge({ id = "sthr-birdie" })
+expect("Birdie's card shows her Years", cardLabel(birdie, "Years 4 · Prime") ~= nil)
+env.shBeginNextLoop()
+env.shApiAge({ id = "sthr-birdie", physical = "agility", mental = "willpower" })   -- 4 -> 5 Weathered
+expect("the card shows the new bracket", cardLabel(birdie, "Years 6 · Weathered") ~= nil)
+-- a fresh control token adopts the newer state from the campaign log (SCED export/import path)
+local before2 = env.shApiState()
+local env2 = setmetatable({ self = { createButton = function() return true end, clearButtons = function() return true end,
+  getPosition = function() return { x = 3, y = 1, z = 0 } end } }, { __index = env })
+local chunk2 = assert(loadfile("dist/stillhour_bundle.lua", "t", env2))
+chunk2()
+env2.onLoad("")
+local after2 = env2.shApiState()
+local yrs = 0
+for _, i in ipairs(env2.shApiInvestigators()) do yrs = yrs + i.years end
+expect("a fresh control token adopts the campaign-log copy (SCED export/import path)",
+  after2.loops == before2.loops and after2.memory == before2.memory and yrs == 8)
 
 expect("no board-wiring errors on a vanilla table", #errors == 0)
 for _, e in ipairs(errors) do print("    " .. e) end

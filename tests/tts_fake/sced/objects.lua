@@ -6,7 +6,7 @@
 -- GUIDReferenceApi exposes. The map is owner -> type -> guid.
 local INDEX = {
   Mythos = { PlayArea = "5ce0a1", TokenSpawnTracker = "e3fa31", InvestigatorCounter = "f182ee" },
-  White = { Playermat = "8b081b" },
+  White = { Playermat = "8b081b", InvestigatorSkillTracker = "e598c2" },
 }
 
 function getObjectByOwnerAndType(params)
@@ -57,5 +57,32 @@ val = 3
 function updateVal(v) val = v end
 
 --@@ Playermat
+-- src/playermat/Playermat.ttslua: activeInvestigatorData is filled when an
+-- investigator card lands on the mat (maybeUpdateActiveInvestigator). The
+-- fixture starts with a Still Hour investigator seated on White.
 matColor = "White"
 playerColor = "White"
+local activeInvestigatorData = { id = "sthr-elias", class = "Guardian", miniId = "sthr--m" }
+function getActiveInvestigatorData() return activeInvestigatorData end
+function setActiveInvestigatorData(newData) activeInvestigatorData = newData end
+
+--@@ InvestigatorSkillTracker
+-- src/playermat/InvestigatorSkillTracker.ttslua (same state, labels, save).
+stats = { 1, 1, 1, 1 }
+function updateSave() self.script_state = JSON.encode(stats) end
+function onLoad(savedData)
+  if savedData and savedData ~= "" then stats = JSON.decode(savedData) or { 1, 1, 1, 1 } end
+  for index = 1, 4 do
+    self.createButton({ click_function = "noop", function_owner = self, label = stats[index] .. "   " })
+  end
+end
+function updateButtonLabel(index)
+  self.editButton({ index = index - 1, label = stats[index] .. "   " })
+end
+function updateStats(newStats)
+  if newStats and #newStats == 4 then
+    stats = newStats
+    for i = 1, 4 do updateButtonLabel(i) end
+    updateSave()
+  end
+end

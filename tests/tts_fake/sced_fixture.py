@@ -3,7 +3,8 @@
 Returns the list of objects mock_tts.lua loads before running a chunk: SCED's
 Global (tests/tts_fake/sced/Global.lua, as the "__Global__" pseudo-object), the
 GUID reference handler at SCED's fixed GUID 123456, the Mythos objects its APIs
-resolve (PlayArea, TokenSpawnTracker, InvestigatorCounter), one playermat and a
+resolve (PlayArea, TokenSpawnTracker, InvestigatorCounter), one playermat (a
+Still Hour investigator active on it) with its skill tracker, a campaign log and a
 chaos bag holding ordinary SCED tokens (Custom_Tile, named like ID_URL_MAP)."""
 import os
 import re
@@ -43,6 +44,9 @@ def sced_table():
         _obj("Custom_Tile", "Token Spawn Tracker", "e3fa31", s["TokenSpawnTracker"], x=-60, z=5),
         _obj("Custom_Tile", "Investigator Counter", "f182ee", s["InvestigatorCounter"], x=-60, z=8),
         _obj("Custom_Tile", "White Playermat", "8b081b", s["Playermat"], tags=["Playermat"], x=-20, z=-25),
+        _obj("Custom_Tile", "White Skill Tracker", "e598c2", s["InvestigatorSkillTracker"], x=-20, z=-30),
+        _obj("Custom_Token", "Campaign Log", "c10901", tags=["CampaignLog"], x=-50, z=20,
+             GMNotes='{"id":"STHR-LOG","type":"CampaignLog"}'),
         _obj("Bag", "Chaos Bag", "cb0001", tags=["ChaosBag"], x=-8, z=12,
              ContainedObjects=tokens),
     ]

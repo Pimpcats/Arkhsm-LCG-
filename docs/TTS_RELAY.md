@@ -40,13 +40,15 @@ For each new commit on the watched branch:
    their persistence; `[static]` tokens entering/leaving SCED's chaos bag and a
    drawn one raising Dissonance; two test location cards flipping and
    un-sealing; the Appointed card manifesting at the farthest location, Hold
-   Back, returning when put in a bag, hunting), and dealing a card. With the
-   table payload (`dist/the_still_hour_table.json`) it also presses the
-   campaign box's Place, checks the minicards / campaign guide / campaign log it
-   lays out (log clicks, save+reload, page turn, sync from the campaign state),
-   screenshots the log, and presses Recall. Best run on a fresh SCED table:
-   other locations/minicards already on the table take part in "farthest" and
-   "prey". It also moves the
+   Back, returning when put in a bag, hunting the investigator with the most
+   on-card Memory; Aging on an investigator card and its SCED skill tracker;
+   the state riding in the campaign log through a simulated SCED export), and
+   dealing a card. With the table payload (`dist/the_still_hour_table.json`) it
+   also presses the campaign box's Place, checks the minicards / campaign guide /
+   campaign log it lays out (log clicks, save+reload, page turn, sync from the
+   campaign state), screenshots the log, and presses Recall. Best run on a fresh
+   SCED table: other locations/minicards already on the table take part in
+   "farthest" and "prey". It also moves the
    camera over each object so the relay can screenshot the TTS window.
 4. Commits `runs/<time>_<commit>/{results.json,log.txt,screenshots/}` plus
    `latest.json` to the `tts-results` branch and pushes it.

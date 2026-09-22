@@ -167,10 +167,14 @@ function makeObject(data, stateId)
       end
       if k == "__env" then return st.env end
       if k == "loading_custom" then return false end
+      if k == "memo" then return data.Memo or "" end
       return fields[k]
     end,
-    __newindex = function(_, k, v)
-      if k == "script_state" then data.LuaScriptState = v else rawset(o, k, v) end
+    -- Object.memo (saved user-data) and Object.script_state are writable
+    __newindex = function(t, k, v)
+      if k == "memo" then data.Memo = v
+      elseif k == "script_state" then data.LuaScriptState = v
+      else rawset(t, k, v) end
     end,
   })
   local function tags()
@@ -250,6 +254,14 @@ function makeObject(data, stateId)
     return l
   end)
   o.createButton = method(o, function(def) st.buttons[#st.buttons + 1] = deepcopy(def) ; return true end)
+  o.editButton = method(o, function(p)
+    local b = st.buttons[(p.index or 0) + 1]
+    if not b then return false end
+    for k, v in pairs(p) do if k ~= "index" then b[k] = v end end
+    return true
+  end)
+  o.getMemo = method(o, function() return data.Memo or "" end)
+  o.setMemo = method(o, function(v) data.Memo = v ; return true end)
   o.removeButton = method(o, function(i) table.remove(st.buttons, (i or 0) + 1) ; return true end)
   o.clearButtons = method(o, function() st.buttons = {} ; return true end)
   o.addTag = method(o, function(tag) st.tags[tag] = true ; return true end)

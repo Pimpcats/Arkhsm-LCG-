@@ -149,4 +149,32 @@ function SCED.spawnForCard(card)
   return true
 end
 
+------------------------------------------------------------------ playmats --
+
+-- SCED's four mat colours (core/GUIDReferenceHandler.ttslua owners).
+SCED.MAT_COLORS = { "White", "Orange", "Green", "Red" }
+
+--- The playermat object for a mat colour (GUIDReferenceApi owner/type lookup).
+function SCED.playermat(matColor)
+  return SCED.getObjectByOwnerAndType(matColor, "Playermat")
+end
+
+--- PlayermatApi.getActiveInvestigatorData(matColor) -> {id, class, miniId, ...}.
+-- Playermat.ttslua fills it when an investigator card lands on the mat.
+function SCED.activeInvestigatorData(matColor)
+  local mat = SCED.playermat(matColor)
+  if not mat then return nil end
+  local d = try(function() return mat.call("getActiveInvestigatorData") end)
+  if type(d) == "table" then return d end
+  return nil
+end
+
+--- Set a mat's skill tracker the way Playermat.maybeUpdateActiveInvestigator
+-- does: ownedObjects.InvestigatorSkillTracker.call("updateStats", {wil, int, com, agi}).
+function SCED.setSkillTracker(matColor, wil, int, com, agi)
+  local tracker = SCED.getObjectByOwnerAndType(matColor, "InvestigatorSkillTracker")
+  if not tracker then return false end
+  return try(function() tracker.call("updateStats", { wil, int, com, agi }) ; return true end) or false
+end
+
 return SCED

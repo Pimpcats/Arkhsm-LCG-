@@ -94,7 +94,7 @@ Everything below the line is done and tested offline; the ordered gaps to an
 actual play session:
 
 1. **In-TTS load test** (~an evening, needs your PC): load
-   `dist/the_still_hour_mod.json`, click **Run Tests** (expect 45/45), poke the
+   `dist/the_still_hour_mod.json`, click **Run Tests** (expect 47/47), poke the
    counters. First real-engine validation. The TTS relay
    (`docs/TTS_RELAY.md`) now also drives the board wiring below.
 2. **Board wiring** — 🟡 built, offline-verified; needs the real-TTS relay run.
@@ -112,9 +112,29 @@ actual play session:
    `memoryCost`, level-ups 1–5, Begin Next Loop), all persisted in `onSave`.
    Knowledge facts are recorded from the console (`shUnlock("<fact-id>")`),
    deliberately with no on-table list (fact names are spoilers).
+   **Prey / on-card Memory:** each investigator's Memory-on-cards is a
+   touchable counter (a Memory button on the investigator card and a row on
+   the control token), stored in `CampaignState.onCardMemory`. Hunt goes for
+   the most Memory (`Appointed.preyCandidates`); tied prey → the nearest; a
+   tie that remains is the lead investigator's call (the design is silent, so
+   the Arkham rule applies) and the table is told. Investigators are linked to
+   their minicard by id (`<id>-m`) and, under SCED, to a mat via
+   `getActiveInvestigatorData`. The interlude banks on-card Memory; Elder+
+   start each loop with 1 on their card.
+   **Aging on the table:** the interlude panel ages each investigator once
+   (Defeated / Leaned toggles, "ended in danger" from the Dissonance recorded
+   at the reset, locked physical/mental choice). Years + bracket (and changed
+   max health/sanity) show on the investigator card; under SCED the aged
+   skills go to that mat's skill tracker (`InvestigatorSkillTracker.
+   updateStats`, as Playermat does). SCED has no max-health/sanity setter, so
+   those show on the card only. Trackers are rewritten only on Age / Begin
+   Next Loop / Sync Board, never on routine clicks.
    Open: the fact-flipped location *backs* have no art yet (a flipped card
-   shows the generic encounter back); on-card Memory per investigator is not
-   tracked physically, so the Appointed hunts the nearest investigator.
+   shows the generic encounter back). SCED's `Global.getMiniId` turns any
+   short hyphenated id into its first five characters + "-m", so for
+   `sthr-...` investigators SCED expects the minicard id `sthr--m` (its
+   minicard highlight will not match `sthr-elias-m`); our board matches by
+   stripping `-m` and is unaffected.
 3. **Playable content minimum**: the Prologue + district locations exist as
    *rules text* in the guide but not yet as location/objective **cards** in the
    spec (only the 33 player/boss cards are generated). Generating the ~25

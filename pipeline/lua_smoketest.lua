@@ -357,6 +357,45 @@ CampaignState.init(3); CampaignState.advanceAppointed(1); CampaignState.setHour(
 Appointed.holdBack(actx)
 check("Hold Back to Unseen removes the figure from the board", removed == 1 and Appointed.stage() == 0)
 
+print("== Prey: on-card Memory per investigator ==")
+CampaignState.init(3)
+CampaignState.addOnCardMemory("sthr-elias", 2)
+CampaignState.addOnCardMemory("sthr-ayako", 3)
+CampaignState.addOnCardMemory("sthr-cass", 3)
+check("on-card Memory is per investigator", CampaignState.getOnCardMemory("sthr-ayako") == 3
+  and CampaignState.getOnCardMemory("sthr-birdie") == 0)
+check("on-card Memory never goes below 0", CampaignState.addOnCardMemory("sthr-elias", -9) == 0)
+local cands, most = Appointed.preyCandidates(CampaignState.onCardMemoryMap())
+check("prey candidates = everyone tied for most", #cands == 2 and cands[1] == "sthr-ayako"
+  and cands[2] == "sthr-cass" and most == 3)
+CampaignState.addOnCardMemory("sthr-cass", 1)
+check("a single most-Memory investigator is the prey", Appointed.prey(CampaignState.onCardMemoryMap()) == "sthr-cass")
+local blob2 = CampaignState.serialize()
+CampaignState.init(3) ; CampaignState.deserialize(blob2)
+check("on-card Memory survives save/load (node travel)", CampaignState.getOnCardMemory("sthr-cass") == 4)
+CampaignState.raiseDissonance(13) ; CampaignState.reset()
+check("a reset keeps on-card Memory until the interlude banks it", CampaignState.getOnCardMemory("sthr-cass") == 4)
+check("the loop-end Dissonance is recorded for Aging", CampaignState.getLastLoopEndDissonance() == 13)
+check("...and reads as ended in danger (>= 12 at 3p)", Interlude.loopEndedInDanger() == true)
+local banked0 = CampaignState.getBankedMemory()
+check("interlude banks all on-card Memory", Interlude.bankOnCard() == 7
+  and CampaignState.getBankedMemory() == banked0 + 7 and CampaignState.getOnCardMemory("sthr-cass") == 0)
+
+print("== Aging: locked choice + Elder start-of-loop Memory ==")
+CampaignState.init(3) ; CampaignState.addYears("sthr-birdie", 5)
+check("Weathered without a choice needs one", Aging.needsChoice("sthr-birdie") == true)
+check("lockChoice rejects a non-physical skill", Aging.lockChoice("sthr-birdie", "intellect", "willpower") == false)
+check("lockChoice records the first choice", Aging.lockChoice("sthr-birdie", "agility", "willpower") == true
+  and not Aging.needsChoice("sthr-birdie"))
+check("the choice is locked", Aging.lockChoice("sthr-birdie", "combat", "intellect") == false
+  and CampaignState.getBracket("sthr-birdie").physical == "agility")
+local bs = Aging.applyDriftToStats({ wil = 2, int = 3, com = 3, agi = 5, health = 6, sanity = 7 }, "sthr-birdie")
+check("locked drift applies (agi 5->4, wil 2->3)", bs.agi == 4 and bs.wil == 3 and bs.com == 3)
+CampaignState.addYears("sthr-birdie", 5)   -- Elder
+Interlude.beginNextLoop()
+check("Elder begins the loop with 1 Memory on their card", CampaignState.getOnCardMemory("sthr-birdie") == 1)
+check("a Prime investigator does not", CampaignState.getOnCardMemory("sthr-elias") == 0)
+
 print("== Board wiring: SCED adapter is inert without SCED ==")
 local SCED = require("StillHour/SCED")
 check("SCED absent offline", SCED.isPresent() == false)

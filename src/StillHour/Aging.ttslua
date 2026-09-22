@@ -102,6 +102,30 @@ function Aging.applyInterlude(investigatorId, cond, lockedChoice)
   }
 end
 
+--- Record the Weathered drift choice later than applyInterlude (e.g. from the
+-- interlude panel). Only the first choice sticks — it is LOCKED thereafter.
+-- Returns true if the choice was recorded now.
+function Aging.lockChoice(investigatorId, physical, mental)
+  if not Aging.PHYSICAL_SKILLS[physical] or not Aging.MENTAL_SKILLS[mental] then
+    return false
+  end
+  local record = CampaignState.getBracket(investigatorId) or {}
+  if record.physical then
+    return false
+  end
+  record.physical, record.mental = physical, mental
+  record.bracket = record.bracket or Aging.bracketForYears(CampaignState.getYears(investigatorId))
+  CampaignState.setBracket(investigatorId, record)
+  return true
+end
+
+--- Does this investigator still need a locked drift choice (Weathered+ without one)?
+function Aging.needsChoice(investigatorId)
+  local bracket = Aging.bracketForYears(CampaignState.getYears(investigatorId))
+  local record = CampaignState.getBracket(investigatorId) or {}
+  return bracket ~= Aging.PRIME and not record.physical
+end
+
 --- The cumulative stat drift for an investigator's current bracket.
 -- Deltas are relative to the printed base stat line; the host applies them with
 -- a floor of 1 on skills. Returns nil for Prime (no change).
