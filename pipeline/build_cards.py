@@ -65,8 +65,29 @@ def transform():
 def build_gmnotes(c):
     """Emit only the metadata fields relevant to this card's type."""
     t = c["type"]
-    m = {"id": c["id"], "type": t, "class": c["class"], "traits": c["traits"],
-         "cycle": "The Still Hour"}
+    # SCED calls the chaos-token card a ScenarioReference (docs/art_reference/
+    # sced_objects/campaign_box_memory_bag.json); our editor calls it Scenario.
+    meta_type = "ScenarioReference" if t == "Scenario" else t
+    m = {"id": c["id"], "type": meta_type, "class": c["class"],
+         "traits": c["traits"], "cycle": "The Still Hour"}
+    if t in SCENARIO_SIDE_TYPES and not c.get("traits"):
+        # real agendas/acts/references carry no traits key at all
+        del m["traits"]
+    if t == "Agenda":
+        # agenda_front.json: the doom threshold is the agenda's one mechanic
+        doom = c.get("doom")
+        if isinstance(doom, int) and not isinstance(doom, bool):
+            m["doomThreshold"] = doom
+        return json.dumps(m, separators=(",", ":"))
+    if t == "Act":
+        # act_back.json: an act is id/type/class/cycle only; its threshold and
+        # objective live on the printed card
+        return json.dumps(m, separators=(",", ":"))
+    if t == "Scenario":
+        tokens = scenario_tokens(c.get("tokens"))
+        if tokens:
+            m["tokens"] = {"front": tokens}
+        return json.dumps(m, separators=(",", ":"))
     if t == "Investigator":
         # real-SCED shape (docs/art_reference/sced_objects/investigator_front.json):
         # statline as *Icons keys, elderSignEffect {description, modifier}
@@ -144,6 +165,36 @@ def build_gmnotes(c):
     return json.dumps(m, separators=(",", ":"))
 
 
+SCENARIO_SIDE_TYPES = ("Agenda", "Act", "Scenario", "Story")
+
+# chaos-token keys as SCED spells them in a ScenarioReference's tokens map
+TOKEN_META = {"skull": "Skull", "cultist": "Cultist", "tablet": "Tablet",
+              "elderthing": "Elder Thing", "elder thing": "Elder Thing"}
+
+
+def scenario_tokens(tokens):
+    """[{token, text}] -> SCED's {Skull: {description, modifier}} map. The
+    modifier is the text's leading number; an X value is -999, as on the real
+    reference card in campaign_box_memory_bag.json."""
+    out = {}
+    for t in tokens or []:
+        if not isinstance(t, dict):
+            continue
+        key = TOKEN_META.get(str(t.get("token", "")).strip().lower())
+        if not key:
+            continue
+        text = str(t.get("text", "")).strip()
+        mod = re.match(r"\s*([+-]?)\s*(\d+|X)\b", text)
+        if mod and mod.group(2) == "X":
+            modifier = -999
+        elif mod:
+            modifier = int(mod.group(2)) * (-1 if mod.group(1) == "-" else 1)
+        else:
+            modifier = 0
+        out[key] = {"description": text, "modifier": modifier}
+    return out
+
+
 # our lowercase symbol names -> the capitalised names SCED's own metadata uses
 LOC_SYMBOL_META = {
     "circle": "Circle", "square": "Square", "triangle": "Triangle",
@@ -185,8 +236,15 @@ def tags_for(c):
 COLOR_DIFFUSE = {"r": 0.713235259, "g": 0.713235259, "b": 0.713235259}
 
 
+# types SCED lays sideways and leaves visible face-down: the real agenda and
+# act objects are SidewaysCard true / HideWhenFaceDown false (agenda_front.json,
+# act_back.json), like investigators
+SIDEWAYS_TYPES = ("Investigator", "Agenda", "Act")
+
+
 def build_card(c):
     is_inv = c["type"] == "Investigator"
+    sideways = c["type"] in SIDEWAYS_TYPES
     is_encounter = bool(c.get("encounter"))
     deck_id = str(c["deck"])
     # campaign-wide back art: art_urls.json may carry "_player_back" /
@@ -205,14 +263,14 @@ def build_card(c):
     art = ART_URLS.get(c["id"], {})
     return {
         "Name": "Card", "Nickname": c["name"], "Description": c.get("subtitle", ""),
-        "GUID": guid(c["id"]), "CardID": int(deck_id + "00"), "SidewaysCard": is_inv,
+        "GUID": guid(c["id"]), "CardID": int(deck_id + "00"), "SidewaysCard": sideways,
         "Tags": tags_for(c), "LuaScript": "", "LuaScriptState": "",
         "ColorDiffuse": dict(COLOR_DIFFUSE), "Hands": True,
-        "HideWhenFaceDown": not is_inv,
+        "HideWhenFaceDown": not sideways,
         "GMNotes": build_gmnotes(c), "Transform": transform(),
         "CustomUIAssets": [ARKHAM_ICONS],
         "CustomDeck": {deck_id: {
-            "FaceURL": art.get("face") or face_ph(c["name"], land=is_inv),
+            "FaceURL": art.get("face") or face_ph(c["name"], land=sideways),
             "BackURL": art.get("back") or back,
             "NumWidth": 1, "NumHeight": 1, "Type": 0,
             "UniqueBack": is_inv, "BackIsHidden": is_inv}},
