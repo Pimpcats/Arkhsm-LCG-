@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "campaign": "still_hour",
-  "stage": "scenario_content_complete",
+  "stage": "build_complete_pending_art_and_tts",
   "owner_preferences": {
     "minimal_manual_work": true,
     "first_time_player": true,
@@ -25,7 +25,13 @@
     "tts_relay_runs_on_owner_pc": 0,
     "text_only_faces": 7,
     "objectives_feasible_1_to_4_investigators": true,
-    "sced_connection_keys_unique": true
+    "sced_connection_keys_unique": true,
+    "lua_rules_tests": "178/178 (Lua 5.2 and 5.4)",
+    "pytest": "59 passed, 143 subtests",
+    "scenario_audit": "8/8 locked, 0 errors, 0 notes",
+    "cardforge_selftest": "20/20",
+    "studio_selftest": "252/252",
+    "tts_relay_offline": "81 checks vanilla, 92 checks SCED fixture, 0 Lua errors"
   },
   "evidence": [
     "python3 pipeline/scenario_content.py: 8/8 scenarios, 0 errors (notes: one inherited stat deviation, five cross-district symbol repeats in distinct colours)",
@@ -34,10 +40,8 @@
     "Design decisions and open flags: docs/design/CONTENT_DECISIONS.md (spoilers)"
   ],
   "next_actions": [
-    "Merge board wiring and table-presence tracks; add campaign box to the relay job.",
-    "Owner starts the TTS relay; fix anything failing in real TTS.",
-    "Generate, inspect and register artwork in coherent batches with character continuity.",
-    "Load dist/the_still_hour_campaign.json in TTS and playtest the Prologue and one loop."
+    "Owner starts the TTS relay (docs/TTS_RELAY.md); fix anything real TTS reports (button placement, log field alignment, box meshes are unverified offline).",
+    "Art: needs api.openai.com + OPENAI_API_KEY in the cloud environment; then style sample for approval, batches with character references, render, publish."
   ],
   "connection": "GitHub handoff; no live connection to the owner's desktop or TTS.",
   "tts_relay": {
