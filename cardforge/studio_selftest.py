@@ -748,9 +748,10 @@ check("ComfyUI is pointed at the SHARED vendor/models checkpoints",
 check("a real (non dry-run) install is refused off Windows",
       _plat.system() == "Windows"
       or "Windows-only" in _expect_raises(installer.install_comfy))
-check("both backends are offered in the Setup tab",
-      "install_comfy" in page and "vendor_comfy" in page
-      and "btn_comfy" in page)
+# owner decision (commit 447fdb5): Setup installs nothing; cloud art is the
+# default path. The installer endpoints stay for the API only.
+check("Setup offers the cloud art path and no local installers",
+      "OpenAI" in page and "install_comfy" not in page and "install_a1111" not in page)
 _sh.rmtree(os.path.join(ROOT, "vendor", "comfy"), ignore_errors=True)
 with open(_rig.rig_path(), "w", encoding="utf-8") as f:
     f.write(rig_backup_setup)
@@ -763,7 +764,7 @@ check("SE lands under vendor/ and the launch command points at it",
       and "vendor" in _seb.load_config()["launch_command"])
 check("setup tab + per-tab steps in the UI",
       all(x in page for x in ("Setup", "steps_setup", "steps_illustrate",
-                              "renderSteps", "vendor/models")))
+                              "renderSteps")))
 _sh.rmtree(os.path.join(ROOT, "vendor"), ignore_errors=True)
 with open(camp_path, "w", encoding="utf-8") as f:
     f.write(camp_backup2)
@@ -783,6 +784,12 @@ os.remove(os.path.join(ROOT, "state", "_test.ledger.json"))
 print("== BACKEND RIG: auto launch/load ==")
 from cardforge import rig
 rig_backup = open(rig.rig_path(), encoding="utf-8").read()
+# rig.json is the owner's machine-local config; test against a known fixture
+_rig_fixture = json.loads(rig_backup)
+_rig_fixture["a1111"] = dict(_rig_fixture.get("a1111", {}), cwd="C:/SD/SDXL",
+                             command="webui.bat --api")
+with open(rig.rig_path(), "w", encoding="utf-8") as f:
+    json.dump(_rig_fixture, f, indent=2)
 s = requests.get(BASE + "/api/status?campaign=still_hour").json()
 check("status carries the rig (a1111 folder pre-configured)",
       s["rig"]["a1111"]["cwd"] == "C:/SD/SDXL"
@@ -837,10 +844,16 @@ print("== INPAINT: blank frames from the region maps (dry-run) ==")
 sys.path.insert(0, os.path.join(ROOT, "pipeline"))
 import template_render as T
 _sh.rmtree(os.path.join(ROOT, "vendor"), ignore_errors=True)
+# blank-frame inpainting is A1111-only (inpaint.py); exercise it on that backend
+_camp_inpaint = open(camp_path, encoding="utf-8").read()
+with open(camp_path, "w", encoding="utf-8") as f:
+    json.dump(dict(json.loads(_camp_inpaint), backend="a1111"), f, indent=2)
 r = requests.post(BASE + "/api/inpaint_frames",
                   json={"campaign": "still_hour", "dry_run": True}).json()
 check("inpaint job accepted", r.get("started"))
 check("inpaint job completes", wait_idle(60))
+with open(camp_path, "w", encoding="utf-8") as f:
+    f.write(_camp_inpaint)
 blanks = os.listdir(os.path.join(ROOT, "vendor", "frames"))
 check("all six layouts produce blank frames",
       sorted(blanks) == ["blank_enemy.png", "blank_enemy_elite.png",
