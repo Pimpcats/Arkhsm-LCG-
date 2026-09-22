@@ -80,7 +80,11 @@ def load_manifest(name, starter=False):
 
 
 def make_backend(camp, dry_run=False):
-    kind = camp.get("backend", "a1111")
+    # CARDFORGE_BACKEND lets a headless run (e.g. the cloud assistant with an
+    # OpenAI key) use another backend without editing the owner's campaign.json
+    kind = os.environ.get("CARDFORGE_BACKEND") or camp.get("backend", "a1111")
+    if os.environ.get("CARDFORGE_BACKEND") and kind != camp.get("backend"):
+        camp = dict(camp, base_url=None)    # the campaign's URL belongs to its own backend
     out_dir = os.path.join(repo_root(), camp.get("output_dir", "out/" + camp["name"]))
     payload_dir = os.path.join(out_dir, "payloads")
     if kind == "comfy":
