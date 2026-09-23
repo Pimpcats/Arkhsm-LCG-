@@ -1,8 +1,10 @@
 """ChatGPT art pack: every illustrated card as a numbered, paste-ready brief.
 
 The owner generates art in ChatGPT on their own subscription (no API credits),
-so the prompt CardForge would have sent is rewritten for a chat. Every card's "prompt" is complete on its own (house style + brief), so
-the owner can run one fresh chat per card, many at once. Numbers are stable (manifest order within a fixed type order), so an
+so the prompt CardForge would have sent is rewritten for a chat. "requests"
+are the owner's batch format: up to 4 separate images per message with the
+house style pasted once, one fresh chat each, many at once. Every card also
+keeps a standalone single-image "prompt". Numbers are stable (manifest order within a fixed type order), so an
 image that comes back as "#007" maps to exactly one card id.
 
     python3 pipeline/chatgpt_art_pack.py
@@ -20,6 +22,12 @@ CAMPAIGN = "still_hour"
 TYPE_ORDER = ("investigator_portrait", "event", "skill", "asset", "enemy",
               "treachery", "location", "agenda", "act", "story", "scenario")
 BATCH = 10
+PER_REQUEST = 4       # images per ChatGPT message (owner's batch-request format)
+
+# scenes that invite painted writing or numerals get an explicit guard
+LETTERING_WORDS = ("script", "ink", "writ", "page", "letter", "numeral", "sign",
+                   "handbill", "marking", "journal", "notebook", "logbook",
+                   "map", "clock", "watch", "photograph", "name")
 
 # words that pull image models toward the glossy generated look; stripped from
 # the per-type framing because the house style already says how to paint
@@ -79,11 +87,47 @@ def standalone_prompt(camp, chars, job, brief_text):
     return head + "\n\n" + style_block(camp) + "\n\nCARD BRIEF\n" + brief_text
 
 
+def scene_text(job):
+    text = job["scene"].rstrip(".")
+    if any(w in text.lower() for w in LETTERING_WORDS):
+        text += " (any writing or numbers only as unreadable marks, never legible)"
+    return text + "."
+
+
+def request_prompt(camp, chars, cards, jobs_by_id, profiles):
+    """The owner's batch format: up to PER_REQUEST separate images in one
+    message, house style pasted once, one block per image. No reference line —
+    ChatGPT stalls on references."""
+    k = len(cards)
+    out = ["BATCH REQUEST: {k} SEPARATE IMAGES\n\n"
+           "Generate exactly ONE independent image for EACH numbered prompt below: "
+           "{k} separate images total.\n\n"
+           "These are different scenes, not {k} variations of one scene. Do not "
+           "combine them into a collage, grid, or contact sheet. Do not ask for "
+           "approval between images. Apply the shared house style to every image. "
+           "No text, letters, numbers, captions, borders, or frames inside any "
+           "image.\n\nSHARED HOUSE STYLE:\n".format(k=k)
+           + style_block(camp).replace("HOUSE STYLE: ", "", 1)]
+    ratio = {"landscape 3:2": "3:2 (landscape)", "portrait 2:3": "2:3 (portrait)",
+             "square 1:1": "1:1 (square)"}
+    for i, c in enumerate(cards, 1):
+        job, prof = jobs_by_id[c["id"]], profiles[c["art_type"]]
+        who = "none"
+        if job.get("character") and prof.get("allow_character"):
+            who = "{} — {}".format(NAMES.get(job["character"], job["character"]),
+                                   chars[job["character"]]["description"])
+        out.append("IMAGE {} (save as {:03d})\nAspect ratio: {}\nScene: {}\n"
+                   "Framing: {}.\nCharacter: {}".format(
+                       i, c["n"], ratio[c["aspect"]], scene_text(job),
+                       framing(prof), who))
+    return "\n\n".join(out)
+
+
 def brief(n, job, prof, chars):
     # the number alone maps back to the card; ids stay out of what the owner
     # reads (they name enemies and story beats — AGENTS.md, no spoilers)
     lines = ["#{:03d} · {}".format(n, aspect(prof)),
-             "Scene: " + job["scene"].rstrip(".") + "."]
+             "Scene: " + scene_text(job)]
     if job.get("character") and prof.get("allow_character"):
         who = NAMES.get(job["character"], job["character"])
         line = "Character: {} — {}.".format(who, chars[job["character"]]["description"])
@@ -122,8 +166,17 @@ def build():
     inv = [c for c in cards if c["art_type"] == "investigator_portrait"]
     rest = [c for c in cards if c["art_type"] != "investigator_portrait"]
     batches = [inv] + [rest[i:i + BATCH] for i in range(0, len(rest), BATCH)]
+    jobs_by_id = {j["id"]: j for j in jobs}
+    requests = []
+    for bi, b in enumerate(batches, 1):
+        for i in range(0, len(b), PER_REQUEST):
+            group = b[i:i + PER_REQUEST]
+            requests.append({"batch": bi, "cards": [c["n"] for c in group],
+                             "prompt": request_prompt(camp, chars, group,
+                                                      jobs_by_id, profiles)})
     pack = {"campaign": CAMPAIGN,
-            "batches": [[c["n"] for c in b] for b in batches], "cards": cards}
+            "batches": [[c["n"] for c in b] for b in batches],
+            "requests": requests, "cards": cards}
     with open(os.path.join(ROOT, "pipeline", "chatgpt_art_pack.json"), "w",
               encoding="utf-8") as f:
         json.dump(pack, f, indent=1, ensure_ascii=False)
@@ -134,19 +187,17 @@ def build():
 
 
 def write_md(pack):
-    by_n = {c["n"]: c for c in pack["cards"]}
     out = ["# The Still Hour — ChatGPT art pack", "",
            "Generated by `pipeline/chatgpt_art_pack.py`; don't edit by hand.", "",
-           "**Every prompt is complete on its own:** open a new ChatGPT chat per "
-           "card, paste its prompt, and run as many chats at once as you like. "
-           "No attachments needed. Name each image by its number (e.g. `007.png`).", ""]
-    for i, batch in enumerate(pack["batches"], 1):
-        title = "investigator portraits (approve these first)" if i == 1 else \
-            "#{:03d}–#{:03d}".format(batch[0], batch[-1])
-        out += ["## Batch {} — {}".format(i, title), ""]
-        for n in batch:
-            c = by_n[n]
-            out += ["### #{:03d}".format(n), "", "```", c["prompt"], "```", ""]
+           "**One request per new ChatGPT chat**, up to {} images each, house style "
+           "included. Run as many chats at once as you like; no attachments. Save "
+           "each image under the number in its `save as` line (e.g. `016.png`)."
+           .format(PER_REQUEST), ""]
+    for bi in range(1, len(pack["batches"]) + 1):
+        out += ["## Batch {}".format(bi), ""]
+        for r in (r for r in pack["requests"] if r["batch"] == bi):
+            out += ["### #{:03d}–#{:03d}".format(r["cards"][0], r["cards"][-1]), "",
+                    "```", r["prompt"], "```", ""]
     with open(os.path.join(ROOT, "docs", "CHATGPT_ART_PACK.md"), "w",
               encoding="utf-8") as f:
         f.write("\n".join(out))
