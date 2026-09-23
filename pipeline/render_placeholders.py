@@ -47,12 +47,23 @@ FURNITURE = False
 BLANK = False
 
 
+ILLUSTRATIONS_DIR = os.path.join(ROOT, "assets", "illustrations", "still_hour")
+
+
 def load_art_index():
-    """id -> chosen illustration path (CardForge's out/<campaign>/index.json)."""
+    """id -> chosen illustration path. Committed art (assets/illustrations/,
+    written by pipeline/import_art.py) is the base; a local pick in CardForge's
+    out/<campaign>/index.json overrides it card by card."""
+    index = {}
+    if os.path.isdir(ILLUSTRATIONS_DIR):
+        for f in sorted(os.listdir(ILLUSTRATIONS_DIR)):
+            stem, ext = os.path.splitext(f)
+            if ext.lower() in (".jpg", ".jpeg", ".png", ".webp"):
+                index[stem] = os.path.relpath(os.path.join(ILLUSTRATIONS_DIR, f), ROOT)
     path = os.path.join(ROOT, "out", "still_hour", "index.json")
     if os.path.exists(path):
-        return json.load(open(path, encoding="utf-8"))
-    return {}
+        index.update(json.load(open(path, encoding="utf-8")))
+    return index
 
 
 PLACEMENTS_PATH = os.path.join(ROOT, "out", "still_hour", "placements.json")
