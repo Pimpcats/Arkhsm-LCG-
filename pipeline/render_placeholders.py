@@ -1609,6 +1609,18 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
     img.save(dest)
 
 
+def _has_art_window(frame, clip):
+    """True when the frame's art window is see-through (art goes UNDER it).
+    Judged inside the clip rect: some opaque frames (Rogue, Mystic) carry a few
+    transparent pixels elsewhere, and a whole-frame test pasted their art under
+    a solid window, hiding it behind the class emblem."""
+    alpha = frame.getchannel("A")
+    if not clip:
+        return alpha.getextrema()[0] < 250
+    hist = alpha.crop(tuple(int(v) for v in clip)).histogram()
+    return sum(hist[:250]) > 0.1 * sum(hist)
+
+
 def _se_frame_compose(tpl_name, kind, clip_key, art_path, placement,
                       landscape=False, underlay=None):
     """Template + art: windowed frames get art UNDER, opaque ones get art
@@ -1620,7 +1632,7 @@ def _se_frame_compose(tpl_name, kind, clip_key, art_path, placement,
     H = (375 if landscape else 525) * SE_SCALE
     frame2 = frame.resize((W, H), Image.LANCZOS)
     clip = se_reg(kind, clip_key)
-    windowed = frame.getchannel("A").getextrema()[0] < 250
+    windowed = _has_art_window(frame2, clip)
     if BLANK:
         # the card with no art: keep the background the frame provides so the
         # editor can show the class colour behind the live art

@@ -82,7 +82,12 @@ import atexit
 _BACKUPS = []
 
 
+_CREATED = []   # paths the test creates where the owner had nothing: removed on exit
+
+
 def _sideline(path):
+    if not os.path.exists(path):
+        _CREATED.append(path)
     if os.path.exists(path):
         bak = path + ".pretest-backup"
         shutil.rmtree(bak, ignore_errors=True)
@@ -112,6 +117,11 @@ def _snapshot(path):
 
 
 def _restore_owner_state():
+    for path in _CREATED:
+        if os.path.isdir(path):
+            shutil.rmtree(path, ignore_errors=True)
+        elif os.path.isfile(path):
+            os.remove(path)
     for path, bak in _BACKUPS:
         if os.path.exists(bak):
             if os.path.isdir(path):
