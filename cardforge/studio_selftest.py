@@ -1017,13 +1017,14 @@ check("campaign box carries memory-bag layout + log + guide",
       and any("CampaignLog" in (o.get("Tags") or []) for o in _top["ContainedObjects"])
       and any("CampaignGuide" in (o.get("Tags") or []) for o in _top["ContainedObjects"]))
 # locked house style: one LoRA + framing rules drive EVERY card (owner pick:
-# style E, 1930s pulp oil, plus the anti-repetition clause)
+# style E, 1930s pulp oil, economical paint + the anti-repetition clause)
 _camp_cfg = json.load(open(os.path.join(ROOT, "campaigns", "still_hour",
                                         "campaign.json"), encoding="utf-8"))
 check("house style locked in the campaign",
       "cosmic horror" in _camp_cfg["style_positive"]
       and "hand-painted in oil" in _camp_cfg["style_positive"]
-      and "nothing is uniform" in _camp_cfg["style_positive"]
+      and "economical, workmanlike finish" in _camp_cfg["style_positive"]
+      and "not from texture on every surface" in _camp_cfg["style_positive"]
       and "repeating pattern" in _camp_cfg["style_negative"])
 # the house style must describe the ARTIST'S HAND only — lighting, palette and
 # environment vary per card, or all 100+ cards come out looking copy-pasted

@@ -62,13 +62,13 @@ def setup_message(camp, chars):
         "image in the stated shape. Don't ask questions, don't offer variations, "
         "and never add text, letters, numbers, captions, borders or frames to the image.\n\n"
         "HOUSE STYLE (every image): " + camp["style_positive"] + ".\n\n"
-        "COMPOSITION (every image): detail concentrated on the focal point, background "
-        "loosely suggested, soft painterly falloff toward the edges, crisp confident "
-        "brushwork on the subject. Keep the main subject away from the outer edges; "
-        "the card frame crops the image.\n\n"
-        "LIGHTING AND PALETTE: vary them from card to card to suit each scene. Muted "
-        "and desaturated overall, with warm lamplight as a rare, fragile note. Don't "
-        "reuse the same lighting setup every time.\n\n"
+        + "".join("{}: {}\n\n".format(k, v)
+                  for k, v in camp.get("style_guidance", {}).items()) +
+        "CROP: keep the main subject away from the outer edges; the card frame "
+        "crops the image.\n\n"
+        "LIGHTING AND PALETTE: vary them from card to card to suit each scene. Flat, "
+        "muted and desaturated overall; lamplight is the only fragile warm note. "
+        "Don't reuse the same lighting setup every time.\n\n"
         "AVOID: " + camp["style_negative"] + ".\n\n"
         "THE INVESTIGATORS (keep their looks identical whenever they appear; if I "
         "attach a portrait, match that face exactly):\n" + bible + "\n\n"
@@ -76,7 +76,9 @@ def setup_message(camp, chars):
 
 
 def brief(n, job, prof, chars):
-    lines = ["#{:03d} · {} · {}".format(n, job["id"], aspect(prof)),
+    # the number alone maps back to the card; ids stay out of what the owner
+    # reads (they name enemies and story beats — AGENTS.md, no spoilers)
+    lines = ["#{:03d} · {}".format(n, aspect(prof)),
              "Scene: " + job["scene"].rstrip(".") + "."]
     if job.get("character") and prof.get("allow_character"):
         who = NAMES.get(job["character"], job["character"])
@@ -86,7 +88,8 @@ def brief(n, job, prof, chars):
             line += " Match the attached approved portrait of {} exactly.".format(who)
         lines.append(line)
     lines.append("Framing: " + framing(prof) + ".")
-    lines.append("Hand-painted and uneven: no repeated or stamped shapes, no text.")
+    lines.append("Broad economical paint, detail only at the focal point, calm simple "
+                 "areas elsewhere; no all-over texture, no repeated shapes, no text.")
     return "\n".join(lines)
 
 
