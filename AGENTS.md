@@ -20,6 +20,8 @@ little production work as possible. Read docs/ASSISTANT_WORKFLOW.md first.
 
 ## Working branch
 
-Campaign integration work begins on codex/campaign-assistant-bridge, based on
-claude/new-session-r230bz. main is a placeholder; do not build from it.
+main is the working branch (owner decision, 2026-09-22): every earlier branch
+(codex/campaign-assistant-bridge, claude/new-session-r230bz,
+claude/card-editor-campaign-setup-11fij3, claude/campaign-art-tts-testing-w2yabf)
+was fast-forwarded into main with nothing lost, then deleted. Build from main.
 Inspect current branch heads and changes before resuming work.
