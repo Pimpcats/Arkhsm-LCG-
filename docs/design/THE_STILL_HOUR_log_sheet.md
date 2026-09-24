@@ -7,6 +7,11 @@
 
 ## LOOP COUNTER
 Completed loops: `[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]`  →  **Dissonance scar next loop** (= loops, max 6): ______
+
+**How each loop ended** (guide §4, loop resolutions) — write **T** (Torn: Dissonance 18), **K** (Taken: everyone defeated) or **H** (Closed at the Hour):
+Loop 1 ___ · 2 ___ · 3 ___ · 4 ___ · 5 ___ · 6 ___ · 7 ___ · 8 ___ · 9 ___ · 10 ___
+
+**Prologue:** ☐ R1 You Saw It Coming (+1 banked Memory) ☐ R2 It Caught You Unready
 Current **Act**:  ☐ I — Learning the Rules   ☐ II — The Shape of the Hour   ☐ The Last Hour available
 
 ---

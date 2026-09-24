@@ -8,7 +8,7 @@
 1. How this campaign works
 2. Campaign special rules (the systems, in play order)
 3. The Ambergrove map
-4. The interlude procedure
+4. The interlude procedure (with **the loop resolutions**)
 5. **Prologue — The First Hour**
 6. **The six districts** (each with a surface and a deep objective)
    - The Lighthouse · The Drowned Church · The Sunken Road · The Square · The Fairground · The Almanac House
@@ -25,7 +25,7 @@ The Still Hour is not played as a line of separate scenarios. It is played as **
 
 - A **loop** is one continuous play-through of the night across the shared Ambergrove map. The **Hourglass** (the Occultation clock, Hours I–IX) is the master timer for the whole loop.
 - You travel between **districts** during the loop. Each district is a set-piece with things to learn and do. You will only reach **2–3 districts** before time runs out.
-- When the Hourglass reaches **Hour IX — The Appointed Hour**, or when every investigator is defeated, or when Dissonance hits **18**, the loop **resets.** The board wipes and everyone is healed — but **Memory, the Knowledge Track, Dissonance's scar, and Years all carry forward.**
+- When the Hourglass reaches **Hour IX — The Appointed Hour**, or when every investigator is defeated, or when Dissonance hits **18**, the loop **resets** (read the loop's resolution, §4). The board wipes and everyone is healed — but **Memory, the Knowledge Track, Dissonance's scar, and Years all carry forward.**
 - Between loops you play an **interlude** (§4): age the investigators, bank Memory, buy Recollections.
 - You are trying to learn enough of the night (the **Knowledge Track**) to reach and survive **The Last Hour** — knowing that every loop costs you years.
 
@@ -85,6 +85,30 @@ A small inland town under a starless, snagged sky. **The Square** is the hub; tr
 
 ## 4. THE INTERLUDE PROCEDURE (run after every reset)
 
+### Loop resolutions (read first)
+
+A loop ends the moment one of its three endings happens. Read the matching resolution, checked **top to bottom** (use the first that qualifies), then run the interlude below. Nothing here changes the reset itself: the board wipes, and Memory, the Knowledge Track, Dissonance's scar and Years carry forward as always.
+
+**R2 — The Seam Tears** *(Dissonance reached 18).*
+> *You leaned on what you remembered until the night could feel the weight. Every clock in Ambergrove stops on the same wrong second. The sky does not fold this time — it splits, and you fall back through the gap to eleven o'clock, bleeding time.*
+- The loop ended in danger: each investigator's **+1 Year** for Dissonance 12+ applies (§2, Aging).
+- On the log, mark this loop **Torn**.
+- If this is the **second or later Torn** loop, read instead of the usual interlude beat: *The town has learned your shape. Strangers at the fair stop mid-laugh when you pass, and do not know why.*
+
+**No resolution — The Night Keeps You** *(every investigator was defeated).*
+> *The dark finishes what it started. For a long moment there is nothing — no Square, no bell, no salt. Then the lanterns are being lit again, and you are standing where you always stand, and your hands will not stop shaking.*
+- Each investigator gains the **+1 Year** for being defeated (§2, Aging).
+- On the log, mark this loop **Taken**.
+- If this is the **second or later Taken** loop, read instead of the usual interlude beat: *You have died in this town more times than you can hold in your head at once. Each of you keeps one of those deaths close, like a stone in a pocket, and it is heavier every time.*
+
+**R1 — The Appointed Hour** *(the Hourglass reached Hour IX).*
+> *The occultation completes on time, exactly as the almanac promised. Something reaches through the edgeless dark — and, again, does not finish reaching. The night folds along its old crease. Eleven o'clock. Salt. The lanterns.*
+- Nothing extra: the ordinary reset.
+- On the log, mark this loop **Closed at the Hour**.
+- If you learned **at least one** new Knowledge fact this loop, add to the usual interlude beat: *It is the first night that felt like progress. You hold on to that.* If you learned **none**, add: *Another night spent. The town did not notice you at all, which is its own kind of warning.*
+
+*(The Prologue has its own resolutions, §5. The Finale's resolutions are in §9.)*
+
 1. **Age.** Each investigator adds their **Years** for the loop just ended. Apply any bracket change now (choose the locked physical/mental skills the first time you enter Weathered). Any investigator reaching 18 Years ages out.
 2. **Bank Memory.** Move all on-card Memory to banked Memory. Reduce banked Memory to **18** if higher (you can't hold more of the night than that).
 3. **Spend.** Spend banked Memory as experience, from the shared pool: buy Recollections (at their `memoryCost`) **and/or** level up eligible cards (at 1 Memory per card level, respecting each investigator's deckbuilding access). Upgraded variants replace their base.
@@ -113,10 +137,17 @@ A small inland town under a starless, snagged sky. **The Square** is the hub; tr
 
 **Objective.** Gather 5 clues total, then an investigator at the Almanac Steps may **resolve the Occultation** (no test). When they do, read the ending. If the Hourglass reaches Hour IX first, read the ending anyway.
 
-**Scripted ending — "The First Reset."**
-> *The occultation completes. Something reaches through — and does not finish reaching. The night folds. You are standing in the Square again at eleven o'clock, salt on your tongue, and you are the only ones who feel the seam.*
+**Resolutions — "The First Reset."** The Prologue always ends in the first reset; how it ends decides one small reward. Check top to bottom:
 
+**R1 — You Saw It Coming** *(an investigator resolved the Occultation at the Almanac Steps).*
+> *You were standing on the right step at the right second. You watched the occultation complete, and you watched something reach through — and not finish reaching. When the night folds, you fold with it on purpose, and you keep more of it.*
+- Each investigator gains **2 banked Memory** (their first), and the party gains **+1** more banked Memory (you finished the objective).
+
+**R2 — It Caught You Unready** *(the Hourglass reached Hour IX first, or every investigator was defeated).*
+> *The occultation completes. Something reaches through — and does not finish reaching. The night folds. You are standing in the Square again at eleven o'clock, salt on your tongue, and you are the only ones who feel the seam.*
 - Each investigator gains **2 banked Memory** (their first).
+
+**Either resolution:**
 - Record the fact **"You Are Unstuck"** on the log (Act I begins).
 - No Years are gained from the Prologue. Proceed to the first interlude, then Loop 1.
 

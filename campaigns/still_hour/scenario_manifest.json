@@ -465,6 +465,29 @@
       "R4",
       "R5",
       "R6"
+    ],
+    "loop_resolutions": [
+      {
+        "id": "R2",
+        "name": "The Seam Tears",
+        "condition": "Dissonance reached 18",
+        "source": "campaign guide §4",
+        "log": "Mark the loop Torn. Loop ended in danger (+1 Year, Aging). Second or later Torn loop: read its interlude beat."
+      },
+      {
+        "id": "NR",
+        "name": "The Night Keeps You",
+        "condition": "every investigator was defeated",
+        "source": "campaign guide §4",
+        "log": "Mark the loop Taken (+1 Year each for being defeated). Second or later Taken loop: read its interlude beat."
+      },
+      {
+        "id": "R1",
+        "name": "The Appointed Hour",
+        "condition": "the Hourglass reached Hour IX",
+        "source": "campaign guide §4",
+        "log": "Mark the loop Closed at the Hour. Interlude beat depends on whether a new Knowledge fact was learned this loop."
+      }
     ]
   },
   "scenarios": [
@@ -554,6 +577,22 @@
       },
       "grants": [
         "You Are Unstuck"
+      ],
+      "resolutions": [
+        {
+          "id": "R1",
+          "name": "You Saw It Coming",
+          "condition": "an investigator resolved the Occultation at the Almanac Steps",
+          "source": "campaign guide §5",
+          "log": "2 banked Memory each, +1 banked Memory to the party. Record \"You Are Unstuck\" (Act I)."
+        },
+        {
+          "id": "R2",
+          "name": "It Caught You Unready",
+          "condition": "the Hourglass reached Hour IX first, or every investigator was defeated",
+          "source": "campaign guide §5",
+          "log": "2 banked Memory each. Record \"You Are Unstuck\" (Act I)."
+        }
       ]
     },
     {
