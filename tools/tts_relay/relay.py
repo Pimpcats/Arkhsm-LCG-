@@ -51,6 +51,12 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 LOG_PATH = os.path.join(os.path.expanduser("~"), "StillHourRelay", "relay.log")
 
 
+def _utcnow():
+    """Naive UTC now (the relay's timestamps), without utcnow()'s 3.12+
+    deprecation warning."""
+    return dt.datetime.now(dt.timezone.utc).replace(tzinfo=None)
+
+
 def say(msg):
     stamp = dt.datetime.now().strftime("%H:%M:%S")
     line = "[{}] {}".format(stamp, msg)
@@ -325,11 +331,11 @@ def run_job(repo, sha, branch, args, listener, run_dir):
     shots = os.path.join(run_dir, "screenshots")
     log_lines, checks, errors, notes, screenshots = [], [], [], [], []
     summary = {"run": run_id, "commit": sha, "branch": branch,
-               "started": dt.datetime.utcnow().isoformat() + "Z",
+               "started": _utcnow().isoformat() + "Z",
                "host": platform.platform(), "passed": 0, "failed": 0}
 
     def log(kind, text):
-        log_lines.append("{} {:5} {}".format(dt.datetime.utcnow().strftime("%H:%M:%S.%f")[:-3], kind, text))
+        log_lines.append("{} {:5} {}".format(_utcnow().strftime("%H:%M:%S.%f")[:-3], kind, text))
 
     chunk, n = build_chunk(repo, job, run_id)
     log("relay", "sending runner + {} object(s), {} KB".format(n, len(chunk) // 1024))
@@ -398,7 +404,7 @@ def run_job(repo, sha, branch, args, listener, run_dir):
         verdict = "fail"
     else:
         verdict = "pass"
-    summary.update({"finished": dt.datetime.utcnow().isoformat() + "Z", "verdict": verdict,
+    summary.update({"finished": _utcnow().isoformat() + "Z", "verdict": verdict,
                     "passed": passed, "failed": failed, "lua_errors": errors,
                     "checks": checks, "notes": notes, "screenshots": screenshots,
                     "timed_out": done is None})
@@ -475,7 +481,7 @@ def main(argv=None):
                     say("testing {} in TTS ...".format(sha[:7]))
                     tested = sync_repo(repo, args.remote, branch)
                     ensure_results_repo(results, args.remote)
-                    run_name = dt.datetime.utcnow().strftime("%Y%m%d-%H%M%S") + "_" + tested[:7]
+                    run_name = _utcnow().strftime("%Y%m%d-%H%M%S") + "_" + tested[:7]
                     run_dir = os.path.join(results, "runs", run_name)
                     try:
                         summary = run_job(repo, tested, branch, args, listener, run_dir)

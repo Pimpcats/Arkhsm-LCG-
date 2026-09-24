@@ -134,7 +134,8 @@ def main(argv=None):
         # re-fetch the download; "filename" is the placeholderDownload key)
         "Tags": ["CampaignBox", "Reloadable", "StillHour"],
         "ColorDiffuse": {"r": 0.13, "g": 0.11, "b": 0.18},
-        "Transform": transform(0),
+        # campaign-box area at the top of the SCED table, off the mats
+        "Transform": dict(transform(63.0), posZ=8.0),
         "GMNotes": json.dumps({"filename": FILENAME, "id": "CB-STHR",
                                "type": "CampaignBox"}, separators=(",", ":")),
         "LuaScript": box_lua,

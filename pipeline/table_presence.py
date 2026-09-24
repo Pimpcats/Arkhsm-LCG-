@@ -63,6 +63,7 @@ WHITE = {"r": 1.0, "g": 1.0, "b": 1.0}
 PLACE_LOG = {"x": -1.353, "y": 1.581, "z": -26.603}
 PLACE_GUIDE = {"x": -1.5, "y": 1.481, "z": 51.0}
 PLACE_MINIS = {"x": -0.796, "y": 1.546, "z": -36.385}
+CAMPAIGN_BOX_POS = {"x": 63.0, "y": 2.5, "z": 8.0}
 
 
 def scenario_box_slot(i):
@@ -258,10 +259,15 @@ def campaign_box(scenario_boxes=(), name=CAMPAIGN, filename=FILENAME,
                          (build_guide(PLACE_GUIDE), PLACE_GUIDE)):
             contained.append(obj)
             ml[obj["GUID"]] = ml_entry(pos)
-    return memory_bag(name, {"filename": filename, "id": box_id,
-                             "type": "CampaignBox"},
-                      ["CampaignBox", "Reloadable"], MESH_BIG, SCALE_BIG,
-                      contained, ml, desc="fan campaign — not for sale")
+    box = memory_bag(name, {"filename": filename, "id": box_id,
+                            "type": "CampaignBox"},
+                     ["CampaignBox", "Reloadable"], MESH_BIG, SCALE_BIG,
+                     contained, ml, desc="fan campaign — not for sale")
+    # where it appears when spawned: the campaign-box area at the top of the
+    # SCED table (the official box sits at x 63, z 16), beside it, dropping in
+    # from above the surface — never on the scenario mat at the origin
+    box["Transform"] = transform(CAMPAIGN_BOX_POS, 270, SCALE_BIG)
+    return box
 
 
 # ------------------------------------------------------------ box texture --
