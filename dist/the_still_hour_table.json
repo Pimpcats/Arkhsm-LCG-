@@ -129,8 +129,8 @@
           ],
           "CustomDeck": {
             "99130": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrelias-m.jpg?v=b8bb4f5e93",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrelias-m-back.jpg?v=b3cbfc72c7",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrelias-m.jpg?v=1e67214a4f",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrelias-m-back.jpg?v=482289a3ed",
               "NumWidth": 1,
               "NumHeight": 1,
               "BackIsHidden": true,
@@ -226,8 +226,8 @@
               "SidewaysCard": false,
               "CustomDeck": {
                 "99130": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrelias-m.jpg?v=b8bb4f5e93",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrelias-m-back.jpg?v=b3cbfc72c7",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrelias-m.jpg?v=1e67214a4f",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrelias-m-back.jpg?v=482289a3ed",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "BackIsHidden": true,

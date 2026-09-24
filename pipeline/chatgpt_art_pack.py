@@ -89,8 +89,30 @@ def standalone_prompt(camp, chars, job, brief_text):
     return head + "\n\n" + style_block(camp) + "\n\nCARD BRIEF\n" + brief_text
 
 
+# rewritten scenes for images rejected in review: the original wording drew
+# legible lettering or a stamped grid. Keyed by card id so numbers can't drift.
+REDO_SCENES = {
+    "sthr-hourlearnedname": "a spoken word shown only as a plume of frost-breath curling "
+        "through the air, an abstract drifting swirl with no letters or word shapes in it, "
+        "a vast shadow flinching back from it",
+    "sthr-wrongturn": "a crossroads on a moor at dusk, a leaning wooden signpost with four "
+        "blank weathered boards (bare wood, no letters, no painted words at all), every "
+        "road bending back toward the same distant town",
+    "sthr-loopnotices": "a long dark street of old, sagging, mismatched buildings, their lit "
+        "windows all different sizes, crooked and unevenly spaced, some dark or shuttered; "
+        "in many windows a silhouette in its own pose, all turned toward the viewer; no "
+        "regular grid of windows anywhere",
+    "sthr-act-vote": "a town ledger lying open under lamplight, its pages covered in "
+        "faded ink scribble that cannot be read (no names, no legible words), a column of "
+        "tally strokes, a pen resting across it",
+    "sthr-act-almanachid": "a printing press mid-stroke, a fresh sheet coming off it printed "
+        "with a large moon-and-clock emblem and bands of abstract ornament (no letters, no "
+        "digits, no calendar grid)",
+}
+
+
 def scene_text(job):
-    text = job["scene"].rstrip(".")
+    text = REDO_SCENES.get(job["id"], job["scene"]).rstrip(".")
     if any(w in text.lower() for w in LETTERING_WORDS):
         text += " (any writing or numbers only as unreadable marks, never legible)"
     return text + "."
@@ -177,6 +199,14 @@ def build():
             requests.append({"batch": bi, "cards": [c["n"] for c in group],
                              "prompt": request_prompt(camp, chars, group,
                                                       jobs_by_id, profiles)})
+    stray = set(REDO_SCENES) - {c["id"] for c in cards}
+    if stray:
+        raise SystemExit("REDO_SCENES ids not in the manifest: " + ", ".join(sorted(stray)))
+    redo = [c for c in cards if c["id"] in REDO_SCENES]
+    if redo:
+        requests.insert(0, {"batch": 0, "cards": [c["n"] for c in redo],
+                            "prompt": request_prompt(camp, chars, redo,
+                                                     jobs_by_id, profiles)})
     pack = {"campaign": CAMPAIGN,
             "batches": [[c["n"] for c in b] for b in batches],
             "requests": requests, "cards": cards}

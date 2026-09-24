@@ -145,7 +145,7 @@ Character: none
 
 IMAGE 9 (save as 014)
 Aspect ratio: 3:2 (landscape)
-Scene: a name spoken as visible frost in the air, a vast shadow flinching back from it (any writing or numbers only as unreadable marks, never legible).
+Scene: a spoken word shown only as a plume of frost-breath curling through the air, an abstract drifting swirl with no letters or word shapes in it, a vast shadow flinching back from it (any writing or numbers only as unreadable marks, never legible).
 Framing: a single dramatic moment of impact, close composition filling the frame, motion.
 Character: none
 
@@ -592,7 +592,7 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 044)
 Aspect ratio: 3:2 (landscape)
-Scene: a crossroads where the signposts point to the same town four times (any writing or numbers only as unreadable marks, never legible).
+Scene: a crossroads on a moor at dusk, a leaning wooden signpost with four blank weathered boards (bare wood, no letters, no painted words at all), every road bending back toward the same distant town (any writing or numbers only as unreadable marks, never legible).
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
@@ -641,7 +641,7 @@ Character: none
 
 IMAGE 2 (save as 047)
 Aspect ratio: 3:2 (landscape)
-Scene: a hundred lit windows across a dark street, a silhouette standing in every one, all turned toward the viewer.
+Scene: a long dark street of old, sagging, mismatched buildings, their lit windows all different sizes, crooked and unevenly spaced, some dark or shuttered; in many windows a silhouette in its own pose, all turned toward the viewer; no regular grid of windows anywhere.
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
@@ -1300,7 +1300,7 @@ Character: none
 
 IMAGE 7 (save as 102)
 Aspect ratio: 2:3 (portrait)
-Scene: a town ledger open to a page of signatures and a tally, a pen resting across it (any writing or numbers only as unreadable marks, never legible).
+Scene: a town ledger lying open under lamplight, its pages covered in faded ink scribble that cannot be read (no names, no legible words), a column of tally strokes, a pen resting across it (any writing or numbers only as unreadable marks, never legible).
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
 Character: none
 
@@ -1318,7 +1318,7 @@ Character: none
 
 IMAGE 10 (save as 105)
 Aspect ratio: 2:3 (portrait)
-Scene: a printing press mid-stroke, a fresh almanac sheet coming off it with a different time printed.
+Scene: a printing press mid-stroke, a fresh sheet coming off it printed with a large moon-and-clock emblem and bands of abstract ornament (no letters, no digits, no calendar grid) (any writing or numbers only as unreadable marks, never legible).
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
 Character: none
 ```

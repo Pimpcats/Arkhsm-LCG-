@@ -29,6 +29,7 @@ PACK = os.path.join(HERE, "chatgpt_art_pack.json")
 # while keeping ~120 committed illustrations small
 MAX_SIDE = 1600
 EXTS = (".png", ".jpg", ".jpeg", ".webp")
+MIN_SIDE = 480
 
 
 def card_ids():
@@ -56,7 +57,9 @@ def resolve(name, ids, numbers):
 def import_one(src, card):
     im = Image.open(src)
     im.load()
-    if im.width < 512 or im.height < 512:
+    # the largest art windows are ~750x600 (render_placeholders.art_box), so a
+    # 3:2 image down to ~760x500 still covers them at <=1.2x
+    if min(im.width, im.height) < MIN_SIDE:
         raise SystemExit("{}: {}x{} is too small for a card".format(src, im.width, im.height))
     im = im.convert("RGB")
     im.thumbnail((MAX_SIDE, MAX_SIDE), Image.LANCZOS)
