@@ -75,12 +75,15 @@ PLACE = {
     "reference":   {"pos": (-3.85, 1.59, -10.39), "rot": 270},
     "agenda_deck": {"pos": (-2.94, 1.61, 0.36), "rot": 180},
     "act_deck":    {"pos": (-2.94, 1.61, -5.05), "rot": 180},
-    "encounter":   {"pos": (-3.85, 1.75, 5.72), "rot": 270},
-    "setup_aside": {"pos": (1.69, 1.56, 14.24), "rot": 225},
+    "encounter":   {"pos": (-3.85, 1.75, 5.72), "rot": 270, "face_down": True},
+    "setup_aside": {"pos": (1.69, 1.56, 14.24), "rot": 225, "face_down": True},
     # set-aside enemies: where the official boxes put them, beside the
     # encounter discard (Court of the Ancients / The Grand Vault, Drowned City)
-    "named":       {"pos": (-3.83, 1.60, 14.98), "rot": 270},
+    "named":       {"pos": (-3.83, 1.60, 14.98), "rot": 270, "face_down": True},
 }
+# Face-up stacks (agenda, act) show their LAST contained card on top, so the
+# official boxes list stage 1 last; face-down stacks (encounter deck, set-aside
+# cards: rot z 180 in every official box) draw their FIRST card.
 # The play area's location snaps, at full card spacing: rows step 6.60 AWAY
 # from the scenario mat starting just below it (x -17.04 .. -43.44), columns
 # step 7.65 left to right (z 15.30 .. -15.30). A map slot [col, row] is exactly
@@ -108,8 +111,8 @@ def guid(key):
     return hashlib.sha1(key.encode("utf-8")).hexdigest()[:6]
 
 
-def transform(x=0.0, z=0.0, y=1.5, ry=180, scale=1.15):
-    return {"posX": x, "posY": y, "posZ": z, "rotX": 0, "rotY": ry, "rotZ": 0,
+def transform(x=0.0, z=0.0, y=1.5, ry=180, scale=1.15, rz=0):
+    return {"posX": x, "posY": y, "posZ": z, "rotX": 0, "rotY": ry, "rotZ": rz,
             "scaleX": scale, "scaleY": 1, "scaleZ": scale}
 
 
@@ -167,9 +170,12 @@ def normalize(c):
     return c
 
 
-def build_deck(cards, nickname, key, x, z):
-    """A TTS Deck object holding the cards of one stack (single card -> card)."""
+def build_deck(cards, nickname, key, x, z, face_down=False):
+    """A TTS Deck object holding the cards of one stack (single card -> card),
+    `cards` in stage order: the first one ends up on top either way."""
     objs = [B.build_card(normalize(c)) for c in cards]
+    if not face_down:
+        objs.reverse()
     if not objs:
         return None
     if len(objs) == 1:
@@ -180,9 +186,13 @@ def build_deck(cards, nickname, key, x, z):
     for o in objs:
         deck_ids.append(o["CardID"])
         custom.update(o["CustomDeck"])
+    # TTS draws a deck by the Deck's own flag, not its cards': the official
+    # agenda/act decks are SidewaysCard true, Hands false (The Drowned City box)
+    sideways = all(o.get("SidewaysCard") for o in objs)
     return {
         "Name": "Deck", "Nickname": nickname, "Description": "",
         "GUID": guid("deck:" + key), "Tags": ["ScenarioCard"],
+        "SidewaysCard": sideways, "Hands": False,
         "Transform": transform(x, z),
         "ColorDiffuse": dict(B.COLOR_DIFFUSE),
         "DeckIDs": deck_ids, "CustomDeck": custom,
@@ -221,16 +231,18 @@ def build_scenario_box(sc, assign, cards, campaign_name="Campaign"):
         anchor = PLACE.get(stack, {"pos": (0.0, 1.5, 0.0), "rot": 180})
         x, y, z = anchor["pos"]
         rot = anchor["rot"]
+        rz = 180 if anchor.get("face_down") else 0
         d = build_deck([cards[i] for i in ids],
                        "{} — {}".format(sc.get("name", sid), label),
-                       "{}:{}".format(sid, stack), x, z)
+                       "{}:{}".format(sid, stack), x, z,
+                       face_down=bool(rz))
         if d:
-            d["Transform"] = transform(x, z, y=y, ry=rot)
+            d["Transform"] = transform(x, z, y=y, ry=rot, rz=rz)
             contained.append(d)
             ml[d["GUID"]] = {"lock": False,
                              "pos": {"x": round(x, 3), "y": round(y, 3),
                                      "z": round(z, 3)},
-                             "rot": {"x": 0, "y": rot, "z": 0}}
+                             "rot": {"x": 0, "y": rot, "z": rz}}
     # SCED's scenario book: small box mesh + the MemoryBag script (Place /
     # Recall) reading ml. Connections travel on the cards' locationFront /
     # locationBack metadata, not in the box.

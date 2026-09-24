@@ -468,3 +468,23 @@ def test_mythos_anchors_match_the_official_drowned_city_boxes():
     assert ours("encounter") in spots(lambda r: r["name"] == "Encounter Deck")
     assert ours("setup_aside") in spots(lambda r: r["object"] == "Custom_Model_Bag")
     assert ours("named") in spots(lambda r: "Enemy" in r["types"])
+
+
+def test_agenda_and_act_decks_lie_sideways_like_the_official_boxes():
+    # TTS lays a deck out by the Deck object's own SidewaysCard flag; the
+    # official agenda/act decks are SidewaysCard true, Hands false
+    rel = json.load(open(os.path.join(ROOT, "dist", "downloads",
+                                      "the_still_hour.json"), encoding="utf-8"))
+    decks = []
+
+    def walk(o):
+        for c in o.get("ContainedObjects") or []:
+            if c.get("Name") == "Deck" and all(
+                    json.loads(k.get("GMNotes") or "{}").get("type") in ("Agenda", "Act")
+                    for k in c["ContainedObjects"]):
+                decks.append(c)
+            walk(c)
+    walk(rel)
+    assert decks, "no agenda/act decks in the release box"
+    for d in decks:
+        assert d["SidewaysCard"] is True and d["Hands"] is False, d["Nickname"]

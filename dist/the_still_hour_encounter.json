@@ -60,8 +60,8 @@
           ],
           "CustomDeck": {
             "95040": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/25cfef761882013f5498e5c6516e306d6121d51f/dist/cards/sthr-appointed.jpg?v=576f437a64",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/25cfef761882013f5498e5c6516e306d6121d51f/dist/cards/encounter_back.jpg?v=8f98d69b44",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-appointed.jpg?v=576f437a64",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/encounter_back.jpg?v=8f98d69b44",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -110,8 +110,8 @@
           ],
           "CustomDeck": {
             "95041": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/25cfef761882013f5498e5c6516e306d6121d51f/dist/cards/sthr-appointedwhisper.jpg?v=e0db6eb7ed",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/25cfef761882013f5498e5c6516e306d6121d51f/dist/cards/encounter_back.jpg?v=8f98d69b44",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-appointedwhisper.jpg?v=e0db6eb7ed",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/encounter_back.jpg?v=8f98d69b44",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -160,8 +160,8 @@
           ],
           "CustomDeck": {
             "95042": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/25cfef761882013f5498e5c6516e306d6121d51f/dist/cards/sthr-crossing.jpg?v=1e848f126f",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/25cfef761882013f5498e5c6516e306d6121d51f/dist/cards/encounter_back.jpg?v=8f98d69b44",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-crossing.jpg?v=1e848f126f",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/encounter_back.jpg?v=8f98d69b44",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -210,8 +210,8 @@
           ],
           "CustomDeck": {
             "95043": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/25cfef761882013f5498e5c6516e306d6121d51f/dist/cards/sthr-bellringer.jpg?v=d7a5d33089",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/25cfef761882013f5498e5c6516e306d6121d51f/dist/cards/encounter_back.jpg?v=8f98d69b44",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-bellringer.jpg?v=d7a5d33089",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/encounter_back.jpg?v=8f98d69b44",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -260,8 +260,8 @@
           ],
           "CustomDeck": {
             "95044": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/25cfef761882013f5498e5c6516e306d6121d51f/dist/cards/sthr-wearssheriff.jpg?v=6d10480f7c",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/25cfef761882013f5498e5c6516e306d6121d51f/dist/cards/encounter_back.jpg?v=8f98d69b44",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-wearssheriff.jpg?v=6d10480f7c",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/encounter_back.jpg?v=8f98d69b44",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -310,8 +310,8 @@
           ],
           "CustomDeck": {
             "95045": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/25cfef761882013f5498e5c6516e306d6121d51f/dist/cards/sthr-onewhorides.jpg?v=14da6eb8c0",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/25cfef761882013f5498e5c6516e306d6121d51f/dist/cards/encounter_back.jpg?v=8f98d69b44",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-onewhorides.jpg?v=14da6eb8c0",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/encounter_back.jpg?v=8f98d69b44",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
