@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "campaign": "still_hour",
-  "stage": "build_complete_pending_art_and_tts",
+  "stage": "build_complete_art_done_relay_testing",
   "owner_preferences": {
     "minimal_manual_work": true,
     "first_time_player": true,
@@ -42,8 +42,8 @@
     "2026-09-24: first complete real-TTS relay run (ab136f1, owner's PC, SCED table): 82 passed, 1 failed (prey step, fixed in f0be782)."
   ],
   "next_actions": [
-    "Owner starts the TTS relay (docs/TTS_RELAY.md); fix anything real TTS reports (button placement, log field alignment, box meshes are unverified offline).",
-    "Art: needs api.openai.com + OPENAI_API_KEY in the cloud environment; then style sample for approval, batches with character references, render, publish.",
+    "Keep the TTS relay running on the owner's PC; fix whatever each run reports (tts-results branch, latest.json).",
+    "Owner playtests the Prologue and one loop in TTS (art approval and relay passes are not playtest approval).",
     "Box art (owner, not urgent): campaign box and the eight scenario boxes still use the generic texture; give them Still Hour art."
   ],
   "connection": "GitHub handoff; no live connection to the owner's desktop or TTS.",
