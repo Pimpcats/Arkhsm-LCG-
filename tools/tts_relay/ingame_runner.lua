@@ -50,6 +50,35 @@ local function alive(o)
   local ok, dead = pcall(function() return o.isDestroyed() end)
   return ok and dead == false
 end
+-- the step now running, so an error in one of its delayed callbacks can be
+-- charged to it and the run can move on
+local currentName, currentGo = nil, nil
+
+-- Delayed callbacks (Wait.frames / condition / time) run outside the step's
+-- pcall: an error there used to kill the whole run ("incomplete", timed out).
+-- This local Wait passes everything to TTS's Wait with each callback
+-- protected: the error becomes a failed check naming the step, and the run
+-- continues with the next step.
+local TTSWait = Wait
+local function protect(fn)
+  if type(fn) ~= "function" then return fn end
+  return function(...)
+    local ok, err = pcall(fn, ...)
+    if not ok then
+      check("step '" .. tostring(currentName) .. "' ran without a Lua error", false, err)
+      if currentGo then currentGo() end
+    end
+  end
+end
+local Wait = {
+  frames = function(fn, n) return TTSWait.frames(protect(fn), n) end,
+  time = function(fn, secs, reps) return TTSWait.time(protect(fn), secs, reps) end,
+  condition = function(fn, cond, timeout, onTimeout)
+    return TTSWait.condition(protect(fn), cond, timeout, protect(onTimeout))
+  end,
+  stop = function(id) return TTSWait.stop(id) end,
+}
+
 local function nextStep()
   idx = idx + 1
   local s = steps[idx]
@@ -64,6 +93,7 @@ local function nextStep()
     called = true
     nextStep()
   end
+  currentName, currentGo = s.name, go
   local ok, err = pcall(s.fn, go)
   if not ok then
     check("step '" .. s.name .. "' ran without a Lua error", false, err)

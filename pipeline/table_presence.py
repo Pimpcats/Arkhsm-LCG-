@@ -305,6 +305,10 @@ def render_box_texture(dest=None):
 # ------------------------------------------------------------------ main --
 def build(out=OUT):
     box = campaign_box()
+    # the table-presence-only box sits one box-width over from the compiled
+    # campaign box: the relay spawns both, and two memory bags dropped on the
+    # same spot put one inside the other
+    box["Transform"]["posZ"] = CAMPAIGN_BOX_POS["z"] - 8.0
     save = {"SaveName": CAMPAIGN, "GameMode": CAMPAIGN, "ObjectStates": [box]}
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w", encoding="utf-8") as f:
