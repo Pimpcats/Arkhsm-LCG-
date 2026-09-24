@@ -257,7 +257,7 @@ def test_compile_campaign_with_fixture(tmp_path, monkeypatch):
     # fixture-b's hand-placed location lands on grid slot (2, 2)
     mlb = json.loads(sboxes[1]["LuaScriptState"])["ml"]
     (only,) = mlb.values()
-    assert only["pos"]["x"] == round(cc.LOCATION_GRID["x0"] + 2 * cc.LOCATION_GRID["dx"], 3)
+    assert (only["pos"]["x"], only["pos"]["z"]) == cc.slot_xz(2, 2)
     kinds = sorted(o["Name"] for o in box["ContainedObjects"])
     assert kinds == ["Custom_Model_Bag", "Custom_Model_Bag", "Custom_PDF", "Custom_Token", "Deck"]
     # unlocked scenarios still refuse
@@ -406,3 +406,40 @@ def test_sced_derives_each_investigators_own_minicard_id():
     assert len(set(derived)) == len(invs), derived
     for d in derived:
         assert d in minis, "no minicard with SCED's id " + d
+
+
+# ------------------------------------------------------------ placement --
+# SCED's own snap points (argonui/SCED objects/PlayArea.721ba2 location snaps and
+# MythosArea.9f334f, converted to world coordinates). Place must land on them.
+SCED_LOCATION_X = [-17.04, -20.34, -23.64, -26.94, -30.24, -33.54, -36.84, -40.14, -43.44]
+SCED_LOCATION_Z = [15.3, 11.48, 7.65, 3.83, 0.0, -3.83, -7.65, -11.48, -15.3]
+SCED_MYTHOS = {"encounter": (-3.85, 5.72), "agenda_deck": (-2.94, 0.36),
+               "act_deck": (-2.94, -5.05), "reference": (-3.85, -10.39)}
+
+
+def test_every_map_slot_is_a_sced_location_snap_off_the_mythos_mat():
+    for col in range(cc.LOCATION_GRID["cols"]):
+        for row in range(cc.LOCATION_GRID["rows"]):
+            x, z = cc.slot_xz(col, row)
+            assert any(abs(x - v) < 0.02 for v in SCED_LOCATION_X), (col, row, x)
+            assert any(abs(z - v) < 0.02 for v in SCED_LOCATION_Z), (col, row, z)
+            assert x < -10, "location slot runs onto the scenario mat"
+
+
+def test_map_columns_run_across_and_rows_run_down():
+    # a row authored left-to-right in the Studio stays a row at the table
+    # (same x, z falling to the players' right), and row 0 sits nearest the mat
+    xs = {cc.slot_xz(c, 2)[0] for c in range(5)}
+    zs = [cc.slot_xz(c, 2)[1] for c in range(5)]
+    assert len(xs) == 1 and zs == sorted(zs, reverse=True)
+    assert cc.slot_xz(0, 0)[0] > cc.slot_xz(0, 4)[0]
+
+
+def test_scenario_stacks_land_on_the_mythos_mat_snaps():
+    for stack, (x, z) in SCED_MYTHOS.items():
+        px, _, pz = cc.PLACE[stack]["pos"]
+        assert (round(px, 2), round(pz, 2)) == (x, z), stack
+    assert cc.PLACE["act_deck"]["rot"] == cc.PLACE["agenda_deck"]["rot"]
+    # nothing else may take the scenario card's slot
+    ref = cc.PLACE["reference"]["pos"]
+    assert all(v["pos"] != ref for k, v in cc.PLACE.items() if k != "reference")

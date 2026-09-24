@@ -1156,9 +1156,9 @@ _r = requests.post(BASE + "/api/map_save",
 check("a map layout saves against the real TTS grid",
       _r.get("ok") and _r["slots"][_locs[0]] == [1, 0]
       and _r["grid"]["rot"] == 270)
-check("grid slots resolve to the measured table coordinates",
-      studio.map_xz(0, 0) == (-30.24, 11.46)
-      and studio.map_xz(1, 1) == (-23.64, 3.81))
+check("grid slots resolve to SCED's play-area snap points (col across, row down)",
+      studio.map_xz(0, 0) == (-17.04, 15.3)
+      and studio.map_xz(1, 1) == (-23.64, 7.65))
 _r = requests.post(BASE + "/api/map_save",
                    json={"campaign": _sc, "scenario": _ms,
                          "slots": {_locs[0]: [99, 99]}}).json()
@@ -1169,8 +1169,8 @@ _g = requests.get(BASE + "/api/status?campaign=" + _sc).json()["scenarios"]
 check("the grid matches the playmat's 5 x 5 slots",
       _g["grid"]["cols"] == 5 and _g["grid"]["rows"] == 5)
 check("slot steps stay on the measured 6.60 / 7.65 spacing",
-      abs(studio.map_xz(1, 0)[0] - studio.map_xz(0, 0)[0] - 6.60) < 0.01
-      and abs(studio.map_xz(0, 0)[1] - studio.map_xz(0, 1)[1] - 7.65) < 0.01)
+      abs(studio.map_xz(0, 0)[0] - studio.map_xz(0, 1)[0] - 6.60) < 0.01
+      and abs(studio.map_xz(0, 0)[1] - studio.map_xz(1, 0)[1] - 7.65) < 0.01)
 check("the preview knows the rest of the table, not just the map",
       {f["key"] for f in _g["furniture"]} >=
       {"encounter", "agenda_deck", "act_deck", "setup_aside"})

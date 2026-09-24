@@ -375,6 +375,12 @@ step("board: locations flip and seal", function(go)
     base.x + 2, base.z + 9), function(o) LOC_B.obj = o ; one() end)
   spawnJSON(JSON.encode({ Name = "CardCustom", Nickname = "Relay Minicard", Tags = { "Minicard", TAG },
     GMNotes = JSON.encode({ id = "relay-m", type = "Minicard" }),
+    -- a custom card without CustomDeck makes TTS open its blocking "Custom Card"
+    -- import dialog (empty Face/Back), which stalls the whole relay run
+    CardID = 990300, CustomDeck = { ["9903"] = {
+      FaceURL = "https://placehold.co/500x700/2b2233/e8d9a8.png?text=minicard",
+      BackURL = "https://placehold.co/500x700/1b1622/e8d9a8.png?text=back",
+      NumWidth = 1, NumHeight = 1, BackIsHidden = true, UniqueBack = false, Type = 0 } },
     Transform = { posX = base.x - 2, posY = 2, posZ = base.z + 9, rotX = 0, rotY = 180, rotZ = 0,
                   scaleX = 0.6, scaleY = 1, scaleZ = 0.6 } }), function(o) MINI = o ; one() end)
   waitFor(function() return pending <= 0 end, 20, function(ok)
@@ -494,6 +500,10 @@ end
 local function minicardJSON(id, pos)
   return JSON.encode({ Name = "CardCustom", Nickname = "Relay minicard " .. id, Tags = { "Minicard", TAG },
     GMNotes = JSON.encode({ id = id, type = "Minicard" }),
+    CardID = 990300, CustomDeck = { ["9903"] = {
+      FaceURL = "https://placehold.co/500x700/2b2233/e8d9a8.png?text=minicard",
+      BackURL = "https://placehold.co/500x700/1b1622/e8d9a8.png?text=back",
+      NumWidth = 1, NumHeight = 1, BackIsHidden = true, UniqueBack = false, Type = 0 } },
     Transform = { posX = pos.x, posY = pos.y + 1, posZ = pos.z, rotX = 0, rotY = 180, rotZ = 0,
                   scaleX = 0.6, scaleY = 1, scaleZ = 0.6 } })
 end

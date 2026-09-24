@@ -63,38 +63,41 @@ STACK_ORDER = [
 ]
 
 # ---------------------------------------------------------------- placement --
-# Fixed table anchors, measured off the real SCED scenario box (One Last Job,
-# docs/art_reference/sced_objects/scenario_box_memory_bag.json). Hitting Place
-# in TTS drops each stack where the official campaigns put it:
-#   locations grid  x -30..-23, z -11..11   (rot 270, upright to the players)
-#   encounter deck  x -3.85  z  5.72
-#   agenda / act    x -2.94 / -1.79, z 0.36 / -5.02
-#   set-aside       x  1.69  z 14.24        (rot 225, off to the corner)
+# Table anchors = SCED's own snap points (argonui/SCED objects/MythosArea and
+# PlayArea, converted to world coordinates). +x runs toward the scenario mat,
+# +z runs to the players' LEFT. The mythos mat, left to right as you sit:
+#   encounter discard z 10.38 · encounter deck 5.72 · agenda 0.36 ·
+#   act -5.05 · scenario card -10.39   (x -3.85 / -2.94)
+# with angled corner snaps at (1.69, 14.24) and (1.6, -13.75).
 PLACE = {
-    "reference":   {"pos": (-12.22, 1.59, -8.90), "rot": 90},
+    "reference":   {"pos": (-3.85, 1.59, -10.39), "rot": 270},
     "agenda_deck": {"pos": (-2.94, 1.61, 0.36), "rot": 180},
-    "act_deck":    {"pos": (-1.79, 1.40, -5.02), "rot": 0},
+    "act_deck":    {"pos": (-2.94, 1.61, -5.05), "rot": 180},
     "encounter":   {"pos": (-3.85, 1.75, 5.72), "rot": 270},
-    "named":       {"pos": (-3.85, 1.60, -10.39), "rot": 270},
     "setup_aside": {"pos": (1.69, 1.56, 14.24), "rot": 225},
+    "named":       {"pos": (1.60, 1.56, -13.75), "rot": 315},
 }
-# The playmat's location slots: 5 x 5, stepping 6.60 in x from -30.24 and
-# -7.65 in z from 11.46. The step and origin are measured off the real
-# scenario box (docs/art_reference/sced_objects/scenario_box_memory_bag.json);
-# the 5 x 5 extent is what the playmat shows in TTS.
-LOCATION_GRID = {"x0": -30.24, "dx": 6.60, "z0": 11.46, "dz": -7.65,
+# The play area's location snaps, at full card spacing: rows step 6.60 AWAY
+# from the scenario mat starting just below it (x -17.04 .. -43.44), columns
+# step 7.65 left to right (z 15.30 .. -15.30). A map slot [col, row] is exactly
+# what the Studio's map editor shows: col = across, row = down.
+LOCATION_GRID = {"x0": -17.04, "row_dx": -6.60, "z0": 15.30, "col_dz": -7.65,
                  "cols": 5, "rows": 5, "y": 1.53, "rot": 270}
 
 
+def slot_xz(col, row):
+    """Table position of map slot [col, row]."""
+    return (round(LOCATION_GRID["x0"] + row * LOCATION_GRID["row_dx"], 3),
+            round(LOCATION_GRID["z0"] + col * LOCATION_GRID["col_dz"], 3))
+
+
 def location_slot(i):
-    """Nth location on the official grid: fills a column top-to-bottom, then
-    steps right — the same shape the real scenario books lay out."""
-    col, row = divmod(i, LOCATION_GRID["rows"])
-    col = min(col, LOCATION_GRID["cols"] - 1)     # stay on the playmat
-    return ((LOCATION_GRID["x0"] + col * LOCATION_GRID["dx"],
-             LOCATION_GRID["y"],
-             LOCATION_GRID["z0"] + row * LOCATION_GRID["dz"]),
-            LOCATION_GRID["rot"])
+    """Nth location when the scenario has no authored map: left to right
+    across the middle row, then the rows below it."""
+    row, col = divmod(i, LOCATION_GRID["cols"])
+    row = min(2 + row, LOCATION_GRID["rows"] - 1)
+    x, z = slot_xz(col, row)
+    return (x, LOCATION_GRID["y"], z), LOCATION_GRID["rot"]
 
 
 def guid(key):
@@ -199,9 +202,7 @@ def build_scenario_box(sc, assign, cards, campaign_name="Campaign"):
             for n, cid in enumerate(ids):
                 slot = placed.get(cid)
                 if (isinstance(slot, (list, tuple)) and len(slot) == 2):
-                    col, row = int(slot[0]), int(slot[1])
-                    x = LOCATION_GRID["x0"] + col * LOCATION_GRID["dx"]
-                    z = LOCATION_GRID["z0"] + row * LOCATION_GRID["dz"]
+                    x, z = slot_xz(int(slot[0]), int(slot[1]))
                     y, rot = LOCATION_GRID["y"], LOCATION_GRID["rot"]
                 else:
                     (x, y, z), rot = location_slot(n)

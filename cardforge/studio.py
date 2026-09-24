@@ -742,31 +742,24 @@ def act_scenario_rename(p):
 
 
 
-# The TTS location map: the black bordered slot grid you see when a scenario is
-# laid out. Columns/rows map 1:1 onto table coordinates measured from the real
-# SCED box (columns 6.6 apart, rows 7.65 apart, locations rotated 270).
-MAP_GRID = {"x0": -30.24, "dx": 6.60, "z0": 11.46, "dz": -7.65,
-            "cols": 5, "rows": 5, "y": 1.53, "rot": 270,
-            # a location card's own footprint on the table, in the same units
-            "cw": 2.63, "ch": 3.68}
+# The TTS location map and the rest of the scenario mat come from the
+# compiler (pipeline/compile_campaign.py), which takes them from SCED's own snap
+# points, so what the map editor shows is exactly where Place drops things.
+# A slot is [col, row]: col runs across (left to right as you sit), row runs
+# down, away from the scenario mat.
+sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+import compile_campaign as _cc  # noqa: E402
 
-# The rest of the table, at the coordinates the real box uses. These are not
-# slots you can drop a location on — they are what the map has to fit around,
-# and the reason the grid stops at four columns: a fifth would land on the
-# encounter deck at x -3.85.
-MAP_FURNITURE = [
-    {"key": "encounter", "label": "Encounter deck", "x": -3.85, "z": 5.72,
-     "rot": 270},
-    {"key": "agenda_deck", "label": "Agenda", "x": -2.94, "z": 0.36,
-     "rot": 180},
-    {"key": "act_deck", "label": "Act", "x": -1.79, "z": -5.02, "rot": 0},
-    {"key": "named", "label": "Named / story", "x": -3.85, "z": -10.39,
-     "rot": 270},
-    {"key": "reference", "label": "Scenario reference", "x": -12.22,
-     "z": -8.90, "rot": 90},
-    {"key": "setup_aside", "label": "Set-aside", "x": 1.69, "z": 14.24,
-     "rot": 225},
-]
+MAP_GRID = dict(_cc.LOCATION_GRID,
+                # a location card's own footprint on the table: across / down
+                cw=2.63, ch=3.68)
+
+_FURNITURE_LABELS = (("encounter", "Encounter deck"), ("agenda_deck", "Agenda"),
+                     ("act_deck", "Act"), ("reference", "Scenario card"),
+                     ("setup_aside", "Set-aside"), ("named", "Named enemies"))
+MAP_FURNITURE = [{"key": k, "label": lbl, "x": _cc.PLACE[k]["pos"][0],
+                  "z": _cc.PLACE[k]["pos"][2], "rot": _cc.PLACE[k]["rot"]}
+                 for k, lbl in _FURNITURE_LABELS]
 
 
 def has_face(cid):
@@ -791,8 +784,7 @@ def rp_keys():
 
 def map_xz(col, row):
     """Table position of a grid slot."""
-    return (round(MAP_GRID["x0"] + col * MAP_GRID["dx"], 3),
-            round(MAP_GRID["z0"] + row * MAP_GRID["dz"], 3))
+    return _cc.slot_xz(col, row)
 
 
 def act_map_save(p):
@@ -4375,7 +4367,7 @@ grid.style.gridTemplateColumns='repeat('+g.cols+',104px)';grid.innerHTML='';
 const at={};for(const cid in placed)at[placed[cid].join(',')]=cid;
 for(let r=0;r<g.rows;r++)for(let c=0;c<g.cols;c++){
 const cell=document.createElement('div');cell.className='mslot';cell.dataset.rc=c+','+r;
-const x=(g.x0+c*g.dx).toFixed(1),z=(g.z0+r*g.dz).toFixed(1);
+const x=(g.x0+r*g.row_dx).toFixed(1),z=(g.z0+c*g.col_dz).toFixed(1);
 cell.innerHTML='<span class=co>'+x+' / '+z+'</span>';
 const cid=at[c+','+r];
 if(cid)cell.appendChild(mapCard(cid));
@@ -4591,31 +4583,33 @@ const[c,r]=cell.dataset.rc.split(',').map(Number);
 const card=mapFind(img.dataset.cid);
 items.push({kind:'card',cid:img.dataset.cid,
 name:(card&&card.name)||img.dataset.cid,
-x:g.x0+c*g.dx, z:g.z0+r*g.dz, w:g.cw||2.63, h:g.ch||3.68});}
+x:g.x0+r*g.row_dx, z:g.z0+c*g.col_dz, w:g.cw||2.63, h:g.ch||3.68});}
 // …and the fixed furniture, drawn as labelled footprints
 for(const f of (S.furniture||[])){
-const side=(f.rot===90||f.rot===270);
+// rot 90/270 stands a card upright to the players; 0/180 lays it sideways
+const upright=(f.rot===90||f.rot===270);
 items.push({kind:'box',name:f.label,x:f.x,z:f.z,
-w:side?(g.ch||3.68):(g.cw||2.63),
-h:side?(g.cw||2.63):(g.ch||3.68)});}
+w:upright?(g.cw||2.63):(g.ch||3.68),
+h:upright?(g.ch||3.68):(g.cw||2.63)});}
 if(!items.length){stage.innerHTML=
 '<div class=hint style="padding:24px;text-align:center">place a location on the grid to see the table</div>';
 stage.style.height='';document.getElementById('pvinfo').textContent='';return;}
 // world bounds -> a stage that fits the panel
+// w runs across the table (z), h runs down it (x)
 let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9;
-for(const it of items){x0=Math.min(x0,it.x-it.w/2);x1=Math.max(x1,it.x+it.w/2);
-z0=Math.min(z0,it.z-it.h/2);z1=Math.max(z1,it.z+it.h/2);}
+for(const it of items){z0=Math.min(z0,it.z-it.w/2);z1=Math.max(z1,it.z+it.w/2);
+x0=Math.min(x0,it.x-it.h/2);x1=Math.max(x1,it.x+it.h/2);}
 const pad=1.5;x0-=pad;x1+=pad;z0-=pad;z1+=pad;
 const avail=Math.max(320,(stage.parentElement.clientWidth||900)-24);
-const k=Math.min(avail/(x1-x0),620/(z1-z0));
-const W=Math.round((x1-x0)*k),H=Math.round((z1-z0)*k);
+const k=Math.min(avail/(z1-z0),620/(x1-x0));
+const W=Math.round((z1-z0)*k),H=Math.round((x1-x0)*k);
 stage.style.width=W+'px';stage.style.height=H+'px';stage.innerHTML='';
-// +x runs right; +z runs AWAY from the player, so it draws upward
-const px=it=>[(it.x-it.w/2-x0)*k,(z1-it.z-it.h/2)*k,it.w*k,it.h*k];
+// drawn as you sit at the table: +z is your left, +x (the scenario mat) is up
+const px=it=>[(z1-it.z-it.w/2)*k,(x1-it.x-it.h/2)*k,it.w*k,it.h*k];
 const clash=new Set();
 for(let i=0;i<items.length;i++)for(let j=i+1;j<items.length;j++){
 const a=items[i],b=items[j];
-if(Math.abs(a.x-b.x)<(a.w+b.w)/2&&Math.abs(a.z-b.z)<(a.h+b.h)/2){
+if(Math.abs(a.z-b.z)<(a.w+b.w)/2&&Math.abs(a.x-b.x)<(a.h+b.h)/2){
 clash.add(i);clash.add(j);}}
 const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
 svg.setAttribute('width',W);svg.setAttribute('height',H);
@@ -4641,7 +4635,7 @@ for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++){
 if(drawConn(svg,ids[i],ids[j],at,csz))links++;}
 document.getElementById('pvinfo').innerHTML=
 Object.keys(at).length+' location(s) &middot; '+links+' connection(s) &middot; '+
-((x1-x0).toFixed(1))+' &times; '+((z1-z0).toFixed(1))+' table units'+
+((z1-z0).toFixed(1))+' &times; '+((x1-x0).toFixed(1))+' table units'+
 (clash.size?' &mdash; <b style="color:#e08080">'+clash.size+
 ' object(s) overlap</b>':' &mdash; nothing overlaps');}
 function mapSlots(){const out={};
