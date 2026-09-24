@@ -40,6 +40,7 @@ import time
 DEFAULT_REMOTE = "https://github.com/Pimpcats/Arkhsm-LCG-.git"
 DEFAULT_BRANCH = "main"
 RESULTS_BRANCH = "tts-results"
+FALLBACK_BRANCH = "main"
 JOB_FILE = "tools/tts_relay/job.json"
 TAG = "StillHourRelay"
 KEEP_RUNS = 30
@@ -436,7 +437,17 @@ def main(argv=None):
     waiting_note = None
     while True:
         try:
-            sha = remote_sha(args.remote, args.branch)
+            branch = args.branch
+            sha = remote_sha(args.remote, branch)
+            if sha is None and branch != FALLBACK_BRANCH:
+                # a merged work branch is usually deleted: keep testing what it became
+                sha = remote_sha(args.remote, FALLBACK_BRANCH)
+                if sha is not None:
+                    branch = FALLBACK_BRANCH
+                    if waiting_note != "fallback":
+                        say("branch '{}' is gone (merged?); testing '{}' instead".format(
+                            args.branch, FALLBACK_BRANCH))
+                        waiting_note = "fallback"
             if sha is None:
                 raise GitError("branch '{}' not found on {}".format(args.branch, args.remote))
             if args.once or sha != state.get("last_tested"):
@@ -450,17 +461,17 @@ def main(argv=None):
                 else:
                     waiting_note = None
                     say("testing {} in TTS ...".format(sha[:7]))
-                    tested = sync_repo(repo, args.remote, args.branch)
+                    tested = sync_repo(repo, args.remote, branch)
                     ensure_results_repo(results, args.remote)
                     run_name = dt.datetime.utcnow().strftime("%Y%m%d-%H%M%S") + "_" + tested[:7]
                     run_dir = os.path.join(results, "runs", run_name)
                     try:
-                        summary = run_job(repo, tested, args.branch, args, listener, run_dir)
+                        summary = run_job(repo, tested, branch, args, listener, run_dir)
                     except (GitError, OSError):
                         raise
                     except Exception as e:      # bad job file, bad payload JSON, ...
                         os.makedirs(run_dir, exist_ok=True)
-                        summary = {"run": run_name, "commit": tested, "branch": args.branch,
+                        summary = {"run": run_name, "commit": tested, "branch": branch,
                                    "verdict": "relay_error", "error": repr(e), "passed": 0,
                                    "failed": 0, "lua_errors": [], "checks": []}
                         with open(os.path.join(run_dir, "results.json"), "w", encoding="utf-8") as f:
