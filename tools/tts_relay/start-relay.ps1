@@ -18,15 +18,51 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     return
 }
 
-$Py = $null
-foreach ($c in @('py', 'python', 'python3')) {
-    if (Get-Command $c -ErrorAction SilentlyContinue) {
-        & $c -c "import sys; raise SystemExit(0 if sys.version_info >= (3, 8) else 1)" 2>$null
-        if ($LASTEXITCODE -eq 0) { $Py = $c; break }
+# A Python counts only if it actually RUNS and reports 3.8+. An exit code alone
+# is not enough: a broken `py` launcher (no Python behind it) or the Microsoft
+# Store placeholder can return success while running nothing, and the relay
+# then "stops" instantly with no output.
+function Test-Python([string[]]$Cmd) {
+    try {
+        $exe = $Cmd[0]; $pre = @(); if ($Cmd.Count -gt 1) { $pre = $Cmd[1..($Cmd.Count - 1)] }
+        $out = & $exe @pre -c "import sys; print('PYOK', sys.version_info[0], sys.version_info[1], sys.executable)" 2>$null
+        $line = @($out | Where-Object { "$_" -like 'PYOK *' })[0]
+        if (-not $line) { return $null }
+        $f = "$line".Split(' ', 4)
+        if ([int]$f[1] -gt 3 -or ([int]$f[1] -eq 3 -and [int]$f[2] -ge 8)) { return $f[3].Trim() }
+    } catch { }
+    return $null
+}
+
+function Find-Python {
+    $cands = @(@('py', '-3'), @('python'), @('python3'))
+    # python.org installs: <root>\Python3xx\python.exe (only roots that exist)
+    foreach ($base in @($env:LOCALAPPDATA, $env:ProgramFiles, ${env:ProgramFiles(x86)})) {
+        if (-not $base) { continue }
+        $root = if ($base -eq $env:LOCALAPPDATA) { Join-Path $base 'Programs\Python' } else { $base }
+        if (-not (Test-Path -LiteralPath $root)) { continue }
+        Get-ChildItem -LiteralPath $root -Directory -Filter 'Python3*' -ErrorAction SilentlyContinue |
+            Sort-Object Name -Descending | ForEach-Object {
+                $exe = Join-Path $_.FullName 'python.exe'
+                if (Test-Path -LiteralPath $exe) { $cands += ,@($exe) }
+            }
     }
+    foreach ($c in $cands) {
+        if (-not (Get-Command $c[0] -ErrorAction SilentlyContinue)) { continue }
+        $exe = Test-Python $c
+        if ($exe) { return $exe }
+    }
+    return $null
+}
+
+$Py = Find-Python
+if (-not $Py -and (Get-Command winget -ErrorAction SilentlyContinue)) {
+    Write-Host 'No working Python 3.8+ found. Installing Python 3.12 for your user account (winget)...' -ForegroundColor Yellow
+    winget install -e --id Python.Python.3.12 --scope user --silent --accept-package-agreements --accept-source-agreements
+    $Py = Find-Python
 }
 if (-not $Py) {
-    Write-Host 'Python 3.8+ was not found. Install it from python.org (tick "Add Python to PATH"), then run this line again.' -ForegroundColor Red
+    Write-Host 'No working Python 3.8+ was found. Install it from python.org (tick "Add Python to PATH"), then run this line again.' -ForegroundColor Red
     return
 }
 
@@ -46,9 +82,8 @@ try {
     Invoke-WebRequest -ErrorAction Stop -UseBasicParsing -Uri ("{0}?t={1}" -f $Main, $Stamp) -OutFile $Relay
 }
 Write-Host "Relay downloaded to $Relay"
-$PyExe = (& $Py -c "import sys; print(sys.executable)" 2>$null)
 $PyVer = (& $Py -c "import sys; print(sys.version.split()[0])" 2>$null)
-Write-Host "Starting the relay with $Py ($PyVer, $PyExe). Leave this window open; Ctrl+C stops it."
+Write-Host "Starting the relay with Python $PyVer ($Py). Leave this window open; Ctrl+C stops it."
 # -u: unbuffered, so every line shows here as it happens
 & $Py -u $Relay --branch $Branch @args
 $Code = $LASTEXITCODE

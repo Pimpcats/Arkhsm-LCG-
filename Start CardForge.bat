@@ -5,8 +5,8 @@ cd /d "%~dp0"
 set "PY="
 for %%C in (py python python3) do (
   if not defined PY (
-    %%C -c "import sys;raise SystemExit(0 if sys.version_info>=(3,8) else 1)" >nul 2>&1
-    if not errorlevel 1 set "PY=%%C"
+    REM must actually print: a broken py launcher can "succeed" without running
+    for /f "delims=" %%V in ('%%C -c "import sys;print(1 if sys.version_info>=(3,8) else 0)" 2^>nul') do if "%%V"=="1" set "PY=%%C"
   )
 )
 if not defined PY (
