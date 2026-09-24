@@ -177,11 +177,14 @@ def test_board_wiring_on_an_sced_table(tmp_path, remote):
     for expected in BOARD_CHECKS + SCED_CHECKS:
         assert expected in names, expected
     assert any("control sees SCED" in n for n in latest["notes"])
+    assert any("SCED detected" in n for n in latest["notes"])
     assert rc == 0
 
 
 def test_relay_only_removes_its_own_objects(tmp_path, remote):
-    owner_obj = {"Name": "Custom_Token", "Nickname": "Owner's playmat", "Tags": ["Playermat"],
+    # SCED is recognised by its GUID reference handler (its playmats carry no
+    # identifying tag: in real TTS a "Playermat" tag check never matched)
+    owner_obj = {"Name": "BlockSquare", "Nickname": "GUID Reference Handler", "GUID": "123456",
                  "Transform": {"posX": 0, "posY": 1, "posZ": 0}}
     leftover = {"Name": "Custom_Token", "Nickname": "old relay object", "Tags": [relay.TAG],
                 "Transform": {"posX": 5, "posY": 1, "posZ": 5}}

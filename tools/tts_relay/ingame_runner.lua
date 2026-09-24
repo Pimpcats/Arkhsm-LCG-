@@ -40,6 +40,16 @@ end
 -- exactly once. A step that errors is reported as a failure and the run moves on.
 local steps, idx = {}, 0
 local function step(name, fn) steps[#steps + 1] = { name = name, fn = fn } end
+
+-- A destroyed (or mid-destruction) object throws a .NET NullReferenceException
+-- on any access, and that escapes pcall and kills the run ("Object reference
+-- not set to an instance of an object"). Check before touching an object that
+-- can disappear: one put in a bag, merged into a deck, or removed by SCED.
+local function alive(o)
+  if o == nil then return false end
+  local ok, dead = pcall(function() return o.isDestroyed() end)
+  return ok and dead == false
+end
 local function nextStep()
   idx = idx + 1
   local s = steps[idx]
@@ -110,9 +120,9 @@ local byNick = {}      -- nickname -> object
 step("environment", function(go)
   local all = getObjects()
   info("table has " .. #all .. " object(s) before the run")
-  -- SCED marks its playmats with this tag; its absence means a vanilla table
-  local mats = getObjectsWithTag("Playermat")
-  info(#mats > 0 and ("SCED detected (" .. #mats .. " playmat(s))")
+  -- SCED's GUID reference handler (src/core/GUIDReferenceApi.ttslua); its
+  -- playmats carry no identifying tag, so this is the one reliable marker
+  info(getObjectFromGUID("123456") ~= nil and "SCED detected (GUID reference handler)"
     or "SCED not detected: running on a non-SCED table")
   go()
 end)
@@ -172,7 +182,9 @@ step("card metadata", function(go)
     end
     for _, c in ipairs(data.ContainedObjects or {}) do scan(c) end
   end
-  for _, o in pairs(spawned) do scan(o.getData()) end
+  for name, o in pairs(spawned) do
+    if alive(o) then scan(o.getData()) else info("payload '" .. name .. "' is gone (absorbed into a container?)") end
+  end
   check("spawned content contains cards", cards > 0, cards .. " card(s)")
   check("every card has consistent SCED metadata", #bad == 0,
     #bad == 0 and nil or table.concat(bad, "; ", 1, math.min(#bad, 8)))
@@ -184,7 +196,7 @@ end)
 step("control token", function(go)
   local ctl, ctlName
   for name, o in pairs(spawned) do
-    if (o.getLuaScript() or ""):find("function runStillHourTests", 1, true) then
+    if alive(o) and (o.getLuaScript() or ""):find("function runStillHourTests", 1, true) then
       ctl, ctlName = o, name
     end
   end
@@ -199,14 +211,16 @@ step("control token", function(go)
       tostring(res.passed) .. " passed, " .. tostring(res.failed) .. " failed")
   end
   -- save/load round trip: reload() re-runs onLoad(script_state)
-  local state = ctl.script_state
+  -- script_state is only written when TTS saves the game; getData() runs
+  -- onSave now, which is what a save or reload would store
+  local state = ctl.getData().LuaScriptState
   check("control token saves its state", type(state) == "string" and #state > 0)
   local fresh = ctl.reload()
   Wait.frames(function()
     local nb = fresh and #(fresh.getButtons() or {}) or 0
     check("control token survives save+reload", fresh ~= nil and nb >= 7, nb .. " button(s) after reload")
     check("state preserved across reload",
-      fresh ~= nil and deepEqual(decode(fresh.script_state), decode(state)))
+      alive(fresh) and deepEqual(decode(fresh.getData().LuaScriptState), decode(state)))
     if fresh then spawned[ctlName] = fresh end
     go()
   end, 60)
@@ -220,7 +234,7 @@ end)
 
 local function findControl()
   for _, o in pairs(spawned) do
-    if (o.getLuaScript() or ""):find("function runStillHourTests", 1, true) then return o end
+    if alive(o) and (o.getLuaScript() or ""):find("function runStillHourTests", 1, true) then return o end
   end
   return nil
 end
@@ -271,7 +285,7 @@ step("board: touchable counters", function(go)
   check("Hour counter advances the Hourglass", s2.hour == s0.hour + 1, s0.hour .. " -> " .. s2.hour)
   local s3 = ctl.call("shApiCounter", { name = "hour", delta = -1 })
   check("Hour counter rewinds", s3.hour == s0.hour)
-  local saved = ctl.script_state
+  local saved = ctl.getData().LuaScriptState     -- onSave now (script_state lags until a save)
   local fresh = ctl.reload()
   Wait.frames(function()
     local s4 = fresh and fresh.call("shApiState")
@@ -400,8 +414,11 @@ step("board: locations flip and seal", function(go)
       check("unlocking the flip fact turns the location to its back", LOC_A.obj.is_face_down == true)
       ctl.call("shApiUnlockFact", { id = "what-the-almanac-hid" })
       local r = ctl.call("shApiUnlockFact", { id = "the-vote-that-never-ends" })
-      check("the SEALED label comes off once every fact is known", not hasButton(LOC_B.obj, "SEALED"),
-        labelsOf(LOC_B.obj))
+      -- button removals apply at the end of the frame: look a few frames later
+      Wait.frames(function()
+        check("the SEALED label comes off once every fact is known", not hasButton(LOC_B.obj, "SEALED"),
+          labelsOf(LOC_B.obj))
+      end, 5)
       if scedHere then
         check("SCED clue spawn is released for the opened location",
           r ~= nil and r.report ~= nil and r.report.opened == 1, r and r.report and ("opened " .. tostring(r.report.opened)))
@@ -416,7 +433,7 @@ end)
 
 local function findAppointedCard()
   for _, o in ipairs(getObjects()) do
-    if o.type == "Card" then
+    if alive(o) and o.type == "Card" then
       local md = decode(o.getGMNotes())
       if md and md.id == "sthr-appointed" then return o end
     end
@@ -453,7 +470,7 @@ step("board: the Appointed", function(go)
         card = findAppointedCard()
         -- it cannot be defeated: put it in a container and it comes back
         local bin
-        for _, o in pairs(spawned) do if o.type == "Bag" then bin = o end end
+        for _, o in pairs(spawned) do if alive(o) and o.type == "Bag" then bin = o end end
         if card and bin then bin.putObject(card) end
         waitFor(function()
           local c = findAppointedCard()
@@ -658,7 +675,7 @@ end)
 step("deal a card", function(go)
   local bag, most = nil, 0
   for _, o in pairs(spawned) do
-    local n = (o.type == "Bag" or o.type == "Deck") and #(o.getObjects() or {}) or 0
+    local n = alive(o) and (o.type == "Bag" or o.type == "Deck") and #(o.getObjects() or {}) or 0
     if n > most then bag, most = o, n end
   end
   if not bag then check("a card container was spawned", false) ; return go() end
@@ -687,7 +704,7 @@ local tp = { box = nil, ml = nil, placed = {}, log = nil, n = 0 }
 
 local function findSpawned(pred)
   for _, o in pairs(spawned) do
-    if pred(o) then return o end
+    if alive(o) and pred(o) then return o end
   end
   return nil
 end
@@ -887,7 +904,7 @@ step("screenshots", function(go)
   if not p then info("no seated player: screenshots skipped") ; return go() end
   local views = {}
   for name, o in pairs(spawned) do
-    views[#views + 1] = { name = name, pos = o.getPosition() }
+    if alive(o) then views[#views + 1] = { name = name, pos = o.getPosition() } end
   end
   table.sort(views, function(a, b) return a.name < b.name end)
   local i = 0

@@ -82,6 +82,9 @@ expect("in-bundle tests all pass (" .. res.passed .. ")", res.failed == 0 and re
 print("\n== touch counters (left / right click) ==")
 env.shClickMemory(nil, "White", false) ; env.shClickMemory(nil, "White", false)
 expect("Memory +2 by clicks", env.shApiState().memory == 2)
+expect("script_state is kept current (TTS only writes it on save; reload() reads it)",
+  type(env.self.script_state) == "string" and #env.self.script_state > 0
+  and env.self.script_state:find('"campaign"', 1, true) ~= nil)
 env.shClickMemory(nil, "White", true)
 expect("Memory right-click -1", env.shApiState().memory == 1)
 for _ = 1, 6 do env.shClickDissonance(nil, "White", false) end
@@ -258,6 +261,26 @@ local yrs = 0
 for _, i in ipairs(env2.shApiInvestigators()) do yrs = yrs + i.years end
 expect("a fresh control token adopts the campaign-log copy (SCED export/import path)",
   after2.loops == before2.loops and after2.memory == before2.memory and yrs == 8)
+
+-- a sealed location gets a SEALED label, and loses it once every fact it
+-- waits on is known (the in-TTS relay reported the label staying on)
+local locA = stubCard("Relay Location A", { id = "sthr-loc-lanternroom", type = "Location",
+  locationFront = { icons = "Diamond", connections = "Circle" }, locationBack = { icons = "Diamond", connections = "Circle" } }, { "Location" })
+local locB = stubCard("Relay Location B", { id = "sthr-loc-sealedstudy", type = "Location",
+  locationFront = { icons = "Circle", connections = "Diamond" }, locationBack = { icons = "Circle", connections = "Diamond" } }, { "Location" })
+for _, o in ipairs({ locA, locB }) do
+  o.is_face_down = false
+  o.getRotation = function() return { x = 0, y = 180, z = o.is_face_down and 180 or 0 } end
+  o.setRotation = function(r) o.is_face_down = (r.z or r[3] or 0) > 90 end
+  table_[#table_ + 1] = o
+end
+local snap = env.shApiSnapshot()
+env.shApiSyncBoard()
+expect("a sealed location is labelled SEALED", cardLabel(locB, "SEALED") ~= nil)
+env.shApiUnlockFact({ id = "what-the-almanac-hid" })
+env.shApiUnlockFact({ id = "the-vote-that-never-ends" })
+expect("the SEALED label comes off once every fact is known", cardLabel(locB, "SEALED") == nil)
+env.shApiRestore({ blob = snap })
 
 expect("no board-wiring errors on a vanilla table", #errors == 0)
 for _, e in ipairs(errors) do print("    " .. e) end

@@ -417,6 +417,9 @@ local function persist()
     if lastBody ~= nil then saveSeq = saveSeq + 1 end
     lastBody = b
   end
+  -- TTS only refreshes script_state when the game saves; reload() (and SCED
+  -- tools that reload objects) rebuild from it, so keep it current ourselves
+  pcall(function() self.script_state = onSave() end)
   guarded("campaign log", function() Board.mirrorToLog(onSave(), saveSeq) end)
 end
 
