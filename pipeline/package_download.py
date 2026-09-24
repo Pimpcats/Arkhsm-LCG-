@@ -51,9 +51,12 @@ SOURCE_REPO = "https://github.com/Chr1Z93/SCED-downloads/releases/latest/downloa
 
 # Place spots for the loose content, beside the story-deck row the real
 # campaign box uses (z -36.385).
+# one spot per extra object (card bags, Control, Static token): two sharing a
+# spot on Place would drop one into the other
 EXTRA_PLACE = [{"x": 2.366, "y": 1.55, "z": -36.385},
                {"x": -3.959, "y": 1.55, "z": -36.385},
-               {"x": 5.529, "y": 1.55, "z": -36.385}]
+               {"x": 5.529, "y": 1.55, "z": -36.385},
+               {"x": 8.692, "y": 1.55, "z": -36.385}]
 
 
 def guid(seed):
@@ -107,9 +110,10 @@ def main(argv=None):
     import table_presence as T
     state = json.loads(box.get("LuaScriptState") or "{}")
     ml = state.setdefault("ml", {})
+    assert len(objs) <= len(EXTRA_PLACE), "add a Place spot for every extra object"
     for i, o in enumerate(objs):
         o = copy.deepcopy(o)
-        pos = EXTRA_PLACE[i % len(EXTRA_PLACE)]
+        pos = EXTRA_PLACE[i]
         o["Transform"] = T.transform(pos, 270, (o["Transform"].get("scaleX", 1),
                                                 o["Transform"].get("scaleY", 1),
                                                 o["Transform"].get("scaleZ", 1)))
@@ -121,6 +125,14 @@ def main(argv=None):
     release_path = os.path.join(out_dir, FILENAME + ".json")
     with open(release_path, "w", encoding="utf-8") as f:
         json.dump(box, f, indent=2, ensure_ascii=False)
+    # the same box as a TTS "Saved Object" (save-file shape), so the owner can
+    # import the whole campaign by hand: Objects -> Saved Objects
+    saved_path = os.path.join(ROOT, "dist", "saved_object_the_still_hour.json")
+    with open(saved_path, "w", encoding="utf-8") as f:
+        json.dump({"SaveName": "The Still Hour", "GameMode": "", "Date": "",
+                   "Table": "", "Sky": "", "Note": "", "Rules": "", "XmlUI": "",
+                   "LuaScript": "", "LuaScriptState": "", "ObjectStates": [box]},
+                  f, indent=2, ensure_ascii=False)
 
     # 2. Placeholder download box.
     box_lua = open(os.path.join(ROOT, "src", "tts", "download_box.lua"), encoding="utf-8").read()
