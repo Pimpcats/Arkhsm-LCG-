@@ -68,14 +68,18 @@ STACK_ORDER = [
 # +z runs to the players' LEFT. The mythos mat, left to right as you sit:
 #   encounter discard z 10.38 · encounter deck 5.72 · agenda 0.36 ·
 #   act -5.05 · scenario card -10.39   (x -3.85 / -2.94)
-# with angled corner snaps at (1.69, 14.24) and (1.6, -13.75).
+# with angled corner snaps at (1.69, 14.24) and (1.6, -13.75). Every anchor is
+# checked against the official Drowned City boxes in
+# docs/art_reference/sced_objects/official_layout_drowned_city.json.
 PLACE = {
     "reference":   {"pos": (-3.85, 1.59, -10.39), "rot": 270},
     "agenda_deck": {"pos": (-2.94, 1.61, 0.36), "rot": 180},
     "act_deck":    {"pos": (-2.94, 1.61, -5.05), "rot": 180},
     "encounter":   {"pos": (-3.85, 1.75, 5.72), "rot": 270},
     "setup_aside": {"pos": (1.69, 1.56, 14.24), "rot": 225},
-    "named":       {"pos": (1.60, 1.56, -13.75), "rot": 315},
+    # set-aside enemies: where the official boxes put them, beside the
+    # encounter discard (Court of the Ancients / The Grand Vault, Drowned City)
+    "named":       {"pos": (-3.83, 1.60, 14.98), "rot": 270},
 }
 # The play area's location snaps, at full card spacing: rows step 6.60 AWAY
 # from the scenario mat starting just below it (x -17.04 .. -43.44), columns

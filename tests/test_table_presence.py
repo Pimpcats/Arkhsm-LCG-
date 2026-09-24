@@ -443,3 +443,28 @@ def test_scenario_stacks_land_on_the_mythos_mat_snaps():
     # nothing else may take the scenario card's slot
     ref = cc.PLACE["reference"]["pos"]
     assert all(v["pos"] != ref for k, v in cc.PLACE.items() if k != "reference")
+
+
+OFFICIAL = os.path.join(ROOT, "docs", "art_reference", "sced_objects",
+                        "official_layout_drowned_city.json")
+
+
+def test_mythos_anchors_match_the_official_drowned_city_boxes():
+    """Where FFG's own boxes put the scenario card, agenda, act, encounter deck,
+    set-aside bag and set-aside enemies, Place puts ours."""
+    rows = [r for sc in json.load(open(OFFICIAL, encoding="utf-8"))["scenarios"].values()
+            for r in sc]
+
+    def spots(pred):
+        return {(tuple(r["pos"]), r["rot"]) for r in rows if pred(r)}
+
+    def ours(stack):
+        x, _, z = cc.PLACE[stack]["pos"]
+        return ((round(x, 2), round(z, 2)), cc.PLACE[stack]["rot"])
+
+    assert ours("reference") in spots(lambda r: "ScenarioReference" in r["types"])
+    assert ours("agenda_deck") in spots(lambda r: r["types"] == ["Agenda"])
+    assert ours("act_deck") in spots(lambda r: r["types"] == ["Act"])
+    assert ours("encounter") in spots(lambda r: r["name"] == "Encounter Deck")
+    assert ours("setup_aside") in spots(lambda r: r["object"] == "Custom_Model_Bag")
+    assert ours("named") in spots(lambda r: "Enemy" in r["types"])

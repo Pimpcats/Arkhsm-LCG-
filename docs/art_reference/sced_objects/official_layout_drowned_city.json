@@ -1,0 +1,1621 @@
+{
+ "_doc": "Placement summary of FFG's The Drowned City SCED campaign box (owner-supplied export), used by tests/test_table_presence.py to keep The Still Hour's Place layout on the official spots. pos = (x, z), rot = y.",
+ "scenarios": {
+  "The Apiary": [
+   {
+    "name": "Apiary Entrance",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -30.24,
+     0
+    ],
+    "rot": 270
+   },
+   {
+    "name": "The Apiary",
+    "object": "Card",
+    "types": [
+     "ScenarioReference"
+    ],
+    "pos": [
+     -3.85,
+     -10.39
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Agenda Deck",
+    "object": "Deck",
+    "types": [
+     "Agenda"
+    ],
+    "pos": [
+     -2.94,
+     0.36
+    ],
+    "rot": 180
+   },
+   {
+    "name": "Task Reminder",
+    "object": "Notecard",
+    "types": [
+     "Notecard"
+    ],
+    "pos": [
+     -12.73,
+     -9.47
+    ],
+    "rot": 90
+   },
+   {
+    "name": "Western Expedition",
+    "object": "Bag",
+    "types": [],
+    "pos": [
+     3.5,
+     3.5
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Eastern Expedition",
+    "object": "Bag",
+    "types": [],
+    "pos": [
+     3.5,
+     -3.5
+    ],
+    "rot": 270
+   },
+   {
+    "name": "The Apiary Helper",
+    "object": "Custom_Tile",
+    "types": [],
+    "pos": [
+     -18,
+     -9.47
+    ],
+    "rot": 270
+   },
+   {
+    "name": "",
+    "object": "Deck",
+    "types": [
+     "Enemy",
+     "Location",
+     "Treachery"
+    ],
+    "pos": [
+     -3.85,
+     5.72
+    ],
+    "rot": 270
+   }
+  ],
+  "The Drowned Quarter": [
+   {
+    "name": "Barrier Core",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -30.24,
+     0
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Task Reminder",
+    "object": "Notecard",
+    "types": [
+     "Notecard"
+    ],
+    "pos": [
+     -13.34,
+     6.95
+    ],
+    "rot": 90
+   },
+   {
+    "name": "Reactivate the Core",
+    "object": "Card",
+    "types": [
+     "Act"
+    ],
+    "pos": [
+     -2.94,
+     -5.05
+    ],
+    "rot": 180
+   },
+   {
+    "name": "Drowned Acropolises",
+    "object": "Deck",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -23.64,
+     -3.83
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Flood Tokens",
+    "object": "Custom_Model_Infinite_Bag",
+    "types": [],
+    "pos": [
+     -11.95,
+     -11.58
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Coral Reefs",
+    "object": "Deck",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -23.64,
+     3.83
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Encounter Deck",
+    "object": "Deck",
+    "types": [
+     "Enemy",
+     "Treachery"
+    ],
+    "pos": [
+     -3.85,
+     5.72
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Agenda Deck",
+    "object": "Deck",
+    "types": [
+     "Agenda"
+    ],
+    "pos": [
+     -2.94,
+     0.36
+    ],
+    "rot": 180
+   },
+   {
+    "name": "The Drowned Quarter",
+    "object": "Card",
+    "types": [
+     "ScenarioReference"
+    ],
+    "pos": [
+     -3.85,
+     -10.39
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Sea Floors",
+    "object": "Deck",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -23.64,
+     0
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Set-aside",
+    "object": "Custom_Model_Bag",
+    "types": [],
+    "pos": [
+     1.69,
+     14.24
+    ],
+    "rot": 225
+   },
+   {
+    "name": "Flood Tokens",
+    "object": "Custom_Model_Infinite_Bag",
+    "types": [],
+    "pos": [
+     -11.81,
+     11.52
+    ],
+    "rot": 270
+   },
+   {
+    "name": "The Drowned Quarter Helper",
+    "object": "Custom_Tile",
+    "types": [],
+    "pos": [
+     -18.86,
+     -11.3
+    ],
+    "rot": 270
+   }
+  ],
+  "The Doom of Arkham Part I": [
+   {
+    "name": "Miskatonic University",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -30.24,
+     7.65
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Setup Notes",
+    "object": "Notecard",
+    "types": [
+     "Notecard"
+    ],
+    "pos": [
+     -12.47,
+     7.33
+    ],
+    "rot": 90
+   },
+   {
+    "name": "Easttown",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -23.64,
+     -7.65
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Southsides",
+    "object": "Deck",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -36.84,
+     0
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Set-aside",
+    "object": "Custom_Model_Bag",
+    "types": [],
+    "pos": [
+     1.69,
+     14.24
+    ],
+    "rot": 225
+   },
+   {
+    "name": "Flood Tokens",
+    "object": "Custom_Model_Infinite_Bag",
+    "types": [],
+    "pos": [
+     -11.49,
+     -12.27
+    ],
+    "rot": 270
+   },
+   {
+    "name": "John Raymond Legrasse",
+    "object": "Card",
+    "types": [
+     "Asset"
+    ],
+    "pos": [
+     -16.25,
+     10.35
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Star Spawn",
+    "object": "Deck",
+    "types": [
+     "Enemy"
+    ],
+    "pos": [
+     -7.05,
+     6.11
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Rivertown",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -30.24,
+     0
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Flood Tokens",
+    "object": "Custom_Model_Infinite_Bag",
+    "types": [],
+    "pos": [
+     -11.82,
+     14.73
+    ],
+    "rot": 270
+   },
+   {
+    "name": "The Phantom Shop",
+    "object": "Card",
+    "types": [
+     "Act"
+    ],
+    "pos": [
+     -2.94,
+     -5.05
+    ],
+    "rot": 180
+   },
+   {
+    "name": "The Coming Storm",
+    "object": "Card",
+    "types": [
+     "Agenda"
+    ],
+    "pos": [
+     -2.94,
+     0.36
+    ],
+    "rot": 180
+   },
+   {
+    "name": "Encounter Deck",
+    "object": "Deck",
+    "types": [
+     "Enemy",
+     "Treachery"
+    ],
+    "pos": [
+     -3.85,
+     5.72
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Downtowns",
+    "object": "Deck",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -23.64,
+     0
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Northside",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -23.64,
+     7.65
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Facedown Cards",
+    "object": "Deck",
+    "types": [
+     "Location",
+     "Treachery"
+    ],
+    "pos": [
+     -20.2,
+     3.7
+    ],
+    "rot": 270
+   },
+   {
+    "name": "The Doom of Arkham Pt I",
+    "object": "Card",
+    "types": [
+     "ScenarioReference"
+    ],
+    "pos": [
+     -3.85,
+     -10.39
+    ],
+    "rot": 270
+   },
+   {
+    "name": "St. Mary's Hospital",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -36.84,
+     7.65
+    ],
+    "rot": 270
+   }
+  ],
+  "One Last Job": [
+   {
+    "name": "Tillinghast Esoterica",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -30.22,
+     11.46
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Downtowns",
+    "object": "Deck",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -23.64,
+     -3.83
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Campaign Difficulty",
+    "object": "Custom_Tile",
+    "types": [],
+    "pos": [
+     -3.69,
+     -15.15
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Miskatonic University",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -30.24,
+     3.83
+    ],
+    "rot": 270
+   },
+   {
+    "name": "One Last Job",
+    "object": "Card",
+    "types": [
+     "ScenarioReference"
+    ],
+    "pos": [
+     -3.85,
+     -10.39
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Easttown",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -23.64,
+     -11.48
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Setup Notes",
+    "object": "Notecard",
+    "types": [
+     "Notecard"
+    ],
+    "pos": [
+     -12.22,
+     -8.9
+    ],
+    "rot": 90
+   },
+   {
+    "name": "Agenda Deck",
+    "object": "Deck",
+    "types": [
+     "Agenda"
+    ],
+    "pos": [
+     -2.94,
+     0.36
+    ],
+    "rot": 180
+   },
+   {
+    "name": "Act Decks",
+    "object": "Bag",
+    "types": [],
+    "pos": [
+     -1.79,
+     -5.02
+    ],
+    "rot": 0
+   },
+   {
+    "name": "Rivertown",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -30.24,
+     -3.83
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Encounter Deck",
+    "object": "Deck",
+    "types": [
+     "Enemy",
+     "Treachery"
+    ],
+    "pos": [
+     -3.85,
+     5.72
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Northside",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -23.64,
+     3.83
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Set-aside",
+    "object": "Custom_Model_Bag",
+    "types": [],
+    "pos": [
+     1.69,
+     14.24
+    ],
+    "rot": 225
+   }
+  ],
+  "Obsidian Canyons": [
+   {
+    "name": "Eastern Expedition",
+    "object": "Bag",
+    "types": [],
+    "pos": [
+     3.5,
+     -3.5
+    ],
+    "rot": 270
+   },
+   {
+    "name": "R'lyeh Streets",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -36.84,
+     7.65
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Obsidian Canyons",
+    "object": "Card",
+    "types": [
+     "ScenarioReference"
+    ],
+    "pos": [
+     -3.85,
+     -10.39
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Star Spawns",
+    "object": "Deck",
+    "types": [
+     "Enemy"
+    ],
+    "pos": [
+     3.1,
+     9.9
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Central Spire",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -3.46,
+     14.12
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Task Reminder",
+    "object": "Notecard",
+    "types": [
+     "Notecard"
+    ],
+    "pos": [
+     -11.7,
+     -9.77
+    ],
+    "rot": 90
+   },
+   {
+    "name": "Western Expedition",
+    "object": "Bag",
+    "types": [],
+    "pos": [
+     3.5,
+     3.5
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Encounter Deck",
+    "object": "Deck",
+    "types": [
+     "Enemy",
+     "Treachery"
+    ],
+    "pos": [
+     -3.85,
+     5.72
+    ],
+    "rot": 270
+   },
+   {
+    "name": "The Inescapable",
+    "object": "Deck",
+    "types": [
+     "Enemy",
+     "Treachery"
+    ],
+    "pos": [
+     -0.9,
+     8.44
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Set-aside",
+    "object": "Custom_Model_Bag",
+    "types": [],
+    "pos": [
+     1.69,
+     14.24
+    ],
+    "rot": 225
+   },
+   {
+    "name": "Summit Deck",
+    "object": "Deck",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -13.8,
+     11.48
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Winds",
+    "object": "Card",
+    "types": [
+     "Story"
+    ],
+    "pos": [
+     -3.66,
+     -14.54
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Obsidian Canyons Helper",
+    "object": "Custom_Tile",
+    "types": [],
+    "pos": [
+     -16.81,
+     -12.2
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Summit Assistant",
+    "object": "Custom_Tile",
+    "types": [],
+    "pos": [
+     -16.86,
+     11.45
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Open Skies",
+    "object": "Deck",
+    "types": [],
+    "pos": [
+     -13.8,
+     15.3
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Wind Direction",
+    "object": "Custom_Model",
+    "types": [],
+    "pos": [
+     -6.58,
+     -15.09
+    ],
+    "rot": 270
+   }
+  ],
+  "The Western Wall": [
+   {
+    "name": "Task Reminder",
+    "object": "Notecard",
+    "types": [
+     "Notecard"
+    ],
+    "pos": [
+     -15.59,
+     13.07
+    ],
+    "rot": 90
+   },
+   {
+    "name": "Flood Tokens",
+    "object": "Custom_Model_Infinite_Bag",
+    "types": [],
+    "pos": [
+     -11.84,
+     -11.5
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Flooded Paths",
+    "object": "Card",
+    "types": [
+     "Agenda"
+    ],
+    "pos": [
+     -2.94,
+     0.36
+    ],
+    "rot": 180
+   },
+   {
+    "name": "Eastern Expedition",
+    "object": "Bag",
+    "types": [],
+    "pos": [
+     3.5,
+     -3.5
+    ],
+    "rot": 270
+   },
+   {
+    "name": "The Western Wall",
+    "object": "Card",
+    "types": [
+     "ScenarioReference"
+    ],
+    "pos": [
+     -3.85,
+     -10.39
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Western Expedition",
+    "object": "Bag",
+    "types": [],
+    "pos": [
+     3.5,
+     3.5
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Flood Tokens",
+    "object": "Custom_Model_Infinite_Bag",
+    "types": [],
+    "pos": [
+     -11.7,
+     11.6
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Encounter Deck",
+    "object": "Deck",
+    "types": [
+     "Enemy",
+     "Treachery"
+    ],
+    "pos": [
+     -3.85,
+     5.72
+    ],
+    "rot": 270
+   },
+   {
+    "name": "The Inescapable",
+    "object": "Deck",
+    "types": [
+     "Enemy",
+     "Treachery"
+    ],
+    "pos": [
+     -0.9,
+     8.44
+    ],
+    "rot": 270
+   },
+   {
+    "name": "The Western Wall Helper",
+    "object": "Custom_Tile",
+    "types": [],
+    "pos": [
+     -16.22,
+     -12.2
+    ],
+    "rot": 270
+   }
+  ],
+  "The Grand Vault": [
+   {
+    "name": "Encounter Deck",
+    "object": "Deck",
+    "types": [
+     "Enemy",
+     "Treachery"
+    ],
+    "pos": [
+     -3.85,
+     5.71
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Set-aside Star Spawn",
+    "object": "Deck",
+    "types": [
+     "Enemy"
+    ],
+    "pos": [
+     -3.71,
+     14.79
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Flood Tokens",
+    "object": "Custom_Model_Infinite_Bag",
+    "types": [],
+    "pos": [
+     -12.57,
+     -11.74
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Task Reminder",
+    "object": "Notecard",
+    "types": [
+     "Notecard"
+    ],
+    "pos": [
+     -15.77,
+     5.87
+    ],
+    "rot": 90
+   },
+   {
+    "name": "Moving Platform",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -30.24,
+     7.65
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Core of the Vault",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -30.24,
+     0
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Otherwordly Mechanisms",
+    "object": "Deck",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -25.37,
+     -2.16
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Vault Chambers",
+    "object": "Deck",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -25.38,
+     -4.95
+    ],
+    "rot": 270
+   },
+   {
+    "name": "The Grand Vault Helper",
+    "object": "Custom_Tile",
+    "types": [],
+    "pos": [
+     -20.62,
+     -3.68
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Chamber of the Tablet",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -30.24,
+     -15.3
+    ],
+    "rot": 270
+   },
+   {
+    "name": "The Great Stair",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -30.24,
+     15.3
+    ],
+    "rot": 270
+   },
+   {
+    "name": "The Grand Vault",
+    "object": "Card",
+    "types": [
+     "ScenarioReference"
+    ],
+    "pos": [
+     -3.85,
+     -10.39
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Set-aside",
+    "object": "Custom_Model_Bag",
+    "types": [],
+    "pos": [
+     1.69,
+     14.24
+    ],
+    "rot": 225
+   },
+   {
+    "name": "Agenda Deck",
+    "object": "Deck",
+    "types": [
+     "Agenda"
+    ],
+    "pos": [
+     -2.94,
+     0.36
+    ],
+    "rot": 180
+   },
+   {
+    "name": "Act Deck",
+    "object": "Deck",
+    "types": [
+     "Act"
+    ],
+    "pos": [
+     -2.94,
+     -5.05
+    ],
+    "rot": 180
+   },
+   {
+    "name": "Flood Tokens",
+    "object": "Custom_Model_Infinite_Bag",
+    "types": [],
+    "pos": [
+     -12.43,
+     11.36
+    ],
+    "rot": 270
+   }
+  ],
+  "Court of the Ancients": [
+   {
+    "name": "Court of the Ancients",
+    "object": "Card",
+    "types": [
+     "ScenarioReference"
+    ],
+    "pos": [
+     -3.85,
+     -10.39
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Eastern Expedition",
+    "object": "Bag",
+    "types": [],
+    "pos": [
+     3.5,
+     -3.5
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Twisting Catwalks",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -17.04,
+     15.3
+    ],
+    "rot": 270
+   },
+   {
+    "name": "West Antechamber",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -36.84,
+     15.3
+    ],
+    "rot": 270
+   },
+   {
+    "name": "East Antechamber",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -36.84,
+     0
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Ancient Altar",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -36.84,
+     -7.65
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Crumbling Archives",
+    "object": "Deck",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -23.64,
+     7.65
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Set-aside",
+    "object": "Custom_Model_Bag",
+    "types": [],
+    "pos": [
+     1.69,
+     14.24
+    ],
+    "rot": 225
+   },
+   {
+    "name": "The Inescapable",
+    "object": "Card",
+    "types": [
+     "Enemy"
+    ],
+    "pos": [
+     -3.83,
+     14.98
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Still Behind Yous",
+    "object": "Deck",
+    "types": [
+     "Treachery"
+    ],
+    "pos": [
+     -7.32,
+     6.56
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Western Expedition",
+    "object": "Bag",
+    "types": [],
+    "pos": [
+     3.5,
+     3.5
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Task Reminder",
+    "object": "Notecard",
+    "types": [
+     "Notecard"
+    ],
+    "pos": [
+     -11.86,
+     -10.08
+    ],
+    "rot": 90
+   },
+   {
+    "name": "Court of the Ancients Helper",
+    "object": "Custom_Tile",
+    "types": [],
+    "pos": [
+     -18.86,
+     -10.08
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Encounter Deck",
+    "object": "Deck",
+    "types": [
+     "Enemy",
+     "Treachery"
+    ],
+    "pos": [
+     -3.85,
+     5.72
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Great Lift",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -2.33,
+     16.1
+    ],
+    "rot": 270
+   }
+  ],
+  "Sepulchre of the Sleeper": [
+   {
+    "name": "Sepulchre of the Sleeper",
+    "object": "Card",
+    "types": [
+     "ScenarioReference"
+    ],
+    "pos": [
+     -3.85,
+     -10.39
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Dreamer's Rest",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -30.24,
+     0
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Encounter Deck",
+    "object": "Deck",
+    "types": [
+     "Enemy",
+     "Treachery"
+    ],
+    "pos": [
+     -3.85,
+     5.72
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Agenda Deck",
+    "object": "Deck",
+    "types": [
+     "Agenda"
+    ],
+    "pos": [
+     -2.94,
+     0.36
+    ],
+    "rot": 180
+   },
+   {
+    "name": "Sigil-Carved Alcoves",
+    "object": "Deck",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -26.94,
+     -3.83
+    ],
+    "rot": 270
+   }
+  ],
+  "The Doom of Arkham Part II": [
+   {
+    "name": "Miskatonic University",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -30.24,
+     7.65
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Cthulhu",
+    "object": "Card",
+    "types": [
+     "Enemy"
+    ],
+    "pos": [
+     -11.55,
+     13.66
+    ],
+    "rot": 270
+   },
+   {
+    "name": "The Doom of Arkham Pt II",
+    "object": "Card",
+    "types": [
+     "ScenarioReference"
+    ],
+    "pos": [
+     -3.85,
+     -10.39
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Cthulhu Deck",
+    "object": "Deck",
+    "types": [
+     "Story"
+    ],
+    "pos": [
+     -13.04,
+     16.96
+    ],
+    "rot": 270
+   },
+   {
+    "name": "St. Mary's Hospital",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -36.84,
+     7.65
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Cthulhu",
+    "object": "Card",
+    "types": [
+     "Enemy"
+    ],
+    "pos": [
+     -31.98,
+     -2.42
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Southsides",
+    "object": "Deck",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -36.84,
+     0
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Northside",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -23.64,
+     7.65
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Downtowns",
+    "object": "Deck",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -23.64,
+     0
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Rivertown",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -30.24,
+     0
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Easttown",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -23.64,
+     -7.65
+    ],
+    "rot": 270
+   },
+   {
+    "name": "The Doom of Arkham",
+    "object": "Card",
+    "types": [
+     "Agenda"
+    ],
+    "pos": [
+     -2.94,
+     0.36
+    ],
+    "rot": 180
+   },
+   {
+    "name": "Cthulhu",
+    "object": "Card",
+    "types": [
+     "Enemy"
+    ],
+    "pos": [
+     -11.55,
+     10.75
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Flood Tokens",
+    "object": "Custom_Model_Infinite_Bag",
+    "types": [],
+    "pos": [
+     -17.03,
+     17.25
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Encounter Deck",
+    "object": "Deck",
+    "types": [
+     "Enemy",
+     "Treachery"
+    ],
+    "pos": [
+     -3.85,
+     5.72
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Cthulhu",
+    "object": "Card",
+    "types": [
+     "Enemy"
+    ],
+    "pos": [
+     -11.55,
+     7.87
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Eastern Rooftops",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -30.24,
+     -7.65
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Western Rooftops",
+    "object": "Card",
+    "types": [
+     "Location"
+    ],
+    "pos": [
+     -30.24,
+     15.3
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Cthulhu Board",
+    "object": "CardCustom",
+    "types": [],
+    "pos": [
+     -12.13,
+     10.75
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Flood Tokens",
+    "object": "Custom_Model_Infinite_Bag",
+    "types": [],
+    "pos": [
+     -17.09,
+     -17.53
+    ],
+    "rot": 270
+   },
+   {
+    "name": "Set-aside",
+    "object": "Custom_Model_Bag",
+    "types": [],
+    "pos": [
+     1.69,
+     14.24
+    ],
+    "rot": 225
+   },
+   {
+    "name": "Banish Him!",
+    "object": "Card",
+    "types": [
+     "Act"
+    ],
+    "pos": [
+     -1.1,
+     -6.75
+    ],
+    "rot": 180
+   },
+   {
+    "name": "Fight Back!",
+    "object": "Card",
+    "types": [
+     "Act"
+    ],
+    "pos": [
+     -1.1,
+     -3.6
+    ],
+    "rot": 180
+   },
+   {
+    "name": "Setup Notes",
+    "object": "Notecard",
+    "types": [
+     "Notecard"
+    ],
+    "pos": [
+     -11.91,
+     -9.6
+    ],
+    "rot": 90
+   }
+  ]
+ }
+}
