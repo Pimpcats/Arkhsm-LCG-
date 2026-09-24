@@ -1,0 +1,126 @@
+03:19:17.865 relay sending runner + 6 object(s), 744 KB
+03:19:18.004 print [INFO] table has 211 object(s) before the run
+03:19:18.007 print [INFO] SCED not detected: running on a non-SCED table
+03:19:18.007 print [INFO] removed 0 object(s) left by an earlier relay run
+03:19:18.295 print THE STILL HOUR control ready. Investigators = 3 (SCED detected). Click 'Run Tests' to verify the build.
+03:19:18.396 print [PASS] every payload finished spawning  -- 6/6 spawned
+03:19:19.409 print [PASS] every card has consistent SCED metadata  -- 
+03:19:19.410 print [PASS] spawned content contains cards  -- 339 card(s)
+03:19:19.410 print [PASS] no card image points at a local file:/// path  -- 0 local URL(s)
+03:19:19.411 print [PASS] control token is present and scripted
+03:19:19.411 print [PASS] control token created its buttons  -- 13 button(s)
+03:19:19.412 print [PASS] reset 18 / appointed 12 at 3p
+03:19:19.412 print ──────── THE STILL HOUR — in-engine tests ────────
+03:19:19.412 print [PASS] contest target 12 at 3p (CO-001 4*n)
+03:19:19.412 print [PASS] Calm -> 0 [static]; Appointed Unseen
+03:19:19.412 print [PASS] Glitch -> 1 [static]; Appointed Sensed (1)
+03:19:19.413 print [PASS] Noticed -> 2 [static]; Appointed Arrived (3)
+03:19:19.413 print [PASS] [static] reveal raises Dissonance
+03:19:19.413 print [PASS] virtual [static] bag tracks baseline + temporary
+03:19:19.413 print [PASS] Hour V -> Appointed Sensed (1)
+03:19:19.414 print [PASS] Hour VIII -> Appointed Arrived (3)
+03:19:19.414 print [PASS] Arrived attacks 2/2 and raises Dissonance
+03:19:19.414 print [PASS] Hold Back drops one stage and rewinds one Hour
+03:19:19.414 print [PASS] Appointed cannot be defeated
+03:19:19.414 print [PASS] removing a manifest Appointed puts it back
+03:19:19.415 print [PASS] Sensed figure deals no attack damage
+03:19:19.415 print [PASS] a Sensed figure does not hunt
+03:19:19.415 print [PASS] once-per-loop free at node A
+03:19:19.415 print [PASS] Memory persists across reset
+03:19:19.415 print [PASS] Knowledge persists across reset
+03:19:19.415 print [PASS] Years persist across reset
+03:19:19.416 print [PASS] blocked on reuse
+03:19:19.602 print [PASS] once-per-loop flags cleared
+03:19:19.602 print [PASS] Dissonance dropped to scar (1)
+03:19:19.602 print [PASS] Hourglass reset to Hour I
+03:19:19.603 print [PASS] serialize round-trip (real TTS JSON)
+03:19:19.603 print [PASS] Muscle Memory sees last-loop combat
+03:19:19.603 print [PASS] Memory soft-capped to 18 at loop start
+03:19:19.604 print [PASS] advance resolves Hours II,III,IV
+03:19:19.604 print [PASS] level-3 upgrade debits 3
+03:19:19.604 print [PASS] Recollection debits memoryCost 5
+03:19:19.604 print [PASS] cannot overdraw the pool
+03:19:19.604 print [PASS] Lantern Room front until lamp fact
+03:19:19.605 print [PASS] aging brackets 5/10/15 -> Weathered/Elder/Ancient
+03:19:19.605 print [PASS] Lantern Room flips to back with the fact
+03:19:19.605 print [PASS] Act II opens at 3 surface facts
+03:19:19.605 print [PASS] Sealed Study sealed until both facts
+03:19:19.605 print [PASS] Sealed Study opens with both facts
+03:19:19.606 print [PASS] location cards resolve by metadata id
+03:19:19.606 print [PASS] finale assembles with name+vote+one deep
+03:19:19.606 print [PASS] Victory log survives a reset
+03:19:19.606 print [PASS] Victory claims once and banks its Memory
+03:19:19.606 print [PASS] Interlude buys Recollection at memoryCost (longwayround=2)
+03:19:19.607 print [PASS] Interlude buys level-3 upgrade (=3)
+03:19:19.607 print [PASS] Ancient drift: int 5->7, health/sanity -1, com floored at 1
+03:19:19.607 print [PASS] 'The Hour Was Wrong' removes Hour IV
+03:19:19.686 print [PASS] in-engine rules tests all pass  -- 48 passed, 0 failed
+03:19:19.686 print THE STILL HOUR control ready. Investigators = 3 (SCED detected). Click 'Run Tests' to verify the build.
+03:19:19.687 print [FAIL] control token saves its state
+03:19:20.112 print [PASS] in-engine rules tests ran
+03:19:20.112 print [PASS] interlude banks on-card Memory
+03:19:20.112 print [PASS] prey is the investigator with the most on-card Memory
+03:19:20.113 print Still Hour tests: 48 passed, 0 failed
+03:19:20.113 print [PASS] Interlude rejects unaffordable purchase
+03:19:20.113 print ──────── RESULT: 48 passed, 0 failed ────────
+03:19:20.113 print [PASS] 3 Dissonance raises = leaned on the loop (+1 Year)
+03:19:20.674 print [PASS] control token survives save+reload  -- 13 button(s) after reload
+03:19:20.674 print [PASS] state preserved across reload
+03:19:20.676 print [INFO] control sees SCED; [static] mode virtual
+03:19:20.679 print [PASS] control shows Memory / Dissonance / Hour counters  -- THE STILL HOUR · loop 1 | Memory 0 / 18 | Investigators 3 | Dissonance 0 / 18 · Calm | [static] 0 (virtual) | Hour 1 · First Dark | Appointed: Unseen | Run Tests | Status | Sync Board | Reset Loop | Interlude | Knowledge
+03:19:20.696 print [PASS] Memory counter +2  -- 0 -> 2
+03:19:20.697 print [PASS] Memory button label follows  -- THE STILL HOUR · loop 1 | Memory 2 / 18 | Investigators 3 | Dissonance 0 / 18 · Calm | [static] 0 (virtual) | Hour 1 · First Dark | Appointed: Unseen | Run Tests | Status | Sync Board | Reset Loop | Interlude | Knowledge
+03:19:20.697 print [Still Hour] Hour 2 — Low Water: Each investigator draws 1 encounter card.
+03:19:20.715 print [Still Hour] Hour 1 — First Dark: Hourglass rewound.
+03:19:20.715 print [PASS] Hour counter advances the Hourglass  -- 1 -> 2
+03:19:20.732 print [PASS] Hour counter rewinds
+03:19:20.854 print THE STILL HOUR control ready. Investigators = 3 (SCED detected). Click 'Run Tests' to verify the build.
+03:19:22.380 print [FAIL] counters persist through save+reload  -- memory 0
+03:19:22.405 print [FAIL] save blob is non-empty
+03:19:22.431 print [PASS] SCED chaos bag found (ChaosBagApi.findChaosBag)
+03:19:22.433 print [Still Hour] [static] +1 into the chaos bag (now 1)
+03:19:22.434 print The Appointed draws nearer: Sensed.
+03:19:22.438 print [Still Hour] The Appointed manifests (Sensed): place it at the location farthest from the investigators.
+03:19:22.466 print [PASS] entering Glitch puts 1 [static] in the chaos bag  -- 0 -> 1
+03:19:22.467 print [Still Hour] [static] +1 into the chaos bag (now 2)
+03:19:22.468 print The Appointed draws nearer: Arrived.
+03:19:22.472 print [Still Hour] The Appointed manifests (Arrived): place it at the location farthest from the investigators.
+03:19:22.520 print [PASS] entering Noticed puts a 2nd [static] in the chaos bag  -- in bag: 2
+03:19:22.521 print Static token not recognized. Will not be recorded.
+03:19:22.522 print Static token not recognized. Will not be recorded.
+03:19:22.522 print [PASS] SCED's own bag state still reads (ChaosBagApi.getChaosBagState)  -- 16 SCED token(s)
+03:19:22.527 print [static] revealed: Dissonance 13 (Noticed).
+03:19:22.562 print [PASS] drawing a [static] from the bag raises Dissonance by 1  -- 12 -> 13
+03:19:22.593 print [Still Hour] [static] -2 from the chaos bag (now 0)
+03:19:22.633 print [PASS] back to Calm removes the [static] tokens again  -- in bag: 0
+03:19:22.748 print [PASS] test locations + minicard spawned
+03:19:22.790 print [Still Hour] Board synced: 2 campaign location(s), 0 flipped, 1 sealed.
+03:19:22.790 print [PASS] board finds both campaign locations by metadata id  -- seen 2
+03:19:22.791 print [PASS] a location with an unknown fact stays on its front
+03:19:22.791 print [PASS] a sealed location is labelled SEALED  -- SEALED
+03:19:22.791 print [PASS] SCED clue spawn is held back while sealed (TokenSpawnTrackerApi)
+03:19:23.197 print [PASS] unlocking the flip fact turns the location to its back
+03:19:23.240 print [PASS] SCED clue spawn is released for the opened location  -- opened 1
+03:19:23.241 print [FAIL] the SEALED label comes off once every fact is known  -- SEALED
+03:19:26.930 print [Still Hour] The Appointed manifests at Relay Location B (Sensed).
+03:19:26.930 print The Appointed's Approach advances: Sensed.
+03:19:26.969 print [PASS] a card advance makes it Sensed  -- stage 1
+03:19:26.986 print [PASS] its card carries a Hold Back button  -- The Appointed: Sensed | Hold Back (success)
+03:19:26.986 print [PASS] it manifests at the location farthest from the investigators  -- 0.9 from farthest
+03:19:26.987 print [Still Hour] Hour 2 — Low Water: Each investigator draws 1 encounter card.
+03:19:26.987 print [Still Hour] Hour 3 — The Thirteenth Toll: Raise Dissonance by 1.
+03:19:27.024 print [Still Hour] Hour 2 — Low Water: Hourglass rewound.
+03:19:27.038 print [Still Hour] The Appointed recedes into shadow (Unseen).
+03:19:27.038 print Held back: the Appointed is Unseen; the Hourglass rewinds to Hour 2.
+03:19:27.075 print [PASS] Hold Back drops one stage and rewinds one Hour  -- stage 0, hour 3 -> 2
+03:19:27.295 print [PASS] at Unseen it leaves the board
+03:19:27.328 print [Still Hour] The Appointed manifests at Relay Location B (Sensed).
+03:19:27.328 print The Appointed's Approach advances: Sensed.
+03:19:27.599 ERROR [Global] Lua Error: Object reference not set to an instance of an object.Object reference not set to an instance of an object.
+03:19:52.999 print 3 objects placed
+03:20:48.985 print 8 objects placed
+03:20:48.985 print 3 objects moved
+03:20:59.212 print 8 objects placed
+03:21:06.526 print Knowledge: 0 surface, 0 deep. Act II closed. Finale locked.
+03:21:06.550 print   The Lantern Room       face=front
+03:21:06.550 print   The Sealed Study       face=front (SEALED)

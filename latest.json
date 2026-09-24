@@ -1,0 +1,212 @@
+{
+  "run": "20260924-031917_9adb8c9",
+  "commit": "9adb8c9153bbf2cd03f28a8b9eb10e4fc55722cd",
+  "branch": "main",
+  "started": "2026-09-24T03:19:17.729240Z",
+  "host": "Windows-10-10.0.19045-SP0",
+  "passed": 33,
+  "failed": 4,
+  "finished": "2026-09-24T03:25:18.153131Z",
+  "verdict": "incomplete",
+  "lua_errors": [
+    {
+      "guid": "-1",
+      "error": "[Global] Lua Error: Object reference not set to an instance of an object.Object reference not set to an instance of an object."
+    }
+  ],
+  "checks": [
+    {
+      "name": "every payload finished spawning",
+      "ok": true,
+      "detail": "6/6 spawned"
+    },
+    {
+      "name": "spawned content contains cards",
+      "ok": true,
+      "detail": "339 card(s)"
+    },
+    {
+      "name": "every card has consistent SCED metadata",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no card image points at a local file:/// path",
+      "ok": true,
+      "detail": "0 local URL(s)"
+    },
+    {
+      "name": "control token is present and scripted",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "control token created its buttons",
+      "ok": true,
+      "detail": "13 button(s)"
+    },
+    {
+      "name": "in-engine rules tests all pass",
+      "ok": true,
+      "detail": "48 passed, 0 failed"
+    },
+    {
+      "name": "control token saves its state",
+      "ok": false,
+      "detail": null
+    },
+    {
+      "name": "in-engine rules tests ran",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "control token survives save+reload",
+      "ok": true,
+      "detail": "13 button(s) after reload"
+    },
+    {
+      "name": "state preserved across reload",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "control shows Memory / Dissonance / Hour counters",
+      "ok": true,
+      "detail": "THE STILL HOUR · loop 1 | Memory 0 / 18 | Investigators 3 | Dissonance 0 / 18 · Calm | [static] 0 (virtual) | Hour 1 · First Dark | Appointed: Unseen | Run Tests | Status | Sync Board | Reset Loop | Interlude | Knowledge"
+    },
+    {
+      "name": "Memory counter +2",
+      "ok": true,
+      "detail": "0 -> 2"
+    },
+    {
+      "name": "Memory button label follows",
+      "ok": true,
+      "detail": "THE STILL HOUR · loop 1 | Memory 2 / 18 | Investigators 3 | Dissonance 0 / 18 · Calm | [static] 0 (virtual) | Hour 1 · First Dark | Appointed: Unseen | Run Tests | Status | Sync Board | Reset Loop | Interlude | Knowledge"
+    },
+    {
+      "name": "Hour counter advances the Hourglass",
+      "ok": true,
+      "detail": "1 -> 2"
+    },
+    {
+      "name": "Hour counter rewinds",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "counters persist through save+reload",
+      "ok": false,
+      "detail": "memory 0"
+    },
+    {
+      "name": "save blob is non-empty",
+      "ok": false,
+      "detail": null
+    },
+    {
+      "name": "SCED chaos bag found (ChaosBagApi.findChaosBag)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "entering Glitch puts 1 [static] in the chaos bag",
+      "ok": true,
+      "detail": "0 -> 1"
+    },
+    {
+      "name": "entering Noticed puts a 2nd [static] in the chaos bag",
+      "ok": true,
+      "detail": "in bag: 2"
+    },
+    {
+      "name": "SCED's own bag state still reads (ChaosBagApi.getChaosBagState)",
+      "ok": true,
+      "detail": "16 SCED token(s)"
+    },
+    {
+      "name": "drawing a [static] from the bag raises Dissonance by 1",
+      "ok": true,
+      "detail": "12 -> 13"
+    },
+    {
+      "name": "back to Calm removes the [static] tokens again",
+      "ok": true,
+      "detail": "in bag: 0"
+    },
+    {
+      "name": "test locations + minicard spawned",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "board finds both campaign locations by metadata id",
+      "ok": true,
+      "detail": "seen 2"
+    },
+    {
+      "name": "a location with an unknown fact stays on its front",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "a sealed location is labelled SEALED",
+      "ok": true,
+      "detail": "SEALED"
+    },
+    {
+      "name": "SCED clue spawn is held back while sealed (TokenSpawnTrackerApi)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "unlocking the flip fact turns the location to its back",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "the SEALED label comes off once every fact is known",
+      "ok": false,
+      "detail": "SEALED"
+    },
+    {
+      "name": "SCED clue spawn is released for the opened location",
+      "ok": true,
+      "detail": "opened 1"
+    },
+    {
+      "name": "a card advance makes it Sensed",
+      "ok": true,
+      "detail": "stage 1"
+    },
+    {
+      "name": "it manifests at the location farthest from the investigators",
+      "ok": true,
+      "detail": "0.9 from farthest"
+    },
+    {
+      "name": "its card carries a Hold Back button",
+      "ok": true,
+      "detail": "The Appointed: Sensed | Hold Back (success)"
+    },
+    {
+      "name": "Hold Back drops one stage and rewinds one Hour",
+      "ok": true,
+      "detail": "stage 0, hour 3 -> 2"
+    },
+    {
+      "name": "at Unseen it leaves the board",
+      "ok": true,
+      "detail": null
+    }
+  ],
+  "notes": [
+    "table has 211 object(s) before the run",
+    "SCED not detected: running on a non-SCED table",
+    "removed 0 object(s) left by an earlier relay run",
+    "control sees SCED; [static] mode virtual"
+  ],
+  "screenshots": [],
+  "timed_out": true
+}
