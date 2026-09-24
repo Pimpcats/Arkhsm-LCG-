@@ -493,9 +493,11 @@ def audit(campaign="still_hour"):
             if not c.get("elite") or not c.get("victory"):
                 rep.err(sid, "{}: Named enemy lacks Elite/Victory".format(cid))
 
-        # granted facts are recorded by a card in this box
-        texts = " ".join(_norm(cards[c].get("text")) for st in ("act_deck", "setup_aside")
-                         for c in box.get(st, []) if c in cards)
+        # granted facts are recorded by a card in this box (an act records
+        # its fact on its b side, as the official acts do)
+        texts = " ".join(_norm(cards[c].get(f)) for st in ("act_deck", "setup_aside")
+                         for c in box.get(st, []) if c in cards
+                         for f in ("text", "back_text"))
         for g in sc.get("grants", []):
             if 'record ' + _norm(g) not in texts and _norm(g) not in texts:
                 rep.err(sid, "granted fact '{}' is not recorded by any card".format(g))

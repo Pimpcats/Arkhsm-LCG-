@@ -2,46 +2,64 @@
   "sthr-hour-1": {
     "name": "Hour I — First Dark",
     "text": "The night begins.",
-    "doom": 1
+    "doom": 1,
+    "back_flavor": "Lanterns bob across the Square. Somewhere a band is tuning up for midnight. Above it all, one by one, the stars begin to go out.",
+    "back_text": "The Hourglass turns. Advance to the next Hour."
   },
   "sthr-hour-2": {
     "name": "Hour II — Low Water",
     "text": "When reached: each investigator draws 1 encounter card.",
-    "doom": 1
+    "doom": 1,
+    "back_flavor": "The tide draws back from the Long Pier, farther than any tide should, and does not come in again. The harbour smells of something left too long in the dark.",
+    "back_text": "The Hourglass turns. Advance to the next Hour."
   },
   "sthr-hour-3": {
     "name": "Hour III — The Thirteenth Toll",
     "text": "When reached: raise Dissonance by 1. If any investigator is at a Church location, raise it by 2 instead. If the log shows \"The Thirteenth Toll,\" skip the extra +1.",
-    "doom": 1
+    "doom": 1,
+    "back_flavor": "The church bell counts the hour. Twelve. A pause, long enough to hope. Thirteen.",
+    "back_text": "The Hourglass turns. Advance to the next Hour."
   },
   "sthr-hour-4": {
     "name": "Hour IV — The Road Gives Way",
     "text": "When reached: the location with the fewest clues becomes impassable until the next Hour; investigators there move to a connecting location (that move is a Skip). If the log shows \"The Hour Was Wrong,\" remove this Hour from the Occultation entirely.",
-    "doom": 1
+    "doom": 1,
+    "back_flavor": "Out past the Milestones the road simply stops being there. The walkers on it do not break stride.",
+    "back_text": "The Hourglass turns. Advance to the next Hour."
   },
   "sthr-hour-5": {
     "name": "Hour V — The Streets Empty",
     "text": "When reached: each Sleepwalking Echo awakens if Dissonance is in the Glitch band or higher. The Appointed's Approach advances to at least Sensed.",
-    "doom": 1
+    "doom": 1,
+    "back_flavor": "The fair's music plays on for no one. Doors stand open along every street. The town has gone somewhere without moving.",
+    "back_text": "The Hourglass turns. Advance to the next Hour."
   },
   "sthr-hour-6": {
     "name": "Hour VI — The Wrong Sky",
     "text": "When reached: add 1 Static token to the chaos bag until the next reset. If the log shows \"What the Almanac Hid,\" instead each investigator removes 1 Static token.",
-    "doom": 1
+    "doom": 1,
+    "back_flavor": "The sky is wrong in a new way now: a starless patch the shape of an open door, fraying at its edges.",
+    "back_text": "The Hourglass turns. Advance to the next Hour."
   },
   "sthr-hour-7": {
     "name": "Hour VII — The Guest Approaches",
     "text": "When reached: the Appointed's Approach advances to at least Emerging (Hour VIII advances it to Arrived). If the log shows \"The Appointed's Name,\" it arrives exhausted.",
-    "doom": 1
+    "doom": 1,
+    "back_flavor": "Every dog in Ambergrove faces the same way. Something is coming up the hill toward the Square, politely, with all the time in the world.",
+    "back_text": "The Hourglass turns. Advance to the next Hour."
   },
   "sthr-hour-8": {
     "name": "Hour VIII — Almost",
     "text": "When reached: raise Dissonance by 2. The Appointed's Approach advances to Arrived. All enemies get +1 fight until the next reset.",
-    "doom": 1
+    "doom": 1,
+    "back_flavor": "One minute to midnight. It has been one minute to midnight for a very long time. The seam in the sky pulls taut.",
+    "back_text": "The Hourglass turns. Advance to the next Hour."
   },
   "sthr-hour-9": {
     "name": "Hour IX — The Appointed Hour",
-    "text": "When reached: the night ends. Trigger a reset. If the log shows \"The Way the Night Breaks,\" you may attempt the finale instead."
+    "text": "When reached: the night ends. Trigger a reset. If the log shows \"The Way the Night Breaks,\" you may attempt the finale instead.",
+    "back_flavor": "The occultation completes, exactly as the almanac promised.",
+    "back_text": "The night ends.\nIn the Prologue: (→R2).\nDuring a loop: if \"The Way the Night Breaks\" is recorded, you may attempt the finale instead of resetting (see Contest the Crossing). Otherwise, (→Loop Resolution R1).\nDuring the finale: the finale ends. Turn to the Finale Resolutions in the Campaign Guide."
   },
   "sthr-losthour": {
     "name": "Lost Hour",
@@ -715,11 +733,13 @@
   "sthr-act-firsthour": {
     "name": "The First Hour",
     "clues": 5,
-    "text": "Objective — Once 5 clues have been gathered in total, an investigator at the Almanac Steps may resolve the Occultation (no test). When they do, read \"The First Reset\" (the objective was completed).\nIf the Hourglass reaches Hour IX first, read \"The First Reset\" anyway.",
+    "text": "Objective – If 5 clues have been gathered in total, an investigator at the Almanac Steps may resolve the Occultation (no test). If they do, advance.\nIf the Hourglass reaches Hour IX first, (→R2).",
     "flavor": "The almanac promised the occultation at midnight. It is eleven, and the sky is already wrong.",
     "deck": 95101,
     "index": "1a",
-    "number": "1/1"
+    "number": "1/1",
+    "back_flavor": "You were standing on the right step at the right second. You watched the occultation complete, and you watched something reach through, and not finish reaching. When the night folds, you fold with it on purpose.",
+    "back_text": "(→R1)"
   },
   "sthr-story-firstreset": {
     "name": "The First Reset",
@@ -730,111 +750,139 @@
   "sthr-act-lamp": {
     "name": "Light the Lamp",
     "clues": 4,
-    "text": "Objective — Once 4 clues have been discovered in the Lighthouse district, an investigator at the Lantern Room may test [com] or [wil] (3) to light the lamp. If they succeed, record \"The Lamp Was Never Lit.\"\nWhile the lamp is lit this loop, Echoes at connected districts stay Sleepwalking one band longer. In every later loop, place the Lantern Room calm side up.",
+    "text": "Objective – If 4 clues have been discovered in the Lighthouse district, an investigator at the Lantern Room may test [com] or [wil] (3) to light the lamp. If they succeed, advance.",
     "flavor": "The lamp is dark. It has never, in any loop, been lit.",
     "deck": 95103,
     "index": "1a",
-    "number": "1/2"
+    "number": "1/2",
+    "back_flavor": "The wick takes on the third try. For the first time in more nights than anyone can count, the beam swings out across the water, and down on the Sunken Road every walker stops and turns to face the light.",
+    "back_text": "Record in your Campaign Log: The Lamp Was Never Lit.\nWhile the lamp is lit this loop, Echoes at connected districts stay Sleepwalking one band longer. In every later loop, place the Lantern Room calm side up.\nIf the campaign is in Act II, advance to act 2a. Otherwise, set this act deck aside until the next loop."
   },
   "sthr-act-ninthdeath": {
     "clues": 2,
-    "text": "Act II only, once the log shows \"The Lamp Was Never Lit.\"\nObjective — With the lamp lit this loop, search the Keeper's Quarters (2 clues there) for the keeper's logbook. Record \"The Keeper's Ninth Death.\"\nElias's elder-sign heal also removes 1 horror.",
+    "text": "Act II only, once the log shows \"The Lamp Was Never Lit.\"\nObjective – With the lamp lit this loop, search the Keeper's Quarters (2 clues there) for the keeper's logbook. When you find it, advance.",
     "index": "2a",
-    "number": "2/2"
+    "number": "2/2",
+    "flavor": "Elias kept the log for years. He does not remember writing most of it.",
+    "back_flavor": "Eight deaths in Elias's own careful hand, each one dated tonight. The ninth line is ruled and waiting.",
+    "back_text": "Record in your Campaign Log: The Keeper's Ninth Death.\nElias's elder-sign heal also removes 1 horror.\nThe Lighthouse's objectives are complete. Remove this act deck from the game."
   },
   "sthr-act-whythirteen": {
     "name": "Why Thirteen?",
     "clues": 6,
-    "text": "Objective — Once 6 clues have been discovered in the Drowned Church, an investigator at the Vestry may read the register. Record \"The Thirteenth Toll.\"\nHour III no longer adds the Church's extra Dissonance.",
+    "text": "Objective – If 6 clues have been discovered in the Drowned Church, an investigator at the Vestry may read the register. If they do, advance.",
     "flavor": "The bell tolled thirteen times at the first occultation. It should toll twelve.",
     "deck": 95104,
     "index": "1a",
-    "number": "1/2"
+    "number": "1/2",
+    "back_flavor": "The register lists every service since the church was raised, and every entry ends at twelve. On the night of the first occultation, in a different ink, someone has added a thirteenth stroke, pressed so hard the nib tore the page.",
+    "back_text": "Record in your Campaign Log: The Thirteenth Toll.\nHour III no longer adds the Church's extra Dissonance.\nIf the campaign is in Act II, advance to act 2a. Otherwise, set this act deck aside until the next loop."
   },
   "sthr-act-hourwaswrong": {
     "name": "The Hour Was Wrong",
     "clues": 3,
-    "text": "Act II only, once the log shows \"The Thirteenth Toll.\" The Flooded Crypt opens; the Bell-Ringer Beneath spawns there.\nObjective — Recover the drowned almanac-page (3 clues in the Flooded Crypt). Record \"The Hour Was Wrong.\"\nRemove Hour IV from the Occultation for all future loops.",
+    "text": "Act II only, once the log shows \"The Thirteenth Toll.\" The Flooded Crypt opens; the Bell-Ringer Beneath spawns there.\nObjective – Recover the drowned almanac-page (3 clues in the Flooded Crypt). When you do, advance.",
     "deck": 95105,
     "index": "2a",
-    "number": "2/2"
+    "number": "2/2",
+    "flavor": "Below the bell, below the water, the church keeps what it was told to keep.",
+    "back_flavor": "The page is soft as wet cloth, but the ink held. The same almanac, the same night, and a different hour. Someone set the occultation an hour wrong, and the town has been standing in the gap ever since.",
+    "back_text": "Record in your Campaign Log: The Hour Was Wrong.\nRemove Hour IV (The Road Gives Way) from the Occultation for all future loops.\nThe Drowned Church's objectives are complete. Remove this act deck from the game."
   },
   "sthr-act-walkbackward": {
     "name": "Walk It Backward",
-    "text": "Objective — Move through all three locations in reverse of the Echoes' direction (the Turning, then the Low Bridge, then the Milestones), discovering at least 1 clue at each. Record \"The Road Remembers.\"\nOnce per loop, travel to or from the Lighthouse via the Sunken Road costs 0 Hours.",
+    "text": "Objective – Move through all three locations in reverse of the Echoes' direction (the Turning, then the Low Bridge, then the Milestones), discovering at least 1 clue at each. When you do, advance.",
     "flavor": "The same figures walk it every loop, in the same direction, never arriving.",
     "deck": 95106,
     "index": "1a",
-    "number": "1/2"
+    "number": "1/2",
+    "back_flavor": "Walking against them, you see the road the way the walkers never do: from the shore back toward town. The milestones count down instead of up. You will not lose your way on this road again.",
+    "back_text": "Record in your Campaign Log: The Road Remembers.\nOnce per loop, travel to or from the Lighthouse via the Sunken Road costs 0 Hours.\nIf the campaign is in Act II, advance to act 2a. Otherwise, set this act deck aside until the next loop."
   },
   "sthr-act-walksbeside": {
     "name": "Who Walks Beside You",
-    "text": "Act II only, once the log shows \"The Road Remembers.\"\nObjective — At the Turning, evade an awakened Echo or hold it ([action] Hold: test [wil] or [com] (X), where X is its fight; if you succeed, exhaust it — like Hold Back, this pushes it back without harming it). Then read the face beneath the hood. Record \"Who Walks Beside You.\"\nEchoes get -1 fight against investigators who have this fact.",
+    "text": "Act II only, once the log shows \"The Road Remembers.\"\nObjective – At the Turning, evade an awakened Echo or hold it ([action] Hold: test [wil] or [com] (X), where X is its fight; if you succeed, exhaust it — like Hold Back, this pushes it back without harming it). Then look beneath the hood, and advance.",
     "flavor": "Some of them turn to look at you now.",
     "deck": 95107,
     "index": "2a",
-    "number": "2/2"
+    "number": "2/2",
+    "back_flavor": "The face under the hood is worn almost smooth, like a step a thousand feet have climbed. You know the coat. You know the ring on the hand that lifts to stop you. They were here before you, and they looped until there was nothing left to loop.",
+    "back_text": "Record in your Campaign Log: Who Walks Beside You.\nEchoes get −1 fight against investigators who have this fact.\nThe Sunken Road's objectives are complete. Remove this act deck from the game."
   },
   "sthr-act-sheriffdead": {
     "name": "The Sheriff Is Already Dead",
     "clues": 5,
-    "text": "Objective — Once 5 clues have been discovered in the Square district, an investigator at the Well may examine the body. Record \"The Sheriff Is Already Dead.\"\nIn every later loop, place the Town Hall Steps with its other side up: once per loop, an investigator there may look at the top card of the Occultation.",
+    "text": "Objective – If 5 clues have been discovered in the Square district, an investigator at the Well may examine the body. If they do, advance.",
     "flavor": "He has been dead since ten o'clock. No one has noticed but you.",
     "deck": 95108,
     "index": "1a",
-    "number": "1/2"
+    "number": "1/2",
+    "back_flavor": "He is at the bottom of the Well, and he has been there since ten o'clock. Up on the Town Hall steps, the sheriff clears his throat and begins the speech again.",
+    "back_text": "Record in your Campaign Log: The Sheriff Is Already Dead.\nIn every later loop, place the Town Hall Steps other side up: once per loop, an investigator there may look at the top card of the Occultation.\nIf the campaign is in Act II, advance to act 2a. Otherwise, set this act deck aside until the next loop."
   },
   "sthr-act-vote": {
     "name": "The Vote That Never Ends",
     "clues": 3,
-    "text": "Act II only, once the log shows \"The Sheriff Is Already Dead.\" When this objective is attempted, What Wears the Sheriff spawns at the Records Office.\nObjective — Find the ledger in the Records Office (3 clues there). Record \"The Vote That Never Ends\" and advance Seraphine's thread, \"Who Opened the Door.\"",
-    "flavor": "Ending the loop cleanly requires a cost the town agreed to pay.",
+    "text": "Act II only, once the log shows \"The Sheriff Is Already Dead.\" When this objective is attempted, What Wears the Sheriff spawns at the Records Office.\nObjective – Find the ledger in the Records Office (3 clues there). When you do, advance.",
+    "flavor": "The Records Office keeps every decision the town ever made. It keeps this one in a locked drawer.",
     "deck": 95109,
     "index": "2a",
-    "number": "2/2"
+    "number": "2/2",
+    "back_flavor": "The minutes are dated the night of the first occultation. A motion to open the door. Every name in Ambergrove, each in its own hand. Carried, unanimous. Under the tally a clerk has written: the cost to be settled at the appointed hour.",
+    "back_text": "Record in your Campaign Log: The Vote That Never Ends. Advance Seraphine's thread, \"Who Opened the Door.\"\nEnding the loop cleanly requires a cost the town agreed to pay.\nThe Square's objectives are complete. Remove this act deck from the game."
   },
   "sthr-act-wheelturns": {
     "name": "The Wheel Still Turns",
-    "text": "Objective — An investigator at the Wheel may test [agi] (3) to ride it. If they succeed, they discover 2 clues from a height (from any location in the Fairground). Record \"The Wheel Still Turns.\"\nOnce per loop, from the Wheel, you may look at the top 2 encounter cards and reorder them.",
+    "text": "Objective – An investigator at the Wheel may test [agi] (3) to ride it. If they succeed, they discover 2 clues from a height (from any location in the Fairground), then advance.",
     "flavor": "You see the whole town at once.",
     "deck": 95110,
     "index": "1a",
-    "number": "1/2"
+    "number": "1/2",
+    "back_flavor": "From the top of the Wheel, Ambergrove lies spread out like a map on a table: the Square, the church, the road running out to the lighthouse. Every street is full, and nobody is moving.",
+    "back_text": "Record in your Campaign Log: The Wheel Still Turns.\nOnce per loop, from the Wheel, you may look at the top 2 encounter cards and reorder them.\nIf the campaign is in Act II, advance to act 2a. Otherwise, set this act deck aside until the next loop."
   },
   "sthr-act-bargain": {
     "name": "The Ticket-Taker's Bargain",
-    "text": "Act II only, once the log shows \"The Wheel Still Turns.\"\nObjective — An investigator at the Ticket Booth may speak with the ticket-taker. He offers a way to end the night that is not free. Record \"The Ticket-Taker's Bargain\" and mark on the log that the bargain was heard.",
+    "text": "Act II only, once the log shows \"The Wheel Still Turns.\"\nObjective – An investigator at the Ticket Booth may speak with the ticket-taker. If they do, advance.",
     "flavor": "He smiles at you like he's been expecting you for a very long time.",
     "deck": 95111,
     "index": "2a",
-    "number": "2/2"
+    "number": "2/2",
+    "back_flavor": "He does not ask your name. He tells you there is a way out of the night, that the fare is steep, and that he has waited a very long time for someone who could afford it.",
+    "back_text": "Record in your Campaign Log: The Ticket-Taker's Bargain. Mark on the log that the bargain was heard.\nThe Fairground's objectives are complete. Remove this act deck from the game."
   },
   "sthr-act-almanachid": {
     "name": "What the Almanac Hid",
     "clues": 2,
-    "text": "Objective — Once 2 [perinv] clues have been discovered in the Almanac House, an investigator at the Press may set it to reprint the true occultation time. Record \"What the Almanac Hid.\"\nAt Hour VI, investigators remove a Static token instead of adding one.",
+    "text": "Objective – If 2 [perinv] clues have been discovered in the Almanac House, an investigator at the Press may set it to reprint the true occultation time. If they do, advance.",
     "flavor": "Where the wrong almanac was printed.",
     "deck": 95112,
     "index": "1a",
     "number": "1/2",
-    "clues_per_investigator": true
+    "clues_per_investigator": true,
+    "back_flavor": "The press groans and runs. The pages come out warm, and wrong in a new way: the hour printed on them is the right one. For a moment the sky over the Almanac House looks almost ordinary.",
+    "back_text": "Record in your Campaign Log: What the Almanac Hid.\nAt Hour VI, investigators remove a Static token instead of adding one.\nIf the campaign is in Act II, advance to act 2a. Otherwise, set this act deck aside until the next loop."
   },
   "sthr-act-appointedname": {
     "name": "The Appointed's Name",
     "clues": 3,
-    "text": "Act II only, once the log shows \"What the Almanac Hid\" and \"The Vote That Never Ends.\" The Sealed Study opens.\nObjective — Recover the name inside the Sealed Study (3 clues there). Record \"The Appointed's Name\"; this completes \"Who Opened the Door.\" The Appointed now arrives exhausted at Hour VII.\nOnce you know \"The Appointed's Name,\" \"The Vote That Never Ends,\" and any one other deep fact, record \"The Way the Night Breaks.\" The finale may now be attempted.",
+    "text": "Act II only, once the log shows \"What the Almanac Hid\" and \"The Vote That Never Ends.\" The Sealed Study opens.\nObjective – Recover the name inside the Sealed Study (3 clues there). When you do, advance.",
     "flavor": "Inside is the name the town spoke to call the thing through.",
     "deck": 95113,
     "index": "2a",
-    "number": "2/2"
+    "number": "2/2",
+    "back_flavor": "It is written once, in the middle of an otherwise blank page. You read it. You do not say it aloud. Somewhere on the hill, something pauses mid-step.",
+    "back_text": "Record in your Campaign Log: The Appointed's Name. This completes \"Who Opened the Door.\" The Appointed now arrives exhausted at Hour VII.\nIf you know \"The Appointed's Name,\" \"The Vote That Never Ends\" and any one other deep fact, also record: The Way the Night Breaks. The finale may now be attempted.\nThe Almanac House's objectives are complete. Remove this act deck from the game."
   },
   "sthr-act-lasthour": {
     "name": "Contest the Crossing",
-    "text": "Only once the log shows \"The Way the Night Breaks\": declared by an investigator at the Sealed Study, or when the Hourglass reaches Hour IX (then set it back to Hour V instead of resetting; no Hour resolves). The Appointed's Approach advances to Arrived; it manifests at the location farthest from the investigators if not already on the board. Dissonance does not reset.\nObjective — Before the Hourglass reaches Hour IX, gain contest progress equal to 4 × the number of investigators (12 at three players): 1 for each Hold Back success, 1 for each deep fact spent, and 1 the first time each investigator is at the Sealed Study during the finale.\nWhen the finale ends, read the first resolution that qualifies: R1, R1b, then R2 to R6.",
+    "text": "Only once the log shows \"The Way the Night Breaks\": declared by an investigator at the Sealed Study, or when the Hourglass reaches Hour IX (then set it back to Hour V instead of resetting; no Hour resolves). The Appointed's Approach advances to Arrived; it manifests at the location farthest from the investigators if not already on the board. Dissonance does not reset.\nObjective – Before the Hourglass reaches Hour IX, gain contest progress equal to 4 × the number of investigators (12 at three players): 1 for each Hold Back success, 1 for each deep fact spent, and 1 the first time each investigator is at the Sealed Study during the finale. When you do, advance.\nIf the Hourglass reaches Hour IX or every investigator is defeated first, the finale ends: turn to the Finale Resolutions in the Campaign Guide.",
     "flavor": "An appointment made in ink and never kept.",
     "deck": 95114,
     "index": "1a",
-    "number": "1/1"
+    "number": "1/1",
+    "back_flavor": "The crossing holds. For one long breath the night stops pressing, and every clock in Ambergrove agrees on the time.",
+    "back_text": "The contest is won. Turn to the Finale Resolutions in the Campaign Guide and read the first that qualifies (R1, R1b, then R2 to R4)."
   },
   "sthr-res-1": {
     "name": "Take Its Place",

@@ -226,6 +226,7 @@ class ScenarioContentTests(unittest.TestCase):
     def test_catches_unrecorded_fact_and_empty_act(self):
         cards = copy.deepcopy(CARDS)
         cards["sthr-act-vote"]["text"] = ""
+        cards["sthr-act-vote"]["back_text"] = ""     # the fact's record side
         rep = audit_with(cards=cards)
         errs = rep.errors["district_square"]
         self.assertTrue(any("granted fact" in e for e in errs), errs)
@@ -272,7 +273,8 @@ class ContentGapTests(unittest.TestCase):
         need = next(a for s in MANIFEST["scenarios"] if s["id"] == "finale"
                     for a in s["stacks"]["act_deck"]["cards"])["needs"]["contest"]
         self.assertEqual(need["per_investigator"], 4)
-        text = CARDS["sthr-act-lasthour"]["text"]
+        act = CARDS["sthr-act-lasthour"]
+        text = act["text"] + "\n" + act["back_text"]    # b side: the resolutions
         for part in ("4 ×", "Hold Back", "Sealed Study", "Hour V", "R1b"):
             self.assertIn(part, text)
 

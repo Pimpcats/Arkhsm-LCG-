@@ -17,6 +17,7 @@ Run: python3 pipeline/render_placeholders.py   (from repo root)
 Out: art/faces/{id}.png  (flows through Frame coverage -> Apply)
 """
 import argparse
+import re
 import glob
 import json
 import os
@@ -355,22 +356,29 @@ def list_fonts():
     return sorted(f for f in os.listdir(FONTS_DIR)
                   if f.lower().endswith((".ttf", ".otf"))
                   and "ArkhamFontWithCodex" not in f)   # icon font, not text
+# Body text: Arno Pro is what FFG prints; it is Adobe-licensed, so it is used
+# only when the owner drops their own copies in. Otherwise Crimson Pro (OFL,
+# an Aldine oldstyle cut from the same Garamond lineage as Arno/Minion, static
+# instances committed in assets/fonts) is the default, and Nimbus Roman (a
+# Times clone) is the last committed fallback.
 BODY_FONTS = {
-    # Nimbus Roman No9 L (from the element kit) is the DEFAULT body font — a
-    # complete family (regular/italic/bold/bold-italic), freely redistributable,
-    # committed in-repo, so every card renders body text in one consistent serif
-    # with real bold + italic (no DejaVu last resort). Arno/Minion remain listed
-    # so the owner can still pick their licensed copies from the font dropdown.
-    (False, False): ["NimbusRomNo9L-Reg.otf", "ArnoProRegular.otf",
-                     "ArnoPro-Regular.otf", "MinionProMedium.ttf",
-                     "Minion_Pro_Medium.ttf"],
-    (True, False): ["NimbusRomNo9L-Med.otf", "ArnoProBold.otf",
-                    "ArnoPro-Bold.otf", "MinionProBold.ttf"],
-    (False, True): ["NimbusRomNo9L-RegIta.otf", "ArnoProItalic.otf",
-                    "ArnoPro-Italic.otf", "MinionProItalic.ttf"],
-    (True, True): ["NimbusRomNo9L-MedIta.otf", "ArnoProBoldItalic.otf",
-                   "ArnoPro-BoldItalic.otf", "MinionProBoldItalic.ttf"],
+    (False, False): ["ArnoProRegular.otf", "ArnoPro-Regular.otf",
+                     "CrimsonPro-Regular.ttf", "NimbusRomNo9L-Reg.otf",
+                     "MinionProMedium.ttf", "Minion_Pro_Medium.ttf"],
+    (True, False): ["ArnoProBold.otf", "ArnoPro-Bold.otf",
+                    "CrimsonPro-Bold.ttf", "NimbusRomNo9L-Med.otf",
+                    "MinionProBold.ttf"],
+    (False, True): ["ArnoProItalic.otf", "ArnoPro-Italic.otf",
+                    "CrimsonPro-Italic.ttf", "NimbusRomNo9L-RegIta.otf",
+                    "MinionProItalic.ttf"],
+    (True, True): ["ArnoProBoldItalic.otf", "ArnoPro-BoldItalic.otf",
+                   "CrimsonPro-BoldItalic.ttf", "NimbusRomNo9L-MedIta.otf",
+                   "MinionProBoldItalic.ttf"],
 }
+# Printed Arkham rules text is ~7.5 pt: ~31 px on a 750x1050 face (300 dpi).
+# Every body/flavor block starts there and only shrinks when it must fit.
+BODY_PX = 31
+FLAVOR_PX = 28
 
 
 def _font(size, bold=False, italic=False, glyph=False, title=False,
@@ -433,27 +441,85 @@ GLYPH_PAD_FRAC = 0.16
 PARA_GAP_FRAC = 0.45
 
 
+# Ability triggers print bold with an en dash on the real cards
+# ("Revelation – ...", "Forced – When ...", "Objective – ...").
+TRIGGER_LEAD = re.compile(
+    r"^((?:Revelation|Forced|Objective|Prey|Spawn|Haunted|Setup|Surge"
+    r"|Hold Back|When reached)(?: \([^)]*\))?)\s*[—–-]\s*|^(When reached):\s*")
+
+
+TRIGGER_BREAK = re.compile(
+    r"(?<=[.!?])\s+(?=(?:Revelation|Forced|Objective|Prey|Spawn|Haunted)\s*[—–-])")
+
+
+ARROW = "\u2192"
+
+
+def _arrow_font(size):
+    """Nimbus carries the resolution arrow (→) that Crimson Pro lacks."""
+    try:
+        return ImageFont.truetype(os.path.join(FONTS_DIR, "NimbusRomNo9L-Reg.otf"), size)
+    except OSError:
+        return _font(size)
+
+
+def _smart_quotes(text):
+    """Printed cards use curly quotes and apostrophes."""
+    text = re.sub(r'(^|[\s(\[\u2014\u2013-])"', "\\1\u201c", text)
+    text = text.replace('"', "\u201d")
+    text = re.sub(r"(^|[\s(\[\u2014\u2013-])'", "\\1\u2018", text)
+    return text.replace("'", "\u2019")
+
+
+def _abilities(text):
+    """Each ability on its own paragraph, as printed (curly quotes)."""
+    return _smart_quotes(TRIGGER_BREAK.sub("\n", text or ""))
+
+
+def _trigger_lead(paragraph):
+    """(paragraph with an en-dashed trigger, number of leading bold words)."""
+    m = TRIGGER_LEAD.match(paragraph)
+    if not m:
+        return paragraph, 0
+    key = m.group(1) or m.group(2)
+    rest = paragraph[m.end():]
+    return key + " \u2013 " + rest, len(key.split(" ")) + 1
+
+
 def _para_lines(draw, text, size, max_width, italic=False, bold=False,
                 font_file=None):
     """Wrap [markup] text into a list of paragraphs, each a list of lines of
     (is_glyph, chunk) runs. Paragraph structure is preserved so callers can put
     a gap between abilities."""
     tfont = _font(size, italic=italic, bold=bold, font_file=font_file)
+    kfont = _font(size, italic=italic, bold=True, font_file=font_file)
     gfont = _font(size, glyph=True)
     gpad = int(size * GLYPH_PAD_FRAC)
     paras = []
-    for paragraph in text.split("\n"):
+    for paragraph in _abilities(text).split("\n"):
+        paragraph, nkey = _trigger_lead(paragraph)
         words = []
         for is_glyph, chunk in glyphify(paragraph):
             if is_glyph:
                 words.append((True, chunk))
             else:
                 words.extend((False, w) for w in chunk.split(" ") if w != "")
+        # the leading trigger ("Revelation –") prints bold: run kind None
+        for i in range(min(nkey, len(words))):
+            if words[i][0] is False:
+                words[i] = (None, words[i][1])
+        # a word with a glyph the body face lacks ("(→R1)") draws in the
+        # fallback face: run kind ARROW
+        words = [(ARROW, w) if k is False and ARROW in w else (k, w)
+                 for k, w in words]
+        afont = _arrow_font(size)
         lines, line, width = [], [], 0.0
         for is_glyph, w in words:
-            font = gfont if is_glyph else tfont
-            piece = w if is_glyph else (w + " ")
-            plen = draw.textlength(piece, font=font) + (gpad if is_glyph else 0)
+            font = (afont if is_glyph == ARROW else gfont if is_glyph
+                    else kfont if is_glyph is None else tfont)
+            glyph = is_glyph is True
+            piece = w if glyph else (w + " ")
+            plen = draw.textlength(piece, font=font) + (gpad if glyph else 0)
             if line and width + plen > max_width:
                 lines.append(line)
                 line, width = [], 0.0
@@ -480,12 +546,13 @@ def _wrapped_height(text, size, nlines, leading):
     the fit search reserves room for the same spacing draw_wrapped lays down."""
     lh = int(size * leading)
     pgap = int(lh * PARA_GAP_FRAC)
-    return nlines * lh + max(0, text.count("\n")) * pgap
+    return nlines * lh + max(0, _abilities(text).count("\n")) * pgap
 
 
 def draw_wrapped(draw, text, x, y, size, max_width, fill, italic=False,
                  leading=1.25, bold=False, font_file=None):
     tfont = _font(size, italic=italic, bold=bold, font_file=font_file)
+    kfont = _font(size, italic=italic, bold=True, font_file=font_file)
     gfont = _font(size, glyph=True)
     # centre the inline icons (action/reaction/elder sign...) vertically on the
     # text line they sit in, the way the official cards do, instead of hanging
@@ -503,12 +570,19 @@ def draw_wrapped(draw, text, x, y, size, max_width, fill, italic=False,
         for line in lines:
             cx = x
             for is_glyph, piece in line:
-                if is_glyph:
+                if is_glyph == ARROW:
+                    af = _arrow_font(size)
+                    # same baseline as the body face around it
+                    draw.text((cx, y + tasc), piece, font=af, fill=fill,
+                              anchor="ls")
+                    cx += draw.textlength(piece, font=af)
+                elif is_glyph:
                     draw.text((cx, y + gmid), piece, font=gfont, fill=fill, anchor="lm")
                     cx += draw.textlength(piece, font=gfont) + gpad
                 else:
-                    draw.text((cx, y), piece, font=tfont, fill=fill)
-                    cx += draw.textlength(piece, font=tfont)
+                    f = kfont if is_glyph is None else tfont
+                    draw.text((cx, y), piece, font=f, fill=fill)
+                    cx += draw.textlength(piece, font=f)
             y += lh
     return y
 
@@ -1135,7 +1209,7 @@ def p_investigator_front(c, pt, dest, art_path=None, placement=None):
     _box_block(d, pt.get("text", ""), (a[0], a[1], a[2], a[3] + 40), key="text")
     fl = R["Flavor Text"]
     _box_block(d, pt.get("flavor", ""), (fl[0], fl[1], fl[2], fl[3] + 30),
-               fill=(84, 66, 50), italic=True, start=24, key="flavor")
+               fill=(84, 66, 50), italic=True, start=FLAVOR_PX, key="flavor")
     _box_text(d, str(c.get("health", "-")), R["Health"], fill=(255, 246, 240),
               stat=True, grow=0.85)
     _box_text(d, str(c.get("sanity", "-")), R["Sanity"], fill=(240, 246, 255),
@@ -1164,7 +1238,7 @@ def p_enemy(c, pt, dest, art_path=None, placement=None):
                                     and "Elite" not in c.get("traits", "") else "")
     _box_text(d, traits, R["Keywords"], bold=True, italic=True, max_size=30)
     e2, e1 = R["Effect Text 2"], R["Effect Text"]
-    _box_block(d, pt.get("text", ""), (40, e2[1], 693, e1[3] + 70), start=27, key="text")
+    _box_block(d, pt.get("text", ""), (40, e2[1], 693, e1[3] + 70), start=BODY_PX, key="text")
     if c.get("victory"):
         _box_text(d, "Victory {}.".format(c["victory"]), R["Victory Points"],
                   bold=True, key="victory")
@@ -1192,10 +1266,10 @@ def p_treachery(c, pt, dest, art_path=None, placement=None):
         _box_text(d, c.get("traits", ""), R["Keywords"], bold=True, italic=True,
                   max_size=30)
     e2 = R["Effect Text 2"]
-    _box_block(d, pt.get("text", ""), (52, e2[1], 681, 878), start=27, key="text")
+    _box_block(d, pt.get("text", ""), (52, e2[1], 681, 878), start=BODY_PX, key="text")
     p = R["Plot Text"]
     _box_block(d, pt.get("flavor", ""), (p[0], p[1], p[2], 992),
-               fill=(84, 66, 50), italic=True, start=24, key="flavor")
+               fill=(84, 66, 50), italic=True, start=FLAVOR_PX, key="flavor")
     _box_text(d, _wm(art_path), R["Illustrator Credit"],
               fill=(70, 58, 46))
     img.save(dest)
@@ -1570,10 +1644,10 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
         _box_text(d, c["traits"], (b[0], y, b[2], y + 30),
                   bold=True, italic=True, max_size=24, key="traits")
         y += 36
-    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3] + 24), start=25, key="text")
+    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3] + 24), start=BODY_PX, key="text")
     if pt.get("flavor") and y < b[3]:
         _box_block(d, pt.get("flavor", ""), (b[0], y + 8, b[2], b[3] + 40),
-                   fill=(84, 66, 50), italic=True, start=21, key="flavor")
+                   fill=(84, 66, 50), italic=True, start=FLAVOR_PX, key="flavor")
     if c.get("victory"):
         _box_text(d, "Victory {}.".format(c["victory"]),
                   (b[0], b[3] + 24, b[2], b[3] + 52), bold=True, max_size=22, key="victory")
@@ -1673,7 +1747,7 @@ def _se_frame_compose(tpl_name, kind, clip_key, art_path, placement,
     return img, ImageDraw.Draw(img)
 
 
-def _se_body(d, c, pt, kind, letter="", extra_bottom=26, text_start=25,
+def _se_body(d, c, pt, kind, letter="", extra_bottom=26, text_start=BODY_PX,
              victory=True):
     """Traits + rules + flavor (+ Victory) stacked in the Body region. Pass
     victory=False when the card places its Victory line at a fixed spot (enemies
@@ -1683,15 +1757,15 @@ def _se_body(d, c, pt, kind, letter="", extra_bottom=26, text_start=25,
     if c.get("traits"):
         traits = c["traits"] + ("  Elite." if c.get("elite")
                                 and "Elite" not in c["traits"] else "")
-        _box_text(d, traits, (b[0], y, b[2], y + 28),
-                  bold=True, italic=True, max_size=23, key="traits")
-        y += 34
+        _box_text(d, traits, (b[0], y, b[2], y + 36),
+                  bold=True, italic=True, max_size=BODY_PX, key="traits")
+        y += 40
     y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3] + extra_bottom),
                    start=text_start, key="text")
     if pt.get("flavor") and y + 34 < b[3] + extra_bottom:
         y = _box_block(d, pt.get("flavor", ""),
                        (b[0], y + 6, b[2], b[3] + extra_bottom + 16),
-                       fill=(84, 66, 50), italic=True, start=20, key="flavor")
+                       fill=(84, 66, 50), italic=True, start=FLAVOR_PX, key="flavor")
     if victory and c.get("victory"):
         _box_text(d, "Victory {}.".format(c["victory"]),
                   (b[0], min(y + 6, b[3]), b[2], min(y + 34, b[3] + 30)),
@@ -1716,7 +1790,7 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
                       ("Combat", "com"), ("Agility", "agi")):
         _box_text(d, str(c.get(stat, "-")), se_reg("Investigator", key),
                   stat=True, grow=1.0, pos_key=stat)
-    _se_body(d, c, pt, "Investigator", text_start=20, extra_bottom=0)
+    _se_body(d, c, pt, "Investigator", extra_bottom=0)
     # health (red heart) + sanity (blue brain) chits from the official stat kit
     # — the plugin's own SanityBase is corrupt, so these are the clean source.
     # Push them apart (health left, sanity right) so the two big chits get a
@@ -1759,9 +1833,9 @@ def s_investigator_back(c, pt, dest, art_path=None):
     b = se_reg("InvestigatorBack", "Body")
     portrait = se_reg("InvestigatorBack", "Portrait-portrait-clip")
     if b and portrait:
-        _flow_around(d, pt.get("back_text", ""), b, portrait, start=22)
+        _flow_around(d, pt.get("back_text", ""), b, portrait, start=BODY_PX)
     else:
-        _box_block(d, pt.get("back_text", ""), b, start=22, key="text")
+        _box_block(d, pt.get("back_text", ""), b, start=BODY_PX, key="text")
     img.save(dest)
 
 
@@ -1782,7 +1856,7 @@ def s_enemy(c, pt, dest, art_path=None, placement=None):
                   fill=(238, 232, 216), pos_key=fld)
     _box_text(d, "ENEMY", se_reg("Enemy", "Label"), bold=True, max_size=15,
               fill=(74, 60, 46))
-    _se_body(d, c, pt, "Enemy", extra_bottom=0, text_start=22, victory=False)
+    _se_body(d, c, pt, "Enemy", extra_bottom=0, victory=False)
     # Victory centred just above the damage/horror row (above the centre chevron)
     if c.get("victory"):
         dmg = se_reg("Enemy", "Damage1")
@@ -1829,13 +1903,27 @@ def _scenario_body(d, kind, c, pt, traits=False, top=None):
     y = top if top is not None else b[1]
     b = (b[0], y, b[2], b[3])
     if traits and c.get("traits"):
-        _box_text(d, c["traits"], (b[0], y, b[2], y + 28),
-                  bold=True, italic=True, max_size=22, key="traits")
-        y += 34
-    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3]), start=24, key="text")
+        _box_text(d, c["traits"], (b[0], y, b[2], y + 36),
+                  bold=True, italic=True, max_size=BODY_PX, key="traits")
+        y += 40
+    if kind in ("Agenda", "Act") and pt.get("flavor") and pt.get("text"):
+        # official agenda/act fronts: the story in italics first, rules below
+        # it; both share one size so neither crowds the other out
+        both = "{}\n{}".format(pt["flavor"], pt["text"])
+        size = BODY_PX
+        for size in range(BODY_PX, 14, -1):
+            n = len(wrap_runs(d, both, size, b[2] - b[0]))
+            if _wrapped_height(both, size, n, 1.24) + 10 <= b[3] - y:
+                break
+        y = draw_wrapped(d, pt["flavor"], b[0], y, size, b[2] - b[0],
+                         (84, 66, 50), italic=True, leading=1.24)
+        draw_wrapped(d, pt["text"], b[0], y + 10, size, b[2] - b[0],
+                     PSD_INK, leading=1.24)
+        return
+    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3]), start=BODY_PX, key="text")
     if pt.get("flavor") and y + 30 < b[3]:
         _box_block(d, pt.get("flavor", ""), (b[0], y + 6, b[2], b[3]),
-                   fill=(84, 66, 50), italic=True, start=20, key="flavor")
+                   fill=(84, 66, 50), italic=True, start=FLAVOR_PX, key="flavor")
 
 
 def s_location(c, pt, dest, art_path=None, placement=None):
@@ -1922,13 +2010,13 @@ def s_location(c, pt, dest, art_path=None, placement=None):
     b = se_reg(kind, "Body")
     y = b[1]
     if c.get("traits"):
-        _box_text(d, c["traits"], (b[0], y, b[2], y + 26),
-                  bold=True, italic=True, max_size=20, key="traits")
-        y += 30
-    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3]), start=22, key="text")
+        _box_text(d, c["traits"], (b[0], y, b[2], y + 36),
+                  bold=True, italic=True, max_size=BODY_PX, key="traits")
+        y += 40
+    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3]), start=BODY_PX, key="text")
     if pt.get("flavor") and y + 24 < b[3]:
         _box_block(d, pt.get("flavor", ""), (b[0], y + 4, b[2], b[3]),
-                   fill=(84, 66, 50), italic=True, start=19, key="flavor")
+                   fill=(84, 66, 50), italic=True, start=FLAVOR_PX, key="flavor")
     _box_text(d, _wm(art_path), se_reg(kind, "Copyright"),
               fill=(120, 100, 80), max_size=14)
     img.save(dest)
@@ -2000,6 +2088,59 @@ def s_act(c, pt, dest, art_path=None, placement=None):
     img.save(dest)
 
 
+def _b_index(kind, c):
+    """'Agenda 3b' / 'Act 2b': the b side of the front's index."""
+    idx = str(c.get("index", "")).strip()
+    if idx[-1:] in ("a", "b"):
+        idx = idx[:-1]
+    return "{} {}b".format(kind, idx).strip()
+
+
+def s_scenario_back(kind, c, pt, dest):
+    """Agenda/act b side on the plugin's own back frame: 'Agenda 1b' over the
+    set circle, the name printed sideways up the left column, the story in
+    indented italics and the rules below it, one fitted size for both."""
+    frame = _se_img("templates", "AHLCG-{}Back".format(kind))
+    W, H = 525 * SE_SCALE, 375 * SE_SCALE
+    img = frame.resize((W, H), Image.LANCZOS).convert("RGB")
+    d = ImageDraw.Draw(img)
+    _box_text(d, _b_index(kind, c), se_reg(kind + "Back", "BackScenarioIndex"),
+              bold=True, max_size=15, fill=(74, 60, 46))
+    # the name, reading bottom to top in the tall left column
+    nb = se_reg(kind + "Back", "Name")
+    if nb:
+        nw, nh = int(nb[3] - nb[1]), int(nb[2] - nb[0])
+        strip = Image.new("RGBA", (nw, nh), (0, 0, 0, 0))
+        _box_text(ImageDraw.Draw(strip), c["name"], (0, 0, nw, nh), title=True,
+                  grow=1.0, max_size=int(nh * 0.9))
+        strip = strip.rotate(90, expand=True)
+        img.paste(strip, (int(nb[0]), int(nb[1])), strip)
+    story = pt.get("back_flavor", "")
+    rules = pt.get("back_text", "")
+    sb = se_reg(kind + "Back", "Story")
+    bb = se_reg(kind + "Back", "Body")
+    top, bottom = bb[1] + 14, bb[3] - 14
+    size = BODY_PX
+    for size in range(BODY_PX, 14, -1):
+        h = 0
+        if story:
+            h += _wrapped_height(story, size, len(wrap_runs(
+                d, story, size, sb[2] - sb[0], italic=True)), 1.24) + 18
+        if rules:
+            h += _wrapped_height(rules, size, len(wrap_runs(
+                d, rules, size, bb[2] - bb[0])), 1.24)
+        if h <= bottom - top:
+            break
+    y = top
+    if story:
+        y = draw_wrapped(d, story, sb[0], y, size, sb[2] - sb[0],
+                         (84, 66, 50), italic=True, leading=1.24) + 18
+    if rules:
+        draw_wrapped(d, rules, bb[0], y, size, bb[2] - bb[0], PSD_INK,
+                     leading=1.24)
+    img.save(dest)
+
+
 # real chaos-bag token symbols (SE plugin overlays) for the reference card
 CHAOS_OVERLAY = {"skull": "AHLCG-ChaosSkull", "cultist": "AHLCG-ChaosCultist",
                  "tablet": "AHLCG-ChaosTablet",
@@ -2053,7 +2194,7 @@ def s_scenario_ref(c, pt, dest, art_path=None, placement=None):
             y += rowh + 22
     else:
         _box_block(d, pt.get("text", ""), (body[0], y, body[2], body[3]),
-                   start=27, key="text")
+                   start=BODY_PX, key="text")
     img.save(dest)
 
 
@@ -2354,6 +2495,11 @@ def main():
             s_player_card(c["type"], c, pt, dest, art_path=art, placement=place)
         elif c["type"] in SCENARIO_RENDERERS and has_se_frames():
             SCENARIO_RENDERERS[c["type"]](c, pt, dest, art_path=art, placement=place)
+            if c["type"] in ("Agenda", "Act") and (pt.get("back_text")
+                                                   or pt.get("back_flavor")):
+                # the printed b side: its own landscape back (UniqueBack), so
+                # the card zooms and flips like an official agenda/act
+                s_scenario_back(c["type"], c, pt, back_dest)
             if c["type"] == "Location" and (pt.get("back_text")
                                             or c.get("back_shroud") not in (None, "")):
                 # a location a Knowledge fact flips (src/StillHour/Locations.ttslua

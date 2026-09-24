@@ -61,8 +61,8 @@
           ],
           "CustomDeck": {
             "95010": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrelias.jpg?v=aabecb5921",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrelias-back.jpg?v=44c4fcb296",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrelias.jpg?v=4a523aa4e9",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrelias-back.jpg?v=635e9e7a7d",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -112,7 +112,7 @@
           ],
           "CustomDeck": {
             "95011": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-lamp.jpg?v=d4402b9f6a",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-lamp.jpg?v=291b82f0bd",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -162,7 +162,7 @@
           ],
           "CustomDeck": {
             "95012": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-donebefore.jpg?v=89f5db4781",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-donebefore.jpg?v=f7f40c126d",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -212,7 +212,7 @@
           ],
           "CustomDeck": {
             "95013": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-eighthgrave.jpg?v=19411cd35b",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-eighthgrave.jpg?v=3d1f18c28a",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -263,8 +263,8 @@
           ],
           "CustomDeck": {
             "95014": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrayako.jpg?v=d6805c7c06",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrayako-back.jpg?v=d02f6420d6",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrayako.jpg?v=d5a281e5d9",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrayako-back.jpg?v=9409a84339",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -314,7 +314,7 @@
           ],
           "CustomDeck": {
             "95015": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-lexicon.jpg?v=a0b025b8a5",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-lexicon.jpg?v=9d088e3998",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -364,7 +364,7 @@
           ],
           "CustomDeck": {
             "95016": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-itmeanswait.jpg?v=8c8a5613dd",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-itmeanswait.jpg?v=31d3d58aa2",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -414,7 +414,7 @@
           ],
           "CustomDeck": {
             "95017": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-untranslatable.jpg?v=4d407f7a15",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-untranslatable.jpg?v=88a74016db",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -465,8 +465,8 @@
           ],
           "CustomDeck": {
             "95018": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrcass.jpg?v=a44b8aa88f",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrcass-back.jpg?v=0d74effc62",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrcass.jpg?v=caaac0ae3a",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrcass-back.jpg?v=d0751b321c",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -516,7 +516,7 @@
           ],
           "CustomDeck": {
             "95019": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-markeddeck.jpg?v=11637915a0",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-markeddeck.jpg?v=0cf7bd0593",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -566,7 +566,7 @@
           ],
           "CustomDeck": {
             "95020": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-seenthishand.jpg?v=7349c3b238",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-seenthishand.jpg?v=7768a3e927",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -616,7 +616,7 @@
           ],
           "CustomDeck": {
             "95021": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-housewins.jpg?v=a234ae1da0",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-housewins.jpg?v=68d2bf6481",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -667,8 +667,8 @@
           ],
           "CustomDeck": {
             "95022": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrseraphine.jpg?v=9aba9f5bdb",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrseraphine-back.jpg?v=0aa78bdfee",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrseraphine.jpg?v=8f786552b3",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrseraphine-back.jpg?v=f1b61e92e5",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -718,7 +718,7 @@
           ],
           "CustomDeck": {
             "95023": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-bell.jpg?v=71e2cc2d2c",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-bell.jpg?v=cc0e0a004b",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -768,7 +768,7 @@
           ],
           "CustomDeck": {
             "95024": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-rememberending.jpg?v=405ed68465",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-rememberending.jpg?v=b2cca7801f",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -818,7 +818,7 @@
           ],
           "CustomDeck": {
             "95025": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-debtofhours.jpg?v=7758f12406",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-debtofhours.jpg?v=a37cb7495d",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -869,8 +869,8 @@
           ],
           "CustomDeck": {
             "95026": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrbirdie.jpg?v=89fabe973f",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrbirdie-back.jpg?v=2c14435b80",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrbirdie.jpg?v=a771218cbe",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthrbirdie-back.jpg?v=ef0f32e0e6",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -920,7 +920,7 @@
           ],
           "CustomDeck": {
             "95027": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-compass.jpg?v=ac7fda04a8",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-compass.jpg?v=b4dd706e45",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -970,7 +970,7 @@
           ],
           "CustomDeck": {
             "95028": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-igetout.jpg?v=3f7953204d",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-igetout.jpg?v=8f7e73e468",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1020,7 +1020,7 @@
           ],
           "CustomDeck": {
             "95029": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-nobodybelieves.jpg?v=32fe5038fe",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-nobodybelieves.jpg?v=9a8b535714",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1070,7 +1070,7 @@
           ],
           "CustomDeck": {
             "95030": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-foreknowledge.jpg?v=175cbfa6e0",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-foreknowledge.jpg?v=4ab08227ff",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1120,7 +1120,7 @@
           ],
           "CustomDeck": {
             "95031": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-dejavu.jpg?v=0b94b21340",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-dejavu.jpg?v=cba5fd72ab",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1170,7 +1170,7 @@
           ],
           "CustomDeck": {
             "95032": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-musclememory.jpg?v=6ec8be268e",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-musclememory.jpg?v=3c08d07f35",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1220,7 +1220,7 @@
           ],
           "CustomDeck": {
             "95033": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-rehearsedescape.jpg?v=2efe957a58",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-rehearsedescape.jpg?v=4b1db97d64",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1270,7 +1270,7 @@
           ],
           "CustomDeck": {
             "95034": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-longwayround.jpg?v=4c57c7eab7",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-longwayround.jpg?v=1a828e633a",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1321,7 +1321,7 @@
           ],
           "CustomDeck": {
             "95035": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-borrowedtime.jpg?v=bf1268c803",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-borrowedtime.jpg?v=39cb8e37a5",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1371,7 +1371,7 @@
           ],
           "CustomDeck": {
             "95036": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-thistimeforsure.jpg?v=b5d2f1caef",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-thistimeforsure.jpg?v=46705ed35a",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1422,7 +1422,7 @@
           ],
           "CustomDeck": {
             "95037": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-anchorpoint.jpg?v=fe7a3a9db0",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-anchorpoint.jpg?v=9fbb432312",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1473,7 +1473,7 @@
           ],
           "CustomDeck": {
             "95038": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-cassandrasnotebook.jpg?v=55a1eebaac",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-cassandrasnotebook.jpg?v=73e64377af",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
@@ -1523,7 +1523,7 @@
           ],
           "CustomDeck": {
             "95039": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-hourlearnedname.jpg?v=ae4f5c972e",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-hourlearnedname.jpg?v=71b92d30d3",
               "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
