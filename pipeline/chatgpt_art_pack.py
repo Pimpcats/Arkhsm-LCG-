@@ -23,6 +23,7 @@ TYPE_ORDER = ("investigator_portrait", "event", "skill", "asset", "enemy",
               "treachery", "location", "agenda", "act", "story", "scenario")
 BATCH = 10
 PER_REQUEST = 4       # images per ChatGPT message (owner's batch-request format)
+REMAINING_PER_REQUEST = 10   # the still-needed list goes out 10 images at a time
 # batches sent whole as a single request (owner): 1, 2 and 9 onward
 WHOLE_BATCHES = lambda bi: bi in (1, 2) or bi >= 9
 
@@ -207,9 +208,20 @@ def build():
         requests.insert(0, {"batch": 0, "cards": [c["n"] for c in redo],
                             "prompt": request_prompt(camp, chars, redo,
                                                      jobs_by_id, profiles)})
+    # what the owner still has to generate: every card without committed art,
+    # in REMAINING_PER_REQUEST-image requests (redo cards use REDO_SCENES)
+    art_dir = os.path.join(ROOT, "assets", "illustrations", CAMPAIGN)
+    have = {os.path.splitext(f)[0] for f in os.listdir(art_dir)} \
+        if os.path.isdir(art_dir) else set()
+    todo = [c for c in cards if c["id"] not in have]
+    remaining = [{"cards": [c["n"] for c in todo[i:i + REMAINING_PER_REQUEST]],
+                  "prompt": request_prompt(camp, chars,
+                                           todo[i:i + REMAINING_PER_REQUEST],
+                                           jobs_by_id, profiles)}
+                 for i in range(0, len(todo), REMAINING_PER_REQUEST)]
     pack = {"campaign": CAMPAIGN,
             "batches": [[c["n"] for c in b] for b in batches],
-            "requests": requests, "cards": cards}
+            "requests": requests, "remaining": remaining, "cards": cards}
     with open(os.path.join(ROOT, "pipeline", "chatgpt_art_pack.json"), "w",
               encoding="utf-8") as f:
         json.dump(pack, f, indent=1, ensure_ascii=False)
