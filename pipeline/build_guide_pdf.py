@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """build_guide_pdf.py — typeset the campaign guide as the SCED CampaignGuide PDF.
 
-Source: docs/design/THE_STILL_HOUR_campaign_guide_v0_5.md (already carrying
-the CO-001 / CO-002 amendments). Look: the Strange Eons Arkham plugin's own
+Source: docs/design/THE_STILL_HOUR_player_guide.md, the player-facing guide
+laid out like an official one (intro boxes, numbered setup, "Do not read
+until..." dividers, resolution boxes in ```resolution fences). The design
+reference it is drawn from is THE_STILL_HOUR_campaign_guide_v0_5.md. Look: the Strange Eons Arkham plugin's own
 campaign-guide component (GuideLetter.js / AHLCG-GuideLetter.settings), laid
 out the way it lays a guide page out:
 
@@ -18,8 +20,8 @@ out the way it lays a guide page out:
                endings/resolutions in its resolution box (AHLCG-BoxRes*),
                notes in its interlude box (AHLCG-BoxInt*): top image, the
                1-px line stretched, the top mirrored as the bottom
-  * type       Arkhamic (title family), Nimbus Roman No9 L (body; converted
-               from the vendored CFF .otf to TrueType so it embeds), the Arkham
+  * type       Arkhamic (title family), Crimson Pro (body, the cards'
+               body face), the Arkham
                icon font for [wil]/[int]/[com]/[agi]/[action] markup
 The campaign log pages (pipeline/campaign_log.py) close the guide, like the
 log printed at the back of an official guide.
@@ -31,7 +33,7 @@ Output is byte-stable (reportlab invariant mode), so the hosted URL's
 content hash only changes when the guide does.
 
 Run: python3 pipeline/build_guide_pdf.py [--out dist/guide/...pdf]
-Needs: reportlab (+ fontTools to embed Nimbus; falls back to Times otherwise)
+Needs: reportlab
 """
 import argparse
 import hashlib
@@ -42,7 +44,7 @@ import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-SOURCE = os.path.join(ROOT, "docs", "design", "THE_STILL_HOUR_campaign_guide_v0_5.md")
+SOURCE = os.path.join(ROOT, "docs", "design", "THE_STILL_HOUR_player_guide.md")
 OUT = os.path.join(ROOT, "dist", "guide", "the_still_hour_campaign_guide.pdf")
 GUIDE_DIR = os.path.join(ROOT, "assets", "frames", "se", "guide")
 FONTS = os.path.join(ROOT, "assets", "fonts")
@@ -133,6 +135,17 @@ def parse(md):
         if not st or st == "---":
             i += 1
             continue
+        if st.startswith("```resolution"):
+            # a resolution box: header line, then ordinary markdown inside
+            head = st[len("```resolution"):].strip()
+            inner = []
+            i += 1
+            while i < len(lines) and not lines[i].strip().startswith("```"):
+                inner.append(lines[i])
+                i += 1
+            blocks.append(("res", (head, parse("\n".join(inner)))))
+            i += 1
+            continue
         if st.startswith("```"):
             code = []
             i += 1
@@ -152,7 +165,17 @@ def parse(md):
             while i < len(lines) and lines[i].strip().startswith(">"):
                 quote.append(lines[i].strip()[1:].strip())
                 i += 1
-            blocks.append(("quote", " ".join(q for q in quote if q)))
+            # a bare ">" line is a paragraph break inside the same box
+            paras, cur = [], []
+            for q in quote:
+                if q:
+                    cur.append(q)
+                elif cur:
+                    paras.append(" ".join(cur))
+                    cur = []
+            if cur:
+                paras.append(" ".join(cur))
+            blocks.append(("quote", "\n\n".join(paras)))
             continue
         if st.startswith("|"):
             rows = []
@@ -189,54 +212,6 @@ def parse(md):
 
 
 # ------------------------------------------------------------------ fonts --
-def _otf_to_ttf(src, dest):
-    """CFF-outline .otf -> TrueType (quadratic) so reportlab can embed it."""
-    from fontTools.ttLib import TTFont, newTable
-    from fontTools.pens.cu2quPen import Cu2QuPen
-    from fontTools.pens.ttGlyphPen import TTGlyphPen
-    f = TTFont(src, recalcTimestamp=False)
-    order = f.getGlyphOrder()
-    gs = f.getGlyphSet()
-    glyf = newTable("glyf")
-    glyf.glyphOrder = order
-    glyf.glyphs = {}
-    for name in order:
-        pen = TTGlyphPen(gs)
-        gs[name].draw(Cu2QuPen(pen, 1.0, reverse_direction=True))
-        glyf.glyphs[name] = pen.glyph()
-    f["loca"] = newTable("loca")
-    f["glyf"] = glyf
-    del f["CFF "]
-    for t in ("VORG",):
-        if t in f:
-            del f[t]
-    glyf.compile(f)
-    for name, g in glyf.glyphs.items():
-        adv, _ = f["hmtx"][name]
-        f["hmtx"][name] = (adv, getattr(g, "xMin", 0))
-    maxp = newTable("maxp")
-    maxp.tableVersion = 0x00010000
-    for k in ("maxZones", "maxTwilightPoints", "maxStorage", "maxFunctionDefs",
-              "maxInstructionDefs", "maxStackElements", "maxSizeOfInstructions",
-              "maxComponentElements"):
-        setattr(maxp, k, 0)
-    maxp.maxZones = 1
-    maxp.numGlyphs = len(order)
-    maxp.maxPoints = maxp.maxContours = maxp.maxCompositePoints = 0
-    maxp.maxCompositeContours = maxp.maxComponentDepth = 0
-    f["maxp"] = maxp
-    f["head"].indexToLocFormat = 0
-    f["head"].glyphDataFormat = 0
-    f["post"].formatType = 2.0
-    f["post"].extraNames = []
-    f["post"].mapping = {}
-    f["post"].glyphOrder = order
-    f.sfntVersion = "\x00\x01\x00\x00"
-    f.save(dest)
-    # recompute maxp/bounds on reload
-    TTFont(dest, recalcTimestamp=False).save(dest)
-
-
 def register_fonts(tmp):
     from reportlab.pdfbase import pdfmetrics
     from reportlab.pdfbase.ttfonts import TTFont
@@ -244,15 +219,14 @@ def register_fonts(tmp):
     pdfmetrics.registerFont(TTFont("Arkhamic", os.path.join(FONTS, "Arkhamic_v2.2.ttf")))
     pdfmetrics.registerFont(TTFont("AHIcons", os.path.join(FONTS, "ArkhamFontWithCodex.ttf")))
     pdfmetrics.registerFont(TTFont("Bolton", os.path.join(FONTS, "BoltonBold.ttf")))
-    body = {"Body": "NimbusRomNo9L-Reg", "Body-Italic": "NimbusRomNo9L-RegIta",
-            "Body-Bold": "NimbusRomNo9L-Med", "Body-BoldItalic": "NimbusRomNo9L-MedIta"}
+    # Crimson Pro (OFL, committed static TTFs) is the cards' body face too
+    body = {"Body": "CrimsonPro-Regular", "Body-Italic": "CrimsonPro-Italic",
+            "Body-Bold": "CrimsonPro-Bold", "Body-BoldItalic": "CrimsonPro-BoldItalic"}
     try:
         for name, stem in body.items():
-            dest = os.path.join(tmp, stem + ".ttf")
-            _otf_to_ttf(os.path.join(FONTS, stem + ".otf"), dest)
-            pdfmetrics.registerFont(TTFont(name, dest))
+            pdfmetrics.registerFont(TTFont(name, os.path.join(FONTS, stem + ".ttf")))
         fam = ("Body", "Body-Bold", "Body-Italic", "Body-BoldItalic")
-    except Exception as e:                          # no fontTools: Times
+    except Exception as e:
         print("note: body font falls back to Times ({})".format(e), file=sys.stderr)
         fam = ("Times-Roman", "Times-Bold", "Times-Italic", "Times-BoldItalic")
     addMapping(fam[0], 0, 0, fam[0])
@@ -345,6 +319,9 @@ def build(out=OUT, source=SOURCE, log_pages=True):
                                 leading=11, textColor=TEAL),
         "reshead": ParagraphStyle("reshead", fontName="Arkhamic", fontSize=12,
                                   leading=14, textColor=RES_RED, spaceAfter=2),
+        "noread": ParagraphStyle("noread", fontName=body, fontSize=10.2,
+                                 leading=12.6, alignment=TA_CENTER,
+                                 textColor=RES_RED, spaceBefore=8, spaceAfter=8),
     }
 
     class GuideBox(Flowable):
@@ -474,7 +451,7 @@ def build(out=OUT, source=SOURCE, log_pages=True):
             story.append(Paragraph(inline(title_case(payload)), S["section"]))
         elif kind == "h2":
             text = payload
-            if re.search(r"PROLOGUE|THE SIX DISTRICTS|FINALE", text):
+            if re.search(r"PROLOGUE|THE LOOP|BETWEEN LOOPS|THE DISTRICTS|FINALE", text):
                 story.append(PageBreak())
             else:
                 story.append(CondPageBreak(1.6 * 72))
@@ -488,14 +465,40 @@ def build(out=OUT, source=SOURCE, log_pages=True):
         elif kind == "h4":
             story.append(Paragraph(inline(title_case(payload)), S["sub"]))
         elif kind == "p":
+            if payload.strip("*").startswith("Do not read"):
+                story.append(Paragraph("<b>" + inline(payload.strip("*")) + "</b>",
+                                       S["noread"]))
+                continue
             style = S["intro"] if len(story) < 2 and payload.startswith("*") else S["p"]
             story.append(Paragraph(inline(payload), style))
+        elif kind == "res":
+            head, inner_blocks = payload
+            inner = [Paragraph(inline(head), S["reshead"])]
+            for ik, ip in inner_blocks:
+                if ik == "quote":
+                    inner.append(Paragraph("<i>" + inline(ip) + "</i>",
+                                           ParagraphStyle("rs", parent=S["quote"],
+                                                          spaceAfter=4)))
+                elif ik == "list":
+                    for depth, marker, text in ip:
+                        inner.append(Paragraph(
+                            inline(text),
+                            ParagraphStyle("rli", parent=S["quote"], leftIndent=11,
+                                           bulletIndent=1, spaceAfter=2),
+                            bulletText="•"))
+                elif ik == "p":
+                    inner.append(Paragraph(inline(ip), ParagraphStyle(
+                        "rp", parent=S["quote"], spaceAfter=3)))
+            story.append(GuideBox("res", inner))
+            story.append(Spacer(1, 5))
         elif kind == "quote":
             text = payload
             if text.startswith("**Note.**"):
                 story.append(GuideBox("int", [Paragraph(inline(text), S["quote"])], pad=(20, 12)))
             else:
-                story.append(GuideBox("sa", [Paragraph(inline(text), S["quote"])]))
+                qs = ParagraphStyle("qp", parent=S["quote"], spaceAfter=5)
+                story.append(GuideBox("sa", [Paragraph(inline(t), qs)
+                                             for t in text.split("\n\n")]))
             story.append(Spacer(1, 5))
         elif kind == "list":
             for depth, marker, text in payload:

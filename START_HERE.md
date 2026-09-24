@@ -36,7 +36,7 @@ Manual equivalent: `python3 cardforge/studio.py`.
 - ✅ **Art:** all 119 illustrations approved (style E, generated in ChatGPT via `docs/CHATGPT_ART_PACK.md`), committed in `assets/illustrations/still_hour/` and composited into every face in `dist/` (story frames are text-only).
 
 ## File map (this Project folder)
-**Design (source of truth):** `THE_STILL_HOUR_design*` (concept) · `*_cards_v0_2` (investigators, signatures, weaknesses, Recollections — exact wording) · `*_aging_3p_v0_3` (Aging + 3p constants) · `*_encounter_v0_4` (encounter deck, Occultation, Appointed) · `*_campaign_guide_v0_5` (every scenario, finale) · `*_log_sheet` (campaign log).
+**Design (source of truth):** `THE_STILL_HOUR_design*` (concept) · `*_cards_v0_2` (investigators, signatures, weaknesses, Recollections — exact wording) · `*_aging_3p_v0_3` (Aging + 3p constants) · `*_encounter_v0_4` (encounter deck, Occultation, Appointed) · `*_campaign_guide_v0_5` (every scenario, finale — design reference) · `*_player_guide` (the player-facing campaign guide the PDF is typeset from) · `*_log_sheet` (campaign log).
 **Change orders:** `CO-001_change_order` (contest 4n + Memory-as-XP — applied) · `CO-002_the_appointed` (staged Appointed — applied).
 **Build briefs:** `SCED_BUILD_BRIEF` (the module) · `ART_SPEC` + `ART_PIPELINE_BRIEF` + `CARDFORGE_BRIEF` (art).
 **Build state (from repo):** `REPO_BUILD_STATUS` · `REPO_INTEGRATION` (host-object wiring) · `REPO_LOADING` (how to load in TTS).

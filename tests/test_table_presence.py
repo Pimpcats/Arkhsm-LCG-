@@ -111,6 +111,28 @@ def test_guide_text_is_cleaned_of_designer_asides():
     assert "4 × investigators (12 at three players)" in text
 
 
+def test_guide_reads_like_an_official_guide():
+    # intro boxes, numbered setup, "Do not read until..." dividers and a
+    # resolution box for every resolution the manifest and the cards name
+    import build_guide_pdf as G
+    blocks = G.parse(open(G.SOURCE, encoding="utf-8").read())
+    heads = [p[0] for k, p in blocks if k == "res"]
+    divs = [p for k, p in blocks if k == "p" and p.strip("*").startswith("Do not read")]
+    assert len(divs) >= 3                       # Prologue, loop, finale
+    manifest = json.load(open(os.path.join(ROOT, "campaigns", "still_hour",
+                                           "scenario_manifest.json"), encoding="utf-8"))
+    names = [r["name"] for s in manifest["scenarios"] for r in s.get("resolutions", [])]
+    names += [r["name"] for r in manifest["campaign"].get("loop_resolutions", [])]
+    names += ["Take Its Place", "Let It In, On Your Terms", "Close the Door",
+              "Break Through", "Seal by Force", "Next Time", "The Loop Wins"]
+    for n in names:
+        assert any(n in h for h in heads), n
+    h2 = [p for k, p in blocks if k == "h2"]
+    for sec in ("CAMPAIGN SETUP", "PROLOGUE", "THE LOOP", "BETWEEN LOOPS",
+                "THE DISTRICTS", "FINALE"):
+        assert any(sec in h for h in h2), sec
+
+
 try:
     import reportlab  # noqa: F401
     HAVE_REPORTLAB = True
@@ -488,3 +510,26 @@ def test_agenda_and_act_decks_lie_sideways_like_the_official_boxes():
     assert decks, "no agenda/act decks in the release box"
     for d in decks:
         assert d["SidewaysCard"] is True and d["Hands"] is False, d["Nickname"]
+
+
+def test_boxes_sharing_the_loop_board_never_stack_on_each_other(tmp_path):
+    # a loop Places the Square plus any districts (and the finale) onto one
+    # board: no two of their stacks or cards may share a spot
+    out = tmp_path / "c.json"
+    assert cc.compile_campaign(str(out))["ok"]
+    box = json.load(open(out, encoding="utf-8"))["ObjectStates"][0]
+    manifest = json.load(open(os.path.join(ROOT, "campaigns", "still_hour",
+                                           "scenario_manifest.json"), encoding="utf-8"))
+    shared = {s["name"] for s in manifest["scenarios"]
+              if s["id"] == "district_square" or s.get("shared_from") == "district_square"}
+    spots = []
+    for sb in box["ContainedObjects"]:
+        if sb.get("Name") != "Custom_Model_Bag" or sb["Nickname"] not in shared:
+            continue
+        for e in json.loads(sb["LuaScriptState"])["ml"].values():
+            spots.append((sb["Nickname"], e["pos"]["x"], e["pos"]["z"]))
+    assert len({s[0] for s in spots}) == len(shared)
+    for i, a in enumerate(spots):
+        for b in spots[i + 1:]:
+            # cards are ~2.5 x 3.5: two stacks closer than that on both axes overlap
+            assert abs(a[1] - b[1]) >= 2.5 or abs(a[2] - b[2]) >= 2.5, (a, b)

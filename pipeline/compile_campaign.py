@@ -84,6 +84,42 @@ PLACE = {
 # Face-up stacks (agenda, act) show their LAST contained card on top, so the
 # official boxes list stage 1 last; face-down stacks (encounter deck, set-aside
 # cards: rot z 180 in every official box) draw their FIRST card.
+# A loop lays several district boxes onto one shared board (manifest
+# `shared_from`), so their stacks cannot all take the mythos snaps. Each
+# district gets its own column of the DISTRICT ROW, in map order (the
+# Fairground's side of the town first): its act deck in the gap between the
+# mythos mat and the town map (x -13.8), its encounter set and Named enemy
+# face-down in the row just below the mat (x -7.05). Both rows are where the
+# official Drowned City boxes put their extra stacks (Summit Deck / Open
+# Skies at x -13.8, Star Spawn at x -7.05). The act snap stays free for the
+# Prologue's and the finale's act.
+DISTRICT_ROW = {"district_fairground": 15.3, "district_lighthouse": 9.18,
+                "district_almanac": 3.06, "district_square": -3.06,
+                "district_road": -9.18, "district_church": -15.3}
+DISTRICT_ACT_X, DISTRICT_SET_X = -13.8, -7.05
+# the finale shares the loop's board: its set-aside stack takes the mat's
+# other corner snap, clear of the Square's set-aside stack
+FINALE_ASIDE = {"pos": (1.6, 1.56, -13.75), "rot": 315, "face_down": True}
+
+
+def stack_anchor(sc, stack):
+    """Where a scenario's stack lands on Place (see DISTRICT_ROW)."""
+    sid = sc.get("id")
+    z = DISTRICT_ROW.get(sid)
+    if z is not None:
+        if stack == "act_deck":
+            return {"pos": (DISTRICT_ACT_X, 1.61, z), "rot": 180}
+        if stack == "encounter" and sc.get("shared_from"):
+            return {"pos": (DISTRICT_SET_X, 1.62, z + 1.4), "rot": 270,
+                    "face_down": True}
+        if stack == "named":
+            return {"pos": (DISTRICT_SET_X, 1.62, z - 1.4), "rot": 270,
+                    "face_down": True}
+    if sid == "finale" and stack == "setup_aside":
+        return FINALE_ASIDE
+    return PLACE.get(stack, {"pos": (0.0, 1.5, 0.0), "rot": 180})
+
+
 # The play area's location snaps, at full card spacing: rows step 6.60 AWAY
 # from the scenario mat starting just below it (x -17.04 .. -43.44), columns
 # step 7.65 left to right (z 15.30 .. -15.30). A map slot [col, row] is exactly
@@ -208,6 +244,10 @@ def build_scenario_box(sc, assign, cards, campaign_name="Campaign"):
         ids = [i for i in (assign.get(stack) or []) if i in cards]
         if not ids:
             continue
+        if stack == "reference" and sc.get("shared_from"):
+            # a box laid onto the Square's board uses the reference card the
+            # Square already put out; a second copy would land on top of it
+            continue
         if stack == "locations":
             # every location is placed individually. If the owner arranged the
             # scenario's map grid, those exact slots are scripted; otherwise
@@ -228,7 +268,7 @@ def build_scenario_box(sc, assign, cards, campaign_name="Campaign"):
                                          "z": round(z, 3)},
                                  "rot": {"x": 0, "y": rot, "z": 0}}
             continue
-        anchor = PLACE.get(stack, {"pos": (0.0, 1.5, 0.0), "rot": 180})
+        anchor = stack_anchor(sc, stack)
         x, y, z = anchor["pos"]
         rot = anchor["rot"]
         rz = 180 if anchor.get("face_down") else 0

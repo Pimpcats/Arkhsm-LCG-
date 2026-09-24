@@ -185,7 +185,11 @@ class ScenarioContentTests(unittest.TestCase):
         self.assertEqual(seen["Location"], 23)
         self.assertEqual(seen["Act"], 14)
         self.assertEqual(seen["Agenda"], 18)
-        self.assertEqual(seen["ScenarioReference"], 8)
+        # one reference per board: the Prologue's and the Square's (every box
+        # that shares the Square's board uses its card instead of a duplicate)
+        shared = sum(1 for sc in MANIFEST["scenarios"] if sc.get("shared_from"))
+        self.assertEqual(seen["ScenarioReference"], 8 - shared)
+        self.assertEqual(seen["ScenarioReference"], 2)
 
     # ---- the audit catches what it claims to --------------------------------
     def test_catches_one_way_connection(self):
