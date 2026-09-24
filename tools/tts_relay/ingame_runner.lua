@@ -955,5 +955,20 @@ step("screenshots", function(go)
   shoot()
 end)
 
+-- leave the owner's table as it was: the owner plays on this same table, so a
+-- run must not leave its test objects behind (they used to wait for the next
+-- run's cleanup)
+step("clean up this run", function(go)
+  local n = 0
+  for _, o in pairs(spawned) do
+    if alive(o) then destroyObject(o) ; n = n + 1 end
+  end
+  for _, o in ipairs(getObjectsWithTag(TAG)) do
+    if alive(o) then destroyObject(o) ; n = n + 1 end
+  end
+  info("removed " .. n .. " object(s) this run created")
+  Wait.frames(go, 10)
+end)
+
 nextStep()
 return "runner started: " .. #steps .. " steps"
