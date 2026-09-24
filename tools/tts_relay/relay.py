@@ -38,7 +38,7 @@ import threading
 import time
 
 DEFAULT_REMOTE = "https://github.com/Pimpcats/Arkhsm-LCG-.git"
-DEFAULT_BRANCH = "claude/campaign-art-tts-testing-w2yabf"
+DEFAULT_BRANCH = "main"
 RESULTS_BRANCH = "tts-results"
 JOB_FILE = "tools/tts_relay/job.json"
 TAG = "StillHourRelay"

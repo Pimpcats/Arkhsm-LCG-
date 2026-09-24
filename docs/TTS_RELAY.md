@@ -16,7 +16,7 @@ cloud session ◀──reads── tts-results branch ◀──relay pushes─�
 2. In **local PowerShell** on the same PC, run:
 
    ```powershell
-   irm https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/tools/tts_relay/start-relay.ps1 | iex
+   irm https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/tools/tts_relay/start-relay.ps1 | iex
    ```
 
    Or double-click `Start TTS Relay.bat` in the repo folder.

@@ -1,14 +1,14 @@
 # THE STILL HOUR - start the TTS relay (Windows PowerShell 5.1+ or PowerShell 7).
 #
 # One line, from any local PowerShell window (no checkout needed):
-#   irm https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/claude/campaign-art-tts-testing-w2yabf/tools/tts_relay/start-relay.ps1 | iex
+#   irm https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/tools/tts_relay/start-relay.ps1 | iex
 #
 # Downloads the current relay.py into %USERPROFILE%\StillHourRelay each start
 # (so a restart always runs the latest relay), makes sure Pillow is present
 # for screenshots, then runs the relay until you press Ctrl+C.
 
 $ErrorActionPreference = 'Continue'   # 'Stop' turns a native command's stderr into a fatal error in PS 5.1
-$Branch = 'claude/campaign-art-tts-testing-w2yabf'
+$Branch = 'main'
 $Raw = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/$Branch/tools/tts_relay/relay.py"
 $Dir = Join-Path $env:USERPROFILE 'StillHourRelay'
 New-Item -ItemType Directory -Force -Path $Dir | Out-Null

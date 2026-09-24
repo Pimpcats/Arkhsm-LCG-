@@ -17,7 +17,7 @@ Manual equivalent: `python3 cardforge/studio.py`.
 
 ## Where the code lives
 - **Repo:** `github.com/Pimpcats/Arkhsm-LCG-` (public)
-- **Working branch:** `claude/new-session-r230bz` ← everything is here. **`main` is just a stub README — do not read `main`.**
+- **Working branch:** `main` ← everything is here (all earlier branches were folded into it, 2026-09-22).
 - Point Claude Code / any repo reader at that branch.
 
 ## The design in five lines
@@ -33,7 +33,7 @@ Manual equivalent: `python3 cardforge/studio.py`.
 - ✅ **CO-001 applied** (contest `4 * n`, Memory-as-XP) and **CO-002 applied** (the staged Appointed, renamed from Latecomer).
 - 🟡 **Board wiring + chaos bag built** (Appointed card buttons/placement, location flips/seals, touchable counters, interlude buy panel, physical `[static]` tokens in SCED's bag) — verified offline; the TTS relay run confirms it in the real engine.
 - ⏳ **Pending:** the real in-TTS run · location back art · uploading the download-box release asset.
-- 🎨 **Art:** not started. Pipeline speced (CardForge tool → ComfyUI/A1111/Krea → Strange Eons → sheets → CDN → `build_cards.py`).
+- ✅ **Art:** all 119 illustrations approved (style E, generated in ChatGPT via `docs/CHATGPT_ART_PACK.md`), committed in `assets/illustrations/still_hour/` and composited into every face in `dist/` (story frames are text-only).
 
 ## File map (this Project folder)
 **Design (source of truth):** `THE_STILL_HOUR_design*` (concept) · `*_cards_v0_2` (investigators, signatures, weaknesses, Recollections — exact wording) · `*_aging_3p_v0_3` (Aging + 3p constants) · `*_encounter_v0_4` (encounter deck, Occultation, Appointed) · `*_campaign_guide_v0_5` (every scenario, finale) · `*_log_sheet` (campaign log).
@@ -43,4 +43,4 @@ Manual equivalent: `python3 cardforge/studio.py`.
 **Scaffolds:** `build_cards.py` / `stillhour_cards_spec.json` / `stillhour_starter.json` (note: repo's `pipeline/build_cards.py` is the newer authoritative version) · `build_art_manifest.py` + `art_manifest_starter.json` + `art_profiles.json` + `cardforge_stub.py` (art tooling) · `THE_STILL_HOUR_flow.html` (systems infographic).
 
 ## How to continue
-Hand the next task to **Claude Code** against `Pimpcats/Arkhsm-LCG-` @ `claude/new-session-r230bz`. P1–P8 are done; next up: the **in-TTS load test** (load `dist/the_still_hour_mod.json`, click Run Tests), then the board wiring (Appointed callbacks, location card flips, interlude panel) and the art pipeline.
+Hand the next task to **Claude Code** against `Pimpcats/Arkhsm-LCG-` @ `main`. P1–P8 are done; next up: the **in-TTS load test** (load `dist/the_still_hour_mod.json`, click Run Tests), then the board wiring (Appointed callbacks, location card flips, interlude panel) and the art pipeline.
