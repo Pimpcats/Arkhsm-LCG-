@@ -53,10 +53,15 @@ SOURCE_REPO = "https://github.com/Chr1Z93/SCED-downloads/releases/latest/downloa
 # campaign box uses (z -36.385).
 # one spot per extra object (card bags, Control, Static token): two sharing a
 # spot on Place would drop one into the other
-EXTRA_PLACE = [{"x": 2.366, "y": 1.55, "z": -36.385},
-               {"x": -3.959, "y": 1.55, "z": -36.385},
-               {"x": 5.529, "y": 1.55, "z": -36.385},
-               {"x": 8.692, "y": 1.55, "z": -36.385}]
+# in the order of the mod's objects: Player Cards bag, The Appointed bag,
+# Control, Static. They go in the open area inside SCED's grey lines above the
+# scenario mat (owner's pick), beyond the row the scenario boxes use (x 12.25):
+# the bags and the Static token in a row, the Control on its own to the left
+# with room for its ~4.6-wide button panel (up to ~6.5 in the interlude).
+EXTRA_PLACE = [{"x": 24.0, "y": 1.55, "z": -4.0},
+               {"x": 24.0, "y": 1.55, "z": -9.0},
+               {"x": 25.0, "y": 1.55, "z": 9.0},
+               {"x": 24.0, "y": 1.55, "z": -14.0}]
 
 
 def guid(seed):

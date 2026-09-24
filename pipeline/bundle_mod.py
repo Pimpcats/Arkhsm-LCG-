@@ -79,7 +79,7 @@ def guid(seed):
 # the table and falls through it. Objects drop in from above, in the open strip
 # between the scenario mat (x -6..3) and the row of scenario boxes (x 12.25),
 # one after another across the table (z).
-SPAWN_X, SPAWN_Y = 7.5, 2.5
+SPAWN_X, SPAWN_Y = 24.0, 2.5     # the open area inside SCED's grey lines
 
 
 def transform(z):
