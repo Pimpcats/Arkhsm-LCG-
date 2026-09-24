@@ -37,12 +37,13 @@
     "python3 pipeline/scenario_content.py: 8/8 scenarios, 0 errors (notes: one inherited stat deviation, five cross-district symbol repeats in distinct colours)",
     "python3 -m pytest -q tests: 21 passed",
     "python3 pipeline/compile_campaign.py: ok, 8 scenario boxes, 143 cards",
-    "Design decisions and open flags: docs/design/CONTENT_DECISIONS.md (spoilers)"
+    "Design decisions and open flags: docs/design/CONTENT_DECISIONS.md (spoilers)",
+    "2026-09-24: Prologue R1/R2 and loop resolutions (R2 Seam Tears / NR Night Keeps You / R1 Appointed Hour) written into the guide, log sheet and scenario_manifest.json; guide PDF rebuilt.",
+    "2026-09-24: first complete real-TTS relay run (ab136f1, owner's PC, SCED table): 82 passed, 1 failed (prey step, fixed in f0be782)."
   ],
   "next_actions": [
     "Owner starts the TTS relay (docs/TTS_RELAY.md); fix anything real TTS reports (button placement, log field alignment, box meshes are unverified offline).",
     "Art: needs api.openai.com + OPENAI_API_KEY in the cloud environment; then style sample for approval, batches with character references, render, publish.",
-    "Guide gap (owner, 2026-09-24): the Prologue and the six districts have no resolutions or branching (only the finale's R1-R6 exist). Write per-scenario resolutions (R1-R4 where the scenario supports them) with campaign-log branching, add them to scenario_manifest.json (SCENARIO_SCHEMA 'resolutions') and the guide. Spoiler rule: never show the text to the owner.",
     "Box art (owner, not urgent): campaign box and the eight scenario boxes still use the generic texture; give them Still Hour art."
   ],
   "connection": "GitHub handoff; no live connection to the owner's desktop or TTS.",
