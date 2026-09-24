@@ -46,4 +46,14 @@ try {
     Invoke-WebRequest -ErrorAction Stop -UseBasicParsing -Uri ("{0}?t={1}" -f $Main, $Stamp) -OutFile $Relay
 }
 Write-Host "Relay downloaded to $Relay"
-& $Py $Relay --branch $Branch @args
+$PyExe = (& $Py -c "import sys; print(sys.executable)" 2>$null)
+$PyVer = (& $Py -c "import sys; print(sys.version.split()[0])" 2>$null)
+Write-Host "Starting the relay with $Py ($PyVer, $PyExe). Leave this window open; Ctrl+C stops it."
+# -u: unbuffered, so every line shows here as it happens
+& $Py -u $Relay --branch $Branch @args
+$Code = $LASTEXITCODE
+Write-Host ""
+Write-Host "The relay stopped (exit code $Code). Its log: $Dir\relay.log" -ForegroundColor Yellow
+if ($Code -ne 0 -and $Code -ne $null) {
+    Write-Host 'Send Claude a screenshot of this window, or the relay.log file.' -ForegroundColor Yellow
+}

@@ -61,7 +61,8 @@ def guid(seed):
 
 
 def transform(x=0.0):
-    return {"posX": x, "posY": 1.2, "posZ": 0, "rotX": 0, "rotY": 180, "rotZ": 0,
+    # above SCED's table surface (y ~1.48), so it drops on rather than through
+    return {"posX": x, "posY": 2.5, "posZ": 0, "rotX": 0, "rotY": 180, "rotZ": 0,
             "scaleX": 1, "scaleY": 1, "scaleZ": 1}
 
 

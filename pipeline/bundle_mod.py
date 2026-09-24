@@ -75,8 +75,15 @@ def guid(seed):
     return hashlib.sha1(seed.encode("utf-8")).hexdigest()[:6]
 
 
-def transform(x):
-    return {"posX": x, "posY": 1.2, "posZ": 0, "rotX": 0, "rotY": 180, "rotZ": 0,
+# SCED's table surface sits at y ~1.48: anything spawned lower starts inside
+# the table and falls through it. Objects drop in from above, in the open strip
+# between the scenario mat (x -6..3) and the row of scenario boxes (x 12.25),
+# one after another across the table (z).
+SPAWN_X, SPAWN_Y = 7.5, 2.5
+
+
+def transform(z):
+    return {"posX": SPAWN_X, "posY": SPAWN_Y, "posZ": z, "rotX": 0, "rotY": 270, "rotZ": 0,
             "scaleX": 1, "scaleY": 1, "scaleZ": 1}
 
 

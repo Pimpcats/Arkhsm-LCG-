@@ -282,11 +282,18 @@ end
 local BTN_COLOR = { 0.15, 0.13, 0.2 }
 local BTN_FONT = { 0.95, 0.9, 0.7 }
 
+-- Button height above the token: the block's top face is at local y 0.5, so
+-- anything lower is hidden wherever it passes over the block.
+local BTN_Y = 0.55
+-- Layout grid (local units): a width-1000 button is ~2.0 wide and a width-620
+-- one ~1.24, so pairs sit at +-PAIR_X and rows of three at -ROW3_X / 0 / ROW3_X.
+local PAIR_X, ROW3_X = 1.05, 1.35
+
 local function button(fn, label, x, z, w, tooltip, fs)
   pcall(function()
     self.createButton({
       click_function = fn, function_owner = self, label = label, tooltip = tooltip or "",
-      position = { x, 0.3, z }, rotation = { 0, 0, 0 },
+      position = { x, BTN_Y, z }, rotation = { 0, 0, 0 },
       width = w or 620, height = 300, font_size = fs or 100,
       color = BTN_COLOR, font_color = BTN_FONT,
     })
@@ -297,7 +304,7 @@ local function header(label, z)
   pcall(function()
     self.createButton({
       click_function = "shNoop", function_owner = self, label = label,
-      position = { 0, 0.3, z }, rotation = { 0, 0, 0 },
+      position = { 0, BTN_Y, z }, rotation = { 0, 0, 0 },
       width = 0, height = 0, font_size = 120, font_color = BTN_FONT,
     })
   end)
@@ -309,33 +316,34 @@ local function drawPlay()
   local c = CampaignState.constants()
   header(string.format("THE STILL HOUR · loop %d", CampaignState.getLoopsCompleted() + 1), -2.3)
   button("shClickMemory", string.format("Memory %d / %d", CampaignState.getBankedMemory(), c.memoryCap),
-    -0.9, -1.7, 1000, "Banked Memory. " .. PLUS_MINUS)
-  button("shClickInvestigators", "Investigators " .. c.investigators, 0.9, -1.7, 1000,
+    -PAIR_X, -1.7, 1000, "Banked Memory. " .. PLUS_MINUS)
+  button("shClickInvestigators", "Investigators " .. c.investigators, PAIR_X, -1.7, 1000,
     "Sets every threshold. " .. PLUS_MINUS .. (SCED.getInvestigatorCount()
       and (" (SCED counter: " .. SCED.getInvestigatorCount() .. ")") or ""))
   button("shClickDissonance", string.format("Dissonance %d / %d · %s", CampaignState.getDissonance(),
-    c.resetThreshold, CampaignState.band()), -0.9, -1.1, 1000, "Left-click raise · Right-click reduce")
+    c.resetThreshold, CampaignState.band()), -PAIR_X, -1.1, 1000, "Left-click raise · Right-click reduce")
   local d = bag.describe()
-  button("shClickStatic", string.format("[static] %d (%s)", d.target, d.mode), 0.9, -1.1, 1000,
+  button("shClickStatic", string.format("[static] %d (%s)", d.target, d.mode), PAIR_X, -1.1, 1000,
     "Baseline + temporary [static] this bag should hold. Click to re-sync the chaos bag.")
   local h = CampaignState.getHour()
-  button("shClickHour", string.format("Hour %d · %s", h, Hourglass.HOUR_NAMES[h] or "?"), -0.9, -0.5, 1000,
+  button("shClickHour", string.format("Hour %d · %s", h, Hourglass.HOUR_NAMES[h] or "?"), -PAIR_X, -0.5, 1000,
     "Left-click advance (resolves the Hour) · Right-click rewind")
-  button("shClickAppointed", "Appointed: " .. Appointed.stageName(), 0.9, -0.5, 1000,
+  button("shClickAppointed", "Appointed: " .. Appointed.stageName(), PAIR_X, -0.5, 1000,
     "Left-click: a card advances its Approach one stage (min Sensed). Hold Back is on its card.")
   investigatorList = guarded("investigators", Board.investigators) or {}
   for i, inv in ipairs(investigatorList) do
     if i > 4 then break end
     button("shInvMem" .. i, string.format("%s · Memory %d", inv.name, CampaignState.getOnCardMemory(inv.id)),
-      (i % 2 == 1) and -0.9 or 0.9, 0.1 + math.floor((i - 1) / 2) * 0.55, 1000,
+      (i % 2 == 1) and -PAIR_X or PAIR_X, 0.1 + math.floor((i - 1) / 2) * 0.55, 1000,
       "Memory on this investigator's cards (prey = most). " .. PLUS_MINUS, 80)
   end
-  button("runStillHourTests", "Run Tests", -1.1, 1.4)
-  button("shStatus", "Status", -0.55, 1.4)
-  button("shSyncBoard", "Sync Board", 0.0, 1.4, 620, "Re-apply location faces/seals, the Appointed and the chaos bag.")
-  button("shReset", "Reset Loop", 0.55, 1.4)
-  button("shOpenInterlude", "Interlude", 1.1, 1.4, 620, "Spend Memory: Recollections and level-ups.")
-  button("shKnowledgeStatus", "Knowledge", 0.0, 2.0)
+  -- two rows of three, spaced so no button overlaps another
+  button("runStillHourTests", "Run Tests", -ROW3_X, 1.4)
+  button("shStatus", "Status", 0.0, 1.4)
+  button("shSyncBoard", "Sync Board", ROW3_X, 1.4, 620, "Re-apply location faces/seals, the Appointed and the chaos bag.")
+  button("shReset", "Reset Loop", -ROW3_X, 2.0)
+  button("shOpenInterlude", "Interlude", 0.0, 2.0, 620, "Spend Memory: Recollections and level-ups.")
+  button("shKnowledgeStatus", "Knowledge", ROW3_X, 2.0)
 end
 
 local function drawInterlude()
@@ -349,20 +357,20 @@ local function drawInterlude()
     local col = (i - 1) % 2
     local row = math.floor((i - 1) / 2)
     button("shBuyRec" .. i, string.format("%s (%d)", r.name, r.cost),
-      col == 0 and -0.9 or 0.9, -1.1 + row * 0.55, 1000, "Buy this Recollection for " .. r.cost .. " Memory.", 80)
+      col == 0 and -PAIR_X or PAIR_X, -1.1 + row * 0.55, 1000, "Buy this Recollection for " .. r.cost .. " Memory.", 80)
   end
   local rows = math.ceil(math.min(#recollectionList, 16) / 2)
   local z = -1.1 + rows * 0.55 + 0.1
   for lvl = 1, 5 do
-    button("shBuyLvl" .. lvl, "Lvl " .. lvl .. " (" .. lvl .. ")", -1.3 + (lvl - 1) * 0.65, z, 560,
+    button("shBuyLvl" .. lvl, "Lvl " .. lvl .. " (" .. lvl .. ")", -2.4 + (lvl - 1) * 1.2, z, 520,
       "Level a card up to level " .. lvl .. " for " .. lvl .. " Memory.", 90)
   end
-  button("shBeginNextLoop", "Begin Next Loop", -0.6, z + 0.6, 1000, "Cap Memory and start the next night.")
-  button("shCloseInterlude", "Back", 0.9, z + 0.6, 620)
+  button("shBeginNextLoop", "Begin Next Loop", -0.8, z + 0.6, 1000, "Cap Memory and start the next night.")
+  button("shCloseInterlude", "Back", 1.35, z + 0.6, 620)
   -- Aging + banking, in a column to the right of the token
   local onCard = 0
   for _, n in pairs(CampaignState.onCardMemoryMap()) do onCard = onCard + n end
-  local X = 3.4
+  local X = 4.2
   header("AGING", -2.3)
   button("shBankOnCard", "Bank on-card Memory (" .. onCard .. ")", X, -1.7, 1400,
     "Guide interlude step 2: move all Memory on cards to banked Memory.", 90)
@@ -376,21 +384,21 @@ local function drawInterlude()
     local zi = -0.65 + (i - 1) * 0.95
     local yrs = CampaignState.getYears(inv.id)
     button("shNoop", string.format("%s · Years %d · %s", inv.name, yrs, Aging.bracketForYears(yrs)),
-      X - 0.55, zi, 1000, "", 80)
+      X - 0.75, zi, 1000, "", 80)
     local t = CampaignState.getTallies(inv.id)
-    button("shTalRaised" .. i, "Raised " .. t.raises, X + 0.95, zi, 380,
+    button("shTalRaised" .. i, "Raised " .. t.raises, X + 0.85, zi, 380,
       "Times this investigator raised Dissonance this loop. " .. PLUS_MINUS, 70)
     button("shTalSpent" .. i, "Spent " .. t.spent, X + 1.75, zi, 380,
       "Memory this investigator spent on loop powers (Recollections, foreknowledge) this loop. " .. PLUS_MINUS, 70)
     local locked = (CampaignState.getBracket(inv.id) or {}).physical ~= nil
-    button("shAgeDef" .. i, "Defeated: " .. (a.defeated and "yes" or "no"), X - 1.05, zi + 0.42, 500, "", 70)
-    button("shNoop", "Leaned: " .. (Interlude.leanedOnLoop(inv.id) and "yes" or "no"), X - 0.35, zi + 0.42, 500,
+    button("shAgeDef" .. i, "Defeated: " .. (a.defeated and "yes" or "no"), X - 1.45, zi + 0.42, 330, "", 70)
+    button("shNoop", "Leaned: " .. (Interlude.leanedOnLoop(inv.id) and "yes" or "no"), X - 0.7, zi + 0.42, 330,
       "Derived: raised Dissonance 3+ times or spent 4+ Memory on loop powers this loop.", 70)
-    button("shAgePhys" .. i, "-" .. a.physical .. (locked and " (locked)" or ""), X + 0.35, zi + 0.42, 500,
+    button("shAgePhys" .. i, "-" .. a.physical .. (locked and " (locked)" or ""), X + 0.05, zi + 0.42, 330,
       "Physical skill that drifts down (chosen once, locked).", 60)
-    button("shAgeMent" .. i, "+" .. a.mental .. (locked and " (locked)" or ""), X + 1.05, zi + 0.42, 500,
+    button("shAgeMent" .. i, "+" .. a.mental .. (locked and " (locked)" or ""), X + 0.8, zi + 0.42, 330,
       "Mental skill that drifts up (chosen once, locked).", 60)
-    button("shAge" .. i, a.aged and ("Aged +" .. a.aged) or "Age", X + 1.75, zi + 0.42, 300,
+    button("shAge" .. i, a.aged and ("Aged +" .. a.aged) or "Age", X + 1.6, zi + 0.42, 330,
       "Apply this interlude's Years.", 70)
   end
 end

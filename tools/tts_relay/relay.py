@@ -48,6 +48,9 @@ KEEP_RUNS = 30
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
+LOG_PATH = os.path.join(os.path.expanduser("~"), "StillHourRelay", "relay.log")
+
+
 def say(msg):
     stamp = dt.datetime.now().strftime("%H:%M:%S")
     line = "[{}] {}".format(stamp, msg)
@@ -55,6 +58,13 @@ def say(msg):
         print(line, flush=True)
     except UnicodeEncodeError:          # legacy Windows console code page
         print(line.encode("ascii", "replace").decode("ascii"), flush=True)
+    # a file copy too: if the console swallows output, the owner can send this
+    try:
+        os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
+        with open(LOG_PATH, "a", encoding="utf-8") as f:
+            f.write(line + "\n")
+    except OSError:
+        pass
 
 
 # ----------------------------------------------------------------------- git --
@@ -417,6 +427,8 @@ def main(argv=None):
     ap.add_argument("--tts-port", type=int, default=39999, help=argparse.SUPPRESS)
     ap.add_argument("--editor-port", type=int, default=39998, help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
+    say("relay {} starting (Python {}); watching '{}'".format(
+        os.path.abspath(__file__), platform.python_version(), args.branch))
 
     if not shutil.which("git"):
         raise SystemExit("Git was not found. Install it from https://git-scm.com and run this again.")
@@ -507,3 +519,11 @@ if __name__ == "__main__":
         sys.exit(main())
     except KeyboardInterrupt:
         say("relay stopped.")
+    except SystemExit as e:
+        if e.code not in (None, 0):
+            say("relay exited: {}".format(e.code))
+        raise
+    except Exception as e:              # never die silently
+        import traceback
+        say("relay crashed: {!r}\n{}".format(e, traceback.format_exc()))
+        sys.exit(4)
