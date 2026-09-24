@@ -1,0 +1,7 @@
+04:28:31.009 relay sending runner + 6 object(s), 765 KB
+04:28:31.149 print [INFO] table has 212 object(s) before the run
+04:28:31.150 print [INFO] SCED not detected: running on a non-SCED table
+04:28:31.150 print [INFO] removed 0 object(s) left by an earlier relay run
+04:28:31.441 print THE STILL HOUR control ready. Investigators = 3 (SCED detected). Click 'Run Tests' to verify the build.
+04:28:31.651 print [PASS] every payload finished spawning  -- 6/6 spawned
+04:28:32.422 ERROR [Global] Lua Error: Object reference not set to an instance of an object.Object reference not set to an instance of an object.
