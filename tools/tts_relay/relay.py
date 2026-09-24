@@ -338,6 +338,10 @@ def run_job(repo, sha, branch, args, listener, run_dir):
         log_lines.append("{} {:5} {}".format(_utcnow().strftime("%H:%M:%S.%f")[:-3], kind, text))
 
     chunk, n = build_chunk(repo, job, run_id)
+    # Lua errors name lines of the whole chunk; the runner starts after the
+    # payload header, so runner line = reported line - this offset
+    runner_src = open(os.path.join(repo, job["runner"]), encoding="utf-8").read()
+    summary["runner_line_offset"] = chunk[:len(chunk) - len(runner_src)].count("\n")
     log("relay", "sending runner + {} object(s), {} KB".format(n, len(chunk) // 1024))
     listener.drain()
     tts_send(args.tts_port, {"messageID": 3, "guid": "-1", "script": chunk})
