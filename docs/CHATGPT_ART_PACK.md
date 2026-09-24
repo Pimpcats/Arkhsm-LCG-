@@ -1139,14 +1139,14 @@ Character: none
 
 ## Batch 9
 
-### #076–#079
+### #076–#085
 
 ```
-BATCH REQUEST: 4 SEPARATE IMAGES
+BATCH REQUEST: 10 SEPARATE IMAGES
 
-Generate exactly ONE independent image for EACH numbered prompt below: 4 separate images total.
+Generate exactly ONE independent image for EACH numbered prompt below: 10 separate images total.
 
-These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
+These are different scenes, not 10 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
@@ -1190,96 +1190,38 @@ Aspect ratio: 3:2 (landscape)
 Scene: a hall of warped mirrors under strings of bulbs, reflections not quite matching one another.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
-```
 
-### #080–#083
-
-```
-BATCH REQUEST: 4 SEPARATE IMAGES
-
-Generate exactly ONE independent image for EACH numbered prompt below: 4 separate images total.
-
-These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
-
-SHARED HOUSE STYLE:
-1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
-
-PAINT HANDLING: Use broad, economical brushwork and large quiet areas of thin, relatively flat paint. Do not cover the image in visible texture. No all-over impasto, palette-knife effects, canvas texture, crunchy micro-detail, stippled texture, or repeated short strokes. Brush marks should appear only where the illustrator deliberately needs them. Background forms may be indicated with only a few strokes and can remain visibly underpainted or unresolved. Faces are constructed from a small number of broad light-and-shadow planes, not pores, tiny wrinkles, or individual hairs. Let large areas remain calm and simple.
-
-IMPERFECTION: Hand-painted irregularity should come from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages, and unfinished peripheral areas—not from adding texture to every surface.
-
-DETAIL HIERARCHY: Concentrate detail around the face, hands, and important prop. Keep clothing, architecture, landscape, sea, and sky simplified into large value masses. Background forms should dissolve quickly and should never compete with the focal subject.
-
-EDGES: Use a clear hard/soft edge hierarchy. Crisp edges only around the focal features; allow many secondary contours to merge into shadow or remain unresolved.
-
-AVOID ADDITIONAL: all-over painterly texture, fake impasto, hyper-detailed rocks or clouds, excessive individual beard hairs, heavily modeled skin, cinematic orange-and-teal lighting, glowing atmospheric rim light, fantasy concept-art rendering, equal detail across the whole image.
-
-CROP: keep the main subject away from the outer edges; the card frame crops the image.
-
-LIGHTING AND PALETTE: suit this scene. Flat, muted and desaturated overall; lamplight is the only fragile warm note.
-
-AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, depth of field, bokeh, motion blur, film grain, 3d render, octane, cgi, plastic, waxy skin, subsurface scattering, text, watermark, signature, logo, border, frame, ui, caption, anime, cartoon, comic, cel shading, neon, candy colors, oversaturated, pastel, cheerful, twee, modern clothing, smartphone, car, contemporary setting, deformed hands, extra fingers, extra limbs, mutated, bad anatomy, repeating pattern, tiled texture, stamped texture, copy-pasted elements, cloned identical figures, identical repeated shapes, evenly spaced rows, uniform brushstrokes, perfect symmetry, overly clean, uniform detail everywhere, digital painting, airbrushed, rim light, all-over impasto, fake impasto, palette-knife texture, canvas texture, crunchy micro-detail, stippled texture, repeated short brush strokes, uniform painted texture, all-over painterly texture, hyper-detailed rocks or clouds, excessive individual beard hairs, heavily modeled skin, cinematic orange-and-teal lighting, glowing atmospheric rim light, fantasy concept-art rendering, equal detail across the whole image.
-
-IMAGE 1 (save as 080)
+IMAGE 5 (save as 080)
 Aspect ratio: 3:2 (landscape)
 Scene: a painted ticket booth at the fairground gate, a roll of tickets unspooling across the counter, the window dark.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
-IMAGE 2 (save as 081)
+IMAGE 6 (save as 081)
 Aspect ratio: 3:2 (landscape)
 Scene: a reading room of floor-to-ceiling shelves, ladders and green lamps, one book lying open on the floor.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
-IMAGE 3 (save as 082)
+IMAGE 7 (save as 082)
 Aspect ratio: 3:2 (landscape)
 Scene: a hand-cranked printing press with a half-set page of type, ink gleaming, almanac sheets hung to dry (any writing or numbers only as unreadable marks, never legible).
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
-IMAGE 4 (save as 083)
+IMAGE 8 (save as 083)
 Aspect ratio: 3:2 (landscape)
 Scene: a locked study door at the end of a book-lined corridor, light and a faint murmur coming from under it.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
-```
 
-### #084–#085
-
-```
-BATCH REQUEST: 2 SEPARATE IMAGES
-
-Generate exactly ONE independent image for EACH numbered prompt below: 2 separate images total.
-
-These are different scenes, not 2 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
-
-SHARED HOUSE STYLE:
-1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
-
-PAINT HANDLING: Use broad, economical brushwork and large quiet areas of thin, relatively flat paint. Do not cover the image in visible texture. No all-over impasto, palette-knife effects, canvas texture, crunchy micro-detail, stippled texture, or repeated short strokes. Brush marks should appear only where the illustrator deliberately needs them. Background forms may be indicated with only a few strokes and can remain visibly underpainted or unresolved. Faces are constructed from a small number of broad light-and-shadow planes, not pores, tiny wrinkles, or individual hairs. Let large areas remain calm and simple.
-
-IMPERFECTION: Hand-painted irregularity should come from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages, and unfinished peripheral areas—not from adding texture to every surface.
-
-DETAIL HIERARCHY: Concentrate detail around the face, hands, and important prop. Keep clothing, architecture, landscape, sea, and sky simplified into large value masses. Background forms should dissolve quickly and should never compete with the focal subject.
-
-EDGES: Use a clear hard/soft edge hierarchy. Crisp edges only around the focal features; allow many secondary contours to merge into shadow or remain unresolved.
-
-AVOID ADDITIONAL: all-over painterly texture, fake impasto, hyper-detailed rocks or clouds, excessive individual beard hairs, heavily modeled skin, cinematic orange-and-teal lighting, glowing atmospheric rim light, fantasy concept-art rendering, equal detail across the whole image.
-
-CROP: keep the main subject away from the outer edges; the card frame crops the image.
-
-LIGHTING AND PALETTE: suit this scene. Flat, muted and desaturated overall; lamplight is the only fragile warm note.
-
-AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, depth of field, bokeh, motion blur, film grain, 3d render, octane, cgi, plastic, waxy skin, subsurface scattering, text, watermark, signature, logo, border, frame, ui, caption, anime, cartoon, comic, cel shading, neon, candy colors, oversaturated, pastel, cheerful, twee, modern clothing, smartphone, car, contemporary setting, deformed hands, extra fingers, extra limbs, mutated, bad anatomy, repeating pattern, tiled texture, stamped texture, copy-pasted elements, cloned identical figures, identical repeated shapes, evenly spaced rows, uniform brushstrokes, perfect symmetry, overly clean, uniform detail everywhere, digital painting, airbrushed, rim light, all-over impasto, fake impasto, palette-knife texture, canvas texture, crunchy micro-detail, stippled texture, repeated short brush strokes, uniform painted texture, all-over painterly texture, hyper-detailed rocks or clouds, excessive individual beard hairs, heavily modeled skin, cinematic orange-and-teal lighting, glowing atmospheric rim light, fantasy concept-art rendering, equal detail across the whole image.
-
-IMAGE 1 (save as 084)
+IMAGE 9 (save as 084)
 Aspect ratio: 3:2 (landscape)
 Scene: the town square seen from its centre, four streets leading off into fog toward a church, a fairground, a road and a tall house of books.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
-IMAGE 2 (save as 085)
+IMAGE 10 (save as 085)
 Aspect ratio: 2:3 (portrait)
 Scene: the town square at eleven o'clock, lamps lit, townsfolk looking up at a sky where the stars are sliding behind something without an edge (any writing or numbers only as unreadable marks, never legible).
 Framing: wide establishing scene, escalating dread.
@@ -1288,14 +1230,14 @@ Character: none
 
 ## Batch 10
 
-### #086–#089
+### #086–#095
 
 ```
-BATCH REQUEST: 4 SEPARATE IMAGES
+BATCH REQUEST: 10 SEPARATE IMAGES
 
-Generate exactly ONE independent image for EACH numbered prompt below: 4 separate images total.
+Generate exactly ONE independent image for EACH numbered prompt below: 10 separate images total.
 
-These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
+These are different scenes, not 10 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
@@ -1339,96 +1281,38 @@ Aspect ratio: 2:3 (portrait)
 Scene: empty streets at midnight, every door open, a single chair still rocking on a porch.
 Framing: wide establishing scene, escalating dread.
 Character: none
-```
 
-### #090–#093
-
-```
-BATCH REQUEST: 4 SEPARATE IMAGES
-
-Generate exactly ONE independent image for EACH numbered prompt below: 4 separate images total.
-
-These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
-
-SHARED HOUSE STYLE:
-1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
-
-PAINT HANDLING: Use broad, economical brushwork and large quiet areas of thin, relatively flat paint. Do not cover the image in visible texture. No all-over impasto, palette-knife effects, canvas texture, crunchy micro-detail, stippled texture, or repeated short strokes. Brush marks should appear only where the illustrator deliberately needs them. Background forms may be indicated with only a few strokes and can remain visibly underpainted or unresolved. Faces are constructed from a small number of broad light-and-shadow planes, not pores, tiny wrinkles, or individual hairs. Let large areas remain calm and simple.
-
-IMPERFECTION: Hand-painted irregularity should come from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages, and unfinished peripheral areas—not from adding texture to every surface.
-
-DETAIL HIERARCHY: Concentrate detail around the face, hands, and important prop. Keep clothing, architecture, landscape, sea, and sky simplified into large value masses. Background forms should dissolve quickly and should never compete with the focal subject.
-
-EDGES: Use a clear hard/soft edge hierarchy. Crisp edges only around the focal features; allow many secondary contours to merge into shadow or remain unresolved.
-
-AVOID ADDITIONAL: all-over painterly texture, fake impasto, hyper-detailed rocks or clouds, excessive individual beard hairs, heavily modeled skin, cinematic orange-and-teal lighting, glowing atmospheric rim light, fantasy concept-art rendering, equal detail across the whole image.
-
-CROP: keep the main subject away from the outer edges; the card frame crops the image.
-
-LIGHTING AND PALETTE: suit this scene. Flat, muted and desaturated overall; lamplight is the only fragile warm note.
-
-AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, depth of field, bokeh, motion blur, film grain, 3d render, octane, cgi, plastic, waxy skin, subsurface scattering, text, watermark, signature, logo, border, frame, ui, caption, anime, cartoon, comic, cel shading, neon, candy colors, oversaturated, pastel, cheerful, twee, modern clothing, smartphone, car, contemporary setting, deformed hands, extra fingers, extra limbs, mutated, bad anatomy, repeating pattern, tiled texture, stamped texture, copy-pasted elements, cloned identical figures, identical repeated shapes, evenly spaced rows, uniform brushstrokes, perfect symmetry, overly clean, uniform detail everywhere, digital painting, airbrushed, rim light, all-over impasto, fake impasto, palette-knife texture, canvas texture, crunchy micro-detail, stippled texture, repeated short brush strokes, uniform painted texture, all-over painterly texture, hyper-detailed rocks or clouds, excessive individual beard hairs, heavily modeled skin, cinematic orange-and-teal lighting, glowing atmospheric rim light, fantasy concept-art rendering, equal detail across the whole image.
-
-IMAGE 1 (save as 090)
+IMAGE 5 (save as 090)
 Aspect ratio: 2:3 (portrait)
 Scene: the sky over the rooftops cracked like glaze, wrong constellations showing through the seams.
 Framing: wide establishing scene, escalating dread.
 Character: none
 
-IMAGE 2 (save as 091)
+IMAGE 6 (save as 091)
 Aspect ratio: 2:3 (portrait)
 Scene: a long street seen from its far end, lamps going dark one by one toward the viewer, something tall at the vanishing point.
 Framing: wide establishing scene, escalating dread.
 Character: none
 
-IMAGE 3 (save as 092)
+IMAGE 7 (save as 092)
 Aspect ratio: 2:3 (portrait)
 Scene: the whole town seen from above at the last minute before the hour, clocks on every building pointing the same wrong time (any writing or numbers only as unreadable marks, never legible).
 Framing: wide establishing scene, escalating dread.
 Character: none
 
-IMAGE 4 (save as 093)
+IMAGE 8 (save as 093)
 Aspect ratio: 2:3 (portrait)
 Scene: a black occulted sun-like disc filling the sky over Ambergrove, the town below perfectly still, a seam of pale light down the middle of the night.
 Framing: wide establishing scene, escalating dread.
 Character: none
-```
 
-### #094–#095
-
-```
-BATCH REQUEST: 2 SEPARATE IMAGES
-
-Generate exactly ONE independent image for EACH numbered prompt below: 2 separate images total.
-
-These are different scenes, not 2 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
-
-SHARED HOUSE STYLE:
-1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
-
-PAINT HANDLING: Use broad, economical brushwork and large quiet areas of thin, relatively flat paint. Do not cover the image in visible texture. No all-over impasto, palette-knife effects, canvas texture, crunchy micro-detail, stippled texture, or repeated short strokes. Brush marks should appear only where the illustrator deliberately needs them. Background forms may be indicated with only a few strokes and can remain visibly underpainted or unresolved. Faces are constructed from a small number of broad light-and-shadow planes, not pores, tiny wrinkles, or individual hairs. Let large areas remain calm and simple.
-
-IMPERFECTION: Hand-painted irregularity should come from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages, and unfinished peripheral areas—not from adding texture to every surface.
-
-DETAIL HIERARCHY: Concentrate detail around the face, hands, and important prop. Keep clothing, architecture, landscape, sea, and sky simplified into large value masses. Background forms should dissolve quickly and should never compete with the focal subject.
-
-EDGES: Use a clear hard/soft edge hierarchy. Crisp edges only around the focal features; allow many secondary contours to merge into shadow or remain unresolved.
-
-AVOID ADDITIONAL: all-over painterly texture, fake impasto, hyper-detailed rocks or clouds, excessive individual beard hairs, heavily modeled skin, cinematic orange-and-teal lighting, glowing atmospheric rim light, fantasy concept-art rendering, equal detail across the whole image.
-
-CROP: keep the main subject away from the outer edges; the card frame crops the image.
-
-LIGHTING AND PALETTE: suit this scene. Flat, muted and desaturated overall; lamplight is the only fragile warm note.
-
-AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, depth of field, bokeh, motion blur, film grain, 3d render, octane, cgi, plastic, waxy skin, subsurface scattering, text, watermark, signature, logo, border, frame, ui, caption, anime, cartoon, comic, cel shading, neon, candy colors, oversaturated, pastel, cheerful, twee, modern clothing, smartphone, car, contemporary setting, deformed hands, extra fingers, extra limbs, mutated, bad anatomy, repeating pattern, tiled texture, stamped texture, copy-pasted elements, cloned identical figures, identical repeated shapes, evenly spaced rows, uniform brushstrokes, perfect symmetry, overly clean, uniform detail everywhere, digital painting, airbrushed, rim light, all-over impasto, fake impasto, palette-knife texture, canvas texture, crunchy micro-detail, stippled texture, repeated short brush strokes, uniform painted texture, all-over painterly texture, hyper-detailed rocks or clouds, excessive individual beard hairs, heavily modeled skin, cinematic orange-and-teal lighting, glowing atmospheric rim light, fantasy concept-art rendering, equal detail across the whole image.
-
-IMAGE 1 (save as 094)
+IMAGE 9 (save as 094)
 Aspect ratio: 2:3 (portrait)
 Scene: an open lighthouse logbook by lamplight, the same hand filling page after page, the ink of the latest entry still wet (any writing or numbers only as unreadable marks, never legible).
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
 Character: none
 
-IMAGE 2 (save as 095)
+IMAGE 10 (save as 095)
 Aspect ratio: 2:3 (portrait)
 Scene: the almanac house steps at eleven, handbills announcing the occultation at midnight, the sky already darkening at the edges (any writing or numbers only as unreadable marks, never legible).
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
@@ -1437,14 +1321,14 @@ Character: none
 
 ## Batch 11
 
-### #096–#099
+### #096–#105
 
 ```
-BATCH REQUEST: 4 SEPARATE IMAGES
+BATCH REQUEST: 10 SEPARATE IMAGES
 
-Generate exactly ONE independent image for EACH numbered prompt below: 4 separate images total.
+Generate exactly ONE independent image for EACH numbered prompt below: 10 separate images total.
 
-These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
+These are different scenes, not 10 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
@@ -1488,96 +1372,38 @@ Aspect ratio: 2:3 (portrait)
 Scene: a sunken road seen looking back toward town, footsteps in the mud pointing the other way.
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
 Character: none
-```
 
-### #100–#103
-
-```
-BATCH REQUEST: 4 SEPARATE IMAGES
-
-Generate exactly ONE independent image for EACH numbered prompt below: 4 separate images total.
-
-These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
-
-SHARED HOUSE STYLE:
-1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
-
-PAINT HANDLING: Use broad, economical brushwork and large quiet areas of thin, relatively flat paint. Do not cover the image in visible texture. No all-over impasto, palette-knife effects, canvas texture, crunchy micro-detail, stippled texture, or repeated short strokes. Brush marks should appear only where the illustrator deliberately needs them. Background forms may be indicated with only a few strokes and can remain visibly underpainted or unresolved. Faces are constructed from a small number of broad light-and-shadow planes, not pores, tiny wrinkles, or individual hairs. Let large areas remain calm and simple.
-
-IMPERFECTION: Hand-painted irregularity should come from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages, and unfinished peripheral areas—not from adding texture to every surface.
-
-DETAIL HIERARCHY: Concentrate detail around the face, hands, and important prop. Keep clothing, architecture, landscape, sea, and sky simplified into large value masses. Background forms should dissolve quickly and should never compete with the focal subject.
-
-EDGES: Use a clear hard/soft edge hierarchy. Crisp edges only around the focal features; allow many secondary contours to merge into shadow or remain unresolved.
-
-AVOID ADDITIONAL: all-over painterly texture, fake impasto, hyper-detailed rocks or clouds, excessive individual beard hairs, heavily modeled skin, cinematic orange-and-teal lighting, glowing atmospheric rim light, fantasy concept-art rendering, equal detail across the whole image.
-
-CROP: keep the main subject away from the outer edges; the card frame crops the image.
-
-LIGHTING AND PALETTE: suit this scene. Flat, muted and desaturated overall; lamplight is the only fragile warm note.
-
-AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, depth of field, bokeh, motion blur, film grain, 3d render, octane, cgi, plastic, waxy skin, subsurface scattering, text, watermark, signature, logo, border, frame, ui, caption, anime, cartoon, comic, cel shading, neon, candy colors, oversaturated, pastel, cheerful, twee, modern clothing, smartphone, car, contemporary setting, deformed hands, extra fingers, extra limbs, mutated, bad anatomy, repeating pattern, tiled texture, stamped texture, copy-pasted elements, cloned identical figures, identical repeated shapes, evenly spaced rows, uniform brushstrokes, perfect symmetry, overly clean, uniform detail everywhere, digital painting, airbrushed, rim light, all-over impasto, fake impasto, palette-knife texture, canvas texture, crunchy micro-detail, stippled texture, repeated short brush strokes, uniform painted texture, all-over painterly texture, hyper-detailed rocks or clouds, excessive individual beard hairs, heavily modeled skin, cinematic orange-and-teal lighting, glowing atmospheric rim light, fantasy concept-art rendering, equal detail across the whole image.
-
-IMAGE 1 (save as 100)
+IMAGE 5 (save as 100)
 Aspect ratio: 2:3 (portrait)
 Scene: a hooded walker on a fog-bound road, the hood beginning to lift in the lamplight.
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
 Character: none
 
-IMAGE 2 (save as 101)
+IMAGE 6 (save as 101)
 Aspect ratio: 2:3 (portrait)
 Scene: a sheriff's star and hat lying on the stone lip of a well at night.
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
 Character: none
 
-IMAGE 3 (save as 102)
+IMAGE 7 (save as 102)
 Aspect ratio: 2:3 (portrait)
 Scene: a town ledger open to a page of signatures and a tally, a pen resting across it (any writing or numbers only as unreadable marks, never legible).
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
 Character: none
 
-IMAGE 4 (save as 103)
+IMAGE 8 (save as 103)
 Aspect ratio: 2:3 (portrait)
 Scene: the view from the top of a Ferris wheel over the whole lamplit town at once.
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
 Character: none
-```
 
-### #104–#105
-
-```
-BATCH REQUEST: 2 SEPARATE IMAGES
-
-Generate exactly ONE independent image for EACH numbered prompt below: 2 separate images total.
-
-These are different scenes, not 2 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
-
-SHARED HOUSE STYLE:
-1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
-
-PAINT HANDLING: Use broad, economical brushwork and large quiet areas of thin, relatively flat paint. Do not cover the image in visible texture. No all-over impasto, palette-knife effects, canvas texture, crunchy micro-detail, stippled texture, or repeated short strokes. Brush marks should appear only where the illustrator deliberately needs them. Background forms may be indicated with only a few strokes and can remain visibly underpainted or unresolved. Faces are constructed from a small number of broad light-and-shadow planes, not pores, tiny wrinkles, or individual hairs. Let large areas remain calm and simple.
-
-IMPERFECTION: Hand-painted irregularity should come from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages, and unfinished peripheral areas—not from adding texture to every surface.
-
-DETAIL HIERARCHY: Concentrate detail around the face, hands, and important prop. Keep clothing, architecture, landscape, sea, and sky simplified into large value masses. Background forms should dissolve quickly and should never compete with the focal subject.
-
-EDGES: Use a clear hard/soft edge hierarchy. Crisp edges only around the focal features; allow many secondary contours to merge into shadow or remain unresolved.
-
-AVOID ADDITIONAL: all-over painterly texture, fake impasto, hyper-detailed rocks or clouds, excessive individual beard hairs, heavily modeled skin, cinematic orange-and-teal lighting, glowing atmospheric rim light, fantasy concept-art rendering, equal detail across the whole image.
-
-CROP: keep the main subject away from the outer edges; the card frame crops the image.
-
-LIGHTING AND PALETTE: suit this scene. Flat, muted and desaturated overall; lamplight is the only fragile warm note.
-
-AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, depth of field, bokeh, motion blur, film grain, 3d render, octane, cgi, plastic, waxy skin, subsurface scattering, text, watermark, signature, logo, border, frame, ui, caption, anime, cartoon, comic, cel shading, neon, candy colors, oversaturated, pastel, cheerful, twee, modern clothing, smartphone, car, contemporary setting, deformed hands, extra fingers, extra limbs, mutated, bad anatomy, repeating pattern, tiled texture, stamped texture, copy-pasted elements, cloned identical figures, identical repeated shapes, evenly spaced rows, uniform brushstrokes, perfect symmetry, overly clean, uniform detail everywhere, digital painting, airbrushed, rim light, all-over impasto, fake impasto, palette-knife texture, canvas texture, crunchy micro-detail, stippled texture, repeated short brush strokes, uniform painted texture, all-over painterly texture, hyper-detailed rocks or clouds, excessive individual beard hairs, heavily modeled skin, cinematic orange-and-teal lighting, glowing atmospheric rim light, fantasy concept-art rendering, equal detail across the whole image.
-
-IMAGE 1 (save as 104)
+IMAGE 9 (save as 104)
 Aspect ratio: 2:3 (portrait)
 Scene: a fairground ticket held out through a booth window by a gloved hand, the face behind it in shadow.
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
 Character: none
 
-IMAGE 2 (save as 105)
+IMAGE 10 (save as 105)
 Aspect ratio: 2:3 (portrait)
 Scene: a printing press mid-stroke, a fresh almanac sheet coming off it with a different time printed.
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
@@ -1586,14 +1412,14 @@ Character: none
 
 ## Batch 12
 
-### #106–#109
+### #106–#115
 
 ```
-BATCH REQUEST: 4 SEPARATE IMAGES
+BATCH REQUEST: 10 SEPARATE IMAGES
 
-Generate exactly ONE independent image for EACH numbered prompt below: 4 separate images total.
+Generate exactly ONE independent image for EACH numbered prompt below: 10 separate images total.
 
-These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
+These are different scenes, not 10 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
@@ -1637,96 +1463,38 @@ Aspect ratio: 3:2 (landscape)
 Scene: a long empty street of four lamp posts receding into darkness, each farther lamp dimmer, the last one out.
 Framing: a quiet narrative beat, an interlude moment, restrained composition.
 Character: none
-```
 
-### #110–#113
-
-```
-BATCH REQUEST: 4 SEPARATE IMAGES
-
-Generate exactly ONE independent image for EACH numbered prompt below: 4 separate images total.
-
-These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
-
-SHARED HOUSE STYLE:
-1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
-
-PAINT HANDLING: Use broad, economical brushwork and large quiet areas of thin, relatively flat paint. Do not cover the image in visible texture. No all-over impasto, palette-knife effects, canvas texture, crunchy micro-detail, stippled texture, or repeated short strokes. Brush marks should appear only where the illustrator deliberately needs them. Background forms may be indicated with only a few strokes and can remain visibly underpainted or unresolved. Faces are constructed from a small number of broad light-and-shadow planes, not pores, tiny wrinkles, or individual hairs. Let large areas remain calm and simple.
-
-IMPERFECTION: Hand-painted irregularity should come from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages, and unfinished peripheral areas—not from adding texture to every surface.
-
-DETAIL HIERARCHY: Concentrate detail around the face, hands, and important prop. Keep clothing, architecture, landscape, sea, and sky simplified into large value masses. Background forms should dissolve quickly and should never compete with the focal subject.
-
-EDGES: Use a clear hard/soft edge hierarchy. Crisp edges only around the focal features; allow many secondary contours to merge into shadow or remain unresolved.
-
-AVOID ADDITIONAL: all-over painterly texture, fake impasto, hyper-detailed rocks or clouds, excessive individual beard hairs, heavily modeled skin, cinematic orange-and-teal lighting, glowing atmospheric rim light, fantasy concept-art rendering, equal detail across the whole image.
-
-CROP: keep the main subject away from the outer edges; the card frame crops the image.
-
-LIGHTING AND PALETTE: suit this scene. Flat, muted and desaturated overall; lamplight is the only fragile warm note.
-
-AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, depth of field, bokeh, motion blur, film grain, 3d render, octane, cgi, plastic, waxy skin, subsurface scattering, text, watermark, signature, logo, border, frame, ui, caption, anime, cartoon, comic, cel shading, neon, candy colors, oversaturated, pastel, cheerful, twee, modern clothing, smartphone, car, contemporary setting, deformed hands, extra fingers, extra limbs, mutated, bad anatomy, repeating pattern, tiled texture, stamped texture, copy-pasted elements, cloned identical figures, identical repeated shapes, evenly spaced rows, uniform brushstrokes, perfect symmetry, overly clean, uniform detail everywhere, digital painting, airbrushed, rim light, all-over impasto, fake impasto, palette-knife texture, canvas texture, crunchy micro-detail, stippled texture, repeated short brush strokes, uniform painted texture, all-over painterly texture, hyper-detailed rocks or clouds, excessive individual beard hairs, heavily modeled skin, cinematic orange-and-teal lighting, glowing atmospheric rim light, fantasy concept-art rendering, equal detail across the whole image.
-
-IMAGE 1 (save as 110)
+IMAGE 5 (save as 110)
 Aspect ratio: 3:2 (landscape)
 Scene: dawn that is not dawn over the town square, lanterns relit, the night folding back into eleven o'clock (any writing or numbers only as unreadable marks, never legible).
 Framing: a quiet narrative beat, an interlude moment, restrained composition.
 Character: none
 
-IMAGE 2 (save as 111)
+IMAGE 6 (save as 111)
 Aspect ratio: 3:2 (landscape)
 Scene: a lone lit window in a lighthouse at dawn, the town below waking, one figure keeping watch (any writing or numbers only as unreadable marks, never legible).
 Framing: a quiet narrative beat, an interlude moment, restrained composition.
 Character: none
 
-IMAGE 3 (save as 112)
+IMAGE 7 (save as 112)
 Aspect ratio: 3:2 (landscape)
 Scene: a heavy door closing on a darkness, the town square in first morning light, the lanterns burnt out.
 Framing: a quiet narrative beat, an interlude moment, restrained composition.
 Character: none
 
-IMAGE 4 (save as 113)
+IMAGE 8 (save as 113)
 Aspect ratio: 3:2 (landscape)
 Scene: figures walking out of the town along the sunken road at dawn, the fog behind them not quite lifting.
 Framing: a quiet narrative beat, an interlude moment, restrained composition.
 Character: none
-```
 
-### #114–#115
-
-```
-BATCH REQUEST: 2 SEPARATE IMAGES
-
-Generate exactly ONE independent image for EACH numbered prompt below: 2 separate images total.
-
-These are different scenes, not 2 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
-
-SHARED HOUSE STYLE:
-1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
-
-PAINT HANDLING: Use broad, economical brushwork and large quiet areas of thin, relatively flat paint. Do not cover the image in visible texture. No all-over impasto, palette-knife effects, canvas texture, crunchy micro-detail, stippled texture, or repeated short strokes. Brush marks should appear only where the illustrator deliberately needs them. Background forms may be indicated with only a few strokes and can remain visibly underpainted or unresolved. Faces are constructed from a small number of broad light-and-shadow planes, not pores, tiny wrinkles, or individual hairs. Let large areas remain calm and simple.
-
-IMPERFECTION: Hand-painted irregularity should come from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages, and unfinished peripheral areas—not from adding texture to every surface.
-
-DETAIL HIERARCHY: Concentrate detail around the face, hands, and important prop. Keep clothing, architecture, landscape, sea, and sky simplified into large value masses. Background forms should dissolve quickly and should never compete with the focal subject.
-
-EDGES: Use a clear hard/soft edge hierarchy. Crisp edges only around the focal features; allow many secondary contours to merge into shadow or remain unresolved.
-
-AVOID ADDITIONAL: all-over painterly texture, fake impasto, hyper-detailed rocks or clouds, excessive individual beard hairs, heavily modeled skin, cinematic orange-and-teal lighting, glowing atmospheric rim light, fantasy concept-art rendering, equal detail across the whole image.
-
-CROP: keep the main subject away from the outer edges; the card frame crops the image.
-
-LIGHTING AND PALETTE: suit this scene. Flat, muted and desaturated overall; lamplight is the only fragile warm note.
-
-AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, depth of field, bokeh, motion blur, film grain, 3d render, octane, cgi, plastic, waxy skin, subsurface scattering, text, watermark, signature, logo, border, frame, ui, caption, anime, cartoon, comic, cel shading, neon, candy colors, oversaturated, pastel, cheerful, twee, modern clothing, smartphone, car, contemporary setting, deformed hands, extra fingers, extra limbs, mutated, bad anatomy, repeating pattern, tiled texture, stamped texture, copy-pasted elements, cloned identical figures, identical repeated shapes, evenly spaced rows, uniform brushstrokes, perfect symmetry, overly clean, uniform detail everywhere, digital painting, airbrushed, rim light, all-over impasto, fake impasto, palette-knife texture, canvas texture, crunchy micro-detail, stippled texture, repeated short brush strokes, uniform painted texture, all-over painterly texture, hyper-detailed rocks or clouds, excessive individual beard hairs, heavily modeled skin, cinematic orange-and-teal lighting, glowing atmospheric rim light, fantasy concept-art rendering, equal detail across the whole image.
-
-IMAGE 1 (save as 114)
+IMAGE 9 (save as 114)
 Aspect ratio: 3:2 (landscape)
 Scene: a door sealed with iron bands and wax in the middle of the square, one chair empty beside it.
 Framing: a quiet narrative beat, an interlude moment, restrained composition.
 Character: none
 
-IMAGE 2 (save as 115)
+IMAGE 10 (save as 115)
 Aspect ratio: 3:2 (landscape)
 Scene: eleven o'clock in the square again, but the sky has fewer stars missing than before (any writing or numbers only as unreadable marks, never legible).
 Framing: a quiet narrative beat, an interlude moment, restrained composition.

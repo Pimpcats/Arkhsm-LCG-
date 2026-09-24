@@ -23,6 +23,7 @@ TYPE_ORDER = ("investigator_portrait", "event", "skill", "asset", "enemy",
               "treachery", "location", "agenda", "act", "story", "scenario")
 BATCH = 10
 PER_REQUEST = 4       # images per ChatGPT message (owner's batch-request format)
+WHOLE_BATCH_FROM = 9  # from this batch on, the whole batch is one request (owner)
 
 # scenes that invite painted writing or numerals get an explicit guard
 LETTERING_WORDS = ("script", "ink", "writ", "page", "letter", "numeral", "sign",
@@ -169,8 +170,9 @@ def build():
     jobs_by_id = {j["id"]: j for j in jobs}
     requests = []
     for bi, b in enumerate(batches, 1):
-        for i in range(0, len(b), PER_REQUEST):
-            group = b[i:i + PER_REQUEST]
+        size = len(b) if bi >= WHOLE_BATCH_FROM else PER_REQUEST
+        for i in range(0, len(b), size):
+            group = b[i:i + size]
             requests.append({"batch": bi, "cards": [c["n"] for c in group],
                              "prompt": request_prompt(camp, chars, group,
                                                       jobs_by_id, profiles)})
