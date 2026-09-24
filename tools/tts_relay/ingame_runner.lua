@@ -594,11 +594,15 @@ step("board: prey follows on-card Memory", function(go)
     check("the card's Memory button follows the count", hasButton(INV.birdie, "Memory 3"), labelsOf(INV.birdie))
     ctl.call("shApiCounter", { name = "appointed" })
     ctl.call("shApiCounter", { name = "appointed" })      -- Emerging: a Hunter
+    -- built out here, not inside the callback: in real TTS a table constructed
+    -- in this delayed callback raised "Attempt to perform operations with
+    -- resources owned by different scripts" (run ab136f1, prey step)
+    local eliasPlus4 = { id = "sthrelias", delta = 4 }
     Wait.frames(function()
       check("it manifests at the location away from both investigators", appointedAt(LOC_C))
       ctl.call("shApiHunt")
       check("it hunts the investigator with the most Memory (not merely the nearest)", appointedAt(LOC_B.obj))
-      ctl.call("shApiOnCardMemory", { id = "sthrelias", delta = 4 })
+      ctl.call("shApiOnCardMemory", eliasPlus4)
       ctl.call("shApiHunt")
       check("when another investigator has more Memory, the prey changes", appointedAt(LOC_A.obj))
       go()
