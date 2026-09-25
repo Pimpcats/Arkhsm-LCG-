@@ -49,6 +49,7 @@ local function freshState(n)
     lastLoopEndDissonance = nil, -- Dissonance when the last loop ended (Aging "ended in danger")
     prologue = false,        -- playing the Prologue (The First Hour): not a loop
     contest = 0,             -- finale contest progress (Contest the Crossing)
+    partTwo = false,         -- Part II (The Shape of the Hour) has begun
   }
 end
 
@@ -464,6 +465,17 @@ end
 --- Dissonance at the end of the last loop (nil before the first reset).
 function CampaignState.getLastLoopEndDissonance()
   return state.lastLoopEndDissonance
+end
+
+--- Part II (guide: Between Loops step 5) begins at the interlude that holds
+-- 3+ surface Knowledge entries, or once Loop 3 is complete. It never ends.
+function CampaignState.inPartTwo()
+  return state.partTwo == true
+end
+
+function CampaignState.setPartTwo(on)
+  state.partTwo = on and true or false
+  return state.partTwo
 end
 
 --- The Prologue (The First Hour) is played before Loop 1 and is not a loop.

@@ -373,15 +373,6 @@ local function slotFor(id, name)
 end
 
 local DRIFT = { combat = "dcom", agility = "dagi", willpower = "dwil", intellect = "dint" }
-local CRACKED = {
-  lighthouse = { "the-lamp-was-never-lit", "the-keepers-ninth-death" },
-  church     = { "the-thirteenth-toll", "the-hour-was-wrong" },
-  road       = { "the-road-remembers", "who-walks-beside-you" },
-  square     = { "the-sheriff-is-already-dead", "the-vote-that-never-ends" },
-  fairground = { "the-wheel-still-turns", "the-ticket-takers-bargain" },
-  almanac    = { "what-the-almanac-hid", "the-appointeds-name" },
-}
-
 -- Fill this page from a campaign-state table (or find the state token).
 -- Checkboxes are only ever ticked, never cleared, so hand-written marks stay.
 function syncFromCampaignState(st)
@@ -434,10 +425,6 @@ function syncFromCampaignState(st)
     end
     local vote, name = knowledge["the-vote-that-never-ends"], knowledge["the-appointeds-name"]
     if vote and name then tick("sera_known") elseif vote or name then tick("sera_suspected") end
-    if knowledge["the-ticket-takers-bargain"] then tick("bargain_heard") end
-    for key, pair in pairs(CRACKED) do
-      if knowledge[pair[1]] and knowledge[pair[2]] then tick("cracked_" .. key) end
-    end
   end
   refreshDerived()
   updateSave()

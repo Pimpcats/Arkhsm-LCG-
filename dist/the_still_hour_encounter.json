@@ -60,8 +60,8 @@
           ],
           "CustomDeck": {
             "95040": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-appointed.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-appointed.jpg?v=3ce22584c9",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/encounter_back.jpg?v=8f98d69b44",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -110,8 +110,8 @@
           ],
           "CustomDeck": {
             "95041": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-appointedwhisper.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-appointedwhisper.jpg?v=520f53d798",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/encounter_back.jpg?v=8f98d69b44",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -160,8 +160,8 @@
           ],
           "CustomDeck": {
             "95042": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-crossing.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-crossing.jpg?v=fbf43e3293",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/encounter_back.jpg?v=8f98d69b44",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -210,8 +210,8 @@
           ],
           "CustomDeck": {
             "95043": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-bellringer.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-bellringer.jpg?v=358e1c3620",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/encounter_back.jpg?v=8f98d69b44",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -260,8 +260,8 @@
           ],
           "CustomDeck": {
             "95044": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-wearssheriff.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-wearssheriff.jpg?v=bf29398a18",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/encounter_back.jpg?v=8f98d69b44",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -310,8 +310,8 @@
           ],
           "CustomDeck": {
             "95045": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-onewhorides.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/encounter_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-onewhorides.jpg?v=4ab19c0702",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/encounter_back.jpg?v=8f98d69b44",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,

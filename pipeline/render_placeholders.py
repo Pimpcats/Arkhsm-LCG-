@@ -1087,6 +1087,11 @@ def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
            text, font=f, fill=fill)
 
 
+# text that did not fit its box even at the smallest size: (card id, area, size)
+OVERFLOWS = []
+CURRENT_CARD = [None]
+
+
 def _box_block(d, text, box, fill=PSD_INK, start=30, min_size=15,
                italic=False, leading=1.24, bold=False, key=None):
     """Wrapped [markup] text fitted into a box (shrinks until it fits).
@@ -1107,11 +1112,15 @@ def _box_block(d, text, box, fill=PSD_INK, start=30, min_size=15,
         start = max(min_size, int(round(start * float(st.get("size") or 1.0))))
     bw = box[2] - box[0]
     size = start
+    fits = False
     for size in range(start, min_size - 1, -1):
         n = len(wrap_runs(d, text, size, bw, italic=italic, bold=bold,
                           font_file=font_file))
         if _wrapped_height(text, size, n, leading) <= box[3] - box[1]:
+            fits = True
             break
+    if not fits:
+        OVERFLOWS.append((CURRENT_CARD[0], key or "text", size))
     return draw_wrapped(d, text, box[0], box[1], size, bw, fill,
                         italic=italic, leading=leading, bold=bold,
                         font_file=font_file)
@@ -1178,6 +1187,8 @@ def _flow_around(d, text, box, obstacle, start=22, min_size=13, fill=PSD_INK,
         placed, endy, fits = layout(size)
         if fits:
             break
+    if not fits:
+        OVERFLOWS.append((CURRENT_CARD[0], "text", size))
     # centre inline icons vertically on the text line, like the official cards
     tasc, _ = _font(size, italic=italic).getmetrics()
     gmid = int(tasc * 0.60)
@@ -2192,6 +2203,18 @@ def s_scenario_ref(c, pt, dest, art_path=None, placement=None):
                 _paste_icon_fit(img, _se_img("overlays", ov),
                                 (icx - isize // 2, cy - isize // 2,
                                  icx + isize // 2, cy + isize // 2))
+            elif tok == "static":
+                # the campaign's own [static] token face (render_token.py)
+                from render_token import render_static_token
+                tpath = os.path.join(FACES_DIR, "sthr-static-token.png")
+                if not os.path.exists(tpath):
+                    render_static_token(tpath)
+                icon = Image.open(tpath).convert("RGBA")
+                m = Image.new("L", icon.size, 0)
+                ImageDraw.Draw(m).ellipse([0, 0, icon.size[0] - 1, icon.size[1] - 1], fill=255)
+                icon.putalpha(m)
+                _paste_icon_fit(img, icon, (icx - isize // 2 + 6, cy - isize // 2 + 6,
+                                            icx + isize // 2 - 6, cy + isize // 2 - 6))
             y += rowh + 22
     else:
         _box_block(d, pt.get("text", ""), (body[0], y, body[2], body[3]),
@@ -2447,6 +2470,7 @@ def main():
     font_default = font_overrides.get("_default", {})
     fields_default = font_default.get("fields", {})
     for c in cards:
+        CURRENT_CARD[0] = c.get("id")
         FONT_OVERRIDE = dict(font_default, **font_overrides.get(c["id"], {}))
         # per-area typography: card field styles layered over the global default
         fields_card = font_overrides.get(c["id"], {}).get("fields", {})
@@ -2536,6 +2560,9 @@ def main():
         n, composed, os.path.relpath(FACES_DIR, ROOT)))
     if missing_text:
         print("cards with NO rules text in the print layer: " + ", ".join(missing_text))
+    if OVERFLOWS:
+        print("TEXT OVERFLOW (did not fit at the smallest size): " + ", ".join(
+            "{} [{}@{}px]".format(*o) for o in OVERFLOWS))
 
 
 if __name__ == "__main__":

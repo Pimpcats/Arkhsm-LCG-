@@ -1,6 +1,6 @@
 {
  "campaign": "still_hour",
- "_note": "Scenario content pass, poured in through the editor's own import path (docs/design/CAMPAIGN_FEED.md; applied by pipeline/scenario_content.py --apply-feed). Sources: campaign guide v0.5 (sections 3, 5, 6, 9), encounter v0.4 (sections 1-7), CO-002. Decisions and ambiguities: docs/design/CONTENT_DECISIONS.md. CONTAINS SPOILERS.",
+ "_note": "SUPERSEDED: the card text has since been corrected in card_overrides.json (rules pass, 2026-09-25); do not re-apply this feed (scenario_content.py --apply-feed would overwrite the corrections). Scenario content pass, poured in through the editor's own import path (docs/design/CAMPAIGN_FEED.md; applied by pipeline/scenario_content.py --apply-feed). Sources: campaign guide v0.5 (sections 3, 5, 6, 9), encounter v0.4 (sections 1-7), CO-002. Decisions and ambiguities: docs/design/CONTENT_DECISIONS.md. CONTAINS SPOILERS.",
  "cards": [
   {
    "id": "sthr-loc-hubsquare",

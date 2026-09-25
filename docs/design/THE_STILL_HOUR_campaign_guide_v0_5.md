@@ -2,6 +2,8 @@
 ### v0.5 · every scenario, the loop rules, the interludes, and the age-gated finale
 *For 3 investigators (scales 1–4). Consistent with `design v0.1`, `cards v0.2`, `aging/3p v0.3`, `encounter v0.4`.*
 
+> **Superseded for play.** The rules players use are in `THE_STILL_HOUR_player_guide.md` (Campaign Rules, checked against the Rules Reference, 2026-09-25) and the card text in `campaigns/still_hour/card_overrides.json` / `pipeline/stillhour_print_text.json`. Where this document differs, those win. Kept as design history.
+
 ---
 
 ## CONTENTS

@@ -25,7 +25,7 @@ Locations.LOCATIONS = {
   -- The Drowned Church
   ["nave"]            = { name = "The Nave",           district = "Church" },
   ["belfry"]          = { name = "The Belfry",         district = "Church" },
-  ["flooded-crypt"]   = { name = "The Flooded Crypt",  district = "Church", sealedUntil = { "the-thirteenth-toll" } },
+  ["flooded-crypt"]   = { name = "The Flooded Crypt",  district = "Church", sealedUntil = { "the-thirteenth-toll" }, partTwo = true },
   ["vestry"]          = { name = "The Vestry",         district = "Church" },
   -- The Sunken Road
   ["milestones"]      = { name = "The Milestones",     district = "Sunken Road" },
@@ -43,7 +43,7 @@ Locations.LOCATIONS = {
   ["reading-room"]    = { name = "The Reading Room",   district = "Almanac" },
   ["the-press"]       = { name = "The Press",          district = "Almanac" },
   ["sealed-study"]    = { name = "The Sealed Study",   district = "Almanac",
-                          sealedUntil = { "what-the-almanac-hid", "the-vote-that-never-ends" } },
+                          sealedUntil = { "what-the-almanac-hid", "the-vote-that-never-ends" }, partTwo = true },
 }
 
 local function loc(id)
@@ -64,6 +64,10 @@ function Locations.isSealed(id)
   local l = loc(id)
   if not l.sealedUntil then
     return false
+  end
+  -- closed until its act 2a can be the current act: Part II only
+  if l.partTwo and not CampaignState.inPartTwo() then
+    return true
   end
   for _, factId in ipairs(l.sealedUntil) do
     if not CampaignState.knows(factId) then

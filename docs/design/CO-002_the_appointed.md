@@ -1,6 +1,8 @@
 # THE STILL HOUR — CO-002 / P5 Spec: THE APPOINTED
 ### Rename the boss (Latecomer → **The Appointed**) and rebuild it as a staged, clock-driven Approach. This is the P5 build task.
 
+> **Superseded for play.** The rules players use are in `THE_STILL_HOUR_player_guide.md` (Campaign Rules, checked against the Rules Reference, 2026-09-25) and the card text in `campaigns/still_hour/card_overrides.json` / `pipeline/stillhour_print_text.json`. Where this document differs, those win. Kept as design history.
+
 Supersedes the "Latecomer" content in `encounter_v0.4 §5` and the boss references in the guide/flow/manifest. Owner-approved. Apply on branch `claude/new-session-r230bz`.
 
 **Concept.** The Appointed is not a monster that spawns — it is an arrival the night owes. It is present as dread for most of the loop and **manifests onto the board in stages** as the clock advances and as investigators wake it. It cannot be killed; it can only be **held back** — shoved back into shadow, buying Hours.

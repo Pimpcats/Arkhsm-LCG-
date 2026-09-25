@@ -1,6 +1,8 @@
 # THE STILL HOUR — Rules & Card Text Spec
 ### v0.2 · errata-grade wording pass · balance-tuned against in-engine simulation
 
+> **Superseded for play.** The rules players use are in `THE_STILL_HOUR_player_guide.md` (Campaign Rules, checked against the Rules Reference, 2026-09-25) and the card text in `campaigns/still_hour/card_overrides.json` / `pipeline/stillhour_print_text.json`. Where this document differs, those win. Kept as design history.
+
 This document assumes the design in `THE_STILL_HOUR_design.md`. It does three jobs:
 1. **Defines the non-standard terms precisely** (§A) so card wording is unambiguous.
 2. **Templates every player card** in strict Arkham timing language, each with a **wording note** flagging the interaction the wording guards against (§B–§C).

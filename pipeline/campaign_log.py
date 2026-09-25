@@ -51,33 +51,33 @@ INVESTIGATORS = [
 # The Knowledge Track, in log-sheet order. Ids match src/StillHour/Knowledge.ttslua.
 FACTS = [
     ("you-are-unstuck", "You Are Unstuck", "Prologue", "prologue",
-     "Act I begins; Memory carries across resets."),
+     "Part I begins. You remember across resets."),
     ("the-lamp-was-never-lit", "The Lamp Was Never Lit", "Lighthouse", "surface",
-     "Lit lamp keeps Echoes Sleepwalking one band longer."),
+     "The Lantern Room enters play calm side up."),
     ("the-keepers-ninth-death", "The Keeper's Ninth Death", "Lighthouse", "deep",
-     "Elias elder-sign also heals horror; enables Break Through."),
+     "When Elias's [elder] heals damage, it also heals 1 horror."),
     ("the-thirteenth-toll", "The Thirteenth Toll", "Church", "surface",
-     "Removes the Church's extra Dissonance at Hour III."),
+     "Hour III: no extra Dissonance at a Church location."),
     ("the-hour-was-wrong", "The Hour Was Wrong", "Church", "deep",
-     "Removes Hour IV from the Occultation."),
+     "Remove Hour IV from the Hours deck."),
     ("the-road-remembers", "The Road Remembers", "Sunken Road", "surface",
-     "Free Lighthouse travel once per loop."),
+     "Group limit once per loop: Turning–Winding Stair costs no Hour."),
     ("who-walks-beside-you", "Who Walks Beside You", "Sunken Road", "deep",
-     "Echoes -1 Fight vs. you; softens Take Its Place."),
+     "Each Echo gets −1 fight."),
     ("the-sheriff-is-already-dead", "The Sheriff Is Already Dead", "Square", "surface",
-     "Read the top Occultation card once per loop."),
+     "The Town Hall Steps enter play other side up."),
     ("the-vote-that-never-ends", "The Vote That Never Ends", "Square", "deep",
-     "Seraphine thread; required for Close the Door."),
+     "Seraphine's thread: suspected."),
     ("the-wheel-still-turns", "The Wheel Still Turns", "Fairground", "surface",
-     "Reorder the top 2 encounter cards once per loop."),
+     "At The Wheel, group limit once per loop: reorder top 2 encounter cards."),
     ("the-ticket-takers-bargain", "The Ticket-Taker's Bargain", "Fairground", "deep",
-     "Unlocks Let It In; flags the epilogue."),
+     "See Choices: The Ticket."),
     ("what-the-almanac-hid", "What the Almanac Hid", "Almanac", "surface",
-     "Remove a [static] at Hour VI."),
+     "Hour VI: remove a [static] token instead of adding one."),
     ("the-appointeds-name", "The Appointed's Name", "Almanac", "deep",
-     "Appointed arrives exhausted; required for the finale."),
+     "Hour VII: exhaust the Appointed. Seraphine's thread: known."),
     ("the-way-the-night-breaks", "The Way the Night Breaks", "assembled", "assembled",
-     "Name + Vote + one other deep fact: the finale may be attempted."),
+     "The finale may be begun."),
 ]
 
 # Victory — the Named (ids = the encounter cards' ids; CampaignState.victoryLog keys)
@@ -85,6 +85,15 @@ NAMED = [
     ("sthr-bellringer", "The Bell-Ringer Beneath", "Church", 2),
     ("sthr-wearssheriff", "What Wears the Sheriff", "Square", 3),
     ("sthr-onewhorides", "The One Who Rides Forever", "Fairground", 2),
+]
+# Victory locations (guide: Victory): claimed at a loop's end when revealed and
+# clueless, once per campaign each
+VICTORY_LOCATIONS = [
+    ("sthr-loc-keepersquarters", "The Keeper's Quarters", "Lighthouse", 1),
+    ("sthr-loc-floodedcrypt", "The Flooded Crypt", "Church", 1),
+    ("sthr-loc-recordsoffice", "The Records Office", "Square", 1),
+    ("sthr-loc-ticketbooth", "The Ticket Booth", "Fairground", 1),
+    ("sthr-loc-sealedstudy", "The Sealed Study", "Almanac", 1),
 ]
 
 # Choices (guide: "What You Saw" and each district's deep resolution). Each is
@@ -222,22 +231,22 @@ def _pages():
     y += 6
     p2.text(90, y, "Surface facts held:", size=24, style="bold")
     p2.counter("surface_held", 330, y - 9, derived="surface")
-    p2.text(370, y, "/ 6 — Act II opens at 3+", size=22, style="italic", fill=SOFT)
+    p2.text(370, y, "/ 6 — Part II opens at 3+", size=22, style="italic", fill=SOFT)
     p2.text(720, y, "Deep facts held:", size=24, style="bold")
     p2.counter("deep_held", 925, y - 9, derived="deep")
     p2.text(965, y, "/ 6", size=22, style="italic", fill=SOFT)
 
-    p2.header(y + 70, "Victory — The Named")
+    p2.header(y + 70, "Victory")
     y += 140
     p2.text(760, y - 34, "defeated", size=18, style="italic", fill=SOFT)
     p2.text(900, y - 34, "Memory banked", size=18, style="italic", fill=SOFT)
-    for eid, name, where, vic in NAMED:
-        p2.text(90, y, name, size=24, style="bold")
-        p2.text(470, y, "({}, Victory {})".format(where, vic), size=20,
+    for eid, name, where, vic in NAMED + VICTORY_LOCATIONS:
+        p2.text(90, y, name, size=22, style="bold")
+        p2.text(470, y, "({}, Victory {})".format(where, vic), size=19,
                 style="italic", fill=SOFT)
         p2.checkbox("v:" + eid, 780, y)
         p2.checkbox("vb:" + eid, 940, y)
-        y += 46
+        y += 38
 
     p2.header(y + 26, "Threads & Choices")
     y += 84
@@ -245,21 +254,9 @@ def _pages():
     x = p2.checkbox("sera_unheard", 520, y, "unheard", group="sera")
     x = p2.checkbox("sera_suspected", x, y, "suspected", group="sera")
     p2.checkbox("sera_known", x, y, "known (Vote + Name)", group="sera")
-    y += 46
-    p2.text(90, y, "The Ticket-Taker's Bargain:", size=22, style="bold")
-    x = p2.checkbox("bargain_never", 520, y, "never heard", group="bargain")
-    p2.checkbox("bargain_heard", x, y, "heard (epilogue flag)", group="bargain")
-    y += 46
-    p2.text(90, y, "Districts fully cracked (surface + deep):", size=22, style="bold")
-    y += 42
-    x = 110
-    for key, label in (("lighthouse", "Lighthouse"), ("church", "Church"),
-                       ("road", "Sunken Road"), ("square", "Square"),
-                       ("fairground", "Fairground"), ("almanac", "Almanac")):
-        x = p2.checkbox("cracked_" + key, x, y, label)
 
     p3 = Page(3, "Campaign Log — continued")
-    p3.text(PAGE_W // 2, 116, "The Dead & the Kept", size=52, style="title",
+    p3.text(PAGE_W // 2, 116, "The Lost & the Kept", size=52, style="title",
             fill=TEAL, anchor="ms")
     y = 186
     p3.text(90, y, "Investigator", size=20, style="italic", fill=SOFT)
@@ -268,8 +265,7 @@ def _pages():
     y = 240
     for i in range(1, 5):
         p3.line("dead{}_name".format(i), 90, 520, y)
-        x = p3.checkbox("dead{}_died".format(i), 560, y, "died", group="dead%d" % i)
-        x = p3.checkbox("dead{}_aged".format(i), x, y, "aged out", group="dead%d" % i)
+        x = p3.checkbox("dead{}_aged".format(i), 560, y, "aged out", group="dead%d" % i)
         p3.checkbox("dead{}_kept".format(i), x, y, "kept as anchor", group="dead%d" % i)
         p3.line("dead{}_loop".format(i), 1070, 1185, y)
         y += 58
@@ -364,7 +360,7 @@ def _investigator_panel(p, i, px, py):
     y += 32 + 50
     x = p.checkbox("inv{}_agedout".format(i), x0, y, "Aged out", size=20)
     x = p.checkbox("inv{}_anchor".format(i), x, y, "Anchor", size=20)
-    x = p.checkbox("inv{}_dead".format(i), x, y, "Dead — loop", size=20)
+    x = p.checkbox("inv{}_dead".format(i), x, y, "Defeated — loop", size=20)
     p.line("inv{}_deadloop".format(i), x - 14, x1, y)
 
 

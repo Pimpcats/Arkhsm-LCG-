@@ -61,8 +61,8 @@
           ],
           "CustomDeck": {
             "95010": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthrelias.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthrelias-back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthrelias.jpg?v=2d06534a10",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthrelias-back.jpg?v=59b0d03e30",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -112,8 +112,8 @@
           ],
           "CustomDeck": {
             "95011": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-lamp.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-lamp.jpg?v=971b4eb14f",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -162,8 +162,8 @@
           ],
           "CustomDeck": {
             "95012": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-donebefore.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-donebefore.jpg?v=7cb9693893",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -212,8 +212,8 @@
           ],
           "CustomDeck": {
             "95013": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-eighthgrave.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-eighthgrave.jpg?v=ff7e0c256c",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -263,8 +263,8 @@
           ],
           "CustomDeck": {
             "95014": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthrayako.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthrayako-back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthrayako.jpg?v=553bd09899",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthrayako-back.jpg?v=1850e8567c",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -314,8 +314,8 @@
           ],
           "CustomDeck": {
             "95015": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-lexicon.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-lexicon.jpg?v=467acca617",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -364,8 +364,8 @@
           ],
           "CustomDeck": {
             "95016": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-itmeanswait.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-itmeanswait.jpg?v=64f3de16b8",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -414,8 +414,8 @@
           ],
           "CustomDeck": {
             "95017": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-untranslatable.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-untranslatable.jpg?v=88a74016db",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -465,8 +465,8 @@
           ],
           "CustomDeck": {
             "95018": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthrcass.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthrcass-back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthrcass.jpg?v=35d49976c3",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthrcass-back.jpg?v=66c5c06574",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -516,8 +516,8 @@
           ],
           "CustomDeck": {
             "95019": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-markeddeck.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-markeddeck.jpg?v=f4b91697e4",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -566,8 +566,8 @@
           ],
           "CustomDeck": {
             "95020": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-seenthishand.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-seenthishand.jpg?v=4d3ea141a3",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -616,8 +616,8 @@
           ],
           "CustomDeck": {
             "95021": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-housewins.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-housewins.jpg?v=04fae33081",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -667,8 +667,8 @@
           ],
           "CustomDeck": {
             "95022": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthrseraphine.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthrseraphine-back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthrseraphine.jpg?v=b3462ba3ea",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthrseraphine-back.jpg?v=04bd32755d",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -718,8 +718,8 @@
           ],
           "CustomDeck": {
             "95023": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-bell.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-bell.jpg?v=2e2064b460",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -768,8 +768,8 @@
           ],
           "CustomDeck": {
             "95024": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-rememberending.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-rememberending.jpg?v=50fbead069",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -818,8 +818,8 @@
           ],
           "CustomDeck": {
             "95025": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-debtofhours.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-debtofhours.jpg?v=12cab3633e",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -869,8 +869,8 @@
           ],
           "CustomDeck": {
             "95026": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthrbirdie.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthrbirdie-back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthrbirdie.jpg?v=0cfc586b4f",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthrbirdie-back.jpg?v=c8be92182e",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -920,8 +920,8 @@
           ],
           "CustomDeck": {
             "95027": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-compass.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-compass.jpg?v=dee6cdad9b",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -970,8 +970,8 @@
           ],
           "CustomDeck": {
             "95028": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-igetout.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-igetout.jpg?v=639aa0f386",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1020,8 +1020,8 @@
           ],
           "CustomDeck": {
             "95029": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-nobodybelieves.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-nobodybelieves.jpg?v=3bf56acc89",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1070,8 +1070,8 @@
           ],
           "CustomDeck": {
             "95030": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-foreknowledge.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-foreknowledge.jpg?v=912391be4f",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1120,8 +1120,8 @@
           ],
           "CustomDeck": {
             "95031": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-dejavu.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-dejavu.jpg?v=9453f4a705",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1170,8 +1170,8 @@
           ],
           "CustomDeck": {
             "95032": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-musclememory.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-musclememory.jpg?v=4e3729abd8",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1220,8 +1220,8 @@
           ],
           "CustomDeck": {
             "95033": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-rehearsedescape.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-rehearsedescape.jpg?v=b9f3fe17d1",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1270,8 +1270,8 @@
           ],
           "CustomDeck": {
             "95034": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-longwayround.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-longwayround.jpg?v=1dbe00512f",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1321,8 +1321,8 @@
           ],
           "CustomDeck": {
             "95035": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-borrowedtime.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-borrowedtime.jpg?v=5c7db9033a",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1371,8 +1371,8 @@
           ],
           "CustomDeck": {
             "95036": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-thistimeforsure.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-thistimeforsure.jpg?v=d562c5552e",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1422,8 +1422,8 @@
           ],
           "CustomDeck": {
             "95037": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-anchorpoint.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-anchorpoint.jpg?v=6852fe6e70",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1473,8 +1473,8 @@
           ],
           "CustomDeck": {
             "95038": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-cassandrasnotebook.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-cassandrasnotebook.jpg?v=13fcd9a094",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1523,8 +1523,8 @@
           ],
           "CustomDeck": {
             "95039": {
-              "FaceURL": "file:///home/user/Arkhsm-LCG-/art/faces/sthr-hourlearnedname.png",
-              "BackURL": "file:///home/user/Arkhsm-LCG-/assets/backs/player_back.png",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-hourlearnedname.jpg?v=119ea51aa3",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,

@@ -148,6 +148,7 @@ local function freshState(n)
     lastLoopEndDissonance = nil, -- Dissonance when the last loop ended (Aging "ended in danger")
     prologue = false,        -- playing the Prologue (The First Hour): not a loop
     contest = 0,             -- finale contest progress (Contest the Crossing)
+    partTwo = false,         -- Part II (The Shape of the Hour) has begun
   }
 end
 
@@ -563,6 +564,17 @@ end
 --- Dissonance at the end of the last loop (nil before the first reset).
 function CampaignState.getLastLoopEndDissonance()
   return state.lastLoopEndDissonance
+end
+
+--- Part II (guide: Between Loops step 5) begins at the interlude that holds
+-- 3+ surface Knowledge entries, or once Loop 3 is complete. It never ends.
+function CampaignState.inPartTwo()
+  return state.partTwo == true
+end
+
+function CampaignState.setPartTwo(on)
+  state.partTwo = on and true or false
+  return state.partTwo
 end
 
 --- The Prologue (The First Hour) is played before Loop 1 and is not a loop.
@@ -1476,7 +1488,7 @@ Locations.LOCATIONS = {
   -- The Drowned Church
   ["nave"]            = { name = "The Nave",           district = "Church" },
   ["belfry"]          = { name = "The Belfry",         district = "Church" },
-  ["flooded-crypt"]   = { name = "The Flooded Crypt",  district = "Church", sealedUntil = { "the-thirteenth-toll" } },
+  ["flooded-crypt"]   = { name = "The Flooded Crypt",  district = "Church", sealedUntil = { "the-thirteenth-toll" }, partTwo = true },
   ["vestry"]          = { name = "The Vestry",         district = "Church" },
   -- The Sunken Road
   ["milestones"]      = { name = "The Milestones",     district = "Sunken Road" },
@@ -1494,7 +1506,7 @@ Locations.LOCATIONS = {
   ["reading-room"]    = { name = "The Reading Room",   district = "Almanac" },
   ["the-press"]       = { name = "The Press",          district = "Almanac" },
   ["sealed-study"]    = { name = "The Sealed Study",   district = "Almanac",
-                          sealedUntil = { "what-the-almanac-hid", "the-vote-that-never-ends" } },
+                          sealedUntil = { "what-the-almanac-hid", "the-vote-that-never-ends" }, partTwo = true },
 }
 
 local function loc(id)
@@ -1515,6 +1527,10 @@ function Locations.isSealed(id)
   local l = loc(id)
   if not l.sealedUntil then
     return false
+  end
+  -- closed until its act 2a can be the current act: Part II only
+  if l.partTwo and not CampaignState.inPartTwo() then
+    return true
   end
   for _, factId in ipairs(l.sealedUntil) do
     if not CampaignState.knows(factId) then
@@ -2013,7 +2029,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://placehold.co/512x512/14121e/e2ecf0.png?text=static"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/41b29cef7b0c6a6999c49669e35641272f59c7a3/dist/cards/sthr-static-token.jpg?v=a556271511"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -2309,7 +2325,7 @@ local Board = {}
 
 Board.APPOINTED_ID = "sthr-appointed"
 Board.MINICARD_TAG = "Minicard"
-Board.SEALED_LABEL = "SEALED"
+Board.SEALED_LABEL = "CLOSED"
 Board.OCCUPY_RADIUS = 2.0       -- a minicard within this of a location's centre is "at" it
 Board.APPOINTED_OFFSET = { x = 0, y = 0.6, z = -0.9 }
 
@@ -2940,6 +2956,16 @@ function Board.appointedCtx(extra)
     local byGuid = {}
     for _, l in ipairs(locs) do byGuid[l.guid] = l end
     local here = locationAt(locs, vec(safe(function() return card.getPosition() end)), 3.0)
+    -- Rules Reference, Hunter: an enemy at a location with an investigator
+    -- does not move
+    if here then
+      for _, g in ipairs(Board.occupied(locs)) do
+        if g == here.guid then
+          say("The Appointed is with an investigator: it does not move.")
+          return false
+        end
+      end
+    end
     local target, why = Board.preyLocation(locs, graph, here)
     if not target then say("The Appointed hunts, but no investigator minicard is on a location.") ; return false end
     local nextKey = here and Locations.stepToward(graph, here.guid, target) or target
@@ -3232,6 +3258,12 @@ end
 local function resetLoop()
   local prologue = CampaignState.inPrologue()
   CampaignState.reset()
+  -- Between Loops step 5: Part II begins with 3+ surface entries or after Loop 3
+  if not prologue and not CampaignState.inPartTwo()
+      and (Knowledge.surfaceKnownCount() >= 3 or CampaignState.getLoopsCompleted() >= 3) then
+    CampaignState.setPartTwo(true)
+    announce("Part II begins: read The Shape of the Hour (Between Loops).")
+  end
   bag.clearTemporary()
   Dissonance.syncBag(bag)
   if prologue then
@@ -3352,6 +3384,10 @@ local function unlockFact(id)
   if not ok then
     note("unknown fact id: " .. tostring(id))
     return nil
+  end
+  -- the assembled entry: record it the moment its inputs are all known
+  if newly and Knowledge.assembleFinale() then
+    announce("Record The Way the Night Breaks in your Campaign Log: the finale may now be begun.")
   end
   local rep = guarded("locations", Board.syncLocations) or {}
   return { newly = newly, report = rep }
@@ -4007,6 +4043,12 @@ function shClearBoard()
 end
 
 function shApiClearBoard() return guarded("clear board", clearLoopBoard) end
+function shApiSetPartTwo(p)
+  CampaignState.setPartTwo(p == nil or p.on ~= false)
+  local rep = guarded("locations", Board.syncLocations)
+  afterChange()
+  return rep
+end
 -- Victory X of the Named (the encounter cards' ids; the log's v:<id> boxes)
 local VICTORY = { ["sthr-bellringer"] = 2, ["sthr-wearssheriff"] = 3, ["sthr-onewhorides"] = 2 }
 
@@ -4201,7 +4243,9 @@ function runStillHourTests()
   P, F = check("Lantern Room flips to back with the fact", Locations.activeFace("lantern-room") == "back", P, F)
   P, F = check("Sealed Study sealed until both facts", Locations.isSealed("sealed-study"), P, F)
   CampaignState.unlockFact("what-the-almanac-hid"); CampaignState.unlockFact("the-vote-that-never-ends")
-  P, F = check("Sealed Study opens with both facts", Locations.isOpen("sealed-study"), P, F)
+  P, F = check("Sealed Study stays closed in Part I", Locations.isSealed("sealed-study"), P, F)
+  CampaignState.setPartTwo(true)
+  P, F = check("Sealed Study opens with both facts in Part II", Locations.isOpen("sealed-study"), P, F)
   P, F = check("location cards resolve by metadata id",
     Locations.idForCard("sthr-loc-lanternroom") == "lantern-room" and Locations.idForCard("sthr-loc-well") == "the-well"
     and Locations.idForCard("sthrelias") == nil, P, F)

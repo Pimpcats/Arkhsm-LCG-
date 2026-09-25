@@ -2,6 +2,8 @@
 ### A custom campaign for Arkham Horror: The Card Game (SCED / Tabletop Simulator)
 **Design document v0.1 — investigators, systems, and campaign arc**
 
+> **Superseded for play.** The rules players use are in `THE_STILL_HOUR_player_guide.md` (Campaign Rules, checked against the Rules Reference, 2026-09-25) and the card text in `campaigns/still_hour/card_overrides.json` / `pipeline/stillhour_print_text.json`. Where this document differs, those win. Kept as design history.
+
 > An original cosmic-horror campaign built around one idea no published campaign uses: **the night does not end.** The town of Ambergrove is caught repeating the same span of hours. Five people remember. Everyone else does not.
 
 > *v0.1 is the concept document; where numbers or boss rules differ from later docs, the later docs win: Dissonance bands scale `4×/6× investigators` (encounter v0.4), Memory spends as experience (CO-001), and the boss is the staged **Appointed** — it approaches, it is never merely "put into play" (CO-002).*

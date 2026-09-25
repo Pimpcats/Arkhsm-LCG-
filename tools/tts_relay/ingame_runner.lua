@@ -440,20 +440,21 @@ step("board: locations flip and seal", function(go)
     local rep = ctl.call("shApiSyncBoard")
     check("board finds both campaign locations by metadata id", (rep.seen or 0) >= 2, "seen " .. tostring(rep.seen))
     check("a location with an unknown fact stays on its front", LOC_A.obj.is_face_down == false)
-    check("a sealed location is labelled SEALED", hasButton(LOC_B.obj, "SEALED"), labelsOf(LOC_B.obj))
+    check("a closed location is labelled CLOSED", hasButton(LOC_B.obj, "CLOSED"), labelsOf(LOC_B.obj))
     if scedHere then
       local tracker = scedObject("Mythos", "TokenSpawnTracker")
-      check("SCED clue spawn is held back while sealed (TokenSpawnTrackerApi)",
+      check("SCED clue spawn is held back while closed (TokenSpawnTrackerApi)",
         tracker ~= nil and tracker.call("hasSpawnedTokens", LOC_B.obj.getGUID()) == true)
     end
     ctl.call("shApiUnlockFact", { id = "the-lamp-was-never-lit" })
     Wait.frames(function()
       check("unlocking the flip fact turns the location to its back", LOC_A.obj.is_face_down == true)
+      ctl.call("shApiSetPartTwo", { on = true })
       ctl.call("shApiUnlockFact", { id = "what-the-almanac-hid" })
       local r = ctl.call("shApiUnlockFact", { id = "the-vote-that-never-ends" })
       -- button removals apply at the end of the frame: look a few frames later
       Wait.frames(function()
-        check("the SEALED label comes off once every fact is known", not hasButton(LOC_B.obj, "SEALED"),
+        check("the CLOSED label comes off once every fact is known (Part II)", not hasButton(LOC_B.obj, "CLOSED"),
           labelsOf(LOC_B.obj))
       end, 5)
       if scedHere then
@@ -582,7 +583,8 @@ step("board: prey follows on-card Memory", function(go)
   spawnJSON(investigatorJSON("sthrbirdie", "Relay Investigator B", { 2, 3, 3, 5, 6, 7 }, base.x + 3, base.z - 7),
     function(o) INV.birdie = o ; one() end)
   spawnJSON(minicardJSON("sthrelias-m", LOC_A.obj.getPosition()), one)
-  spawnJSON(minicardJSON("sthrbirdie-m", LOC_B.obj.getPosition()), one)
+  local miniB
+  spawnJSON(minicardJSON("sthrbirdie-m", LOC_B.obj.getPosition()), function(o) miniB = o ; one() end)
   -- a third location joined to both, so "toward the prey" has two directions
   spawnJSON(locationJSON("sthr-loc-nave", "Relay Location C", "Moon", "Diamond|Circle", base.x, base.z + 14),
     function(o) LOC_C = o ; one() end)
@@ -610,8 +612,14 @@ step("board: prey follows on-card Memory", function(go)
       check("it hunts the investigator with the most Memory (not merely the nearest)", appointedAt(LOC_B.obj))
       ctl.call("shApiOnCardMemory", { id = "sthrelias", delta = 4 })
       ctl.call("shApiHunt")
-      check("when another investigator has more Memory, the prey changes", appointedAt(LOC_A.obj))
-      go()
+      check("an investigator at its location holds it there (Rules Reference: Hunter)", appointedAt(LOC_B.obj))
+      -- Birdie leaves; now it goes for the investigator with the most Memory
+      if alive(miniB) then miniB.destruct() end
+      Wait.frames(function()
+        ctl.call("shApiHunt")
+        check("when another investigator has more Memory, the prey changes", appointedAt(LOC_A.obj))
+        go()
+      end, 5)
     end, 20)
   end)
 end)

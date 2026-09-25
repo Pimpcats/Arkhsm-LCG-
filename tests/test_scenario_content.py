@@ -279,7 +279,7 @@ class ContentGapTests(unittest.TestCase):
         self.assertEqual(need["per_investigator"], 4)
         act = CARDS["sthr-act-lasthour"]
         text = act["text"] + "\n" + act["back_text"]    # b side: the resolutions
-        for part in ("4 ×", "Hold Back", "Sealed Study", "Hour V", "R1b"):
+        for part in ("4 [perinv]", "Hold Back", "Sealed Study", "Hour IX", "R1b"):
             self.assertIn(part, text)
 
     def test_sced_draws_only_the_printed_lines(self):
@@ -339,7 +339,7 @@ class ContentGapTests(unittest.TestCase):
     def test_hold_is_defined_where_it_is_used(self):
         text = CARDS["sthr-act-walksbeside"]["text"]
         self.assertIn("[action] Hold", text)
-        self.assertIn("[wil] or [com]", text)
+        self.assertIn("[wil] (X) or [com] (X)", text)
 
     def test_no_dead_cards_in_the_pool(self):
         """Every Still Hour card is played: in a scenario stack, in the player

@@ -1,35 +1,35 @@
 {
   "_comment": "The PRINT layer: everything the frame stage draws that GMNotes must not carry (SCED rule: printed text lives on art). Rules text transcribed from cards_v0.2 (errata-grade) and encounter_v0.4 \u00a75/\u00a75b; [wil]-style markup renders via cardforge/glyphs.py or the SE plugin's tags. Enemy combat stats exist only here. FLAG: The House Always Wins had no statline anywhere in the design docs \u2014 the one here is a DRAFT (owner to confirm).",
   "sthrelias": {
-    "text": "[reaction] When another investigator at your location would take 1 or more damage that is not direct damage: Elias takes that damage instead, then place 1 Memory on Elias. Limit once per round.\n[reaction] If you are the only investigator at your location, after Elias takes 1 or more damage from an enemy: place 1 Memory on Elias. Limit once per round.\n[elder] +1. If there are 3 or more Memory on Elias, this token is +3 instead, and heal 1 damage from Elias.",
+    "text": "[reaction] When another investigator at your location would take 1 or more damage that is not direct damage: Elias takes that damage instead, then place 1 Memory on Elias. Limit once per round.\n[reaction] After an enemy attack deals damage to Elias, if he is the only investigator at his location: Place 1 Memory on Elias. Limit once per round.\n[elder] +1. If there are 3 or more Memory on Elias, this token is +3 instead, and heal 1 damage from Elias.",
     "flavor": "\"I have died in this night more times than anyone. I'll stand between you and the dark once more.\"",
-    "back_text": "Deck Size: 30.\nDeckbuilding Options: Guardian cards level 0\u20135, Neutral cards level 0\u20135, up to 5 Survivor cards level 0\u20132, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): The Ambergrove Lamp, \"I've Done This Before\", The Eighth Grave.",
+    "back_text": "Deck Size: 30.\nDeckbuilding Options: Guardian cards level 0\u20135, Neutral cards level 0\u20135, up to 5 Survivor cards level 0\u20132, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): The Ambergrove Lamp, \"I've Done This Before\", The Eighth Grave, 1 random basic weakness.",
     "back_flavor": "Lighthouse keeper of Ambergrove. He has died in this night more times than anyone, and he keeps standing between the town and the dark."
   },
   "sthr-lamp": {
-    "text": "While the Ambergrove Lamp is in play, each investigator at your location gets +1 [agi] while evading.\n[action], exhaust, raise Dissonance by 1: Look at the top card of the encounter deck of a location connected to you. You may then move to that location.",
-    "flavor": "A lamp that remembers the safe path."
+    "text": "Each investigator at your location gets +1 [agi] while evading.\n[action] Exhaust the Ambergrove Lamp and raise Dissonance by 1: Look at the top card of the encounter deck. Then you may move to a connecting location.",
+    "flavor": "It remembers the safe path."
   },
   "sthr-donebefore": {
-    "text": "Commit only to a skill test. If you have already failed a skill test of the same type ([wil]/[int]/[com]/[agi]) this scenario, this card provides [wild][wild][wild]; otherwise it provides [wild].",
+    "text": "Commit only to a skill test you are performing. If you have already failed a test of this skill this loop, this card has [wild][wild][wild] instead of [wild].",
     "flavor": "You learn from your deaths."
   },
   "sthr-eighthgrave": {
-    "text": "Revelation \u2014 Take 1 horror for each Memory on Elias (maximum 4). If there is no Memory on Elias, instead search the encounter deck and discard pile for an Echo and spawn it engaged with you.",
+    "text": "Revelation \u2013 Take 1 horror for each Memory on Elias (maximum 4). If there is no Memory on Elias, instead search the encounter deck and discard pile for an Echo enemy and spawn it engaged with you. Shuffle the encounter deck.",
     "flavor": "You remember every time you did not come back."
   },
   "sthrayako": {
-    "text": "After you succeed at an [int] skill test: place 1 Memory on Ayako. Limit once per turn.\nDuring each interlude, you may move any amount of Memory from Ayako to your banked Memory.\n[elder] +2. Draw 1 card. If it is a Recollection, it costs 2 less to play this turn.",
+    "text": "[reaction] After you succeed at an [int] test: Place 1 Memory on Ayako. Limit once per turn.\n[elder] +2. Draw 1 card. If it is a Recollection, it costs 2 less to play this turn.",
     "flavor": "\"The night is speaking a dead language. I intend to read it.\"",
-    "back_text": "Deck Size: 30.\nDeckbuilding Options: Seeker cards level 0\u20135, Neutral cards level 0\u20135, up to 5 Mystic cards level 0\u20132, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): The Lexicon of the Hour, \"It Means 'Wait'\", Untranslatable.",
+    "back_text": "Deck Size: 30.\nDeckbuilding Options: Seeker cards level 0\u20135, Neutral cards level 0\u20135, up to 5 Mystic cards level 0\u20132, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): The Lexicon of the Hour, \"It Means 'Wait'\", Untranslatable, 1 random basic weakness.",
     "back_flavor": "A linguist who came to Ambergrove chasing a dead language \u2014 and found it being spoken by the night itself."
   },
   "sthr-lexicon": {
-    "text": "After you succeed at an [int] test by 2 or more: place 1 secret on the Lexicon (max 5).\n[free] Exhaust, spend 1 secret: choose one \u2014 get +2 to an [int] test you are performing; or cancel the \"when revealed\" effect of a non-Elite Static treachery.",
+    "text": "Uses (0 secrets).\n[reaction] After you succeed at an [int] test by 2 or more: Place 1 secret here (maximum 5).\n[free] Exhaust the Lexicon and spend 1 secret: +2 [int] for this test.\n[reaction] When a Static treachery is drawn, exhaust the Lexicon and spend 1 secret: Cancel its revelation effect.",
     "flavor": ""
   },
   "sthr-itmeanswait": {
-    "text": "Fast. Play when you would be affected by a card in the Occultation or The Appointed encounter set. If you have 3 or more banked Memory, cancel that effect.",
+    "text": "Fast. Play when you would be affected by an Hour, Lost Hour, Slippage, The Crossing, The Appointed's Whisper or the Appointed. If there are 3 or more banked Memory, cancel that effect on you.",
     "flavor": "Some of it is just a request to hold on."
   },
   "sthr-untranslatable": {
@@ -37,17 +37,17 @@
     "flavor": "Some words unmake the reader."
   },
   "sthrcass": {
-    "text": "[free] Once per turn, spend 2 resources to call the tide: predict a chaos token symbol. The next time you reveal the predicted symbol during a skill test you perform this round, cancel that token and place 1 Memory on Cass.\n[elder] +1. Gain 1 resource for each Memory on Cass (maximum +3 resources).",
+    "text": "[free] Spend 2 resources: Name a chaos token symbol other than [autofail]. The next time you reveal a token with that symbol during a skill test this round, cancel it (it has no modifier and no symbol effect) and place 1 Memory on Cass. Limit once per turn.\n[elder] +1. Gain 1 resource for each Memory on Cass (maximum +3 resources).",
     "flavor": "\"The house thinks it's dealing. Cute.\"",
-    "back_text": "Deck Size: 30.\nDeckbuilding Options: Rogue cards level 0\u20135, Neutral cards level 0\u20135, up to 5 cards of any other class at level 0, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): Marked Deck, \"Seen This Hand Before\", The House Always Wins.",
+    "back_text": "Deck Size: 30.\nDeckbuilding Options: Rogue cards level 0\u20135, Neutral cards level 0\u20135, up to 5 cards of any other class at level 0, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): Marked Deck, \"Seen This Hand Before\", The House Always Wins, 1 random basic weakness.",
     "back_flavor": "A gambler who figured out the night resets three drinks before anyone else. She has been running the same hours for profit."
   },
   "sthr-markeddeck": {
-    "text": "[free] Exhaust: Look at the next chaos token you would reveal this round.\n[free] Exhaust, raise Dissonance by 1, remove 1 Memory from a card you control: Seal a non-symbol chaos token from the bag until the end of the round.",
+    "text": "[free] Exhaust Marked Deck: Reveal a random chaos token and seal it here. The next time you would reveal a chaos token during a skill test this round, resolve the sealed token instead and release it. At the end of the round, release it.\n[free] Exhaust Marked Deck, raise Dissonance by 1 and remove 1 Memory from a card you control: Search the chaos bag for a non-symbol token and seal it on Marked Deck. Release it at the end of the round.",
     "flavor": "You already know how this hand plays."
   },
   "sthr-seenthishand": {
-    "text": "Fast. Play when a chaos token is revealed during your skill test: cancel that token and gain 2 resources. If the cancelled token was a symbol token, gain 3 resources instead.",
+    "text": "Fast. Play when a chaos token is revealed during your skill test. Cancel that token (it has no modifier and no symbol effect) and gain 2 resources. If it was a symbol token, gain 3 resources instead.",
     "flavor": ""
   },
   "sthr-housewins": {
@@ -56,84 +56,84 @@
     "evade": 2,
     "damage": 1,
     "horror": 1,
-    "text": "Hunter.\nSpawns at the location with the most clues (you choose if tied). While Cass has more Memory on her cards than any other investigator, The House Always Wins cannot be evaded.\nForced \u2014 When The House Always Wins defeats an investigator: that investigator's controller loses 3 banked Memory.",
+    "text": "Hunter.\nSpawn \u2013 The location with the most clues (the lead investigator chooses if tied). While Cass has more Memory on her cards than each other investigator, The House Always Wins cannot be evaded.\nForced \u2013 After The House Always Wins defeats an investigator: Remove 3 Memory from banked Memory.",
     "flavor": "The debt follows you across every loop.",
     "_stats_note": "DRAFT statline \u2014 no source in the design docs; owner to confirm."
   },
   "sthrseraphine": {
-    "text": "During your turn, you may raise Dissonance by 1 to choose one: this investigator gets +2 to a skill test she is performing; or take an additional action this turn; or ready one Spell asset you control. Limit twice per round.\n[elder] +X, where X = current Dissonance (maximum +5). After this skill test, reduce Dissonance by the amount this token added.",
+    "text": "[free] During your turn, raise Dissonance by 1: Choose one \u2013 You get +2 skill value for this skill test; or take an additional action this turn; or ready a Spell asset you control. Limit twice per round.\n[elder] +X, where X is Dissonance (maximum +5). After this skill test ends, lower Dissonance by the amount this token added.",
     "flavor": "\"I reached for the Hour. Perhaps it reached back.\"",
-    "back_text": "Deck Size: 30.\nDeckbuilding Options: Mystic cards level 0\u20135, Neutral cards level 0\u20135, up to 5 Seeker cards level 0\u20132, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): The Bell of Ambergrove, \"I Remember the Ending\", The Debt of Hours.",
+    "back_text": "Deck Size: 30.\nDeckbuilding Options: Mystic cards level 0\u20135, Neutral cards level 0\u20135, up to 5 Seeker cards level 0\u20132, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): The Bell of Ambergrove, \"I Remember the Ending\", The Debt of Hours, 1 random basic weakness.",
     "back_flavor": "A spiritualist who felt the Occultation coming and reached for it \u2014 and may be the reason the door is stuck open."
   },
   "sthr-bell": {
-    "text": "[action], exhaust, spend 1 charge, raise Dissonance by 1: Advance or rewind the Hourglass by 1 Hour.",
+    "text": "Uses (3 charges).\n[action] Exhaust the Bell of Ambergrove, spend 1 charge and raise Dissonance by 1: Advance or rewind the Hourglass by 1 Hour.",
     "flavor": "The bell marks the Hour. It can also un-mark it."
   },
   "sthr-rememberending": {
-    "text": "Limit once per loop. Test [wil] (X = current Dissonance). If you succeed: look at the top 3 cards of the Occultation deck and put them back in any order; the next time the Hourglass would advance this round, cancel that advance.",
+    "text": "Max once per loop. Test [wil] (X), where X is Dissonance. If you succeed, look at the next 3 Hours; the next time the Hourglass would advance this round, cancel that advance.",
     "flavor": "You have seen how this night ends. Not this time."
   },
   "sthr-debtofhours": {
-    "text": "Revelation \u2014 If Dissonance is in the Noticed band: advance the Appointed's Approach by 1 stage. If in the Glitch band: take 2 horror. If in the Calm band: raise Dissonance by 1.",
+    "text": "Revelation \u2013 If Dissonance is in the Noticed band, advance the Appointed's Approach by 1 stage (if it is already Arrived, take 2 horror instead). If it is in the Glitch band, take 2 horror. If it is in the Calm band, raise Dissonance by 1.",
     "flavor": "Paradox comes due."
   },
   "sthrbirdie": {
-    "text": "After you fail a skill test by 2 or more, place 1 Memory on Birdie. Limit once per round.\n[free] Once per scenario, remove 3 Memory from Birdie: change a skill test you just failed into a success.\n[elder] +1. If you have already failed a skill test this round, this token is +3 instead.",
+    "text": "[reaction] After you fail a skill test by 2 or more: Place 1 Memory on Birdie. Limit once per round.\n[reaction] When you would fail a skill test, remove 3 Memory from Birdie: You succeed at that test instead. Limit once per loop.\n[elder] +1. If you have already failed a skill test this round, this token is +3 instead.",
     "flavor": "\"Nobody believes a stranger. Suits me fine.\"",
-    "back_text": "Deck Size: 30.\nDeckbuilding Options: Survivor cards level 0\u20135, Neutral cards level 0\u20135, up to 5 cards of any class at level 0\u20131, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): Lucky Compass, \"I Get Out\", Nobody Believes Her.",
+    "back_text": "Deck Size: 30.\nDeckbuilding Options: Survivor cards level 0\u20135, Neutral cards level 0\u20135, up to 5 cards of any class at level 0\u20131, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): Lucky Compass, \"I Get Out\", Nobody Believes Her, 1 random basic weakness.",
     "back_flavor": "A young drifter who slipped into Ambergrove the wrong night and shouldn't remember a thing \u2014 but she does."
   },
   "sthr-compass": {
-    "text": "[action] Exhaust: Move to a connecting location. This move does not provoke attacks of opportunity.\nIf there are 2 or more Memory on the Lucky Compass, the above action may instead move you to any revealed location you have a Knowledge fact about.",
+    "text": "[action] Exhaust Lucky Compass: Move to a connecting location. (This action does not provoke attacks of opportunity.)\nIf there are 2 or more Memory on Lucky Compass, you may instead move to a revealed location in a district whose surface or deep Knowledge entry your Campaign Log records.",
     "flavor": "The needle always points at the way out."
   },
   "sthr-igetout": {
-    "text": "Fast. Limit once per loop. Play when Birdie would be defeated: instead, disengage from all enemies, move to a connecting location, then heal 1 damage and 1 horror and place 1 Memory on your Lucky Compass.",
+    "text": "Fast. Max once per loop. Play when you would be defeated by damage and/or horror. You are not defeated: heal damage and horror from you until you have 1 remaining health and 1 remaining sanity. Disengage from each enemy engaged with you and move to a connecting location. Place 1 Memory on Lucky Compass.",
     "flavor": ""
   },
   "sthr-nobodybelieves": {
-    "text": "Revelation \u2014 Until the end of the round, card abilities controlled by other investigators cannot target Birdie or her cards, and other investigators cannot take actions that would resolve effects on Birdie or her cards. If Birdie is the only investigator at her location, take 1 horror.",
-    "flavor": "You try to warn them; they look right through you."
+    "text": "Revelation \u2013 Until the end of the round, other investigators cannot target you or cards you control with card abilities, or take actions that affect you or cards you control. If you are the only investigator at your location, take 1 horror.",
+    "flavor": "They look right through you."
   },
   "sthr-foreknowledge": {
-    "text": "Commit. [wild]. Remove 1 Memory from a card you control: this card provides [wild][wild][wild] instead.",
+    "text": "When you commit this card, you may remove 1 Memory from a card you control. If you do, it has [wild][wild][wild] instead of [wild] for this test.",
     "flavor": ""
   },
   "sthr-dejavu": {
-    "text": "Fast. Play after you resolve a card ability during your turn; raise Dissonance by 1: trigger that same ability again if able.",
+    "text": "Fast. As an additional cost, raise Dissonance by 1. Play after you resolve an [action], [free] or [reaction] ability on a card you control during your turn (not D\u00e9j\u00e0 Vu). Trigger it again, paying its costs except any action cost.",
     "flavor": "The same doorway, twice."
   },
   "sthr-musclememory": {
-    "text": "Commit. If your campaign log shows you performed this test type during the previous loop, [wild][wild] and draw 1 card; otherwise [wild].",
+    "text": "If you have already performed a test of this skill this loop, this card has [wild][wild] and you draw 1 card; otherwise it has [wild].",
     "flavor": ""
   },
   "sthr-rehearsedescape": {
-    "text": "Once per loop. Raise Dissonance by 1: automatically evade one enemy engaged with you (no test).",
+    "text": "Evade. Max once per loop. As an additional cost, raise Dissonance by 1. Automatically evade an enemy engaged with you.",
     "flavor": "You have done this exact evade before."
   },
   "sthr-longwayround": {
-    "text": "Move up to 2 connecting locations. This move ignores attacks of opportunity and any Skip effects that would trigger from moving.",
+    "text": "Move to a connecting location, then you may move to another connecting location. This action does not provoke attacks of opportunity, and these moves do not advance the Hourglass.",
     "flavor": ""
   },
   "sthr-borrowedtime": {
-    "text": "Uses (3 Memory).\n[free] Exhaust, remove 1 Memory from Borrowed Time: gain 1 resource or get +1 to a skill test you are performing.",
+    "text": "Uses (3 charges). These charges are not Memory.\n[free] Exhaust Borrowed Time and spend 1 charge: Gain 1 resource, or you get +1 skill value for a skill test you are performing.",
     "flavor": "The sand runs upward, if you hold it right."
   },
   "sthr-thistimeforsure": {
-    "text": "Play after you fail a skill test; raise Dissonance by 1: retry that test once with a +2 bonus.",
+    "text": "Fast. Play after you fail a skill test. As an additional cost, raise Dissonance by 1. Ignore that test's results and perform it again with the same skill and difficulty; you get +2 skill value for it.",
     "flavor": ""
   },
   "sthr-anchorpoint": {
-    "text": "Permanent.\nAt the start of each loop, gain 1 Memory.",
+    "text": "Permanent.\nForced \u2013 At the start of each loop: Place 1 Memory on your investigator card.",
     "flavor": "One fixed thing you always remember."
   },
   "sthr-cassandrasnotebook": {
-    "text": "[reaction] After you unlock a Knowledge fact: draw 2 cards. Limit once per loop.",
+    "text": "[reaction] After a Knowledge entry is recorded in your Campaign Log for the first time: Draw 2 cards. Limit once per loop.",
     "flavor": "The pages ahead are already filled."
   },
   "sthr-hourlearnedname": {
-    "text": "Limit once per loop. Deal damage to the Appointed equal to the number of Knowledge facts you have about it, then rewind the Hourglass by 1.",
+    "text": "Max once per loop. The Appointed must be at your location. Push it back one Approach stage (two if your Campaign Log records The Appointed's Name), then rewind the Hourglass by 1 Hour.",
     "flavor": "A name, spoken like frost."
   },
   "sthr-appointed": {
@@ -142,12 +142,12 @@
     "evade": null,
     "damage": 2,
     "horror": 2,
-    "text": "Prey \u2014 the investigator with the most Memory. The Appointed cannot be attacked, cannot be evaded, and cannot be defeated.\n[action] Hold Back: Test [wil] or [com] (4). If you succeed, push the Appointed back one Approach stage and rewind the Hourglass by 1 Hour.\nForced \u2014 When the Appointed would be defeated or leave play by any effect: instead, it does not.\nIts Approach stages are detailed on \u201cThe Appointed\u2019s Approach.\u201d",
+    "text": "Prey \u2013 Most Memory on their cards. As a hunter, it moves toward its prey even past nearer investigators.\nThe Appointed cannot be attacked, evaded, damaged or defeated. It leaves play only when pushed back to Unseen.\n[action] Hold Back: Test [wil] (4) or [com] (4). This action does not provoke an attack of opportunity from the Appointed. If you succeed, push it back one Approach stage, disengage it and rewind the Hourglass by 1 Hour.",
     "flavor": "It is not late. It was never late. You are simply early, every time."
   },
   "sthr-appointedwhisper": {
-    "text": "Peril.\nRevelation \u2014 It knows your name now. Take 1 horror. If the Appointed is Emerging or Arrived, take 2 horror instead and raise Dissonance by 1.",
-    "flavor": ""
+    "text": "Peril.\nRevelation \u2013 Take 1 horror. If the Appointed is Emerging or Arrived, take 2 horror instead and raise Dissonance by 1.",
+    "flavor": "It knows your name now."
   },
   "sthr-crossing": {
     "text": "Revelation \u2014 Advance the Appointed's Approach by 1 stage (to a minimum of Sensed). Then raise Dissonance by 1.",
@@ -159,7 +159,7 @@
     "evade": 2,
     "damage": 1,
     "horror": 2,
-    "text": "Retaliate.\nSpawns in the Flooded Crypt when it opens.\nForced \u2014 When the Hourglass reaches Hour III while the Bell-Ringer is in play: it readies and attacks the nearest investigator.",
+    "text": "Retaliate.\nSpawn \u2013 The Flooded Crypt.\nForced \u2013 When Hour III is reached, if the Bell-Ringer Beneath is in play: Ready it. It attacks the nearest investigator (the lead investigator breaks ties).",
     "flavor": "It pulls the rope. The toll answers."
   },
   "sthr-wearssheriff": {
@@ -168,7 +168,7 @@
     "evade": 2,
     "damage": 2,
     "horror": 1,
-    "text": "Hunter.\nSpawns at the Records Office when the deep objective is attempted.\nWhile What Wears the Sheriff is in play, the Records Office gains shroud +1.",
+    "text": "Hunter.\nSpawn \u2013 The Records Office.\nWhile What Wears the Sheriff is in play, the Records Office gets +1 shroud.",
     "flavor": "It does not want you reading the ledger."
   },
   "sthr-onewhorides": {
@@ -177,7 +177,7 @@
     "evade": 3,
     "damage": 1,
     "horror": 2,
-    "text": "Prey \u2014 the investigator with the most Memory on their cards.\nSpawns at the Wheel. Cannot be damaged while ready (evade it first; it only comes apart mid-turn, between rotations).",
+    "text": "Prey \u2013 Most Memory on their cards.\nSpawn \u2013 The Wheel.\nWhile the One Who Rides Forever is ready, it cannot be dealt damage.",
     "flavor": "Round and round. It has always been riding. It will always be riding."
   },
   "sthr-loc-lanternroom": {
@@ -204,7 +204,7 @@
     "flavor": "The steps do not always number the same."
   },
   "sthr-appointed-approach": {
-    "text": "The Appointed occupies an Approach stage (Unseen \u2192 Sensed \u2192 Emerging \u2192 Arrived) and manifests at the location farthest from the investigators while Sensed or later.\nWhile Sensed: it does not move or attack. Forced \u2014 At the end of the round, each investigator at its location takes 1 horror.\nWhile Emerging: it gains Hunter. Forced \u2014 When it engages an investigator: that investigator takes 1 horror.\nWhile Arrived: it gains Hunter. Forced \u2014 When it attacks: it deals 2 damage and 2 horror, then raise Dissonance by 1.",
+    "text": "The Approach advances only when an effect says so: Hour V (to at least Sensed), Hour VII (at least Emerging), Hour VIII (Arrived); Dissonance entering the Glitch band (at least Sensed) or the Noticed band (Arrived); The Crossing and The Debt of Hours (1 stage). It never goes above Arrived.\nWhen the Approach becomes Sensed or later while the Appointed is set aside, put it into play at the revealed location farthest from all investigators that is not closed (the lead investigator breaks ties). When it is pushed back to Unseen, set it aside.\nWhile Sensed: It gains aloof and cannot move or attack. Forced \u2013 At the end of the round: Each investigator at its location takes 1 horror.\nWhile Emerging: It gains hunter and cannot attack. Forced \u2013 After the Appointed engages an investigator: That investigator takes 1 horror.\nWhile Arrived: It gains hunter. Forced \u2013 After the Appointed attacks: Raise Dissonance by 1.",
     "flavor": "It is not late. It was never late. You are simply early, every time."
   },
   "sthr-campaign-log": {

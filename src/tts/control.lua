@@ -148,6 +148,12 @@ end
 local function resetLoop()
   local prologue = CampaignState.inPrologue()
   CampaignState.reset()
+  -- Between Loops step 5: Part II begins with 3+ surface entries or after Loop 3
+  if not prologue and not CampaignState.inPartTwo()
+      and (Knowledge.surfaceKnownCount() >= 3 or CampaignState.getLoopsCompleted() >= 3) then
+    CampaignState.setPartTwo(true)
+    announce("Part II begins: read The Shape of the Hour (Between Loops).")
+  end
   bag.clearTemporary()
   Dissonance.syncBag(bag)
   if prologue then
@@ -268,6 +274,10 @@ local function unlockFact(id)
   if not ok then
     note("unknown fact id: " .. tostring(id))
     return nil
+  end
+  -- the assembled entry: record it the moment its inputs are all known
+  if newly and Knowledge.assembleFinale() then
+    announce("Record The Way the Night Breaks in your Campaign Log: the finale may now be begun.")
   end
   local rep = guarded("locations", Board.syncLocations) or {}
   return { newly = newly, report = rep }
@@ -923,6 +933,12 @@ function shClearBoard()
 end
 
 function shApiClearBoard() return guarded("clear board", clearLoopBoard) end
+function shApiSetPartTwo(p)
+  CampaignState.setPartTwo(p == nil or p.on ~= false)
+  local rep = guarded("locations", Board.syncLocations)
+  afterChange()
+  return rep
+end
 -- Victory X of the Named (the encounter cards' ids; the log's v:<id> boxes)
 local VICTORY = { ["sthr-bellringer"] = 2, ["sthr-wearssheriff"] = 3, ["sthr-onewhorides"] = 2 }
 
@@ -1117,7 +1133,9 @@ function runStillHourTests()
   P, F = check("Lantern Room flips to back with the fact", Locations.activeFace("lantern-room") == "back", P, F)
   P, F = check("Sealed Study sealed until both facts", Locations.isSealed("sealed-study"), P, F)
   CampaignState.unlockFact("what-the-almanac-hid"); CampaignState.unlockFact("the-vote-that-never-ends")
-  P, F = check("Sealed Study opens with both facts", Locations.isOpen("sealed-study"), P, F)
+  P, F = check("Sealed Study stays closed in Part I", Locations.isSealed("sealed-study"), P, F)
+  CampaignState.setPartTwo(true)
+  P, F = check("Sealed Study opens with both facts in Part II", Locations.isOpen("sealed-study"), P, F)
   P, F = check("location cards resolve by metadata id",
     Locations.idForCard("sthr-loc-lanternroom") == "lantern-room" and Locations.idForCard("sthr-loc-well") == "the-well"
     and Locations.idForCard("sthrelias") == nil, P, F)

@@ -186,6 +186,10 @@
       {
         "token": "elderthing",
         "text": "-4. If you fail, advance the Hourglass by 1 Hour."
+      },
+      {
+        "token": "static",
+        "text": "-3. Raise Dissonance by 1."
       }
     ],
     "difficulty": "EASY / STANDARD",
@@ -205,6 +209,10 @@
       {
         "token": "elderthing",
         "text": "-5. If you fail, advance the Hourglass by 1 Hour."
+      },
+      {
+        "token": "static",
+        "text": "-3. Raise Dissonance by 1."
       }
     ]
   },

@@ -1,6 +1,8 @@
 # THE STILL HOUR — Encounter Deck
 ### v0.4 · the shared campaign encounter spine + the Occultation clock + the Appointed boss set
 
+> **Superseded for play.** The rules players use are in `THE_STILL_HOUR_player_guide.md` (Campaign Rules, checked against the Rules Reference, 2026-09-25) and the card text in `campaigns/still_hour/card_overrides.json` / `pipeline/stillhour_print_text.json`. Where this document differs, those win. Kept as design history.
+
 Written to the same errata-grade standard as `cards_v0.2`, and consistent with the 3-player constants in `aging_3p_v0.3`. This is the **reusable spine** used across every node; node-specific encounter cards ship later with the six node objectives.
 
 > **Templating recap.** `Revelation` resolves when drawn. `Surge` = after resolving, draw another encounter card. `Peril` = resolve alone, no help from other investigators. `Hunter` = moves toward its prey each enemy phase. `Prey – X` sets targeting. Enemy line is **Fight / Health / Evade**, with **damage/horror** below. Timing words are load-bearing (`When…would` = interrupt; `After` = reaction).

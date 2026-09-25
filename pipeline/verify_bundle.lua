@@ -267,7 +267,7 @@ for _, i in ipairs(env2.shApiInvestigators()) do yrs = yrs + i.years end
 expect("a fresh control token adopts the campaign-log copy (SCED export/import path)",
   after2.loops == before2.loops and after2.memory == before2.memory and yrs == 8)
 
--- a sealed location gets a SEALED label, and loses it once every fact it
+-- a closed location gets a CLOSED label, and loses it once every fact it
 -- waits on is known (the in-TTS relay reported the label staying on)
 local locA = stubCard("Relay Location A", { id = "sthr-loc-lanternroom", type = "Location",
   locationFront = { icons = "Diamond", connections = "Circle" }, locationBack = { icons = "Diamond", connections = "Circle" } }, { "Location" })
@@ -281,10 +281,11 @@ for _, o in ipairs({ locA, locB }) do
 end
 local snap = env.shApiSnapshot()
 env.shApiSyncBoard()
-expect("a sealed location is labelled SEALED", cardLabel(locB, "SEALED") ~= nil)
+expect("a closed location is labelled CLOSED", cardLabel(locB, "CLOSED") ~= nil)
+env.shApiSetPartTwo({ on = true })
 env.shApiUnlockFact({ id = "what-the-almanac-hid" })
 env.shApiUnlockFact({ id = "the-vote-that-never-ends" })
-expect("the SEALED label comes off once every fact is known", cardLabel(locB, "SEALED") == nil)
+expect("the CLOSED label comes off once every fact is known (Part II)", cardLabel(locB, "CLOSED") == nil)
 env.shApiRestore({ blob = snap })
 
 expect("no board-wiring errors on a vanilla table", #errors == 0)
