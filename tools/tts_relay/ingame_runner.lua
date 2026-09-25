@@ -234,6 +234,13 @@ step("control token", function(go)
   if not ctl then return go() end
   local buttons = ctl.getButtons() or {}
   check("control token created its buttons", #buttons >= 7, #buttons .. " button(s)")
+  -- a fresh campaign opens in the Prologue (no Appointed); the board checks
+  -- below exercise a loop, so end the Prologue first
+  local okp, st = pcall(function() return ctl.call("shApiState") end)
+  check("a new campaign opens in the Prologue", okp and type(st) == "table" and st.prologue == true)
+  local oke, st2 = pcall(function() return ctl.call("shApiEndPrologue") end)
+  check("ending the Prologue starts Loop 1 without counting a loop",
+    oke and type(st2) == "table" and st2.prologue == false and st2.loops == 0)
   local ok, res = pcall(function() return ctl.call("runStillHourTests") end)
   check("in-engine rules tests ran", ok and type(res) == "table", (not ok) and res or nil)
   if ok and type(res) == "table" then
@@ -847,11 +854,11 @@ step("campaign log", function(go)
   waitFor(function() return #(log.getButtons() or {}) >= 20 and #(log.getInputs() or {}) >= 5 end, 30, function(ok)
     check("log draws its checkboxes, counters and write-in fields", ok,
       #(log.getButtons() or {}) .. " buttons, " .. #(log.getInputs() or {}) .. " inputs")
-    -- page 1 field order: 1 started, 2 Standard, 3 Hard, 4 investigators, 5 loops
+    -- page 1 field order: 1 started, 2 Easy, 3 Standard, 4 Hard, 5 Expert, 6 loops
     local okc = pcall(function()
-      log.call("sthrLog_2")
-      log.call("sthrLog_5")
-      log.call("sthrLog_5")
+      log.call("sthrLog_3")
+      log.call("sthrLog_6")
+      log.call("sthrLog_6")
     end)
     local v = logValues(log)
     check("clicking a checkbox and a counter records them", okc and v and v.values.diff_standard == true
@@ -930,6 +937,82 @@ step("campaign box: Recall", function(go)
       before .. " -> " .. after)
     go()
   end)
+end)
+
+-- A loop is set up again every night: a scenario box must Place a full,
+-- fresh copy each time, and the control's Clear Board must take every card it
+-- laid out (and any card drawn from it) back off the table.
+local function loopCount()
+  local n = 0
+  for _, o in ipairs(getObjects()) do
+    if alive(o) and o.hasTag("StillHourLoop") then
+      n = n + (o.type == "Deck" and #(o.getObjects() or {}) or 1)
+    end
+  end
+  return n
+end
+
+step("a loop: Place, play, Clear Board, Place again", function(go)
+  local ctl = findControl()
+  local book
+  for _, o in ipairs(getObjects()) do
+    if alive(o) and gm(o).type == "ScenarioBox" and gm(o).id == "district_church" then book = o end
+  end
+  if not book then
+    local camp = findSpawned(function(o)
+      if gm(o).type ~= "CampaignBox" then return false end
+      for _, e in ipairs(o.getObjects() or {}) do
+        if (decode(e.gm_notes) or {}).id == "district_church" then return true end
+      end
+      return false
+    end)
+    if camp then
+      for _, e in ipairs(camp.getObjects() or {}) do
+        if (decode(e.gm_notes) or {}).id == "district_church" then
+          book = camp.takeObject({ guid = e.guid, position = { 20, 3, 30 }, smooth = false })
+        end
+      end
+    end
+  end
+  check("a district's scenario box is available", book ~= nil)
+  if not book or not ctl then return go() end
+  book.addTag(TAG)
+  check("the box is replayable (loop box script)",
+    (book.getLuaScript() or ""):find("StillHourLoop", 1, true) ~= nil)
+  local inside = #(book.getObjects() or {})
+  Wait.frames(function()
+    local ok1, placed = pcall(function() return book.call("buttonClick_place") end)
+    check("Place lays out a copy of every object in the box", ok1 and placed == inside,
+      tostring(placed) .. "/" .. inside)
+    Wait.time(function()
+      local n1 = loopCount()
+      check("the placed cards carry the loop tag", n1 > 0, n1 .. " card(s)")
+      -- play: draw a card off a placed deck onto the table
+      for _, o in ipairs(getObjects()) do
+        if alive(o) and o.type == "Deck" and o.hasTag("StillHourLoop") then
+          local p = o.getPosition()
+          pcall(function() o.takeObject({ position = { p.x, p.y + 2, p.z + 3 } }) end)
+          break
+        end
+      end
+      Wait.time(function()
+        local okc, r = pcall(function() return ctl.call("shApiClearBoard") end)
+        check("Clear Board runs", okc, r)
+        Wait.time(function()
+          check("Clear Board takes every loop card off the table (drawn ones too)", loopCount() == 0,
+            loopCount() .. " left; " .. tostring(type(r) == "table" and r.tokens or "?") .. " token(s) removed")
+          check("the box never empties", #(book.getObjects() or {}) == inside)
+          local ok2, placed2 = pcall(function() return book.call("buttonClick_place") end)
+          Wait.time(function()
+            check("the next loop's Place lays out the same cards again", ok2 and placed2 == inside
+              and loopCount() == n1, loopCount() .. " vs " .. n1)
+            pcall(function() ctl.call("shApiClearBoard") end)
+            Wait.time(go, 2)
+          end, 3)
+        end, 2)
+      end, 2)
+    end, 3)
+  end, 10)
 end)
 
 step("screenshots", function(go)

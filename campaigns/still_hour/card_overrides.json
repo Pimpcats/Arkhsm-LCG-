@@ -205,7 +205,9 @@
         "color": "#1a605e"
       }
     ],
-    "flavor": "You came to Ambergrove for your own reasons. You will not remember why, soon."
+    "flavor": "You came to Ambergrove for your own reasons. You will not remember why, soon.",
+    "unrevealed": true,
+    "unrevealed_flavor": "Planks run out over black water. At the far end, someone is waiting for a boat that is not coming."
   },
   "sthr-loc-almanacsteps": {
     "name": "The Almanac Steps",
@@ -221,7 +223,9 @@
         "symbol": "star",
         "color": "#1a605e"
       }
-    ]
+    ],
+    "unrevealed": true,
+    "unrevealed_flavor": "The printing house's stone steps, worn hollow in the middle. A light burns behind the upper windows."
   },
   "sthr-scn-stillhour": {
     "name": "The Still Hour",
@@ -286,7 +290,9 @@
         "color": "#8a5a2e"
       }
     ],
-    "text": "[action] Test [agi] (2) to climb. If you fail, take 1 damage."
+    "text": "[action] Test [agi] (2) to climb. If you fail, take 1 damage.",
+    "unrevealed": true,
+    "unrevealed_flavor": "Iron steps spiral up into the dark. You can hear them ring under feet that are not yours."
   },
   "sthr-loc-keepersquarters": {
     "name": "The Keeper's Quarters",
@@ -303,7 +309,9 @@
         "symbol": "cross",
         "color": "#5c246e"
       }
-    ]
+    ],
+    "unrevealed": true,
+    "unrevealed_flavor": "A narrow door at the foot of the tower, painted the same green as a hundred years of salt allowed."
   },
   "sthr-darkthatwaits": {
     "name": "The Dark That Waits",
@@ -348,7 +356,9 @@
         "color": "#1a605e"
       }
     ],
-    "flavor": "The congregation is still here. They have been kneeling since the first toll."
+    "flavor": "The congregation is still here. They have been kneeling since the first toll.",
+    "unrevealed": true,
+    "unrevealed_flavor": "Water laps at the church doors. Inside, lamplight lies on it like oil."
   },
   "sthr-loc-belfry": {
     "name": "The Belfry",
@@ -364,7 +374,9 @@
         "symbol": "heart",
         "color": "#2c663c"
       }
-    ]
+    ],
+    "unrevealed": true,
+    "unrevealed_flavor": "The bell rope disappears up through a hole in the ceiling. It is swaying, though there is no wind."
   },
   "sthr-loc-floodedcrypt": {
     "name": "The Flooded Crypt",
@@ -381,7 +393,9 @@
         "symbol": "heart",
         "color": "#2c663c"
       }
-    ]
+    ],
+    "unrevealed": true,
+    "unrevealed_flavor": "Steps go down into the water and do not come up again."
   },
   "sthr-loc-vestry": {
     "name": "The Vestry",
@@ -397,7 +411,9 @@
         "symbol": "heart",
         "color": "#2c663c"
       }
-    ]
+    ],
+    "unrevealed": true,
+    "unrevealed_flavor": "A side door, a brass plate, a key left in the lock as though someone meant to come back."
   },
   "sthr-thirteen": {
     "name": "Thirteen",
@@ -429,7 +445,9 @@
         "color": "#1a605e"
       }
     ],
-    "flavor": "The road between the town and the shore, counted out in stones that never change."
+    "flavor": "The road between the town and the shore, counted out in stones that never change.",
+    "unrevealed": true,
+    "unrevealed_flavor": "Stone markers along the verge, each one carved with a number. The numbers do not go in order."
   },
   "sthr-loc-lowbridge": {
     "name": "The Low Bridge",
@@ -449,7 +467,9 @@
         "color": "#8a5a2e"
       }
     ],
-    "flavor": "The water never quite reaches the top. It never quite goes down."
+    "flavor": "The water never quite reaches the top. It never quite goes down.",
+    "unrevealed": true,
+    "unrevealed_flavor": "A humpbacked bridge over a stream that should not be this deep."
   },
   "sthr-loc-turning": {
     "name": "The Turning",
@@ -469,7 +489,9 @@
         "symbol": "cross",
         "color": "#5c246e"
       }
-    ]
+    ],
+    "unrevealed": true,
+    "unrevealed_flavor": "The road bends toward the shore and out of sight. Every hooded walker takes the bend the same way."
   },
   "sthr-bridgeremembers": {
     "name": "The Bridge Remembers",
@@ -520,7 +542,9 @@
         "symbol": "t",
         "color": "#2c4a7c"
       }
-    ]
+    ],
+    "unrevealed": true,
+    "unrevealed_flavor": "Town Hall's back rooms: ledgers, deeds, and the smell of dust that has been disturbed recently."
   },
   "sthr-loc-well": {
     "name": "The Well",
@@ -536,7 +560,9 @@
         "symbol": "t",
         "color": "#2c4a7c"
       }
-    ]
+    ],
+    "unrevealed": true,
+    "unrevealed_flavor": "An old stone well at the edge of the Square, capped with a board. Something has scratched at the board from beneath."
   },
   "sthr-samespeech": {
     "name": "The Same Speech",
@@ -565,7 +591,9 @@
         "symbol": "moon",
         "color": "#a83870"
       }
-    ]
+    ],
+    "unrevealed": true,
+    "unrevealed_flavor": "The great wheel turns against the wrong sky, every car lit, every car empty."
   },
   "sthr-loc-hallofmirrors": {
     "name": "The Hall of Mirrors",
@@ -581,7 +609,9 @@
         "color": "#a83870"
       }
     ],
-    "flavor": "The occultation fair, mid-celebration, forever."
+    "flavor": "The occultation fair, mid-celebration, forever.",
+    "unrevealed": true,
+    "unrevealed_flavor": "A painted door: SEE YOURSELF AS OTHERS SEE YOU. The paint is still wet."
   },
   "sthr-loc-ticketbooth": {
     "name": "The Ticket Booth",
@@ -606,7 +636,9 @@
         "symbol": "star",
         "color": "#1a605e"
       }
-    ]
+    ],
+    "unrevealed": true,
+    "unrevealed_flavor": "A striped booth at the fair's gate. The window is lit. The ticket-taker is not looking at you, and then he is."
   },
   "sthr-wheelsturn": {
     "name": "The Wheel's Turn",
@@ -642,7 +674,9 @@
         "color": "#1a605e"
       }
     ],
-    "flavor": "Ayako has read every book in it a hundred times."
+    "flavor": "Ayako has read every book in it a hundred times.",
+    "unrevealed": true,
+    "unrevealed_flavor": "Shelves to the ceiling, and a long table laid with open almanacs, all turned to the same page."
   },
   "sthr-loc-press": {
     "name": "The Press",
@@ -658,7 +692,9 @@
         "symbol": "diamond",
         "color": "#2a5c7c"
       }
-    ]
+    ],
+    "unrevealed": true,
+    "unrevealed_flavor": "The iron press stands inked and ready. The type in its bed has already been set."
   },
   "sthr-loc-sealedstudy": {
     "name": "The Sealed Study",
@@ -675,7 +711,9 @@
         "symbol": "diamond",
         "color": "#2a5c7c"
       }
-    ]
+    ],
+    "unrevealed": true,
+    "unrevealed_flavor": "A study door that no key in Ambergrove fits."
   },
   "sthr-pagethatwasnt": {
     "name": "The Page That Wasn't",
@@ -743,7 +781,7 @@
   },
   "sthr-story-firstreset": {
     "name": "The First Reset",
-    "text": "Each investigator gains 2 banked Memory. If the objective was completed, gain 1 more banked Memory.\nRecord \"You Are Unstuck\" in the campaign log. Act I begins.\nNo Years are gained from the Prologue. Proceed to the first interlude, then Loop 1.",
+    "text": "Each investigator gains 2 banked Memory. If an investigator resolved the Occultation, the party gains 1 more banked Memory.\nRecord \"You Are Unstuck\" in your Campaign Log. Act I begins. No Years are gained from the Prologue.\nTurn to the Prologue resolutions in the Campaign Guide.",
     "flavor": "The occultation completes. Something reaches through — and does not finish reaching. The night folds. You are standing in the Square again at eleven o'clock, salt on your tongue, and you are the only ones who feel the seam.",
     "deck": 95102
   },
@@ -882,30 +920,30 @@
     "index": "1a",
     "number": "1/1",
     "back_flavor": "The crossing holds. For one long breath the night stops pressing, and every clock in Ambergrove agrees on the time.",
-    "back_text": "The contest is won. Turn to the Finale Resolutions in the Campaign Guide and read the first that qualifies (R1, R1b, then R2 to R4)."
+    "back_text": "The contest is won. The investigators must decide how to end the night: turn to the Finale Resolutions in the Campaign Guide and choose one resolution from R1, R1b, R2, R3 or R4 whose condition you meet (R4 is always available)."
   },
   "sthr-res-1": {
     "name": "Take Its Place",
     "traits": "Resolution 1.",
-    "text": "Contest reached and an Ancient investigator is present.\nOne Ancient becomes the night's new anchor — kept behind, decades older, so the loop ends for everyone else. Mark them kept as anchor. The town wakes for the first time in a hundred years.\nIf \"Who Walks Beside You\" is known, instead: the ones who walk the Sunken Road take the anchor's weight with you. At dawn the Ancient walks out with the others — +3 Years, but free and not kept.",
+    "text": "Contest reached, and an Ancient investigator, or the investigator who signed the ninth line, is present.\nThat investigator becomes the night's new anchor: kept behind, decades older, so the loop ends for everyone else. Mark them kept as anchor.\nIf \"Who Walks Beside You\" is known, instead: at dawn the anchor walks out with the others, free and not kept, +3 Years older (+1 Year if the walkers keep their ring).",
     "deck": 95115
   },
   "sthr-res-2": {
     "name": "Close the Door",
     "traits": "Resolution 2.",
-    "text": "Contest reached and you know \"The Vote That Never Ends\" and \"The Appointed's Name.\"\nYou pay the price the town agreed to and never paid: everyone present ages +3 Years at once, and the door closes. The cleanest true ending — bought with years.",
+    "text": "Contest reached, you know \"The Vote That Never Ends\" and \"The Appointed's Name,\" and the vote still stands.\nYou pay the price the town agreed to and never paid: each investigator present ages +3 Years (+2 Years if the town was warned), and the door closes.",
     "deck": 95116
   },
   "sthr-res-3": {
     "name": "Break Through",
     "traits": "Resolution 3.",
-    "text": "Contest reached and \"The Keeper's Ninth Death\" is known.\nYou force the night open and all survivors escape — but the loop is only paused. Was it really ended?",
+    "text": "Contest reached and \"The Keeper's Ninth Death\" is known.\nAll surviving investigators escape, but the loop is only paused. If the ninth line was left blank, the loop stays ended.",
     "deck": 95117
   },
   "sthr-res-4": {
     "name": "Seal by Force",
     "traits": "Resolution 4.",
-    "text": "Contest reached.\nThe door is sealed but not closed; one investigator (chosen) ages out doing it.",
+    "text": "Contest reached.\nThe door is sealed but not closed. Choose one investigator: they age out holding it shut. If the vote was torn out, they instead age +3 Years and walk away.",
     "deck": 95118
   },
   "sthr-res-5": {
@@ -937,7 +975,7 @@
   "sthr-res-bargain": {
     "name": "Let It In, On Your Terms",
     "traits": "Resolution 1b.",
-    "text": "Contest reached, \"The Ticket-Taker's Bargain\" is known, and banked Memory is 12 or more. The party may decline this and read on to R2.\nYou take the ticket-taker's offer: the door opens on your terms, not the town's, and the night finally ends. The fare is everything you carried — banked Memory drops to 0 — and each investigator present ages +2 Years. Ambergrove wakes to a morning with one more guest in it.",
+    "text": "Contest reached, \"The Ticket-Taker's Bargain\" is known, you did not refuse the ticket, and banked Memory is 12 or more (10 or more if you kept the night to yourselves).\nThe door opens on your terms and the night finally ends. Banked Memory drops to 0, and each investigator present ages +2 Years (+1 Year if you hold the ticket).",
     "flavor": "He punches your ticket without looking. He has been expecting you for a very long time.",
     "deck": 95123
   }

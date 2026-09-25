@@ -182,10 +182,36 @@ local function setValue(key, value)
   return true
 end
 
+--- The Still Hour control token (it carries the "StillHour" tag).
+local function findControl()
+  local ok, list = pcall(getObjectsWithTag, "StillHour")
+  for _, o in ipairs(ok and list or {}) do
+    if tostring(o.getName()):find("Control", 1, true) then return o end
+  end
+  return nil
+end
+
 local function clickCheckbox(key)
   setValue(key, not values[key])
   refreshDerived()
   updateSave()
+  -- ticking a Knowledge fact records it on the control token too, which
+  -- flips / opens the locations it changes (a fact is never un-learned, so
+  -- clearing the box changes nothing there)
+  local fact = key:match("^k:(.+)$")
+  if fact and values[key] then
+    local ctl = findControl()
+    if ctl then pcall(function() ctl.call("shApiUnlockFact", { id = fact }) end) end
+  end
+  -- ticking a Named enemy as defeated banks its Victory (once per campaign)
+  local named = key:match("^v:(.+)$")
+  if named and values[key] then
+    local ctl = findControl()
+    if ctl then
+      local ok, newly = pcall(function() return ctl.call("shApiClaimVictory", { id = named }) end)
+      if ok and newly then setValue("vb:" .. named, true) ; updateSave() end
+    end
+  end
 end
 
 local function clickCounter(key, alt)

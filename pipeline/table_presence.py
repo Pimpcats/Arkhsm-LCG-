@@ -43,6 +43,8 @@ FILENAME = "the_still_hour"        # SCED download key (GMNotes filename)
 OUT = os.path.join(ROOT, "dist", "the_still_hour_table.json")
 GUIDE_PDF = os.path.join(ROOT, "dist", "guide", "the_still_hour_campaign_guide.pdf")
 MEMORY_BAG_LUA = os.path.join(ROOT, "src", "tts", "memory_bag.lua")
+# scenario books are laid out again every loop: a replayable memory bag
+LOOP_BOX_LUA = os.path.join(ROOT, "src", "tts", "loop_box.lua")
 BOX_TEXTURE_ID = "sthr-box"
 
 # SCED's own box meshes (src/Global/Global.ttslua meshTable; the same URLs the
@@ -218,7 +220,11 @@ def ml_entry(pos, ry=270, rz=0):
             "rot": {"x": 0, "y": ry, "z": rz}}
 
 
-def memory_bag(name, gm, tags, mesh, scale, contained, ml, desc=""):
+def loop_box_script():
+    return open(LOOP_BOX_LUA, encoding="utf-8").read()
+
+
+def memory_bag(name, gm, tags, mesh, scale, contained, ml, desc="", script=None):
     box = _common(
         GUID=guid("box:" + gm.get("id", name)), Name="Custom_Model_Bag",
         Transform=transform(scale=scale), Nickname=name, Description=desc,
@@ -226,7 +232,7 @@ def memory_bag(name, gm, tags, mesh, scale, contained, ml, desc=""):
         json.dumps(gm, separators=(",", ":")),
         ColorDiffuse=dict(WHITE), Snap=True, MaterialIndex=-1, MeshIndex=-1,
         CustomMesh=_mesh(mesh), Bag={"Order": 0},
-        LuaScript=memory_bag_script(),
+        LuaScript=script or memory_bag_script(),
         LuaScriptState=json.dumps({"ml": ml}, indent=2),
         ContainedObjects=contained,
     )
@@ -239,7 +245,8 @@ def scenario_box(name, sid, contained, ml):
     """A scenario book: SCED's small box mesh + memory bag (Tags: none, as
     the exported scenario boxes have none; GMNotes {id, type: ScenarioBox})."""
     return memory_bag(name, {"id": sid, "type": "ScenarioBox"}, None,
-                      MESH_SMALL, SCALE_SMALL, contained, ml)
+                      MESH_SMALL, SCALE_SMALL, contained, ml,
+                      script=loop_box_script())
 
 
 def campaign_box(scenario_boxes=(), name=CAMPAIGN, filename=FILENAME,

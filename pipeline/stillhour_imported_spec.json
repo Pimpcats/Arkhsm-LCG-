@@ -188,7 +188,25 @@
         "text": "-4. If you fail, advance the Hourglass by 1 Hour."
       }
     ],
-    "difficulty": "STANDARD / HARD"
+    "difficulty": "EASY / STANDARD",
+    "back_tokens": [
+      {
+        "token": "skull",
+        "text": "-2. If Dissonance is in the Glitch band or higher, -3 instead."
+      },
+      {
+        "token": "cultist",
+        "text": "-3. Raise Dissonance by 1."
+      },
+      {
+        "token": "tablet",
+        "text": "-4. If the Appointed is Sensed or later, take 1 horror. If it is Arrived, also take 1 damage."
+      },
+      {
+        "token": "elderthing",
+        "text": "-5. If you fail, advance the Hourglass by 1 Hour."
+      }
+    ]
   },
   {
     "id": "sthr-darkthatwaits",

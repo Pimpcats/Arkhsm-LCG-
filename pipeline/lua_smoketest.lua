@@ -522,6 +522,23 @@ check("SCED: bag reconciled once touchable", #contents == n0 + 1 and sb.describe
 Global, getObjects, getObjectFromGUID, spawnObjectData, Wait = nil, nil, nil, nil, nil
 check("adapter falls back cleanly when the table goes away", ChaosBag.new().setBaselineStatic(2) == 2)
 
+-- The Prologue (The First Hour) is not a loop: no Appointed, and its reset
+-- counts no loop and leaves no scar.
+CampaignState.init(3)
+CampaignState.setPrologue(true)
+check("prologue: a fresh campaign can start in the Prologue", CampaignState.inPrologue())
+CampaignState.advanceAppointed(3)
+check("prologue: nothing drives the Appointed", CampaignState.getAppointedStage() == 0)
+CampaignState.raiseDissonance(4)
+CampaignState.reset()
+check("prologue: its reset counts no loop", CampaignState.getLoopsCompleted() == 0)
+check("prologue: its reset leaves no scar", CampaignState.getDissonance() == 0)
+check("prologue: afterwards the campaign is in Loop 1", not CampaignState.inPrologue())
+CampaignState.advanceAppointed(1)
+check("prologue: the Appointed is driven again from Loop 1", CampaignState.getAppointedStage() == 1)
+CampaignState.reset()
+check("prologue: Loop 1's reset counts as the first loop", CampaignState.getLoopsCompleted() == 1)
+
 print("")
 print(string.format("RESULT: %d passed, %d failed", passed, failed))
 os.exit(failed == 0 and 0 or 1)

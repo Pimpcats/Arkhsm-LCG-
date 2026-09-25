@@ -87,6 +87,18 @@ NAMED = [
     ("sthr-onewhorides", "The One Who Rides Forever", "Fairground", 2),
 ]
 
+# Choices (guide: "What You Saw" and each district's deep resolution). Each is
+# a pair of mutually exclusive options; keys are the log fields <key>_a/_b.
+CHOICES = [
+    ("prologue", "What You Saw", ("The town was warned",), ("Kept the night to yourselves",)),
+    ("ninth", "The Ninth Line", ("Signed the ninth line",), ("Left it blank",)),
+    ("page", "The Drowned Page", ("Page reached the Press",), ("The drowned heard the hour",)),
+    ("ring", "The Walker's Ring", ("You carry the ring",), ("The walkers keep it",)),
+    ("vote", "The Ledger", ("The vote was torn out",), ("The vote still stands",)),
+    ("ticket", "The Ticket", ("You hold the ticket",), ("You refused the ticket",)),
+    ("name", "The Name", ("You have spoken the name",), ("Kept unspoken",)),
+]
+
 BRACKETS = [("prime", "Prime", 0, 4), ("weathered", "Weathered", 5, 9),
             ("elder", "Elder", 10, 14), ("ancient", "Ancient", 15, 99)]
 
@@ -150,12 +162,12 @@ def _pages():
             anchor="ms")
     y = 222
     p1.text(90, y, "Campaign started:", size=24, style="bold")
-    p1.line("started", 300, 560, y)
-    p1.text(590, y, "Difficulty:", size=24, style="bold")
-    x = p1.checkbox("diff_standard", 720, y, "Standard", group="diff")
-    p1.checkbox("diff_hard", x, y, "Hard", group="diff")
-    p1.text(960, y, "Investigators:", size=24, style="bold")
-    p1.counter("investigators", 1162, y - 9, 1, 4)
+    p1.line("started", 300, 470, y)
+    p1.text(500, y, "Difficulty:", size=24, style="bold")
+    x = p1.checkbox("diff_easy", 630, y, "Easy", group="diff")
+    x = p1.checkbox("diff_standard", x, y, "Standard", group="diff")
+    x = p1.checkbox("diff_hard", x, y, "Hard", group="diff")
+    p1.checkbox("diff_expert", x, y, "Expert", group="diff")
 
     p1.header(290, "Loop Counter")
     y = 348
@@ -164,6 +176,8 @@ def _pages():
     p1.text(420, y, "Dissonance scar next loop (= loops, max 6):", size=22,
             style="italic", fill=SOFT)
     p1.counter("scar", 895, y - 9, derived="scar")
+    p1.text(960, y, "Investigators:", size=24, style="bold")
+    p1.counter("investigators", 1162, y - 9, 1, 4)
     y = 410
     p1.text(90, y, "Current Act:", size=24, style="bold")
     x = p1.checkbox("act1", 250, y, "I — Learning the Rules", group="act")
@@ -260,8 +274,28 @@ def _pages():
         p3.line("dead{}_loop".format(i), 1070, 1185, y)
         y += 58
 
-    p3.header(y + 30, "Finale Record")
-    y += 92
+    p3.header(y + 30, "Choices")
+    y += 88
+    p3.text(90, y, "Prologue ended:", size=22, style="bold")
+    x = p3.checkbox("pro_r1", 330, y, "R1", group="pro")
+    x = p3.checkbox("pro_r2", x, y, "R2", group="pro")
+    x = p3.checkbox("pro_nr", x, y, "No Resolution", group="pro")
+    p3.text(840, y, "Torn loops", size=22, style="bold")
+    p3.counter("torn", 1000, y - 9, 0, 99)
+    p3.text(1040, y, "Taken", size=22, style="bold")
+    p3.counter("taken", 1150, y - 9, 0, 99)
+    y += 50
+    for key, label, a, b in CHOICES:
+        p3.text(90, y, label, size=22, style="bold")
+        x = p3.checkbox(key + "_a", 400, y, a[0], size=21, group="ch_" + key)
+        x = p3.checkbox(key + "_b", max(x, 780), y, b[0], size=21, group="ch_" + key)
+        y += 44
+    p3.text(90, y, "Signed the ninth line:", size=22, style="bold")
+    p3.line("ninth_signer", 330, 760, y)
+    y -= 8
+
+    p3.header(y + 50, "Finale Record")
+    y += 108
     p3.text(90, y, "Attempted on loop:", size=24, style="bold")
     p3.line("finale_loop", 300, 400, y)
     p3.text(440, y, "Contest reached:", size=24, style="bold")
@@ -269,27 +303,26 @@ def _pages():
     p3.checkbox("contest_no", x, y, "no", group="contest")
     p3.text(880, y, "Banked Memory:", size=24, style="bold")
     p3.counter("finale_memory", 1130, y - 9, 0, 99)
-    y += 60
+    y += 54
     p3.text(90, y, "Resolution reached:", size=24, style="bold")
-    y += 48
-    x = 110
-    for key, label in (("r1", "R1 Take Its Place"), ("r2", "R2 Close the Door"),
-                       ("r3", "R3 Break Through")):
-        x = p3.checkbox(key, x, y, label, group="res")
-    y += 48
-    x = 110
-    for key, label in (("r4", "R4 Seal by Force"), ("r5", "R5 Next Time (continue)"),
-                       ("r6", "R6 The Loop Wins (end)")):
-        x = p3.checkbox(key, x, y, label, group="res")
-    y += 62
+    for row in ((("r1", "R1 Take Its Place"), ("r1b", "R1b Let It In"),
+                 ("r2", "R2 Close the Door")),
+                (("r3", "R3 Break Through"), ("r4", "R4 Seal by Force")),
+                (("r5", "R5 Next Time (continue)"), ("r6", "R6 The Loop Wins (end)"))):
+        y += 44
+        x = 110
+        for key, label in row:
+            x = p3.checkbox(key, x, y, label, group="res")
+    y += 54
     p3.text(90, y, "Anchor left behind:", size=24, style="bold")
     p3.line("anchor", 320, 1185, y)
-    y += 54
-    p3.text(90, y, "Aged +3 (R2):", size=24, style="bold")
-    p3.line("aged3", 320, 1185, y)
+    y += 50
+    p3.text(90, y, "Years paid at the end:", size=24, style="bold")
+    p3.line("aged3", 350, 1185, y)
 
-    p3.header(y + 76, "Campaign Notes")
-    p3.line("notes3", 90, 1190, y + 150, rows=16, row_h=36)
+    p3.header(y + 62, "Campaign Notes")
+    rows = max(2, (1560 - (y + 132)) // 36 + 1)
+    p3.line("notes3", 90, 1190, y + 132, rows=rows, row_h=36)
     return [p1, p2, p3]
 
 

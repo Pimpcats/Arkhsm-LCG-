@@ -113,3 +113,34 @@ punishing.
 *Model caveats: fixed Hold-Back p and one attempt/investigator/round in the
 finale; deck Dissonance held at 0.8/round; income model is Normal-approximate.
 Table play validates the rest.*
+
+---
+
+## Tempo — the act-vs-clock race (`pipeline/simulate_tempo.py`)
+
+`simulate.py` never asked whether a party can travel, gather clues and finish
+objectives before Hour IX. `simulate_tempo.py` plays loops round by round:
+Hour advance (doom 1 + Lost Hours + district Skip cards, deck size growing as
+districts are placed), 3 actions per investigator minus a non-objective action
+tax, 1 Hour per district crossing, investigate odds from the calibrated bag
+against each location's shroud, clue supply from the printed values, objective
+tests, and a Named enemy's cost where one guards an objective. Assumptions are
+named constants (party skills, +1 card boost, tax 25/35/45%).
+
+Loops until The Way the Night Breaks (median, 10–90%), 1500 campaigns each (seed 1729):
+
+| players | finale-first play (35% tax) | exploring, first-time (35% tax) | objectives / loop (exploring) |
+|---|---|---|---|
+| 1 | 6 (5–9) | 9 (6–13), 3.6% never by 15 | 0.94 |
+| 2 | 4 (3–5) | 6 (4–8) | 1.51 |
+| 3 | 4 (3–4) | 5 (4–8) | 1.64 |
+| 4 | 4 (3–4) | 6 (4–8) | 1.61 |
+
+About 1.8 districts beyond the Square are reached per loop (design: "2 or 3").
+
+**Reading:** a first-time party unlocks the finale around loop 5–6 and, with a
+finale attempt or a Next Time retry, lands near the 6–8-loop target. A party
+that knows the route unlocks it by loop 3–4. Solo is slow (and at high tax a
+quarter of campaigns never unlock by loop 15). No change made before the
+owner's first playtest; the knobs are the objective clue counts, the Hour
+thresholds and the travel cost.

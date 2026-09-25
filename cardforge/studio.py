@@ -1977,7 +1977,7 @@ def act_auto(p):
                        check=True, cwd=ROOT)
         log("cards composed on the official frames")
         _apply_local_and_rebuild(campaign)
-        log("AUTO-BUILD DONE — load dist/the_still_hour_mod.json in TTS")
+        log("AUTO-BUILD DONE — load dist/saved_object_the_still_hour.json in TTS (docs/LOADING.md)")
     return run_job("auto-build", chain)
 
 
@@ -2043,7 +2043,7 @@ def act_export_tts(p):
             subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", script)],
                            check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
             log("rebuilt: pipeline/" + script)
-        log("DONE — load dist/the_still_hour_mod.json in Tabletop Simulator")
+        log("DONE — load dist/saved_object_the_still_hour.json in Tabletop Simulator (docs/LOADING.md)")
     return run_job("export-to-tts", chain)
 
 
@@ -2076,7 +2076,7 @@ def act_apply(p):
                            check=True, cwd=ROOT,
                            stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
             log("rebuilt: pipeline/" + script)
-        log("mod rebuilt with {} real face(s) — load dist/the_still_hour_mod.json".format(len(urls)))
+        log("mod rebuilt with {} real face(s) — load dist/saved_object_the_still_hour.json (docs/LOADING.md)".format(len(urls)))
     run_job("apply-to-mod", rebuild)
     return {"ok": True,
             "cards": len([k for k in urls if not k.startswith("_")])}
@@ -3501,8 +3501,8 @@ el('steps_illustrate',
  step(true,'<b>5.</b> Don&rsquo;t like a result? Open the card in <b>3 &middot; Cards</b> &rarr; &#127922; Reroll gives new takes'));
 el('steps_apply',
  step(false,'<b>1.</b> <b>Compose cards &amp; Export to TTS</b> — writes local file:/// art and rebuilds the mod')+
- step(false,'<b>2.</b> Copy <code>dist/the_still_hour_mod.json</code> to <code>Documents/My Games/Tabletop Simulator/Saves/</code>')+
- step(false,'<b>3.</b> In TTS: Games &rarr; Save &amp; Load &rarr; THE STILL HOUR (Run Tests on the Control token should pass 23/23)'));}
+ step(false,'<b>2.</b> Copy <code>dist/saved_object_the_still_hour.json</code> to <code>Documents/My Games/Tabletop Simulator/Saves/Saved Objects/</code>')+
+ step(false,'<b>3.</b> In TTS with SCED loaded: Objects &rarr; Saved Objects &rarr; The Still Hour, then press Place on the box (docs/LOADING.md)'));}
 function renderAll(s){renderChips(s);renderCards(s);renderGallery(s);renderSteps(s);}
 async function refresh(){const r=await fetch('/api/status?campaign='+camp());const s=await r.json();
 ST=s.faces_ver;

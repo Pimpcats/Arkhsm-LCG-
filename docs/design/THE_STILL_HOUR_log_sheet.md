@@ -1,7 +1,7 @@
 # THE STILL HOUR — Campaign Log
 *Fill in at each interlude. Everything on this sheet persists across resets.*
 
-**Campaign started:** ________________  **Difficulty:** ☐ Standard ☐ Hard  **Investigators:** ______
+**Campaign started:** ________________  **Difficulty:** ☐ Easy ☐ Standard ☐ Hard ☐ Expert  **Investigators:** ______
 
 ---
 
@@ -78,6 +78,21 @@ Current banked Memory: **______**  (soft cap **18** — reduce to 18 at each loo
 
 ---
 
+## CHOICES
+*Record each choice when the guide asks for it (What You Saw after the Prologue; each district's deep resolution).*
+
+**Prologue ended:** ☐ R1 ☐ R2 ☐ No Resolution   **Torn loops:** ____   **Taken loops:** ____
+
+| Choice | ☐ | ☐ |
+|---|---|---|
+| What You Saw | The town was warned | You kept the night to yourselves |
+| The Ninth Line | ________ signed the ninth line | The ninth line was left blank |
+| The Drowned Page | The true page reached the Press | The drowned heard the true hour |
+| The Walker's Ring | You carry the walker's ring | The walkers keep their ring |
+| The Ledger | The vote was torn out | The vote still stands |
+| The Ticket | You hold the ticket | You refused the ticket |
+| The Name | You have spoken the name | The name is kept unspoken |
+
 ## THREADS & CHOICES
 - Seraphine — "Who Opened the Door": ☐ unheard ☐ suspected ☐ **known** (Vote + Name)
 - The Ticket-Taker's Bargain: ☐ never heard ☐ **heard** (epilogue flag)
@@ -100,4 +115,4 @@ Resolution reached:
 - ☐ **R1 Take Its Place** ☐ **R1b Let It In, On Your Terms** ☐ **R2 Close the Door** ☐ **R3 Break Through**
 - ☐ **R4 Seal by Force** ☐ **R5 Next Time** (continue) ☐ **R6 The Loop Wins** (end)
 
-Anchor left behind: ______________________  Aged +3 (R2): ______________________
+Anchor left behind: ______________________  Years paid at the end: ______________________

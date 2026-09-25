@@ -261,12 +261,16 @@ def build_scenario_box(sc, assign, cards, campaign_name="Campaign"):
                 else:
                     (x, y, z), rot = location_slot(n)
                 o = B.build_card(normalize(cards[cid]))
-                o["Transform"] = transform(x, z, y=y, ry=rot)
+                # a location with an unrevealed side goes in unrevealed side
+                # up (face down, like location_unrevealed.json); SCED spawns
+                # its clues when the investigators flip it
+                rz = 180 if cards[cid].get("unrevealed") else 0
+                o["Transform"] = transform(x, z, y=y, ry=rot, rz=rz)
                 contained.append(o)
                 ml[o["GUID"]] = {"lock": False,
                                  "pos": {"x": round(x, 3), "y": round(y, 3),
                                          "z": round(z, 3)},
-                                 "rot": {"x": 0, "y": rot, "z": 0}}
+                                 "rot": {"x": 0, "y": rot, "z": rz}}
             continue
         anchor = stack_anchor(sc, stack)
         x, y, z = anchor["pos"]

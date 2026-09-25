@@ -146,6 +146,8 @@ local function freshState(n)
     onCardMemory = {},       -- investigatorId -> Memory on that investigator's cards (this loop)
     loopTallies = {},        -- investigatorId -> {raises, spent}: Aging's "leaned on the loop" inputs
     lastLoopEndDissonance = nil, -- Dissonance when the last loop ended (Aging "ended in danger")
+    prologue = false,        -- playing the Prologue (The First Hour): not a loop
+    contest = 0,             -- finale contest progress (Contest the Crossing)
   }
 end
 
@@ -457,6 +459,8 @@ end
 -- the stage — a driver can only raise it, so calling with a lower value is a
 -- no-op. Returns the resulting stage.
 function CampaignState.advanceAppointed(driverStage)
+  -- the Prologue has no Appointed (guide: The First Hour): nothing drives it
+  if state.prologue then return state.appointedStage end
   local target = math.max(0, math.min(3, math.floor(driverStage or 0)))
   if target > state.appointedStage then
     state.appointedStage = target
@@ -508,6 +512,19 @@ end
 -- bankMemory()/Aging.applyInterlude() around this) — a reset alone does not
 -- bank Memory, per guide §4.
 function CampaignState.reset()
+  if state.prologue then
+    -- the Prologue's first reset: the night folds, but it is not a loop (no
+    -- loop counted, no scar, no Years), and play continues at Loop 1
+    state.prologue = false
+    state.dissonance = 0
+    state.hourglass = Constants.HOUR_FIRST
+    state.oncePerLoopFlags = {}
+    state.testTypesLastLoop = state.testTypesThisLoop
+    state.testTypesThisLoop = {}
+    state.appointedStage = 0
+    state.lastLoopEndDissonance = nil
+    return state
+  end
   state.loopsCompleted = state.loopsCompleted + 1
   -- Aging reads this at the interlude ("ended in danger"), after the drop below.
   state.lastLoopEndDissonance = state.dissonance
@@ -521,7 +538,19 @@ function CampaignState.reset()
   state.testTypesLastLoop = state.testTypesThisLoop
   state.testTypesThisLoop = {}
   state.appointedStage = 0
+  state.contest = 0
   return state
+end
+
+--- Finale contest progress (guide: Contest the Crossing), 0..99. It lasts
+-- only for the finale being played; a reset clears it.
+function CampaignState.getContest()
+  return state.contest or 0
+end
+
+function CampaignState.setContest(n)
+  state.contest = math.max(0, math.min(99, math.floor(tonumber(n) or 0)))
+  return state.contest
 end
 
 --- Begin a new loop's play: enforce the Memory soft cap. Call at §2 setup after
@@ -534,6 +563,16 @@ end
 --- Dissonance at the end of the last loop (nil before the first reset).
 function CampaignState.getLastLoopEndDissonance()
   return state.lastLoopEndDissonance
+end
+
+--- The Prologue (The First Hour) is played before Loop 1 and is not a loop.
+function CampaignState.inPrologue()
+  return state.prologue == true
+end
+
+function CampaignState.setPrologue(on)
+  state.prologue = on and true or false
+  return state.prologue
 end
 
 function CampaignState.getLoopsCompleted()
@@ -1974,7 +2013,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/cards/sthr-static-token.jpg?v=a556271511"
+ChaosBag.TOKEN_IMAGE_URL = "https://placehold.co/512x512/14121e/e2ecf0.png?text=static"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -3191,10 +3230,121 @@ local function hunt()
 end
 
 local function resetLoop()
+  local prologue = CampaignState.inPrologue()
   CampaignState.reset()
   bag.clearTemporary()
   Dissonance.syncBag(bag)
-  note("The night folds. Loop reset: Memory/Knowledge/Years kept; Dissonance dropped to the scar.")
+  if prologue then
+    note("The night folds for the first time. The Prologue is over (it is not a loop): Loop 1 is next.")
+  else
+    note("The night folds. Loop reset: Memory/Knowledge/Years kept; Dissonance dropped to the scar.")
+  end
+end
+
+-- Card types a scenario box lays out (never a player card or a weakness).
+local SCENARIO_TYPES = { Location = true, Act = true, Agenda = true, Enemy = true,
+  Treachery = true, Story = true, ScenarioReference = true, Scenario = true }
+local LOOP_TAG = "StillHourLoop"
+
+local function isLoopCard(tags, gm)
+  for _, t in ipairs(tags or {}) do if t == LOOP_TAG then return true end end
+  local ok, md = pcall(JSON.decode, gm or "")
+  if not ok or type(md) ~= "table" then return false end
+  local id = tostring(md.id or "")
+  return id:sub(1, 5) == "sthr-" and SCENARIO_TYPES[md.type] == true and not md.weakness
+end
+
+--- Tokens resting on a card (clues, doom, damage): small, unlocked, not cards.
+local function tokensOn(card)
+  local found = {}
+  if type(Physics) ~= "table" or type(Physics.cast) ~= "function" then return found end
+  local b = card.getBounds()
+  local hits = Physics.cast({ origin = { b.center.x, b.center.y + 2, b.center.z },
+    direction = { 0, -1, 0 }, type = 3, size = { b.size.x, 1, b.size.z }, max_distance = 3 }) or {}
+  for _, h in ipairs(hits) do
+    local o = h.hit_object
+    if o and o ~= card and not o.getLock() and (o.type == "Tile" or o.type == "Generic"
+        or o.type == "Chip") then
+      found[#found + 1] = o
+    end
+  end
+  return found
+end
+
+--- Loop Setup step 1: take every card the scenario boxes laid out (and the
+-- tokens on them) off the table, so the boxes can be Placed fresh. Player
+-- cards, minicards, mats and the campaign's own objects are never touched.
+local function clearLoopBoard()
+  local removed, tokens = 0, 0
+  if type(getObjects) ~= "function" then return { cards = 0, tokens = 0 } end
+  for pass = 1, 2 do
+    for _, o in ipairs(getObjects()) do
+      if not o.isDestroyed() and (o.type == "Card" or o.type == "Deck") then
+        if o.type == "Card" then
+          if isLoopCard(o.getTags and o.getTags() or {}, o.getGMNotes()) then
+            for _, t in ipairs(tokensOn(o)) do t.destruct() ; tokens = tokens + 1 end
+            o.destruct()
+            removed = removed + 1
+          end
+        else
+          local mine, others = {}, 0
+          for _, e in ipairs(o.getObjects() or {}) do
+            if isLoopCard(e.tags, e.gm_notes) then mine[#mine + 1] = e.guid else others = others + 1 end
+          end
+          if #mine > 0 and others == 0 then
+            for _, t in ipairs(tokensOn(o)) do t.destruct() ; tokens = tokens + 1 end
+            o.destruct()
+            removed = removed + #mine
+          elseif #mine > 0 then
+            local pos = o.getPosition()
+            for _, g in ipairs(mine) do
+              if o.isDestroyed() then break end
+              local ok, c = pcall(o.takeObject, { guid = g, position = { pos.x, pos.y + 3, pos.z }, smooth = false })
+              if ok and c then c.destruct() ; removed = removed + 1 end
+            end
+          end
+        end
+      end
+    end
+  end
+  return { cards = removed, tokens = tokens }
+end
+
+-- The campaign guide's chaos bags (Campaign Setup), as SCED's token ids
+-- (core/Constants.ttslua ID_URL_MAP: blue = Elder Sign, red = Auto-fail,
+-- elder = Elder Thing). [static] tokens are added on top by Dissonance.
+local DIFFICULTY = {
+  { key = "easy", label = "Easy",
+    bag = { "p1", "p1", "0", "0", "0", "m1", "m1", "m1", "m2", "m2",
+            "skull", "skull", "cultist", "tablet", "elder", "red", "blue" } },
+  { key = "standard", label = "Standard",
+    bag = { "p1", "0", "0", "m1", "m1", "m1", "m2", "m2", "m3", "m4",
+            "skull", "skull", "cultist", "tablet", "elder", "red", "blue" } },
+  { key = "hard", label = "Hard",
+    bag = { "0", "0", "0", "m1", "m1", "m2", "m2", "m3", "m3", "m4", "m5",
+            "skull", "skull", "cultist", "tablet", "elder", "red", "blue" } },
+  { key = "expert", label = "Expert",
+    bag = { "0", "m1", "m1", "m2", "m2", "m3", "m3", "m4", "m4", "m5", "m6", "m8",
+            "skull", "skull", "cultist", "tablet", "elder", "red", "blue" } },
+}
+
+--- Fill SCED's chaos bag for a difficulty, then put the band's [static] back.
+local function setDifficulty(i)
+  local d = DIFFICULTY[i]
+  if not d then return false end
+  if not SCED.isPresent() then
+    announce("Chaos bag presets need the SCED mod: build the " .. d.label
+      .. " bag by hand from the Campaign Guide (Campaign Setup).")
+    return false
+  end
+  SCED.globalCall("setChaosBagState", d.bag)
+  -- SCED respawns the bag; once it has landed, re-add the band's [static] tokens
+  Wait.time(function()
+    guarded("chaos bag", Dissonance.syncBag, bag)
+    refreshControl()
+  end, 1.5)
+  announce("Chaos bag set to " .. d.label .. " (" .. #d.bag .. " tokens), plus the Dissonance band's [static].")
+  return true
 end
 
 local function unlockFact(id)
@@ -3359,7 +3509,8 @@ local PLUS_MINUS = "Left-click +1 · Right-click -1"
 
 local function drawPlay()
   local c = CampaignState.constants()
-  header(string.format("THE STILL HOUR · loop %d", CampaignState.getLoopsCompleted() + 1), -2.3)
+  header(CampaignState.inPrologue() and "THE STILL HOUR · Prologue"
+    or string.format("THE STILL HOUR · loop %d", CampaignState.getLoopsCompleted() + 1), -2.3)
   button("shClickMemory", string.format("Memory %d / %d", CampaignState.getBankedMemory(), c.memoryCap),
     -PAIR_X, -1.7, 1000, "Banked Memory. " .. PLUS_MINUS)
   button("shClickInvestigators", "Investigators " .. c.investigators, PAIR_X, -1.7, 1000,
@@ -3389,6 +3540,16 @@ local function drawPlay()
   button("shReset", "Reset Loop", -ROW3_X, 2.0)
   button("shOpenInterlude", "Interlude", 0.0, 2.0, 620, "Spend Memory: Recollections and level-ups.")
   button("shKnowledgeStatus", "Knowledge", ROW3_X, 2.0)
+  if CampaignState.knows("the-way-the-night-breaks") then
+    button("shClickContest", string.format("Contest %d / %d", CampaignState.getContest(), c.contestTarget),
+      0.0, 2.6, 620, "The Last Hour: contest progress. " .. PLUS_MINUS)
+  end
+  button("shClearBoard", "Clear Board", -ROW3_X, 2.6, 620,
+    "Loop Setup: remove every card the scenario boxes laid out, and the tokens on them.")
+  for i, d in ipairs(DIFFICULTY) do
+    button("shDifficulty" .. i, d.label, -1.8 + (i - 1) * 1.2, 3.2, 520,
+      "Campaign Setup: fill SCED's chaos bag for " .. d.label .. " (the guide's list).", 90)
+  end
 end
 
 local function drawInterlude()
@@ -3635,6 +3796,8 @@ end
 
 function onLoad(saved)
   guarded("load", restore, saved)
+  -- a brand-new campaign begins with the Prologue, which is not a loop
+  if saved == nil or saved == "" then CampaignState.setPrologue(true) end
   Board.init(self, { log = note })
   guarded("campaign log", adoptLogMirror)
   bag.count = bag.target()
@@ -3712,7 +3875,14 @@ function shApiState()
     band = CampaignState.band(), hour = CampaignState.getHour(), stage = Appointed.stage(),
     investigators = c.investigators, loops = CampaignState.getLoopsCompleted(),
     static = bag.describe(), sced = SCED.isPresent(), mode = mode,
+    prologue = CampaignState.inPrologue(),
   }
+end
+
+--- End the Prologue if it is still running (tests and the relay start at Loop 1).
+function shApiEndPrologue()
+  if CampaignState.inPrologue() then guarded("reset", resetLoop) ; afterChange() end
+  return shApiState()
 end
 
 function shApiCounter(p)
@@ -3828,6 +3998,44 @@ function shRaiseDissonance()
   if info.reachedReset then print("  Dissonance hit the reset threshold — the loop ends.") ; shReset() end
   afterChange()
 end
+
+function shClearBoard()
+  local r = guarded("clear board", clearLoopBoard) or { cards = 0, tokens = 0 }
+  announce(string.format("The board is cleared: %d scenario card(s) and %d token(s) removed. "
+    .. "Press Place on The Square's box to set up the next loop.", r.cards, r.tokens))
+  return r
+end
+
+function shApiClearBoard() return guarded("clear board", clearLoopBoard) end
+-- Victory X of the Named (the encounter cards' ids; the log's v:<id> boxes)
+local VICTORY = { ["sthr-bellringer"] = 2, ["sthr-wearssheriff"] = 3, ["sthr-onewhorides"] = 2 }
+
+--- Bank a Named enemy's Victory once per campaign (the log's tick calls this).
+function shApiClaimVictory(p)
+  local id = p and p.id
+  if not VICTORY[id] then return false end
+  local newly = CampaignState.claimVictory(id, VICTORY[id])
+  if newly then
+    announce(string.format("Victory: %d banked Memory (%d banked).", VICTORY[id], CampaignState.getBankedMemory()))
+  end
+  afterChange()
+  return newly
+end
+
+function shClickContest(_, _, alt)
+  CampaignState.setContest(CampaignState.getContest() + (alt and -1 or 1))
+  local c = CampaignState.constants()
+  if CampaignState.getContest() >= c.contestTarget then
+    announce("The contest is reached: advance Contest the Crossing.")
+  end
+  afterChange()
+end
+
+function shDifficulty1() setDifficulty(1) end
+function shDifficulty2() setDifficulty(2) end
+function shDifficulty3() setDifficulty(3) end
+function shDifficulty4() setDifficulty(4) end
+function shApiDifficulty(p) return setDifficulty(p and p.i) end
 
 function shReset()
   guarded("reset", resetLoop)

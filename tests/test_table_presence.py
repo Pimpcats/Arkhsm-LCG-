@@ -533,3 +533,73 @@ def test_boxes_sharing_the_loop_board_never_stack_on_each_other(tmp_path):
         for b in spots[i + 1:]:
             # cards are ~2.5 x 3.5: two stacks closer than that on both axes overlap
             assert abs(a[1] - b[1]) >= 2.5 or abs(a[2] - b[2]) >= 2.5, (a, b)
+
+
+# ------------------------------------------ replayable scenario box (fake TTS) --
+LOOP_BOX_CHUNK = r"""
+local BOX = %s
+local box = spawnObjectJSON({ json = BOX })
+local out = {}
+local function count(tag)
+  local n = 0
+  for _, o in ipairs(getObjects()) do
+    if o ~= box and o.hasTag(tag) then
+      n = n + (o.type == "Deck" and #o.getObjects() or 1)
+    end
+  end
+  return n
+end
+Wait.frames(function()
+  local inside = #box.getObjects()
+  out.placed1 = box.call("buttonClick_place")
+  out.onTable1 = count("StillHourLoop")
+  -- play: draw a card off the placed deck and leave it on the table
+  for _, o in ipairs(getObjects()) do
+    if o.type == "Deck" and o.hasTag("StillHourLoop") then
+      local c = o.takeObject({ index = 0, position = { 5, 2, 5 } })
+      out.drawnTagged = c.hasTag("StillHourLoop")
+      break
+    end
+  end
+  out.recalled = box.call("buttonClick_recall")
+  out.onTable2 = count("StillHourLoop")
+  out.boxKept = #box.getObjects() == inside
+  out.placed2 = box.call("buttonClick_place")
+  out.onTable3 = count("StillHourLoop")
+  print("@@OUT " .. JSON.encode(out))
+end, 10)
+"""
+
+
+def test_scenario_box_places_fresh_every_loop(tmp_path):
+    import shutil
+    lua = shutil.which("lua5.2")
+    if not lua:
+        pytest.skip("lua5.2 not installed")
+    sys.path.insert(0, os.path.join(ROOT, "tools", "tts_relay"))
+    import relay
+    camp = json.load(open(os.path.join(ROOT, "dist", "the_still_hour_campaign.json"),
+                          encoding="utf-8"))["ObjectStates"][0]
+    books = [o for o in camp["ContainedObjects"] if o["Name"] == "Custom_Model_Bag"]
+    book = next(b for b in books if json.loads(b["GMNotes"]).get("id") == "district_church")
+    book = json.loads(json.dumps(book))
+    book["LuaScript"] = T.loop_box_script()
+    chunk = LOOP_BOX_CHUNK % relay.lua_long_string(json.dumps(book, ensure_ascii=False))
+    path = tmp_path / "chunk.lua"
+    path.write_text(chunk, encoding="utf-8")
+    r = subprocess.run([lua, os.path.join(ROOT, "tests", "tts_fake", "mock_tts.lua"), str(path)],
+                       capture_output=True, text=True, cwd=ROOT, timeout=120)
+    outs = []
+    for ln in r.stdout.splitlines():
+        if ln.startswith("@@MSG "):
+            msg = json.loads(ln[6:]).get("message", "")
+            if msg.startswith("@@OUT "):
+                outs.append(msg[6:])
+    assert outs, r.stdout[-2000:] + r.stderr[-2000:]
+    out = json.loads(outs[-1])
+    n = len(book["ContainedObjects"])
+    assert out["placed1"] == n and out["placed2"] == n
+    assert out["onTable1"] > 0 and out["drawnTagged"] is True
+    assert out["onTable2"] == 0, "Recall must remove every placed copy, drawn cards too"
+    assert out["boxKept"] is True, "the box never empties"
+    assert out["onTable3"] == out["onTable1"]

@@ -87,6 +87,9 @@ def build_gmnotes(c):
         tokens = scenario_tokens(c.get("tokens"))
         if tokens:
             m["tokens"] = {"front": tokens}
+            back = scenario_tokens(c.get("back_tokens"))
+            if back:                       # Hard / Expert, on the card's back
+                m["tokens"]["back"] = back
         return json.dumps(m, separators=(",", ":"))
     if t == "Investigator":
         # real-SCED shape (docs/art_reference/sced_objects/investigator_front.json):
@@ -161,8 +164,17 @@ def build_gmnotes(c):
                     else "count": c["clues"], "type": "Clue", "token": "clue"}]
             if side:
                 m["locationFront"] = dict(side)
-                m["locationBack"] = dict(
-                    side, **({"victory": c["victory"]} if "victory" in c else {}))
+                if c.get("unrevealed"):
+                    # the back is the unrevealed side: no clues until it is
+                    # flipped (location_unrevealed.json); Victory is printed
+                    # on the revealed side
+                    back = {k: v for k, v in side.items() if k != "uses"}
+                    if "victory" in c:
+                        m["locationFront"]["victory"] = c["victory"]
+                    m["locationBack"] = back
+                else:
+                    m["locationBack"] = dict(
+                        side, **({"victory": c["victory"]} if "victory" in c else {}))
     return json.dumps(m, separators=(",", ":"))
 
 

@@ -34,16 +34,16 @@ docs/
 ## Quickstart
 
 ```bash
-python3 pipeline/build_cards.py            # -> dist/the_still_hour.json (30 cards)
-python3 pipeline/bundle_mod.py             # -> dist/the_still_hour_mod.json (LOADABLE TTS SAVE)
-lua5.4  pipeline/lua_smoketest.lua         # Lua system tests (54 assertions)
-lua5.4  pipeline/verify_bundle.lua         # load the mod bundle in a stubbed TTS env
+python3 pipeline/publish_hosted.py         # render, host images, rebuild every dist/ file
+lua5.4  pipeline/lua_smoketest.lua         # Lua system tests
+lua5.4  pipeline/verify_bundle.lua         # the Control token in a stubbed TTS env
+python3 -m pytest -q tests                 # content, packaging, fake-TTS relay tests
 python3 pipeline/simulate.py               # balance simulation report + assertions
+python3 pipeline/simulate_tempo.py         # act-vs-clock pacing (objectives per loop)
 ```
 
-**To play/test in Tabletop Simulator:** build the two commands above, then load
-`dist/the_still_hour_mod.json` — see **`docs/LOADING.md`**. It spawns the card
-bag + a scripted Control token; click **Run Tests** for an in-engine pass.
+**To play in Tabletop Simulator:** load `dist/saved_object_the_still_hour.json`
+as a Saved Object in SCED — see **`docs/LOADING.md`**.
 
 ## Testing & simulation
 

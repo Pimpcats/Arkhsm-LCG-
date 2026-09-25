@@ -29,7 +29,7 @@ Manual equivalent: `python3 cardforge/studio.py`.
 
 ## Build status (see `REPO_BUILD_STATUS.md` for detail)
 - ✅ **Design frozen** — all docs below.
-- ✅ **P1–P8 all built & tested offline** (99-assertion suite + 39 in-bundle). Loadable mod at `dist/the_still_hour_mod.json`; download-box package in `dist/downloads/`.
+- ✅ **P1–P8 all built & tested offline** (99-assertion suite + 39 in-bundle). The package to load is `dist/saved_object_the_still_hour.json` (a TTS Saved Object; see `docs/LOADING.md`).
 - ✅ **CO-001 applied** (contest `4 * n`, Memory-as-XP) and **CO-002 applied** (the staged Appointed, renamed from Latecomer).
 - 🟡 **Board wiring + chaos bag built** (Appointed card buttons/placement, location flips/seals, touchable counters, interlude buy panel, physical `[static]` tokens in SCED's bag) — verified offline; the TTS relay run confirms it in the real engine.
 - ⏳ **Pending:** the real in-TTS run · location back art · uploading the download-box release asset.
@@ -43,4 +43,4 @@ Manual equivalent: `python3 cardforge/studio.py`.
 **Scaffolds:** `build_cards.py` / `stillhour_cards_spec.json` / `stillhour_starter.json` (note: repo's `pipeline/build_cards.py` is the newer authoritative version) · `build_art_manifest.py` + `art_manifest_starter.json` + `art_profiles.json` + `cardforge_stub.py` (art tooling) · `THE_STILL_HOUR_flow.html` (systems infographic).
 
 ## How to continue
-Hand the next task to **Claude Code** against `Pimpcats/Arkhsm-LCG-` @ `main`. P1–P8 are done; next up: the **in-TTS load test** (load `dist/the_still_hour_mod.json`, click Run Tests), then the board wiring (Appointed callbacks, location card flips, interlude panel) and the art pipeline.
+Hand the next task to **Claude Code** against `Pimpcats/Arkhsm-LCG-` @ `main`. P1–P8, the board wiring and the art are done; next up is the owner's first playtest (load `dist/saved_object_the_still_hour.json`, see `docs/LOADING.md`) and the TTS relay run on the current build. Track current state in `campaigns/still_hour/assistant/production.json`.

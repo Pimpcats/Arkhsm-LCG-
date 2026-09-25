@@ -79,6 +79,11 @@ print("\n== runStillHourTests() ==")
 local res = env.runStillHourTests()
 expect("in-bundle tests all pass (" .. res.passed .. ")", res.failed == 0 and res.passed > 0)
 
+print("\n== a new campaign opens in the Prologue ==")
+expect("a fresh control starts in the Prologue", env.shApiState().prologue == true)
+local ep = env.shApiEndPrologue()
+expect("ending the Prologue counts no loop and starts Loop 1", ep.prologue == false and ep.loops == 0)
+
 print("\n== touch counters (left / right click) ==")
 env.shClickMemory(nil, "White", false) ; env.shClickMemory(nil, "White", false)
 expect("Memory +2 by clicks", env.shApiState().memory == 2)

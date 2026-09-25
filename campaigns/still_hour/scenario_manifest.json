@@ -451,11 +451,11 @@
     ],
     "campaign_log": {
       "template": "Custom_Token",
-      "status": "todo"
+      "status": "built"
     },
     "campaign_guide": {
       "template": "Custom_PDF",
-      "status": "todo"
+      "status": "built"
     },
     "resolutions_order": [
       "R1",
@@ -583,15 +583,21 @@
           "id": "R1",
           "name": "You Saw It Coming",
           "condition": "an investigator resolved the Occultation at the Almanac Steps",
-          "source": "campaign guide §5",
+          "source": "player guide",
           "log": "2 banked Memory each, +1 banked Memory to the party. Record \"You Are Unstuck\" (Act I)."
         },
         {
           "id": "R2",
           "name": "It Caught You Unready",
-          "condition": "the Hourglass reached Hour IX first, or every investigator was defeated",
-          "source": "campaign guide §5",
+          "condition": "the Hourglass reached Hour IX",
+          "source": "player guide",
           "log": "2 banked Memory each. Record \"You Are Unstuck\" (Act I)."
+        },
+        {
+          "id": "NR",
+          "name": "The First Death",
+          "condition": "every investigator was defeated",
+          "source": "player guide"
         }
       ]
     },
@@ -693,6 +699,32 @@
       "grants": [
         "The Lamp Was Never Lit",
         "The Keeper's Ninth Death"
+      ],
+      "resolutions": [
+        {
+          "id": "R1",
+          "name": "The Ninth Line",
+          "condition": "you recorded The Keeper's Ninth Death this loop",
+          "source": "player guide"
+        },
+        {
+          "id": "R2",
+          "name": "A Light on the Water",
+          "condition": "you recorded The Lamp Was Never Lit this loop",
+          "source": "player guide"
+        },
+        {
+          "id": "R3",
+          "name": "The Keeper's Round",
+          "condition": "you completed no objective here this loop, but your log records one of the Lighthouse's facts",
+          "source": "player guide"
+        },
+        {
+          "id": "NR",
+          "name": "The Dark Keeps Its Lamp",
+          "condition": "your log records none of the Lighthouse's facts",
+          "source": "player guide"
+        }
       ]
     },
     {
@@ -800,6 +832,32 @@
       "grants": [
         "The Thirteenth Toll",
         "The Hour Was Wrong"
+      ],
+      "resolutions": [
+        {
+          "id": "R1",
+          "name": "The Page Beneath the Water",
+          "condition": "you recorded The Hour Was Wrong this loop",
+          "source": "player guide"
+        },
+        {
+          "id": "R2",
+          "name": "Twelve Strokes and One",
+          "condition": "you recorded The Thirteenth Toll this loop",
+          "source": "player guide"
+        },
+        {
+          "id": "R3",
+          "name": "Kneeling Water",
+          "condition": "you completed no objective here this loop, but your log records one of the Drowned Church's facts",
+          "source": "player guide"
+        },
+        {
+          "id": "NR",
+          "name": "Thirteen",
+          "condition": "your log records none of the Drowned Church's facts",
+          "source": "player guide"
+        }
       ]
     },
     {
@@ -887,6 +945,32 @@
       "grants": [
         "The Road Remembers",
         "Who Walks Beside You"
+      ],
+      "resolutions": [
+        {
+          "id": "R1",
+          "name": "Worn Smooth",
+          "condition": "you recorded Who Walks Beside You this loop",
+          "source": "player guide"
+        },
+        {
+          "id": "R2",
+          "name": "Against the Walkers",
+          "condition": "you recorded The Road Remembers this loop",
+          "source": "player guide"
+        },
+        {
+          "id": "R3",
+          "name": "Same Direction",
+          "condition": "you completed no objective here this loop, but your log records one of the Sunken Road's facts",
+          "source": "player guide"
+        },
+        {
+          "id": "NR",
+          "name": "Hoods Up",
+          "condition": "your log records none of the Sunken Road's facts",
+          "source": "player guide"
+        }
       ]
     },
     {
@@ -1016,6 +1100,32 @@
       "grants": [
         "The Sheriff Is Already Dead",
         "The Vote That Never Ends"
+      ],
+      "resolutions": [
+        {
+          "id": "R1",
+          "name": "Carried, Unanimous",
+          "condition": "you recorded The Vote That Never Ends this loop",
+          "source": "player guide"
+        },
+        {
+          "id": "R2",
+          "name": "The Body in the Well",
+          "condition": "you recorded The Sheriff Is Already Dead this loop",
+          "source": "player guide"
+        },
+        {
+          "id": "R3",
+          "name": "The Same Speech",
+          "condition": "you completed no objective here this loop, but your log records one of the Square's facts",
+          "source": "player guide"
+        },
+        {
+          "id": "NR",
+          "name": "Eleven O'Clock",
+          "condition": "your log records none of the Square's facts",
+          "source": "player guide"
+        }
       ]
     },
     {
@@ -1112,6 +1222,32 @@
       "grants": [
         "The Wheel Still Turns",
         "The Ticket-Taker's Bargain"
+      ],
+      "resolutions": [
+        {
+          "id": "R1",
+          "name": "The Fare",
+          "condition": "you recorded The Ticket-Taker's Bargain this loop",
+          "source": "player guide"
+        },
+        {
+          "id": "R2",
+          "name": "The Whole Town at Once",
+          "condition": "you recorded The Wheel Still Turns this loop",
+          "source": "player guide"
+        },
+        {
+          "id": "R3",
+          "name": "One More Ride",
+          "condition": "you completed no objective here this loop, but your log records one of the Fairground's facts",
+          "source": "player guide"
+        },
+        {
+          "id": "NR",
+          "name": "The Tune That Doesn't End",
+          "condition": "your log records none of the Fairground's facts",
+          "source": "player guide"
+        }
       ]
     },
     {
@@ -1208,6 +1344,32 @@
         "What the Almanac Hid",
         "The Appointed's Name",
         "The Way the Night Breaks"
+      ],
+      "resolutions": [
+        {
+          "id": "R1",
+          "name": "Written Once",
+          "condition": "you recorded The Appointed's Name this loop",
+          "source": "player guide"
+        },
+        {
+          "id": "R2",
+          "name": "The True Hour",
+          "condition": "you recorded What the Almanac Hid this loop",
+          "source": "player guide"
+        },
+        {
+          "id": "R3",
+          "name": "Fresh Black Type",
+          "condition": "you completed no objective here this loop, but your log records one of the Almanac House's facts",
+          "source": "player guide"
+        },
+        {
+          "id": "NR",
+          "name": "Bound and Dated",
+          "condition": "your log records none of the Almanac House's facts",
+          "source": "player guide"
+        }
       ]
     },
     {
@@ -1268,7 +1430,51 @@
         "note": "Dissonance does not reset; contest = 4 x investigators before Hour IX",
         "chaos_bag": "per campaign log",
         "requires_fact": "The Way the Night Breaks"
-      }
+      },
+      "resolutions": [
+        {
+          "id": "R1",
+          "name": "Take Its Place",
+          "condition": "contest reached, and an Ancient investigator, or the investigator who signed the ninth line, is present",
+          "source": "player guide"
+        },
+        {
+          "id": "R1b",
+          "name": "Let It In, On Your Terms",
+          "condition": "contest reached, your log records The Ticket-Taker's Bargain but not \"You refused the ticket,\" and banked Memory is 12 or more; 10 or more if you kept the night to yourselves",
+          "source": "player guide"
+        },
+        {
+          "id": "R2",
+          "name": "Close the Door",
+          "condition": "contest reached, your log records The Vote That Never Ends and The Appointed's Name, and the vote still stands",
+          "source": "player guide"
+        },
+        {
+          "id": "R3",
+          "name": "Break Through",
+          "condition": "contest reached, and your log records The Keeper's Ninth Death",
+          "source": "player guide"
+        },
+        {
+          "id": "R4",
+          "name": "Seal by Force",
+          "condition": "contest reached",
+          "source": "player guide"
+        },
+        {
+          "id": "R5",
+          "name": "Next Time",
+          "condition": "contest not reached, banked Memory 12 or more",
+          "source": "player guide"
+        },
+        {
+          "id": "R6",
+          "name": "The Loop Wins",
+          "condition": "contest not reached, banked Memory below 12",
+          "source": "player guide"
+        }
+      ]
     }
   ]
 }

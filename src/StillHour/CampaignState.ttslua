@@ -47,6 +47,8 @@ local function freshState(n)
     onCardMemory = {},       -- investigatorId -> Memory on that investigator's cards (this loop)
     loopTallies = {},        -- investigatorId -> {raises, spent}: Aging's "leaned on the loop" inputs
     lastLoopEndDissonance = nil, -- Dissonance when the last loop ended (Aging "ended in danger")
+    prologue = false,        -- playing the Prologue (The First Hour): not a loop
+    contest = 0,             -- finale contest progress (Contest the Crossing)
   }
 end
 
@@ -358,6 +360,8 @@ end
 -- the stage — a driver can only raise it, so calling with a lower value is a
 -- no-op. Returns the resulting stage.
 function CampaignState.advanceAppointed(driverStage)
+  -- the Prologue has no Appointed (guide: The First Hour): nothing drives it
+  if state.prologue then return state.appointedStage end
   local target = math.max(0, math.min(3, math.floor(driverStage or 0)))
   if target > state.appointedStage then
     state.appointedStage = target
@@ -409,6 +413,19 @@ end
 -- bankMemory()/Aging.applyInterlude() around this) — a reset alone does not
 -- bank Memory, per guide §4.
 function CampaignState.reset()
+  if state.prologue then
+    -- the Prologue's first reset: the night folds, but it is not a loop (no
+    -- loop counted, no scar, no Years), and play continues at Loop 1
+    state.prologue = false
+    state.dissonance = 0
+    state.hourglass = Constants.HOUR_FIRST
+    state.oncePerLoopFlags = {}
+    state.testTypesLastLoop = state.testTypesThisLoop
+    state.testTypesThisLoop = {}
+    state.appointedStage = 0
+    state.lastLoopEndDissonance = nil
+    return state
+  end
   state.loopsCompleted = state.loopsCompleted + 1
   -- Aging reads this at the interlude ("ended in danger"), after the drop below.
   state.lastLoopEndDissonance = state.dissonance
@@ -422,7 +439,19 @@ function CampaignState.reset()
   state.testTypesLastLoop = state.testTypesThisLoop
   state.testTypesThisLoop = {}
   state.appointedStage = 0
+  state.contest = 0
   return state
+end
+
+--- Finale contest progress (guide: Contest the Crossing), 0..99. It lasts
+-- only for the finale being played; a reset clears it.
+function CampaignState.getContest()
+  return state.contest or 0
+end
+
+function CampaignState.setContest(n)
+  state.contest = math.max(0, math.min(99, math.floor(tonumber(n) or 0)))
+  return state.contest
 end
 
 --- Begin a new loop's play: enforce the Memory soft cap. Call at §2 setup after
@@ -435,6 +464,16 @@ end
 --- Dissonance at the end of the last loop (nil before the first reset).
 function CampaignState.getLastLoopEndDissonance()
   return state.lastLoopEndDissonance
+end
+
+--- The Prologue (The First Hour) is played before Loop 1 and is not a loop.
+function CampaignState.inPrologue()
+  return state.prologue == true
+end
+
+function CampaignState.setPrologue(on)
+  state.prologue = on and true or false
+  return state.prologue
 end
 
 function CampaignState.getLoopsCompleted()

@@ -96,6 +96,29 @@ def local_urls(obj):
     return json.dumps(obj).count("file:///")
 
 
+# Recollections are bought from a shared pool, by any investigator, up to the
+# usual 2 copies of a title per deck: ship 4 of each so two investigators can
+# each take a full playset without copying cards in TTS.
+RECOLLECTION_COPIES = 4
+
+
+def add_recollection_copies(bag):
+    extra = []
+    for card in bag.get("ContainedObjects", []):
+        try:
+            md = json.loads(card.get("GMNotes") or "{}")
+        except ValueError:
+            continue
+        if "memoryCost" not in md:
+            continue
+        for k in range(1, RECOLLECTION_COPIES):
+            c = copy.deepcopy(card)
+            c["GUID"] = guid("{}-copy{}".format(md.get("id", card["GUID"]), k))
+            extra.append(c)
+    bag["ContainedObjects"].extend(extra)
+    return len(extra)
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.strip().splitlines()[0])
     ap.add_argument("--require-hosted", action="store_true",
@@ -117,7 +140,14 @@ def main(argv=None):
     ml = state.setdefault("ml", {})
     assert len(objs) <= len(EXTRA_PLACE), "add a Place spot for every extra object"
     for i, o in enumerate(objs):
+        # the mod's loose "The Appointed" bag is a test fixture for the relay;
+        # every one of its cards already ships in the scenario boxes, and a
+        # bag by that name in the campaign box would spoil the boss
+        if "The Appointed" in (o.get("Nickname") or ""):
+            continue
         o = copy.deepcopy(o)
+        if "Player Cards" in (o.get("Nickname") or ""):
+            add_recollection_copies(o)
         pos = EXTRA_PLACE[i]
         o["Transform"] = T.transform(pos, 270, (o["Transform"].get("scaleX", 1),
                                                 o["Transform"].get("scaleY", 1),

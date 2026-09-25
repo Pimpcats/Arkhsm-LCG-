@@ -86,7 +86,7 @@ OV_SPEC_KEYS = ("name", "subtitle", "traits", "cost", "level", "victory",
                 "shroud", "clues", "doom", "back_shroud")
 OV_PT_KEYS = ("text", "flavor", "back_text", "back_flavor", "fight", "evade",
               "damage", "horror", "player", "investigator1", "xp1",
-              "investigator2", "xp2", "investigator3", "xp3")
+              "investigator2", "xp2", "investigator3", "xp3", "unrevealed_flavor")
 # fields that are only ever str()-formatted onto the card (an "X" cost or "—"
 # is legal, so these aren't forced to int)…
 OV_NUMERIC_KEYS = ("cost", "level", "victory", "wil", "int", "com", "agi",
@@ -104,7 +104,7 @@ OV_LOC_KEYS = ("icons", "color", "clues_per_investigator", "connections")
 # an investigator's elder-sign effect and signature cards. Everything here is
 # editable from the Studio, so a whole campaign can be typed in by hand.
 OV_FLAG_KEYS = ("elite", "unique", "weakness", "permanent",
-                "clues_per_investigator")
+                "clues_per_investigator", "unrevealed")
 OV_COUNT_KEYS = ("quantity", "memoryCost", "wildIcons",
                  "wilIcons", "intIcons", "comIcons", "agiIcons")
 # index is what prints ("Agenda 1"), number is the encounter number ("1/9") —
@@ -1933,8 +1933,9 @@ def s_location(c, pt, dest, art_path=None, placement=None):
     coloured connection symbols. Shroud is print-only (not a TTS data field)."""
     back = bool(c.get("revealed"))
     kind = "LocationBack" if back else "Location"
-    img, d = _se_frame_compose("AHLCG-" + kind, kind, "Portrait-portrait-clip",
-                               art_path, placement)
+    # the plugin names the unrevealed side's art window BackPortrait
+    clip = "BackPortrait-portrait-clip" if back else "Portrait-portrait-clip"
+    img, d = _se_frame_compose("AHLCG-" + kind, kind, clip, art_path, placement)
     _box_text(d, c["name"], se_reg(kind, "Name"), title=True, grow=1.15, key="name")
     # a location may have a subtitle banner under the title (e.g. "Feeding
     # Grounds") — distinct from its trait line
@@ -2500,7 +2501,18 @@ def main():
                 # the printed b side: its own landscape back (UniqueBack), so
                 # the card zooms and flips like an official agenda/act
                 s_scenario_back(c["type"], c, pt, back_dest)
-            if c["type"] == "Location" and (pt.get("back_text")
+            if c["type"] == "Scenario" and c.get("back_tokens"):
+                # the reference card's Hard / Expert side, like an official one
+                s_scenario_ref(dict(c, tokens=c["back_tokens"], difficulty="HARD / EXPERT"),
+                               pt, back_dest)
+            if c["type"] == "Location" and c.get("unrevealed"):
+                # the unrevealed side, as the card's back: name, traits, its
+                # own symbol, connections and a line of flavour; no shroud or
+                # clues (SCED spawns them when the location is revealed)
+                s_location(dict(c, revealed=True),
+                           dict(pt, text="", flavor=pt.get("unrevealed_flavor", "")),
+                           back_dest, art_path=art, placement=place)
+            elif c["type"] == "Location" and (pt.get("back_text")
                                             or c.get("back_shroud") not in (None, "")):
                 # a location a Knowledge fact flips (src/StillHour/Locations.ttslua
                 # flipFact) prints its flipped side as the card's back: same

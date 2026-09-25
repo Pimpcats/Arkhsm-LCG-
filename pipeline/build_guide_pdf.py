@@ -451,8 +451,10 @@ def build(out=OUT, source=SOURCE, log_pages=True):
             story.append(Paragraph(inline(title_case(payload)), S["section"]))
         elif kind == "h2":
             text = payload
-            if re.search(r"PROLOGUE|THE LOOP|BETWEEN LOOPS|THE DISTRICTS|FINALE", text):
+            if re.search(r"PROLOGUE|THE DISTRICTS|FINALE", text):
                 story.append(PageBreak())
+            elif re.search(r"THE LOOP|BETWEEN LOOPS", text):
+                story.append(CondPageBreak(3.2 * 72))
             else:
                 story.append(CondPageBreak(1.6 * 72))
             story.append(Paragraph(inline(title_case(text)), S["section"]))
@@ -481,11 +483,13 @@ def build(out=OUT, source=SOURCE, log_pages=True):
                                                           spaceAfter=4)))
                 elif ik == "list":
                     for depth, marker, text in ip:
+                        # a choice's options sit one level in, under an en dash
                         inner.append(Paragraph(
                             inline(text),
-                            ParagraphStyle("rli", parent=S["quote"], leftIndent=11,
-                                           bulletIndent=1, spaceAfter=2),
-                            bulletText="•"))
+                            ParagraphStyle("rli", parent=S["quote"],
+                                           leftIndent=11 + depth * 11,
+                                           bulletIndent=1 + depth * 11, spaceAfter=2),
+                            bulletText="–" if depth else "•"))
                 elif ik == "p":
                     inner.append(Paragraph(inline(ip), ParagraphStyle(
                         "rp", parent=S["quote"], spaceAfter=3)))
