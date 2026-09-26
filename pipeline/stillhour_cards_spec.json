@@ -124,7 +124,7 @@
   {
     "deck": 95035, "id": "sthr-borrowedtime", "type": "Asset", "name": "Borrowed Time",
     "subtitle": "", "class": "Neutral", "traits": "Item. Recollection.", "level": 0, "cost": 2, "memoryCost": 4,
-    "uses": [{ "count": 3, "type": "Memory", "token": "resource" }]
+    "uses": [{ "count": 3, "type": "Charge", "token": "resource" }]
   },
   {
     "deck": 95036, "id": "sthr-thistimeforsure", "type": "Event", "name": "This Time For Sure",

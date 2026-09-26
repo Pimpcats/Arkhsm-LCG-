@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "campaign": "still_hour",
-  "stage": "build_complete_art_done_relay_testing",
+  "stage": "rules_pass_and_playability_fixes_awaiting_relay_and_playtest",
   "owner_preferences": {
     "minimal_manual_work": true,
     "first_time_player": true,
@@ -12,7 +12,7 @@
   "validation": {
     "bridge_tests_passed": 4,
     "scenario_content_tests_passed": 27,
-    "current_effective_cards": 121,
+    "current_effective_cards": 131,
     "scenarios_locked": 8,
     "scenario_readiness_errors": 0,
     "campaign_box_compiles_without_force": true,
@@ -22,16 +22,20 @@
     "tts_playtested": false,
     "tts_relay_offline_tests_passed": 6,
     "hosted_card_images": 131,
-    "tts_relay_runs_on_owner_pc": 0,
+    "tts_relay_runs_on_owner_pc": 5,
     "text_only_faces": 7,
     "objectives_feasible_1_to_4_investigators": true,
     "sced_connection_keys_unique": true,
-    "lua_rules_tests": "178/178 (Lua 5.2 and 5.4)",
-    "pytest": "59 passed, 143 subtests",
-    "scenario_audit": "8/8 locked, 0 errors, 0 notes",
+    "lua_rules_tests": "186/186 (Lua 5.2 and 5.4)",
+    "pytest": "68 passed, 143 subtests",
+    "scenario_audit": "8/8 locked, 0 errors",
     "cardforge_selftest": "20/20",
-    "studio_selftest": "252/252",
-    "tts_relay_offline": "81 checks vanilla, 92 checks SCED fixture, 0 Lua errors"
+    "studio_selftest": "253/253",
+    "tts_relay_offline": "81 checks vanilla, 92 checks SCED fixture, 0 Lua errors",
+    "verify_bundle": "OK",
+    "tts_relay_latest": "89/89 pass on 5bb290d (before this work; re-run needed on the current head)",
+    "rules_wording_passes": "pass 1 audit (Rules Reference source) applied; pass 3 independent verification running",
+    "tempo_sim": "first-time 3p party unlocks the finale ~loop 5 (4-8); solo ~9 (docs/BALANCE.md)"
   },
   "evidence": [
     "python3 pipeline/scenario_content.py: 8/8 scenarios, 0 errors (notes: one inherited stat deviation, five cross-district symbol repeats in distinct colours)",
@@ -39,12 +43,16 @@
     "python3 pipeline/compile_campaign.py: ok, 8 scenario boxes, 143 cards",
     "Design decisions and open flags: docs/design/CONTENT_DECISIONS.md (spoilers)",
     "2026-09-24: Prologue R1/R2 and loop resolutions (R2 Seam Tears / NR Night Keeps You / R1 Appointed Hour) written into the guide, log sheet and scenario_manifest.json; guide PDF rebuilt.",
-    "2026-09-24: first complete real-TTS relay run (ab136f1, owner's PC, SCED table): 82 passed, 1 failed (prey step, fixed in f0be782)."
+    "2026-09-24: first complete real-TTS relay run (ab136f1, owner's PC, SCED table): 82 passed, 1 failed (prey step, fixed in f0be782).",
+    "2026-09-25: resolutions for every scenario (Prologue 3, loop 3, districts 4 each, finale 7 + age epilogue); 7 recorded choices tied to other districts and the finale.",
+    "2026-09-25: replayable scenario boxes (loop_box.lua) + Control Clear Board; Prologue mode; difficulty buttons (SCED setChaosBagState); Knowledge/Victory ticks on the log reach the Control; unrevealed location sides; Hard/Expert reference side.",
+    "2026-09-25: rules-wording pass against the Rules Reference applied to the guide and every card; renderer reports text overflow; every card checked visually."
   ],
   "next_actions": [
-    "Keep the TTS relay running on the owner's PC; fix whatever each run reports (tts-results branch, latest.json).",
-    "Owner playtests the Prologue and one loop in TTS (art approval and relay passes are not playtest approval).",
-    "Box art (owner, not urgent): campaign box and the eight scenario boxes still use the generic texture; give them Still Hour art."
+    "Owner: run the TTS relay on the current head (local PowerShell): it now also tests Place / Clear Board / Place again and the Prologue.",
+    "Owner: first playtest of the Prologue and Loop 1 (relay passes are not playtest approval).",
+    "Owner decision pending: hide Knowledge entry names on the Campaign Log until earned (spoiler-light) or keep the visible checklist.",
+    "Box art (not urgent): campaign box and scenario boxes still share one texture."
   ],
   "connection": "GitHub handoff; no live connection to the owner's desktop or TTS.",
   "tts_relay": {

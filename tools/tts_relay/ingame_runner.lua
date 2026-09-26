@@ -483,6 +483,10 @@ step("board: the Appointed", function(go)
   local ctl = findControl()
   if not ctl or not LOC_B.obj then check("locations available for the Appointed step", false) ; return go() end
   ctl.call("shApiRestore", { blob = snapshot })
+  -- the Appointed never appears at a closed location: open LOC_B first
+  ctl.call("shApiSetPartTwo", { on = true })
+  ctl.call("shApiUnlockFact", { id = "what-the-almanac-hid" })
+  ctl.call("shApiUnlockFact", { id = "the-vote-that-never-ends" })
   local s = ctl.call("shApiCounter", { name = "appointed" })   -- a card advances it: Sensed
   check("a card advance makes it Sensed", s.stage == 1, "stage " .. tostring(s.stage))
   waitFor(function()
@@ -573,6 +577,10 @@ step("board: prey follows on-card Memory", function(go)
   local ctl = findControl()
   if not ctl or not LOC_A.obj or not LOC_B.obj then check("locations available for the prey step", false) ; return go() end
   ctl.call("shApiRestore", { blob = snapshot })
+  -- the Appointed never enters a closed location: open LOC_B first
+  ctl.call("shApiSetPartTwo", { on = true })
+  ctl.call("shApiUnlockFact", { id = "what-the-almanac-hid" })
+  ctl.call("shApiUnlockFact", { id = "the-vote-that-never-ends" })
   -- the earlier step's minicard would count as a nearer investigator; move it off the map
   if MINI then MINI.destruct() ; MINI = nil end
   local base = ctl.getPosition()

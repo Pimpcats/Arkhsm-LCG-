@@ -174,7 +174,9 @@ def test_log_layout_is_sane_and_matches_campaign_state_ids():
         assert len(keys) == len(set(keys)), "duplicate field key"
         for f in page["fields"]:
             assert 0.02 < f["u"] < 0.98 and 0.02 < f["v"] < 0.98, f
-            assert f["t"] in ("cb", "ct", "tx", "dv")
+            assert f["t"] in ("cb", "ct", "tx", "dv", "rv")
+            if f["t"] == "rv":
+                assert f.get("rw") in keys and f.get("rt"), f
     src = open(os.path.join(ROOT, "src", "StillHour", "Knowledge.ttslua"), encoding="utf-8").read()
     fact_ids = set(re.findall(r'\["([a-z-]+)"\]\s*=\s*\{ name', src))
     assert {f[0] for f in L.FACTS} == fact_ids

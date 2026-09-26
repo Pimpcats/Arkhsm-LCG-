@@ -1650,14 +1650,21 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
 
     # body: traits line, rules, flavor — stacked inside the Body region
     b = se_reg(kind, "Body")
+    if kind == "Skill":
+        # the plugin's Skill body region runs under the frame's left border
+        b = (b[0] + 26, b[1], b[2] - 8, b[3])
     y = b[1]
     if c.get("traits"):
         _box_text(d, c["traits"], (b[0], y, b[2], y + 30),
                   bold=True, italic=True, max_size=24, key="traits")
         y += 36
-    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3] + 24), start=BODY_PX, key="text")
+    # the Event box curves inward at its lower corners: stop the rules higher
+    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3] + (-44 if kind == "Event" else 24)),
+                   start=BODY_PX, key="text")
     if pt.get("flavor") and y < b[3]:
-        _box_block(d, pt.get("flavor", ""), (b[0], y + 8, b[2], b[3] + 40),
+        # the Event box curves inward at its lower corners
+        fx = b[0] + (28 if kind == "Event" else 0)
+        _box_block(d, pt.get("flavor", ""), (fx, y + 8, b[2], b[3] + 40),
                    fill=(84, 66, 50), italic=True, start=FLAVOR_PX, key="flavor")
     if c.get("victory"):
         _box_text(d, "Victory {}.".format(c["victory"]),
@@ -1764,6 +1771,9 @@ def _se_body(d, c, pt, kind, letter="", extra_bottom=26, text_start=BODY_PX,
     victory=False when the card places its Victory line at a fixed spot (enemies
     print it centred just above the damage/horror row, not after the text)."""
     b = se_reg(kind, "Body", letter)
+    if kind == "Enemy":
+        # the enemy text circle narrows toward its lower edge: keep lines clear
+        b = (b[0] + 18, b[1], b[2] - 18, b[3])
     y = b[1]
     if c.get("traits"):
         traits = c["traits"] + ("  Elite." if c.get("elite")
@@ -1912,7 +1922,12 @@ def _scenario_body(d, kind, c, pt, traits=False, top=None):
     if not b:
         return
     y = top if top is not None else b[1]
-    b = (b[0], y, b[2], b[3])
+    bottom = b[3]
+    clues = se_reg(kind, "Clues") if kind == "Act" else None
+    if clues:
+        # keep act-front text above the clue-threshold icon
+        bottom = min(bottom, clues[1] - 6)
+    b = (b[0], y, b[2], bottom)
     if traits and c.get("traits"):
         _box_text(d, c["traits"], (b[0], y, b[2], y + 36),
                   bold=True, italic=True, max_size=BODY_PX, key="traits")

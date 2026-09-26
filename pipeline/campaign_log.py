@@ -73,7 +73,7 @@ FACTS = [
     ("the-ticket-takers-bargain", "The Ticket-Taker's Bargain", "Fairground", "deep",
      "See Choices: The Ticket."),
     ("what-the-almanac-hid", "What the Almanac Hid", "Almanac", "surface",
-     "Hour VI: remove a [static] token instead of adding one."),
+     "Hour VI: the bag holds 1 fewer Static token instead of 1 more."),
     ("the-appointeds-name", "The Appointed's Name", "Almanac", "deep",
      "Hour VII: exhaust the Appointed. Seraphine's thread: known."),
     ("the-way-the-night-breaks", "The Way the Night Breaks", "assembled", "assembled",
@@ -99,13 +99,13 @@ VICTORY_LOCATIONS = [
 # Choices (guide: "What You Saw" and each district's deep resolution). Each is
 # a pair of mutually exclusive options; keys are the log fields <key>_a/_b.
 CHOICES = [
-    ("prologue", "What You Saw", ("The town was warned",), ("Kept the night to yourselves",)),
-    ("ninth", "The Ninth Line", ("Signed the ninth line",), ("Left it blank",)),
-    ("page", "The Drowned Page", ("Page reached the Press",), ("The drowned heard the hour",)),
-    ("ring", "The Walker's Ring", ("You carry the ring",), ("The walkers keep it",)),
-    ("vote", "The Ledger", ("The vote was torn out",), ("The vote still stands",)),
-    ("ticket", "The Ticket", ("You hold the ticket",), ("You refused the ticket",)),
-    ("name", "The Name", ("You have spoken the name",), ("Kept unspoken",)),
+    ("prologue", "Prologue", "The town was warned", "You kept the night to yourselves"),
+    ("ninth", "The Lighthouse", "signed the ninth line (name below)", "The ninth line was left blank"),
+    ("page", "The Drowned Church", "The true page reached the Press", "The drowned heard the true hour"),
+    ("ring", "The Sunken Road", "You carry the walker's ring", "The walkers keep their ring"),
+    ("vote", "The Square", "The vote was torn out", "The vote still stands"),
+    ("ticket", "The Fairground", "You hold the ticket", "You refused the ticket"),
+    ("name", "The Almanac House", "You have spoken the name", "The name is kept unspoken"),
 ]
 
 BRACKETS = [("prime", "Prime", 0, 4), ("weathered", "Weathered", 5, 9),
@@ -153,6 +153,13 @@ class Page:
             f.update({"min": lo, "max": hi})
         self.fields.append(f)
 
+    def reveal(self, key, watch, text, x0, x1, y, h=30):
+        """Text that appears on the token only once `watch` is ticked (names
+        stay hidden until earned); the printed page shows a write-in rule."""
+        self.ops.append(("line", x0, y + 4, x1))
+        self.fields.append({"k": key, "t": "rv", "rw": watch, "rt": text,
+                            "x": x0, "y": y - h + 6, "w": x1 - x0, "h": h})
+
     def line(self, key, x0, x1, y, rows=1, row_h=34):
         """Write-in line(s); the input box sits on top of them."""
         for r in range(rows):
@@ -182,13 +189,13 @@ def _pages():
     y = 348
     p1.text(90, y, "Completed loops", size=24, style="bold")
     p1.counter("loops", 320, y - 9, 0, 99)
-    p1.text(420, y, "Dissonance scar next loop (= loops, max 6):", size=22,
+    p1.text(400, y, "Scar next loop (= loops; max 3/4/6/8 at 1–4 inv.):", size=20,
             style="italic", fill=SOFT)
     p1.counter("scar", 895, y - 9, derived="scar")
     p1.text(960, y, "Investigators:", size=24, style="bold")
     p1.counter("investigators", 1162, y - 9, 1, 4)
     y = 410
-    p1.text(90, y, "Current Act:", size=24, style="bold")
+    p1.text(90, y, "Current Part:", size=24, style="bold")
     x = p1.checkbox("act1", 250, y, "I — Learning the Rules", group="act")
     x = p1.checkbox("act2", x, y, "II — The Shape of the Hour", group="act")
     p1.checkbox("act3", x, y, "The Last Hour available", group="act")
@@ -202,7 +209,7 @@ def _pages():
     y = 1368
     p1.text(90, y, "Banked Memory", size=24, style="bold")
     p1.counter("banked", 300, y - 9, 0, 99)
-    p1.text(345, y, "(soft cap 6 × investigators — reduce at each loop start)",
+    p1.text(345, y, "(cap 6 × investigators: after spending, reduce to the cap)",
             size=20, style="italic", fill=SOFT)
     p1.text(900, y, "Spent this interlude", size=24, style="bold")
     p1.counter("spent", 1150, y - 9, 0, 99)
@@ -215,48 +222,53 @@ def _pages():
     p2 = Page(2, "Campaign Log — continued")
     p2.text(PAGE_W // 2, 116, "The Knowledge Track", size=52, style="title",
             fill=TEAL, anchor="ms")
-    p2.text(PAGE_W // 2, 150, "Check when unlocked. Each edits the night "
-            "permanently.", size=22, style="italic", fill=SOFT, anchor="ms")
+    p2.text(PAGE_W // 2, 150, "When the guide says to record an entry, tick its row "
+            "(or write its name on the line). It lasts through every reset.",
+            size=20, style="italic", fill=SOFT, anchor="ms")
     y = 206
     for fid, name, district, layer, summary in FACTS:
         p2.checkbox("k:" + fid, 88, y)
-        p2.text(128, y, name, size=24, style="bold")
-        p2.text(128, y + 22, district if layer != "assembled"
-                else "assembled", size=17, style="italic", fill=SOFT)
-        p2.text(510, y - 2, summary, size=20, style="body")
-        if layer == "deep":
-            p2.text(1178, y - 2, "deep", size=16, style="italic", fill=SOFT,
-                    anchor="rs")
+        where = {"prologue": "Prologue", "assembled": "Assembled"}.get(
+            layer, "{} — {}".format(district, layer))
+        p2.text(128, y, where, size=21, style="bold")
+        p2.reveal("kr:" + fid, "k:" + fid, "{}: {}".format(name, summary), 440, 1185, y, h=34)
         y += 52
     y += 6
-    p2.text(90, y, "Surface facts held:", size=24, style="bold")
-    p2.counter("surface_held", 330, y - 9, derived="surface")
-    p2.text(370, y, "/ 6 — Part II opens at 3+", size=22, style="italic", fill=SOFT)
-    p2.text(720, y, "Deep facts held:", size=24, style="bold")
-    p2.counter("deep_held", 925, y - 9, derived="deep")
-    p2.text(965, y, "/ 6", size=22, style="italic", fill=SOFT)
+    p2.text(90, y, "Surface entries recorded:", size=22, style="bold")
+    p2.counter("surface_held", 380, y - 9, derived="surface")
+    p2.text(420, y, "/ 6 — Part II at 3+", size=20, style="italic", fill=SOFT)
+    p2.text(700, y, "Deep entries recorded:", size=22, style="bold")
+    p2.counter("deep_held", 960, y - 9, derived="deep")
+    p2.text(1000, y, "/ 6", size=20, style="italic", fill=SOFT)
 
     p2.header(y + 70, "Victory")
     y += 140
-    p2.text(760, y - 34, "defeated", size=18, style="italic", fill=SOFT)
+    p2.text(760, y - 34, "claimed", size=18, style="italic", fill=SOFT)
     p2.text(900, y - 34, "Memory banked", size=18, style="italic", fill=SOFT)
-    for eid, name, where, vic in NAMED + VICTORY_LOCATIONS:
-        p2.text(90, y, name, size=22, style="bold")
+    for eid, name, where, vic in NAMED:
+        # a Named enemy's name stays hidden until it is claimed
+        p2.text(90, y, "{} — Named (Victory {})".format(where, vic), size=20, style="bold")
+        p2.reveal("vr:" + eid, "v:" + eid, name, 420, 750, y, h=30)
+        p2.checkbox("v:" + eid, 780, y)
+        p2.checkbox("vb:" + eid, 940, y)
+        y += 38
+    for eid, name, where, vic in VICTORY_LOCATIONS:
+        p2.text(90, y, name, size=21, style="bold")
         p2.text(470, y, "({}, Victory {})".format(where, vic), size=19,
                 style="italic", fill=SOFT)
         p2.checkbox("v:" + eid, 780, y)
         p2.checkbox("vb:" + eid, 940, y)
         y += 38
 
-    p2.header(y + 26, "Threads & Choices")
+    p2.header(y + 26, "Threads")
     y += 84
-    p2.text(90, y, "Seraphine — \"Who Opened the Door\":", size=22, style="bold")
-    x = p2.checkbox("sera_unheard", 520, y, "unheard", group="sera")
+    p2.text(90, y, "Seraphine's thread:", size=22, style="bold")
+    x = p2.checkbox("sera_unheard", 420, y, "unheard", group="sera")
     x = p2.checkbox("sera_suspected", x, y, "suspected", group="sera")
-    p2.checkbox("sera_known", x, y, "known (Vote + Name)", group="sera")
+    p2.checkbox("sera_known", x, y, "known", group="sera")
 
     p3 = Page(3, "Campaign Log — continued")
-    p3.text(PAGE_W // 2, 116, "The Lost & the Kept", size=52, style="title",
+    p3.text(PAGE_W // 2, 116, "Those Who Left the Loop", size=52, style="title",
             fill=TEAL, anchor="ms")
     y = 186
     p3.text(90, y, "Investigator", size=20, style="italic", fill=SOFT)
@@ -266,7 +278,7 @@ def _pages():
     for i in range(1, 5):
         p3.line("dead{}_name".format(i), 90, 520, y)
         x = p3.checkbox("dead{}_aged".format(i), 560, y, "aged out", group="dead%d" % i)
-        p3.checkbox("dead{}_kept".format(i), x, y, "kept as anchor", group="dead%d" % i)
+        p3.checkbox("dead{}_kept".format(i), x, y, "in the finale", group="dead%d" % i)
         p3.line("dead{}_loop".format(i), 1070, 1185, y)
         y += 58
 
@@ -276,17 +288,24 @@ def _pages():
     x = p3.checkbox("pro_r1", 330, y, "R1", group="pro")
     x = p3.checkbox("pro_r2", x, y, "R2", group="pro")
     x = p3.checkbox("pro_nr", x, y, "No Resolution", group="pro")
-    p3.text(840, y, "Torn loops", size=22, style="bold")
-    p3.counter("torn", 1000, y - 9, 0, 99)
-    p3.text(1040, y, "Taken", size=22, style="bold")
-    p3.counter("taken", 1150, y - 9, 0, 99)
     y += 50
+    p3.text(90, y, "Loops ended:  Torn", size=22, style="bold")
+    p3.counter("torn", 330, y - 9, 0, 99)
+    p3.text(380, y, "Taken", size=22, style="bold")
+    p3.counter("taken", 490, y - 9, 0, 99)
+    p3.text(540, y, "Closed at the Hour", size=22, style="bold")
+    p3.counter("closed", 770, y - 9, 0, 99)
+    y += 52
     for key, label, a, b in CHOICES:
-        p3.text(90, y, label, size=22, style="bold")
-        x = p3.checkbox(key + "_a", 400, y, a[0], size=21, group="ch_" + key)
-        x = p3.checkbox(key + "_b", max(x, 780), y, b[0], size=21, group="ch_" + key)
-        y += 44
-    p3.text(90, y, "Signed the ninth line:", size=22, style="bold")
+        # the choice itself stays hidden until it is made: tick "first" or
+        # "second" in the order the guide lists them
+        p3.text(90, y, label, size=21, style="bold")
+        p3.checkbox(key + "_a", 330, y, "1st", size=18, group="ch_" + key)
+        p3.reveal(key + "_ar", key + "_a", a, 420, 760, y, h=28)
+        p3.checkbox(key + "_b", 780, y, "2nd", size=18, group="ch_" + key)
+        p3.reveal(key + "_br", key + "_b", b, 870, 1185, y, h=28)
+        y += 42
+    p3.text(90, y, "Name (Lighthouse):", size=21, style="bold")
     p3.line("ninth_signer", 330, 760, y)
     y -= 8
 
@@ -301,16 +320,16 @@ def _pages():
     p3.counter("finale_memory", 1130, y - 9, 0, 99)
     y += 54
     p3.text(90, y, "Resolution reached:", size=24, style="bold")
-    for row in ((("r1", "R1 Take Its Place"), ("r1b", "R1b Let It In"),
-                 ("r2", "R2 Close the Door")),
-                (("r3", "R3 Break Through"), ("r4", "R4 Seal by Force")),
-                (("r5", "R5 Next Time (continue)"), ("r6", "R6 The Loop Wins (end)"))):
-        y += 44
-        x = 110
-        for key, label in row:
-            x = p3.checkbox(key, x, y, label, group="res")
+    y += 44
+    x = 110
+    for key, label in (("r1", "R1"), ("r1b", "R1b"), ("r2", "R2"), ("r3", "R3"),
+                       ("r4", "R4"), ("r5", "R5"), ("r6", "R6")):
+        x = p3.checkbox(key, x, y, label, group="res")
+    y += 50
+    p3.text(90, y, "Deep entries spent this finale:", size=22, style="bold")
+    p3.line("spent_deep", 420, 1185, y)
     y += 54
-    p3.text(90, y, "Anchor left behind:", size=24, style="bold")
+    p3.text(90, y, "How the night ended:", size=24, style="bold")
     p3.line("anchor", 320, 1185, y)
     y += 50
     p3.text(90, y, "Years paid at the end:", size=24, style="bold")
@@ -359,9 +378,8 @@ def _investigator_panel(p, i, px, py):
     p.line("inv{}_recollections".format(i), x0 + 150, x1, y, rows=2, row_h=32)
     y += 32 + 50
     x = p.checkbox("inv{}_agedout".format(i), x0, y, "Aged out", size=20)
-    x = p.checkbox("inv{}_anchor".format(i), x, y, "Anchor", size=20)
-    x = p.checkbox("inv{}_dead".format(i), x, y, "Defeated — loop", size=20)
-    p.line("inv{}_deadloop".format(i), x - 14, x1, y)
+    p.text(x, y, "Finale:", size=20, style="bold")
+    p.line("inv{}_deadloop".format(i), x + 80, x1, y)
 
 
 PANEL_H = 374

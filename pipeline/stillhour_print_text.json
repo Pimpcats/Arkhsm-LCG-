@@ -11,7 +11,7 @@
     "flavor": "It remembers the safe path."
   },
   "sthr-donebefore": {
-    "text": "Commit only to a skill test you are performing. If you have already failed a test of this skill this loop, this card has [wild][wild][wild] instead of [wild].",
+    "text": "Commit only to a skill test you are performing. If you have already failed a test of the same skill this loop, this card has [wild][wild][wild] instead of [wild].",
     "flavor": "You learn from your deaths."
   },
   "sthr-eighthgrave": {
@@ -29,11 +29,11 @@
     "flavor": ""
   },
   "sthr-itmeanswait": {
-    "text": "Fast. Play when you would be affected by an Hour, Lost Hour, Slippage, The Crossing, The Appointed's Whisper or the Appointed. If there are 3 or more banked Memory, cancel that effect on you.",
-    "flavor": "Some of it is just a request to hold on."
+    "text": "Fast. Play when an Hour's \u201cWhen reached\u201d text or the revelation ability of Lost Hour, Slippage, The Crossing or The Appointed's Whisper would resolve, or when the Appointed would attack you or deal you horror. If there are 3 or more banked Memory, cancel that effect.",
+    "flavor": ""
   },
   "sthr-untranslatable": {
-    "text": "Revelation \u2014 Take horror equal to half your banked Memory, rounded up (maximum 5).",
+    "text": "Revelation \u2013 Take horror equal to half of banked Memory, rounded up (maximum 5).",
     "flavor": "Some words unmake the reader."
   },
   "sthrcass": {
@@ -56,12 +56,12 @@
     "evade": 2,
     "damage": 1,
     "horror": 1,
-    "text": "Hunter.\nSpawn \u2013 The location with the most clues (the lead investigator chooses if tied). While Cass has more Memory on her cards than each other investigator, The House Always Wins cannot be evaded.\nForced \u2013 After The House Always Wins defeats an investigator: Remove 3 Memory from banked Memory.",
-    "flavor": "The debt follows you across every loop.",
+    "text": "Hunter.\nSpawn \u2013 The location with the most clues. While Cass has more Memory on her cards than each other investigator, The House Always Wins cannot be evaded.\nForced \u2013 After The House Always Wins defeats an investigator: Remove 3 banked Memory.",
+    "flavor": "",
     "_stats_note": "DRAFT statline \u2014 no source in the design docs; owner to confirm."
   },
   "sthrseraphine": {
-    "text": "[free] During your turn, raise Dissonance by 1: Choose one \u2013 You get +2 skill value for this skill test; or take an additional action this turn; or ready a Spell asset you control. Limit twice per round.\n[elder] +X, where X is Dissonance (maximum +5). After this skill test ends, lower Dissonance by the amount this token added.",
+    "text": "[free] During your turn, raise Dissonance by 1: Choose one \u2013 You get +2 skill value for this skill test; or gain 1 additional action this turn; or ready a Spell asset you control. Limit twice per round.\n[elder] +X, where X is Dissonance (maximum +5). After this skill test ends, lower Dissonance by the amount this token added.",
     "flavor": "\"I reached for the Hour. Perhaps it reached back.\"",
     "back_text": "Deck Size: 30.\nDeckbuilding Options: Mystic cards level 0\u20135, Neutral cards level 0\u20135, up to 5 Seeker cards level 0\u20132, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): The Bell of Ambergrove, \"I Remember the Ending\", The Debt of Hours, 1 random basic weakness.",
     "back_flavor": "A spiritualist who felt the Occultation coming and reached for it \u2014 and may be the reason the door is stuck open."
@@ -85,15 +85,15 @@
     "back_flavor": "A young drifter who slipped into Ambergrove the wrong night and shouldn't remember a thing \u2014 but she does."
   },
   "sthr-compass": {
-    "text": "[action] Exhaust Lucky Compass: Move to a connecting location. (This action does not provoke attacks of opportunity.)\nIf there are 2 or more Memory on Lucky Compass, you may instead move to a revealed location in a district whose surface or deep Knowledge entry your Campaign Log records.",
-    "flavor": "The needle always points at the way out."
+    "text": "[action] Exhaust Lucky Compass: Move to a connecting location or, if there are 2 or more Memory on Lucky Compass, to any revealed location in a district that has a Knowledge entry recorded in your Campaign Log. This action does not provoke attacks of opportunity.",
+    "flavor": ""
   },
   "sthr-igetout": {
     "text": "Fast. Max once per loop. Play when you would be defeated by damage and/or horror. You are not defeated: heal damage and horror from you until you have 1 remaining health and 1 remaining sanity. Disengage from each enemy engaged with you and move to a connecting location. Place 1 Memory on Lucky Compass.",
     "flavor": ""
   },
   "sthr-nobodybelieves": {
-    "text": "Revelation \u2013 Until the end of the round, other investigators cannot target you or cards you control with card abilities, or take actions that affect you or cards you control. If you are the only investigator at your location, take 1 horror.",
+    "text": "Revelation \u2013 Until the end of the round, other investigators' card abilities cannot choose or affect you or cards you control, and other investigators cannot commit cards to your skill tests. If no other investigator is at your location, take 1 horror.",
     "flavor": "They look right through you."
   },
   "sthr-foreknowledge": {
@@ -101,15 +101,15 @@
     "flavor": ""
   },
   "sthr-dejavu": {
-    "text": "Fast. As an additional cost, raise Dissonance by 1. Play after you resolve an [action], [free] or [reaction] ability on a card you control during your turn (not D\u00e9j\u00e0 Vu). Trigger it again, paying its costs except any action cost.",
+    "text": "Fast. As an additional cost to play this card, raise Dissonance by 1. Play during your turn, after you resolve an [action], [free] or [reaction] ability on an asset or investigator card you control. Resolve that ability again (pay its costs except [action]; this counts toward its limits).",
     "flavor": "The same doorway, twice."
   },
   "sthr-musclememory": {
-    "text": "If you have already performed a test of this skill this loop, this card has [wild][wild] and you draw 1 card; otherwise it has [wild].",
+    "text": "If you have already performed a test of the same skill this loop, this card has [wild][wild] instead of [wild], and when you commit it, draw 1 card.",
     "flavor": ""
   },
   "sthr-rehearsedescape": {
-    "text": "Evade. Max once per loop. As an additional cost, raise Dissonance by 1. Automatically evade an enemy engaged with you.",
+    "text": "Evade. Max once per loop. As an additional cost to play Rehearsed Escape, raise Dissonance by 1. Automatically evade an enemy engaged with you.",
     "flavor": "You have done this exact evade before."
   },
   "sthr-longwayround": {
@@ -121,7 +121,7 @@
     "flavor": "The sand runs upward, if you hold it right."
   },
   "sthr-thistimeforsure": {
-    "text": "Fast. Play after you fail a skill test. As an additional cost, raise Dissonance by 1. Ignore that test's results and perform it again with the same skill and difficulty; you get +2 skill value for it.",
+    "text": "Fast. Play after you fail a skill test. As an additional cost to play This Time For Sure, raise Dissonance by 1. Ignore that test's results and perform it again with the same skill and difficulty; you get +2 skill value for it.",
     "flavor": ""
   },
   "sthr-anchorpoint": {
@@ -133,7 +133,7 @@
     "flavor": "The pages ahead are already filled."
   },
   "sthr-hourlearnedname": {
-    "text": "Max once per loop. The Appointed must be at your location. Push it back one Approach stage (two if your Campaign Log records The Appointed's Name), then rewind the Hourglass by 1 Hour.",
+    "text": "Max once per loop. Play only if the Appointed is at your location. Push it back one Approach stage (two if your Campaign Log records The Appointed's Name), then rewind the Hourglass by 1 Hour.",
     "flavor": "A name, spoken like frost."
   },
   "sthr-appointed": {
@@ -142,7 +142,7 @@
     "evade": null,
     "damage": 2,
     "horror": 2,
-    "text": "Prey \u2013 Most Memory on their cards. As a hunter, it moves toward its prey even past nearer investigators.\nThe Appointed cannot be attacked, evaded, damaged or defeated. It leaves play only when pushed back to Unseen.\n[action] Hold Back: Test [wil] (4) or [com] (4). This action does not provoke an attack of opportunity from the Appointed. If you succeed, push it back one Approach stage, disengage it and rewind the Hourglass by 1 Hour.",
+    "text": "Prey \u2013 Most Memory on their cards. It moves toward its prey even if other investigators are nearer.\nThe Appointed cannot be attacked, evaded, damaged or defeated, and leaves play only when pushed back to Unseen.\n[action]: Hold Back. Test [wil] (4) or [com] (4). This action does not provoke an attack of opportunity from the Appointed. If you succeed, push it back one Approach stage, disengage and exhaust it, and rewind the Hourglass by 1 Hour.",
     "flavor": "It is not late. It was never late. You are simply early, every time."
   },
   "sthr-appointedwhisper": {

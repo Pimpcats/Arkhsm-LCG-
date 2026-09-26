@@ -233,7 +233,9 @@ function ChaosBag.new(opts)
   end
 
   function a.removeStatic(n)
-    a.extra = math.max(0, a.extra - math.max(0, math.floor(n or 1)))
+    -- may go below 0: "1 fewer than the band calls for" (Hour VI with What
+    -- the Almanac Hid); target() never lets the bag hold fewer than 0
+    a.extra = a.extra - math.max(0, math.floor(n or 1))
     return a.reconcile()
   end
 

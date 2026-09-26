@@ -387,8 +387,10 @@ end
 local function ageInvestigator(id)
   local a = agingFor(id)
   if a.aged then return nil end
-  local r = Interlude.age(id, { defeated = a.defeated, endedInDanger = Interlude.loopEndedInDanger() },
+  local r = Interlude.age(id, { defeated = a.defeated, endedInDanger = Interlude.loopEndedInDanger(),
+    extraYears = CampaignState.getPendingYears(id) },
     { physical = a.physical, mental = a.mental })
+  CampaignState.clearPendingYears(id)
   a.aged = r.yearsGained
   guarded("aging", Board.refreshInvestigators, true)
   local name = id
@@ -446,7 +448,7 @@ local function drawPlay()
     c.resetThreshold, CampaignState.band()), -PAIR_X, -1.1, 1000, "Left-click raise · Right-click reduce")
   local d = bag.describe()
   button("shClickStatic", string.format("[static] %d (%s)", d.target, d.mode), PAIR_X, -1.1, 1000,
-    "Baseline + temporary [static] this bag should hold. Click to re-sync the chaos bag.")
+    "Static tokens the bag holds (band + temporary). Left-click: a card adds one for a time. Right-click: remove a temporary one.")
   local h = CampaignState.getHour()
   button("shClickHour", string.format("Hour %d · %s", h, Hourglass.HOUR_NAMES[h] or "?"), -PAIR_X, -0.5, 1000,
     "Left-click advance (resolves the Hour) · Right-click rewind")
@@ -519,13 +521,13 @@ local function drawInterlude()
       X - 0.75, zi, 1000, "", 80)
     local t = CampaignState.getTallies(inv.id)
     button("shTalRaised" .. i, "Raised " .. t.raises, X + 0.85, zi, 380,
-      "Times this investigator raised Dissonance this loop. " .. PLUS_MINUS, 70)
+      "Times this investigator paid 'raise Dissonance' as a cost this loop (3+ = leaned). " .. PLUS_MINUS, 70)
     button("shTalSpent" .. i, "Spent " .. t.spent, X + 1.75, zi, 380,
-      "Memory this investigator spent on loop powers (Recollections, foreknowledge) this loop. " .. PLUS_MINUS, 70)
+      "Memory this investigator removed from their own cards for their own cards or abilities this loop (4+ = leaned). " .. PLUS_MINUS, 70)
     local locked = (CampaignState.getBracket(inv.id) or {}).physical ~= nil
     button("shAgeDef" .. i, "Defeated: " .. (a.defeated and "yes" or "no"), X - 1.45, zi + 0.42, 330, "", 70)
     button("shNoop", "Leaned: " .. (Interlude.leanedOnLoop(inv.id) and "yes" or "no"), X - 0.7, zi + 0.42, 330,
-      "Derived: raised Dissonance 3+ times or spent 4+ Memory on loop powers this loop.", 70)
+      "Derived: paid 'raise Dissonance' as a cost 3+ times, or removed 4+ Memory from own cards for own cards or abilities, this loop.", 70)
     button("shAgePhys" .. i, "-" .. a.physical .. (locked and " (locked)" or ""), X + 0.05, zi + 0.42, 330,
       "Physical skill that drifts down (chosen once, locked).", 60)
     button("shAgeMent" .. i, "+" .. a.mental .. (locked and " (locked)" or ""), X + 0.8, zi + 0.42, 330,
@@ -568,7 +570,15 @@ function shClickMemory(_, _, alt) guarded("memory", changeMemory, alt and -1 or 
 function shClickInvestigators(_, _, alt) guarded("investigators", changeInvestigators, alt and -1 or 1) ; afterChange() end
 function shClickDissonance(_, _, alt) guarded("dissonance", changeDissonance, alt and -1 or 1) ; afterChange() end
 function shClickHour(_, _, alt) guarded("hour", changeHour, alt and -1 or 1) ; afterChange() end
-function shClickStatic() guarded("chaos bag", Dissonance.syncBag, bag) ; refreshControl() end
+-- left-click: a card adds a temporary Static token; right-click: its time is
+-- up (or Hour VI with What the Almanac Hid). Either way the bag is re-synced.
+function shClickStatic(_, _, alt)
+  guarded("chaos bag", function()
+    if alt then bag.removeStatic(1) else bag.addStatic(1) end
+    Dissonance.syncBag(bag)
+  end)
+  afterChange()
+end
 function shClickAppointed(_, _, alt)
   if alt then note("The Appointed: " .. Appointed.stageName()) return end
   guarded("appointed", advanceAppointedByCard) ; afterChange()
@@ -629,6 +639,18 @@ function shTalSpent4(_, _, alt) clickTally(4, "spent", alt) end
 function shCardRaised(obj, _, alt)
   guarded("tally", changeTally, Board.investigatorIdOf(obj), "raises", alt and -1 or 1)
   afterChange()
+end
+function shCardYears(obj, _, alt)
+  guarded("years", function()
+    local id = Board.investigatorIdOf(obj)
+    if id then CampaignState.addPendingYears(id, alt and -1 or 1) end
+  end)
+  afterChange()
+end
+function shApiPendingYears(p)
+  if p and p.id then CampaignState.addPendingYears(p.id, p.delta or 1) end
+  afterChange()
+  return p and p.id and CampaignState.getPendingYears(p.id) or 0
 end
 function shCardSpent(obj, _, alt)
   guarded("tally", changeTally, Board.investigatorIdOf(obj), "spent", alt and -1 or 1)
@@ -940,7 +962,9 @@ function shApiSetPartTwo(p)
   return rep
 end
 -- Victory X of the Named (the encounter cards' ids; the log's v:<id> boxes)
-local VICTORY = { ["sthr-bellringer"] = 2, ["sthr-wearssheriff"] = 3, ["sthr-onewhorides"] = 2 }
+local VICTORY = { ["sthr-bellringer"] = 2, ["sthr-wearssheriff"] = 3, ["sthr-onewhorides"] = 2,
+  ["sthr-loc-keepersquarters"] = 1, ["sthr-loc-floodedcrypt"] = 1, ["sthr-loc-recordsoffice"] = 1,
+  ["sthr-loc-ticketbooth"] = 1, ["sthr-loc-sealedstudy"] = 1 }
 
 --- Bank a Named enemy's Victory once per campaign (the log's tick calls this).
 function shApiClaimVictory(p)

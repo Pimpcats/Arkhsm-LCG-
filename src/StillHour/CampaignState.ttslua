@@ -50,6 +50,7 @@ local function freshState(n)
     prologue = false,        -- playing the Prologue (The First Hour): not a loop
     contest = 0,             -- finale contest progress (Contest the Crossing)
     partTwo = false,         -- Part II (The Shape of the Hour) has begun
+    pendingYears = {},       -- investigatorId -> Years a card gave this loop (added at Age)
   }
 end
 
@@ -465,6 +466,22 @@ end
 --- Dissonance at the end of the last loop (nil before the first reset).
 function CampaignState.getLastLoopEndDissonance()
   return state.lastLoopEndDissonance
+end
+
+--- Years a card or resolution gave during the loop, added at the next Age.
+function CampaignState.getPendingYears(investigatorId)
+  return (state.pendingYears or {})[investigatorId] or 0
+end
+
+function CampaignState.addPendingYears(investigatorId, n)
+  state.pendingYears = state.pendingYears or {}
+  local v = math.max(0, (state.pendingYears[investigatorId] or 0) + math.floor(n or 0))
+  state.pendingYears[investigatorId] = v
+  return v
+end
+
+function CampaignState.clearPendingYears(investigatorId)
+  if state.pendingYears then state.pendingYears[investigatorId] = nil end
 end
 
 --- Part II (guide: Between Loops step 5) begins at the interlude that holds

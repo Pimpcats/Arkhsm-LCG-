@@ -107,7 +107,10 @@ end
 local function derive(f)
   local d = f.d or ""
   if d == "scar" then
-    return tostring(math.min(num("loops"), 6))
+    -- scar cap: one third of the reset value (3 / 4 / 6 / 8 at 1-4 investigators)
+    local caps = { 3, 4, 6, 8 }
+    local n = math.max(1, math.min(4, math.floor(num("investigators"))))
+    return tostring(math.min(num("loops"), caps[n]))
   elseif d == "surface" then
     return tostring(countFacts("surface"))
   elseif d == "deep" then
@@ -133,6 +136,8 @@ local function labelFor(f, idx)
   if f.t == "cb" then return values[f.k] and markFor(idx) or "" end
   if f.t == "ct" then return tostring(num(f.k)) end
   if f.t == "dv" then return derive(f) end
+  -- hidden until earned: a name appears once its box is ticked
+  if f.t == "rv" then return values[f.rw] and (f.rt or "") or "" end
   return ""
 end
 
@@ -145,7 +150,7 @@ end
 
 local function refreshDerived()
   for _, f in ipairs(FIELDS) do
-    if f.t == "dv" then refreshButton(f.k) end
+    if f.t == "dv" or f.t == "rv" then refreshButton(f.k) end
   end
 end
 
@@ -241,7 +246,19 @@ function buildUi()
     local w = f.w * 2 * extent.hx
     local h = f.h * 2 * extent.hz
     local fname = "sthrLog_" .. i
-    if f.t == "tx" then
+    if f.t == "rv" then
+      -- hidden until earned: an unclickable label that shows once ticked
+      self.createButton({
+        click_function = "click_none", function_owner = self,
+        label = labelFor(f, nb),
+        position = { x, Y, z }, rotation = { 0, 0, 0 },
+        scale = { UI_SCALE, UI_SCALE, UI_SCALE },
+        width = 0, height = 0, font_size = math.floor(units(h) * 0.5),
+        color = { 1, 1, 1, 0 }, font_color = INK, tooltip = "",
+      })
+      buttonIndex[f.k] = nb
+      nb = nb + 1
+    elseif f.t == "tx" then
       local rows = f.rows or 1
       local hu = units(h)
       local fs = math.max(20, math.floor((hu - 23) / rows * 0.82))

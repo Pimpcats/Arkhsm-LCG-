@@ -137,6 +137,21 @@ function Board.locationCards()
   return out
 end
 
+--- Locations the Appointed may be placed at or move into: revealed (face up)
+-- and not closed (guide: The Appointed; Closed and impassable locations).
+function Board.eligibleLocations()
+  local out = {}
+  for _, l in ipairs(Board.locationCards()) do
+    local down = safe(function() return l.obj.is_face_down end) == true
+    -- a flip location's back is a revealed side; its unrevealed state is
+    -- not modelled here, so only unrevealed-side cards count as face down
+    local unrevealedSide = down and not (l.locId and Locations.hasBack(l.locId))
+    local closed = l.locId and Locations.isSealed(l.locId)
+    if not unrevealedSide and not closed then out[#out + 1] = l end
+  end
+  return out
+end
+
 --- Graph keyed by guid, from each visible side's icons/connections (the same
 -- data SCED's PlayArea uses to draw connection lines). Undirected.
 function Board.graph(locs)
@@ -375,7 +390,7 @@ function Board.refreshInvestigators(applyStats)
         card.createButton({
           click_function = "shCardRaised", function_owner = host,
           label = "Dissonance raised " .. t.raises,
-          tooltip = "Times THIS investigator raised Dissonance this loop (3+ = leaned on the loop). "
+          tooltip = "Times THIS investigator paid 'raise Dissonance' as a cost this loop (3+ = leaned on the loop). "
             .. "Left-click +1 · Right-click -1",
           position = { -0.75, 0.3, 1.65 }, rotation = { 0, 0, 0 },
           width = 760, height = 180, font_size = 90,
@@ -384,9 +399,18 @@ function Board.refreshInvestigators(applyStats)
         card.createButton({
           click_function = "shCardSpent", function_owner = host,
           label = "Loop-power Memory " .. t.spent,
-          tooltip = "Memory THIS investigator spent on loop powers (Recollections, foreknowledge) "
+          tooltip = "Memory THIS investigator removed from their own cards for their own cards or abilities "
             .. "this loop (4+ = leaned on the loop). Left-click +1 · Right-click -1",
           position = { 0.75, 0.3, 1.65 }, rotation = { 0, 0, 0 },
+          width = 760, height = 180, font_size = 90,
+          color = { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
+        })
+        card.createButton({
+          click_function = "shCardYears", function_owner = host,
+          label = "Years pending " .. CampaignState.getPendingYears(inv.id),
+          tooltip = "Years a card or resolution gave THIS investigator during the loop (A Year in a Night, "
+            .. "the ninth line, the name). Added when they Age. Left-click +1 · Right-click -1",
+          position = { 0, 0.3, 2.05 }, rotation = { 0, 0, 0 },
           width = 760, height = 180, font_size = 90,
           color = { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
         })
@@ -596,7 +620,7 @@ function Board.appointedCtx(extra)
   end
 
   function ctx.placeAtFarthest()
-    local locs = Board.locationCards()
+    local locs = Board.eligibleLocations()
     if #locs == 0 then
       -- nothing to place it on: tell the table once per stage, not per click
       if st.appointed.noticeStage ~= Appointed.stage() then
@@ -657,7 +681,7 @@ function Board.appointedCtx(extra)
   function ctx.moveTowardPrey()
     local card = Board.findAppointed()
     if not card then return false end
-    local locs = Board.locationCards()
+    local locs = Board.eligibleLocations()
     local graph = Board.graph(locs)
     local byGuid = {}
     for _, l in ipairs(locs) do byGuid[l.guid] = l end

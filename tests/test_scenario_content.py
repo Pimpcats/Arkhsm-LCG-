@@ -338,7 +338,7 @@ class ContentGapTests(unittest.TestCase):
 
     def test_hold_is_defined_where_it_is_used(self):
         text = CARDS["sthr-act-walksbeside"]["text"]
-        self.assertIn("[action] Hold", text)
+        self.assertIn("[action]: Hold", text)
         self.assertIn("[wil] (X) or [com] (X)", text)
 
     def test_no_dead_cards_in_the_pool(self):

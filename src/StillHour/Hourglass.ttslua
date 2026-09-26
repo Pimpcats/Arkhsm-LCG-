@@ -111,40 +111,40 @@ local HOUR_HANDLERS = {
       if ctx and ctx.awakenSleepwalkingEchoes then
         ctx.awakenSleepwalkingEchoes()
       end
-      return "The streets empty. Sleepwalking Echoes awaken; the Appointed is Sensed."
+      return "The streets empty. The Appointed is at least Sensed (Echoes are awake in this band)."
     end
-    return "The streets empty. The Appointed is Sensed (Echoes still asleep in Calm)."
+    return "The streets empty. The Appointed is at least Sensed (Echoes sleepwalk in Calm)."
   end,
 
   [6] = function(ctx)
     if CampaignState.knows("what-the-almanac-hid") then
       if ctx and ctx.removeStatic then ctx.removeStatic(1) end
-      return "Each investigator removes 1 [static]."
+      return "The bag holds 1 fewer Static token than its band calls for, until the end of the loop."
     end
     if ctx and ctx.addStatic then ctx.addStatic(1) end
-    return "Add 1 [static] token until the next reset."
+    return "Add 1 Static token to the chaos bag until the end of the loop."
   end,
 
   [7] = function(ctx)
     advanceAppointed(ctx, 2)  -- Hour VII -> at least Emerging
     return "The guest approaches. The Appointed is Emerging"
-      .. (CampaignState.knows("the-appointeds-name") and " (arriving exhausted)." or ".")
+      .. (CampaignState.knows("the-appointeds-name") and ". Exhaust the Appointed." or ".")
   end,
 
   [8] = function(ctx)
     raiseDissonance(ctx, 2)
     advanceAppointed(ctx, 3)  -- Hour VIII -> Arrived
     if ctx and ctx.enemiesGetFightBonus then ctx.enemiesGetFightBonus(1) end
-    return "Almost. Raise Dissonance by 2; all enemies +1 Fight; the Appointed has Arrived."
+    return "Almost. Raise Dissonance by 2; each enemy gets +1 fight until the end of the loop; the Appointed has Arrived."
   end,
 
   [9] = function(ctx)
     if CampaignState.knows("the-way-the-night-breaks") then
       if ctx and ctx.onFinaleAttemptable then ctx.onFinaleAttemptable() end
-      return "The Appointed Hour — you may attempt the finale."
+      return "The Appointed Hour. In the finale, the finale ends (contest not reached). Otherwise the loop ends, or you may begin the finale."
     end
     if ctx and ctx.onReset then ctx.onReset() end
-    return "The Appointed Hour — the night ends. Trigger a reset."
+    return "The Appointed Hour. The loop ends: read the loop resolution, then click Reset Loop."
   end,
 }
 

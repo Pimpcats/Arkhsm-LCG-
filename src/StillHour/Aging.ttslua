@@ -78,7 +78,9 @@ end
 -- @return table {years, bracket, bracketChanged, agedOut, drift}
 function Aging.applyInterlude(investigatorId, cond, lockedChoice)
   local before = Aging.bracketForYears(CampaignState.getYears(investigatorId))
-  local gained = Aging.computeYearsGained(cond)
+  -- Years a card or resolution gave during the loop (A Year in a Night, the
+  -- ninth line, the name) are added with the reset Years
+  local gained = Aging.computeYearsGained(cond) + math.max(0, math.floor((cond and cond.extraYears) or 0))
   local years = CampaignState.addYears(investigatorId, gained)
   local bracket = Aging.bracketForYears(years)
 

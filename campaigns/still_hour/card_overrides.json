@@ -36,7 +36,7 @@
   },
   "sthr-hour-6": {
     "name": "Hour VI — The Wrong Sky",
-    "text": "When reached: Add 1 Static token to the chaos bag until the end of the loop. If your Campaign Log records What the Almanac Hid, instead remove 1 Static token from the chaos bag until the end of the loop.",
+    "text": "When reached: Add 1 Static token to the chaos bag until the end of the loop. If your Campaign Log records What the Almanac Hid, instead: until the end of the loop, the chaos bag holds 1 fewer Static token than its band calls for (never fewer than 0).",
     "doom": 1,
     "back_flavor": "The sky is wrong in a new way now: a starless patch the shape of an open door, fraying at its edges.",
     "back_text": "Set this Hour aside beside the Hours deck. Hour VII becomes the current agenda: resolve its “When reached” text."
@@ -57,14 +57,14 @@
   },
   "sthr-hour-9": {
     "name": "Hour IX — The Appointed Hour",
-    "text": "When reached: The loop ends. In the Prologue, (→R2). In the finale, the finale ends and the contest is not reached. Otherwise, if your Campaign Log records The Way the Night Breaks, you may begin the finale instead; if you do not, (→Loop Resolution 1).",
+    "text": "When reached: In the Prologue, (→R2). In the finale, the finale ends and the contest is not reached. Otherwise, the loop ends (→Loop Resolution 1), unless your Campaign Log records The Way the Night Breaks and you begin the finale instead.",
     "back_flavor": "The occultation completes, exactly as the almanac promised.",
     "back_text": ""
   },
   "sthr-losthour": {
     "name": "Lost Hour",
     "traits": "Static.",
-    "text": "Revelation – Advance the Hourglass by 1 Hour. If the current Hour is Hour VI or later, advance it by 2 Hours instead.",
+    "text": "Revelation – Advance the Hourglass by 2 Hours if the current Hour is Hour VI or later; otherwise, advance it by 1 Hour.",
     "quantity": 3
   },
   "sthr-slippage": {
@@ -269,7 +269,7 @@
     ],
     "flavor": "The light remembers a path the dark has forgotten.",
     "back_shroud": 3,
-    "back_text": "Calm side (your Campaign Log records The Lamp Was Never Lit).\n[action] Light the lamp. It stays lit until the end of the loop.\nWhile the lamp is lit, each Echo in the Lighthouse and Sunken Road districts is Sleepwalking while Dissonance is in the Calm or Glitch band, and The Dark That Waits treats investigators here as not at the Lantern Room.",
+    "back_text": "Calm side (your Campaign Log records The Lamp Was Never Lit).\n[action]: Light the lamp. It stays lit until the end of the loop.\nWhile the lamp is lit, each Echo in the Lighthouse and Sunken Road districts is Sleepwalking while Dissonance is in the Calm or Glitch band, and The Dark That Waits treats investigators here as not at the Lantern Room.",
     "back_flavor": "You know how to light it now. Some part of you always did."
   },
   "sthr-loc-windingstair": {
@@ -294,7 +294,7 @@
         "color": "#8a5a2e"
       }
     ],
-    "text": "Investigators cannot move from the Winding Stair to the Lantern Room except with this ability.\n[action] Climb: Test [agi] (2). If you succeed, move to the Lantern Room. If you fail, take 1 damage.",
+    "text": "Investigators cannot move from the Winding Stair to the Lantern Room except with this ability.\n[action]: Test [agi] (2). If you succeed, move to the Lantern Room. If you fail, take 1 damage.",
     "unrevealed": true,
     "unrevealed_flavor": "Iron steps spiral up into the dark. You can hear them ring under feet that are not yours."
   },
@@ -388,7 +388,7 @@
     "victory": 1,
     "shroud": 4,
     "clues": 3,
-    "text": "Closed. It opens when The Hour Was Wrong becomes the current act.",
+    "text": "Closed. It opens when The Hour Was Wrong becomes the current act, and in every loop once your Campaign Log records The Hour Was Wrong.",
     "clues_per_investigator": true,
     "icons": "spade",
     "color": "#1c2a52",
@@ -528,7 +528,7 @@
     ],
     "back_shroud": 2,
     "flavor": "The sheriff gives the same speech to the same crowd. He has been giving it since ten o'clock.",
-    "back_text": "Other side (your Campaign Log records The Sheriff Is Already Dead).\n[free] Group limit once per loop: An investigator here may look at the next Hour (the card beneath the current Hour).",
+    "back_text": "Other side (your Campaign Log records The Sheriff Is Already Dead).\n[free]: An investigator here looks at the next Hour (the card beneath the current Hour). Group limit once per loop.",
     "back_flavor": "The records let you read the night ahead."
   },
   "sthr-loc-recordsoffice": {
@@ -578,7 +578,7 @@
   "sthr-crowdturns": {
     "name": "The Crowd Turns",
     "traits": "Terror.",
-    "text": "Revelation – Ready each Echo enemy in play. If there are none, this card gains surge.",
+    "text": "Revelation – Ready each Echo enemy in play. If there is no Echo enemy in play, The Crowd Turns gains surge.",
     "quantity": 1
   },
   "sthr-loc-wheel": {
@@ -785,20 +785,20 @@
   },
   "sthr-story-firstreset": {
     "name": "The First Reset",
-    "text": "Each investigator gains 2 banked Memory. If you advanced The First Hour, the party gains 1 more banked Memory.\nRecord You Are Unstuck in your Campaign Log. Part I begins. No Years are gained from the Prologue.\nTurn to the Prologue resolutions in the Campaign Guide.",
+    "text": "The Prologue ends. In your Campaign Log, record You Are Unstuck.\nThen turn to the Prologue resolutions in the Campaign Guide and read the one that applies.",
     "flavor": "The occultation completes. Something reaches through — and does not finish reaching. The night folds. You are standing in the Square again at eleven o'clock, salt on your tongue, and you are the only ones who feel the seam.",
     "deck": 95102
   },
   "sthr-act-lamp": {
     "name": "Light the Lamp",
     "clues": 4,
-    "text": "Objective – [action] An investigator at the Lantern Room may spend 4 clues (investigators there may contribute) and test [wil] (3) or [com] (3). If they succeed, advance. If they fail, place the spent clues on the Lantern Room.",
+    "text": "Objective – [action] Spend 4 clues: Test [wil] (3) or [com] (3). Only an investigator at the Lantern Room may use this ability; investigators at the Lantern Room may contribute the clues. If you succeed, advance. If you fail, place 4 clues from the token pool on the Lantern Room.",
     "flavor": "The lamp is dark. It has never, in any loop, been lit.",
     "deck": 95103,
     "index": "1a",
     "number": "1/2",
     "back_flavor": "The wick takes on the third try. For the first time in more nights than anyone can count, the beam swings out across the water, and down on the Sunken Road every walker stops and turns to face the light.",
-    "back_text": "Record in your Campaign Log: The Lamp Was Never Lit.\nThe lamp is lit until the end of this loop. While the lamp is lit, each Echo in the Lighthouse and Sunken Road districts is Sleepwalking while Dissonance is in the Calm or Glitch band.\nIn every later loop, the Lantern Room enters play calm side up.\nIn Part II, advance to act 2a. In Part I, remove this act deck from the game."
+    "back_text": "Record in your Campaign Log: The Lamp Was Never Lit.\nThe lamp is lit until the end of this loop. While the lamp is lit, each Echo in the Lighthouse and Sunken Road districts is Sleepwalking while Dissonance is in the Calm or Glitch band, and The Dark That Waits treats investigators at the Lantern Room as not at the Lantern Room.\nFrom now on the Lantern Room is calm side up: flip it now (do not add clues), and in every later loop it enters play calm side up.\nIn Part II, advance to act 2a. In Part I, remove this act deck from the game."
   },
   "sthr-act-ninthdeath": {
     "clues": 2,
@@ -807,7 +807,7 @@
     "number": "2/2",
     "flavor": "Elias kept the log for years. He does not remember writing most of it.",
     "back_flavor": "Eight deaths in Elias's own careful hand, each one dated tonight. The ninth line is ruled and waiting.",
-    "back_text": "Record in your Campaign Log: The Keeper's Ninth Death.\nWhen Elias's [elder] heals damage, it also heals 1 horror.\nThe Lighthouse's objectives are complete. From now on, do not use this act deck when you Place this box."
+    "back_text": "Record in your Campaign Log: The Keeper's Ninth Death.\nFrom now on, when Elias's [elder] heals damage, it also heals 1 horror.\nThe Lighthouse's objectives are complete. From now on, do not use this act deck when you Place this box."
   },
   "sthr-act-whythirteen": {
     "name": "Why Thirteen?",
@@ -829,11 +829,11 @@
     "number": "2/2",
     "flavor": "Below the bell, below the water, the church keeps what it was told to keep.",
     "back_flavor": "The page is soft as wet cloth, but the ink held. The same almanac, the same night, and a different hour. Someone set the occultation an hour wrong, and the town has been standing in the gap ever since.",
-    "back_text": "Record in your Campaign Log: The Hour Was Wrong.\nRemove Hour IV from the Hours deck now (if it has not been reached) and during every later Loop Setup.\nThe Drowned Church's objectives are complete. From now on, do not use this act deck when you Place this box."
+    "back_text": "Record in your Campaign Log: The Hour Was Wrong.\nRemove Hour IV from the game now unless it is the current Hour (if it is, remove it as soon as it is set aside), and during every later Loop Setup. The Hourglass steps over it in both directions.\nThe Drowned Church's objectives are complete. From now on, do not use this act deck when you Place this box."
   },
   "sthr-act-walkbackward": {
     "name": "Walk It Backward",
-    "text": "Objective – An investigator who discovers a clue at the Turning, then later this loop a clue at the Low Bridge, then a clue at the Milestones, advances this act. (Mark each step with a resource on this act.)",
+    "text": "Objective – Advance when one investigator has discovered a clue at the Turning, then a clue at the Low Bridge, then a clue at the Milestones, in that order, during this loop. (Keep a separate pile of resources from the token pool on this act for each investigator, 1 per step.)",
     "flavor": "The same figures walk it every loop, in the same direction, never arriving.",
     "deck": 95106,
     "index": "1a",
@@ -843,7 +843,7 @@
   },
   "sthr-act-walksbeside": {
     "name": "Who Walks Beside You",
-    "text": "Part II only.\nObjective – [action] Hold: Choose a ready Echo at the Turning that is not Sleepwalking. Test [wil] (X) or [com] (X), where X is its fight value. If you succeed, exhaust it. After an investigator evades or Holds an Echo at the Turning, advance.",
+    "text": "Part II only.\nObjective – [action]: Hold. Only an investigator at the Turning may use this ability. Choose a ready, non-Sleepwalking Echo at the Turning and test [wil] (X) or [com] (X), where X is its fight value. If you succeed, exhaust it. After an investigator evades an Echo at the Turning or succeeds at Hold, advance.",
     "flavor": "Some of them turn to look at you now.",
     "deck": 95107,
     "index": "2a",
@@ -860,7 +860,7 @@
     "index": "1a",
     "number": "1/2",
     "back_flavor": "He is at the bottom of the Well, and he has been there since ten o'clock. Up on the Town Hall steps, the sheriff clears his throat and begins the speech again.",
-    "back_text": "Record in your Campaign Log: The Sheriff Is Already Dead.\nIn every later loop, the Town Hall Steps enter play other side up.\nIn Part II, advance to act 2a. In Part I, remove this act deck from the game."
+    "back_text": "Record in your Campaign Log: The Sheriff Is Already Dead.\nFrom now on the Town Hall Steps are other side up: flip them now (do not add clues), and in every later loop they enter play other side up.\nIn Part II, advance to act 2a. In Part I, remove this act deck from the game."
   },
   "sthr-act-vote": {
     "name": "The Vote That Never Ends",
@@ -875,17 +875,17 @@
   },
   "sthr-act-wheelturns": {
     "name": "The Wheel Still Turns",
-    "text": "Objective – [action] An investigator at the Wheel may test [agi] (3). If they succeed, they discover 2 clues from among Fairground locations, then advance.",
+    "text": "Objective – [action]: Test [agi] (3). Only an investigator at the Wheel may use this ability. If you succeed, discover up to 2 clues from among Fairground locations, and advance.",
     "flavor": "You see the whole town at once.",
     "deck": 95110,
     "index": "1a",
     "number": "1/2",
     "back_flavor": "From the top of the Wheel, Ambergrove lies spread out like a map on a table: the Square, the church, the road running out to the lighthouse. Every street is full, and nobody is moving.",
-    "back_text": "Record in your Campaign Log: The Wheel Still Turns.\nFrom now on: [free] Group limit once per loop: An investigator at the Wheel may look at the top 2 cards of the encounter deck and put them back in any order.\nIn Part II, advance to act 2a. In Part I, remove this act deck from the game."
+    "back_text": "Record in your Campaign Log: The Wheel Still Turns.\nFrom now on, while your Campaign Log records The Wheel Still Turns: [free] An investigator at the Wheel may look at the top 2 cards of the encounter deck and put them back in any order. Group limit once per loop.\nIn Part II, advance to act 2a. In Part I, remove this act deck from the game."
   },
   "sthr-act-bargain": {
     "name": "The Ticket-Taker's Bargain",
-    "text": "Part II only.\nObjective – [action] Parley: An investigator at the Ticket Booth speaks with the ticket-taker. Advance.",
+    "text": "Part II only.\nObjective – [action]: Parley. Only an investigator at the Ticket Booth may use this ability. Advance.",
     "flavor": "He smiles at you like he's been expecting you for a very long time.",
     "deck": 95111,
     "index": "2a",
@@ -903,7 +903,7 @@
     "number": "1/2",
     "clues_per_investigator": true,
     "back_flavor": "The press groans and runs. The pages come out warm, and wrong in a new way: the hour printed on them is the right one. For a moment the sky over the Almanac House looks almost ordinary.",
-    "back_text": "Record in your Campaign Log: What the Almanac Hid.\nAt Hour VI, remove 1 Static token instead of adding one.\nIn Part II, advance to act 2a. In Part I, remove this act deck from the game."
+    "back_text": "Record in your Campaign Log: What the Almanac Hid.\nAt Hour VI, the chaos bag holds 1 fewer Static token for the rest of the loop instead of 1 more.\nIn Part II, advance to act 2a. In Part I, remove this act deck from the game."
   },
   "sthr-act-appointedname": {
     "name": "The Appointed's Name",
@@ -914,11 +914,11 @@
     "index": "2a",
     "number": "2/2",
     "back_flavor": "It is written once, in the middle of an otherwise blank page. You read it. You do not say it aloud. Somewhere on the hill, something pauses mid-step.",
-    "back_text": "Record in your Campaign Log: The Appointed's Name. Mark Seraphine's thread “known.”\nAt Hour VII, exhaust the Appointed.\nIf your Campaign Log records The Appointed's Name, The Vote That Never Ends and one other deep entry, also record The Way the Night Breaks: the finale may now be begun.\nThe Almanac House's objectives are complete. From now on, do not use this act deck when you Place this box."
+    "back_text": "Record in your Campaign Log: The Appointed's Name. Mark Seraphine's thread “known.”\nAt Hour VII, exhaust the Appointed.\nIf your Campaign Log records The Appointed's Name, The Vote That Never Ends and at least one other deep entry, also record The Way the Night Breaks: the finale may now be begun.\nThe Almanac House's objectives are complete. From now on, do not use this act deck when you Place this box."
   },
   "sthr-act-lasthour": {
     "name": "Contest the Crossing",
-    "text": "Objective – Gain contest progress: 1 each time an investigator succeeds at Hold Back, 1 for each deep Knowledge entry spent, and 1 the first time each investigator is at the Sealed Study during the finale. When progress reaches 4 [perinv], advance.\nIf Hour IX is reached, every investigator is defeated, or Dissonance reaches the reset value, the finale ends and the contest is not reached.",
+    "text": "Objective – Gain 1 contest progress each time an investigator succeeds at Hold Back or spends a deep Knowledge entry, and the first time each investigator is at the Sealed Study. When progress reaches 4 [perinv], advance.\n[action]: Spend a deep Knowledge entry your Campaign Log records (each entry once per finale).\nIf Hour IX is reached, every investigator is defeated, or Dissonance reaches the reset value, the finale ends and the contest is not reached.",
     "flavor": "An appointment made in ink and never kept.",
     "deck": 95114,
     "index": "1a",
