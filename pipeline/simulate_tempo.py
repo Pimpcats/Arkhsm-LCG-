@@ -72,13 +72,37 @@ LOST_HOURS = 3
 
 # Districts: node-set size and Skip cards in it (count, chance it triggers).
 DISTRICT = {
-    "square": {"set": 2, "skips": []},
-    "almanac": {"set": 3, "skips": []},
-    "fairground": {"set": 2, "skips": [(1, 1.0)]},     # The Wheel's Turn
-    "church": {"set": 3, "skips": [(1, 0.8)]},         # Thirteen (if at the Church)
-    "road": {"set": 2, "skips": [(1, 0.4)]},           # The Bridge Remembers
+    "square": {"set": 3, "skips": []},
+    "almanac": {"set": 4, "skips": []},
+    "fairground": {"set": 3, "skips": [(1, 1.0)]},     # The Wheel's Turn
+    "church": {"set": 4, "skips": [(1, 0.8)]},         # Thirteen (if at the Church)
+    "road": {"set": 3, "skips": [(1, 0.4)]},           # The Bridge Remembers
     "lighthouse": {"set": 2, "skips": []},
 }
+# Each district's own monster (the recurring Echoes are inside the action tax).
+# kill: party actions to defeat it; cost: actions it takes when handled the
+# efficient way (evade / endure). ASSUMPTION: values from its fight/health/evade
+# against the modelled party (about one damage-2 hit per 1.5 actions).
+DISTRICT_ENEMY = {
+    "square": {"id": "band", "kill": 2, "cost": 1, "calm_idle": True},        # Echo: sleeps in Calm
+    "church": {"id": "verger", "kill": 3, "cost": 1, "vp": 1},                # Aloof; engages at the Vestry
+    "road": {"id": "milecounter", "kill": 3, "cost": 3, "vp": 1},             # Hunter; left alone it skips Hours, so it is always killed
+    "fairground": {"id": "barker", "kill": 2, "cost": 2},                     # Hunter; killed either way
+    "almanac": {"id": "compositor", "kill": 4, "cost": 0, "vp": 1,            # Retaliate; left alone, failed Press tests raise Dissonance
+                "press_diss": True},
+}
+# Victory locations: (district, shroud, clues per investigator, opens when)
+VP_LOCATIONS = {
+    "keepers": ("lighthouse", 2, 2, None),
+    "records": ("square", 3, 3, None),
+    "ticketbooth": ("fairground", 2, 2, None),
+    "crypt": ("church", 4, 3, "church_surface"),     # Part II: opens with its act 2a
+    "study": ("almanac", 4, 3, "almanac_surface"),   # Part II: opens with its act 2a
+}
+# Named enemies: (district, Victory, extra kill cost for the greedy party when
+# its objective does not already require dealing with it)
+NAMED_VP = {"square_deep": ("sheriff", 3), "church_deep": ("bellringer", 2)}
+RIDER = ("fairground", 2, 8)
 # Map: the Square is the hub; the Lighthouse hangs off the Sunken Road.
 EDGES = {("square", "almanac"), ("square", "fairground"), ("square", "church"),
          ("square", "road"), ("road", "lighthouse")}
@@ -108,24 +132,24 @@ def crossings(a, b):
 # cards. ("at", loc) marks the moment the party must stand at an objective
 # location (its "after you enter" effects apply there).
 OBJ = {
-    "square_surface": ("square", "surface", [("clues", 5, [(1, 2, "square"), (2, 2, "townhall"), (2, 2, "well"),
+    "square_surface": ("square", "surface", [("clues_pi", 2, [(1, 2, "square"), (2, 2, "townhall"), (2, 2, "well"),
                                                             (3, 3, "records")]), ("at", "well"), ("act", 1)]),
-    "square_deep": ("square", "deep", [("named", "square_deep"), ("clues", 3, [(4, 3, "records")])]),
+    "square_deep": ("square", "deep", [("named", "square_deep"), ("clues_pi", 1, [(4, 3, "records")])]),
     "almanac_surface": ("almanac", "surface", [("clues_pi", 2, [(2, 2, "readingroom"), (3, 3, "press")]),
                                                ("at", "press"), ("act", 1)]),
-    "almanac_deep": ("almanac", "deep", [("move", 1), ("clues", 3, [(4, 3, "study")])]),
+    "almanac_deep": ("almanac", "deep", [("move", 1), ("clues_pi", 1, [(4, 3, "study")])]),
     "fairground_surface": ("fairground", "surface", [("at", "wheel"), ("test", "agi", 3, "wheel")]),
     "fairground_deep": ("fairground", "deep", [("move", 1), ("act", 1)]),
-    "church_surface": ("church", "surface", [("clues", 6, [(2, 3, "nave"), (3, 2, "belfry"), (2, 2, "vestry")]),
+    "church_surface": ("church", "surface", [("clues_pi", 2, [(2, 3, "nave"), (3, 2, "belfry"), (2, 2, "vestry")]),
                                              ("at", "vestry"), ("act", 1)]),
-    "church_deep": ("church", "deep", [("named", "church_deep"), ("clues", 3, [(4, 3, "crypt")])]),
+    "church_deep": ("church", "deep", [("named", "church_deep"), ("clues_pi", 1, [(4, 3, "crypt")])]),
     "road_surface": ("road", "surface", [("move", 1), ("clues", 1, [(2, 3, "turning")]), ("move", 1),
                                          ("clues", 1, [(3, 2, "lowbridge")]), ("move", 1),
                                          ("clues", 1, [(1, 2, "milestones")])]),
     "road_deep": ("road", "deep", [("glitch",), ("move", 1), ("test", "agi", 3, "turning")]),
-    "lighthouse_surface": ("lighthouse", "surface", [("clues", 4, [(2, 1, "stair"), (2, 2, "keepers"),
+    "lighthouse_surface": ("lighthouse", "surface", [("clues_pi", 1, [(2, 1, "stair"), (2, 2, "keepers"),
                                                                    (4, 2, "lantern")]), ("test", "wil", 3, "lantern")]),
-    "lighthouse_deep": ("lighthouse", "deep", [("act", 1), ("move", 1), ("clues", 2, [(2, 2, "keepers")])]),
+    "lighthouse_deep": ("lighthouse", "deep", [("act", 1), ("move", 1), ("clues_pi", 1, [(2, 2, "keepers")])]),
 }
 # Location card effects the pacing can feel, per profile. Keys:
 #   extra_action  - investigating here costs this many more actions
@@ -209,8 +233,15 @@ def available(obj, facts, act2):
     return act2
 
 
-def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
+def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None, greedy=False, claimed=None, only=None):
     fx = fx or {}
+    claimed = claimed if claimed is not None else set()
+    vp_gain = []
+    enemies_in = []            # district enemies shuffled into the deck
+    compositor_live = False
+    pending_cost = 0
+    clearing = {}              # VP location -> clues still on it (greedy)
+    rider_hp = None
     party = PARTY[n]
     reset_at = 9 if n == 1 else 6 * n
     stats = {"reset": False, "harm": 0, "diss_fx": 0, "memory": 0, "years": 0,
@@ -242,6 +273,8 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
         rank = {d: i for i, d in enumerate(["square"] + ds)}
         prio.sort(key=lambda o: (rank[OBJ[o][0]], OBJ[o][1] != "surface"))
     plan = [o for o in prio if available(o, facts, act2)]
+    if only is not None:
+        plan = [o for o in plan if o in only]
     # group by district in first-appearance order, Square first
     order = ["square"] + [OBJ[o][0] for o in plan if OBJ[o][0] != "square"]
     districts = list(dict.fromkeys(order))
@@ -269,8 +302,11 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
     done = []
     deck = SPINE_SIZE + DISTRICT["square"]["set"] + (2 if act2 else 0)
     skip_cards = []
+    if "square" in DISTRICT_ENEMY:
+        enemies_in.append("square")
     cur, progress, supply = None, 0, None
     cur_district = "square"
+    comp_round = -1
     rounds = 0
     ti = 0
     while True:
@@ -286,12 +322,36 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
                     adv += 2 if hour >= 5 else 1
                 else:
                     r -= LOST_HOURS
+                    drawn_skip = False
                     for cnt, p in skip_cards:
                         if r < cnt:
                             if rng.random() < p:
                                 adv += 1
+                            drawn_skip = True
                             break
                         r -= cnt
+                    if not drawn_skip:
+                        for d_ in list(enemies_in):
+                            if r < 1:
+                                en = DISTRICT_ENEMY[d_]
+                                enemies_in.remove(d_)            # one copy: it stays in play
+                                band_now = band_for(diss, n)
+                                vp = en.get("vp")
+                                if vp and greedy and en["id"] not in claimed:
+                                    pending_cost += en["kill"]
+                                    claimed.add(en["id"]); vp_gain.append((en["id"], vp))
+                                elif en["id"] == "milecounter":
+                                    pending_cost += en["kill"]
+                                    if en["id"] not in claimed:
+                                        claimed.add(en["id"]); vp_gain.append((en["id"], vp))
+                                elif en.get("press_diss"):
+                                    compositor_live = True
+                                elif en.get("calm_idle") and band_now == "Calm":
+                                    pass
+                                else:
+                                    pending_cost += en["cost"]
+                                break
+                            r -= 1
             hour += adv
             diss += dissonance_rate(n)
             if ti < len(tasks) and tasks[ti][0] == "test" and len(tasks[ti]) > 3 \
@@ -304,6 +364,9 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
                 break
         band = band_for(diss, n)
         budget = sum(1 for _ in range(n * ACTIONS) if rng.random() >= tax)
+        paid = min(budget, pending_cost)
+        budget -= paid
+        pending_cost -= paid
         actor = 0
         glitch_at = 3 if n == 1 else 2 * n
         noticed_at = 6 if n == 1 else 4 * n
@@ -316,6 +379,28 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
                 if t2[0] in ("clues", "clues_pi", "test", "move", "act", "named", "at", "glitch"):
                     return False
             return True
+
+        if greedy and budget > 0 and district_clear():
+            # greed: clear this district's Victory location before moving on
+            for name, (dd, sh, cpi, needs) in VP_LOCATIONS.items():
+                if dd != cur_district or name in claimed:
+                    continue
+                if needs and not (act2 and needs in facts):
+                    continue
+                left = clearing.setdefault(name, cpi * n)
+                while budget > 0 and left > 0:
+                    budget -= 1
+                    if rng.random() < success_probability(party["int"][actor % n] + BOOST - sh, band_for(diss, n)):
+                        left -= 1
+                    actor += 1
+                clearing[name] = left
+            if act2 and cur_district == RIDER[0] and "rider" not in claimed:
+                rider_hp = RIDER[2] if rider_hp is None else rider_hp
+                spend = min(budget, rider_hp)
+                budget -= spend
+                rider_hp -= spend
+                if rider_hp <= 0:
+                    claimed.add("rider"); vp_gain.append(("rider", RIDER[1]))
 
         lv = levers.get(cur_district)
         if lv and budget > 0 and (lv[0] in ("rewind", "lower_diss") or district_clear()):
@@ -359,6 +444,8 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
                     placed.add(d)
                     deck += DISTRICT[d]["set"]
                     skip_cards += DISTRICT[d]["skips"]
+                    if d in DISTRICT_ENEMY:
+                        enemies_in.append(d)
                 ti += 1
                 if hour >= hours_total:
                     break
@@ -375,6 +462,9 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
                 ti += 1
             elif k == "done":
                 done.append(t[1])
+                stats.setdefault("done_hour", {})[t[1]] = hour
+                if t[1] in NAMED_VP and NAMED_VP[t[1]][0] not in claimed:
+                    claimed.add(NAMED_VP[t[1]][0]); vp_gain.append(NAMED_VP[t[1]])
                 ti += 1
             elif k == "move":
                 need = n * t[1]
@@ -431,6 +521,10 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
                     diss += e.get("fail_diss", 0)
                     stats["diss_fx"] += e.get("fail_diss", 0)
                     stats["harm"] += e.get("fail_harm", 0)
+                    if compositor_live and loc[2] == "press" and comp_round != rounds:
+                        comp_round = rounds
+                        diss += 1
+                        stats["diss_fx"] += 1
                 if progress >= need:
                     progress, supply = 0, None
                     ti += 1
@@ -442,14 +536,20 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
         if hour >= hours_total:
             break
     stats["year_in_night"] = year_in_night
+    for name, left in clearing.items():
+        if left <= 0 and name not in claimed:
+            claimed.add(name); vp_gain.append((name, 1))
+    stats["vp"] = sum(v for _, v in vp_gain)
     return done, rounds, len(placed), stats
 
 
-def campaign(rng, n, tax, max_loops=15, explore=False, fx=None, log=None):
+def campaign(rng, n, tax, max_loops=15, explore=False, fx=None, log=None, greedy=False):
     facts, act2 = set(), False
     per_loop, districts = [], []
+    claimed = set()
     for loop in range(1, max_loops + 1):
-        done, rounds, placed, st = play_loop(rng, n, tax, facts, act2, min(loop - 1, scar_cap(n)), explore, fx)
+        done, rounds, placed, st = play_loop(rng, n, tax, facts, act2, min(loop - 1, scar_cap(n)), explore, fx,
+                                             greedy=greedy, claimed=claimed)
         if log is not None:
             log.append(st)
         facts.update(done)
@@ -470,6 +570,63 @@ def pct(xs, p):
 
 
 PROFILES_TO_COMPARE = ("none", "friction", "spin")
+
+
+def district_race(trials, seed, n=3):
+    """One loop, one district: how often its objective beats the Hourglass."""
+    fx = LOCATION_PROFILES["spin"]
+    print()
+    print("District race at {} investigators (one loop, heading straight there from the Square):".format(n))
+    print("objective                 | scar 0: done  Hours left | scar 4: done  Hours left")
+    rows = [(o, OBJ[o][0], OBJ[o][1]) for o in PRIORITY]
+    for obj, d, layer in rows:
+        facts = set()
+        if layer == "deep":
+            facts = {d + "_surface"} | ({"square_deep"} if obj == "almanac_deep" else set())
+        out = []
+        for scar in (0, 4):
+            rng = random.Random(seed)
+            ok, left = 0, []
+            for _ in range(trials):
+                done, rounds, placed, st = play_loop(rng, n, 0.35, set(facts), layer == "deep", scar,
+                                                     fx=fx, only={obj})
+                if obj in done:
+                    ok += 1
+                    left.append(8 - st["done_hour"][obj])
+            out.append((ok / trials, statistics.mean(left) if left else 0))
+        print("{:25} |   {:>5.0%}   {:>4.1f}            |   {:>5.0%}   {:>4.1f}".format(
+            obj, out[0][0], out[0][1], out[1][0], out[1][1]))
+
+
+def compare_greed(trials, seed):
+    """Efficient vs greedy Victory play, printed locations, first-time play."""
+    print()
+    print("Victory greed: 'efficient' ignores optional Victory; 'greedy' kills optional Victory")
+    print("monsters, clears Victory locations before moving on and hunts the Named rider.")
+    print("players | policy    | unlock median (10-90%) | never | obj/loop | Victory Memory by unlock | loops of extra aging")
+    fx = LOCATION_PROFILES["spin"]
+    for n in (1, 2, 3, 4):
+        base = None
+        for greedy in (False, True):
+            rng = random.Random(seed)
+            unlocks, objs, never, log = [], [], 0, []
+            vps = []
+            for _ in range(trials):
+                sub = []
+                u, per, _ = campaign(rng, n, 0.35, explore=True, fx=fx, log=sub, greedy=greedy)
+                vps.append(sum(x["vp"] for x in sub))
+                if u is None:
+                    never += 1
+                else:
+                    unlocks.append(u)
+                objs.extend(per)
+            med = statistics.mean(unlocks) if unlocks else float("nan")
+            if base is None:
+                base = med
+            rs = "{}-{}".format(pct(unlocks, 10), pct(unlocks, 90)) if unlocks else "-"
+            print("   {}    | {:9} | {:>4.1f} ({:>5})           | {:>5.1%} | {:>8.2f} | {:>6.1f}                   | {:+.1f}".format(
+                n, "greedy" if greedy else "efficient", med, rs, never / trials, statistics.mean(objs),
+                statistics.mean(vps), med - base))
 
 
 def compare(trials, seed):
@@ -509,9 +666,20 @@ def main():
                     help="location effects to apply in the main table")
     ap.add_argument("--compare", action="store_true",
                     help="print only the location-profile comparison")
+    ap.add_argument("--race", action="store_true",
+                    help="print only the per-district race (objective vs Hourglass)")
+    ap.add_argument("--greed", action="store_true",
+                    help="print only the efficient-vs-greedy Victory comparison")
     a = ap.parse_args()
     if a.compare:
         compare(a.trials, a.seed)
+        return
+    if a.greed:
+        compare_greed(a.trials, a.seed)
+        return
+    if a.race:
+        for n in (2, 3, 4):
+            district_race(a.trials, a.seed, n)
         return
     rng = random.Random(a.seed)
     fx = LOCATION_PROFILES[a.locations]

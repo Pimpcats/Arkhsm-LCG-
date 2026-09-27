@@ -766,5 +766,41 @@
     "art_type": "story",
     "scene": "a fairground gate at first light, a punched ticket on the ground, a tall shadow walking out into the morning",
     "seed": 3251
+  },
+  {
+    "id": "sthr-bandonsteps",
+    "art_type": "enemy",
+    "scene": "a small brass band on the Town Hall steps at night, instruments raised mid-note, faces blank and patient, lanterns strung overhead",
+    "seed": 3853
+  },
+  {
+    "id": "sthr-drownedverger",
+    "art_type": "enemy",
+    "scene": "a church verger in a sodden cassock standing in a dim vestry, water to his shins, holding a ring of keys, face grey and swollen",
+    "seed": 5400
+  },
+  {
+    "id": "sthr-milecounter",
+    "art_type": "enemy",
+    "scene": "a long thin shape crouched beside a roadside milestone in fog, too many joints, one hand resting on the carved stone as if counting",
+    "seed": 3895
+  },
+  {
+    "id": "sthr-barker",
+    "art_type": "enemy",
+    "scene": "a fairground barker in a striped waistcoat and straw boater under carnival lights, grin too wide, one gloved hand beckoning, the wheel lit behind him",
+    "seed": 7975
+  },
+  {
+    "id": "sthr-compositor",
+    "art_type": "enemy",
+    "scene": "a hunched printer at a composing stick in a dark print shop, arms black with ink to the elbow, eyes like wet type, trays of letters glinting",
+    "seed": 3279
+  },
+  {
+    "id": "sthr-uninvited",
+    "art_type": "enemy",
+    "scene": "a tall faceless figure in an old-fashioned mourning coat at the edge of lantern light on a hill above a small town, the stars sliding behind it",
+    "seed": 2432
   }
 ]

@@ -33,30 +33,32 @@ import statistics
 # --------------------------------------------------------------------------- #
 # CHAOS BAG MODEL
 # --------------------------------------------------------------------------- #
-# A "Standard"-difficulty bag calibrated so that the calm-bag success curve
-# reproduces the design doc's headline numbers exactly: 25% / 56% / 75% at
-# delta 0 / +1 / +2 (cards_v0.2 §D). "AUTOFAIL" always fails regardless of delta
-# (that is why overkill tests never hit 100%). Symbol tokens are given generic
-# campaign modifiers; ELDER is treated as a flat +1 baseline.
+# The shipped Standard bag (guide, Campaign Setup) with the Easy / Standard
+# side of the scenario reference card: numeric tokens +1, 0, 0, -1, -1, -1, -2,
+# -2, -3, -4; two Skulls (-1, or -2 from the Glitch band up); Cultist -2;
+# Tablet -2; Elder Thing -3; auto-fail; Elder Sign (a flat +1 assumption; it
+# varies by investigator). Symbol side effects (Dissonance, Hours, horror) are
+# not modifiers and are not modelled here. The band adds [static] tokens (-3).
 #
-# ASSUMPTION: this token list. The design docs never print the exact bag; this
-# one is reverse-engineered to hit the documented curve, then reused for the
-# band comparison. Swap it here if the campaign ships a different Standard bag.
+# Reference: an official Dunwich-era Standard bag succeeds 44% / 75% / 88% at
+# +1 / +2 / +3; this bag, weighted by time spent in each band over a campaign,
+# succeeds 43% / 73% / 89%, and its symbol side effects make it play slightly
+# harder (docs/BALANCE.md, "Normal difficulty").
 AUTOFAIL = "autofail"
-BASE_BAG = [
-    1, 0, 0, -1, -1, -1, -2, -2, -3, -4,   # numeric tokens
-    -1, -1,        # two Skulls
-    -2,            # Cultist
-    -3,            # Tablet
-    1,             # Elder Sign (flat +1 assumption)
-    AUTOFAIL,      # auto-fail
-]
-STATIC_MODIFIER = -3           # the [static] token (encounter v0.4 §0)
+NUMERIC = [1, 0, 0, -1, -1, -1, -2, -2, -3, -4]
+SYMBOLS = [-2,             # Cultist
+           -2,             # Tablet
+           -3,             # Elder Thing
+           1,              # Elder Sign (flat +1 assumption)
+           AUTOFAIL]
+SKULL = {"Calm": -1, "Glitch": -2, "Noticed": -2}
+BASE_BAG = NUMERIC + [SKULL["Calm"]] * 2 + SYMBOLS
+STATIC_MODIFIER = -3           # the [static] token
 STATIC_BY_BAND = {"Calm": 0, "Glitch": 1, "Noticed": 2}
 
 
 def bag_for_band(band):
-    return list(BASE_BAG) + [STATIC_MODIFIER] * STATIC_BY_BAND[band]
+    return NUMERIC + [SKULL[band]] * 2 + SYMBOLS + [STATIC_MODIFIER] * STATIC_BY_BAND[band]
 
 
 def success_probability(delta, band):
@@ -374,10 +376,16 @@ def main():
                 " ".join("{:5.0f}%".format(100 * success_probability(delta, b))
                          for b in ("Calm", "Glitch", "Noticed")))
             print(row)
-    assert_("calm curve 25/56/75 at delta 0/+1/+2 (within 1pt)",
-            abs(success_probability(0, "Calm") - 0.25) < 0.01
-            and abs(success_probability(1, "Calm") - 0.5625) < 0.01
-            and abs(success_probability(2, "Calm") - 0.75) < 0.01)
+    # ASSUMPTION: share of tests taken in each band over a 7-loop, 3-player
+    # campaign (scar 0-6, ~1.3 Dissonance per round, 8 rounds a loop)
+    share = {"Calm": 0.34, "Glitch": 0.54, "Noticed": 0.12}
+    weighted = {d: sum(share[b] * success_probability(d, b) for b in share) for d in (1, 2, 3)}
+    print("  campaign-weighted: +1 {:.0%}  +2 {:.0%}  +3 {:.0%}   (official Standard ~44% / 75% / 88%)".format(
+        weighted[1], weighted[2], weighted[3]))
+    assert_("Normal is slightly harder than official Standard at +2 (70-75%)",
+            0.70 <= weighted[2] < 0.75)
+    assert_("Normal matches official Standard at +3 (within 3pt of 88%)",
+            abs(weighted[3] - 0.88) <= 0.03)
     assert_("Noticed band squeezes marginal (delta+1) tests vs Calm",
             success_probability(1, "Noticed") < success_probability(1, "Calm"))
     assert_("overkill never reaches 100% (autofail floor)",

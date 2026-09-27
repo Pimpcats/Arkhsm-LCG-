@@ -117,7 +117,8 @@
     "encounter": [
       "sthr-drownedchoir",
       "sthr-thirteen",
-      "sthr-risingwater"
+      "sthr-risingwater",
+      "sthr-drownedverger"
     ],
     "named": [
       "sthr-bellringer"
@@ -157,7 +158,8 @@
     ],
     "encounter": [
       "sthr-waitingcongregation",
-      "sthr-bridgeremembers"
+      "sthr-bridgeremembers",
+      "sthr-milecounter"
     ],
     "_map": {
       "sthr-loc-milestones": [
@@ -227,7 +229,8 @@
       "sthr-oldbones",
       "sthr-crossing",
       "sthr-samespeech",
-      "sthr-crowdturns"
+      "sthr-crowdturns",
+      "sthr-bandonsteps"
     ],
     "named": [
       "sthr-wearssheriff"
@@ -275,7 +278,8 @@
     ],
     "encounter": [
       "sthr-wheelsturn",
-      "sthr-reflectionlies"
+      "sthr-reflectionlies",
+      "sthr-barker"
     ],
     "named": [
       "sthr-onewhorides"
@@ -312,7 +316,8 @@
     "encounter": [
       "sthr-pagethatwasnt",
       "sthr-inkrunsbackward",
-      "sthr-studydoor"
+      "sthr-studydoor",
+      "sthr-compositor"
     ],
     "_map": {
       "sthr-loc-readingroom": [
@@ -345,7 +350,8 @@
       "sthr-res-3",
       "sthr-res-4",
       "sthr-res-5",
-      "sthr-res-6"
+      "sthr-res-6",
+      "sthr-uninvited"
     ],
     "_locked": true
   }

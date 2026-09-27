@@ -160,6 +160,12 @@ SCENES.update({
     # node sets
     "sthr-darkthatwaits": "darkness pooled at the top of a lighthouse stair, thick as water, the lens above it unlit",
     "sthr-somethingonstair": "a hunched figure sitting on a spiral stair in the dark, knees drawn up, head turned away",
+    "sthr-bandonsteps": "a small brass band on the Town Hall steps at night, instruments raised mid-note, faces blank and patient, lanterns strung overhead",
+    "sthr-drownedverger": "a church verger in a sodden cassock standing in a dim vestry, water to his shins, holding a ring of keys, face grey and swollen",
+    "sthr-milecounter": "a long thin shape crouched beside a roadside milestone in fog, too many joints, one hand resting on the carved stone as if counting",
+    "sthr-barker": "a fairground barker in a striped waistcoat and straw boater under carnival lights, grin too wide, one gloved hand beckoning, the wheel lit behind him",
+    "sthr-compositor": "a hunched printer at a composing stick in a dark print shop, arms black with ink to the elbow, eyes like wet type, trays of letters glinting",
+    "sthr-uninvited": "a tall faceless figure in an old-fashioned mourning coat at the edge of lantern light on a hill above a small town, the stars sliding behind it",
     "sthr-thirteen": "a church clock face with thirteen hour marks, the hands pointing to the extra one",
     "sthr-risingwater": "black water climbing a flight of stone stairs one step at a time",
     "sthr-bridgeremembers": "wet footprints crossing a low stone bridge that begin and end in the middle",

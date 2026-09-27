@@ -486,26 +486,26 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 036)
 Aspect ratio: 3:2 (landscape)
-Scene: eight identical fresh graves in a row under a folding starless sky, one open and empty.
-Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
+Scene: a small brass band on the Town Hall steps at night, instruments raised mid-note, faces blank and patient, lanterns strung overhead.
+Framing: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.
 Character: none
 
 IMAGE 2 (save as 037)
 Aspect ratio: 3:2 (landscape)
-Scene: a page of writhing script that hurts to look at, the letters casting shadows in the wrong direction (any writing or numbers only as unreadable marks, never legible).
-Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
+Scene: a church verger in a sodden cassock standing in a dim vestry, water to his shins, holding a ring of keys, face grey and swollen.
+Framing: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.
 Character: none
 
 IMAGE 3 (save as 038)
 Aspect ratio: 3:2 (landscape)
-Scene: a grandfather clock with its hands spinning backward, shadow spilling from the open case like water (any writing or numbers only as unreadable marks, never legible).
-Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
+Scene: a long thin shape crouched beside a roadside milestone in fog, too many joints, one hand resting on the carved stone as if counting.
+Framing: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.
 Character: none
 
 IMAGE 4 (save as 039)
 Aspect ratio: 3:2 (landscape)
-Scene: a crowd of townsfolk looking straight through the viewer, one empty space where a person should be.
-Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
+Scene: a fairground barker in a striped waistcoat and straw boater under carnival lights, grin too wide, one gloved hand beckoning, the wheel lit behind him.
+Framing: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.
 Character: none
 ```
 
@@ -539,25 +539,25 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 040)
 Aspect ratio: 3:2 (landscape)
-Scene: an ear-shaped ripple in the air over a sleeping town, words visible as thin black threads.
-Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
+Scene: a hunched printer at a composing stick in a dark print shop, arms black with ink to the elbow, eyes like wet type, trays of letters glinting (any writing or numbers only as unreadable marks, never legible).
+Framing: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.
 Character: none
 
 IMAGE 2 (save as 041)
 Aspect ratio: 3:2 (landscape)
-Scene: a freestanding doorway in the town square, its far side showing the same square one hour later.
-Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
+Scene: a tall faceless figure in an old-fashioned mourning coat at the edge of lantern light on a hill above a small town, the stars sliding behind it.
+Framing: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.
 Character: none
 
 IMAGE 3 (save as 042)
 Aspect ratio: 3:2 (landscape)
-Scene: a pocket watch lying in the street, its hands missing, a scattering of numerals on the cobbles like dropped coins (any writing or numbers only as unreadable marks, never legible).
+Scene: eight identical fresh graves in a row under a folding starless sky, one open and empty.
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
 IMAGE 4 (save as 043)
 Aspect ratio: 3:2 (landscape)
-Scene: a street reflected in a puddle that is a few seconds behind the street above it.
+Scene: a page of writhing script that hurts to look at, the letters casting shadows in the wrong direction (any writing or numbers only as unreadable marks, never legible).
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 ```
@@ -592,13 +592,13 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 044)
 Aspect ratio: 3:2 (landscape)
-Scene: a crossroads on a moor at dusk, a leaning wooden signpost with four blank weathered boards (bare wood, no letters, no painted words at all), every road bending back toward the same distant town (any writing or numbers only as unreadable marks, never legible).
+Scene: a grandfather clock with its hands spinning backward, shadow spilling from the open case like water (any writing or numbers only as unreadable marks, never legible).
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
 IMAGE 2 (save as 045)
 Aspect ratio: 3:2 (landscape)
-Scene: footprints in wet sand leading backward into a figure that is walking forward.
+Scene: a crowd of townsfolk looking straight through the viewer, one empty space where a person should be.
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 ```
@@ -635,25 +635,25 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 046)
 Aspect ratio: 3:2 (landscape)
-Scene: a radio set on a kitchen table with its dial glowing and the air around it visibly still, dust hanging motionless.
+Scene: an ear-shaped ripple in the air over a sleeping town, words visible as thin black threads.
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
 IMAGE 2 (save as 047)
 Aspect ratio: 3:2 (landscape)
-Scene: a long dark street of old, sagging, mismatched buildings, their lit windows all different sizes, crooked and unevenly spaced, some dark or shuttered; in many windows a silhouette in its own pose, all turned toward the viewer; no regular grid of windows anywhere.
+Scene: a freestanding doorway in the town square, its far side showing the same square one hour later.
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
 IMAGE 3 (save as 048)
 Aspect ratio: 3:2 (landscape)
-Scene: a hand on a table aging from young to old across a single candle's burn.
+Scene: a pocket watch lying in the street, its hands missing, a scattering of numerals on the cobbles like dropped coins (any writing or numbers only as unreadable marks, never legible).
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
 IMAGE 4 (save as 049)
 Aspect ratio: 3:2 (landscape)
-Scene: a photograph whose faces are fading out while the room in it stays sharp (any writing or numbers only as unreadable marks, never legible).
+Scene: a street reflected in a puddle that is a few seconds behind the street above it.
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 ```
@@ -688,25 +688,25 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 050)
 Aspect ratio: 3:2 (landscape)
-Scene: a walking cane and a pair of worn boots at the foot of a long steep stair.
+Scene: a crossroads on a moor at dusk, a leaning wooden signpost with four blank weathered boards (bare wood, no letters, no painted words at all), every road bending back toward the same distant town (any writing or numbers only as unreadable marks, never legible).
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
 IMAGE 2 (save as 051)
 Aspect ratio: 3:2 (landscape)
-Scene: darkness pooled at the top of a lighthouse stair, thick as water, the lens above it unlit.
+Scene: footprints in wet sand leading backward into a figure that is walking forward.
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
 IMAGE 3 (save as 052)
 Aspect ratio: 3:2 (landscape)
-Scene: a church clock face with thirteen hour marks, the hands pointing to the extra one (any writing or numbers only as unreadable marks, never legible).
+Scene: a radio set on a kitchen table with its dial glowing and the air around it visibly still, dust hanging motionless.
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
 IMAGE 4 (save as 053)
 Aspect ratio: 3:2 (landscape)
-Scene: black water climbing a flight of stone stairs one step at a time.
+Scene: a long dark street of old, sagging, mismatched buildings, their lit windows all different sizes, crooked and unevenly spaced, some dark or shuttered; in many windows a silhouette in its own pose, all turned toward the viewer; no regular grid of windows anywhere.
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 ```
@@ -741,13 +741,13 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 054)
 Aspect ratio: 3:2 (landscape)
-Scene: wet footprints crossing a low stone bridge that begin and end in the middle.
+Scene: a hand on a table aging from young to old across a single candle's burn.
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
 IMAGE 2 (save as 055)
 Aspect ratio: 3:2 (landscape)
-Scene: a crowd in a square listening to a speech, their faces lit identically, their mouths moving with the speaker's.
+Scene: a photograph whose faces are fading out while the room in it stays sharp (any writing or numbers only as unreadable marks, never legible).
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 ```
@@ -784,25 +784,25 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 056)
 Aspect ratio: 3:2 (landscape)
-Scene: a crowd of townsfolk all turning their heads at once toward the viewer.
+Scene: a walking cane and a pair of worn boots at the foot of a long steep stair.
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
 IMAGE 2 (save as 057)
 Aspect ratio: 3:2 (landscape)
-Scene: the gears and axle of a Ferris wheel turning in the dark, the hub bolt shaped like a clock hand (any writing or numbers only as unreadable marks, never legible).
+Scene: darkness pooled at the top of a lighthouse stair, thick as water, the lens above it unlit.
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
 IMAGE 3 (save as 058)
 Aspect ratio: 3:2 (landscape)
-Scene: a funhouse mirror whose reflection is smiling while the room is empty.
+Scene: a church clock face with thirteen hour marks, the hands pointing to the extra one (any writing or numbers only as unreadable marks, never legible).
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
 IMAGE 4 (save as 059)
 Aspect ratio: 3:2 (landscape)
-Scene: a single loose page lying on a library floor, printed in fresh ink that the rest of the book never had (any writing or numbers only as unreadable marks, never legible).
+Scene: black water climbing a flight of stone stairs one step at a time.
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 ```
@@ -837,26 +837,26 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 060)
 Aspect ratio: 3:2 (landscape)
-Scene: ink lifting off a written page back up into the nib of a hovering pen (any writing or numbers only as unreadable marks, never legible).
+Scene: wet footprints crossing a low stone bridge that begin and end in the middle.
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
 IMAGE 2 (save as 061)
 Aspect ratio: 3:2 (landscape)
-Scene: a brass keyhole in a dark wooden door, a thread of pale light leaking out and bending the wrong way.
+Scene: a crowd in a square listening to a speech, their faces lit identically, their mouths moving with the speaker's.
 Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
 IMAGE 3 (save as 062)
 Aspect ratio: 3:2 (landscape)
-Scene: the glass lantern room at the top of a lighthouse, the great lens dark and cold, salt on the panes, night beyond.
-Framing: the place itself, empty of people, wrong-feeling stillness.
+Scene: a crowd of townsfolk all turning their heads at once toward the viewer.
+Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
 IMAGE 4 (save as 063)
 Aspect ratio: 3:2 (landscape)
-Scene: a spiral iron stair climbing the inside of a lighthouse tower, rust and damp, the steps vanishing upward into shadow.
-Framing: the place itself, empty of people, wrong-feeling stillness.
+Scene: the gears and axle of a Ferris wheel turning in the dark, the hub bolt shaped like a clock hand (any writing or numbers only as unreadable marks, never legible).
+Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 ```
 
@@ -890,14 +890,14 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 064)
 Aspect ratio: 3:2 (landscape)
-Scene: a lighthouse keeper's cramped room, a narrow cot, oilcloth coat on a hook, a logbook open on the desk (any writing or numbers only as unreadable marks, never legible).
-Framing: the place itself, empty of people, wrong-feeling stillness.
+Scene: a funhouse mirror whose reflection is smiling while the room is empty.
+Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
 IMAGE 2 (save as 065)
 Aspect ratio: 3:2 (landscape)
-Scene: Ambergrove's town square at night, bunting and paper lanterns for the occultation, a bandstand, the sky wrong overhead.
-Framing: the place itself, empty of people, wrong-feeling stillness.
+Scene: a single loose page lying on a library floor, printed in fresh ink that the rest of the book never had (any writing or numbers only as unreadable marks, never legible).
+Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 ```
 
@@ -933,25 +933,25 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 066)
 Aspect ratio: 3:2 (landscape)
-Scene: a long wooden pier running out over black still water into mist, lanterns at intervals, the far end lost.
-Framing: the place itself, empty of people, wrong-feeling stillness.
+Scene: ink lifting off a written page back up into the nib of a hovering pen (any writing or numbers only as unreadable marks, never legible).
+Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
 IMAGE 2 (save as 067)
 Aspect ratio: 3:2 (landscape)
-Scene: broad stone steps up to a narrow printing house door, a painted sign reading nothing legible, handbills scattered on the steps (any writing or numbers only as unreadable marks, never legible).
-Framing: the place itself, empty of people, wrong-feeling stillness.
+Scene: a brass keyhole in a dark wooden door, a thread of pale light leaking out and bending the wrong way.
+Framing: one ominous symbolic beat, surreal wrongness, a figure caught in it.
 Character: none
 
 IMAGE 3 (save as 068)
 Aspect ratio: 3:2 (landscape)
-Scene: a church nave half flooded, pews standing in black water, candles still burning on the altar above the waterline.
+Scene: the glass lantern room at the top of a lighthouse, the great lens dark and cold, salt on the panes, night beyond.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 4 (save as 069)
 Aspect ratio: 3:2 (landscape)
-Scene: a belfry with a great bell hanging motionless, its rope dripping, the town far below through the louvres.
+Scene: a spiral iron stair climbing the inside of a lighthouse tower, rust and damp, the steps vanishing upward into shadow.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 ```
@@ -986,25 +986,25 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 070)
 Aspect ratio: 3:2 (landscape)
-Scene: a vaulted crypt under dark water, tomb lids just visible, a faint shape of paper drifting near the ceiling.
+Scene: a lighthouse keeper's cramped room, a narrow cot, oilcloth coat on a hook, a logbook open on the desk (any writing or numbers only as unreadable marks, never legible).
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 2 (save as 071)
 Aspect ratio: 3:2 (landscape)
-Scene: a small vestry with robes on pegs and a heavy parish register open on a lectern by candlelight.
+Scene: Ambergrove's town square at night, bunting and paper lanterns for the occultation, a bandstand, the sky wrong overhead.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 3 (save as 072)
 Aspect ratio: 3:2 (landscape)
-Scene: a sunken lane between high banks, old milestones along the verge counting down to a town that is behind you.
+Scene: a long wooden pier running out over black still water into mist, lanterns at intervals, the far end lost.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 4 (save as 073)
 Aspect ratio: 3:2 (landscape)
-Scene: a low stone bridge barely above a slow river, water lapping over the cobbles, fog on both banks.
+Scene: broad stone steps up to a narrow printing house door, a painted sign reading nothing legible, handbills scattered on the steps (any writing or numbers only as unreadable marks, never legible).
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 ```
@@ -1039,13 +1039,13 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 074)
 Aspect ratio: 3:2 (landscape)
-Scene: a bend in a sunken road where the lane doubles back on itself, a lighthouse beam that never sweeps visible over the trees.
+Scene: a church nave half flooded, pews standing in black water, candles still burning on the altar above the waterline.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 2 (save as 075)
 Aspect ratio: 3:2 (landscape)
-Scene: the wide steps of a small town hall draped in occultation bunting, a speaker's podium at the top, papers blowing.
+Scene: a belfry with a great bell hanging motionless, its rope dripping, the town far below through the louvres.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 ```
@@ -1082,62 +1082,62 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 076)
 Aspect ratio: 3:2 (landscape)
-Scene: a records office of tall wooden drawers and ledgers, a single green-shaded lamp over a desk.
+Scene: a vaulted crypt under dark water, tomb lids just visible, a faint shape of paper drifting near the ceiling.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 2 (save as 077)
 Aspect ratio: 3:2 (landscape)
-Scene: an old stone well in a small yard behind the town hall, a bucket rope pulled taut into the dark.
+Scene: a small vestry with robes on pegs and a heavy parish register open on a lectern by candlelight.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 3 (save as 078)
 Aspect ratio: 3:2 (landscape)
-Scene: a Ferris wheel lit with bulbs against the black sky, one carriage swinging at the very top.
+Scene: a sunken lane between high banks, old milestones along the verge counting down to a town that is behind you.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 4 (save as 079)
 Aspect ratio: 3:2 (landscape)
-Scene: a hall of warped mirrors under strings of bulbs, reflections not quite matching one another.
+Scene: a low stone bridge barely above a slow river, water lapping over the cobbles, fog on both banks.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 5 (save as 080)
 Aspect ratio: 3:2 (landscape)
-Scene: a painted ticket booth at the fairground gate, a roll of tickets unspooling across the counter, the window dark.
+Scene: a bend in a sunken road where the lane doubles back on itself, a lighthouse beam that never sweeps visible over the trees.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 6 (save as 081)
 Aspect ratio: 3:2 (landscape)
-Scene: a reading room of floor-to-ceiling shelves, ladders and green lamps, one book lying open on the floor.
+Scene: the wide steps of a small town hall draped in occultation bunting, a speaker's podium at the top, papers blowing.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 7 (save as 082)
 Aspect ratio: 3:2 (landscape)
-Scene: a hand-cranked printing press with a half-set page of type, ink gleaming, almanac sheets hung to dry (any writing or numbers only as unreadable marks, never legible).
+Scene: a records office of tall wooden drawers and ledgers, a single green-shaded lamp over a desk.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 8 (save as 083)
 Aspect ratio: 3:2 (landscape)
-Scene: a locked study door at the end of a book-lined corridor, light and a faint murmur coming from under it.
+Scene: an old stone well in a small yard behind the town hall, a bucket rope pulled taut into the dark.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 9 (save as 084)
 Aspect ratio: 3:2 (landscape)
-Scene: the town square seen from its centre, four streets leading off into fog toward a church, a fairground, a road and a tall house of books.
+Scene: a Ferris wheel lit with bulbs against the black sky, one carriage swinging at the very top.
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 10 (save as 085)
-Aspect ratio: 2:3 (portrait)
-Scene: the town square at eleven o'clock, lamps lit, townsfolk looking up at a sky where the stars are sliding behind something without an edge (any writing or numbers only as unreadable marks, never legible).
-Framing: wide establishing scene, escalating dread.
+Aspect ratio: 3:2 (landscape)
+Scene: a hall of warped mirrors under strings of bulbs, reflections not quite matching one another.
+Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 ```
 
@@ -1172,63 +1172,63 @@ LIGHTING AND PALETTE: suit this scene. Flat, muted and desaturated overall; lamp
 AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, depth of field, bokeh, motion blur, film grain, 3d render, octane, cgi, plastic, waxy skin, subsurface scattering, text, watermark, signature, logo, border, frame, ui, caption, anime, cartoon, comic, cel shading, neon, candy colors, oversaturated, pastel, cheerful, twee, modern clothing, smartphone, car, contemporary setting, deformed hands, extra fingers, extra limbs, mutated, bad anatomy, repeating pattern, tiled texture, stamped texture, copy-pasted elements, cloned identical figures, identical repeated shapes, evenly spaced rows, uniform brushstrokes, perfect symmetry, overly clean, uniform detail everywhere, digital painting, airbrushed, rim light, all-over impasto, fake impasto, palette-knife texture, canvas texture, crunchy micro-detail, stippled texture, repeated short brush strokes, uniform painted texture, all-over painterly texture, hyper-detailed rocks or clouds, excessive individual beard hairs, heavily modeled skin, cinematic orange-and-teal lighting, glowing atmospheric rim light, fantasy concept-art rendering, equal detail across the whole image.
 
 IMAGE 1 (save as 086)
-Aspect ratio: 2:3 (portrait)
-Scene: a lake shore where the water is drawing back unnaturally fast under a dark sky, moored boats settling crooked on the mud.
-Framing: wide establishing scene, escalating dread.
+Aspect ratio: 3:2 (landscape)
+Scene: a painted ticket booth at the fairground gate, a roll of tickets unspooling across the counter, the window dark.
+Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 2 (save as 087)
-Aspect ratio: 2:3 (portrait)
-Scene: a half-drowned church tower against the night, the bell swinging, thirteen faint rings of sound rippling the air.
-Framing: wide establishing scene, escalating dread.
+Aspect ratio: 3:2 (landscape)
+Scene: a reading room of floor-to-ceiling shelves, ladders and green lamps, one book lying open on the floor.
+Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 3 (save as 088)
-Aspect ratio: 2:3 (portrait)
-Scene: a sunken road collapsing into black water, milestones tilting, a lantern on the far side going out.
-Framing: wide establishing scene, escalating dread.
+Aspect ratio: 3:2 (landscape)
+Scene: a hand-cranked printing press with a half-set page of type, ink gleaming, almanac sheets hung to dry (any writing or numbers only as unreadable marks, never legible).
+Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 4 (save as 089)
-Aspect ratio: 2:3 (portrait)
-Scene: empty streets at midnight, every door open, a single chair still rocking on a porch.
-Framing: wide establishing scene, escalating dread.
+Aspect ratio: 3:2 (landscape)
+Scene: a locked study door at the end of a book-lined corridor, light and a faint murmur coming from under it.
+Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 5 (save as 090)
-Aspect ratio: 2:3 (portrait)
-Scene: the sky over the rooftops cracked like glaze, wrong constellations showing through the seams.
-Framing: wide establishing scene, escalating dread.
+Aspect ratio: 3:2 (landscape)
+Scene: the town square seen from its centre, four streets leading off into fog toward a church, a fairground, a road and a tall house of books.
+Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
 IMAGE 6 (save as 091)
 Aspect ratio: 2:3 (portrait)
-Scene: a long street seen from its far end, lamps going dark one by one toward the viewer, something tall at the vanishing point.
+Scene: the town square at eleven o'clock, lamps lit, townsfolk looking up at a sky where the stars are sliding behind something without an edge (any writing or numbers only as unreadable marks, never legible).
 Framing: wide establishing scene, escalating dread.
 Character: none
 
 IMAGE 7 (save as 092)
 Aspect ratio: 2:3 (portrait)
-Scene: the whole town seen from above at the last minute before the hour, clocks on every building pointing the same wrong time (any writing or numbers only as unreadable marks, never legible).
+Scene: a lake shore where the water is drawing back unnaturally fast under a dark sky, moored boats settling crooked on the mud.
 Framing: wide establishing scene, escalating dread.
 Character: none
 
 IMAGE 8 (save as 093)
 Aspect ratio: 2:3 (portrait)
-Scene: a black occulted sun-like disc filling the sky over Ambergrove, the town below perfectly still, a seam of pale light down the middle of the night.
+Scene: a half-drowned church tower against the night, the bell swinging, thirteen faint rings of sound rippling the air.
 Framing: wide establishing scene, escalating dread.
 Character: none
 
 IMAGE 9 (save as 094)
 Aspect ratio: 2:3 (portrait)
-Scene: an open lighthouse logbook by lamplight, the same hand filling page after page, the ink of the latest entry still wet (any writing or numbers only as unreadable marks, never legible).
-Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
+Scene: a sunken road collapsing into black water, milestones tilting, a lantern on the far side going out.
+Framing: wide establishing scene, escalating dread.
 Character: none
 
 IMAGE 10 (save as 095)
 Aspect ratio: 2:3 (portrait)
-Scene: the almanac house steps at eleven, handbills announcing the occultation at midnight, the sky already darkening at the edges (any writing or numbers only as unreadable marks, never legible).
-Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
+Scene: empty streets at midnight, every door open, a single chair still rocking on a porch.
+Framing: wide establishing scene, escalating dread.
 Character: none
 ```
 
@@ -1264,61 +1264,61 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 096)
 Aspect ratio: 2:3 (portrait)
-Scene: the great lighthouse lens catching its first flame, light beginning to pour out over the dark water.
-Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
+Scene: the sky over the rooftops cracked like glaze, wrong constellations showing through the seams.
+Framing: wide establishing scene, escalating dread.
 Character: none
 
 IMAGE 2 (save as 097)
 Aspect ratio: 2:3 (portrait)
-Scene: a parish register open under a candle, a column of tally marks for the bell, one mark too many.
-Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
+Scene: a long street seen from its far end, lamps going dark one by one toward the viewer, something tall at the vanishing point.
+Framing: wide establishing scene, escalating dread.
 Character: none
 
 IMAGE 3 (save as 098)
 Aspect ratio: 2:3 (portrait)
-Scene: a waterlogged almanac page held up out of dark crypt water, the printed time smeared (any writing or numbers only as unreadable marks, never legible).
-Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
+Scene: the whole town seen from above at the last minute before the hour, clocks on every building pointing the same wrong time (any writing or numbers only as unreadable marks, never legible).
+Framing: wide establishing scene, escalating dread.
 Character: none
 
 IMAGE 4 (save as 099)
 Aspect ratio: 2:3 (portrait)
-Scene: a sunken road seen looking back toward town, footsteps in the mud pointing the other way.
-Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
+Scene: a black occulted sun-like disc filling the sky over Ambergrove, the town below perfectly still, a seam of pale light down the middle of the night.
+Framing: wide establishing scene, escalating dread.
 Character: none
 
 IMAGE 5 (save as 100)
 Aspect ratio: 2:3 (portrait)
-Scene: a hooded walker on a fog-bound road, the hood beginning to lift in the lamplight.
+Scene: an open lighthouse logbook by lamplight, the same hand filling page after page, the ink of the latest entry still wet (any writing or numbers only as unreadable marks, never legible).
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
 Character: none
 
 IMAGE 6 (save as 101)
 Aspect ratio: 2:3 (portrait)
-Scene: a sheriff's star and hat lying on the stone lip of a well at night.
+Scene: the almanac house steps at eleven, handbills announcing the occultation at midnight, the sky already darkening at the edges (any writing or numbers only as unreadable marks, never legible).
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
 Character: none
 
 IMAGE 7 (save as 102)
 Aspect ratio: 2:3 (portrait)
-Scene: a town ledger lying open under lamplight, its pages covered in faded ink scribble that cannot be read (no names, no legible words), a column of tally strokes, a pen resting across it (any writing or numbers only as unreadable marks, never legible).
+Scene: the great lighthouse lens catching its first flame, light beginning to pour out over the dark water.
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
 Character: none
 
 IMAGE 8 (save as 103)
 Aspect ratio: 2:3 (portrait)
-Scene: the view from the top of a Ferris wheel over the whole lamplit town at once.
+Scene: a parish register open under a candle, a column of tally marks for the bell, one mark too many.
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
 Character: none
 
 IMAGE 9 (save as 104)
 Aspect ratio: 2:3 (portrait)
-Scene: a fairground ticket held out through a booth window by a gloved hand, the face behind it in shadow.
+Scene: a waterlogged almanac page held up out of dark crypt water, the printed time smeared (any writing or numbers only as unreadable marks, never legible).
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
 Character: none
 
 IMAGE 10 (save as 105)
 Aspect ratio: 2:3 (portrait)
-Scene: a printing press mid-stroke, a fresh sheet coming off it printed with a large moon-and-clock emblem and bands of abstract ornament (no letters, no digits, no calendar grid) (any writing or numbers only as unreadable marks, never legible).
+Scene: a sunken road seen looking back toward town, footsteps in the mud pointing the other way.
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
 Character: none
 ```
@@ -1355,75 +1355,75 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 106)
 Aspect ratio: 2:3 (portrait)
-Scene: a study desk with a single word written again and again on every paper, the word itself illegible (any writing or numbers only as unreadable marks, never legible).
+Scene: a hooded walker on a fog-bound road, the hood beginning to lift in the lamplight.
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
 Character: none
 
 IMAGE 2 (save as 107)
 Aspect ratio: 2:3 (portrait)
-Scene: the town square at the edge of midnight, a freestanding doorway at its centre, figures holding it shut against the dark.
+Scene: a sheriff's star and hat lying on the stone lip of a well at night.
 Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
 Character: none
 
 IMAGE 3 (save as 108)
+Aspect ratio: 2:3 (portrait)
+Scene: a town ledger lying open under lamplight, its pages covered in faded ink scribble that cannot be read (no names, no legible words), a column of tally strokes, a pen resting across it (any writing or numbers only as unreadable marks, never legible).
+Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
+Character: none
+
+IMAGE 4 (save as 109)
+Aspect ratio: 2:3 (portrait)
+Scene: the view from the top of a Ferris wheel over the whole lamplit town at once.
+Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
+Character: none
+
+IMAGE 5 (save as 110)
+Aspect ratio: 2:3 (portrait)
+Scene: a fairground ticket held out through a booth window by a gloved hand, the face behind it in shadow.
+Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
+Character: none
+
+IMAGE 6 (save as 111)
+Aspect ratio: 2:3 (portrait)
+Scene: a printing press mid-stroke, a fresh sheet coming off it printed with a large moon-and-clock emblem and bands of abstract ornament (no letters, no digits, no calendar grid) (any writing or numbers only as unreadable marks, never legible).
+Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
+Character: none
+
+IMAGE 7 (save as 112)
+Aspect ratio: 2:3 (portrait)
+Scene: a study desk with a single word written again and again on every paper, the word itself illegible (any writing or numbers only as unreadable marks, never legible).
+Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
+Character: none
+
+IMAGE 8 (save as 113)
+Aspect ratio: 2:3 (portrait)
+Scene: the town square at the edge of midnight, a freestanding doorway at its centre, figures holding it shut against the dark.
+Framing: the scene the investigators are working toward, a place mid-event, no central portrait.
+Character: none
+
+IMAGE 9 (save as 114)
 Aspect ratio: 3:2 (landscape)
 Scene: a figure waking on a bench in the square at dusk, salt on the lips, the same lanterns being lit again.
 Framing: a quiet narrative beat, an interlude moment, restrained composition.
 Character: none
 
-IMAGE 4 (save as 109)
-Aspect ratio: 3:2 (landscape)
-Scene: a long empty street of four lamp posts receding into darkness, each farther lamp dimmer, the last one out.
-Framing: a quiet narrative beat, an interlude moment, restrained composition.
-Character: none
-
-IMAGE 5 (save as 110)
-Aspect ratio: 3:2 (landscape)
-Scene: dawn that is not dawn over the town square, lanterns relit, the night folding back into eleven o'clock (any writing or numbers only as unreadable marks, never legible).
-Framing: a quiet narrative beat, an interlude moment, restrained composition.
-Character: none
-
-IMAGE 6 (save as 111)
-Aspect ratio: 3:2 (landscape)
-Scene: a lone lit window in a lighthouse at dawn, the town below waking, one figure keeping watch (any writing or numbers only as unreadable marks, never legible).
-Framing: a quiet narrative beat, an interlude moment, restrained composition.
-Character: none
-
-IMAGE 7 (save as 112)
-Aspect ratio: 3:2 (landscape)
-Scene: a heavy door closing on a darkness, the town square in first morning light, the lanterns burnt out.
-Framing: a quiet narrative beat, an interlude moment, restrained composition.
-Character: none
-
-IMAGE 8 (save as 113)
-Aspect ratio: 3:2 (landscape)
-Scene: figures walking out of the town along the sunken road at dawn, the fog behind them not quite lifting.
-Framing: a quiet narrative beat, an interlude moment, restrained composition.
-Character: none
-
-IMAGE 9 (save as 114)
-Aspect ratio: 3:2 (landscape)
-Scene: a door sealed with iron bands and wax in the middle of the square, one chair empty beside it.
-Framing: a quiet narrative beat, an interlude moment, restrained composition.
-Character: none
-
 IMAGE 10 (save as 115)
 Aspect ratio: 3:2 (landscape)
-Scene: eleven o'clock in the square again, but the sky has fewer stars missing than before (any writing or numbers only as unreadable marks, never legible).
+Scene: a long empty street of four lamp posts receding into darkness, each farther lamp dimmer, the last one out.
 Framing: a quiet narrative beat, an interlude moment, restrained composition.
 Character: none
 ```
 
 ## Batch 13
 
-### #116–#119
+### #116–#125
 
 ```
-BATCH REQUEST: 4 SEPARATE IMAGES
+BATCH REQUEST: 10 SEPARATE IMAGES
 
-Generate exactly ONE independent image for EACH numbered prompt below: 4 separate images total.
+Generate exactly ONE independent image for EACH numbered prompt below: 10 separate images total.
 
-These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
+These are different scenes, not 10 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
@@ -1446,23 +1446,59 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 116)
 Aspect ratio: 3:2 (landscape)
-Scene: hooded figures walking the sunken road in fog, all in the same direction, never arriving.
+Scene: dawn that is not dawn over the town square, lanterns relit, the night folding back into eleven o'clock (any writing or numbers only as unreadable marks, never legible).
 Framing: a quiet narrative beat, an interlude moment, restrained composition.
 Character: none
 
 IMAGE 2 (save as 117)
 Aspect ratio: 3:2 (landscape)
-Scene: the edge of the square at night, a tall shape at the end of a street that was not there a moment ago.
+Scene: a lone lit window in a lighthouse at dawn, the town below waking, one figure keeping watch (any writing or numbers only as unreadable marks, never legible).
 Framing: a quiet narrative beat, an interlude moment, restrained composition.
 Character: none
 
 IMAGE 3 (save as 118)
 Aspect ratio: 3:2 (landscape)
-Scene: an almanac house window lit late at night, the rest of the town dark and still.
+Scene: a heavy door closing on a darkness, the town square in first morning light, the lanterns burnt out.
 Framing: a quiet narrative beat, an interlude moment, restrained composition.
 Character: none
 
 IMAGE 4 (save as 119)
+Aspect ratio: 3:2 (landscape)
+Scene: figures walking out of the town along the sunken road at dawn, the fog behind them not quite lifting.
+Framing: a quiet narrative beat, an interlude moment, restrained composition.
+Character: none
+
+IMAGE 5 (save as 120)
+Aspect ratio: 3:2 (landscape)
+Scene: a door sealed with iron bands and wax in the middle of the square, one chair empty beside it.
+Framing: a quiet narrative beat, an interlude moment, restrained composition.
+Character: none
+
+IMAGE 6 (save as 121)
+Aspect ratio: 3:2 (landscape)
+Scene: eleven o'clock in the square again, but the sky has fewer stars missing than before (any writing or numbers only as unreadable marks, never legible).
+Framing: a quiet narrative beat, an interlude moment, restrained composition.
+Character: none
+
+IMAGE 7 (save as 122)
+Aspect ratio: 3:2 (landscape)
+Scene: hooded figures walking the sunken road in fog, all in the same direction, never arriving.
+Framing: a quiet narrative beat, an interlude moment, restrained composition.
+Character: none
+
+IMAGE 8 (save as 123)
+Aspect ratio: 3:2 (landscape)
+Scene: the edge of the square at night, a tall shape at the end of a street that was not there a moment ago.
+Framing: a quiet narrative beat, an interlude moment, restrained composition.
+Character: none
+
+IMAGE 9 (save as 124)
+Aspect ratio: 3:2 (landscape)
+Scene: an almanac house window lit late at night, the rest of the town dark and still.
+Framing: a quiet narrative beat, an interlude moment, restrained composition.
+Character: none
+
+IMAGE 10 (save as 125)
 Aspect ratio: 3:2 (landscape)
 Scene: a fairground gate at first light, a punched ticket on the ground, a tall shadow walking out into the morning.
 Framing: a quiet narrative beat, an interlude moment, restrained composition.

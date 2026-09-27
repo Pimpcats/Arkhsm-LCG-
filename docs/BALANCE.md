@@ -172,3 +172,65 @@ No loop ends at the Dissonance reset in any profile. **Reading:** the location
 system adds choices without moving the difficulty. See
 `docs/design/LOCATION_DESIGN.md`.
 
+
+
+## Normal difficulty, creatures, Victory and the district race (2026-09-27)
+
+### Normal is slightly harder than official Standard
+The simulator's bag was missing the Elder Thing token the guide's Standard bag
+contains; it now models the shipped bag exactly (`pipeline/simulate.py`). With
+the Easy / Standard side of the scenario reference card (Skull −1, or −2 from
+Glitch; Cultist −2; Tablet −2; Elder Thing −3), weighted by the time a
+three-investigator campaign spends in each band (Calm 34%, Glitch 54%, Noticed
+12%):
+
+| test margin | The Still Hour, Normal | official Standard (Dunwich-era) |
+|---|---|---|
+| +1 | 43% | 44% |
+| +2 | 73% | 75% |
+| +3 | 89% | 88% |
+
+The raw odds sit just under official Standard; the symbol side effects
+(Dissonance on a failed Cultist, a lost Hour on a failed Elder Thing, horror on
+the Tablet once the Appointed is near) and the band's Static tokens are what
+make Normal play slightly harder. Before this change Tablet was −3 and Elder
+Thing −4, which put +2 tests at 68% (clearly harder). Hard / Expert unchanged.
+`simulate.py` asserts this target on every run.
+
+### Per-investigator act thresholds
+Every act that asked for a flat number of clues now asks per investigator
+(Square and Church first acts 2 [perinv], deep acts and the Lamp 1 [perinv],
+the Prologue 2 [perinv]). Totals at three investigators barely move; solo stops
+stalling and four investigators stop coasting. Finale unlock loop, first-time
+play: **1p 7, 2p 5, 3p 6, 4p 6** (10–90%: 4–9), 0% never by loop 15. With the
+finale attempt that is the 6–8-loop target at every party size.
+
+### Creatures
+Every scenario introduces its own monster; the Echoes of the shared deck recur
+everywhere, and the Church and Sunken Road add a copy of their own Echo. See
+`docs/design/CREATURES_AND_VICTORY.md`. Modelled cost (actions when drawn): the
+new monsters change the 3-investigator unlock loop by under 0.1 loop; they add
+danger (damage, horror, Dissonance, Hours) rather than delay.
+
+### Victory greed (`simulate_tempo.py --greed`)
+Three investigators, first-time play, 2500 campaigns:
+
+| play | finale unlock (mean loops) | Victory Memory by then |
+|---|---|---|
+| efficient (optional Victory ignored) | 5.6 | 4.6 |
+| hunt optional Victory monsters | +0.1 | +0.8 |
+| also clear Part I Victory locations | +0.75 | +2.9 |
+| everything, including a Named enemy not in the way | +1.0 | +3.1 |
+
+Greed always pays and always costs: cheap greed (monsters) risks damage and
+horror; big greed (clearing Victory locations) costs most of a loop, which is
+about 2 more Years per investigator and a higher scar. Total Victory in the
+campaign is 15 Memory (6 reachable in Part I).
+
+### The district race (`simulate_tempo.py --race`)
+One loop, one district, three investigators, heading straight there: every
+objective finishes 95–100% of the time (the Sunken Road deep act 81% at scar 0,
+because it waits for the Glitch band), with 2.4–6.7 Hours to spare. The race in
+this campaign is how many districts you fit into one night, not whether one
+district can be finished: a planned party completes about 1.7 objectives per
+loop.

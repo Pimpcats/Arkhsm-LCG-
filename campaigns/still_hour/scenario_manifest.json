@@ -262,6 +262,12 @@
             "name": "Rising Water",
             "type": "Treachery",
             "qty": 1
+          },
+          {
+            "id": "sthr-drownedverger",
+            "name": "The Drowned Verger",
+            "type": "Enemy",
+            "qty": 1
           }
         ]
       },
@@ -279,6 +285,12 @@
             "id": "sthr-bridgeremembers",
             "name": "The Bridge Remembers",
             "type": "Treachery",
+            "qty": 1
+          },
+          {
+            "id": "sthr-milecounter",
+            "name": "The Mile-Counter",
+            "type": "Enemy",
             "qty": 1
           }
         ]
@@ -298,6 +310,12 @@
             "name": "The Crowd Turns",
             "type": "Treachery",
             "qty": 1
+          },
+          {
+            "id": "sthr-bandonsteps",
+            "name": "The Band on the Steps",
+            "type": "Enemy",
+            "qty": 1
           }
         ]
       },
@@ -315,6 +333,12 @@
             "id": "sthr-reflectionlies",
             "name": "Your Reflection Lies",
             "type": "Treachery",
+            "qty": 1
+          },
+          {
+            "id": "sthr-barker",
+            "name": "The Barker",
+            "type": "Enemy",
             "qty": 1
           }
         ]
@@ -339,6 +363,12 @@
             "id": "sthr-studydoor",
             "name": "The Study Door",
             "type": "Treachery",
+            "qty": 1
+          },
+          {
+            "id": "sthr-compositor",
+            "name": "The Compositor",
+            "type": "Enemy",
             "qty": 1
           }
         ]
@@ -1422,6 +1452,11 @@
               "id": "sthr-story-beforefinale",
               "name": "The Last Hour",
               "role": "interlude beat before the finale"
+            },
+            {
+              "id": "sthr-uninvited",
+              "name": "The Uninvited",
+              "role": "finale enemy, spawned at finale setup"
             }
           ]
         }

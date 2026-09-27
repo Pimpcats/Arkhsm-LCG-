@@ -13,6 +13,49 @@ Along the way the guide will ask you to **make choices**. Record each one in you
 
 ---
 
+## NEW RULES
+
+Read this section aloud before the Prologue. It explains what is new in The Still Hour in plain terms. **Campaign Rules**, after it, gives the exact wording to check during play. Everything else works as in the Arkham Horror: The Card Game Rules Reference. Numbers here are for three investigators; **Difficulty and Player Count** gives the others, and the Control token applies them.
+
+**One night, played again and again.** Each play of the night is a **loop**. When a loop ends, the board is cleared and the night starts over at eleven o'clock in the Square. Three things always carry over: your **Campaign Log**, your shared **banked Memory** and each investigator's **Years**.
+
+**The Hourglass is the clock.** The agenda deck is nine **Hours**, Hour I to Hour IX. Every Hour has a doom threshold of 1, so from the second round on, one Hour passes in each Mythos phase. Many Hours do something the moment they arrive ("When reached"). When the Hourglass reaches **Hour IX**, the loop ends. A few effects skip Hours forward, and a few rewind them.
+
+**The town is split into districts.** Ambergrove has six **districts**, each a small cluster of locations with its own box, act deck and encounter cards. The Square is always in play. At the start of each loop, you choose which other districts to visit and lay them out. **Travel costs time:** the first time in a round that anyone crosses from one district into another, the Hourglass advances 1 Hour. In one loop you will usually finish work in two or three districts, so choosing where to go is your biggest decision.
+
+**Each district has its own act deck.** Its first act (a surface objective) can be completed from the start. Its second act (a deep objective) opens in **Part II** of the campaign. Several act decks can be in play at once, one per district.
+
+**Dissonance is how much the night has noticed you.** It is one shared number from 0 to 18, and it only changes when an effect says to raise or lower it. Its **band** sets how dangerous the night is:
+
+| Band | Dissonance | What changes |
+|---|---|---|
+| Calm | 0–5 | Echo enemies are Sleepwalking (harmless). |
+| Glitch | 6–11 | 1 Static token joins the chaos bag. Echoes wake. The Appointed draws closer. |
+| Noticed | 12–17 | 2 Static tokens. The Appointed arrives. Each investigator ages 1 extra Year at the reset. |
+| Reset | 18 | The loop ends at once. |
+
+Each loop starts Dissonance at the **scar**: the number of loops you have completed, up to 6. Later loops start closer to danger.
+
+**The Static token** ([static]) is a new chaos token: **−3, and raise Dissonance by 1** when it is revealed. The band decides how many are in the bag, so rising Dissonance makes more of them likely.
+
+**The Appointed** is something that climbs toward you through four stages: Unseen, Sensed, Emerging, Arrived. Rising Dissonance and certain Hours push it up. It cannot be defeated. An investigator at its location can **Hold Back** it: a successful Hold Back pushes it down one stage and rewinds the Hourglass by 1 Hour. It hunts whoever carries the most Memory on their cards.
+
+**Memory is your experience.** During a loop you gain **Memory** tokens on your cards. Some investigators' abilities use them, but they also make you the one being hunted. At the reset, all Memory on cards goes into one shared pool, **banked Memory**, which you spend between loops like experience: on **Recollections** (cards that remember the loop) and on upgrades.
+
+**Years are the price.** No one suffers trauma or dies in this campaign. Instead, at each reset, each investigator gains **1 Year**, plus 1 more if they were defeated, plus 1 more if the loop ended in the Noticed band, plus 1 more if they **leaned on the loop** (paid "raise Dissonance" as a cost 3 or more times, or spent 4 or more of their own Memory on their own cards and abilities). Years move you through age brackets, **Prime, Weathered, Elder and Ancient**, each with a small change to your skills. At **18 Years** an investigator ages out of the campaign.
+
+**Knowledge is what you learn.** Completing a district's act records a **Knowledge** entry in your Campaign Log. Knowledge is never bought, only found, and it changes the town for good: some locations turn to a kinder side, some hazards stop, some Hours soften. Once you have **3 surface entries**, or after Loop 3, **Part II** begins. Gather enough deep entries and the way to end the night opens: **The Last Hour**, the finale.
+
+**Locations trade one thing for another.** Many locations have an ability that lets you pay in one currency (time, Dissonance, a clue, a Year) to gain another. A few have a hazard that stops once your Campaign Log records that district's Knowledge.
+
+**Victory.** Some locations and some enemies have **Victory X**. The first time you claim each one in the campaign, add X to banked Memory. Claiming them takes time that the Hourglass will not give back, so being greedy always has a cost.
+
+**A first loop, in short.** Set up the Square and pick one or two districts. Investigate, gather clues and work toward each district's act. Watch the Hourglass: every district crossing costs an Hour. Watch Dissonance: the Glitch band wakes the Echoes and brings the Appointed. When the loop ends, read its resolutions, age, bank your Memory, spend it and record what you learned. Then the night begins again, and you are a little older than the town.
+
+**The Control token keeps the books.** It tracks the Hour, Dissonance and its Static tokens, the Appointed's stage, Memory, Years and aging, and it matches Knowledge with the Campaign Log token. Click it when this guide tells you to.
+
+---
+
 ## CAMPAIGN RULES
 
 These rules add to the Arkham Horror: The Card Game Rules Reference. Where they disagree with it, these rules win. Numbers are for **three investigators**; **Difficulty and Player Count** gives the other values, and the Control token applies them for you.
@@ -332,7 +375,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > The kneeling congregation is murmuring now, all of them, the same two syllables over and over under the black water. You know the word. You were the one who said it first.
 
-**When you Place this box:** The Nave, The Belfry, The Vestry and The Flooded Crypt join the map. The Flooded Crypt enters play closed; it opens when **The Hour Was Wrong** becomes the current act, and enters play open (revealed) in every loop once your Campaign Log records The Hour Was Wrong. Shuffle its encounter set (The Drowned Choir, Thirteen, Rising Water) into the encounter deck. Its act deck: **Why Thirteen?** (1a) and **The Hour Was Wrong** (2a). **Part II:** its Named enemy stays set aside until its act spawns it.
+**When you Place this box:** The Nave, The Belfry, The Vestry and The Flooded Crypt join the map. The Flooded Crypt enters play closed; it opens when **The Hour Was Wrong** becomes the current act, and enters play open (revealed) in every loop once your Campaign Log records The Hour Was Wrong. Shuffle its encounter set (The Drowned Choir, The Drowned Verger, Thirteen, Rising Water) into the encounter deck. Its act deck: **Why Thirteen?** (1a) and **The Hour Was Wrong** (2a). **Part II:** its Named enemy stays set aside until its act spawns it.
 
 **Do not read until the loop ends.**
 
@@ -371,7 +414,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > One of the walkers carries a book under their arm, bound in oilcloth like the keeper's log. As you pass, they turn it so you can see the spine. There is fresh ink on it.
 
-**When you Place this box:** The Milestones, The Low Bridge and The Turning join the map. Shuffle its encounter set (The Waiting Congregation, The Bridge Remembers) into the encounter deck. Its act deck: **Walk It Backward** (1a) and **Who Walks Beside You** (2a).
+**When you Place this box:** The Milestones, The Low Bridge and The Turning join the map. Shuffle its encounter set (The Waiting Congregation, The Mile-Counter, The Bridge Remembers) into the encounter deck. Its act deck: **Walk It Backward** (1a) and **Who Walks Beside You** (2a).
 
 **Do not read until the loop ends.**
 
@@ -408,7 +451,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > Near the back of the crowd a woman in a green shawl is not watching the sheriff. She is watching you, frowning, the way you frown at a word on the tip of your tongue.
 
-**Every loop:** the Square's box is placed in Loop Setup, so its locations (The Square and The Town Hall Steps revealed), encounter set (The Same Speech, The Crowd Turns) and act deck are always in play. Its act deck: **The Sheriff Is Already Dead** (1a) and **The Vote That Never Ends** (2a). **Part II:** its Named enemy stays set aside until its act spawns it.
+**Every loop:** the Square's box is placed in Loop Setup, so its locations (The Square and The Town Hall Steps revealed), encounter set (The Band on the Steps, The Same Speech, The Crowd Turns) and act deck are always in play. Its act deck: **The Sheriff Is Already Dead** (1a) and **The Vote That Never Ends** (2a). **Part II:** its Named enemy stays set aside until its act spawns it.
 
 **Do not read until the loop ends.**
 
@@ -447,7 +490,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > The ticket-taker catches your eye across the crowd and touches one finger to the side of his nose. A man who keeps a secret knows another who does.
 
-**When you Place this box:** The Wheel, The Hall of Mirrors and The Ticket Booth join the map. Shuffle its encounter set (The Wheel's Turn, Your Reflection Lies) into the encounter deck. Its act deck: **The Wheel Still Turns** (1a) and **The Ticket-Taker's Bargain** (2a). **Part II:** shuffle its Named enemy into the encounter deck with its encounter set; it spawns at **The Wheel** when drawn.
+**When you Place this box:** The Wheel, The Hall of Mirrors and The Ticket Booth join the map. Shuffle its encounter set (The Barker, The Wheel's Turn, Your Reflection Lies) into the encounter deck. Its act deck: **The Wheel Still Turns** (1a) and **The Ticket-Taker's Bargain** (2a). **Part II:** shuffle its Named enemy into the encounter deck with its encounter set; it spawns at **The Wheel** when drawn.
 
 **Do not read until the loop ends.**
 
@@ -486,7 +529,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > The page you brought up out of the flooded crypt lies on the bed of the press, dry now, and the type beside it has been set in the right order. Someone has been working here in the loops you were not watching.
 
-**When you Place this box:** The Reading Room, The Press and The Sealed Study join the map. The Sealed Study enters play closed; it opens when **The Appointed's Name** becomes the current act, and enters play open (revealed) in every loop once your Campaign Log records The Appointed's Name. Shuffle its encounter set (The Page That Wasn't, Ink Runs Backward, The Study Door) into the encounter deck. Its act deck: **What the Almanac Hid** (1a) and **The Appointed's Name** (2a).
+**When you Place this box:** The Reading Room, The Press and The Sealed Study join the map. The Sealed Study enters play closed; it opens when **The Appointed's Name** becomes the current act, and enters play open (revealed) in every loop once your Campaign Log records The Appointed's Name. Shuffle its encounter set (The Compositor, The Page That Wasn't, Ink Runs Backward, The Study Door) into the encounter deck. Its act deck: **What the Almanac Hid** (1a) and **The Appointed's Name** (2a).
 
 **Do not read until the loop ends.**
 
@@ -529,13 +572,14 @@ Before the finale begins: if you completed a district's act 2a this loop, read t
 
 **Setup**
 1. Press **Place** on **The Last Hour** box. **Contest the Crossing** becomes the current act, in the act spot on the mythos mat. Set every district's act deck aside: no district objective can be completed during the finale. Its set-aside stack goes to the mythos area's lower corner; do not read those cards.
-2. Advance the Appointed's Approach to **Arrived** (click **Appointed** on the Control token until it shows Arrived). If it is set aside, it manifests. Dissonance keeps its current value. If the finale began at Hour IX, return Hours V to IX to the Hours deck in order, Hour V as the current agenda (no Hour resolves; right-click **Hour** four times); Hours VI to VIII resolve again when they are reached.
+2. Advance the Appointed's Approach to **Arrived** (click **Appointed** on the Control token until it shows Arrived). If it is set aside, it manifests. Dissonance keeps its current value. If the finale began at Hour IX, return Hours V to IX to the Hours deck in order, Hour V as the current agenda (no Hour resolves; right-click **Hour** four times); Hours VI to VIII resolve again when they are reached. Then spawn the set-aside **Uninvited** at the revealed location farthest from all investigators that is not closed (the lead investigator breaks ties).
 3. On the Control token, set **Contest** to 0. Then apply each of these your Campaign Log records:
    - *You have spoken the name:* gain 2 contest progress. It already knows that you know.
    - *The drowned heard the true hour:* rewind the Hourglass by 1 Hour. Below the church, a congregation is keeping time for you.
 
 **Contest progress.** Gain 1 contest progress:
 - each time an investigator succeeds at Hold Back;
+- when the Uninvited is defeated (its card says so);
 - the first time each investigator is at The Sealed Study during the finale (an investigator already there when the finale begins gains it at once);
 - each time a deep Knowledge entry is spent with the [action] on Contest the Crossing. Each entry can be spent once per finale. Note it on the Finale Record; it stays recorded for every other purpose, including the resolutions.
 

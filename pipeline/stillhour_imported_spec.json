@@ -181,11 +181,11 @@
       },
       {
         "token": "tablet",
-        "text": "-3. If the Appointed is Sensed or later, take 1 horror."
+        "text": "-2. If the Appointed is Sensed or later, take 1 horror."
       },
       {
         "token": "elderthing",
-        "text": "-4. If you fail, advance the Hourglass by 1 Hour."
+        "text": "-3. If you fail, advance the Hourglass by 1 Hour."
       },
       {
         "token": "static",
@@ -693,5 +693,53 @@
     "text": "Contest reached, \"The Ticket-Taker's Bargain\" is known, and banked Memory is 12 or more. The party may decline this and read on to R2.\nYou take the ticket-taker's offer: the door opens on your terms, not the town's, and the night finally ends. The fare is everything you carried — banked Memory drops to 0 — and each investigator present ages +2 Years. Ambergrove wakes to a morning with one more guest in it.",
     "flavor": "He punches your ticket without looking. He has been expecting you for a very long time.",
     "deck": 95123
+  },
+  {
+    "id": "sthr-bandonsteps",
+    "type": "Enemy",
+    "class": "Mythos",
+    "name": "The Band on the Steps",
+    "traits": "Echo. Humanoid.",
+    "health": 2
+  },
+  {
+    "id": "sthr-drownedverger",
+    "type": "Enemy",
+    "class": "Mythos",
+    "name": "The Drowned Verger",
+    "traits": "Humanoid. Monster.",
+    "health": 3
+  },
+  {
+    "id": "sthr-milecounter",
+    "type": "Enemy",
+    "class": "Mythos",
+    "name": "The Mile-Counter",
+    "traits": "Monster.",
+    "health": 3
+  },
+  {
+    "id": "sthr-barker",
+    "type": "Enemy",
+    "class": "Mythos",
+    "name": "The Barker",
+    "traits": "Humanoid.",
+    "health": 2
+  },
+  {
+    "id": "sthr-compositor",
+    "type": "Enemy",
+    "class": "Mythos",
+    "name": "The Compositor",
+    "traits": "Humanoid. Monster.",
+    "health": 4
+  },
+  {
+    "id": "sthr-uninvited",
+    "type": "Enemy",
+    "class": "Mythos",
+    "name": "The Uninvited",
+    "traits": "Monster.",
+    "health": 4
   }
 ]

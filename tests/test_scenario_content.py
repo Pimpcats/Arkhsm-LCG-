@@ -145,7 +145,8 @@ class ScenarioContentTests(unittest.TestCase):
         self.assertEqual(spine["sthr-losthour"], 3)
         hub = collections.Counter(ASSIGN["district_square"]["encounter"])
         self.assertEqual(hub - spine, collections.Counter(
-            {"sthr-crossing": 1, "sthr-samespeech": 1, "sthr-crowdturns": 1}))
+            {"sthr-crossing": 1, "sthr-samespeech": 1, "sthr-crowdturns": 1,
+             "sthr-bandonsteps": 1}))
         self.assertNotIn("sthr-crossing", ASSIGN["prologue"]["encounter"])
         aside = collections.Counter(ASSIGN["district_square"]["setup_aside"])
         self.assertEqual(aside["sthr-appointedwhisper"], 2)
