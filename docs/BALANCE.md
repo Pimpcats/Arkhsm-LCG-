@@ -144,3 +144,33 @@ that knows the route unlocks it by loop 3–4. Solo is slow (and at high tax a
 quarter of campaigns never unlock by loop 15). No change made before the
 owner's first playtest; the knobs are the objective clue counts, the Hour
 thresholds and the travel cost.
+
+### Model corrections and location effects (2026-09-27)
+
+Two gaps were closed in `simulate_tempo.py`:
+- A loop now also ends when Dissonance reaches the reset value (it only ended
+  at Hour IX before).
+- Dissonance gain now scales with the number of investigators (it comes from
+  encounter draws and chaos-token pulls), and the scar is capped at one-third of
+  the reset, as **Difficulty and Player Count** says. Before this, solo play
+  used the three-investigator rate and hit the reset in ~83% of loops.
+
+Location card effects are modelled per location (`LOCATION_PROFILES`), and
+`python3 pipeline/simulate_tempo.py --compare` prints the cards with no
+location text against the printed location text. Results, 4000 campaigns each,
+35% tax (seed 1729):
+
+| play | players | unlock loop, no location text | unlock loop, printed text | never by 15 | reset loops | location harm / investigator / loop |
+|---|---|---|---|---|---|---|
+| first-time | 1 | 9 (6–12) | 9 (6–12) | 2.2% → 2.1% | 0% | 0.18 |
+| first-time | 2 | 6 (4–8) | 6 (4–8) | 0% | 0% | 0.11 |
+| first-time | 3 | 6 (4–8) | 6 (4–8) | 0% | 0% | 0.08 |
+| first-time | 4 | 6 (4–8) | 6 (4–8) | 0% | 0% | 0.06 |
+| finale-first | 3 | 4 (3–5) | 4 (3–5) | 0% | 0% | 0.10 |
+
+**Reading:** the location text adds risk (a little damage, horror and
+Dissonance) without changing the pace. One tried effect was rejected: an extra
+action to investigate the Records Office cut solo finale unlocks from 98% to 80%
+by loop 15, because the Square's deep objective spends its clues there. See
+`docs/design/LOCATION_DESIGN.md`.
+

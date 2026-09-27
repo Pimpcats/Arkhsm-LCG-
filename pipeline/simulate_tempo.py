@@ -52,8 +52,19 @@ PARTY = {
     4: {"int": [5, 3, 3, 2], "agi": [5, 4, 3, 3], "wil": [5, 3, 3, 3], "com": [4, 3, 3, 2]},
 }
 BOOST = 1
-# ASSUMPTION: Dissonance gained per round (deck + typical foreknowledge use).
+# ASSUMPTION: Dissonance gained per round at three investigators (deck +
+# typical foreknowledge use). It comes from encounter draws and chaos-token
+# pulls, so it scales with the number of investigators (dissonance_rate).
 DISSONANCE_PER_ROUND = 1.3
+
+
+def dissonance_rate(n):
+    return DISSONANCE_PER_ROUND * n / 3
+
+
+def scar_cap(n):
+    """Guide, Difficulty and Player Count: one-third of the reset value."""
+    return 3 if n == 1 else 2 * n
 # ASSUMPTION: extra party actions a Named enemy costs when it guards an objective.
 NAMED_COST = {"square_deep": 8, "church_deep": 6}
 SPINE_SIZE = 25          # 24-card spine + The Crossing (CONTENT_DECISIONS D4/D5)
@@ -93,22 +104,57 @@ def crossings(a, b):
 
 
 # Objectives: (id, district, layer, steps). Clue steps name the locations the
-# act allows, as (shroud, clues per investigator); from the location cards.
+# act allows, as (shroud, clues per investigator, location); from the location
+# cards. ("at", loc) marks the moment the party must stand at an objective
+# location (its "after you enter" effects apply there).
 OBJ = {
-    "square_surface": ("square", "surface", [("clues", 5, [(1, 2), (2, 2), (2, 2), (3, 3)]), ("act", 1)]),
-    "square_deep": ("square", "deep", [("named", "square_deep"), ("clues", 3, [(4, 3)])]),
-    "almanac_surface": ("almanac", "surface", [("clues_pi", 2, [(2, 2), (3, 3)]), ("act", 1)]),
-    "almanac_deep": ("almanac", "deep", [("move", 1), ("clues", 3, [(4, 3)])]),
-    "fairground_surface": ("fairground", "surface", [("test", "agi", 3)]),
+    "square_surface": ("square", "surface", [("clues", 5, [(1, 2, "square"), (2, 2, "townhall"), (2, 2, "well"),
+                                                            (3, 3, "records")]), ("at", "well"), ("act", 1)]),
+    "square_deep": ("square", "deep", [("named", "square_deep"), ("clues", 3, [(4, 3, "records")])]),
+    "almanac_surface": ("almanac", "surface", [("clues_pi", 2, [(2, 2, "readingroom"), (3, 3, "press")]),
+                                               ("at", "press"), ("act", 1)]),
+    "almanac_deep": ("almanac", "deep", [("move", 1), ("clues", 3, [(4, 3, "study")])]),
+    "fairground_surface": ("fairground", "surface", [("at", "wheel"), ("test", "agi", 3, "wheel")]),
     "fairground_deep": ("fairground", "deep", [("move", 1), ("act", 1)]),
-    "church_surface": ("church", "surface", [("clues", 6, [(2, 3), (3, 2), (2, 2)]), ("act", 1)]),
-    "church_deep": ("church", "deep", [("named", "church_deep"), ("clues", 3, [(4, 3)])]),
-    "road_surface": ("road", "surface", [("move", 1), ("clues", 1, [(2, 3)]), ("move", 1),
-                                         ("clues", 1, [(3, 2)]), ("move", 1), ("clues", 1, [(1, 2)])]),
-    "road_deep": ("road", "deep", [("glitch",), ("move", 1), ("test", "agi", 3)]),
-    "lighthouse_surface": ("lighthouse", "surface", [("clues", 4, [(2, 1), (2, 2), (4, 2)]), ("test", "wil", 3)]),
-    "lighthouse_deep": ("lighthouse", "deep", [("act", 1), ("move", 1), ("clues", 2, [(2, 2)])]),
+    "church_surface": ("church", "surface", [("clues", 6, [(2, 3, "nave"), (3, 2, "belfry"), (2, 2, "vestry")]),
+                                             ("at", "vestry"), ("act", 1)]),
+    "church_deep": ("church", "deep", [("named", "church_deep"), ("clues", 3, [(4, 3, "crypt")])]),
+    "road_surface": ("road", "surface", [("move", 1), ("clues", 1, [(2, 3, "turning")]), ("move", 1),
+                                         ("clues", 1, [(3, 2, "lowbridge")]), ("move", 1),
+                                         ("clues", 1, [(1, 2, "milestones")])]),
+    "road_deep": ("road", "deep", [("glitch",), ("move", 1), ("test", "agi", 3, "turning")]),
+    "lighthouse_surface": ("lighthouse", "surface", [("clues", 4, [(2, 1, "stair"), (2, 2, "keepers"),
+                                                                   (4, 2, "lantern")]), ("test", "wil", 3, "lantern")]),
+    "lighthouse_deep": ("lighthouse", "deep", [("act", 1), ("move", 1), ("clues", 2, [(2, 2, "keepers")])]),
 }
+# Location card effects the pacing can feel, per profile. Keys:
+#   extra_action  - investigating here costs this many more actions
+#   fail_diss     - Dissonance raised when an investigation here fails
+#   fail_harm     - damage/horror when an investigation here fails
+#   enter_diss / enter_harm - per investigator who enters (see VISITORS)
+#   hour_harm     - horror to the investigator here each time the Hourglass advances
+# Effects with no tempo weight (the Ticket Booth's lost resource, the Keeper's
+# Quarters' optional heal, the Hall of Mirrors, which no objective needs you to
+# investigate) are left out. An extra-action cost on the Records Office was
+# tried and rejected: solo, it cut the finale unlock rate (2% -> 20% never by
+# loop 15) because the Square's deep objective spends its clues there.
+LOCATION_PROFILES = {
+    "none": {},
+    "proposed": {
+        "well": {"enter_harm": 1},
+        "press": {"fail_diss": 1},
+        "wheel": {"hour_harm": 1},
+        "belfry": {"enter_diss": 1},
+        "lowbridge": {"fail_harm": 1},
+    },
+}
+
+
+def visitors(n):
+    """ASSUMPTION: how many investigators enter a given side location."""
+    return 1 if n <= 2 else 2
+
+
 # ASSUMPTION: finale-first priority (the party is heading for the finale).
 PRIORITY = ["square_surface", "almanac_surface", "fairground_surface",
             "square_deep", "almanac_deep", "fairground_deep",
@@ -146,8 +192,21 @@ def available(obj, facts, act2):
     return act2
 
 
-def play_loop(rng, n, tax, facts, act2, scar, explore=False):
+def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
+    fx = fx or {}
     party = PARTY[n]
+    reset_at = 9 if n == 1 else 6 * n
+    stats = {"reset": False, "harm": 0, "diss_fx": 0}
+    entered = set()
+
+    def enter(loc, who):
+        if loc in entered:
+            return
+        entered.add(loc)
+        e = fx.get(loc, {})
+        stats["harm"] += e.get("enter_harm", 0) * who
+        stats["diss_fx"] += e.get("enter_diss", 0) * who
+        return e.get("enter_diss", 0) * who
     hours_total = 8 - (1 if "church_deep" in facts else 0)   # advances to Hour IX
     hour = 0
     diss = float(scar)
@@ -207,7 +266,12 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False):
                             break
                         r -= cnt
             hour += adv
-            diss += DISSONANCE_PER_ROUND
+            diss += dissonance_rate(n)
+            if ti < len(tasks) and tasks[ti][0] == "test" and len(tasks[ti]) > 3:
+                stats["harm"] += fx.get(tasks[ti][3], {}).get("hour_harm", 0) * adv
+            if diss >= reset_at:
+                stats["reset"] = True
+                break
             if hour >= hours_total:
                 break
         band = band_for(diss, n)
@@ -232,6 +296,9 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False):
                     ti += 1
                 else:                               # skip to after its "done"
                     ti = tasks.index(("done", t[1]), ti) + 1
+            elif k == "at":
+                diss += enter(t[1], 1) or 0
+                ti += 1
             elif k == "done":
                 done.append(t[1])
                 ti += 1
@@ -270,33 +337,46 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False):
             elif k in ("clues", "clues_pi"):
                 need = t[1] * (n if k == "clues_pi" else 1)
                 if supply is None or cur != ti:
-                    cur, supply = ti, [[s, c * n] for s, c in sorted(t[2])]
+                    # easiest first; an extra action counts like higher shroud
+                    order = sorted(t[2], key=lambda x: x[0] + 1.5 * fx.get(x[2], {}).get("extra_action", 0))
+                    cur, supply = ti, [[s_, c * n, name] for s_, c, name in order]
                     progress = 0
-                loc = next((s for s in supply if s[1] > 0), None)
+                loc = next((s_ for s_ in supply if s_[1] > 0), None)
                 if loc is None:
                     ti += 1                         # feasibility is audited elsewhere
                     continue
-                budget -= 1
+                e = fx.get(loc[2], {})
+                diss += enter(loc[2], visitors(n)) or 0
+                budget -= 1 + e.get("extra_action", 0)
                 skill = party["int"][actor % n] + BOOST
                 actor += 1
                 if rng.random() < success_probability(skill - loc[0], band):
                     loc[1] -= 1
                     progress += 1
+                else:
+                    diss += e.get("fail_diss", 0)
+                    stats["diss_fx"] += e.get("fail_diss", 0)
+                    stats["harm"] += e.get("fail_harm", 0)
                 if progress >= need:
                     progress, supply = 0, None
                     ti += 1
+        if diss >= reset_at:
+            stats["reset"] = True
+            break
         if ti >= len(tasks):
             break
         if hour >= hours_total:
             break
-    return done, rounds, len(placed)
+    return done, rounds, len(placed), stats
 
 
-def campaign(rng, n, tax, max_loops=15, explore=False):
+def campaign(rng, n, tax, max_loops=15, explore=False, fx=None, log=None):
     facts, act2 = set(), False
     per_loop, districts = [], []
     for loop in range(1, max_loops + 1):
-        done, rounds, placed = play_loop(rng, n, tax, facts, act2, min(loop - 1, 6), explore)
+        done, rounds, placed, st = play_loop(rng, n, tax, facts, act2, min(loop - 1, scar_cap(n)), explore, fx)
+        if log is not None:
+            log.append(st)
         facts.update(done)
         per_loop.append(len(done))
         districts.append(placed)
@@ -314,12 +394,47 @@ def pct(xs, p):
     return xs[min(len(xs) - 1, int(p / 100 * len(xs)))]
 
 
+def compare(trials, seed):
+    """Location profiles side by side (tax 0.35, first-time and finale-first)."""
+    print()
+    print("Location effects: 'none' = no location text, 'proposed' = the location cards")
+    print("play      | players | profile  | unlock median (10-90%) | never | obj/loop | reset loops | harm/inv/loop | Dissonance from locations/loop")
+    for explore in (True, False):
+        for n in (1, 2, 3, 4):
+            for prof in ("none", "proposed"):
+                rng = random.Random(seed)
+                fx = LOCATION_PROFILES[prof]
+                unlocks, objs, never, log = [], [], 0, []
+                for _ in range(trials):
+                    u, per, _ = campaign(rng, n, 0.35, explore=explore, fx=fx, log=log)
+                    if u is None:
+                        never += 1
+                    else:
+                        unlocks.append(u)
+                    objs.extend(per)
+                med = statistics.median(unlocks) if unlocks else float("nan")
+                rs = "{}-{}".format(pct(unlocks, 10), pct(unlocks, 90)) if unlocks else "-"
+                print("{:9} | {:>7} | {:8} | {:>4} ({:>5})           | {:>5.1%} | {:>8.2f} | {:>11.1%} | {:>13.2f} | {:.2f}".format(
+                    "first" if explore else "planned", n, prof, med, rs, never / trials, statistics.mean(objs),
+                    sum(1 for x in log if x["reset"]) / len(log),
+                    statistics.mean(x["harm"] for x in log) / n,
+                    statistics.mean(x["diss_fx"] for x in log)))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--trials", type=int, default=4000)
     ap.add_argument("--seed", type=int, default=1729)
+    ap.add_argument("--locations", choices=sorted(LOCATION_PROFILES), default="proposed",
+                    help="location effects to apply in the main table")
+    ap.add_argument("--compare", action="store_true",
+                    help="print only the location-profile comparison")
     a = ap.parse_args()
+    if a.compare:
+        compare(a.trials, a.seed)
+        return
     rng = random.Random(a.seed)
+    fx = LOCATION_PROFILES[a.locations]
     for explore in (False, True):
       print()
       print("Tempo: loops until the finale unlocks ({} play)".format(
@@ -329,7 +444,7 @@ def main():
         for tax in TAX_LEVELS:
             unlocks, objs, dists, never = [], [], [], 0
             for _ in range(a.trials):
-                u, per, ds = campaign(rng, n, tax, explore=explore)
+                u, per, ds = campaign(rng, n, tax, explore=explore, fx=fx)
                 if u is None:
                     never += 1
                 else:

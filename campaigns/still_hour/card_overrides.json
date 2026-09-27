@@ -208,14 +208,14 @@
     "flavor": "You came to Ambergrove for your own reasons. You will not remember why, soon.",
     "unrevealed": true,
     "unrevealed_flavor": "Planks run out over black water. At the far end, someone is waiting for a boat that is not coming.",
-    "text": "[free] Discard 1 card from your hand: Heal 1 horror. Limit once per round."
+    "text": ""
   },
   "sthr-loc-almanacsteps": {
     "name": "The Almanac Steps",
     "traits": "Ambergrove.",
     "shroud": 2,
     "clues": 3,
-    "text": "[action]: Look at the next Hour (the card beneath the current Hour). Group limit once per round.",
+    "text": "Forced – After you enter the Almanac Steps: Raise Dissonance by 1.",
     "clues_per_investigator": true,
     "icons": "cross",
     "color": "#aa8e46",
@@ -306,7 +306,7 @@
     "victory": 1,
     "shroud": 2,
     "clues": 2,
-    "text": "[action]: Heal 1 damage and 1 horror, then raise Dissonance by 1. Group limit once per round.",
+    "text": "[action][action]: Heal 1 damage and 1 horror.",
     "clues_per_investigator": true,
     "icons": "clover",
     "color": "#960e12",
@@ -365,7 +365,7 @@
     "flavor": "The congregation is still here. They have been kneeling since the first toll.",
     "unrevealed": true,
     "unrevealed_flavor": "Water laps at the church doors. Inside, lamplight lies on it like oil.",
-    "text": "[action]: Look at the top card of the encounter deck. You may discard it. Group limit once per round."
+    "text": ""
   },
   "sthr-loc-belfry": {
     "name": "The Belfry",
@@ -384,7 +384,7 @@
     ],
     "unrevealed": true,
     "unrevealed_flavor": "The bell rope disappears up through a hole in the ceiling. It is swaying, though there is no wind.",
-    "text": "[action]: Test [com] (3). If you succeed, exhaust each Echo in the Church district, then raise Dissonance by 1. Group limit once per round."
+    "text": "Forced – After you enter the Belfry: Raise Dissonance by 1."
   },
   "sthr-loc-floodedcrypt": {
     "name": "The Flooded Crypt",
@@ -392,7 +392,7 @@
     "victory": 1,
     "shroud": 4,
     "clues": 3,
-    "text": "Closed. It opens when The Hour Was Wrong becomes the current act, and in every loop once your Campaign Log records The Hour Was Wrong.\nForced – After you enter the Flooded Crypt: Take 1 damage.",
+    "text": "Closed. It opens when The Hour Was Wrong becomes the current act, and in every loop once your Campaign Log records The Hour Was Wrong.",
     "clues_per_investigator": true,
     "icons": "spade",
     "color": "#1c2a52",
@@ -411,7 +411,7 @@
     "traits": "Church.",
     "shroud": 2,
     "clues": 2,
-    "text": "Forced – After you successfully investigate the Vestry: Lower Dissonance by 1. Limit once per round.",
+    "text": "",
     "clues_per_investigator": true,
     "icons": "clover",
     "color": "#4a7c46",
@@ -458,7 +458,7 @@
     "flavor": "The road between the town and the shore, counted out in stones that never change.",
     "unrevealed": true,
     "unrevealed_flavor": "Stone markers along the verge, each one carved with a number. The numbers do not go in order.",
-    "text": "[free]: Move to a connecting location. Limit once per round."
+    "text": ""
   },
   "sthr-loc-lowbridge": {
     "name": "The Low Bridge",
@@ -488,7 +488,7 @@
     "traits": "Road.",
     "shroud": 2,
     "clues": 3,
-    "text": "[action] Raise Dissonance by 2: Rewind the Hourglass by 1 Hour. Group limit once per loop.",
+    "text": "",
     "clues_per_investigator": true,
     "icons": "slash",
     "color": "#8a5a2e",
@@ -546,7 +546,7 @@
     "victory": 1,
     "shroud": 3,
     "clues": 3,
-    "text": "[action] Spend 2 clues: Place 1 Memory on your investigator card. Group limit once per loop.",
+    "text": "",
     "clues_per_investigator": true,
     "icons": "hourglass",
     "color": "#7c5a2e",
@@ -565,7 +565,7 @@
     "traits": "Ambergrove.",
     "shroud": 2,
     "clues": 2,
-    "text": "Forced – After you successfully investigate the Well: Take 1 horror, then discover 1 additional clue at the Well.",
+    "text": "Forced – After you enter the Well: Take 1 horror.",
     "clues_per_investigator": true,
     "icons": "circle",
     "color": "#3a7c7a",
@@ -628,7 +628,7 @@
     "flavor": "The occultation fair, mid-celebration, forever.",
     "unrevealed": true,
     "unrevealed_flavor": "A painted door: SEE YOURSELF AS OTHERS SEE YOU. The paint is still wet.",
-    "text": "[action]: Test [wil] (3). If you succeed, place 1 Memory on your investigator card. If you fail, take 1 horror. Limit once per loop."
+    "text": "Forced – After you fail a skill test while investigating the Hall of Mirrors: Take 1 horror."
   },
   "sthr-loc-ticketbooth": {
     "name": "The Ticket Booth",
@@ -636,7 +636,7 @@
     "victory": 1,
     "shroud": 2,
     "clues": 2,
-    "text": "[action] Spend 2 resources: Discover 1 clue at the Ticket Booth. Limit once per round.",
+    "text": "Forced – After you enter the Ticket Booth: Lose 1 resource.",
     "clues_per_investigator": true,
     "icons": "moon",
     "color": "#a83870",
@@ -695,14 +695,14 @@
     "flavor": "Ayako has read every book in it a hundred times.",
     "unrevealed": true,
     "unrevealed_flavor": "Shelves to the ceiling, and a long table laid with open almanacs, all turned to the same page.",
-    "text": "[action]: Search the top 6 cards of your deck for a Recollection card and draw it. Limit once per loop."
+    "text": ""
   },
   "sthr-loc-press": {
     "name": "The Press",
     "traits": "Almanac House.",
     "shroud": 3,
     "clues": 3,
-    "text": "[action]: Test [int] (3). If you succeed, look at the top 3 cards of the encounter deck and put them back in any order. If you fail, raise Dissonance by 1. Group limit once per round.",
+    "text": "Forced – After you fail a skill test while investigating the Press: Raise Dissonance by 1.",
     "clues_per_investigator": true,
     "icons": "triangle",
     "color": "#4a3c6c",
