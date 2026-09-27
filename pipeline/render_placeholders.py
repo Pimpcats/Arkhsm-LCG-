@@ -1853,11 +1853,78 @@ def s_investigator_back(c, pt, dest, art_path=None):
                   max_w_factor=1.0, key="subtitle")
     b = se_reg("InvestigatorBack", "Body")
     portrait = se_reg("InvestigatorBack", "Portrait-portrait-clip")
-    if b and portrait:
-        _flow_around(d, pt.get("back_text", ""), b, portrait, start=BODY_PX)
-    else:
-        _box_block(d, pt.get("back_text", ""), b, start=BODY_PX, key="text")
+    # the frame's brass cartridge hangs below the portrait: keep text clear of it
+    ob = (portrait[0], portrait[1], portrait[2], portrait[3] + 118)
+    paras = [(line, "label") for line in pt.get("back_text", "").split("\n") if line.strip()]
+    if pt.get("back_flavor"):
+        paras.append((pt["back_flavor"], "story"))
+    _flow_rich(d, paras, (b[0], b[1], b[2], b[3] - 8), ob, start=BODY_PX)
     img.save(dest)
+
+
+def _flow_rich(d, paras, box, obstacle, start=22, min_size=13, leading=1.24, gap=18):
+    """Investigator-back text, official layout: each deckbuilding line opens
+    with its label in bold ("Deck Size:"), then the story paragraph in italics.
+    Beside the portrait (and the cartridge under it) lines start right of it;
+    below, they run full width. Shrinks everything together until it fits."""
+    left, top, right, bottom = box
+    ob_r, ob_b = obstacle[2] + gap, obstacle[3]
+
+    def avail(y, lh):
+        lx = ob_r if y + lh > obstacle[1] and y < ob_b else left
+        return lx, right - lx
+
+    def words_of(text, kind):
+        out = []
+        if kind == "label" and ":" in text:
+            head, tail = text.split(":", 1)
+            out += [("b", w) for w in (head + ":").split(" ") if w]
+            text = tail
+        style = "i" if kind == "story" else "r"
+        out += [(style, w) for w in text.split(" ") if w]
+        return out
+
+    def layout(size):
+        fonts = {"r": _font(size), "b": _font(size, bold=True), "i": _font(size, italic=True)}
+        lh = int(size * leading)
+        pgap = int(lh * PARA_GAP_FRAC)
+        y, placed, fits = top, [], True
+        for pi, (text, kind) in enumerate(paras):
+            if pi:
+                y += pgap * (3 if kind == "story" else 1)
+            if kind == "story":
+                # the story runs full width under the portrait, as printed
+                y = max(y, ob_b + 4)
+            lx, aw = avail(y, lh)
+            line, lw = [], 0.0
+            for st, w in words_of(text, kind):
+                piece = w + " "
+                pl = d.textlength(piece, font=fonts[st])
+                if line and lw + pl > aw:
+                    placed.append((y, lx, line, kind))
+                    y += lh
+                    lx, aw = avail(y, lh)
+                    line, lw = [], 0.0
+                line.append((piece, fonts[st]))
+                lw += pl
+            placed.append((y, lx, line, kind))
+            y += lh
+            if y > bottom:
+                fits = False
+        return placed, fits
+
+    for size in range(start, min_size - 1, -1):
+        placed, fits = layout(size)
+        if fits:
+            break
+    if not fits:
+        OVERFLOWS.append((CURRENT_CARD[0], "back_text", size))
+    for ly, lx, line, kind in placed:
+        cx = lx
+        fill = (84, 66, 50) if kind == "story" else PSD_INK
+        for piece, font in line:
+            d.text((cx, ly), piece, font=font, fill=fill)
+            cx += d.textlength(piece, font=font)
 
 
 def s_enemy(c, pt, dest, art_path=None, placement=None):
