@@ -155,22 +155,20 @@ Two gaps were closed in `simulate_tempo.py`:
   the reset, as **Difficulty and Player Count** says. Before this, solo play
   used the three-investigator rate and hit the reset in ~83% of loops.
 
-Location card effects are modelled per location (`LOCATION_PROFILES`), and
-`python3 pipeline/simulate_tempo.py --compare` prints the cards with no
-location text against the printed location text. Results, 4000 campaigns each,
-35% tax (seed 1729):
+Location card effects are modelled per location (`LOCATION_PROFILES`), with a
+party that uses the location levers sensibly. `python3
+pipeline/simulate_tempo.py --compare` prints no location text, the earlier
+friction-only set and the printed set ("What the town remembers"). First-time
+play, 4000 campaigns each, 35% tax (seed 1729):
 
-| play | players | unlock loop, no location text | unlock loop, printed text | never by 15 | reset loops | location harm / investigator / loop |
-|---|---|---|---|---|---|---|
-| first-time | 1 | 9 (6–12) | 9 (6–12) | 2.2% → 2.1% | 0% | 0.18 |
-| first-time | 2 | 6 (4–8) | 6 (4–8) | 0% | 0% | 0.11 |
-| first-time | 3 | 6 (4–8) | 6 (4–8) | 0% | 0% | 0.08 |
-| first-time | 4 | 6 (4–8) | 6 (4–8) | 0% | 0% | 0.06 |
-| finale-first | 3 | 4 (3–5) | 4 (3–5) | 0% | 0% | 0.10 |
+| players | unlock loop, no location text | unlock loop, printed locations | objectives / loop | Memory / loop from locations | Years / investigator / loop |
+|---|---|---|---|---|---|
+| 1 | 9 (6–13), 2.4% never | 9 (6–13), 3.3% never | 0.97 → 0.95 | 0.20 | 0.09 |
+| 2 | 6 (4–8) | 6 (4–8) | 1.52 → 1.52 | 0.22 | 0.04 |
+| 3 | 6 (4–8) | 6 (4–8) | 1.65 → 1.69 | 0.22 | 0.03 |
+| 4 | 5 (4–8) | 5 (4–8) | 1.66 → 1.73 | 0.19 | 0.02 |
 
-**Reading:** the location text adds risk (a little damage, horror and
-Dissonance) without changing the pace. One tried effect was rejected: an extra
-action to investigate the Records Office cut solo finale unlocks from 98% to 80%
-by loop 15, because the Square's deep objective spends its clues there. See
+No loop ends at the Dissonance reset in any profile. **Reading:** the location
+system adds choices without moving the difficulty. See
 `docs/design/LOCATION_DESIGN.md`.
 

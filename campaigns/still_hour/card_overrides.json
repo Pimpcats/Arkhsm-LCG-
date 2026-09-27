@@ -208,7 +208,7 @@
     "flavor": "You came to Ambergrove for your own reasons. You will not remember why, soon.",
     "unrevealed": true,
     "unrevealed_flavor": "Planks run out over black water. At the far end, someone is waiting for a boat that is not coming.",
-    "text": ""
+    "text": "[action]: Test [wil] (2). If you succeed, place 1 Memory on your investigator card. Group limit once per game."
   },
   "sthr-loc-almanacsteps": {
     "name": "The Almanac Steps",
@@ -384,7 +384,7 @@
     ],
     "unrevealed": true,
     "unrevealed_flavor": "The bell rope disappears up through a hole in the ceiling. It is swaying, though there is no wind.",
-    "text": "Forced – After you enter the Belfry: Raise Dissonance by 1."
+    "text": "Forced – After you enter the Belfry: If your Campaign Log does not record The Thirteenth Toll, raise Dissonance by 1."
   },
   "sthr-loc-floodedcrypt": {
     "name": "The Flooded Crypt",
@@ -411,7 +411,7 @@
     "traits": "Church.",
     "shroud": 2,
     "clues": 2,
-    "text": "",
+    "text": "[action] Spend 1 clue: Lower Dissonance by 1. Group limit once per round.",
     "clues_per_investigator": true,
     "icons": "clover",
     "color": "#4a7c46",
@@ -481,14 +481,14 @@
     "flavor": "The water never quite reaches the top. It never quite goes down.",
     "unrevealed": true,
     "unrevealed_flavor": "A humpbacked bridge over a stream that should not be this deep.",
-    "text": "Forced – After you fail a skill test while investigating the Low Bridge: Take 1 damage."
+    "text": ""
   },
   "sthr-loc-turning": {
     "name": "The Turning",
     "traits": "Road.",
     "shroud": 2,
     "clues": 3,
-    "text": "",
+    "text": "[action] Raise Dissonance by 2: Rewind the Hourglass by 1 Hour. Group limit once per loop.",
     "clues_per_investigator": true,
     "icons": "slash",
     "color": "#8a5a2e",
@@ -546,7 +546,7 @@
     "victory": 1,
     "shroud": 3,
     "clues": 3,
-    "text": "",
+    "text": "[action] Spend 2 clues: An investigator at the Records Office who gained Years from a card effect during this loop loses 1 of those Years. Group limit once per loop.",
     "clues_per_investigator": true,
     "icons": "hourglass",
     "color": "#7c5a2e",
@@ -565,7 +565,7 @@
     "traits": "Ambergrove.",
     "shroud": 2,
     "clues": 2,
-    "text": "Forced – After you enter the Well: Take 1 horror.",
+    "text": "Forced – After you enter the Well: If your Campaign Log does not record The Sheriff Is Already Dead, take 1 horror.",
     "clues_per_investigator": true,
     "icons": "circle",
     "color": "#3a7c7a",
@@ -628,7 +628,7 @@
     "flavor": "The occultation fair, mid-celebration, forever.",
     "unrevealed": true,
     "unrevealed_flavor": "A painted door: SEE YOURSELF AS OTHERS SEE YOU. The paint is still wet.",
-    "text": "Forced – After you fail a skill test while investigating the Hall of Mirrors: Take 1 horror."
+    "text": "[action]: You gain 1 Year (record it now; it takes effect Between Loops). Place 2 Memory on your investigator card. Group limit once per loop."
   },
   "sthr-loc-ticketbooth": {
     "name": "The Ticket Booth",
@@ -636,7 +636,7 @@
     "victory": 1,
     "shroud": 2,
     "clues": 2,
-    "text": "Forced – After you enter the Ticket Booth: Lose 1 resource.",
+    "text": "Forced – After you enter the Ticket Booth: If your Campaign Log does not record You hold the ticket, lose 1 resource.",
     "clues_per_investigator": true,
     "icons": "moon",
     "color": "#a83870",
@@ -702,7 +702,7 @@
     "traits": "Almanac House.",
     "shroud": 3,
     "clues": 3,
-    "text": "Forced – After you fail a skill test while investigating the Press: Raise Dissonance by 1.",
+    "text": "[action] Spend 1 clue: Remove from the chaos bag 1 Static token that a card effect added until the end of a turn or round. Group limit once per round.",
     "clues_per_investigator": true,
     "icons": "triangle",
     "color": "#4a3c6c",

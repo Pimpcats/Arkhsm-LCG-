@@ -140,12 +140,29 @@ OBJ = {
 # loop 15) because the Square's deep objective spends its clues there.
 LOCATION_PROFILES = {
     "none": {},
-    "proposed": {
+    # friction only (the previous proposal, kept for comparison)
+    "friction": {
         "well": {"enter_harm": 1},
         "press": {"fail_diss": 1},
         "wheel": {"hour_harm": 1},
         "belfry": {"enter_diss": 1},
         "lowbridge": {"fail_harm": 1},
+    },
+    # "What the town remembers" (the printed location cards): one lever per
+    # district, hazards that a Knowledge entry quiets. Not modelled (no tempo
+    # weight): the Ticket Booth's fare, the Press removing a temporary Static
+    # token, the Keeper's Quarters' rest, the Prologue's Long Pier.
+    "spin": {
+        "well": {"enter_harm": 1, "unless": "square_surface"},
+        "belfry": {"enter_diss": 1, "unless": "church_surface"},
+        "wheel": {"hour_harm": 1},
+        "levers": {
+            # district: (lever, config)
+            "road": ("rewind", {"diss_cost": 2, "actions": 1, "per_loop": 1}),
+            "church": ("lower_diss", {"actions": 2, "per_round": 1}),
+            "fairground": ("mirror", {"actions": 1, "memory": 2, "years": 1, "per_loop": 1}),
+            "square": ("strike_year", {"actions": 3, "per_loop": 1}),
+        },
     },
 }
 
@@ -196,7 +213,11 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
     fx = fx or {}
     party = PARTY[n]
     reset_at = 9 if n == 1 else 6 * n
-    stats = {"reset": False, "harm": 0, "diss_fx": 0}
+    stats = {"reset": False, "harm": 0, "diss_fx": 0, "memory": 0, "years": 0,
+             "rewinds": 0, "lowered": 0}
+    levers = fx.get("levers", {})
+    used = {}
+    year_in_night = 0
     entered = set()
 
     def enter(loc, who):
@@ -204,6 +225,8 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
             return
         entered.add(loc)
         e = fx.get(loc, {})
+        if e.get("unless") in facts:
+            return 0
         stats["harm"] += e.get("enter_harm", 0) * who
         stats["diss_fx"] += e.get("enter_diss", 0) * who
         return e.get("enter_diss", 0) * who
@@ -222,7 +245,7 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
     # group by district in first-appearance order, Square first
     order = ["square"] + [OBJ[o][0] for o in plan if OBJ[o][0] != "square"]
     districts = list(dict.fromkeys(order))
-    tasks = []
+    tasks = [("district", "square")]
     here = "square"
     free_lighthouse = "road_surface" in facts
     placed = {"square"}
@@ -235,6 +258,7 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
         for a, b in crossings(here, d):
             free = free_lighthouse and "lighthouse" in (a, b)
             tasks.append(("travel", b, 0 if free else 1))
+            tasks.append(("district", b))
             if free:
                 free_lighthouse = False
         here = d
@@ -246,6 +270,7 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
     deck = SPINE_SIZE + DISTRICT["square"]["set"] + (2 if act2 else 0)
     skip_cards = []
     cur, progress, supply = None, 0, None
+    cur_district = "square"
     rounds = 0
     ti = 0
     while True:
@@ -254,6 +279,8 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
             draws = n + (n if hour == 1 else 0)          # Hour II: extra draw
             adv = 1
             for _ in range(draws):
+                if rng.random() < 2 / deck and rng.random() < 0.45:
+                    year_in_night += 1
                 r = rng.random() * deck
                 if r < LOST_HOURS:
                     adv += 2 if hour >= 5 else 1
@@ -267,7 +294,8 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
                         r -= cnt
             hour += adv
             diss += dissonance_rate(n)
-            if ti < len(tasks) and tasks[ti][0] == "test" and len(tasks[ti]) > 3:
+            if ti < len(tasks) and tasks[ti][0] == "test" and len(tasks[ti]) > 3 \
+                    and fx.get(tasks[ti][3], {}).get("unless") not in facts:
                 stats["harm"] += fx.get(tasks[ti][3], {}).get("hour_harm", 0) * adv
             if diss >= reset_at:
                 stats["reset"] = True
@@ -277,6 +305,49 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
         band = band_for(diss, n)
         budget = sum(1 for _ in range(n * ACTIONS) if rng.random() >= tax)
         actor = 0
+        glitch_at = 3 if n == 1 else 2 * n
+        noticed_at = 6 if n == 1 else 4 * n
+        def district_clear():
+            """ASSUMPTION: optional levers (Memory, striking a Year) are used only
+            once this district's objectives for the loop are done, before moving on."""
+            for t2 in tasks[ti:]:
+                if t2[0] in ("travel", "district"):
+                    return True
+                if t2[0] in ("clues", "clues_pi", "test", "move", "act", "named", "at", "glitch"):
+                    return False
+            return True
+
+        lv = levers.get(cur_district)
+        if lv and budget > 0 and (lv[0] in ("rewind", "lower_diss") or district_clear()):
+            kind, cfg = lv
+            if kind == "rewind" and used.get(kind, 0) < cfg["per_loop"] and hour > 0 \
+                    and diss + cfg["diss_cost"] < noticed_at:
+                used[kind] = used.get(kind, 0) + 1
+                hour -= 1
+                diss += cfg["diss_cost"]
+                stats["diss_fx"] += cfg["diss_cost"]
+                stats["rewinds"] += 1
+                budget -= cfg["actions"]
+            elif kind == "lower_diss" and diss >= noticed_at - 1 and budget >= cfg["actions"]:
+                # ASSUMPTION: used to stay out of the Noticed band, not every round
+                diss -= 1
+                stats["diss_fx"] -= 1
+                stats["lowered"] += 1
+                budget -= cfg["actions"]
+            elif kind == "mirror" and used.get(kind, 0) < cfg["per_loop"]:
+                used[kind] = 1
+                stats["memory"] += cfg["memory"]
+                stats["years"] += cfg["years"]
+                budget -= cfg["actions"]
+            elif kind == "strike_year" and used.get(kind, 0) < cfg["per_loop"] \
+                    and (year_in_night > 0 or stats["years"] > 0) and budget >= cfg["actions"]:
+                used[kind] = 1
+                if year_in_night > 0:
+                    year_in_night -= 1
+                else:
+                    stats["years"] -= 1
+                stats["struck"] = stats.get("struck", 0) + 1
+                budget -= cfg["actions"]
         while budget > 0 and ti < len(tasks):
             t = tasks[ti]
             k = t[0]
@@ -296,6 +367,9 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
                     ti += 1
                 else:                               # skip to after its "done"
                     ti = tasks.index(("done", t[1]), ti) + 1
+            elif k == "district":
+                cur_district = t[1]
+                ti += 1
             elif k == "at":
                 diss += enter(t[1], 1) or 0
                 ti += 1
@@ -367,6 +441,7 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None):
             break
         if hour >= hours_total:
             break
+    stats["year_in_night"] = year_in_night
     return done, rounds, len(placed), stats
 
 
@@ -394,14 +469,17 @@ def pct(xs, p):
     return xs[min(len(xs) - 1, int(p / 100 * len(xs)))]
 
 
+PROFILES_TO_COMPARE = ("none", "friction", "spin")
+
+
 def compare(trials, seed):
     """Location profiles side by side (tax 0.35, first-time and finale-first)."""
     print()
     print("Location effects: 'none' = no location text, 'proposed' = the location cards")
-    print("play      | players | profile  | unlock median (10-90%) | never | obj/loop | reset loops | harm/inv/loop | Dissonance from locations/loop")
+    print("play      | players | profile  | unlock median (10-90%) | never | obj/loop | reset loops | harm/inv/loop | diss/loop | Memory/loop | Years/inv/loop (locations)")
     for explore in (True, False):
         for n in (1, 2, 3, 4):
-            for prof in ("none", "proposed"):
+            for prof in PROFILES_TO_COMPARE:
                 rng = random.Random(seed)
                 fx = LOCATION_PROFILES[prof]
                 unlocks, objs, never, log = [], [], 0, []
@@ -414,18 +492,20 @@ def compare(trials, seed):
                     objs.extend(per)
                 med = statistics.median(unlocks) if unlocks else float("nan")
                 rs = "{}-{}".format(pct(unlocks, 10), pct(unlocks, 90)) if unlocks else "-"
-                print("{:9} | {:>7} | {:8} | {:>4} ({:>5})           | {:>5.1%} | {:>8.2f} | {:>11.1%} | {:>13.2f} | {:.2f}".format(
+                print("{:9} | {:>7} | {:8} | {:>4} ({:>5})           | {:>5.1%} | {:>8.2f} | {:>11.1%} | {:>13.2f} | {:>6.2f} | {:>6.2f} | {:>6.2f}".format(
                     "first" if explore else "planned", n, prof, med, rs, never / trials, statistics.mean(objs),
                     sum(1 for x in log if x["reset"]) / len(log),
                     statistics.mean(x["harm"] for x in log) / n,
-                    statistics.mean(x["diss_fx"] for x in log)))
+                    statistics.mean(x["diss_fx"] for x in log),
+                    statistics.mean(x["memory"] for x in log),
+                    statistics.mean(x["years"] - x.get("struck", 0) * 0 for x in log) / n))
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--trials", type=int, default=4000)
     ap.add_argument("--seed", type=int, default=1729)
-    ap.add_argument("--locations", choices=sorted(LOCATION_PROFILES), default="proposed",
+    ap.add_argument("--locations", choices=sorted(LOCATION_PROFILES), default="spin",
                     help="location effects to apply in the main table")
     ap.add_argument("--compare", action="store_true",
                     help="print only the location-profile comparison")
