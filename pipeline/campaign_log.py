@@ -86,6 +86,12 @@ NAMED = [
     ("sthr-wearssheriff", "What Wears the Sheriff", "Square", 3),
     ("sthr-onewhorides", "The One Who Rides Forever", "Fairground", 2),
 ]
+# Victory monsters: optional, not Named (guide: Victory); names hidden until claimed
+VICTORY_ENEMIES = [
+    ("sthr-drownedverger", "The Drowned Verger", "Church", 1),
+    ("sthr-milecounter", "The Mile-Counter", "Sunken Road", 1),
+    ("sthr-compositor", "The Compositor", "Almanac", 1),
+]
 # Victory locations (guide: Victory): claimed at a loop's end when revealed and
 # clueless, once per campaign each
 VICTORY_LOCATIONS = [
@@ -251,14 +257,20 @@ def _pages():
         p2.reveal("vr:" + eid, "v:" + eid, name, 420, 750, y, h=30)
         p2.checkbox("v:" + eid, 780, y)
         p2.checkbox("vb:" + eid, 940, y)
-        y += 38
+        y += 34
+    for eid, name, where, vic in VICTORY_ENEMIES:
+        p2.text(90, y, "{} — monster (Victory {})".format(where, vic), size=20, style="bold")
+        p2.reveal("vr:" + eid, "v:" + eid, name, 420, 750, y, h=30)
+        p2.checkbox("v:" + eid, 780, y)
+        p2.checkbox("vb:" + eid, 940, y)
+        y += 34
     for eid, name, where, vic in VICTORY_LOCATIONS:
         p2.text(90, y, name, size=21, style="bold")
         p2.text(470, y, "({}, Victory {})".format(where, vic), size=19,
                 style="italic", fill=SOFT)
         p2.checkbox("v:" + eid, 780, y)
         p2.checkbox("vb:" + eid, 940, y)
-        y += 38
+        y += 34
 
     p2.header(y + 26, "Threads")
     y += 84

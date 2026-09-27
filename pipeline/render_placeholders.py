@@ -1659,7 +1659,10 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
                   bold=True, italic=True, max_size=24, key="traits")
         y += 36
     # the Event box curves inward at its lower corners: stop the rules higher
-    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3] + (-44 if kind == "Event" else 24)),
+    # Events: the box curves inward at its lower corners. Assets with a slot:
+    # the slot icon sits in the lower right, so stop the rules above it.
+    bottom_pad = -44 if kind == "Event" else (-6 if kind == "Asset" and c.get("slot") else 24)
+    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3] + bottom_pad),
                    start=BODY_PX, key="text")
     if pt.get("flavor") and y < b[3]:
         # the Event box curves inward at its lower corners
@@ -1931,10 +1934,15 @@ def s_enemy(c, pt, dest, art_path=None, placement=None):
     tpl = "AHLCG-WeaknessEnemy" if c.get("weakness") else "AHLCG-Enemy"
     img, d = _se_frame_compose(tpl, "Enemy", "Portrait-portrait-clip",
                                art_path, placement)
-    _box_text(d, c["name"], se_reg("Enemy", "Name"), title=True, grow=1.15, key="name")
+    nb = se_reg("Enemy", "Name")
     if c.get("subtitle"):
-        _box_text(d, c["subtitle"], se_reg("Enemy", "SubtitleText"),
-                  italic=True, max_size=26, max_w_factor=1.0, key="subtitle")
+        # no subtitle banner in the frame kit: name and subtitle share the title
+        # banner (as on official unique enemies), clear of the stat row
+        _box_text(d, c["name"], (nb[0], nb[1] - 4, nb[2], nb[1] + 38), title=True, grow=1.0, key="name")
+        _box_text(d, c["subtitle"], (nb[0] + 30, nb[1] + 38, nb[2] - 30, nb[3] + 2),
+                  italic=True, max_size=20, max_w_factor=1.0, key="subtitle")
+    else:
+        _box_text(d, c["name"], nb, title=True, grow=1.15, key="name")
     for key, fld, val in (("Attack", "fight", pt.get("fight")),
                           ("Health", "health", pt.get("health")),
                           ("Evade", "evade", pt.get("evade"))):

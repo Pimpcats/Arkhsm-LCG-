@@ -74,6 +74,7 @@ local function playCtx()
     log = hourLog,
     addStatic = function(n) bag.addStatic(n) end,
     removeStatic = function(n) bag.removeStatic(n) end,
+    setAlmanac = function() bag.setAlmanac(true) end,
     onAppointedAdvance = function() end,        -- reconciled once, after the action
     onReset = function()
       announce("The Appointed Hour: the night ends. Resolve the reset, then click Reset Loop.")
@@ -100,6 +101,11 @@ end
 local function changeInvestigators(delta)
   local n = CampaignState.constants().investigators + delta
   CampaignState.setInvestigatorCount(math.max(1, math.min(4, n)))
+  if mode == "interlude" then
+    -- the next loop starts at the scar for the NEW party size
+    local c = CampaignState.constants()
+    CampaignState.setDissonanceRaw(math.min(CampaignState.getLoopsCompleted(), c.scarCap))
+  end
   Dissonance.syncBag(bag)
 end
 
@@ -145,15 +151,22 @@ local function hunt()
   return moved
 end
 
-local function resetLoop()
-  local prologue = CampaignState.inPrologue()
-  CampaignState.reset()
-  -- Between Loops step 5: Part II begins with 3+ surface entries or after Loop 3
-  if not prologue and not CampaignState.inPartTwo()
+-- Between Loops step 5: Part II begins with 3+ surface entries or after Loop 3.
+-- Checked at the reset, again when an entry is ticked between loops, and at
+-- Begin Next Loop, so an entry recorded late still starts it.
+local function checkPartTwo()
+  if not CampaignState.inPrologue() and not CampaignState.inPartTwo()
+      and CampaignState.getLoopsCompleted() >= 1
       and (Knowledge.surfaceKnownCount() >= 3 or CampaignState.getLoopsCompleted() >= 3) then
     CampaignState.setPartTwo(true)
     announce("Part II begins: read The Shape of the Hour (Between Loops).")
   end
+end
+
+local function resetLoop()
+  local prologue = CampaignState.inPrologue()
+  CampaignState.reset()
+  if not prologue then checkPartTwo() end
   bag.clearTemporary()
   Dissonance.syncBag(bag)
   if prologue then
@@ -275,6 +288,7 @@ local function unlockFact(id)
     note("unknown fact id: " .. tostring(id))
     return nil
   end
+  if newly and mode == "interlude" then checkPartTwo() end
   -- the assembled entry: record it the moment its inputs are all known
   if newly and Knowledge.assembleFinale() then
     announce("Record The Way the Night Breaks in your Campaign Log: the finale may now be begun.")
@@ -344,6 +358,7 @@ local function buyLevel(level)
 end
 
 local function beginNextLoop()
+  checkPartTwo()
   Interlude.beginNextLoop()
   Dissonance.syncBag(bag)
   aging = {}
@@ -580,7 +595,17 @@ function shClickStatic(_, _, alt)
   afterChange()
 end
 function shClickAppointed(_, _, alt)
-  if alt then note("The Appointed: " .. Appointed.stageName()) return end
+  if alt then
+    -- push back one stage WITHOUT rewinding the Hour (e.g. The Hour I Learned
+    -- Your Name, or undoing a cancelled advance); Hold Back has its own button
+    guarded("appointed", function()
+      CampaignState.pushBackAppointed()
+      Board.syncAll({ log = hourLog })
+    end)
+    note("The Appointed: " .. Appointed.stageName())
+    afterChange()
+    return
+  end
   guarded("appointed", advanceAppointedByCard) ; afterChange()
 end
 function shAppointedInfo() note("The Appointed: " .. Appointed.stageName() .. " (stage " .. Appointed.stage() .. ")") end
@@ -964,7 +989,8 @@ end
 -- Victory X of the Named (the encounter cards' ids; the log's v:<id> boxes)
 local VICTORY = { ["sthr-bellringer"] = 2, ["sthr-wearssheriff"] = 3, ["sthr-onewhorides"] = 2,
   ["sthr-loc-keepersquarters"] = 1, ["sthr-loc-floodedcrypt"] = 1, ["sthr-loc-recordsoffice"] = 1,
-  ["sthr-loc-ticketbooth"] = 1, ["sthr-loc-sealedstudy"] = 1 }
+  ["sthr-loc-ticketbooth"] = 1, ["sthr-loc-sealedstudy"] = 1,
+  ["sthr-drownedverger"] = 1, ["sthr-milecounter"] = 1, ["sthr-compositor"] = 1 }
 
 --- Bank a Named enemy's Victory once per campaign (the log's tick calls this).
 function shApiClaimVictory(p)

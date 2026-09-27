@@ -166,8 +166,16 @@ end
 
 --- Set the active investigator count (drives every threshold). Does not wipe state.
 function CampaignState.setInvestigatorCount(n)
+  -- the Memory cap is applied after spending (startLoop), not here
   state.investigators = math.max(1, math.floor(n or 3))
-  CampaignState.capMemory()
+end
+
+--- Set Dissonance directly (no band-entry effects): only for re-applying the
+-- scar between loops.
+function CampaignState.setDissonanceRaw(v)
+  local c = CampaignState.constants()
+  state.dissonance = math.max(0, math.min(c.resetThreshold, math.floor(tonumber(v) or 0)))
+  return state.dissonance
 end
 
 --- The derived constants (thresholds/bands) for the current investigator count.
@@ -887,8 +895,13 @@ local HOUR_HANDLERS = {
   end,
 
   [6] = function(ctx)
+    -- the card: "This does not stack" (a rewind can reach Hour VI again)
+    if not CampaignState.setFlag("hour-vi-resolved") then
+      return "Hour VI has already resolved this loop: no further effect."
+    end
     if CampaignState.knows("what-the-almanac-hid") then
-      if ctx and ctx.removeStatic then ctx.removeStatic(1) end
+      if ctx and ctx.setAlmanac then ctx.setAlmanac()
+      elseif ctx and ctx.removeStatic then ctx.removeStatic(1) end
       return "The bag holds 1 fewer Static token than its band calls for, until the end of the loop."
     end
     if ctx and ctx.addStatic then ctx.addStatic(1) end
@@ -2048,7 +2061,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/11614ac779d6627e6e81e28ba2c430e1050a83fb/dist/cards/sthr-static-token.jpg?v=a556271511"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-static-token.jpg?v=a556271511"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -2117,6 +2130,7 @@ function ChaosBag.new(opts)
   local a = {
     baseline = 0,      -- band-driven baseline (Dissonance.syncBag)
     extra = 0,         -- temporary extras (Hour VI) until the next reset
+    almanac = false,   -- Hour VI with What the Almanac Hid: 1 fewer than the band
     count = 0,         -- the target count (virtual bag's contents)
     pendingAdd = 0,
     pendingRemove = 0,
@@ -2144,7 +2158,7 @@ function ChaosBag.new(opts)
   end
 
   function a.target()
-    return math.max(0, a.baseline + a.extra)
+    return math.max(0, a.baseline - (a.almanac and 1 or 0)) + a.extra
   end
 
   --- Tokens drawn out of the bag that still exist on the table.
@@ -2248,15 +2262,22 @@ function ChaosBag.new(opts)
   end
 
   function a.removeStatic(n)
-    -- may go below 0: "1 fewer than the band calls for" (Hour VI with What
-    -- the Almanac Hid); target() never lets the bag hold fewer than 0
-    a.extra = a.extra - math.max(0, math.floor(n or 1))
+    -- a temporary token leaves (its duration ended, or the Press removed it)
+    a.extra = math.max(0, a.extra - math.max(0, math.floor(n or 1)))
+    return a.reconcile()
+  end
+
+  --- Hour VI with What the Almanac Hid: until the end of the loop the bag holds
+  -- 1 fewer [static] than its band calls for (never fewer than 0). Idempotent.
+  function a.setAlmanac(on)
+    a.almanac = on and true or false
     return a.reconcile()
   end
 
   --- Temporary [static] lasts "until the next reset" (Hour VI).
   function a.clearTemporary()
     a.extra = 0
+    a.almanac = false
     return a.reconcile()
   end
 
@@ -2287,19 +2308,20 @@ function ChaosBag.new(opts)
   function a.describe(withPhysical)
     local phys = withPhysical and a.physicalCount() or nil
     return { mode = a.lastMode, target = a.target(), baseline = a.baseline,
-             extra = a.extra, physical = phys }
+             extra = a.extra, almanac = a.almanac, physical = phys }
   end
 
   function a.save()
     local out = {}
     for g in pairs(a.out) do out[#out + 1] = g end
-    return { baseline = a.baseline, extra = a.extra, out = out }
+    return { baseline = a.baseline, extra = a.extra, almanac = a.almanac, out = out }
   end
 
   function a.load(t)
     if type(t) ~= "table" then return end
     a.baseline = tonumber(t.baseline) or 0
-    a.extra = tonumber(t.extra) or 0
+    a.extra = math.max(0, tonumber(t.extra) or 0)
+    a.almanac = t.almanac == true or (tonumber(t.extra) or 0) < 0
     a.out = {}
     for _, g in ipairs(t.out or {}) do a.out[g] = true end
     a.count = a.target()
@@ -3229,6 +3251,7 @@ local function playCtx()
     log = hourLog,
     addStatic = function(n) bag.addStatic(n) end,
     removeStatic = function(n) bag.removeStatic(n) end,
+    setAlmanac = function() bag.setAlmanac(true) end,
     onAppointedAdvance = function() end,        -- reconciled once, after the action
     onReset = function()
       announce("The Appointed Hour: the night ends. Resolve the reset, then click Reset Loop.")
@@ -3255,6 +3278,11 @@ end
 local function changeInvestigators(delta)
   local n = CampaignState.constants().investigators + delta
   CampaignState.setInvestigatorCount(math.max(1, math.min(4, n)))
+  if mode == "interlude" then
+    -- the next loop starts at the scar for the NEW party size
+    local c = CampaignState.constants()
+    CampaignState.setDissonanceRaw(math.min(CampaignState.getLoopsCompleted(), c.scarCap))
+  end
   Dissonance.syncBag(bag)
 end
 
@@ -3300,15 +3328,22 @@ local function hunt()
   return moved
 end
 
-local function resetLoop()
-  local prologue = CampaignState.inPrologue()
-  CampaignState.reset()
-  -- Between Loops step 5: Part II begins with 3+ surface entries or after Loop 3
-  if not prologue and not CampaignState.inPartTwo()
+-- Between Loops step 5: Part II begins with 3+ surface entries or after Loop 3.
+-- Checked at the reset, again when an entry is ticked between loops, and at
+-- Begin Next Loop, so an entry recorded late still starts it.
+local function checkPartTwo()
+  if not CampaignState.inPrologue() and not CampaignState.inPartTwo()
+      and CampaignState.getLoopsCompleted() >= 1
       and (Knowledge.surfaceKnownCount() >= 3 or CampaignState.getLoopsCompleted() >= 3) then
     CampaignState.setPartTwo(true)
     announce("Part II begins: read The Shape of the Hour (Between Loops).")
   end
+end
+
+local function resetLoop()
+  local prologue = CampaignState.inPrologue()
+  CampaignState.reset()
+  if not prologue then checkPartTwo() end
   bag.clearTemporary()
   Dissonance.syncBag(bag)
   if prologue then
@@ -3430,6 +3465,7 @@ local function unlockFact(id)
     note("unknown fact id: " .. tostring(id))
     return nil
   end
+  if newly and mode == "interlude" then checkPartTwo() end
   -- the assembled entry: record it the moment its inputs are all known
   if newly and Knowledge.assembleFinale() then
     announce("Record The Way the Night Breaks in your Campaign Log: the finale may now be begun.")
@@ -3499,6 +3535,7 @@ local function buyLevel(level)
 end
 
 local function beginNextLoop()
+  checkPartTwo()
   Interlude.beginNextLoop()
   Dissonance.syncBag(bag)
   aging = {}
@@ -3735,7 +3772,17 @@ function shClickStatic(_, _, alt)
   afterChange()
 end
 function shClickAppointed(_, _, alt)
-  if alt then note("The Appointed: " .. Appointed.stageName()) return end
+  if alt then
+    -- push back one stage WITHOUT rewinding the Hour (e.g. The Hour I Learned
+    -- Your Name, or undoing a cancelled advance); Hold Back has its own button
+    guarded("appointed", function()
+      CampaignState.pushBackAppointed()
+      Board.syncAll({ log = hourLog })
+    end)
+    note("The Appointed: " .. Appointed.stageName())
+    afterChange()
+    return
+  end
   guarded("appointed", advanceAppointedByCard) ; afterChange()
 end
 function shAppointedInfo() note("The Appointed: " .. Appointed.stageName() .. " (stage " .. Appointed.stage() .. ")") end
@@ -4119,7 +4166,8 @@ end
 -- Victory X of the Named (the encounter cards' ids; the log's v:<id> boxes)
 local VICTORY = { ["sthr-bellringer"] = 2, ["sthr-wearssheriff"] = 3, ["sthr-onewhorides"] = 2,
   ["sthr-loc-keepersquarters"] = 1, ["sthr-loc-floodedcrypt"] = 1, ["sthr-loc-recordsoffice"] = 1,
-  ["sthr-loc-ticketbooth"] = 1, ["sthr-loc-sealedstudy"] = 1 }
+  ["sthr-loc-ticketbooth"] = 1, ["sthr-loc-sealedstudy"] = 1,
+  ["sthr-drownedverger"] = 1, ["sthr-milecounter"] = 1, ["sthr-compositor"] = 1 }
 
 --- Bank a Named enemy's Victory once per campaign (the log's tick calls this).
 function shApiClaimVictory(p)

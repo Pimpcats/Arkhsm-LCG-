@@ -102,6 +102,7 @@ function ChaosBag.new(opts)
   local a = {
     baseline = 0,      -- band-driven baseline (Dissonance.syncBag)
     extra = 0,         -- temporary extras (Hour VI) until the next reset
+    almanac = false,   -- Hour VI with What the Almanac Hid: 1 fewer than the band
     count = 0,         -- the target count (virtual bag's contents)
     pendingAdd = 0,
     pendingRemove = 0,
@@ -129,7 +130,7 @@ function ChaosBag.new(opts)
   end
 
   function a.target()
-    return math.max(0, a.baseline + a.extra)
+    return math.max(0, a.baseline - (a.almanac and 1 or 0)) + a.extra
   end
 
   --- Tokens drawn out of the bag that still exist on the table.
@@ -233,15 +234,22 @@ function ChaosBag.new(opts)
   end
 
   function a.removeStatic(n)
-    -- may go below 0: "1 fewer than the band calls for" (Hour VI with What
-    -- the Almanac Hid); target() never lets the bag hold fewer than 0
-    a.extra = a.extra - math.max(0, math.floor(n or 1))
+    -- a temporary token leaves (its duration ended, or the Press removed it)
+    a.extra = math.max(0, a.extra - math.max(0, math.floor(n or 1)))
+    return a.reconcile()
+  end
+
+  --- Hour VI with What the Almanac Hid: until the end of the loop the bag holds
+  -- 1 fewer [static] than its band calls for (never fewer than 0). Idempotent.
+  function a.setAlmanac(on)
+    a.almanac = on and true or false
     return a.reconcile()
   end
 
   --- Temporary [static] lasts "until the next reset" (Hour VI).
   function a.clearTemporary()
     a.extra = 0
+    a.almanac = false
     return a.reconcile()
   end
 
@@ -272,19 +280,20 @@ function ChaosBag.new(opts)
   function a.describe(withPhysical)
     local phys = withPhysical and a.physicalCount() or nil
     return { mode = a.lastMode, target = a.target(), baseline = a.baseline,
-             extra = a.extra, physical = phys }
+             extra = a.extra, almanac = a.almanac, physical = phys }
   end
 
   function a.save()
     local out = {}
     for g in pairs(a.out) do out[#out + 1] = g end
-    return { baseline = a.baseline, extra = a.extra, out = out }
+    return { baseline = a.baseline, extra = a.extra, almanac = a.almanac, out = out }
   end
 
   function a.load(t)
     if type(t) ~= "table" then return end
     a.baseline = tonumber(t.baseline) or 0
-    a.extra = tonumber(t.extra) or 0
+    a.extra = math.max(0, tonumber(t.extra) or 0)
+    a.almanac = t.almanac == true or (tonumber(t.extra) or 0) < 0
     a.out = {}
     for _, g in ipairs(t.out or {}) do a.out[g] = true end
     a.count = a.target()

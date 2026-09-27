@@ -74,6 +74,9 @@ Spent this interlude: ______  on: _______________________________________
 - ☐ **Church — Named (Victory 2)** — ______________________ — banked: ☐
 - ☐ **Square — Named (Victory 3)** — ______________________ — banked: ☐
 - ☐ **Fairground — Named (Victory 2)** — ______________________ — banked: ☐
+- ☐ **Church — monster (Victory 1)** — ______________________ — banked: ☐
+- ☐ **Sunken Road — monster (Victory 1)** — ______________________ — banked: ☐
+- ☐ **Almanac — monster (Victory 1)** — ______________________ — banked: ☐
 - ☐ **The Keeper's Quarters** *(Lighthouse, Victory 1)* — banked: ☐
 - ☐ **The Flooded Crypt** *(Church, Victory 1)* — banked: ☐
 - ☐ **The Records Office** *(Square, Victory 1)* — banked: ☐

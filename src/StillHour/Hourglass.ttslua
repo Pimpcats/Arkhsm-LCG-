@@ -117,8 +117,13 @@ local HOUR_HANDLERS = {
   end,
 
   [6] = function(ctx)
+    -- the card: "This does not stack" (a rewind can reach Hour VI again)
+    if not CampaignState.setFlag("hour-vi-resolved") then
+      return "Hour VI has already resolved this loop: no further effect."
+    end
     if CampaignState.knows("what-the-almanac-hid") then
-      if ctx and ctx.removeStatic then ctx.removeStatic(1) end
+      if ctx and ctx.setAlmanac then ctx.setAlmanac()
+      elseif ctx and ctx.removeStatic then ctx.removeStatic(1) end
       return "The bag holds 1 fewer Static token than its band calls for, until the end of the loop."
     end
     if ctx and ctx.addStatic then ctx.addStatic(1) end

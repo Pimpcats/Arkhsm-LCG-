@@ -441,6 +441,20 @@ vb.setBaselineStatic(1) ; vb.addStatic(2)
 check("virtual: baseline 1 + temporary 2 = 3", vb.count == 3 and vb.describe().mode == "virtual")
 vb.clearTemporary()
 check("virtual: temporary cleared at reset", vb.count == 1)
+-- Hour VI with What the Almanac Hid: 1 fewer than the band, not a negative extra
+local ab = ChaosBag.new()
+ab.setBaselineStatic(1) ; ab.setAlmanac(true)
+check("almanac: band 1 -> bag holds 0", ab.count == 0)
+ab.addStatic(1)
+check("almanac: a card-added token still joins (0 + 1)", ab.count == 1)
+ab.removeStatic(1) ; ab.removeStatic(1)
+check("removing temporary tokens never goes below the band rule", ab.count == 0 and ab.describe().extra == 0)
+ab.setAlmanac(true)
+check("almanac is idempotent (no stacking)", ab.count == 0)
+ab.setBaselineStatic(2)
+check("almanac: band 2 -> bag holds 1", ab.count == 1)
+ab.clearTemporary()
+check("almanac cleared at reset", ab.count == 2)
 
 -- a physical "Chaos Bag" on a table (vanilla: no SCED)
 local live = {}
@@ -542,5 +556,18 @@ CampaignState.reset()
 check("prologue: Loop 1's reset counts as the first loop", CampaignState.getLoopsCompleted() == 1)
 
 print("")
+print("== Hour VI does not stack ==")
+do
+  local cnt = 0
+  local c = { addStatic = function(n) cnt = cnt + n end, removeStatic = function() end,
+              setAlmanac = function() cnt = cnt + 100 end }
+  CampaignState.reset()
+  local guard = 0
+  while CampaignState.getHour() < 6 and guard < 20 do Hourglass.advance(1, c) ; guard = guard + 1 end
+  local after = cnt
+  check("Hour VI resolved once on the way", after > 0)
+  Hourglass.rewind(1, c) ; Hourglass.advance(1, c)
+  check("reaching Hour VI again after a rewind adds nothing", cnt == after)
+end
 print(string.format("RESULT: %d passed, %d failed", passed, failed))
 os.exit(failed == 0 and 0 or 1)

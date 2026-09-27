@@ -67,8 +67,16 @@ end
 
 --- Set the active investigator count (drives every threshold). Does not wipe state.
 function CampaignState.setInvestigatorCount(n)
+  -- the Memory cap is applied after spending (startLoop), not here
   state.investigators = math.max(1, math.floor(n or 3))
-  CampaignState.capMemory()
+end
+
+--- Set Dissonance directly (no band-entry effects): only for re-applying the
+-- scar between loops.
+function CampaignState.setDissonanceRaw(v)
+  local c = CampaignState.constants()
+  state.dissonance = math.max(0, math.min(c.resetThreshold, math.floor(tonumber(v) or 0)))
+  return state.dissonance
 end
 
 --- The derived constants (thresholds/bands) for the current investigator count.
