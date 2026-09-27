@@ -207,14 +207,15 @@
     ],
     "flavor": "You came to Ambergrove for your own reasons. You will not remember why, soon.",
     "unrevealed": true,
-    "unrevealed_flavor": "Planks run out over black water. At the far end, someone is waiting for a boat that is not coming."
+    "unrevealed_flavor": "Planks run out over black water. At the far end, someone is waiting for a boat that is not coming.",
+    "text": "[free] Discard 1 card from your hand: Heal 1 horror. Limit once per round."
   },
   "sthr-loc-almanacsteps": {
     "name": "The Almanac Steps",
     "traits": "Ambergrove.",
     "shroud": 2,
     "clues": 3,
-    "text": "",
+    "text": "[action]: Look at the next Hour (the card beneath the current Hour). Group limit once per round.",
     "clues_per_investigator": true,
     "icons": "cross",
     "color": "#aa8e46",
@@ -225,7 +226,8 @@
       }
     ],
     "unrevealed": true,
-    "unrevealed_flavor": "The printing house's stone steps, worn hollow in the middle. A light burns behind the upper windows."
+    "unrevealed_flavor": "The printing house's stone steps, worn hollow in the middle. A light burns behind the upper windows.",
+    "flavor": "Worn hollow by a hundred years of townsfolk coming to read the date."
   },
   "sthr-scn-stillhour": {
     "name": "The Still Hour",
@@ -304,7 +306,7 @@
     "victory": 1,
     "shroud": 2,
     "clues": 2,
-    "text": "",
+    "text": "[action]: Heal 1 damage and 1 horror, then raise Dissonance by 1. Group limit once per round.",
     "clues_per_investigator": true,
     "icons": "clover",
     "color": "#960e12",
@@ -362,7 +364,8 @@
     ],
     "flavor": "The congregation is still here. They have been kneeling since the first toll.",
     "unrevealed": true,
-    "unrevealed_flavor": "Water laps at the church doors. Inside, lamplight lies on it like oil."
+    "unrevealed_flavor": "Water laps at the church doors. Inside, lamplight lies on it like oil.",
+    "text": "[action]: Look at the top card of the encounter deck. You may discard it. Group limit once per round."
   },
   "sthr-loc-belfry": {
     "name": "The Belfry",
@@ -380,7 +383,8 @@
       }
     ],
     "unrevealed": true,
-    "unrevealed_flavor": "The bell rope disappears up through a hole in the ceiling. It is swaying, though there is no wind."
+    "unrevealed_flavor": "The bell rope disappears up through a hole in the ceiling. It is swaying, though there is no wind.",
+    "text": "[action]: Test [com] (3). If you succeed, exhaust each Echo in the Church district, then raise Dissonance by 1. Group limit once per round."
   },
   "sthr-loc-floodedcrypt": {
     "name": "The Flooded Crypt",
@@ -388,7 +392,7 @@
     "victory": 1,
     "shroud": 4,
     "clues": 3,
-    "text": "Closed. It opens when The Hour Was Wrong becomes the current act, and in every loop once your Campaign Log records The Hour Was Wrong.",
+    "text": "Closed. It opens when The Hour Was Wrong becomes the current act, and in every loop once your Campaign Log records The Hour Was Wrong.\nForced – After you enter the Flooded Crypt: Take 1 damage.",
     "clues_per_investigator": true,
     "icons": "spade",
     "color": "#1c2a52",
@@ -399,14 +403,15 @@
       }
     ],
     "unrevealed": true,
-    "unrevealed_flavor": "Steps go down into the water and do not come up again."
+    "unrevealed_flavor": "Steps go down into the water and do not come up again.",
+    "flavor": "The water is colder than the sea it came from."
   },
   "sthr-loc-vestry": {
     "name": "The Vestry",
     "traits": "Church.",
     "shroud": 2,
     "clues": 2,
-    "text": "",
+    "text": "Forced – After you successfully investigate the Vestry: Lower Dissonance by 1. Limit once per round.",
     "clues_per_investigator": true,
     "icons": "clover",
     "color": "#4a7c46",
@@ -417,7 +422,8 @@
       }
     ],
     "unrevealed": true,
-    "unrevealed_flavor": "A side door, a brass plate, a key left in the lock as though someone meant to come back."
+    "unrevealed_flavor": "A side door, a brass plate, a key left in the lock as though someone meant to come back.",
+    "flavor": "Vestments hang in a row, stiff with salt. One peg is empty."
   },
   "sthr-thirteen": {
     "name": "Thirteen",
@@ -451,7 +457,8 @@
     ],
     "flavor": "The road between the town and the shore, counted out in stones that never change.",
     "unrevealed": true,
-    "unrevealed_flavor": "Stone markers along the verge, each one carved with a number. The numbers do not go in order."
+    "unrevealed_flavor": "Stone markers along the verge, each one carved with a number. The numbers do not go in order.",
+    "text": "[free]: Move to a connecting location. Limit once per round."
   },
   "sthr-loc-lowbridge": {
     "name": "The Low Bridge",
@@ -473,14 +480,15 @@
     ],
     "flavor": "The water never quite reaches the top. It never quite goes down.",
     "unrevealed": true,
-    "unrevealed_flavor": "A humpbacked bridge over a stream that should not be this deep."
+    "unrevealed_flavor": "A humpbacked bridge over a stream that should not be this deep.",
+    "text": "Forced – After you fail a skill test while investigating the Low Bridge: Take 1 damage."
   },
   "sthr-loc-turning": {
     "name": "The Turning",
     "traits": "Road.",
     "shroud": 2,
     "clues": 3,
-    "text": "",
+    "text": "[action] Raise Dissonance by 2: Rewind the Hourglass by 1 Hour. Group limit once per loop.",
     "clues_per_investigator": true,
     "icons": "slash",
     "color": "#8a5a2e",
@@ -495,7 +503,8 @@
       }
     ],
     "unrevealed": true,
-    "unrevealed_flavor": "The road bends toward the shore and out of sight. Every hooded walker takes the bend the same way."
+    "unrevealed_flavor": "The road bends toward the shore and out of sight. Every hooded walker takes the bend the same way.",
+    "flavor": "Every walker takes the bend the same way. You could turn back."
   },
   "sthr-bridgeremembers": {
     "name": "The Bridge Remembers",
@@ -537,7 +546,7 @@
     "victory": 1,
     "shroud": 3,
     "clues": 3,
-    "text": "",
+    "text": "[action] Spend 2 clues: Place 1 Memory on your investigator card. Group limit once per loop.",
     "clues_per_investigator": true,
     "icons": "hourglass",
     "color": "#7c5a2e",
@@ -548,14 +557,15 @@
       }
     ],
     "unrevealed": true,
-    "unrevealed_flavor": "Town Hall's back rooms: ledgers, deeds, and the smell of dust that has been disturbed recently."
+    "unrevealed_flavor": "Town Hall's back rooms: ledgers, deeds, and the smell of dust that has been disturbed recently.",
+    "flavor": "Every decision the town ever made, filed where no one will look."
   },
   "sthr-loc-well": {
     "name": "The Well",
     "traits": "Ambergrove.",
     "shroud": 2,
     "clues": 2,
-    "text": "",
+    "text": "Forced – After you successfully investigate the Well: Take 1 horror, then discover 1 additional clue at the Well.",
     "clues_per_investigator": true,
     "icons": "circle",
     "color": "#3a7c7a",
@@ -566,7 +576,8 @@
       }
     ],
     "unrevealed": true,
-    "unrevealed_flavor": "An old stone well at the edge of the Square, capped with a board. Something has scratched at the board from beneath."
+    "unrevealed_flavor": "An old stone well at the edge of the Square, capped with a board. Something has scratched at the board from beneath.",
+    "flavor": "The board over its mouth is scored on the underside."
   },
   "sthr-samespeech": {
     "name": "The Same Speech",
@@ -586,7 +597,7 @@
     "traits": "Fairground.",
     "shroud": 3,
     "clues": 2,
-    "text": "",
+    "text": "Forced – When the Hourglass advances, each investigator at the Wheel takes 1 horror.",
     "clues_per_investigator": true,
     "icons": "spade",
     "color": "#7c2a5c",
@@ -597,7 +608,8 @@
       }
     ],
     "unrevealed": true,
-    "unrevealed_flavor": "The great wheel turns against the wrong sky, every car lit, every car empty."
+    "unrevealed_flavor": "The great wheel turns against the wrong sky, every car lit, every car empty.",
+    "flavor": "From the top, the whole town holds still."
   },
   "sthr-loc-hallofmirrors": {
     "name": "The Hall of Mirrors",
@@ -615,7 +627,8 @@
     ],
     "flavor": "The occultation fair, mid-celebration, forever.",
     "unrevealed": true,
-    "unrevealed_flavor": "A painted door: SEE YOURSELF AS OTHERS SEE YOU. The paint is still wet."
+    "unrevealed_flavor": "A painted door: SEE YOURSELF AS OTHERS SEE YOU. The paint is still wet.",
+    "text": "[action]: Test [wil] (3). If you succeed, place 1 Memory on your investigator card. If you fail, take 1 horror. Limit once per loop."
   },
   "sthr-loc-ticketbooth": {
     "name": "The Ticket Booth",
@@ -623,7 +636,7 @@
     "victory": 1,
     "shroud": 2,
     "clues": 2,
-    "text": "",
+    "text": "[action] Spend 2 resources: Discover 1 clue at the Ticket Booth. Limit once per round.",
     "clues_per_investigator": true,
     "icons": "moon",
     "color": "#a83870",
@@ -642,7 +655,8 @@
       }
     ],
     "unrevealed": true,
-    "unrevealed_flavor": "A striped booth at the fair's gate. The window is lit. The ticket-taker is not looking at you, and then he is."
+    "unrevealed_flavor": "A striped booth at the fair's gate. The window is lit. The ticket-taker is not looking at you, and then he is.",
+    "flavor": "ADMIT ONE. No price is posted."
   },
   "sthr-wheelsturn": {
     "name": "The Wheel's Turn",
@@ -680,14 +694,15 @@
     ],
     "flavor": "Ayako has read every book in it a hundred times.",
     "unrevealed": true,
-    "unrevealed_flavor": "Shelves to the ceiling, and a long table laid with open almanacs, all turned to the same page."
+    "unrevealed_flavor": "Shelves to the ceiling, and a long table laid with open almanacs, all turned to the same page.",
+    "text": "[action]: Search the top 6 cards of your deck for a Recollection card and draw it. Limit once per loop."
   },
   "sthr-loc-press": {
     "name": "The Press",
     "traits": "Almanac House.",
     "shroud": 3,
     "clues": 3,
-    "text": "",
+    "text": "[action]: Test [int] (3). If you succeed, look at the top 3 cards of the encounter deck and put them back in any order. If you fail, raise Dissonance by 1. Group limit once per round.",
     "clues_per_investigator": true,
     "icons": "triangle",
     "color": "#4a3c6c",
@@ -698,7 +713,8 @@
       }
     ],
     "unrevealed": true,
-    "unrevealed_flavor": "The iron press stands inked and ready. The type in its bed has already been set."
+    "unrevealed_flavor": "The iron press stands inked and ready. The type in its bed has already been set.",
+    "flavor": "It has printed the same page all night. The ink is always wet."
   },
   "sthr-loc-sealedstudy": {
     "name": "The Sealed Study",
@@ -717,7 +733,8 @@
       }
     ],
     "unrevealed": true,
-    "unrevealed_flavor": "A study door that no key in Ambergrove fits."
+    "unrevealed_flavor": "A study door that no key in Ambergrove fits.",
+    "flavor": "Inside, it is eleven o'clock exactly, and always has been."
   },
   "sthr-pagethatwasnt": {
     "name": "The Page That Wasn't",

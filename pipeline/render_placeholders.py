@@ -2145,8 +2145,11 @@ def s_agenda(c, pt, dest, art_path=None, placement=None):
               fill=(74, 60, 46), align="right")
     _box_text(d, c["name"], se_reg("Agenda", "Name"), title=True, grow=1.15, key="name")
     if c.get("doom") not in (None, ""):
-        _box_text(d, str(c["doom"]), se_reg("Agenda", "Doom"),
-                  stat=True, grow=1.0, fill=(238, 232, 216), pos_key="doom")
+        db = se_reg("Agenda", "Doom")
+        # sized to sit inside the doom circle, not spill over its rim
+        _box_text(d, str(c["doom"]), db, stat=True, grow=1.0,
+                  max_size=int((db[3] - db[1]) * 0.56),
+                  fill=(238, 232, 216), pos_key="doom")
     _scenario_body(d, "Agenda", c, pt)
     _scenario_footer(d, "Agenda", c, art_path)
     img.save(dest)
@@ -2167,16 +2170,18 @@ def s_act(c, pt, dest, art_path=None, placement=None):
             # a per-investigator threshold: numeral left of centre and the
             # plugin's own per-investigator mark beside it, as on locations
             w = cb[2] - cb[0]
-            _box_text(d, str(c["clues"]), (cb[0] - w // 8, cb[1], cb[2] - w // 8, cb[3]),
-                      stat=True, grow=1.0, max_size=int((cb[3] - cb[1]) * 0.75),
+            _box_text(d, str(c["clues"]), (cb[0] - w // 6, cb[1], cb[2] - w // 6, cb[3]),
+                      stat=True, grow=1.0, max_size=int((cb[3] - cb[1]) * 0.5),
                       fill=(238, 232, 216), pos_key="clues")
             hat = _tint_icon(_se_img("icons", "AHLCG-PerInvestigator"), (238, 232, 216))
-            cx, cy = cb[2] - w // 6, (cb[1] + cb[3]) // 2 - (cb[3] - cb[1]) // 6
-            hw, hh = int(w * 0.22), int(w * 0.18)
+            cx, cy = cb[2] - int(w * 0.30), (cb[1] + cb[3]) // 2 - (cb[3] - cb[1]) // 8
+            hw, hh = int(w * 0.15), int(w * 0.12)
             _paste_icon_fit(img, hat, (cx - hw, cy - hh, cx + hw, cy + hh))
         else:
-            _box_text(d, str(c["clues"]), cb,
-                      stat=True, grow=1.0, fill=(238, 232, 216), pos_key="clues")
+            # sized to sit inside the clue circle, not spill over its rim
+            _box_text(d, str(c["clues"]), cb, stat=True, grow=1.0,
+                      max_size=int((cb[3] - cb[1]) * 0.56),
+                      fill=(238, 232, 216), pos_key="clues")
     _scenario_body(d, "Act", c, pt)
     _scenario_footer(d, "Act", c, art_path)
     img.save(dest)

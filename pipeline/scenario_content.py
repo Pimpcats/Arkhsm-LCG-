@@ -142,7 +142,7 @@ def map_groups(manifest):
 
 # the [markup] the renderer draws as glyphs (docs/design/CAMPAIGN_FEED.md); any
 # other bracketed word prints literally, e.g. "[agility]"
-MARKUP = {"action", "fast", "reaction", "wil", "int", "com", "agi", "wild",
+MARKUP = {"action", "fast", "free", "reaction", "wil", "int", "com", "agi", "wild",
           "perinv", "unique", "skull", "cultist", "tablet", "elderthing",
           "elder", "autofail", "codex"}
 
