@@ -61,8 +61,8 @@
           ],
           "CustomDeck": {
             "95010": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthrelias.jpg?v=bdd097c947",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthrelias-back.jpg?v=e9d2e92bee",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthrelias.jpg?v=bdd097c947",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthrelias-back.jpg?v=e9d2e92bee",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -91,7 +91,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-lamp\",\"type\":\"Asset\",\"class\":\"Guardian\",\"traits\":\"Item. Tool.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"slot\":\"Hand\"}",
+          "GMNotes": "{\"id\":\"sthr-lamp\",\"type\":\"Asset\",\"class\":\"Guardian\",\"traits\":\"Item. Tool.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"willpowerIcons\":1,\"agilityIcons\":1,\"slot\":\"Hand\"}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -112,8 +112,8 @@
           ],
           "CustomDeck": {
             "95011": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-lamp.jpg?v=971b4eb14f",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-lamp.jpg?v=0da31aace8",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -162,8 +162,8 @@
           ],
           "CustomDeck": {
             "95012": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-donebefore.jpg?v=577c5c561a",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-donebefore.jpg?v=577c5c561a",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -212,8 +212,8 @@
           ],
           "CustomDeck": {
             "95013": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-eighthgrave.jpg?v=dc0491e959",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-eighthgrave.jpg?v=82ddfd6689",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -242,7 +242,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": false,
-          "GMNotes": "{\"id\":\"sthrayako\",\"type\":\"Investigator\",\"class\":\"Seeker\",\"traits\":\"Scholar. Chronicler.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":5,\"combatIcons\":1,\"agilityIcons\":3,\"health\":5,\"sanity\":8,\"signatures\":[{\"sthr-lexicon\":1,\"sthr-itmeanswait\":1,\"sthr-untranslatable\":1}],\"elderSignEffect\":{\"description\":\"+2. Draw 1 card. If it is a Recollection, it costs 2 less to play this turn.\",\"modifier\":2}}",
+          "GMNotes": "{\"id\":\"sthrayako\",\"type\":\"Investigator\",\"class\":\"Seeker\",\"traits\":\"Scholar. Chronicler.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":5,\"combatIcons\":1,\"agilityIcons\":3,\"health\":5,\"sanity\":8,\"signatures\":[{\"sthr-lexicon\":1,\"sthr-itmeanswait\":1,\"sthr-untranslatable\":1}],\"elderSignEffect\":{\"description\":\"+2. Draw 1 card. If it is a Recollection, it costs 2 fewer resources to play until the end of the round.\",\"modifier\":2}}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -263,8 +263,8 @@
           ],
           "CustomDeck": {
             "95014": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthrayako.jpg?v=4be916f4f2",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthrayako-back.jpg?v=c29ddc7026",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthrayako.jpg?v=4be916f4f2",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthrayako-back.jpg?v=c29ddc7026",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -293,7 +293,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-lexicon\",\"type\":\"Asset\",\"class\":\"Seeker\",\"traits\":\"Item. Tome.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"slot\":\"Hand\",\"uses\":[{\"count\":0,\"type\":\"Secret\",\"token\":\"secret\"}],\"unique\":true}",
+          "GMNotes": "{\"id\":\"sthr-lexicon\",\"type\":\"Asset\",\"class\":\"Seeker\",\"traits\":\"Item. Tome.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"willpowerIcons\":1,\"intellectIcons\":1,\"slot\":\"Hand\",\"uses\":[{\"count\":0,\"type\":\"Secret\",\"token\":\"secret\"}],\"unique\":true}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -314,8 +314,8 @@
           ],
           "CustomDeck": {
             "95015": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-lexicon.jpg?v=6af72853a0",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-lexicon.jpg?v=269a3cc445",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -343,7 +343,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-itmeanswait\",\"type\":\"Event\",\"class\":\"Seeker\",\"traits\":\"Insight.\",\"cycle\":\"The Still Hour\",\"cost\":0}",
+          "GMNotes": "{\"id\":\"sthr-itmeanswait\",\"type\":\"Event\",\"class\":\"Seeker\",\"traits\":\"Insight.\",\"cycle\":\"The Still Hour\",\"cost\":0,\"willpowerIcons\":1,\"intellectIcons\":1}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -364,8 +364,8 @@
           ],
           "CustomDeck": {
             "95016": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-itmeanswait.jpg?v=aa8c9ed655",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-itmeanswait.jpg?v=5d82f8e1a4",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -414,8 +414,8 @@
           ],
           "CustomDeck": {
             "95017": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-untranslatable.jpg?v=8638f252c6",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-untranslatable.jpg?v=8638f252c6",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -444,7 +444,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": false,
-          "GMNotes": "{\"id\":\"sthrcass\",\"type\":\"Investigator\",\"class\":\"Rogue\",\"traits\":\"Criminal. Drifter.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":2,\"intellectIcons\":3,\"combatIcons\":3,\"agilityIcons\":5,\"health\":7,\"sanity\":6,\"signatures\":[{\"sthr-markeddeck\":1,\"sthr-seenthishand\":1,\"sthr-housewins\":1}],\"elderSignEffect\":{\"description\":\"+1. Gain 1 resource for each Memory on Cass (maximum +3 resources).\",\"modifier\":1}}",
+          "GMNotes": "{\"id\":\"sthrcass\",\"type\":\"Investigator\",\"class\":\"Rogue\",\"traits\":\"Criminal. Drifter.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":2,\"intellectIcons\":3,\"combatIcons\":3,\"agilityIcons\":5,\"health\":7,\"sanity\":6,\"signatures\":[{\"sthr-markeddeck\":1,\"sthr-seenthishand\":1,\"sthr-housewins\":1}],\"elderSignEffect\":{\"description\":\"+1. Gain 1 resource for each Memory on Cass (maximum 3).\",\"modifier\":1}}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -465,8 +465,8 @@
           ],
           "CustomDeck": {
             "95018": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthrcass.jpg?v=42d410895f",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthrcass-back.jpg?v=076c076a4d",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthrcass.jpg?v=42d410895f",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthrcass-back.jpg?v=076c076a4d",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -495,7 +495,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-markeddeck\",\"type\":\"Asset\",\"class\":\"Rogue\",\"traits\":\"Item. Illicit.\",\"cycle\":\"The Still Hour\",\"cost\":1,\"level\":0,\"slot\":\"Hand\",\"unique\":true}",
+          "GMNotes": "{\"id\":\"sthr-markeddeck\",\"type\":\"Asset\",\"class\":\"Rogue\",\"traits\":\"Item. Illicit.\",\"cycle\":\"The Still Hour\",\"cost\":1,\"level\":0,\"intellectIcons\":1,\"agilityIcons\":1,\"slot\":\"Hand\",\"unique\":true}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -516,8 +516,8 @@
           ],
           "CustomDeck": {
             "95019": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-markeddeck.jpg?v=85fae9b0f7",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-markeddeck.jpg?v=816d6f3ad5",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -545,7 +545,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-seenthishand\",\"type\":\"Event\",\"class\":\"Rogue\",\"traits\":\"Fortune. Insight.\",\"cycle\":\"The Still Hour\",\"cost\":1}",
+          "GMNotes": "{\"id\":\"sthr-seenthishand\",\"type\":\"Event\",\"class\":\"Rogue\",\"traits\":\"Fortune. Insight.\",\"cycle\":\"The Still Hour\",\"cost\":1,\"combatIcons\":1,\"agilityIcons\":1}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -566,8 +566,8 @@
           ],
           "CustomDeck": {
             "95020": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-seenthishand.jpg?v=691da5a867",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-seenthishand.jpg?v=501971d88c",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -616,8 +616,8 @@
           ],
           "CustomDeck": {
             "95021": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-housewins.jpg?v=b8bcca3c26",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-housewins.jpg?v=b8bcca3c26",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -646,7 +646,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": false,
-          "GMNotes": "{\"id\":\"sthrseraphine\",\"type\":\"Investigator\",\"class\":\"Mystic\",\"traits\":\"Sorcerer. Cursed.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":5,\"intellectIcons\":3,\"combatIcons\":2,\"agilityIcons\":2,\"health\":6,\"sanity\":8,\"signatures\":[{\"sthr-bell\":1,\"sthr-rememberending\":1,\"sthr-debtofhours\":1}],\"elderSignEffect\":{\"description\":\"+X, where X = current Dissonance (maximum +5). After this skill test, reduce Dissonance by the amount this token added.\"}}",
+          "GMNotes": "{\"id\":\"sthrseraphine\",\"type\":\"Investigator\",\"class\":\"Mystic\",\"traits\":\"Sorcerer. Cursed.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":5,\"intellectIcons\":3,\"combatIcons\":2,\"agilityIcons\":2,\"health\":6,\"sanity\":8,\"signatures\":[{\"sthr-bell\":1,\"sthr-rememberending\":1,\"sthr-debtofhours\":1}],\"elderSignEffect\":{\"description\":\"+X, where X is Dissonance (maximum +5). After this skill test ends, lower Dissonance by the amount this token added.\"}}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -667,8 +667,8 @@
           ],
           "CustomDeck": {
             "95022": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthrseraphine.jpg?v=cdae9c0af8",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthrseraphine-back.jpg?v=7e1f0f56e6",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthrseraphine.jpg?v=df360e1207",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthrseraphine-back.jpg?v=7e1f0f56e6",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -697,7 +697,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-bell\",\"type\":\"Asset\",\"class\":\"Mystic\",\"traits\":\"Relic.\",\"cycle\":\"The Still Hour\",\"cost\":3,\"level\":0,\"slot\":\"Accessory\",\"uses\":[{\"count\":3,\"type\":\"Charge\",\"token\":\"resource\"}],\"unique\":true}",
+          "GMNotes": "{\"id\":\"sthr-bell\",\"type\":\"Asset\",\"class\":\"Mystic\",\"traits\":\"Relic.\",\"cycle\":\"The Still Hour\",\"cost\":3,\"level\":0,\"willpowerIcons\":2,\"slot\":\"Accessory\",\"uses\":[{\"count\":3,\"type\":\"Charge\",\"token\":\"resource\"}],\"unique\":true}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -718,8 +718,8 @@
           ],
           "CustomDeck": {
             "95023": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-bell.jpg?v=2e2064b460",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-bell.jpg?v=a73533236c",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -747,7 +747,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-rememberending\",\"type\":\"Event\",\"class\":\"Mystic\",\"traits\":\"Spell. Insight.\",\"cycle\":\"The Still Hour\",\"cost\":2}",
+          "GMNotes": "{\"id\":\"sthr-rememberending\",\"type\":\"Event\",\"class\":\"Mystic\",\"traits\":\"Spell. Insight.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"willpowerIcons\":2}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -768,8 +768,8 @@
           ],
           "CustomDeck": {
             "95024": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-rememberending.jpg?v=67b1c3c233",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-rememberending.jpg?v=b3fe65a7d2",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -818,8 +818,8 @@
           ],
           "CustomDeck": {
             "95025": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-debtofhours.jpg?v=60714e47a6",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-debtofhours.jpg?v=60714e47a6",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -869,8 +869,8 @@
           ],
           "CustomDeck": {
             "95026": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthrbirdie.jpg?v=1daf767108",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthrbirdie-back.jpg?v=da32977bef",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthrbirdie.jpg?v=1daf767108",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthrbirdie-back.jpg?v=da32977bef",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -899,7 +899,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-compass\",\"type\":\"Asset\",\"class\":\"Survivor\",\"traits\":\"Item. Charm.\",\"cycle\":\"The Still Hour\",\"cost\":1,\"level\":0,\"slot\":\"Accessory\",\"unique\":true}",
+          "GMNotes": "{\"id\":\"sthr-compass\",\"type\":\"Asset\",\"class\":\"Survivor\",\"traits\":\"Item. Charm.\",\"cycle\":\"The Still Hour\",\"cost\":1,\"level\":0,\"willpowerIcons\":1,\"agilityIcons\":1,\"slot\":\"Accessory\",\"unique\":true}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -920,8 +920,8 @@
           ],
           "CustomDeck": {
             "95027": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-compass.jpg?v=f30278b962",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-compass.jpg?v=ab39445c76",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -949,7 +949,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-igetout\",\"type\":\"Event\",\"class\":\"Survivor\",\"traits\":\"Gambit.\",\"cycle\":\"The Still Hour\",\"cost\":0}",
+          "GMNotes": "{\"id\":\"sthr-igetout\",\"type\":\"Event\",\"class\":\"Survivor\",\"traits\":\"Gambit.\",\"cycle\":\"The Still Hour\",\"cost\":0,\"willpowerIcons\":1,\"agilityIcons\":1}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -970,8 +970,8 @@
           ],
           "CustomDeck": {
             "95028": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-igetout.jpg?v=f2fb352cc1",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-igetout.jpg?v=caacddcfdb",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1020,8 +1020,8 @@
           ],
           "CustomDeck": {
             "95029": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-nobodybelieves.jpg?v=3d39b99d87",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-nobodybelieves.jpg?v=3d39b99d87",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1070,8 +1070,8 @@
           ],
           "CustomDeck": {
             "95030": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-foreknowledge.jpg?v=01e0fb3b6b",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-foreknowledge.jpg?v=01e0fb3b6b",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1099,7 +1099,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-dejavu\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Insight. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":1,\"level\":0,\"memoryCost\":4}",
+          "GMNotes": "{\"id\":\"sthr-dejavu\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Insight. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":1,\"level\":0,\"wildIcons\":1,\"memoryCost\":4}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -1120,8 +1120,8 @@
           ],
           "CustomDeck": {
             "95031": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-dejavu.jpg?v=6f3b6a068b",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-dejavu.jpg?v=ab58cde65b",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1170,8 +1170,8 @@
           ],
           "CustomDeck": {
             "95032": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-musclememory.jpg?v=923574f300",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-musclememory.jpg?v=d046b42347",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1199,7 +1199,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-rehearsedescape\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Trick. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":0,\"level\":0,\"memoryCost\":3}",
+          "GMNotes": "{\"id\":\"sthr-rehearsedescape\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Trick. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":0,\"level\":0,\"wildIcons\":1,\"memoryCost\":3}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -1220,8 +1220,8 @@
           ],
           "CustomDeck": {
             "95033": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-rehearsedescape.jpg?v=8191539b69",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-rehearsedescape.jpg?v=a0f06e4cfe",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1249,7 +1249,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-longwayround\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Trick. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":1,\"level\":0,\"memoryCost\":2}",
+          "GMNotes": "{\"id\":\"sthr-longwayround\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Trick. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":1,\"level\":0,\"wildIcons\":1,\"memoryCost\":2}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -1270,8 +1270,8 @@
           ],
           "CustomDeck": {
             "95034": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-longwayround.jpg?v=f9581d4f9a",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-longwayround.jpg?v=2124d1b9ac",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1300,7 +1300,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-borrowedtime\",\"type\":\"Asset\",\"class\":\"Neutral\",\"traits\":\"Item. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"uses\":[{\"count\":3,\"type\":\"Charge\",\"token\":\"resource\"}],\"memoryCost\":4}",
+          "GMNotes": "{\"id\":\"sthr-borrowedtime\",\"type\":\"Asset\",\"class\":\"Neutral\",\"traits\":\"Item. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"wildIcons\":1,\"uses\":[{\"count\":3,\"type\":\"Charge\",\"token\":\"resource\"}],\"memoryCost\":3}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -1321,8 +1321,8 @@
           ],
           "CustomDeck": {
             "95035": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-borrowedtime.jpg?v=e43c813181",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-borrowedtime.jpg?v=5d57b099a2",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1350,7 +1350,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-thistimeforsure\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Insight. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"memoryCost\":4}",
+          "GMNotes": "{\"id\":\"sthr-thistimeforsure\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Insight. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"wildIcons\":1,\"memoryCost\":4}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -1371,8 +1371,8 @@
           ],
           "CustomDeck": {
             "95036": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-thistimeforsure.jpg?v=9927d7a045",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-thistimeforsure.jpg?v=ee854187f1",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1422,8 +1422,8 @@
           ],
           "CustomDeck": {
             "95037": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-anchorpoint.jpg?v=6852fe6e70",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-anchorpoint.jpg?v=6852fe6e70",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1452,7 +1452,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-cassandrasnotebook\",\"type\":\"Asset\",\"class\":\"Neutral\",\"traits\":\"Item. Tome. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"slot\":\"Hand\",\"memoryCost\":4}",
+          "GMNotes": "{\"id\":\"sthr-cassandrasnotebook\",\"type\":\"Asset\",\"class\":\"Neutral\",\"traits\":\"Item. Tome. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"intellectIcons\":1,\"slot\":\"Hand\",\"memoryCost\":4}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -1473,8 +1473,8 @@
           ],
           "CustomDeck": {
             "95038": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-cassandrasnotebook.jpg?v=13fcd9a094",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-cassandrasnotebook.jpg?v=125bf5a416",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -1502,7 +1502,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-hourlearnedname\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Spell. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":3,\"level\":0,\"memoryCost\":5}",
+          "GMNotes": "{\"id\":\"sthr-hourlearnedname\",\"type\":\"Event\",\"class\":\"Neutral\",\"traits\":\"Spell. Recollection.\",\"cycle\":\"The Still Hour\",\"cost\":3,\"level\":0,\"wildIcons\":1,\"memoryCost\":5}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -1523,8 +1523,8 @@
           ],
           "CustomDeck": {
             "95039": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/sthr-hourlearnedname.jpg?v=c566fd4693",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9322ff9b5405894225ea7e0c2fb1bb5f8b1a4fe1/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-hourlearnedname.jpg?v=8b51526d7c",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
