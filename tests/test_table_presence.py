@@ -550,6 +550,12 @@ def test_no_box_lays_a_stack_on_sceds_own_objects(tmp_path):
             for what, (x, z) in cc.SCED_FIXED_SPOTS.items():
                 assert abs(e["pos"]["x"] - x) >= 2.5 or abs(e["pos"]["z"] - z) >= 2.5, \
                     (sb["Nickname"], what, e["pos"])
+            # a card's footprint (~2.2 x 3.1; long side along x when turned 90/270)
+            turned = round((e.get("rot") or {}).get("y", 0)) % 180 == 90
+            hx, hz = (1.55, 1.1) if turned else (1.1, 1.55)
+            for what, (x, z, r) in cc.SCED_COUNTERS.items():
+                assert abs(e["pos"]["x"] - x) >= hx + r or abs(e["pos"]["z"] - z) >= hz + r, \
+                    (sb["Nickname"], what, e["pos"])
 
 
 # ------------------------------------------ replayable scenario box (fake TTS) --

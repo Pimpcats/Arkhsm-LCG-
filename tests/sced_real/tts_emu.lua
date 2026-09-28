@@ -44,6 +44,12 @@ E.J = J
 local unpack = table.unpack or unpack
 local FRAME = 1 / 60
 
+-- MoonSharp's string extensions (TTS scripts can call them)
+string.startsWith = string.startsWith or function(s, p) return tostring(s):sub(1, #p) == p end
+string.endsWith = string.endsWith or function(s, p) return p == "" or tostring(s):sub(-#p) == p end
+string.contains = string.contains or function(s, p) return tostring(s):find(p, 1, true) ~= nil end
+string.unicode = string.unicode or function(s, i, j) return string.byte(s, i, j) end
+
 ------------------------------------------------------------------ utils --
 
 local function deepcopy(v, seen)
@@ -78,6 +84,19 @@ E.rand = rand
 function E.seed(n) rngState = n % 2147483648 end
 
 ------------------------------------------------------------------ JSON --
+
+-- TTS hands scripts a save's States keyed by number, snap points as
+-- {position = Vector, rotation = Vector, rotation_snap, tags}
+function E.numericStates(d)
+  if type(d) ~= "table" then return d end
+  if type(d.States) == "table" then
+    local n = {}
+    for k, v in pairs(d.States) do n[tonumber(k) or k] = E.numericStates(v) end
+    d.States = n
+  end
+  for _, c in ipairs(d.ContainedObjects or {}) do E.numericStates(c) end
+  return d
+end
 
 local function jsonDecode(s)
   if type(s) ~= "string" then return nil end
@@ -153,7 +172,10 @@ Vector.__mul = function(a, b)
   if isnum(b) then return vnew(a.x * b, a.y * b, a.z * b) end
   return vnew(a.x * b.x, a.y * b.y, a.z * b.z)
 end
-Vector.__eq = function(a, b) return a:equals(b) end
+Vector.__eq = function(a, b)
+  if getmetatable(a) ~= Vector or getmetatable(b) ~= Vector then return false end
+  return a:equals(b)
+end
 Vector.__tostring = function(a) return a:string() end
 function Vector:setAt(k, v) self[k] = v ; return self end
 function Vector:set(x, y, z)
@@ -287,7 +309,10 @@ Color.new = function(...) return cnew(...) end
 Color.fromString = fromString
 Color.fromHex = fromString
 Color.list = { "White", "Brown", "Red", "Orange", "Yellow", "Green", "Teal", "Blue", "Purple", "Pink", "Grey", "Black" }
-Color.__eq = function(a, b) return a:equals(b) end
+Color.__eq = function(a, b)
+  if getmetatable(a) ~= Color or getmetatable(b) ~= Color then return false end
+  return a:equals(b)
+end
 Color.__tostring = function(c) return c:toString() end
 function Color:get() return self.r, self.g, self.b, self.a end
 function Color:copy() return cnew(self.r, self.g, self.b, self.a) end
@@ -663,7 +688,9 @@ local function land(o)
     local os_ = S[other]
     if other ~= o and not os_.removed and not isZone(other) then
       local ob = aabb(other)
-      if overlapXZ(b, ob) and ob.max.y <= st.pos.y + 0.05 then
+      -- anything whose body reaches below its centre holds it up (a card
+      -- spawned into a token is pushed up onto it)
+      if overlapXZ(b, ob) and ob.min.y <= st.pos.y + 0.05 and ob.max.y <= st.pos.y + 1.0 then
         touching[#touching + 1] = { obj = other, top = ob.max.y, box = ob }
         if containsXZ(ob, st.pos) and ob.max.y > top then support, top = other, ob.max.y end
       end
@@ -695,7 +722,19 @@ local function land(o)
     if t.top >= top - 0.3 then now[t.obj] = true end
   end
   local before = st.contacts or {}
+  local lifted = st.lifted
+  st.lifted = nil
   st.contacts = now
+  if lifted then
+    -- it was lifted (flipped / teleported): it left everything, then lands
+    for other in pairs(before) do
+      if isAlive(other) then
+        collide(other, o, "onCollisionExit")
+        collide(o, other, "onCollisionExit")
+      end
+    end
+    before = {}
+  end
   for other in pairs(before) do
     if not now[other] and isAlive(other) then
       collide(other, o, "onCollisionExit")
@@ -768,23 +807,121 @@ Physics.play_area = 0.5
 
 ------------------------------------------------------------ UI (tracked) --
 
-local function makeUI(ownerLabel)
-  local ui = { xml = "", xmlTable = {}, attrs = {}, assets = {}, calls = 0 }
+-- XML <-> the table form TTS's UI.getXmlTable() returns:
+-- { {tag=, attributes={}, children={...}, value=text}, ... }
+local function xmlUnescape(t)
+  return (t:gsub("&lt;", "<"):gsub("&gt;", ">"):gsub("&quot;", '"'):gsub("&apos;", "'"):gsub("&amp;", "&"))
+end
+local function xmlParse(src)
+  src = tostring(src or ""):gsub("<!%-%-.-%-%->", ""):gsub("<%?.-%?>", "")
+  local root = { children = {} }
+  local stack = { root }
+  local i = 1
+  while true do
+    local lt = src:find("<", i, true)
+    local text = src:sub(i, (lt or #src + 1) - 1)
+    if text:find("%S") then
+      local top = stack[#stack]
+      top.value = (top.value or "") .. xmlUnescape(text:match("^%s*(.-)%s*$"))
+    end
+    if not lt then break end
+    local gt = src:find(">", lt, true)
+    if not gt then break end
+    local inner = src:sub(lt + 1, gt - 1)
+    if inner:sub(1, 1) == "/" then
+      if #stack > 1 then table.remove(stack) end
+    else
+      local selfClose = inner:sub(-1) == "/"
+      if selfClose then inner = inner:sub(1, -2) end
+      local tag = inner:match("^%s*([%w_:%.%-]+)")
+      local el = { tag = tag, attributes = {}, children = {} }
+      for k, _, v in inner:gmatch("([%w_:%.%-]+)%s*=%s*([\"'])(.-)%2") do el.attributes[k] = xmlUnescape(v) end
+      local top = stack[#stack]
+      top.children[#top.children + 1] = el
+      if not selfClose then stack[#stack + 1] = el end
+    end
+    i = gt + 1
+  end
+  return root.children
+end
+E.xmlParse = xmlParse
+local function xmlSerialize(list)
+  local out = {}
+  local function one(el)
+    if type(el) ~= "table" or not el.tag then return end
+    out[#out + 1] = "<" .. el.tag
+    local keys = {}
+    for k in pairs(el.attributes or {}) do keys[#keys + 1] = k end
+    table.sort(keys)
+    for _, k in ipairs(keys) do out[#out + 1] = string.format(' %s="%s"', k, tostring(el.attributes[k])) end
+    out[#out + 1] = ">"
+    if el.value then out[#out + 1] = tostring(el.value) end
+    for _, c in ipairs(el.children or {}) do one(c) end
+    out[#out + 1] = "</" .. el.tag .. ">"
+  end
+  for _, el in ipairs(list or {}) do one(el) end
+  return table.concat(out)
+end
+
+local function makeUI(ownerLabel, initialXml)
+  local ui = { xml = initialXml or "", xmlTable = nil, attrs = {}, assets = {}, calls = 0 }
   local api = {}
   local function track() ui.calls = ui.calls + 1 end
-  function api.setXml(x) track() ui.xml = x or "" return true end
-  function api.getXml() return ui.xml end
-  function api.setXmlTable(t) track() ui.xmlTable = t or {} return true end
-  function api.getXmlTable() return deepcopy(ui.xmlTable) end
-  function api.setAttribute(id, k, v) track() ui.attrs[id] = ui.attrs[id] or {} ; ui.attrs[id][k] = v return true end
-  function api.setAttributes(id, t) track() ui.attrs[id] = ui.attrs[id] or {} for k, v in pairs(t or {}) do ui.attrs[id][k] = v end return true end
-  function api.getAttribute(id, k) return (ui.attrs[id] or {})[k] end
-  function api.getAttributes(id) return deepcopy(ui.attrs[id] or {}) end
+  local function tbl()
+    if not ui.xmlTable then ui.xmlTable = xmlParse(ui.xml) end
+    return ui.xmlTable
+  end
+  local function byId(id, list)
+    for _, el in ipairs(list or tbl()) do
+      if type(el) == "table" then
+        if el.attributes and el.attributes.id == id then return el end
+        local f = el.children and byId(id, el.children)
+        if f then return f end
+      end
+    end
+    return nil
+  end
+  function api.setXml(x) track() ui.xml = x or "" ui.xmlTable = nil return true end
+  function api.getXml() if ui.xmlTable then return xmlSerialize(ui.xmlTable) end return ui.xml end
+  function api.setXmlTable(t) track() ui.xmlTable = deepcopy(t or {}) return true end
+  function api.getXmlTable() return deepcopy(tbl()) end
+  function api.setAttribute(id, k, v)
+    track()
+    ui.attrs[id] = ui.attrs[id] or {}
+    ui.attrs[id][k] = v
+    local el = byId(id)
+    if el then
+      el.attributes = el.attributes or {}
+      el.attributes[k] = type(v) == "boolean" and tostring(v) or v
+    end
+    return true
+  end
+  function api.setAttributes(id, t) for k, v in pairs(t or {}) do api.setAttribute(id, k, v) end return true end
+  function api.getAttribute(id, k)
+    local v = (ui.attrs[id] or {})[k]
+    if v ~= nil then return v end
+    local el = byId(id)
+    return el and el.attributes and el.attributes[k] or nil
+  end
+  function api.getAttributes(id)
+    local el = byId(id)
+    local out = deepcopy(el and el.attributes or {})
+    for k, v in pairs(ui.attrs[id] or {}) do out[k] = v end
+    return out
+  end
   function api.show(id) return api.setAttribute(id, "active", true) end
   function api.hide(id) return api.setAttribute(id, "active", false) end
-  function api.setValue(id, v) return api.setAttribute(id, "text", v) end
-  function api.getValue(id) return (ui.attrs[id] or {}).text end
-  function api.setCustomAssets(a) ui.assets = a or {} return true end
+  function api.setValue(id, v)
+    local el = byId(id)
+    if el then el.value = tostring(v) end
+    return api.setAttribute(id, "text", v)
+  end
+  function api.getValue(id)
+    local el = byId(id)
+    if el and el.value ~= nil then return el.value end
+    return (ui.attrs[id] or {}).text
+  end
+  function api.setCustomAssets(a) ui.assets = deepcopy(a or {}) return true end
   function api.getCustomAssets() return deepcopy(ui.assets) end
   function api.setClass(id, v) return api.setAttribute(id, "class", v) end
   api.loading = false
@@ -838,7 +975,7 @@ objectMeta.__index = function(o, k)
           requireAlive(o, k)
           return nil
         end
-        if a == o then return m(o, ...) end
+        if rawequal(a, o) then return m(o, ...) end
         return m(o, a, ...)
       end
       cache[k] = f
@@ -872,6 +1009,10 @@ objectMeta.__index = function(o, k)
   end
   if k == "TextTool" then
     if st.data.Name == "3DText" then return st.textTool end
+    return nil
+  end
+  if k == "AssetBundle" then
+    if st.data.Name == "Custom_Assetbundle" then return st.assetBundle end
     return nil
   end
   if k == "Counter" or k == "Clock" or k == "LayoutZone" or k == "RPGFigurine" or k == "Browser"
@@ -967,36 +1108,37 @@ function methods.getRotation(o) return Vector(S[o].rot) end
 function methods.getScale(o) return Vector(S[o].scale) end
 -- a moved or flipped object leaves what it rested on (TTS lifts it; the
 -- landing fires onCollisionEnter again)
+-- (the exits and enters fire when it lands, as the physics step would)
 local function liftOff(o)
   local st = S[o]
-  local before = st.contacts
-  if not before or st.locked then return end
-  st.contacts = {}
-  for other in pairs(before) do
-    if isAlive(other) then
-      collide(other, o, "onCollisionExit")
-      collide(o, other, "onCollisionExit")
-    end
-  end
+  if st.locked then return end
+  st.lifted = true
 end
-local function moved(o, frames)
-  liftOff(o)
+local function moved(o, frames, old)
+  local st = S[o]
+  -- a teleport onto (nearly) the same spot keeps its contacts
+  if not old or math.abs(old.x - st.pos.x) > 0.05 or math.abs(old.z - st.pos.z) > 0.05
+     or st.pos.y > old.y + 0.2 then
+    liftOff(o)
+  end
   updateZones(o)
   scheduleLanding(o, frames)
 end
 function methods.setPosition(o, p)
   local st = S[o]
   local v = vecOf(p)
+  local old = st.pos
   st.pos = { x = v.x, y = v.y, z = v.z }
-  moved(o, 6)
+  moved(o, 6, old)
   return true
 end
 function methods.setPositionSmooth(o, p)
   local st = S[o]
   local v = vecOf(p)
   st.smoothUntil = E.frame + 20
+  local old = st.pos
   st.pos = { x = v.x, y = v.y, z = v.z }
-  moved(o, 24)
+  moved(o, 24, old)
   return true
 end
 local function faceDown(rot) local z = rot.z % 360 return z > 90 and z < 270 end
@@ -1098,8 +1240,8 @@ function methods.setDecals(o, l) S[o].data.AttachedDecals = datacopy(l or {}) ; 
 function methods.addDecal(o, d) local l = S[o].data.AttachedDecals or {} l[#l + 1] = datacopy(d) S[o].data.AttachedDecals = l return true end
 function methods.getVectorLines(o) return datacopy(S[o].props.__lines or {}) end
 function methods.setVectorLines(o, l) S[o].props.__lines = datacopy(l or {}) ; return true end
-function methods.getSnapPoints(o) return datacopy(S[o].data.AttachedSnapPoints or {}) end
-function methods.setSnapPoints(o, l) S[o].data.AttachedSnapPoints = datacopy(l or {}) ; return true end
+function methods.getSnapPoints(o) return E.snapsToLua(S[o].data.AttachedSnapPoints) end
+function methods.setSnapPoints(o, l) S[o].data.AttachedSnapPoints = E.snapsToData(l) ; return true end
 function methods.setHiddenFrom() return true end
 function methods.setInvisibleTo() return true end
 function methods.attachHider() return true end
@@ -1251,6 +1393,7 @@ function methods.getData(o)
   d.Transform = { posX = st.pos.x, posY = st.pos.y, posZ = st.pos.z, rotX = st.rot.x, rotY = st.rot.y,
                   rotZ = st.rot.z, scaleX = st.scale.x, scaleY = st.scale.y, scaleZ = st.scale.z }
   if st.states then d.States = datacopy(st.states) end
+  E.numericStates(d)
   if st.buttons and #st.buttons > 0 then end
   return d
 end
@@ -1270,6 +1413,9 @@ function methods.destruct(o, silent)
   local st = S[o]
   if st.destroying or st.removed then return true end
   st.destroying = true
+  -- who destroyed what (the harness names the culprit when a table piece goes)
+  E.destroyedBy = E.destroyedBy or {}
+  E.destroyedBy[st.guid] = (currentWho and currentWho.label or "?") .. " at " .. E.now .. "s\n" .. debug.traceback("", 2)
   if not silent then E.fire("onObjectDestroy", o) end
   pendingDestroy[#pendingDestroy + 1] = o
   return true
@@ -1497,7 +1643,11 @@ function makeObject(data, stateId, opts)
   st.rot = { x = t.rotX or 0, y = t.rotY or 0, z = t.rotZ or 0 }
   st.scale = { x = t.scaleX or 1, y = t.scaleY or 1, z = t.scaleZ or 1 }
   data.Transform = nil
-  st.states = data.States
+  st.states = nil
+  if data.States then
+    st.states = {}
+    for k, v in pairs(data.States) do st.states[tostring(k)] = v end
+  end
   data.States = nil
   st.stateId = st.states and (stateId or 1) or -1
   local ty = typeOf(data.Name)
@@ -1505,12 +1655,19 @@ function makeObject(data, stateId, opts)
     st.contained = data.ContainedObjects or {}
   end
   data.ContainedObjects = nil
-  st.ui = makeUI(tostring(data.Nickname))
+  st.ui = makeUI(tostring(data.Nickname), data.XmlUI)
   st.book = { page = 0 }
   st.book.getPage = function() return st.book.page end
   st.book.setPage = function(p) st.book.page = p ; return true end
   st.book.setHighlight = function() return true end
   st.book.clearHighlight = function() return true end
+  st.assetBundle = {
+    playTriggerEffect = function(i) st.props.__trigger = i ; return true end,
+    playLoopingEffect = function(i) st.props.__loop = i ; return true end,
+    getLoopingEffectIndex = function() return st.props.__loop or 0 end,
+    getTriggerEffects = function() return {} end,
+    getLoopingEffects = function() return {} end,
+  }
   st.textTool = {
     getValue = function() return (data.Text or {}).Text or "" end,
     setValue = function(v) data.Text = data.Text or {} ; data.Text.Text = v ; return true end,
@@ -1616,6 +1773,32 @@ function E.makeRequire(env)
   end
 end
 
+function E.snapsToLua(list)
+  local out = {}
+  for i, sp in ipairs(list or {}) do
+    local p = sp.Position or sp.position or {}
+    local r = sp.Rotation or sp.rotation
+    out[i] = { position = Vector(p.x or p[1] or 0, p.y or p[2] or 0, p.z or p[3] or 0),
+               rotation = Vector(r and (r.x or r[1]) or 0, r and (r.y or r[2]) or 0, r and (r.z or r[3]) or 0),
+               rotation_snap = r ~= nil or sp.rotation_snap == true, tags = datacopy(sp.Tags or sp.tags or {}) }
+  end
+  return out
+end
+function E.snapsToData(list)
+  local out = {}
+  for i, sp in ipairs(list or {}) do
+    local p = vecOf(sp.position or sp.Position) or { x = 0, y = 0, z = 0 }
+    local d = { Position = { x = p.x, y = p.y, z = p.z } }
+    if sp.rotation_snap or sp.Rotation then
+      local r = vecOf(sp.rotation or sp.Rotation) or { x = 0, y = 0, z = 0 }
+      d.Rotation = { x = r.x, y = r.y, z = r.z }
+    end
+    if sp.tags and #sp.tags > 0 then d.Tags = datacopy(sp.tags) end
+    out[i] = d
+  end
+  return out
+end
+
 ------------------------------------------------------------------ Global --
 
 local players = {}
@@ -1696,8 +1879,8 @@ local function globalObject()
     if not res[1] then error(res[2], 0) end
     return unpack(res, 2)
   end
-  g.getSnapPoints = function() return datacopy(snaps) end
-  g.setSnapPoints = function(l) snaps = datacopy(l or {}) return true end
+  g.getSnapPoints = function() return E.snapsToLua(snaps) end
+  g.setSnapPoints = function(l) snaps = E.snapsToData(l) return true end
   g.getVectorLines = function() return datacopy(lines) end
   g.setVectorLines = function(l) lines = datacopy(l or {}) return true end
   g.getDecals = function() return datacopy(decals) end
@@ -1761,7 +1944,24 @@ end
 local coroutines = {}
 
 E.G = setmetatable({
+  -- TTS (MoonSharp, like Lua 5.2) lets math.min/max take numeric strings;
+  -- Lua 5.4's do not
+  math = setmetatable({
+    min = function(...)
+      local t = { ... }
+      for i = 1, select("#", ...) do t[i] = tonumber(t[i]) or t[i] end
+      return math.min(unpack(t, 1, select("#", ...)))
+    end,
+    max = function(...)
+      local t = { ... }
+      for i = 1, select("#", ...) do t[i] = tonumber(t[i]) or t[i] end
+      return math.max(unpack(t, 1, select("#", ...)))
+    end,
+  }, { __index = math }),
   JSON = E.JSON,
+  -- MoonSharp's json module, which TTS scripts also see
+  json = { parse = function(s) return J.decode(s) end, serialize = function(v) return J.encode(v) end,
+           isNull = function(v) return v == nil end, null = function() return nil end },
   Wait = Wait,
   Global = GlobalObj,
   Vector = Vector,
@@ -1982,7 +2182,7 @@ function E.step()
     local ok, res = coroutine.resume(c.co)
     currentWho = prev
     if not ok then
-      E.protect(c.who, error, res)
+      E.protect(c.who, error, debug.traceback(c.co, tostring(res)), 0)
       table.remove(coroutines, i)
     elseif coroutine.status(c.co) == "dead" then
       table.remove(coroutines, i)
@@ -2031,6 +2231,7 @@ function E.loadSave(save, origin)
   E.globalScript = save.LuaScript or ""
   E.globalState = save.LuaScriptState or ""
   if save.SnapPoints then GlobalObj.setSnapPoints(save.SnapPoints) end
+  if save.XmlUI then GlobalObj.UI.setXml(save.XmlUI) end
   local created = {}
   for _, d in ipairs(save.ObjectStates or {}) do
     created[#created + 1] = makeObject(datacopy(d), nil, { noScript = true, origin = origin or "table" })
@@ -2086,6 +2287,7 @@ function E.save()
     if not S[o].removed then objs[#objs + 1] = methods.getData(o) end
   end
   return { LuaScript = E.globalScript, LuaScriptState = GlobalObj.script_state, ObjectStates = objs,
+           XmlUI = GlobalObj.UI.getXml(),
            SnapPoints = GlobalObj.getSnapPoints() }
 end
 

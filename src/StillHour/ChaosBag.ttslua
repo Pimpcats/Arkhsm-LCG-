@@ -165,7 +165,13 @@ function ChaosBag.new(opts)
       data = ChaosBag.tokenData({ x = p.x, y = (p.y or 1) + 2, z = p.z }),
       callback_function = function(o)
         a.pendingAdd = math.max(0, a.pendingAdd - 1)
-        pcall(function() bag.putObject(o) end)
+        -- SCED respawns its bag when a difficulty is set: if that happened
+        -- while this token was spawning, put it in the new bag
+        local target = bag
+        if target == nil or safe(function() return target.isDestroyed() end) ~= false then
+          target = a.findBag()
+        end
+        if target then pcall(function() target.putObject(o) end) end
       end,
     })
     if not ok then a.pendingAdd = math.max(0, a.pendingAdd - 1) end

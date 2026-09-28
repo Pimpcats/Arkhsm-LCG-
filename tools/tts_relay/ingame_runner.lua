@@ -336,6 +336,10 @@ step("board: touchable counters", function(go)
 end)
 
 local function staticInBag(bag)
+  -- SCED respawns its chaos bag when a difficulty is set (setChaosBagState),
+  -- so a bag found earlier can be gone: look it up again
+  if not alive(bag) then bag = Global.call("findChaosBag") end
+  if not alive(bag) then return 0 end
   local n = 0
   for _, e in ipairs(bag.getObjects() or {}) do
     for _, t in ipairs(e.tags or {}) do if t == "StillHourStatic" then n = n + 1 end end

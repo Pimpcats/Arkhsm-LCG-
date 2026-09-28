@@ -162,10 +162,16 @@ return function(H)
       local a = E.aabb(o)
       for _, s in ipairs(objects()) do
         local g = s.getGUID()
-        if H.scedGuids[g] and not BOARDS[g] and not E.isZone(s) and s.type ~= "Scripting" then
+        -- hidden, non-interactable boards (the mythos mat's warning overlay
+        -- under it) are not in the way
+        if H.scedGuids[g] and not BOARDS[g] and not E.isZone(s) and s.type ~= "Scripting"
+           and not s.hasTag("NotInteractable") then
           local b = E.aabb(s)
-          if b.size.x < 30 and b.size.z < 30 and a.min.x < b.max.x and a.max.x > b.min.x
-             and a.min.z < b.max.z and a.max.z > b.min.z then
+          local sp, op = s.getPosition(), o.getPosition()
+          -- sizes are estimates: count it only when one covers the other's centre
+          local covers = (sp.x > a.min.x and sp.x < a.max.x and sp.z > a.min.z and sp.z < a.max.z)
+            or (op.x > b.min.x and op.x < b.max.x and op.z > b.min.z and op.z < b.max.z)
+          if b.size.x < 30 and b.size.z < 30 and covers then
             out[#out + 1] = o.getName() .. " on " .. s.getName() .. " (" .. g .. ")"
           end
         end
@@ -175,19 +181,20 @@ return function(H)
   end
 
   -- tokens SCED spawned onto a card (clues), found by footprint
-  local function tokensOn(card)
-    if not card or not alive(card) then return 0 end
+  local function tokenObjectsOn(card)
+    local l = {}
+    if not card or not alive(card) then return l end
     local b = E.aabb(card)
-    local n = 0
     for _, o in ipairs(objects()) do
       if E.stateOfObj(o).origin == "sced" and not H.scedGuids[o.getGUID()]
          and (o.type == "Tile" or o.type == "Generic" or o.type == "Chip") then
         local p = o.getPosition()
-        if p.x >= b.min.x and p.x <= b.max.x and p.z >= b.min.z and p.z <= b.max.z then n = n + 1 end
+        if p.x >= b.min.x and p.x <= b.max.x and p.z >= b.min.z and p.z <= b.max.z then l[#l + 1] = o end
       end
     end
-    return n
+    return l
   end
+  local function tokensOn(card) return #tokenObjectsOn(card) end
 
   local fellMark = 0
   local function newFalls()
@@ -216,7 +223,10 @@ return function(H)
   local function snapshotDiff(a, b)
     local diffs = {}
     for g, v in pairs(a) do
-      if b[g] == nil then diffs[#diffs + 1] = "gone: " .. v
+      if b[g] == nil then
+        local by = (E.destroyedBy or {})[g]
+        diffs[#diffs + 1] = "gone: " .. v .. (by and (" (destroyed by " .. by:match("^[^\n]*") .. ")") or "")
+        if by then io.write("  [destroyed] " .. v .. " by " .. by:sub(1, 1500) .. "\n") end
       elseif b[g] ~= v then diffs[#diffs + 1] = v .. " -> " .. b[g] end
     end
     for g, v in pairs(b) do if a[g] == nil then diffs[#diffs + 1] = "new: " .. v end end
@@ -336,7 +346,8 @@ return function(H)
   -- bag onto a playmat, minicard onto the map later
   local seated = {}
   step("Campaign Setup: seat two investigators on SCED playmats", function()
-    local pbag = find(function(o) return o.type == "Bag" and tostring(o.getName()):find("Player Cards", 1, true) ~= nil end)
+    local pbag = find(function(o) return o.type == "Bag" and o.hasTag("StillHour")
+      and tostring(o.getName()):find("Player Cards", 1, true) ~= nil end)
     check("the player-card bag is on the table", pbag ~= nil)
     if not pbag then return end
     local mats = { "White", "Orange" }
@@ -349,12 +360,8 @@ return function(H)
         if m.id == id then guid = e.guid end
       end
       local mat = handler and handler.call("getObjectByOwnerAndType", { owner = mats[i], type = "Playermat" })
-      local pos = mat and mat.positionToWorld({ -1.365, 0.1, -0.625 }) or { x = -20 + 4 * i, y = 2, z = -25 }
-      if mat and sced then
-        -- SCED's investigator slot on the mat (PlayermatApi localInvestigatorPosition)
-        local lp = mat.getVar("localInvestigatorPosition") or mat.getVar("LOCAL_INVESTIGATOR_POSITION")
-        if lp then pos = mat.positionToWorld(lp) end
-      end
+      -- SCED's investigator slot on the mat (PlayermatApi localInvestigatorPosition)
+      local pos = mat and mat.positionToWorld({ -1.17, 0.1, -0.01 }) or { x = -20 + 4 * i, y = 2, z = -25 }
       local card = guid and pbag.takeObject({ guid = guid, position = { pos.x, (pos.y or 1.5) + 1, pos.z }, smooth = false })
       E.run(1)
       if card then
@@ -399,6 +406,9 @@ return function(H)
   local prologueBox
   step("Prologue: Place The First Hour", function()
     fellMark = #(E.fellInto or {})
+    -- SCED rearranges its own pieces when investigators are seated; from here
+    -- on only the campaign acts on the table
+    startScedSnapshot = scedSnapshot()
     prologueBox = placeBox("prologue")
     if not prologueBox then return end
     local placed = placedBy(prologueBox)
@@ -506,18 +516,19 @@ return function(H)
     local snap = scedSnapshot()
     local campaignGuids = {}
     for _, o in ipairs(placedCampaign) do if alive(o) then campaignGuids[o.getGUID()] = true end end
+    -- the tokens SCED spawned onto the laid-out cards (clues on locations)
+    local onCards = {}
+    for _, c in ipairs(loopObjects()) do
+      for _, t in ipairs(tokenObjectsOn(c)) do onCards[#onCards + 1] = t end
+    end
+    info(#onCards .. " token(s) on the laid-out cards before Clear Board")
     click(control(), "Clear Board")
     E.run(3)
     check("Clear Board removes every card the Prologue box laid out", loopCardCount() == 0, loopCardCount() .. " left")
-    -- tokens SCED spawned onto the laid-out cards (clues on locations)
-    local left = findAll(function(o)
-      local g = o.getGUID()
-      return E.stateOfObj(o).origin == "sced" and not H.scedGuids[g] and o ~= chaosBag()
-        and (o.type == "Tile" or o.type == "Generic" or o.type == "Chip")
-    end)
     local names = {}
-    for _, o in ipairs(left) do names[#names + 1] = o.getName() .. "(" .. o.type .. ")" end
-    check("no token placed on those cards is left behind", #left == 0, table.concat(names, ", "))
+    for _, t in ipairs(onCards) do if alive(t) then names[#names + 1] = t.getName() .. "(" .. t.type .. ")" end end
+    check("no token placed on those cards is left behind", #onCards > 0 and #names == 0,
+      #onCards .. " on cards; left: " .. table.concat(names, ", "))
     local diff = snapshotDiff(snap, scedSnapshot())
     check("SCED's own table objects are untouched", #diff == 0, table.concat(diff, "; "))
     local kept = 0
@@ -866,6 +877,6 @@ return function(H)
 
   step("the table outside the campaign is as SCED left it", function()
     local diff = snapshotDiff(startScedSnapshot, scedSnapshot())
-    check("SCED's own objects are where they started", #diff == 0, table.concat(diff, "; "))
+    check("SCED's own objects are where they were before the first box was Placed", #diff == 0, table.concat(diff, "; "))
   end)
 end

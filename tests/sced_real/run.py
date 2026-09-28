@@ -72,6 +72,13 @@ def fake_table():
             t.update(posX=-55, posY=1.45, posZ=16.1, rotY=270, scaleX=6.43, scaleY=1, scaleZ=6.43)
             save["SizeOverride"][o["GUID"]] = [2.1, 0.1, 1.3]
         save["ObjectStates"].append(o)
+    # two loose SCED pieces that lie in its play area on a fresh table
+    # (objects/LeadInvestigator.acaa93.json, objects/SCEDTour.0e5aa8.json)
+    for nick, guid, x, z, scale, tags in (("Lead Investigator", "acaa93", -45, 0, 0.61, ["CleanUpHelper_ignore"]),
+                                          ("SCED Tour", "0e5aa8", -24.5, 0, 4, [])):
+        save["ObjectStates"].append({"Name": "Custom_Token", "Nickname": nick, "GUID": guid, "Tags": tags,
+                                     "Transform": {"posX": x, "posY": 1.6, "posZ": z, "rotY": 270,
+                                                   "scaleX": scale, "scaleY": 1, "scaleZ": scale}})
     return save
 
 

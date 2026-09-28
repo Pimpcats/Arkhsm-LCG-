@@ -96,7 +96,11 @@ PLACE = {
 DISTRICT_ROW = {"district_fairground": 15.3, "district_lighthouse": 9.18,
                 "district_almanac": 3.06, "district_square": -3.06,
                 "district_road": -9.18, "district_church": -15.3}
-DISTRICT_ACT_X, DISTRICT_SET_X = -13.8, -7.05
+# The set row sits at x -8.0, not the official -7.05: a card there reaches
+# x -6.45, clear of SCED's doom / clue counters at x -5.9 (DoomCounter,
+# OtherDoominPlay, MasterClueCounter); at -7.05 the Square's Named enemy lay
+# over the Master Clue Counter.
+DISTRICT_ACT_X, DISTRICT_SET_X = -13.8, -8.0
 # the finale shares the loop's board: its set-aside stack goes where the
 # official boxes put set-aside cards, beside the encounter discard, clear of
 # the Square's set-aside stack. Never the mat's other corner snap
@@ -106,6 +110,10 @@ FINALE_ASIDE = {"pos": (-3.83, 1.60, 14.98), "rot": 270, "face_down": True}
 # SCED's own table objects near the mythos mat that no stack may land on
 SCED_FIXED_SPOTS = {"chaos bag": (1.6, -13.75), "trash": (3.7, -8.8),
                     "connection markers": (3.7, -11.3), "chaos bag stat tracker": (4.19, -16.6)}
+# SCED's small counters beside the mythos mat: (x, z, radius); no card may
+# cover them
+SCED_COUNTERS = {"doom counter": (-5.9, 0.38, 0.45), "other doom in play": (-5.9, 1.8, 0.3),
+                 "master clue counter": (-5.9, -5.1, 0.45), "investigator count": (-12.03, -4.0, 0.35)}
 
 
 def stack_anchor(sc, stack):

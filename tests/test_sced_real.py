@@ -44,7 +44,35 @@ def _dist_finale_on_chaos_bag():
     return False
 
 
-STALE = [(_dist_finale_on_chaos_bag, {
+def _saved_object():
+    return json.load(open(os.path.join(ROOT, "dist", "saved_object_the_still_hour.json"), encoding="utf-8"))
+
+
+def _dist_clear_board_takes_sced_pieces():
+    # Clear Board used to take any unlocked token its card's bounds touched,
+    # including SCED's lead-investigator marker and tour starter
+    for o in _saved_object()["ObjectStates"][0]["ContainedObjects"]:
+        if o.get("Nickname", "").endswith("Control"):
+            return "CleanUpHelper_ignore" not in o.get("LuaScript", "")
+    return False
+
+
+def _dist_set_row_over_sced_counters():
+    # the district set row sat at x -7.05, over SCED's clue counter
+    for sb in _saved_object()["ObjectStates"][0]["ContainedObjects"]:
+        for e in json.loads(sb.get("LuaScriptState") or "{}").get("ml", {}).values() \
+                if sb.get("Name") == "Custom_Model_Bag" else []:
+            if abs(e["pos"]["x"] + 7.05) < 0.01:
+                return True
+    return False
+
+
+STALE = [(_dist_clear_board_takes_sced_pieces, {
+    "SCED's own table objects are untouched",
+    "SCED's own objects are where they were before the first box was Placed",
+}), (_dist_set_row_over_sced_counters, {
+    "nothing laid out sits on SCED's own table objects",
+}), (_dist_finale_on_chaos_bag, {
     "nothing the finale box laid out fell into a bag",
     "SCED's chaos bag holds the same number of objects",
     "nothing the finale box laid out sits on SCED's own table objects",

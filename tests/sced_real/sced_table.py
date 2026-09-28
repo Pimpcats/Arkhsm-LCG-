@@ -35,7 +35,7 @@ PINNED = "0e12534a3dcaceba504f02678e999b727900f6dd"
 REPO_URL = "https://github.com/argonui/SCED"
 CACHE = os.path.join(ROOT, ".cache")
 LOCAL_CLONE = "/home/user/argonui/sced"
-ASSEMBLER_VERSION = "3"
+ASSEMBLER_VERSION = "4"
 
 
 def _git(*args, cwd=None, timeout=300):
@@ -144,6 +144,8 @@ class Assembler:
             p = d.pop(key + "_path", None)
             if p:
                 d[key] = _read(self._side(base_dir, p))
+        if d.get("XmlUI"):
+            d["XmlUI"] = self.xml(d["XmlUI"])
         cpath = d.pop("ContainedObjects_path", None)
         order = d.pop("ContainedObjects_order", None)
         if cpath:
@@ -165,6 +167,17 @@ class Assembler:
             d["States"] = states
         return d
 
+    def xml(self, text, depth=0):
+        """Inline <Include src="..."/> from SCED's xml/ folder (the build does)."""
+        import re
+
+        def inc(m):
+            path = os.path.join(self.sced, "xml", m.group(1))
+            if depth > 8 or not os.path.isfile(path):
+                return m.group(0)
+            return self.xml(_read(path), depth + 1)
+        return re.sub(r'<Include\s+src="([^"]+)"\s*/>', inc, text)
+
     def table(self):
         cfg = json.load(open(os.path.join(self.sced, "config.json"), encoding="utf-8"))
         objs = [self.load(os.path.join(self.objects, n + ".json")) for n in cfg["ObjectStates_order"]]
@@ -179,7 +192,8 @@ class Assembler:
         if os.path.isfile(sp):
             snaps = json.load(open(sp, encoding="utf-8"))
         return {"SaveName": cfg.get("SaveName", ""), "LuaScript": cfg.get("LuaScript", ""),
-                "LuaScriptState": state, "ObjectStates": objs, "SnapPoints": snaps}
+                "LuaScriptState": state, "ObjectStates": objs, "SnapPoints": snaps,
+                "XmlUI": self.xml(cfg.get("XmlUI", ""))}
 
 
 def _lua_str(s):

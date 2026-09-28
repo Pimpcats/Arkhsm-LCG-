@@ -228,18 +228,25 @@ local function isLoopCard(tags, gm)
   return id:sub(1, 5) == "sthr-" and SCENARIO_TYPES[md.type] == true and not md.weakness
 end
 
---- Tokens resting on a card (clues, doom, damage): small, unlocked, not cards.
+--- Tokens resting on a card (clues, doom, damage): small, unlocked, not cards,
+-- centred on the card and above it. SCED's own table pieces that merely touch
+-- the card's edge or lie under it (the lead-investigator marker, the tour
+-- starter) are never taken, nor anything SCED marks CleanUpHelper_ignore.
 local function tokensOn(card)
   local found = {}
   if type(Physics) ~= "table" or type(Physics.cast) ~= "function" then return found end
   local b = card.getBounds()
+  local hx, hz = b.size.x / 2, b.size.z / 2
   local hits = Physics.cast({ origin = { b.center.x, b.center.y + 2, b.center.z },
     direction = { 0, -1, 0 }, type = 3, size = { b.size.x, 1, b.size.z }, max_distance = 3 }) or {}
   for _, h in ipairs(hits) do
     local o = h.hit_object
     if o and o ~= card and not o.getLock() and (o.type == "Tile" or o.type == "Generic"
-        or o.type == "Chip") then
-      found[#found + 1] = o
+        or o.type == "Chip") and not o.hasTag("CleanUpHelper_ignore") then
+      local p = o.getPosition()
+      if math.abs(p.x - b.center.x) <= hx and math.abs(p.z - b.center.z) <= hz and p.y >= b.center.y then
+        found[#found + 1] = o
+      end
     end
   end
   return found
