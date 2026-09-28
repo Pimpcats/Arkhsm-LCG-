@@ -1567,10 +1567,14 @@ function Knowledge.unlock(factId)
   assert(Knowledge.FACTS[factId], "unknown Knowledge fact: " .. tostring(factId))
   local newly = CampaignState.unlockFact(factId)
   local paid = 0
-  if newly and CampaignState.getKnowledgePaid(factId) == nil then
-    paid = Knowledge.memoryFor(factId)
+  if newly then
+    -- the paid marker holds what this entry still has in the bank; a re-tick
+    -- after a partial refund pays only what was taken back
+    local held = CampaignState.getKnowledgePaid(factId) or 0
+    local full = Knowledge.memoryFor(factId)
+    paid = math.max(0, full - held)
     if paid > 0 then CampaignState.bankMemory(paid) end
-    CampaignState.setKnowledgePaid(factId, paid)
+    CampaignState.setKnowledgePaid(factId, math.max(full, held))
   end
   return newly, paid
 end
@@ -1580,9 +1584,13 @@ end
 function Knowledge.forget(factId)
   assert(Knowledge.FACTS[factId], "unknown Knowledge fact: " .. tostring(factId))
   if not CampaignState.forgetFact(factId) then return false, 0 end
-  local refund = CampaignState.getKnowledgePaid(factId) or 0
+  -- take back what the entry paid, as far as banked Memory allows; whatever
+  -- was already spent stays marked as paid, so re-recording it cannot pay twice
+  local paid = CampaignState.getKnowledgePaid(factId) or 0
+  local refund = math.min(paid, CampaignState.getBankedMemory())
   if refund > 0 then CampaignState.bankMemory(-refund) end
-  CampaignState.setKnowledgePaid(factId, nil)
+  local shortfall = paid - refund
+  CampaignState.setKnowledgePaid(factId, shortfall > 0 and shortfall or nil)
   return true, refund
 end
 
@@ -2274,7 +2282,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/21aeceafdce9a548dcb3428f9bbecc1727015791/dist/cards/sthr-static-token.jpg?v=a556271511"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/3c84769d07ce7899bd7529cfa424b0c15e1fce69/dist/cards/sthr-static-token.jpg?v=a556271511"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -4489,10 +4497,13 @@ function shApiBeginNextLoop() guarded("next loop", beginNextLoop) ; afterChange(
 function shStatus()
   local c = CampaignState.constants()
   print(string.format(
-    "STILL HOUR | loop %d | Memory %d/%d | Dissonance %d/%d (%s) | Hour %s | Appointed: %s | contest %d | [static] %d (%s)%s",
-    CampaignState.getLoopsCompleted(), CampaignState.getBankedMemory(), c.memoryCap,
+    "STILL HOUR | loop %d | scar %d | %s | Memory %d/%d | Dissonance %d/%d (%s) | Hour %s | Appointed: %s | contest %d/%d | [static] %d (%s)%s",
+    CampaignState.getLoopsCompleted(), math.min(CampaignState.getLoopsCompleted(), c.scarCap),
+    CampaignState.inPrologue() and "Prologue" or (CampaignState.inPartTwo() and "Part II" or "Part I"),
+    CampaignState.getBankedMemory(), c.memoryCap,
     CampaignState.getDissonance(), c.resetThreshold, CampaignState.band(),
-    Hourglass.HOUR_NAMES[CampaignState.getHour()] or "?", Appointed.stageName(), c.contestTarget,
+    Hourglass.HOUR_NAMES[CampaignState.getHour()] or "?", Appointed.stageName(),
+    CampaignState.getContest(), c.contestTarget,
     bag.target(), bag.describe().mode, SCED.isPresent() and (" | SCED " .. tostring(SCED.version())) or ""))
 end
 
@@ -4612,6 +4623,12 @@ function shKnowledgeStatus()
     Knowledge.surfaceKnownCount(), Knowledge.deepKnownCount(),
     Knowledge.actIIOpen() and "OPEN" or "closed",
     Knowledge.finaleAttemptable() and "ATTEMPTABLE" or (Knowledge.canAssembleFinale() and "assemblable" or "locked")))
+  local known = {}
+  for id, f in pairs(Knowledge.FACTS) do
+    if CampaignState.knows(id) then known[#known + 1] = string.format("%s (%s)", f.name, f.layer) end
+  end
+  table.sort(known)
+  print("  Recorded: " .. (#known > 0 and table.concat(known, "; ") or "none yet"))
   local locs = guarded("scan", Board.locationCards) or {}
   local n = 0
   for _, l in ipairs(locs) do
