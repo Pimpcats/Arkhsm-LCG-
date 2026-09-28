@@ -961,7 +961,22 @@ end
 function methods.getPosition(o) return Vector(S[o].pos) end
 function methods.getRotation(o) return Vector(S[o].rot) end
 function methods.getScale(o) return Vector(S[o].scale) end
+-- a moved or flipped object leaves what it rested on (TTS lifts it; the
+-- landing fires onCollisionEnter again)
+local function liftOff(o)
+  local st = S[o]
+  local before = st.contacts
+  if not before or st.locked then return end
+  st.contacts = {}
+  for other in pairs(before) do
+    if isAlive(other) then
+      collide(other, o, "onCollisionExit")
+      collide(o, other, "onCollisionExit")
+    end
+  end
+end
 local function moved(o, frames)
+  liftOff(o)
   updateZones(o)
   scheduleLanding(o, frames)
 end
@@ -980,7 +995,16 @@ function methods.setPositionSmooth(o, p)
   moved(o, 24)
   return true
 end
-function methods.setRotation(o, r) local v = vecOf(r) S[o].rot = { x = v.x, y = v.y, z = v.z } ; scheduleLanding(o, 4) ; return true end
+local function faceDown(rot) local z = rot.z % 360 return z > 90 and z < 270 end
+function methods.setRotation(o, r)
+  local st = S[o]
+  local v = vecOf(r)
+  local turned = faceDown(st.rot) ~= faceDown(v)
+  st.rot = { x = v.x, y = v.y, z = v.z }
+  if turned then liftOff(o) end
+  scheduleLanding(o, 4)
+  return true
+end
 function methods.setRotationSmooth(o, r) return methods.setRotation(o, r) end
 function methods.setScale(o, s) local v = vecOf(s) S[o].scale = { x = v.x, y = v.y, z = v.z } ; return true end
 function methods.scale(o, s)
@@ -1030,6 +1054,7 @@ methods.getVisualBoundsNormalized = methods.getBoundsNormalized
 function methods.flip(o)
   local st = S[o]
   st.rot = { x = st.rot.x, y = st.rot.y, z = (st.rot.z + 180) % 360 }
+  liftOff(o)
   scheduleLanding(o, 10)
   return true
 end

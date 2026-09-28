@@ -174,6 +174,21 @@ return function(H)
     return out
   end
 
+  -- tokens SCED spawned onto a card (clues), found by footprint
+  local function tokensOn(card)
+    if not card or not alive(card) then return 0 end
+    local b = E.aabb(card)
+    local n = 0
+    for _, o in ipairs(objects()) do
+      if E.stateOfObj(o).origin == "sced" and not H.scedGuids[o.getGUID()]
+         and (o.type == "Tile" or o.type == "Generic" or o.type == "Chip") then
+        local p = o.getPosition()
+        if p.x >= b.min.x and p.x <= b.max.x and p.z >= b.min.z and p.z <= b.max.z then n = n + 1 end
+      end
+    end
+    return n
+  end
+
   local fellMark = 0
   local function newFalls()
     local l = {}
@@ -415,6 +430,16 @@ return function(H)
     local square = cardWithId("sthr-loc-square")
     check("The Square is revealed, the other two are not", square ~= nil and not square.is_face_down
       and cardWithId("sthr-loc-longpier").is_face_down and cardWithId("sthr-loc-almanacsteps").is_face_down)
+    E.run(2)
+    check("SCED spawns clues on the revealed location (its play area)", tokensOn(square) > 0,
+      tokensOn(square) .. " token(s)")
+    check("SCED spawns nothing on the unrevealed ones", tokensOn(cardWithId("sthr-loc-longpier")) == 0
+      and tokensOn(cardWithId("sthr-loc-almanacsteps")) == 0)
+    -- the owner reveals a location: SCED spawns its clues
+    local pier = cardWithId("sthr-loc-longpier")
+    if pier then E.playerFlip(pier) end
+    E.run(2)
+    check("revealing a location (flipping it) spawns its clues", tokensOn(pier) > 0, tokensOn(pier) .. " token(s)")
     -- the minicards go to The Square (each investigator begins there)
     local minis = find(function(o) return o.type == "Deck" and o.hasTag("Minicard") end)
     if minis and square then
@@ -746,6 +771,13 @@ return function(H)
     placeBox("district_square")
     placeBox("district_almanac")
     check("the boxes still lay out in Part II", loopCardCount() > 26)
+    E.run(3)
+    local study = cardWithId("sthr-loc-sealedstudy")
+    check("a location that is still closed carries its CLOSED label", hasLabel(study, "CLOSED"), labels(study))
+    if study then E.playerFlip(study) end
+    E.run(2)
+    check("revealing a closed location spawns no clues (held back in SCED's spawn tracker)",
+      study ~= nil and tokensOn(study) == 0, tokensOn(study) .. " token(s)")
   end)
 
   ------------------------------------------------------------ finale --
@@ -755,6 +787,9 @@ return function(H)
       tickLog(k)
     end
     E.run(2)
+    local study = cardWithId("sthr-loc-sealedstudy")
+    check("once opened, the location loses its CLOSED label", study ~= nil and not hasLabel(study, "CLOSED"), labels(study))
+    check("once opened, SCED spawns its clues", tokensOn(study) > 0, tokensOn(study) .. " token(s)")
     check("the finale entry is assembled on the Control", hasLabel(control(), "Begin Finale"), labels(control()))
     click(control(), "Begin Finale")
     E.run(1)

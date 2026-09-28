@@ -26,6 +26,26 @@ import sced_table  # noqa: E402
 
 SUITES = ("playthrough", "runner")
 
+PLAY_AREA_STAND_IN = """
+local enabled = false
+function onLoad() Wait.time(function() enabled = true end, 1) end
+function isInPlayArea(object)
+  local b = self.getBounds()
+  local p = object.getPosition()
+  return p.x > b.center.x - b.size.x / 2 and p.x < b.center.x + b.size.x / 2
+     and p.z > b.center.z - b.size.z / 2 and p.z < b.center.z + b.size.z / 2
+end
+function onCollisionEnter(info)
+  local card = info.collision_object
+  if not enabled or card.type ~= "Card" then return end
+  local md = JSON.decode(card.getGMNotes())
+  if md == nil then return end
+  if md.type == "Location" or md.type == "Enemy" or md.type == "Treachery" or md.weakness then
+    Global.call("callTable", { { "TokenManager", "spawnForCard" }, { card = card } })
+  end
+end
+"""
+
 
 def fake_table():
     """The relay test's SCED stand-in, laid out like SCED's real table."""
@@ -43,11 +63,10 @@ def fake_table():
             t.update(posX=1.6, posY=1.587, posZ=-13.75, rotY=315)
         if o["Nickname"] == "Play Area":  # SCED's play area (objects/PlayArea.721ba2.json)
             t.update(posX=-27.94, posY=1.47, posZ=0, rotY=270, scaleX=10, scaleY=1, scaleZ=10)
-            o["LuaScript"] = ("function isInPlayArea(object)\n"
-                              "  local b = self.getBounds()\n  local p = object.getPosition()\n"
-                              "  return p.x > b.center.x - b.size.x / 2 and p.x < b.center.x + b.size.x / 2\n"
-                              "     and p.z > b.center.z - b.size.z / 2 and p.z < b.center.z + b.size.z / 2\n"
-                              "end\n")
+            # like SCED's PlayArea: bounds-based isInPlayArea, and a card
+            # (location / enemy / treachery / weakness) landing on the play
+            # area gets its tokens spawned
+            o["LuaScript"] = PLAY_AREA_STAND_IN
             save["SizeOverride"][o["GUID"]] = [3.6, 0.1, 3.6]
         if o["Nickname"] == "White Playermat":
             t.update(posX=-55, posY=1.45, posZ=16.1, rotY=270, scaleX=6.43, scaleY=1, scaleZ=6.43)
