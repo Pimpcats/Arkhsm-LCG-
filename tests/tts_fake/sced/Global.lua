@@ -7,6 +7,24 @@
 -- MOD_VERSION / ID_URL_MAP from src/core/Constants.ttslua. Bodies follow the
 -- real ones; only physics is replaced (a token spawned "into" the bag is put
 -- there with putObject, which the real game does by dropping it in).
+--
+-- Where the real SCED (pinned 0e12534) differs, as seen by tests/sced_real:
+--   * setChaosBagState: SCED destroys the bag and respawns it from its data
+--     with tokens copied from the ChaosBagReserve (a new bag object, new
+--     GUID, onObjectSpawn fires); here the same bag is emptied and refilled.
+--   * findChaosBag: SCED looks only on the mythos mat (a Physics.cast over
+--     MythosArea); here any object named "Chaos Bag" anywhere counts.
+--   * spawnChaosToken: SCED spawns the token just inside the bag and lets it
+--     fall in, then lays out the token arranger.
+--   * drawChaosToken: SCED shuffles, takes to a spot by the playmat, tracks
+--     stats and shows the token splash; this one takes without a position.
+--   * TokenManager.spawnForCard: SCED spawns real token templates from its
+--     TokenSource bag, and its PlayArea spawns a card's tokens itself when the
+--     card lands in the play area (onCollisionEnter); a scenario reference
+--     card landing on the mythos mat resets every location's spawn state and
+--     shuffles the encounter deck. None of that happens here.
+--   * TokenSpawnTracker lives at GUID e3ffc9 in SCED (e3fa31 here); callers
+--     go through the GUID reference handler, so both work.
 
 MOD_VERSION = "4.9.2"
 
