@@ -17,6 +17,11 @@ ID_URL_MAP = {
   ['m1']      = { name = "-1", url = "https://example.invalid/m1.png" },
   ['m2']      = { name = "-2", url = "https://example.invalid/m2.png" },
   ['m3']      = { name = "-3", url = "https://example.invalid/m3.png" },
+  ['m4']      = { name = "-4", url = "https://example.invalid/m4.png" },
+  ['m5']      = { name = "-5", url = "https://example.invalid/m5.png" },
+  ['m6']      = { name = "-6", url = "https://example.invalid/m6.png" },
+  ['m7']      = { name = "-7", url = "https://example.invalid/m7.png" },
+  ['m8']      = { name = "-8", url = "https://example.invalid/m8.png" },
   ['skull']   = { name = "Skull", url = "https://example.invalid/skull.png" },
   ['cultist'] = { name = "Cultist", url = "https://example.invalid/cultist.png" },
   ['tablet']  = { name = "Tablet", url = "https://example.invalid/tablet.png" },
@@ -82,6 +87,17 @@ function getChaosBagState()
     end
   end
   return tokens
+end
+
+-- empties the bag (every token, whatever it is) and fills it with tokenList
+function setChaosBagState(tokenList)
+  if not canTouchChaosTokens() then return end
+  local chaosBag = findChaosBag()
+  if not chaosBag then return end
+  for _, v in ipairs(chaosBag.getObjects()) do
+    chaosBag.takeObject({ guid = v.guid, smooth = false, callback_function = function(obj) obj.destruct() end })
+  end
+  for _, id in ipairs(tokenList or {}) do spawnChaosToken(id) end
 end
 
 function spawnChaosToken(id)
