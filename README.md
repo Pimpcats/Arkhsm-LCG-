@@ -2,72 +2,91 @@
 
 An original loop-horror campaign for **Arkham Horror: The Card Game**, built as a
 module for **SCED** (Super Complete Edition, Tabletop Simulator). The town of
-Ambergrove repeats the same span of hours; five investigators remember. You get
-stronger by *remembering*, and using what you remember is what gets you noticed.
+Ambergrove repeats the same span of hours, and the investigators remember.
 
-The design is frozen (see the six design docs referenced by
-`SCED_BUILD_BRIEF.md`). This repo is the **build**: card content as data plus the
-custom Lua for the campaign's novel systems.
+This repository is the **build**: card content as data, the campaign's custom
+Lua for Tabletop Simulator, the pipeline that renders and packages it, and
+**CardForge Studio**, the local app used to make it. The design documents live
+in `docs/design/` and contain spoilers.
+
+**To play:** load `dist/saved_object_the_still_hour.json` as a Saved Object in
+SCED. See **`docs/LOADING.md`**. New here? Start with **`START_HERE.md`**.
 
 ## Layout
 
 ```
-pipeline/
-  build_cards.py            card generator: spec -> SCED Card objects
-  stillhour_cards_spec.json full player-card spec (5 investigators, 15 sig/weakness, 10 Recollections)
-  lua_smoketest.lua         offline test harness for the Lua modules (48 assertions)
-src/StillHour/
-  Constants.ttslua          thresholds/bands derived from investigator count
-  CampaignState.ttslua      the single owned state store (Memory/Dissonance/Hourglass/Years/Knowledge/flags)
-  Dissonance.ttslua         [static] token + band-driven chaos-bag reconciliation
-  LoopFlags.ttslua          once-per-loop + per-loop test-type bookkeeping
-  Hourglass.ttslua          the Occultation clock (advance/rewind, "when reached" Hours)
-  Aging.ttslua              age brackets + stat drift
-dist/
-  the_still_hour.json       generated 30-card player-card bag
-  stillhour_starter.json    generated Elias vertical slice
-docs/
-  BUILD_STATUS.md           priority ladder (P0–P8) + flagged design-doc conflicts
-  INTEGRATION.md            how to wire this into an argonui/SCED fork
+dist/                         generated; never edit by hand
+  saved_object_the_still_hour.json   THE file to load in TTS (campaign box)
+  cards/                      hosted card images (JPEG), referenced by commit hash
+  guide/                      the typeset campaign guide PDF
+  downloads/                  the same box for SCED's download mechanism (optional)
+  the_still_hour_*.json       component builds the TTS relay spawns for tests
+src/StillHour/                the campaign's Lua modules (bundled into the Control token)
+  Constants.ttslua            thresholds scaled by investigator count
+  CampaignState.ttslua        the single campaign state store + persistence
+  Dissonance.ttslua           Dissonance bands and the [static] token count
+  ChaosBag.ttslua             physical [static] tokens in SCED's chaos bag
+  LoopFlags.ttslua            once-per-loop bookkeeping
+  Hourglass.ttslua            the Hour clock
+  Knowledge.ttslua            the Knowledge Track registry
+  Locations.ttslua            which side of each campaign location is in play
+  Appointed.ttslua            scripted behaviour for one encounter card
+  Aging.ttslua                Years and age brackets
+  Interlude.ttslua            the between-loops procedure and purchases
+  Board.ttslua                table wiring: buttons, counters, card placement
+  SCED.ttslua                 fail-safe adapter over SCED's public API
+src/tts/                      object scripts: Control entry, campaign log,
+                              scenario/campaign boxes, download box
+pipeline/                     specs, renderer, compiler and packagers (Python)
+  publish_hosted.py           the release build: render, host images, rebuild dist/
+cardforge/                    CardForge Studio (python3 cardforge/studio.py) + selftests
+campaigns/                    per-campaign data (still_hour, plus hollow and demo)
+tests/                        pytest suite, fake-TTS relay tests
+tools/tts_relay/              automated in-game testing on the owner's PC
+docs/                         loading, relay, workflow and build notes
 ```
 
-## Quickstart
+## Build and test
 
 ```bash
-python3 pipeline/publish_hosted.py         # render, host images, rebuild every dist/ file
-lua5.4  pipeline/lua_smoketest.lua         # Lua system tests
-lua5.4  pipeline/verify_bundle.lua         # the Control token in a stubbed TTS env
+python3 pipeline/publish_hosted.py         # the release build (see below)
 python3 -m pytest -q tests                 # content, packaging, fake-TTS relay tests
-python3 pipeline/simulate.py               # balance simulation report + assertions
-python3 pipeline/simulate_tempo.py         # act-vs-clock pacing (objectives per loop)
+python3 cardforge/selftest.py              # CardForge batch tool (seconds)
+python3 cardforge/studio_selftest.py       # CardForge Studio end to end (~20-45 min)
+lua5.4  pipeline/lua_smoketest.lua         # the Lua rules modules
+lua5.4  pipeline/verify_bundle.lua         # the Control token in a stubbed TTS
+python3 pipeline/scenario_content.py       # scenario readiness audit
+python3 pipeline/simulate.py               # balance model
+python3 pipeline/simulate_tempo.py         # pacing model
 ```
 
-**To play in Tabletop Simulator:** load `dist/saved_object_the_still_hour.json`
-as a Saved Object in SCED — see **`docs/LOADING.md`**.
-
-## Testing & simulation
-
-Two complementary layers, plus an in-engine harness:
-
-- **`pipeline/lua_smoketest.lua`** — offline functional tests of the Lua modules
-  (state persistence, bands, loop flags, clock, aging, CO-001 spend). 54 asserts.
-- **`pipeline/simulate.py`** — Monte-Carlo *balance* model: chaos-bag success
-  curve (reproduces 25/56/75), Memory economy vs the official-XP benchmark
-  (~40–50/investigator), Dissonance pacing (cautious vs greedy), and the aging
-  spread. Validates the math the design docs cite. `--trials/--loops/--quiet`.
-- **`tests/tts_console_harness.lua`** — runs the *same* assertions inside
-  Tabletop Simulator against the real bundled modules, with a live
-  loop→reset→interlude walkthrough. Attach to an object and click its button, or
-  `>execute runStillHourTests()` from the console (see the file header).
-
-The simulator validates probabilities/economy/pacing; it cannot validate fun or
-catch rules-interaction surprises — those still need real play in TTS.
+- **Release build.** `publish_hosted.py` renders every face, writes the card
+  images to `dist/cards/`, commits them, and pins every image URL to that
+  commit, then rebuilds all of `dist/`. The individual build scripts
+  (`build_cards.py`, `bundle_mod.py`, `table_presence.py`,
+  `package_download.py`) refuse to write placeholder or `file:///` image URLs
+  into `dist/`; pass `--local` for a private test build that must not be
+  committed.
+- **Never squash- or rebase-merge a publish commit.** The hosted image URLs
+  name that exact commit; rewriting it blanks every card face in TTS.
+- **Selftests are sandboxed.** Both CardForge selftests copy the repository to
+  a temporary folder, run there, and delete the copy, so they never change
+  tracked files or your generated art. The pytest suite does not write to
+  tracked files either.
+- Machine-specific backend settings go in `rig.local.json` (ignored by git;
+  `rig.example.json` shows the shape). `rig.json` holds shared defaults only.
 
 ## Status
 
-P1–P7 are implemented and tested offline (99-assertion suite): the card pipeline,
-the campaign state manager, the `[static]`/Dissonance bands, loop bookkeeping, the
-Appointed (P5, staged Approach), the Occultation clock + location fact-toggles
-(P6), and aging drift + the interlude (P7). Remaining: P8 download-box packaging,
-the real in-TTS load test, and per-system board wiring (see `docs/BUILD_STATUS.md`).
-`docs/INTEGRATION.md` covers folding this into an SCED fork.
+The campaign is content-complete and passes its offline checks (pytest, both
+CardForge selftests, the Lua rules suite, the bundle check and the scenario
+audit). Current counts live in `campaigns/still_hour/assistant/production.json`.
+Still to do before it is released to the group:
+
+- a real TTS relay run on the current build (`docs/TTS_RELAY.md`);
+- six remaining illustrations, generated in ChatGPT from the art pack (the
+  `remaining` request in `pipeline/chatgpt_art_pack.json`; see
+  `docs/CHATGPT_ART_PACK.md`);
+- the first playtest.
+
+Offline checks and relay passes are not playtest approval.

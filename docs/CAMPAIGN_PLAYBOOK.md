@@ -225,6 +225,23 @@ check misses text that runs under frame art. Known trouble spots:
 - Relay test fixtures must respect the rules they test (for example, closed
   locations).
 - Keep spoilers out of chat even when summarizing your own work.
+- Never squash- or rebase-merge a publish commit. `publish_hosted.py` pins
+  every hosted image URL to the commit that holds the images; rewriting that
+  commit blanks every face in TTS. Use a normal merge or fast-forward.
+- Tests must never write to the checkout. The CardForge selftests run in a
+  temporary copy (`cardforge/sandbox.py`); a snapshot-and-restore scheme left
+  tracked files rewritten mid-run and could wipe local art and backends.
+  Check `git status --porcelain` is identical before and after every suite.
+- Build scripts must fail loudly rather than write a broken release: without
+  hosted URLs they refuse to put placeholder or `file:///` images into `dist/`
+  (`--local` for private test builds).
+- Keep machine-specific settings out of tracked files (`rig.local.json`, not
+  `rig.json`) from the first commit. Untracking a file that is already
+  tracked deletes it on the next pull elsewhere; keep it tracked with neutral
+  defaults and have the app write an ignored override file.
+- A test that waits on a background job must check the job's outcome, not
+  just that the worker went idle, and must not let its own output be
+  captured by the app's log redirection.
 
 ## Definition of done (per campaign)
 

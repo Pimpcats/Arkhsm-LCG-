@@ -24,6 +24,8 @@ Image/PDF URLs come from pipeline/art_urls.json (publish_hosted.py writes the
 hosted raw.githubusercontent URLs there).
 
 Run: python3 pipeline/table_presence.py      -> dist/the_still_hour_table.json
+(the release build runs it through publish_hosted.py; placeholder or file:///
+image URLs in dist/ are refused unless --local is passed)
 """
 import copy
 import hashlib
@@ -310,16 +312,18 @@ def render_box_texture(dest=None):
 
 
 # ------------------------------------------------------------------ main --
-def build(out=OUT):
+def build(out=OUT, allow_local=False):
     box = campaign_box()
     # the table-presence-only box sits one box-width over from the compiled
     # campaign box: the relay spawns both, and two memory bags dropped on the
     # same spot put one inside the other
     box["Transform"]["posZ"] = CAMPAIGN_BOX_POS["z"] - 8.0
     save = {"SaveName": CAMPAIGN, "GameMode": CAMPAIGN, "ObjectStates": [box]}
+    text = json.dumps(save, indent=2, ensure_ascii=False)
+    B.release_guard(out, text, allow_local)
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w", encoding="utf-8") as f:
-        json.dump(save, f, indent=2, ensure_ascii=False)
+        f.write(text)
     d = json.load(open(out, encoding="utf-8"))["ObjectStates"][0]
     kinds = sorted(o["Name"] for o in d["ContainedObjects"])
     return {"out": os.path.relpath(out, ROOT), "objects": kinds,
@@ -328,8 +332,12 @@ def build(out=OUT):
             "guide_url": box["ContainedObjects"][2]["CustomPDF"]["PDFUrl"]}
 
 
-def main():
-    print(json.dumps(build(), indent=2))
+def main(argv=None):
+    import argparse
+    ap = argparse.ArgumentParser(description="Build the campaign's table-presence box.")
+    B.add_local_flag(ap)
+    args = ap.parse_args(argv)
+    print(json.dumps(build(allow_local=args.local), indent=2))
 
 
 if __name__ == "__main__":

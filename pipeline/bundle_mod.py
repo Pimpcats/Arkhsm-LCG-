@@ -12,10 +12,17 @@ Outputs:
   dist/the_still_hour_mod.json  a TTS save: card bag + scripted control token
 
 Run: python3 pipeline/bundle_mod.py   (from repo root)
+The release build runs this through pipeline/publish_hosted.py; writing
+placeholder or file:/// image URLs into dist/ is refused unless --local.
 """
+import argparse
 import hashlib
 import json
 import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from build_cards import add_local_flag, release_guard  # noqa: E402
 
 MODULES = [
     "Constants",
@@ -168,20 +175,26 @@ def build_save(root, bundle):
     }
 
 
-def main():
+def main(argv=None):
+    ap = argparse.ArgumentParser(description="Assemble the TTS mod for THE STILL HOUR.")
+    add_local_flag(ap)
+    args = ap.parse_args(argv)
     here = os.path.dirname(os.path.abspath(__file__))
     root = os.path.dirname(here)
     os.makedirs(os.path.join(root, "dist"), exist_ok=True)
 
     bundle = build_bundle(root)
     bundle_path = os.path.join(root, "dist", "stillhour_bundle.lua")
-    with open(bundle_path, "w", encoding="utf-8") as f:
-        f.write(bundle)
-
     save = build_save(root, bundle)
     save_path = os.path.join(root, "dist", "the_still_hour_mod.json")
+    save_text = json.dumps(save, indent=2, ensure_ascii=False)
+    # check both before writing either, so a refusal leaves dist/ untouched
+    release_guard(bundle_path, bundle, args.local)
+    release_guard(save_path, save_text, args.local)
+    with open(bundle_path, "w", encoding="utf-8") as f:
+        f.write(bundle)
     with open(save_path, "w", encoding="utf-8") as f:
-        json.dump(save, f, indent=2, ensure_ascii=False)
+        f.write(save_text)
 
     # Validate the save round-trips and the control script embedded cleanly.
     reloaded = json.load(open(save_path, encoding="utf-8"))

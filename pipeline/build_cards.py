@@ -12,6 +12,11 @@ Usage:
     python3 build_cards.py --out path.json      # alternate output
     python3 build_cards.py --only sthrelias sthr-lamp sthr-donebefore sthr-eighthgrave
                                                 # Elias vertical slice -> dist/stillhour_starter.json
+    python3 build_cards.py --local              # private test build (see below)
+
+The release dist/ files are rebuilt by pipeline/publish_hosted.py, which writes
+hosted image URLs to pipeline/art_urls.json first. Writing into dist/ with
+placeholder or file:/// image URLs is refused unless --local is passed.
 
 Structure verified against Arkham SCE 4.8.0:
   - Card object: Name="Card", Tags=[<Type>,"PlayerCard"], SidewaysCard=True only for Investigators.
@@ -254,6 +259,45 @@ def _load_art_urls():
 ART_URLS = _load_art_urls()
 
 
+# --------------------------------------------------------- release guard --
+# The release files in dist/ are what the owner loads in Tabletop Simulator:
+# they must carry the hosted image URLs publish_hosted.py writes. Run alone in
+# a fresh clone (no pipeline/art_urls.json) a build script would silently fill
+# them with placeholder or this machine's file:/// images, so every script that
+# writes into dist/ refuses that unless --local asks for a private test build.
+RELEASE_DIST = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                            "dist")
+NON_RELEASE_URLS = ("file:///", "placehold.co")
+
+
+def is_release_path(path):
+    """True for files under the repository's own dist/ folder."""
+    return os.path.normcase(os.path.abspath(path)).startswith(
+        os.path.normcase(RELEASE_DIST) + os.sep)
+
+
+def release_guard(path, text, allow_local=False):
+    """Refuse (SystemExit, non-zero) to write a release dist file whose text
+    still points at placeholder or machine-local images."""
+    if allow_local or not is_release_path(path):
+        return
+    found = [m for m in NON_RELEASE_URLS if m in text]
+    if found:
+        raise SystemExit(
+            "refusing to write {}: it would ship {} image URLs. The release build "
+            "is made by pipeline/publish_hosted.py, which writes the hosted URLs "
+            "first. For a private local test build, pass --local.".format(
+                os.path.relpath(path, os.path.dirname(RELEASE_DIST)).replace(os.sep, "/"),
+                " and ".join("machine-local file:///" if m == "file:///"
+                             else "placeholder (" + m + ")" for m in found)))
+
+
+def add_local_flag(ap):
+    ap.add_argument("--local", action="store_true",
+                    help="allow placeholder / file:/// image URLs in dist/ "
+                         "(private test build; never commit or share it)")
+
+
 def tags_for(c):
     """Real-SCED tagging (see docs/art_reference/sced_objects/): a type tag is
     added only where SCED scripting needs it (Investigator, Asset slots,
@@ -325,11 +369,13 @@ def build_bag(cards, nickname):
     }
 
 
-def generate(spec, out_path, nickname):
+def generate(spec, out_path, nickname, allow_local=False):
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     cards = [build_card(c) for c in spec]
+    text = json.dumps({"ObjectStates": [build_bag(cards, nickname)]}, indent=2)
+    release_guard(out_path, text, allow_local)
     with open(out_path, "w", encoding="utf-8") as f:
-        json.dump({"ObjectStates": [build_bag(cards, nickname)]}, f, indent=2)
+        f.write(text)
 
     # Validate: round-trip + metadata parses + no duplicate CardIDs/ids.
     d = json.load(open(out_path, encoding="utf-8"))
@@ -361,6 +407,7 @@ def main():
     ap.add_argument("--out", default=None)
     ap.add_argument("--only", nargs="*", default=None,
                     help="Restrict output to these card ids (e.g. the Elias starter slice).")
+    add_local_flag(ap)
     args = ap.parse_args()
 
     spec = with_overrides(json.load(open(args.spec, encoding="utf-8")))
@@ -371,17 +418,17 @@ def main():
         if missing:
             raise SystemExit(f"--only referenced unknown card ids: {sorted(missing)}")
         generate(spec, args.out or os.path.join(root, "dist", "stillhour_starter.json"),
-                 "THE STILL HOUR — Starter Slice")
+                 "THE STILL HOUR — Starter Slice", args.local)
         return
 
     # Default full build: player cards, plus the encounter deck if its spec exists.
     generate(spec, args.out or os.path.join(root, "dist", "the_still_hour.json"),
-             "THE STILL HOUR — Player Cards")
+             "THE STILL HOUR — Player Cards", args.local)
     enc_spec_path = os.path.join(here, "stillhour_encounter_spec.json")
     if args.out is None and os.path.exists(enc_spec_path):
         generate(with_overrides(json.load(open(enc_spec_path, encoding="utf-8"))),
                  os.path.join(root, "dist", "the_still_hour_encounter.json"),
-                 "THE STILL HOUR — The Appointed")
+                 "THE STILL HOUR — The Appointed", args.local)
 
 
 if __name__ == "__main__":

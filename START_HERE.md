@@ -1,8 +1,13 @@
 # THE STILL HOUR — START HERE
-*Drop this in the Claude Project knowledge folder first. It orients any chat in 60 seconds.*
+*Drop this in the Claude Project knowledge folder first. It orients any chat in 60 seconds. Spoiler-free.*
 
 ## What this is
-An **original Arkham Horror LCG campaign**, "The Still Hour," built as a module for the **SCED** Tabletop Simulator mod. A time-loop cosmic-horror campaign for **3 investigators** (scales 1–4).
+An **original Arkham Horror LCG campaign**, "The Still Hour," built as a module for the **SCED** Tabletop Simulator mod. A time-loop cosmic-horror campaign tuned for **3 investigators** (plays 1–4).
+
+The owner is playing it as a **first-time player**: keep story spoilers (card effects, enemy roles, twists, solutions, endings) out of chat and out of owner-facing docs. The design documents in `docs/design/` are spoilers.
+
+## Play it
+Load `dist/saved_object_the_still_hour.json` as a Saved Object in SCED. Step by step: **`docs/LOADING.md`**. Card images load from GitHub, so the file works on any PC.
 
 ## Run the app (one click)
 
@@ -11,36 +16,36 @@ Double-click in the repo folder:
 - **macOS** — `Start CardForge.command`
 - **Linux** — `./start-cardforge.sh`
 
-It finds Python, installs Pillow on first run, starts the studio and opens
+It finds Python, installs Pillow on first run, starts CardForge Studio and opens
 <http://127.0.0.1:8570> in your browser. Close the window (or Ctrl-C) to stop.
-Manual equivalent: `python3 cardforge/studio.py`.
+Manual equivalent: `python3 cardforge/studio.py`. Local image backends are
+optional; their machine-specific settings live in `rig.local.json`.
 
 ## Where the code lives
 - **Repo:** `github.com/Pimpcats/Arkhsm-LCG-` (public)
-- **Working branch:** `main` ← everything is here (all earlier branches were folded into it, 2026-09-22).
-- Point Claude Code / any repo reader at that branch.
+- **Working branch:** `main`. It is current: all earlier branches were folded into it (2026-09-22) and later work is merged there.
+- Point Claude Code / any repo reader at `main`. GitHub access is not access to the owner's running desktop app or Tabletop Simulator.
 
-## The design in five lines
-1. **Time loop.** You play one night; it resets; you carry what you remembered. The reset is the heartbeat.
-2. **Memory = XP** (shared pool, soft cap `6 × investigators` = 18 at 3p). Buys level-ups (1/level) **and** Recollections (their `memoryCost`).
-3. **Dissonance** rises when you use foreknowledge; the **Appointed** climbs a staged Approach (Unseen → Sensed → Emerging → Arrived) driven by the clock and the Dissonance bands — entering Noticed (`4 × n`, 12 at 3p) drives it to Arrived; at `6 × n` (18) the loop resets (CO-002).
-4. **Knowledge Track** — facts unlocked by district objectives; they permanently edit the night. You must loop to fill it.
-5. **Aging is the finale's cost.** Every loop adds Years; brackets drift body→mind; the finale's ending is gated by the party's Age. The contest target is `4 × n` (12 at 3p).
+## The systems in brief (what the player guide teaches)
+- **Time loop.** You play one night; it resets; you keep what you remembered.
+- **Memory** is the campaign's experience: it buys upgrades between loops.
+- **Dissonance** tracks how hard you lean on what you know.
+- **Knowledge** — facts you earn that change later nights.
+- **Aging** — living the same night again has a cost.
 
-## Build status (see `REPO_BUILD_STATUS.md` for detail)
-- ✅ **Design frozen** — all docs below.
-- ✅ **P1–P8 all built & tested offline** (99-assertion suite + 39 in-bundle). The package to load is `dist/saved_object_the_still_hour.json` (a TTS Saved Object; see `docs/LOADING.md`).
-- ✅ **CO-001 applied** (contest `4 * n`, Memory-as-XP) and **CO-002 applied** (the staged Appointed, renamed from Latecomer).
-- 🟡 **Board wiring + chaos bag built** (Appointed card buttons/placement, location flips/seals, touchable counters, interlude buy panel, physical `[static]` tokens in SCED's bag) — verified offline; the TTS relay run confirms it in the real engine.
-- ⏳ **Pending:** the real in-TTS run · location back art · uploading the download-box release asset.
-- ✅ **Art:** all 119 illustrations approved (style E, generated in ChatGPT via `docs/CHATGPT_ART_PACK.md`), committed in `assets/illustrations/still_hour/` and composited into every face in `dist/` (story frames are text-only).
+## Status (2026-09-27)
+- ✅ Campaign content, rules wording passes, balance models, guide PDF and campaign log built; offline checks green (pytest, CardForge selftests, Lua rules suite, bundle check, scenario audit). Counts: `campaigns/still_hour/assistant/production.json`.
+- ✅ Card art: the illustrations are approved and composited into the faces in `dist/`, except six still to generate (below).
+- ⏳ **Pending:**
+  1. a real **TTS relay run on the current head** (owner, local PowerShell; `docs/TTS_RELAY.md`);
+  2. **six illustrations** via the ChatGPT art pack's "remaining" request (`docs/CHATGPT_ART_PACK.md`, `pipeline/chatgpt_art_pack.json`);
+  3. the owner's **first playtest**.
+- Relay passes and offline checks are not playtest approval.
 
-## File map (this Project folder)
-**Design (source of truth):** `THE_STILL_HOUR_design*` (concept) · `*_cards_v0_2` (investigators, signatures, weaknesses, Recollections — exact wording) · `*_aging_3p_v0_3` (Aging + 3p constants) · `*_encounter_v0_4` (encounter deck, Occultation, Appointed) · `*_campaign_guide_v0_5` (every scenario, finale — design reference) · `*_player_guide` (the player-facing campaign guide the PDF is typeset from) · `*_log_sheet` (campaign log).
-**Change orders:** `CO-001_change_order` (contest 4n + Memory-as-XP — applied) · `CO-002_the_appointed` (staged Appointed — applied).
-**Build briefs:** `SCED_BUILD_BRIEF` (the module) · `ART_SPEC` + `ART_PIPELINE_BRIEF` + `CARDFORGE_BRIEF` (art).
-**Build state (from repo):** `REPO_BUILD_STATUS` · `REPO_INTEGRATION` (host-object wiring) · `REPO_LOADING` (how to load in TTS).
-**Scaffolds:** `build_cards.py` / `stillhour_cards_spec.json` / `stillhour_starter.json` (note: repo's `pipeline/build_cards.py` is the newer authoritative version) · `build_art_manifest.py` + `art_manifest_starter.json` + `art_profiles.json` + `cardforge_stub.py` (art tooling) · `THE_STILL_HOUR_flow.html` (systems infographic).
+## File map
+**Owner docs:** `docs/LOADING.md` (load in TTS) · `docs/TTS_RELAY.md` (automated in-game test) · `docs/CHECKLIST.md` (status) · `docs/HANDOFF.md` (next session).
+**Assistant/designer docs (spoilers):** `docs/ASSISTANT_WORKFLOW.md` (read first) · `docs/CAMPAIGN_PLAYBOOK.md` · `docs/BUILD_STATUS.md` · `docs/design/` (design, change orders, audits).
+**State:** `campaigns/still_hour/assistant/production.json` (current counts, validation, next actions).
 
 ## How to continue
-Hand the next task to **Claude Code** against `Pimpcats/Arkhsm-LCG-` @ `main`. P1–P8, the board wiring and the art are done; next up is the owner's first playtest (load `dist/saved_object_the_still_hour.json`, see `docs/LOADING.md`) and the TTS relay run on the current build. Track current state in `campaigns/still_hour/assistant/production.json`.
+Hand the next task to **Claude Code** against `Pimpcats/Arkhsm-LCG-` @ `main`; it reads `AGENTS.md` and `docs/ASSISTANT_WORKFLOW.md` first. Next up: the relay run on the current head, the six remaining illustrations, then the first playtest.

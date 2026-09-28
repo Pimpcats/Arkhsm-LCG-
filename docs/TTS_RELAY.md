@@ -39,9 +39,8 @@ For each new commit on the watched branch:
    token's rules tests, save/reload, the board wiring (touchable counters and
    their persistence; `[static]` tokens entering/leaving SCED's chaos bag and a
    drawn one raising Dissonance; two test location cards flipping and
-   un-sealing; the Appointed card manifesting at the farthest location, Hold
-   Back, returning when put in a bag, hunting the investigator with the most
-   on-card Memory; Aging on an investigator card and its SCED skill tracker;
+   un-sealing; the scripted encounter card's buttons and placement; Aging on
+   an investigator card and its SCED skill tracker;
    the state riding in the campaign log through a simulated SCED export), and
    dealing a card. With the table payload (`dist/the_still_hour_table.json`) it
    also presses the campaign box's Place, checks the minicards / campaign guide /
@@ -53,10 +52,12 @@ For each new commit on the watched branch:
 4. Commits `runs/<time>_<commit>/{results.json,log.txt,screenshots/}` plus
    `latest.json` to the `tts-results` branch and pushes it.
 
-If the watched branch no longer exists (merged and deleted), the relay and its
-launcher fall back to `main`. Card images and the guide are hosted at the
-commit that holds them (`pipeline/publish_hosted.py`), so deleting a branch
-never blanks the faces in TTS.
+The relay watches `main` (the working branch) by default. If a watched branch
+no longer exists (merged and deleted), the relay and its launcher fall back to
+`main`. Card images and the guide are hosted at the commit that holds them
+(`pipeline/publish_hosted.py`), so deleting a branch never blanks the faces in
+TTS, as long as that commit survives the merge: **never squash- or
+rebase-merge a publish commit**.
 
 Only objects tagged `StillHourRelay` (the ones the relay spawned) are ever
 removed. Only Lua from the watched commit is sent to TTS. The relay never runs
