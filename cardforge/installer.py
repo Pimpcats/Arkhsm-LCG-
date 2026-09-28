@@ -12,7 +12,7 @@ v1.1 version. Civitai requires a personal API token for most downloads —
 paste it in the Setup tab (stored in state/, never committed). After the
 download the campaign's "checkpoint" is set to the file and the A1111 rig
 launch gains --ckpt-dir vendor/models so the backend sees it wherever the
-folder lives (toggle "use_vendor_models" off in rig.json to use your own
+folder lives (toggle "use_vendor_models" off in rig.local.json to use your own
 model library instead).
 
 Strange Eons: fetched from the official GitHub releases (CGJennings/
@@ -260,7 +260,7 @@ def install_checkpoint(campaign="still_hour", token=None, dry_run=False, log=pri
         json.dump(camp, f, indent=2)
     log("campaign checkpoint -> " + fname)
     log("A1111 will see it via --ckpt-dir vendor/models (added at launch; "
-        "set \"use_vendor_models\": false in rig.json to opt out)")
+        "set \"use_vendor_models\": false in rig.local.json to opt out)")
     return fname
 
 

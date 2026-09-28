@@ -14,6 +14,9 @@ assets/fonts/ArnoPro*
 assets/fonts/MinionPro*
 pipeline/art_urls.json
 
+# machine-local backend settings (rig.json holds neutral shared defaults)
+rig.local.json
+
 # selftest safety copies of the owner state (removed when the run ends)
 *.pretest-backup
 *.pretest-copy

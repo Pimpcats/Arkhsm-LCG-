@@ -1,0 +1,13 @@
+{
+  "a1111": {
+    "cwd": "C:\\path\\to\\stable-diffusion-webui",
+    "command": "webui.bat --api --nowebui",
+    "startup_timeout": 420
+  },
+  "comfy": {
+    "cwd": "C:\\path\\to\\ComfyUI",
+    "command": "python main.py",
+    "startup_timeout": 300
+  },
+  "_note": "Example of rig.local.json (machine-local backend settings, not tracked). Copy it to rig.local.json and edit, or let the Studio's Illustrate tab write it. Any key left out falls back to rig.json, then to the built-in defaults."
+}

@@ -1,8 +1,11 @@
 """Backend rig — where A1111/ComfyUI live on THIS machine and how to start
 them, so the Studio can launch the image backend itself and wait for its API.
 
-Config is rig.json at the repo root (machine-local; edit there or in the
-Studio's Illustrate tab). The launched process gets its own console window on
+Config is layered: built-in defaults, then rig.json at the repo root (tracked,
+neutral shared defaults, never machine paths), then rig.local.json (ignored by
+git: this machine's folders and commands). The Studio's Illustrate tab and the
+installers write rig.local.json only, so a pull never overwrites the owner's
+settings and a commit never publishes them. rig.example.json shows the shape. The launched process gets its own console window on
 Windows (its logs stay visible) / its own session elsewhere, and outlives the
 Studio. `ensure_up` is the one entry point: reachable? done. Not reachable?
 launch it, then poll the backend's own check() until the API answers or the
@@ -25,16 +28,33 @@ RIG_DEFAULTS = {
 }
 
 
-def rig_path():
+def shared_rig_path():
+    """Tracked, neutral defaults (no machine paths)."""
     return os.path.join(runner.repo_root(), "rig.json")
 
 
+def rig_path():
+    """This machine's settings (not tracked); every save goes here."""
+    return os.path.join(runner.repo_root(), "rig.local.json")
+
+
+def _read(path):
+    if not os.path.exists(path):
+        return {}
+    try:
+        data = json.load(open(path, encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
 def load_rig():
+    """Defaults, then rig.json, then rig.local.json (each layer optional)."""
     cfg = {k: dict(v) for k, v in RIG_DEFAULTS.items()}
-    if os.path.exists(rig_path()):
-        data = json.load(open(rig_path(), encoding="utf-8"))
+    for data in (_read(shared_rig_path()), _read(rig_path())):
         for k in cfg:
-            cfg[k].update(data.get(k, {}))
+            if isinstance(data.get(k), dict):
+                cfg[k].update(data[k])
         if data.get("_note"):
             cfg["_note"] = data["_note"]
     return cfg
@@ -52,10 +72,10 @@ def launch(kind):
     cwd, command = entry.get("cwd", ""), entry.get("command", "")
     if not command:
         return False, ("no launch command for '{}' — set it in the Illustrate "
-                       "tab (or rig.json)".format(kind))
+                       "tab (or rig.local.json)".format(kind))
     if cwd and not os.path.isdir(cwd):
         return False, ("backend folder not found: {} — fix it in the "
-                       "Illustrate tab (or rig.json)".format(cwd))
+                       "Illustrate tab (or rig.local.json)".format(cwd))
     if kind == "a1111":
         from . import installer
         command += installer.ckpt_dir_args()   # self-contained vendor/models
@@ -100,5 +120,5 @@ def ensure_up(camp, dry_run=False, on_log=print, launch_if_down=True):
                    "progress)".format(backend.name, int(time.time() - t0)))
     raise RuntimeError(
         "[{}] did not come up within {}s — check its console window; if it "
-        "needs longer on first boot, raise startup_timeout in rig.json"
+        "needs longer on first boot, raise startup_timeout in rig.local.json"
         .format(backend.name, timeout))
