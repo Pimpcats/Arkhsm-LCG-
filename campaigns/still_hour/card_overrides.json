@@ -865,7 +865,7 @@
   },
   "sthr-act-walksbeside": {
     "name": "Who Walks Beside You",
-    "text": "Part II only.\nForced – When this act becomes the current act: Search the encounter deck and discard pile for a Waiting Congregation and spawn it at the Turning. While this act is the current act, each Echo at the Turning is not Sleepwalking.\nObjective – [action]: Stand Firm. Only an investigator at the Turning may use this ability. Choose a ready Echo at the Turning and test [wil] (X) or [com] (X), where X is its fight value. If you succeed, exhaust it. After an investigator evades an Echo at the Turning or succeeds at Stand Firm, advance.",
+    "text": "Part II only.\nForced – When this act becomes the current act: Search the encounter deck and discard pile for a Waiting Congregation, spawn it at the Turning and shuffle the encounter deck. While this act is the current act, each Echo at the Turning is not Sleepwalking.\nObjective – [action]: Stand Firm. Only an investigator at the Turning may use this ability. Choose a ready Echo at the Turning and test [wil] (X) or [com] (X), where X is its fight value. If you succeed, exhaust it. After an investigator evades an Echo at the Turning or succeeds at Stand Firm, advance.",
     "flavor": "Some of them turn to look at you now.",
     "deck": 95107,
     "index": "2a",
@@ -1188,7 +1188,7 @@
     "agiIcons": 1
   },
   "sthrseraphine": {
-    "text": "[free] During your turn, raise Dissonance by 1: Choose one – You get +2 skill value for this skill test; or gain 1 additional action this turn; or ready a Spell asset you control. Limit twice per round.\n[reaction] After you use the ability above for the second time in a round: Place 1 Memory on Seraphine.\n[elder] +X, where X is Dissonance (maximum +5). After this skill test ends, lower Dissonance by the amount this token added.",
+    "text": "[free] During your turn, raise Dissonance by 1: Choose one – You get +2 skill value for this skill test; or gain 1 additional action this turn; or ready a Spell asset you control. Limit twice per round.\n[reaction] After you resolve Seraphine's [free] ability for the second time this round: Place 1 Memory on Seraphine.\n[elder] +X, where X is Dissonance (maximum +5). After this skill test ends, lower Dissonance by the amount this token added.",
     "elderSign": "+X, where X is Dissonance (maximum +5). After this skill test ends, lower Dissonance by the amount this token added."
   },
   "sthr-lamp": {

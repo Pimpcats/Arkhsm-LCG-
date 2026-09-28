@@ -52,10 +52,14 @@ function Knowledge.unlock(factId)
   assert(Knowledge.FACTS[factId], "unknown Knowledge fact: " .. tostring(factId))
   local newly = CampaignState.unlockFact(factId)
   local paid = 0
-  if newly and CampaignState.getKnowledgePaid(factId) == nil then
-    paid = Knowledge.memoryFor(factId)
+  if newly then
+    -- the paid marker holds what this entry still has in the bank; a re-tick
+    -- after a partial refund pays only what was taken back
+    local held = CampaignState.getKnowledgePaid(factId) or 0
+    local full = Knowledge.memoryFor(factId)
+    paid = math.max(0, full - held)
     if paid > 0 then CampaignState.bankMemory(paid) end
-    CampaignState.setKnowledgePaid(factId, paid)
+    CampaignState.setKnowledgePaid(factId, math.max(full, held))
   end
   return newly, paid
 end
@@ -65,9 +69,13 @@ end
 function Knowledge.forget(factId)
   assert(Knowledge.FACTS[factId], "unknown Knowledge fact: " .. tostring(factId))
   if not CampaignState.forgetFact(factId) then return false, 0 end
-  local refund = CampaignState.getKnowledgePaid(factId) or 0
+  -- take back what the entry paid, as far as banked Memory allows; whatever
+  -- was already spent stays marked as paid, so re-recording it cannot pay twice
+  local paid = CampaignState.getKnowledgePaid(factId) or 0
+  local refund = math.min(paid, CampaignState.getBankedMemory())
   if refund > 0 then CampaignState.bankMemory(-refund) end
-  CampaignState.setKnowledgePaid(factId, nil)
+  local shortfall = paid - refund
+  CampaignState.setKnowledgePaid(factId, shortfall > 0 and shortfall or nil)
   return true, refund
 end
 

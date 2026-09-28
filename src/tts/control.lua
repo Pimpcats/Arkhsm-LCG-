@@ -1086,10 +1086,13 @@ function shApiBeginNextLoop() guarded("next loop", beginNextLoop) ; afterChange(
 function shStatus()
   local c = CampaignState.constants()
   print(string.format(
-    "STILL HOUR | loop %d | Memory %d/%d | Dissonance %d/%d (%s) | Hour %s | Appointed: %s | contest %d | [static] %d (%s)%s",
-    CampaignState.getLoopsCompleted(), CampaignState.getBankedMemory(), c.memoryCap,
+    "STILL HOUR | loop %d | scar %d | %s | Memory %d/%d | Dissonance %d/%d (%s) | Hour %s | Appointed: %s | contest %d/%d | [static] %d (%s)%s",
+    CampaignState.getLoopsCompleted(), math.min(CampaignState.getLoopsCompleted(), c.scarCap),
+    CampaignState.inPrologue() and "Prologue" or (CampaignState.inPartTwo() and "Part II" or "Part I"),
+    CampaignState.getBankedMemory(), c.memoryCap,
     CampaignState.getDissonance(), c.resetThreshold, CampaignState.band(),
-    Hourglass.HOUR_NAMES[CampaignState.getHour()] or "?", Appointed.stageName(), c.contestTarget,
+    Hourglass.HOUR_NAMES[CampaignState.getHour()] or "?", Appointed.stageName(),
+    CampaignState.getContest(), c.contestTarget,
     bag.target(), bag.describe().mode, SCED.isPresent() and (" | SCED " .. tostring(SCED.version())) or ""))
 end
 
@@ -1209,6 +1212,12 @@ function shKnowledgeStatus()
     Knowledge.surfaceKnownCount(), Knowledge.deepKnownCount(),
     Knowledge.actIIOpen() and "OPEN" or "closed",
     Knowledge.finaleAttemptable() and "ATTEMPTABLE" or (Knowledge.canAssembleFinale() and "assemblable" or "locked")))
+  local known = {}
+  for id, f in pairs(Knowledge.FACTS) do
+    if CampaignState.knows(id) then known[#known + 1] = string.format("%s (%s)", f.name, f.layer) end
+  end
+  table.sort(known)
+  print("  Recorded: " .. (#known > 0 and table.concat(known, "; ") or "none yet"))
   local locs = guarded("scan", Board.locationCards) or {}
   local n = 0
   for _, l in ipairs(locs) do

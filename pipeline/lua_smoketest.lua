@@ -740,8 +740,16 @@ Interlude.beginNextLoop()
 check("...and is reduced to 6n when it does", CampaignState.getBankedMemory() == 18)
 CampaignState.init(3) ; CampaignState.bankMemory(1)
 Knowledge.unlock("the-lamp-was-never-lit") ; CampaignState.spendMemory(4)
-check("a refund never takes banked Memory below 0", select(2, Knowledge.forget("the-lamp-was-never-lit")) == 3
+check("a refund never takes banked Memory below 0", select(2, Knowledge.forget("the-lamp-was-never-lit")) == 0
   and CampaignState.getBankedMemory() == 0)
+check("re-ticking an entry whose Memory was spent pays nothing again",
+  select(2, Knowledge.unlock("the-lamp-was-never-lit")) == 0 and CampaignState.getBankedMemory() == 0)
+CampaignState.init(3) ; CampaignState.bankMemory(1)
+Knowledge.unlock("the-lamp-was-never-lit") ; CampaignState.spendMemory(3)
+check("a partial refund takes back what the bank holds", select(2, Knowledge.forget("the-lamp-was-never-lit")) == 1
+  and CampaignState.getBankedMemory() == 0)
+check("...and a re-tick pays back only that part", select(2, Knowledge.unlock("the-lamp-was-never-lit")) == 1
+  and CampaignState.getBankedMemory() == 1)
 CampaignState.unlockFact("the-wheel-still-turns")
 check("an entry recorded before this rule (no payment) refunds nothing",
   select(2, Knowledge.forget("the-wheel-still-turns")) == 0)

@@ -1218,7 +1218,7 @@
               "act": "I",
               "at": "The Wheel",
               "needs": {
-                "fixed": 2,
+                "clues": "card",
                 "from": [
                   "The Wheel",
                   "The Hall of Mirrors",
@@ -1232,7 +1232,12 @@
               "act": "II",
               "at": "The Ticket Booth",
               "needs": {
-                "test": "speak with the ticket-taker at The Ticket Booth"
+                "clues": "card",
+                "from": [
+                  "The Wheel",
+                  "The Hall of Mirrors",
+                  "The Ticket Booth"
+                ]
               }
             }
           ]

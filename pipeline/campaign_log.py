@@ -65,7 +65,7 @@ FACTS = [
     ("who-walks-beside-you", "Who Walks Beside You", "Sunken Road", "deep",
      "Each Echo gets −1 fight."),
     ("the-sheriff-is-already-dead", "The Sheriff Is Already Dead", "Square", "surface",
-     "The Town Hall Steps enter play other side up."),
+     "The Town Hall Steps enter play calm side up."),
     ("the-vote-that-never-ends", "The Vote That Never Ends", "Square", "deep",
      "Seraphine's thread: suspected."),
     ("the-wheel-still-turns", "The Wheel Still Turns", "Fairground", "surface",
@@ -215,7 +215,7 @@ def _pages():
     y = 1368
     p1.text(90, y, "Banked Memory", size=24, style="bold")
     p1.counter("banked", 300, y - 9, 0, 99)
-    p1.text(345, y, "(cap 6 × investigators: after spending, reduce to the cap)",
+    p1.text(345, y, "(cap 6 × investigators after spending; never below 0)",
             size=20, style="italic", fill=SOFT)
     p1.text(900, y, "Spent this interlude", size=24, style="bold")
     p1.counter("spent", 1150, y - 9, 0, 99)
@@ -231,7 +231,10 @@ def _pages():
     p2.text(PAGE_W // 2, 150, "When the guide says to record an entry, tick its row "
             "(or write its name on the line). It lasts through every reset.",
             size=20, style="italic", fill=SOFT, anchor="ms")
-    y = 206
+    p2.text(PAGE_W // 2, 177, "The first time you record an entry, each investigator gains "
+            "banked Memory: 1 for a surface entry, 3 for a deep entry.",
+            size=18, style="italic", fill=SOFT, anchor="ms")
+    y = 212
     for fid, name, district, layer, summary in FACTS:
         p2.checkbox("k:" + fid, 88, y)
         where = {"prologue": "Prologue", "assembled": "Assembled"}.get(
