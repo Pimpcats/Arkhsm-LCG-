@@ -49,7 +49,7 @@ to swap; it will tell you how to keep that state.
 | File | What it is |
 |---|---|
 | `dist/saved_object_the_still_hour.json` | **The package the owner loads** (the campaign box as a Saved Object). |
-| `dist/downloads/the_still_hour.json` | The same box as a single object, for SCED's download mechanism. |
+| `dist/downloads/the_still_hour.json`, `the_still_hour_box.json` | The same box as a single object plus a download-box stub, for SCED's download mechanism. **Optional and not a load path:** the stub only works once the release file is hosted where SCED's downloader looks, which this build does not do. Use the Saved Object. |
 | `dist/the_still_hour_mod.json`, `dist/the_still_hour_campaign.json`, `dist/the_still_hour_table.json` | Component builds the TTS relay spawns for automated in-game tests. Not for play. |
 
 Rebuild everything (cards, hosted images, guide PDF, boxes, package):
@@ -60,6 +60,12 @@ python3 -m pytest -q tests              # offline checks
 lua5.4 pipeline/lua_smoketest.lua       # rules engine
 lua5.4 pipeline/verify_bundle.lua       # the Control token in a stubbed TTS
 ```
+
+`publish_hosted.py` commits the card images and pins every image URL to that
+commit, so **never squash- or rebase-merge a publish commit** (the pinned URLs
+would stop resolving and every face in TTS would go blank). The individual
+build scripts refuse to write placeholder or `file:///` image URLs into
+`dist/`; `--local` makes a private test build that must not be committed.
 
 `bundle_mod.py` inlines `src/StillHour/*.ttslua` behind a local `require` and
 appends `src/tts/control.lua` as the entry script. Scenario boxes carry

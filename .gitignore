@@ -17,6 +17,7 @@ pipeline/art_urls.json
 # machine-local backend settings (rig.json holds neutral shared defaults)
 rig.local.json
 
-# selftest safety copies of the owner state (removed when the run ends)
+# leftovers of selftests from before they ran in a temporary copy
+# (cardforge/sandbox.py); safe to delete if any remain
 *.pretest-backup
 *.pretest-copy

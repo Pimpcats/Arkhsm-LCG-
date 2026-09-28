@@ -1,33 +1,49 @@
 # THE STILL HOUR — SCED build status
 
-Tracks the `SCED_BUILD_BRIEF.md` priorities. This session delivered the
-**card pipeline (all player cards)** and the **campaign state manager core**
-(P1–P4 + the P6/P7 data models), all runnable and tested offline.
+*Designer-facing (spoilers). Updated 2026-09-27.* Tracks the
+`SCED_BUILD_BRIEF.md` priorities. P0–P8, the board wiring, the chaos-bag
+integration, every scenario and the table presence are built and pass their
+offline checks. Current counts and test results:
+`campaigns/still_hour/assistant/production.json`. Remaining before release:
+a real TTS relay run on the current head, six illustrations (the ChatGPT art
+pack's "remaining" request) and the first playtest.
 
 ## Priority ladder
 
 | # | System | Status | Where |
 |---|--------|--------|-------|
 | P0 | Vertical slice loads (Elias + 2 sig + weakness) | ✅ generated + loadable mod | `dist/stillhour_starter.json`; full loadable save `dist/the_still_hour_mod.json` (`pipeline/bundle_mod.py`) |
-| P1 | Card pipeline → all player cards | ✅ done | `pipeline/build_cards.py`, `pipeline/stillhour_cards_spec.json`, `dist/the_still_hour.json` (30 cards) |
+| P1 | Card pipeline → all player cards | ✅ done | `pipeline/build_cards.py`, `pipeline/stillhour_cards_spec.json`, `dist/the_still_hour.json` |
 | P2 | Campaign state manager (Memory/Dissonance/Hourglass/Years/Knowledge/flags) + persistence | ✅ core done | `src/StillHour/CampaignState.ttslua` |
 | P3 | `[static]` token + Dissonance bands + chaos-bag banding | ✅ done | `src/StillHour/Dissonance.ttslua`, `Constants.ttslua` |
 | P4 | Once-per-loop + per-loop test-type flags across node travel | ✅ done | `src/StillHour/LoopFlags.ttslua` (+ CampaignState) |
 | P5 | The Appointed (staged Approach, undefeatable / Hold Back / hunts most-Memory) | ✅ done (CO-002) | `src/StillHour/Appointed.ttslua`, `CampaignState.ttslua`, clock/band drivers; cards `dist/the_still_hour_encounter.json` |
 | P6 | Occultation clock + location fact-toggles | ✅ done | `src/StillHour/Hourglass.ttslua`, `Locations.ttslua`, `Knowledge.ttslua` |
 | P7 | Aging bracket drift + interlude | ✅ logic done; demo UI in control token | `src/StillHour/Aging.ttslua` (`applyDriftToStats`), `Interlude.ttslua` |
-| P8 | Package as `the_still_hour.json` download-box asset | ✅ built; upload + API-verify remain | `pipeline/package_download.py` → `dist/downloads/` + `src/tts/download_box.lua` |
+| P8 | Package as `the_still_hour.json` download-box asset | ✅ built; optional (the Saved Object `dist/saved_object_the_still_hour.json` is the load path; the download box needs a hosted release file it does not have) | `pipeline/package_download.py` → `dist/downloads/` + `src/tts/download_box.lua` |
 
 Legend: ✅ done · 🟡 partial · ⏳ not started
 
 ## What runs today (offline, no TTS)
 
 ```bash
-python3 pipeline/build_cards.py            # 30-card player deck + The Appointed encounter set
-python3 pipeline/bundle_mod.py             # loadable TTS save (dist/the_still_hour_mod.json)
-lua5.4  pipeline/lua_smoketest.lua         # 99 assertions across P2/P3/P4/P5/P6/P7
+python3 pipeline/publish_hosted.py         # THE build: render faces, host images, rebuild all of dist/
+python3 -m pytest -q tests                 # content, packaging, fake-TTS relay tests
+python3 cardforge/selftest.py              # CardForge batch tool (sandboxed)
+python3 cardforge/studio_selftest.py       # CardForge Studio end to end (sandboxed, ~20-45 min)
+lua5.4  pipeline/lua_smoketest.lua         # Lua rules suite (P2-P7 + board)
 lua5.4  pipeline/verify_bundle.lua         # drive the mod bundle in a stubbed TTS env
+python3 pipeline/scenario_content.py       # scenario readiness audit
 ```
+
+`publish_hosted.py` commits the card images and pins every image URL to that
+commit (never squash- or rebase-merge a publish commit). Run on their own,
+`build_cards.py`, `bundle_mod.py`, `table_presence.py` and
+`package_download.py` refuse to write placeholder or `file:///` image URLs into
+`dist/` (a fresh clone has no `pipeline/art_urls.json`); `--local` makes a
+private test build that must not be committed. The selftests copy the
+repository to a temporary folder (`cardforge/sandbox.py`) and never touch
+tracked files.
 
 The smoke test exercises the brief's acceptance criteria directly: state
 survives node travel and a reset, Dissonance drops to the scar, bands add/remove
@@ -93,11 +109,11 @@ aging/3p v0.3 → encounter v0.4 → guide v0.5 (latest wins).
 Everything below the line is done and tested offline; the ordered gaps to an
 actual play session:
 
-1. **In-TTS load test** (~an evening, needs your PC): load
-   `dist/the_still_hour_mod.json`, click **Run Tests** (expect 48/48), poke the
-   counters. First real-engine validation. The TTS relay
-   (`docs/TTS_RELAY.md`) now also drives the board wiring below.
-2. **Board wiring** — 🟡 built, offline-verified; needs the real-TTS relay run.
+1. **Real-TTS relay run on the current head** (owner's PC, local PowerShell;
+   `docs/TTS_RELAY.md`). Earlier heads have passed real relay runs; the
+   current one has not been run yet.
+2. **Board wiring** — ✅ built, offline-verified and passed on an earlier real
+   relay run; re-confirm with the relay on the current head.
    `src/StillHour/Board.ttslua` + `src/tts/control.lua`: the Appointed's card
    gets Hold Back / Hunt buttons and is taken out, placed at the farthest
    location (by SCED `locationFront/Back` icons+connections from the
@@ -140,14 +156,11 @@ actual play session:
    `sthr-...` investigators SCED expects the minicard id `sthr--m` (its
    minicard highlight will not match `sthrelias-m`); our board matches by
    stripping `-m` and is unaffected.
-3. **Playable content minimum**: the Prologue + district locations exist as
-   *rules text* in the guide but not yet as location/objective **cards** in the
-   spec (only the 33 player/boss cards are generated). Generating the ~25
-   location cards + 6 district node sets + the 26-card shared encounter spine
-   from `encounter v0.4` through the existing pipeline is data entry, not new
-   code.
-4. **Chaos-bag integration** — 🟡 built, offline-verified against a SCED
-   stand-in; needs the real-TTS relay run. `src/StillHour/ChaosBag.ttslua`
+3. **Playable content** — ✅ done: every scenario is authored as cards and
+   scenario boxes and locked (`pipeline/scenario_content.py`: 0 errors); the
+   campaign box compiles without `--force`.
+4. **Chaos-bag integration** — ✅ built, offline-verified against a SCED
+   stand-in and exercised by the real relay. `src/StillHour/ChaosBag.ttslua`
    drives physical `[static]` tokens in the bag SCED's
    `ChaosBagApi.findChaosBag()` returns (respecting `canTouchChaosTokens`),
    else any table object named "Chaos Bag", else a virtual count (vanilla).
@@ -156,13 +169,16 @@ actual play session:
    `publish_hosted.py`); one loose token ships in the mod save. SCED's
    `getChaosBagState()` / campaign export skip it (and print "not
    recognized"); the count is rebuilt from Dissonance on load.
-5. **Art** (cosmetic — placeholders load today): see **`docs/ART_HANDOFF.md`** —
-   complete 41-face scene-mode manifest is ready; CardForge build + GPU batch +
-   Strange Eons framing are the remaining (machine-side) work.
-6. **P8 last mile**: upload `dist/downloads/the_still_hour.json` to a release
-   URL and verify `placeholderDownload` in the fork.
+5. **Art** — 🟡 the illustrations are approved (generated in ChatGPT via
+   `docs/CHATGPT_ART_PACK.md`) and composited into every face, except six
+   cards still waiting on the art pack's "remaining" request
+   (`pipeline/chatgpt_art_pack.json`). Box art: campaign and scenario boxes
+   share one texture.
+6. **P8 download box** — optional. The Saved Object is the load path; the
+   download box would need the release file hosted where SCED's downloader
+   looks, plus a check of `placeholderDownload` in the fork.
 
-A *rules-complete tabletop playtest* needs 1–3. Items 4–6 make it shippable.
+Next: the relay run (1), the six illustrations (5), then the first playtest.
 
 ## CardForge (art batch tool)
 
@@ -172,47 +188,30 @@ character resolver (JSON now; interface ready for the character-select tool),
 crash-safe resume ledger, variants, report, contact sheets, `index.json`, a
 `seeds` step-0 command, and a `--dry-run` mode that emits exact HTTP payloads.
 Campaigns are plug-in folders (`campaigns/<name>/`) — the `demo` campaign proves
-zero-code reuse. Acceptance: `python3 cardforge/selftest.py` (20 checks, green).
+zero-code reuse. Acceptance: `python3 cardforge/selftest.py` (20 checks, green,
+sandboxed).
 **Needs the owner's rig:** live P0 smoke on both backends, checkpoint config,
 Step-0 seed curation + LoRA training. Golden prompt fixtures (`prompts.json`)
 auto-compare when dropped at the repo root.
 
-**CardForge Studio** (`python3 -m cardforge.studio`) wraps it all in one local
-app: Illustrate tab (batch + gallery curation) · **Frame tab** (Strange Eons
-orchestration — generated automation bundle, launch, coverage; SE sources:
-strangeeons.cgjennings.ca, github.com/CGJennings/strange-eons) · Apply tab
-(art_urls.json overlay — file:/// local mode or hosted — + full mod rebuild).
-`studio_selftest.py`: 24 end-to-end checks over the live server, green. Owner
-seams: SE class-map/setting keys (once per plugin version) and the SE launch
-command.
+**CardForge Studio** (`python3 cardforge/studio.py`) wraps it all in one local
+app with tabs Setup · Illustrate · Cards · Campaign / scenarios · Play in TTS ·
+Advanced. The Frame tab (Strange Eons hand-off) was removed; its `se_*`
+endpoints remain for the API and the selftest. The Play in TTS tab writes
+`pipeline/art_urls.json` (local `file:///` or hosted) and rebuilds the mod; its
+local modes pass `--local` to the build scripts. `studio_selftest.py`:
+end-to-end checks over the live server, all green (count in `production.json`),
+run in a temporary copy of the repository.
 
-## Next steps (in brief order)
+## Next steps
 
-- **P5 Appointed** — ✅ done (CO-002). Staged Approach (Unseen→Sensed→Emerging→
-  Arrived) in `Appointed.ttslua`, ratcheted by the clock (Hours V/VII/VIII) and
-  Dissonance bands (Glitch/Noticed); Hold Back (`[wil]`/`[com]` 4) pushes it back
-  one stage + rewinds an Hour; undefeatable via the defeat-replacement. Board
-  effects delegate to `ctx`. Remaining board wiring: hook the enemy card's Hold
-  Back button and the manifest/place-at-farthest callbacks to the real SCED board.
-- **P6 location toggles** — ✅ done. `Locations.ttslua` decides each location's
-  active face (front/back off a Knowledge flip-fact) and sealed/open state;
-  `Knowledge.ttslua` is the fact registry + Act II / finale-assembly gates.
-  Remaining board wiring: flip the physical location card to the chosen face and
-  gate its clues on `isOpen`.
-- **P7 interlude** — ✅ logic done. `Aging.applyDriftToStats` returns the drifted
-  stat line (skills floor at 1); `Interlude.ttslua` orchestrates age → bank →
-  spend (Recollections at `memoryCost`, level-ups at `=level`) → `beginNextLoop`
-  (soft cap). The control token has an **Interlude Demo** button + `shBuy(id)`
-  console helper. Remaining: a full point-and-click buy panel and applying the
-  drift to the physical investigator sheet.
-- **P8 download box** — ✅ built. `package_download.py` emits the release asset
-  `dist/downloads/the_still_hour.json` (campaign box: player + encounter bags +
-  Control token) and the placeholder `the_still_hour_box.json` (GMNotes
-  `{"filename":"the_still_hour"}` + `download_box.lua`). Remaining: upload the
-  release asset to a releases URL the mod's `SOURCE_REPO` resolves, and verify
-  `GlobalApi.placeholderDownload`'s signature in your fork (the box has a fallback
-  if it's absent).
-- **Remaining**: the in-TTS load test, and per-system board wiring (Appointed
-  board callbacks, location card flips, interlude panel). Host wiring: attach
-  `CampaignState` to a state token and register its `onSave`/`onLoad` with SCED's
-  campaign save — see `docs/INTEGRATION.md`.
+1. Owner: run the TTS relay on the current head (`docs/TTS_RELAY.md`).
+2. Generate and import the six remaining illustrations (ChatGPT art pack
+   "remaining" request), re-render, `publish_hosted.py`, review with neutral
+   labels.
+3. Owner: first playtest (Prologue and Loop 1); record errata.
+4. Open designer items: `docs/design/AUDIT_PASS5.md` and
+   `docs/design/CONTENT_DECISIONS.md`.
+
+Host wiring for an SCED fork (state token, `onSave`/`onLoad` with SCED's
+campaign save) is described in `docs/INTEGRATION.md`.
