@@ -673,18 +673,18 @@ return function(H)
     E.run(3)
     check("Noticed band: 2 [static] in SCED's chaos bag", staticInBag() == 2 and st().band == "Noticed",
       staticInBag() .. " at " .. st().dissonance .. " " .. st().band)
-    -- a reveal: a [static] drawn from the bag raises Dissonance by 1
-    local bag = chaosBag()
-    local g
-    for _, e in ipairs(bag.getObjects()) do
-      for _, t in ipairs(e.tags or {}) do if t == "StillHourStatic" then g = e.guid end end
-    end
+    -- a reveal through SCED's own draw (its chaos-token draw for the White
+    -- mat, asking for the [static] by name): Dissonance rises by 1
     local before = st().dissonance
-    local p = bag.getPosition()
-    local tok = bag.takeObject({ guid = g, position = { p.x, p.y + 3, p.z + 4 }, smooth = false })
-    E.run(1)
+    local okDraw, tok = pcall(E.Global.call, "drawChaosToken",
+      { mat = "White", drawAdditional = true, tokenType = "Static" })
+    E.run(2)
+    check("SCED's chaos-token draw takes the [static] out", okDraw and tok ~= nil and tostring(tok.getName()) == "Static",
+      okDraw and tostring(tok) or tok)
     check("drawing a [static] raises Dissonance by 1", st().dissonance == before + 1, before .. " -> " .. st().dissonance)
-    if tok and alive(tok) then E.playerPut(chaosBag(), tok) end
+    local okRet, errRet = pcall(E.Global.call, "returnChaosTokens")
+    E.run(2)
+    check("SCED returns the drawn [static] to the bag", okRet and staticInBag() == 2, okRet and staticInBag() or errRet)
     for _ = 1, st().dissonance - d0 do click(control(), "Dissonance", true) end
     E.run(3)
     check("back below Glitch: the [static] tokens leave the bag", staticInBag() == 0, staticInBag() .. " at " .. st().dissonance)

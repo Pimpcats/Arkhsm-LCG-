@@ -342,6 +342,7 @@ function E.protect(who, fn, ...)
     E.errors[#E.errors + 1] = { where = label, origin = origin, phase = E.phase,
       msg = (tostring(res):match("^[^\n]*")), trace = res, t = E.now }
     if not E.quiet then io.stderr:write("[lua error] " .. label .. ": " .. tostring(res) .. "\n") end
+    if E.onError then E.onError(E.errors[#E.errors]) end
     return false, res
   end
   return true, res
@@ -350,6 +351,7 @@ end
 local function say(kind, msg)
   E.log[#E.log + 1] = { kind = kind, msg = msg, t = E.now }
   if E.echo then print(string.format("  [%s] %s", kind, msg)) end
+  if E.onSay then E.onSay(kind, msg) end
 end
 E.say = say
 
@@ -630,6 +632,8 @@ local function land(o)
   local st = S[o]
   st.landFrame = nil
   if st.removed or st.inContainer then return end
+  local came = st.cameFrom      -- the container it was just taken from
+  st.cameFrom = nil
   local b = aabb(o)
   local half = b.size.y / 2
   local mtype0 = typeOf(st.data.Name)
@@ -639,7 +643,7 @@ local function land(o)
     for _, other in ipairs(E.objects) do
       local os_ = S[other]
       local ot = os_ and typeOf(os_.data.Name)
-      if other ~= o and not os_.removed and (ot == "Bag" or ot == "Infinite") and containsXYZ(aabb(other), st.pos) then
+      if other ~= o and other ~= came and not os_.removed and (ot == "Bag" or ot == "Infinite") and containsXYZ(aabb(other), st.pos) then
         if mayEnter(other, o) then
           E.physicsEntries = (E.physicsEntries or 0) + 1
           E.fellInto = E.fellInto or {}
@@ -669,7 +673,7 @@ local function land(o)
     -- a bag it lands on takes it in (how SCED puts spawned tokens in a bag)
     local stype = typeOf(S[support].data.Name)
     local mtype = typeOf(st.data.Name)
-    if (stype == "Bag" or stype == "Infinite") and mtype ~= "Bag" and mtype ~= "Infinite" then
+    if support ~= came and (stype == "Bag" or stype == "Infinite") and mtype ~= "Bag" and mtype ~= "Infinite" then
       if mayEnter(support, o) then
         E.physicsEntries = (E.physicsEntries or 0) + 1
         E.fellInto = E.fellInto or {}
@@ -1367,6 +1371,7 @@ function methods.takeObject(o, p)
     cd.Transform.rotX, cd.Transform.rotY, cd.Transform.rotZ = st.rot.x, st.rot.y, st.rot.z
   end
   local child = makeObject(cd, nil, { origin = st.origin, deferScript = true })
+  S[child].cameFrom = o   -- it does not drop straight back into what it left
   E.fire("onObjectLeaveContainer", o, child)
   if isDeck and #c == 0 then
     methods.destruct(o, true)
@@ -1984,6 +1989,18 @@ function E.step()
     end
   end
   flushDestroy()
+end
+
+--- True while anything is scheduled: timers, script loads, landings,
+-- deferred destruction, coroutines.
+function E.pendingWork()
+  for _, t in ipairs(timers) do if not cancelled[t.id] then return true end end
+  if #pendingLoad > 0 or #pendingDestroy > 0 or #coroutines > 0 then return true end
+  for _, o in ipairs(E.objects) do
+    local st = S[o]
+    if st and not st.removed and st.landFrame then return true end
+  end
+  return false
 end
 
 function E.run(seconds)

@@ -579,11 +579,14 @@ Wait.frames(function()
     end
   end
   out.recalled = box.call("buttonClick_recall")
-  out.onTable2 = count("StillHourLoop")
-  out.boxKept = #box.getObjects() == inside
-  out.placed2 = box.call("buttonClick_place")
-  out.onTable3 = count("StillHourLoop")
-  print("@@OUT " .. JSON.encode(out))
+  -- TTS removes destroyed objects at the end of the frame: look next frame
+  Wait.frames(function()
+    out.onTable2 = count("StillHourLoop")
+    out.boxKept = #box.getObjects() == inside
+    out.placed2 = box.call("buttonClick_place")
+    out.onTable3 = count("StillHourLoop")
+    print("@@OUT " .. JSON.encode(out))
+  end, 1)
 end, 10)
 """
 
