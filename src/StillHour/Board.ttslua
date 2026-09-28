@@ -152,6 +152,17 @@ function Board.eligibleLocations()
   return out
 end
 
+--- Locations an enemy may move through or into (Arkham rules: unrevealed
+-- locations included); closed ones are excluded (guide: Closed and impassable
+-- locations). Only cards on the table are considered: out of play is not here.
+function Board.movableLocations()
+  local out = {}
+  for _, l in ipairs(Board.locationCards()) do
+    if not (l.locId and Locations.isSealed(l.locId)) then out[#out + 1] = l end
+  end
+  return out
+end
+
 --- Graph keyed by guid, from each visible side's icons/connections (the same
 -- data SCED's PlayArea uses to draw connection lines). Undirected.
 function Board.graph(locs)
@@ -681,7 +692,9 @@ function Board.appointedCtx(extra)
   function ctx.moveTowardPrey()
     local card = Board.findAppointed()
     if not card then return false end
-    local locs = Board.eligibleLocations()
+    -- a Hunter moves through (and into) unrevealed locations; closed ones
+    -- are not connected to anything
+    local locs = Board.movableLocations()
     local graph = Board.graph(locs)
     local byGuid = {}
     for _, l in ipairs(locs) do byGuid[l.guid] = l end

@@ -32,7 +32,7 @@ Aging.PRIME = "Prime"
 Aging.WEATHERED = "Weathered"
 Aging.ELDER = "Elder"
 Aging.ANCIENT = "Ancient"
-Aging.AGE_OUT_YEARS = 18
+Aging.AGE_OUT_YEARS = require("StillHour/Constants").AGE_OUT_YEARS
 
 Aging.PHYSICAL_SKILLS = { combat = true, agility = true }
 Aging.MENTAL_SKILLS = { willpower = true, intellect = true }

@@ -29,6 +29,9 @@ Constants.STATIC_BY_BAND = {
 Constants.HOUR_FIRST = 1
 Constants.HOUR_LAST = 9
 
+-- At this many Years an investigator ages out of the campaign (aging v0.3).
+Constants.AGE_OUT_YEARS = 18
+
 --- Compute the full constant set for a given investigator count.
 -- @param n integer number of investigators (>= 1)
 -- @return table of thresholds

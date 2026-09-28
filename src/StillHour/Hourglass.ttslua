@@ -26,10 +26,12 @@
 --   ctx.onHourReached   -- function(hourNumber, descriptor)
 --   ctx.onReset         -- function()
 --   ctx.onFinaleAttemptable -- function()
+--   ctx.onFinaleEnds    -- function() Hour IX during the finale
 --   ctx.onAppointedAdvance  -- function(stage) board hook after the clock ratchets
 --                              the Appointed's Approach (Hours V/VII/VIII)
 --   ctx.addStatic       -- function(n) temporary bag static (Hour VI)
 --   ctx.removeStatic    -- function(n) (Hour VI when almanac fact known)
+--   ctx.setAlmanac      -- function(on) Hour VI with the almanac fact (on=false undoes it)
 --   ctx.enemiesGetFightBonus -- function(n) (Hour VIII)
 
 local Constants = require("StillHour/Constants")
@@ -64,6 +66,39 @@ local function advanceAppointed(ctx, stage)
     ctx.onAppointedAdvance(s)
   end
   return s
+end
+
+-- Once-per-loop flags (cleared by the reset): Hour VI has resolved, and what
+-- it applied (so a cancelled Hour VI can be undone).
+Hourglass.HOUR_SIX_FLAG = "hour-vi-resolved"
+Hourglass.HOUR_SIX_STATIC_FLAG = "hour-vi-static"
+Hourglass.HOUR_SIX_ALMANAC_FLAG = "hour-vi-almanac"
+
+--- Has Hour VI resolved this loop?
+function Hourglass.hourSixResolved()
+  return CampaignState.isFlagSet(Hourglass.HOUR_SIX_FLAG)
+end
+
+--- Hour VI's "When reached" was cancelled (e.g. It Means 'Wait'): reverse what
+-- it applied — its temporary Static token, or, with What the Almanac Hid, the
+-- bag's "1 fewer" — and clear its once-per-loop flag so reaching Hour VI again
+-- this loop resolves it. Returns "static" | "almanac" | nil (nothing to undo).
+function Hourglass.undoHourSix(ctx)
+  if not CampaignState.isFlagSet(Hourglass.HOUR_SIX_FLAG) then return nil end
+  local flags = CampaignState.raw().oncePerLoopFlags
+  local what
+  if flags[Hourglass.HOUR_SIX_ALMANAC_FLAG] then
+    what = "almanac"
+    if ctx and ctx.setAlmanac then ctx.setAlmanac(false)
+    elseif ctx and ctx.addStatic then ctx.addStatic(1) end
+  else
+    what = "static"
+    if flags[Hourglass.HOUR_SIX_STATIC_FLAG] and ctx and ctx.removeStatic then ctx.removeStatic(1) end
+  end
+  flags[Hourglass.HOUR_SIX_FLAG] = nil
+  flags[Hourglass.HOUR_SIX_STATIC_FLAG] = nil
+  flags[Hourglass.HOUR_SIX_ALMANAC_FLAG] = nil
+  return what
 end
 
 --- Is this Hour structurally removed from the clock by a Knowledge fact?
@@ -118,14 +153,16 @@ local HOUR_HANDLERS = {
 
   [6] = function(ctx)
     -- the card: "This does not stack" (a rewind can reach Hour VI again)
-    if not CampaignState.setFlag("hour-vi-resolved") then
+    if not CampaignState.setFlag(Hourglass.HOUR_SIX_FLAG) then
       return "Hour VI has already resolved this loop: no further effect."
     end
     if CampaignState.knows("what-the-almanac-hid") then
-      if ctx and ctx.setAlmanac then ctx.setAlmanac()
+      CampaignState.setFlag(Hourglass.HOUR_SIX_ALMANAC_FLAG)
+      if ctx and ctx.setAlmanac then ctx.setAlmanac(true)
       elseif ctx and ctx.removeStatic then ctx.removeStatic(1) end
       return "The bag holds 1 fewer Static token than its band calls for, until the end of the loop."
     end
+    CampaignState.setFlag(Hourglass.HOUR_SIX_STATIC_FLAG)
     if ctx and ctx.addStatic then ctx.addStatic(1) end
     return "Add 1 Static token to the chaos bag until the end of the loop."
   end,
@@ -144,6 +181,10 @@ local HOUR_HANDLERS = {
   end,
 
   [9] = function(ctx)
+    if CampaignState.inFinale() then
+      if ctx and ctx.onFinaleEnds then ctx.onFinaleEnds() end
+      return "The Appointed Hour. In the finale: the finale ends and the contest is not reached."
+    end
     if CampaignState.knows("the-way-the-night-breaks") then
       if ctx and ctx.onFinaleAttemptable then ctx.onFinaleAttemptable() end
       return "The Appointed Hour. In the finale, the finale ends (contest not reached). Otherwise the loop ends, or you may begin the finale."

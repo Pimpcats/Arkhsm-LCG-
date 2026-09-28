@@ -201,12 +201,14 @@ local function clickCheckbox(key)
   refreshDerived()
   updateSave()
   -- ticking a Knowledge fact records it on the control token too, which
-  -- flips / opens the locations it changes (a fact is never un-learned, so
-  -- clearing the box changes nothing there)
+  -- flips / opens the locations it changes and, the first time, pays its
+  -- banked Memory; clearing the box (a mis-tick) removes it there and refunds
+  -- what it paid
   local fact = key:match("^k:(.+)$")
-  if fact and values[key] then
+  if fact then
     local ctl = findControl()
-    if ctl then pcall(function() ctl.call("shApiUnlockFact", { id = fact }) end) end
+    local fn = values[key] and "shApiUnlockFact" or "shApiForgetFact"
+    if ctl then pcall(function() ctl.call(fn, { id = fact }) end) end
   end
   -- ticking a Named enemy as defeated banks its Victory (once per campaign)
   local named = key:match("^v:(.+)$")
@@ -407,16 +409,22 @@ function syncFromCampaignState(st)
   end
   local function tick(key) if not values[key] then put(key, true) end end
   local knowledge = st.knowledge or {}
-  local surface = 0
-  for id, l in pairs(FACT_LAYER) do
-    if l == "surface" and knowledge[id] then surface = surface + 1 end
-  end
   if PAGE == 1 then
     put("loops", tonumber(st.loopsCompleted) or 0)
     put("banked", tonumber(st.bankedMemory) or 0)
     if st.investigators then put("investigators", tonumber(st.investigators)) end
+    -- the Control's own Part II state (it begins Between Loops, not mid-loop);
+    -- a state saved before it was recorded falls back to the entry/loop count
+    local partTwo = st.partTwo == true
+    if st.partTwo == nil then
+      local surface = 0
+      for id, l in pairs(FACT_LAYER) do
+        if l == "surface" and knowledge[id] then surface = surface + 1 end
+      end
+      partTwo = surface >= 3 or (tonumber(st.loopsCompleted) or 0) >= 3
+    end
     if knowledge["the-way-the-night-breaks"] then tick("act3")
-    elseif surface >= 3 or (tonumber(st.loopsCompleted) or 0) >= 3 then tick("act2")
+    elseif partTwo then tick("act2")
     else tick("act1") end
     for _, inv in ipairs(INVESTIGATORS) do
       local years = (st.years or {})[inv.id]

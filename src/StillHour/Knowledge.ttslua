@@ -29,15 +29,46 @@ Knowledge.FACTS = {
   ["the-way-the-night-breaks"] = { name = "The Way the Night Breaks",  district = "(assembled)", layer = "assembled" },
 }
 
+-- Knowledge pays Memory: the first time an entry is recorded in the campaign
+-- it adds banked Memory, per investigator (current count), by layer.
+Knowledge.MEMORY_PER_INVESTIGATOR = { prologue = 0, surface = 1, deep = 3, assembled = 0 }
+
 function Knowledge.knows(factId)
   return CampaignState.knows(factId)
 end
 
---- Unlock a fact by id. Returns true if newly unlocked. Errors on unknown id so
--- typos surface immediately rather than silently no-op'ing.
+--- Banked Memory recording this fact pays now (layer rate x investigators).
+function Knowledge.memoryFor(factId)
+  local f = Knowledge.FACTS[factId]
+  if not f then return 0 end
+  return (Knowledge.MEMORY_PER_INVESTIGATOR[f.layer] or 0) * CampaignState.constants().investigators
+end
+
+--- Unlock a fact by id. Returns (newly, paid): true if newly unlocked, and the
+-- banked Memory its first recording paid (0 if none or already paid). Pays
+-- once per entry per campaign. Errors on unknown id so typos surface
+-- immediately rather than silently no-op'ing.
 function Knowledge.unlock(factId)
   assert(Knowledge.FACTS[factId], "unknown Knowledge fact: " .. tostring(factId))
-  return CampaignState.unlockFact(factId)
+  local newly = CampaignState.unlockFact(factId)
+  local paid = 0
+  if newly and CampaignState.getKnowledgePaid(factId) == nil then
+    paid = Knowledge.memoryFor(factId)
+    if paid > 0 then CampaignState.bankMemory(paid) end
+    CampaignState.setKnowledgePaid(factId, paid)
+  end
+  return newly, paid
+end
+
+--- Remove a recorded fact (its Campaign Log box un-ticked) and refund what its
+-- recording paid. Returns (removed, refunded).
+function Knowledge.forget(factId)
+  assert(Knowledge.FACTS[factId], "unknown Knowledge fact: " .. tostring(factId))
+  if not CampaignState.forgetFact(factId) then return false, 0 end
+  local refund = CampaignState.getKnowledgePaid(factId) or 0
+  if refund > 0 then CampaignState.bankMemory(-refund) end
+  CampaignState.setKnowledgePaid(factId, nil)
+  return true, refund
 end
 
 local function countKnownByLayer(layer)
@@ -58,9 +89,15 @@ function Knowledge.deepKnownCount()
   return countKnownByLayer("deep")
 end
 
---- Act II opens at the interlude once 3+ surface facts are known (guide §8).
+--- Part II is due (Between Loops step 5): 3+ surface entries, or Loop 3 is
+-- complete.
+function Knowledge.partTwoDue()
+  return Knowledge.surfaceKnownCount() >= 3 or CampaignState.getLoopsCompleted() >= 3
+end
+
+--- Act II (Part II) is open, or opens at the next interlude.
 function Knowledge.actIIOpen()
-  return Knowledge.surfaceKnownCount() >= 3
+  return CampaignState.inPartTwo() or Knowledge.partTwoDue()
 end
 
 --- "The Way the Night Breaks" assembles when you know The Appointed's Name, The

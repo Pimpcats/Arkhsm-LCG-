@@ -25,7 +25,7 @@ Interlude.RECOLLECTION_COST = {
   ["sthr-musclememory"]       = 3,
   ["sthr-rehearsedescape"]    = 3,
   ["sthr-longwayround"]       = 2,
-  ["sthr-borrowedtime"]       = 4,
+  ["sthr-borrowedtime"]       = 3,
   ["sthr-thistimeforsure"]    = 4,
   ["sthr-anchorpoint"]        = 3,
   ["sthr-cassandrasnotebook"] = 4,
@@ -41,7 +41,9 @@ Interlude.RECOLLECTION_COST = {
 -- loop tallies (Interlude.leanedOnLoop).
 function Interlude.age(investigatorId, cond, lockedChoice)
   cond = cond or {}
-  local c = { defeated = cond.defeated, endedInDanger = cond.endedInDanger, leanedOnLoop = cond.leanedOnLoop }
+  -- extraYears: Years a card or resolution gave during the loop (pending Years)
+  local c = { defeated = cond.defeated, endedInDanger = cond.endedInDanger, leanedOnLoop = cond.leanedOnLoop,
+              extraYears = cond.extraYears }
   if c.leanedOnLoop == nil then c.leanedOnLoop = Interlude.leanedOnLoop(investigatorId) end
   return Aging.applyInterlude(investigatorId, c, lockedChoice)
 end
@@ -64,10 +66,22 @@ function Interlude.bank(amount)
   return CampaignState.bankMemory(amount)
 end
 
+--- Has this investigator left the campaign? Aged out (18+ Years), or — when
+-- `inPlay` (a set id -> true of the investigators in play) is given — not
+-- among them.
+function Interlude.isDeparted(investigatorId, inPlay)
+  if CampaignState.getYears(investigatorId) >= Aging.AGE_OUT_YEARS then return true end
+  if inPlay ~= nil and not inPlay[investigatorId] then return true end
+  return false
+end
+
 --- Guide §4 step 2: move every investigator's on-card Memory to the bank.
--- Returns the amount moved.
-function Interlude.bankOnCard()
-  return CampaignState.bankOnCardMemory()
+-- Memory on a departed investigator's cards is dropped, not banked.
+-- Returns the amount moved and the amount dropped.
+function Interlude.bankOnCard(inPlay)
+  return CampaignState.bankOnCardMemory(function(id)
+    return not Interlude.isDeparted(id, inPlay)
+  end)
 end
 
 --- "Leaned on the loop" for Aging, derived from the investigator's own tallies
@@ -77,8 +91,12 @@ function Interlude.leanedOnLoop(investigatorId)
   return Aging.leanedOnLoop(t.raises, t.spent)
 end
 
---- "Ended in danger" for Aging, from the Dissonance recorded when the loop ended.
+--- "Ended in danger" for Aging: decided at the reset with that loop's
+-- investigator count. An older save without the stored answer falls back to
+-- the loop-end Dissonance with the current count.
 function Interlude.loopEndedInDanger()
+  local stored = CampaignState.getLastLoopEndedInDanger()
+  if stored ~= nil then return stored == true end
   local d = CampaignState.getLastLoopEndDissonance()
   if d == nil then return false end
   return Aging.loopEndedInDanger(d, CampaignState.constants().investigators)
@@ -113,13 +131,16 @@ end
 --------------------------------------------------------------- loop handoff --
 
 --- Begin the next loop's play: enforce the Memory soft cap (6 x investigators).
--- Call at the end of the interlude, before loop setup.
-function Interlude.beginNextLoop()
+-- Call at the end of the interlude, before loop setup. `inPlay` (optional set
+-- id -> true): investigators still in the campaign; a departed investigator
+-- (aged out, or not in play) gets no start-of-loop Memory.
+function Interlude.beginNextLoop(inPlay)
   local s = CampaignState.startLoop()
   CampaignState.clearTallies()     -- the new loop starts its own tallies
+  CampaignState.setLoopEnded(false) -- a new loop: Reset Loop can end it
   -- Elder/Ancient: "begin each loop with 1 Memory on your investigator card".
   for id in pairs(s.years or {}) do
-    local drift = Aging.driftFor(id)
+    local drift = not Interlude.isDeparted(id, inPlay) and Aging.driftFor(id)
     if drift and drift.startLoopMemory > 0 and CampaignState.getOnCardMemory(id) < drift.startLoopMemory then
       CampaignState.setOnCardMemory(id, drift.startLoopMemory)
     end
