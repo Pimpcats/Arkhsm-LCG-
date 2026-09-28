@@ -4,7 +4,7 @@
 -- test-type record. These are the two flags the base game has no concept of:
 --   * "Limit once per loop" persists across NODE TRAVEL and clears only on reset
 --     (cards v0.2 §A) — CampaignState clears them in reset().
---   * Muscle Memory reads whether a test type was performed the PREVIOUS loop.
+--   * Muscle Memory reads whether a test type was already performed THIS loop.
 --
 -- Cards call through here; they never store loop state themselves.
 
@@ -29,10 +29,11 @@ function LoopFlags.recordTest(testType)
   CampaignState.recordTestType(testType)
 end
 
---- Muscle Memory: true if the party performed this test type during the previous
--- loop, meaning the card provides [wild][wild] and draws 1 instead of [wild].
+--- Muscle Memory ("If you have already performed a test of the same skill type
+-- as this test during this loop"): true if a test of this type was recorded
+-- during the current loop, meaning the card provides [wild][wild] and draws 1.
 function LoopFlags.muscleMemoryUpgraded(testType)
-  return CampaignState.performedLastLoop(testType)
+  return CampaignState.performedThisLoop(testType)
 end
 
 return LoopFlags

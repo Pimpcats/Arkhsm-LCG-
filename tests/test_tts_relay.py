@@ -138,6 +138,14 @@ BOARD_CHECKS = (
     "the next interlude reaches Weathered",
     "the investigator card shows Years and bracket",
     "Years persist through save+reload",
+    "claiming a Named enemy's Victory banks its Memory (+2)",
+    "a second claim of the same Victory banks nothing",
+    "buying a Recollection spends its Memory",
+    "an unaffordable level-up is refused",
+    "Bank on-card Memory moves the investigators' Memory to the bank (3)",
+    "a card's Years are held as pending (2)",
+    "reaching Hour VI adds 1 Static token until the end of the loop",
+    "reaching Hour VI again this loop adds nothing (once per loop)",
 )
 
 SCED_CHECKS = (
@@ -153,6 +161,9 @@ SCED_CHECKS = (
     "state is mirrored into the campaign log",
     "the campaign log's saved data (what SCED exports) carries the state",
     "a fresh control token adopts the imported state",
+    "Easy fills SCED's chaos bag with the guide's 17 tokens",
+    "Expert replaces the token set (19 tokens, one -8, no +1)",
+    "the table's own chaos bag is put back afterwards",
 )
 
 
@@ -167,7 +178,8 @@ def _assert_clean_pass(latest):
 def test_board_wiring_on_a_vanilla_table(tmp_path, remote):
     rc, latest, _ = run_relay(tmp_path, remote)
     names = _assert_clean_pass(latest)
-    for expected in BOARD_CHECKS + ("vanilla table: [static] counted without touching any bag",):
+    for expected in BOARD_CHECKS + ("vanilla table: [static] counted without touching any bag",
+                                    "vanilla table: a difficulty preset asks for the bag to be built by hand"):
         assert expected in names, expected
     assert not any(n in names for n in SCED_CHECKS)
 

@@ -449,9 +449,11 @@ step("board: locations flip and seal", function(go)
     ctl.call("shApiUnlockFact", { id = "the-lamp-was-never-lit" })
     Wait.frames(function()
       check("unlocking the flip fact turns the location to its back", LOC_A.obj.is_face_down == true)
+      -- the Sealed Study opens when its act 2a becomes current: act 1a (What
+      -- the Almanac Hid) advancing in Part II with the Vote already recorded
       ctl.call("shApiSetPartTwo", { on = true })
-      ctl.call("shApiUnlockFact", { id = "what-the-almanac-hid" })
-      local r = ctl.call("shApiUnlockFact", { id = "the-vote-that-never-ends" })
+      ctl.call("shApiUnlockFact", { id = "the-vote-that-never-ends" })
+      local r = ctl.call("shApiUnlockFact", { id = "what-the-almanac-hid" })
       -- button removals apply at the end of the frame: look a few frames later
       Wait.frames(function()
         check("the CLOSED label comes off once every fact is known (Part II)", not hasButton(LOC_B.obj, "CLOSED"),
@@ -485,8 +487,8 @@ step("board: the Appointed", function(go)
   ctl.call("shApiRestore", { blob = snapshot })
   -- the Appointed never appears at a closed location: open LOC_B first
   ctl.call("shApiSetPartTwo", { on = true })
-  ctl.call("shApiUnlockFact", { id = "what-the-almanac-hid" })
   ctl.call("shApiUnlockFact", { id = "the-vote-that-never-ends" })
+  ctl.call("shApiUnlockFact", { id = "what-the-almanac-hid" })
   local s = ctl.call("shApiCounter", { name = "appointed" })   -- a card advances it: Sensed
   check("a card advance makes it Sensed", s.stage == 1, "stage " .. tostring(s.stage))
   waitFor(function()
@@ -579,8 +581,8 @@ step("board: prey follows on-card Memory", function(go)
   ctl.call("shApiRestore", { blob = snapshot })
   -- the Appointed never enters a closed location: open LOC_B first
   ctl.call("shApiSetPartTwo", { on = true })
-  ctl.call("shApiUnlockFact", { id = "what-the-almanac-hid" })
   ctl.call("shApiUnlockFact", { id = "the-vote-that-never-ends" })
+  ctl.call("shApiUnlockFact", { id = "what-the-almanac-hid" })
   -- the earlier step's minicard would count as a nearer investigator; move it off the map
   if MINI then MINI.destruct() ; MINI = nil end
   local base = ctl.getPosition()
@@ -726,6 +728,174 @@ step("board: SCED campaign export carries the state", function(go)
       go()
     end, 30)
   end })
+end)
+
+-- does the control build carry this function? (a check that needs a newer
+-- build is reported as skipped on an older one, not failed)
+local function ctlHas(ctl, fname)
+  return (ctl.getLuaScript() or ""):find(fname, 1, true) ~= nil
+end
+
+local function countOf(list, id)
+  local n = 0
+  for _, v in ipairs(list or {}) do if v == id then n = n + 1 end end
+  return n
+end
+
+step("board: chaos bag difficulty presets", function(go)
+  local ctl = findControl()
+  if not ctl then return go() end
+  ctl.call("shApiRestore", { blob = snapshot })
+  if not scedHere then
+    local r = ctl.call("shApiDifficulty", { i = 2 })
+    check("vanilla table: a difficulty preset asks for the bag to be built by hand", r == false)
+    return go()
+  end
+  local bag = Global.call("findChaosBag")
+  if not bag then check("SCED chaos bag found for the difficulty presets", false) ; return go() end
+  -- the owner's bag is put back exactly as it was afterwards
+  local before = {}
+  for i, id in ipairs(Global.call("getChaosBagState") or {}) do before[i] = id end
+  ctl.call("shApiCounter", { name = "dissonance", delta = 6 })     -- Glitch: 1 [static]
+  local ok1 = ctl.call("shApiDifficulty", { i = 1 })              -- Easy: 17 tokens
+  waitFor(function()
+    local st = Global.call("getChaosBagState") or {}
+    return #st == 17 and staticInBag(bag) == 1
+  end, 15, function(done1)
+    local st = Global.call("getChaosBagState") or {}
+    check("Easy fills SCED's chaos bag with the guide's 17 tokens", ok1 == true and done1 and #st == 17
+      and countOf(st, "p1") == 2 and countOf(st, "blue") == 1, #st .. " token(s)")
+    check("...and the band's [static] is put back in the bag", staticInBag(bag) == 1, "in bag: " .. staticInBag(bag))
+    ctl.call("shApiDifficulty", { i = 4 })                          -- Expert: 19 tokens
+    waitFor(function()
+      local s2 = Global.call("getChaosBagState") or {}
+      return #s2 == 19 and staticInBag(bag) == 1
+    end, 15, function(done2)
+      local s2 = Global.call("getChaosBagState") or {}
+      check("Expert replaces the token set (19 tokens, one -8, no +1)", done2 and #s2 == 19
+        and countOf(s2, "m8") == 1 and countOf(s2, "p1") == 0, #s2 .. " token(s)")
+      Global.call("setChaosBagState", before)
+      ctl.call("shApiRestore", { blob = snapshot })
+      waitFor(function() return staticInBag(bag) == 0 and #(Global.call("getChaosBagState") or {}) == #before end,
+        15, function(back)
+          check("the table's own chaos bag is put back afterwards", back, "in bag: " .. staticInBag(bag))
+          go()
+        end)
+    end)
+  end)
+end)
+
+step("board: claiming a Victory banks it once", function(go)
+  local ctl = findControl()
+  if not ctl then return go() end
+  ctl.call("shApiRestore", { blob = snapshot })
+  local m0 = ctl.call("shApiState").memory
+  local first = ctl.call("shApiClaimVictory", { id = "sthr-bellringer" })
+  local m1 = ctl.call("shApiState").memory
+  check("claiming a Named enemy's Victory banks its Memory (+2)", first == true and m1 == m0 + 2, m0 .. " -> " .. m1)
+  local second = ctl.call("shApiClaimVictory", { id = "sthr-bellringer" })
+  local m2 = ctl.call("shApiState").memory
+  check("a second claim of the same Victory banks nothing", second == false and m2 == m1, m1 .. " -> " .. m2)
+  check("an unknown enemy has no Victory to claim", ctl.call("shApiClaimVictory", { id = "sthr-nobody" }) == false)
+  ctl.call("shApiRestore", { blob = snapshot })
+  go()
+end)
+
+step("board: an interlude purchase", function(go)
+  local ctl = findControl()
+  if not ctl then return go() end
+  ctl.call("shApiRestore", { blob = snapshot })
+  ctl.call("shApiCounter", { name = "memory", delta = 5 })
+  local cost
+  for _, r in ipairs(ctl.call("shApiInterlude", {}) or {}) do
+    if r.id == "sthr-longwayround" then cost = r.cost end
+  end
+  check("the interlude panel lists a Recollection with its price", cost == 2, tostring(cost))
+  check("the control shows the Interlude panel", hasButton(ctl, "Begin Next Loop"), labelsOf(ctl))
+  local m0 = ctl.call("shApiState").memory
+  local r1 = ctl.call("shApiBuy", { recollection = "sthr-longwayround" })
+  check("buying a Recollection spends its Memory", r1 ~= nil and r1.ok == true and r1.memory == m0 - 2,
+    r1 and (m0 .. " -> " .. r1.memory) or "no result")
+  local r2 = ctl.call("shApiBuy", { level = 5 })
+  check("an unaffordable level-up is refused", r2 ~= nil and r2.ok == false and r2.memory == m0 - 2)
+  local r3 = ctl.call("shApiBuy", { level = 3 })
+  check("a level-3 upgrade spends 3", r3 ~= nil and r3.ok == true and r3.memory == m0 - 5)
+  ctl.call("shApiInterlude", { open = false })
+  ctl.call("shApiRestore", { blob = snapshot })
+  go()
+end)
+
+step("board: bank on-card Memory", function(go)
+  local ctl = findControl()
+  if not ctl or not INV.elias then check("investigators available for banking", false) ; return go() end
+  ctl.call("shApiRestore", { blob = snapshot })
+  ctl.call("shApiOnCardMemory", { id = "sthrelias", delta = 2 })
+  ctl.call("shApiOnCardMemory", { id = "sthrbirdie", delta = 1 })
+  local departedCheck = ctlHas(ctl, "function Interlude.isDeparted")
+  if departedCheck then ctl.call("shApiOnCardMemory", { id = "sthr-not-in-play", delta = 4 }) end
+  local m0 = ctl.call("shApiState").memory
+  local n = ctl.call("shApiBankOnCard")
+  local m1 = ctl.call("shApiState").memory
+  check("Bank on-card Memory moves the investigators' Memory to the bank (3)", n == 3 and m1 == m0 + 3,
+    tostring(n) .. " banked, " .. m0 .. " -> " .. m1)
+  check("the investigator card's Memory goes back to 0", hasButton(INV.elias, "Memory 0"), labelsOf(INV.elias))
+  if departedCheck then
+    check("Memory on a departed investigator's cards is not banked", n == 3)
+  else
+    info("control build predates departed investigators: that check is skipped")
+  end
+  ctl.call("shApiRestore", { blob = snapshot })
+  go()
+end)
+
+step("board: pending Years", function(go)
+  local ctl = findControl()
+  if not ctl or not INV.elias then check("investigators available for pending Years", false) ; return go() end
+  ctl.call("shApiRestore", { blob = snapshot })
+  ctl.call("shApiBeginNextLoop")                           -- a fresh loop: nobody has aged in it
+  local p = ctl.call("shApiPendingYears", { id = "sthrelias", delta = 2 })
+  check("a card's Years are held as pending (2)", p == 2, tostring(p))
+  check("the investigator card shows its pending Years", hasButton(INV.elias, "Years pending 2"), labelsOf(INV.elias))
+  ctl.call("shApiReset")                                    -- a calm loop: no danger
+  local r = ctl.call("shApiAge", { id = "sthrelias", physical = "combat", mental = "willpower" })
+  if ctlHas(ctl, "extraYears = cond.extraYears") then
+    check("Age adds the pending Years (1 + 2)", r ~= nil and r.gained == 3, r and ("gained " .. r.gained) or "no result")
+  else
+    info("control build predates pending Years reaching Age: that check is skipped")
+  end
+  check("pending Years are cleared once added", ctl.call("shApiPendingYears", { id = "sthrelias", delta = 0 }) == 0)
+  ctl.call("shApiRestore", { blob = snapshot })
+  ctl.call("shApiSyncBoard")
+  go()
+end)
+
+step("board: Hour VI once per loop", function(go)
+  local ctl = findControl()
+  if not ctl then return go() end
+  ctl.call("shApiRestore", { blob = snapshot })
+  local s0 = ctl.call("shApiState")
+  local extra0 = s0.static.extra
+  local s1 = ctl.call("shApiCounter", { name = "hour", delta = 6 - s0.hour })
+  check("reaching Hour VI adds 1 Static token until the end of the loop", s1.hour == 6 and s1.static.extra == extra0 + 1,
+    "hour " .. s1.hour .. ", extra " .. s1.static.extra)
+  ctl.call("shApiCounter", { name = "hour", delta = -1 })
+  local s2 = ctl.call("shApiCounter", { name = "hour", delta = 1 })
+  check("reaching Hour VI again this loop adds nothing (once per loop)", s2.hour == 6 and s2.static.extra == extra0 + 1,
+    "extra " .. s2.static.extra)
+  if ctlHas(ctl, "function shApiUndoHourSix") then
+    check("the control offers Undo Hour VI", hasButton(ctl, "Undo Hour VI"), labelsOf(ctl))
+    local what = ctl.call("shApiUndoHourSix")
+    local s3 = ctl.call("shApiState")
+    check("Undo Hour VI takes its Static token back", what == "static" and s3.static.extra == extra0
+      and s3.hourSix == false, tostring(what) .. ", extra " .. s3.static.extra)
+    ctl.call("shApiCounter", { name = "hour", delta = -1 })
+    local s4 = ctl.call("shApiCounter", { name = "hour", delta = 1 })
+    check("after the undo, Hour VI resolves again when reached", s4.static.extra == extra0 + 1)
+  else
+    info("control build predates Undo Hour VI: that check is skipped")
+  end
+  ctl.call("shApiRestore", { blob = snapshot })
+  Wait.frames(go, 10)
 end)
 
 step("deal a card", function(go)

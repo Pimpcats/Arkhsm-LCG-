@@ -12,6 +12,10 @@
 -- Fields per location:
 --   flipFact    -- fact id that flips FRONT -> BACK (nil = no back)
 --   sealedUntil -- list of fact ids ALL required to unseal (nil = always open)
+--   partTwo     -- closed in Part I whatever the facts
+--   actFlag     -- once-per-loop flag that must be set: the act that opens it
+--                  became the current act this loop
+--   openFact    -- once this fact is known it enters play open, whatever else
 
 local CampaignState = require("StillHour/CampaignState")
 
@@ -42,9 +46,35 @@ Locations.LOCATIONS = {
   -- The Almanac House
   ["reading-room"]    = { name = "The Reading Room",   district = "Almanac" },
   ["the-press"]       = { name = "The Press",          district = "Almanac" },
+  -- the card: "Closed. It opens when The Appointed's Name becomes the current
+  -- act. Once your Campaign Log records The Appointed's Name, it enters play
+  -- open (revealed)."
   ["sealed-study"]    = { name = "The Sealed Study",   district = "Almanac",
-                          sealedUntil = { "what-the-almanac-hid", "the-vote-that-never-ends" }, partTwo = true },
+                          sealedUntil = { "what-the-almanac-hid", "the-vote-that-never-ends" }, partTwo = true,
+                          actFlag = "almanac-act2a-current", openFact = "the-appointeds-name" },
 }
+
+-- The Almanac House's act 2a (The Appointed's Name): "Part II only, once your
+-- Campaign Log records What the Almanac Hid and The Vote That Never Ends."
+Locations.ALMANAC_ACT2A_FLAG = "almanac-act2a-current"
+
+function Locations.almanacActTwoRequirementsMet()
+  return CampaignState.inPartTwo() and CampaignState.knows("what-the-almanac-hid")
+    and CampaignState.knows("the-vote-that-never-ends")
+end
+
+--- Act 2a becomes the Almanac House's current act this loop — when act 1a
+-- advances in Part II with its requirements met, or at a Part II Place with
+-- act 1a's entry recorded (guide: the district's act deck). Returns true if
+-- it is (now) current; false (nothing recorded) if its requirements are not
+-- met or its deep entry is already recorded (the act deck is then removed).
+function Locations.markAlmanacActTwoCurrent()
+  if CampaignState.knows("the-appointeds-name") or not Locations.almanacActTwoRequirementsMet() then
+    return false
+  end
+  CampaignState.setFlag(Locations.ALMANAC_ACT2A_FLAG)
+  return true
+end
 
 local function loc(id)
   return assert(Locations.LOCATIONS[id], "unknown location: " .. tostring(id))
@@ -65,6 +95,9 @@ function Locations.isSealed(id)
   if not l.sealedUntil then
     return false
   end
+  if l.openFact and CampaignState.knows(l.openFact) then
+    return false
+  end
   -- closed until its act 2a can be the current act: Part II only
   if l.partTwo and not CampaignState.inPartTwo() then
     return true
@@ -73,6 +106,9 @@ function Locations.isSealed(id)
     if not CampaignState.knows(factId) then
       return true
     end
+  end
+  if l.actFlag and not CampaignState.isFlagSet(l.actFlag) then
+    return true
   end
   return false
 end

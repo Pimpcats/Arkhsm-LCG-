@@ -46,7 +46,12 @@ local function freshState(n)
     victoryLog = {},         -- enemyId -> true (Victory claimed; once per campaign)
     onCardMemory = {},       -- investigatorId -> Memory on that investigator's cards (this loop)
     loopTallies = {},        -- investigatorId -> {raises, spent}: Aging's "leaned on the loop" inputs
-    lastLoopEndDissonance = nil, -- Dissonance when the last loop ended (Aging "ended in danger")
+    lastLoopEndDissonance = nil, -- Dissonance when the last loop ended
+    lastLoopEndedInDanger = nil, -- that loop ended at the Noticed band or higher, measured
+                                 -- at the reset with that loop's investigator count (Aging)
+    loopEnded = false,       -- Reset Loop was clicked; cleared when the next loop begins
+    finale = false,          -- the finale (The Last Hour) is being played
+    knowledgePaid = {},      -- factId -> banked Memory its first recording paid (refund on removal)
     prologue = false,        -- playing the Prologue (The First Hour): not a loop
     contest = 0,             -- finale contest progress (Contest the Crossing)
     partTwo = false,         -- Part II (The Shape of the Hour) has begun
@@ -111,6 +116,12 @@ function CampaignState.deserialize(saved, decoder)
     state.victoryLog = state.victoryLog or {}
     state.onCardMemory = state.onCardMemory or {}
     state.loopTallies = state.loopTallies or {}
+    state.knowledgePaid = state.knowledgePaid or {}
+    state.bankedMemory = math.max(0, math.floor(tonumber(state.bankedMemory) or 0))
+    state.loopEnded = state.loopEnded == true
+    state.finale = state.finale == true
+    -- lastLoopEndedInDanger stays nil on an older save: Aging then falls back
+    -- to lastLoopEndDissonance with the current investigator count
   end
   return state
 end
@@ -193,13 +204,18 @@ function CampaignState.onCardMemoryMap()
   return out
 end
 
---- Interlude: move all on-card Memory to banked Memory. Returns the amount moved.
-function CampaignState.bankOnCardMemory()
-  local total = 0
-  for _, n in pairs(state.onCardMemory) do total = total + n end
+--- Interlude: move all on-card Memory to banked Memory. Returns the amount
+-- moved and the amount dropped. `keep(investigatorId)` (optional) returns false
+-- for an investigator who has left the campaign: their Memory is dropped, not
+-- banked.
+function CampaignState.bankOnCardMemory(keep)
+  local total, dropped = 0, 0
+  for id, n in pairs(state.onCardMemory) do
+    if keep == nil or keep(id) then total = total + n else dropped = dropped + n end
+  end
   state.onCardMemory = {}
   CampaignState.bankMemory(total)
-  return total
+  return total, dropped
 end
 
 ------------------------------------------------------- leaned-on-the-loop --
@@ -297,6 +313,24 @@ function CampaignState.unlockFact(factId)
   return not was  -- true if newly unlocked
 end
 
+--- Remove a recorded fact (a Campaign Log box un-ticked). Returns true if it
+-- was known.
+function CampaignState.forgetFact(factId)
+  local was = state.knowledge[factId] == true
+  state.knowledge[factId] = nil
+  return was
+end
+
+--- Banked Memory a fact's first recording paid (nil when it has not paid).
+function CampaignState.getKnowledgePaid(factId)
+  return (state.knowledgePaid or {})[factId]
+end
+
+function CampaignState.setKnowledgePaid(factId, amount)
+  state.knowledgePaid = state.knowledgePaid or {}
+  state.knowledgePaid[factId] = amount
+end
+
 function CampaignState.knownFacts()
   local list = {}
   for factId in pairs(state.knowledge) do
@@ -334,6 +368,11 @@ end
 --- Did the party perform this test type during the PREVIOUS loop?
 function CampaignState.performedLastLoop(testType)
   return state.testTypesLastLoop[testType] == true
+end
+
+--- Has a test of this type been performed during THIS loop (Muscle Memory)?
+function CampaignState.performedThisLoop(testType)
+  return state.testTypesThisLoop[testType] == true
 end
 
 ------------------------------------------------------------------ years/age --
@@ -434,14 +473,22 @@ function CampaignState.reset()
     state.testTypesThisLoop = {}
     state.appointedStage = 0
     state.lastLoopEndDissonance = nil
+    state.lastLoopEndedInDanger = false
+    state.loopEnded = true
+    state.finale = false
     return state
   end
   state.loopsCompleted = state.loopsCompleted + 1
-  -- Aging reads this at the interlude ("ended in danger"), after the drop below.
+  -- Aging reads these at the interlude ("ended in danger"), after the drop
+  -- below. Danger is decided now, with this loop's investigator count, so a
+  -- later change of Investigators does not move the threshold.
+  local c = CampaignState.constants()
   state.lastLoopEndDissonance = state.dissonance
+  state.lastLoopEndedInDanger = state.dissonance >= c.appointedThreshold
+  state.loopEnded = true
+  state.finale = false
 
   -- Scar floor: completed loops, capped by scarCap.
-  local c = CampaignState.constants()
   state.dissonance = math.min(state.loopsCompleted, c.scarCap)
 
   state.hourglass = Constants.HOUR_FIRST
@@ -474,6 +521,33 @@ end
 --- Dissonance at the end of the last loop (nil before the first reset).
 function CampaignState.getLastLoopEndDissonance()
   return state.lastLoopEndDissonance
+end
+
+--- Did the last loop end at the Noticed band or higher? Decided at the reset
+-- (nil on a save made before this was recorded).
+function CampaignState.getLastLoopEndedInDanger()
+  return state.lastLoopEndedInDanger
+end
+
+--- Reset Loop has been clicked and the next loop has not begun yet: a second
+-- Reset Loop must not count another loop.
+function CampaignState.isLoopEnded()
+  return state.loopEnded == true
+end
+
+function CampaignState.setLoopEnded(on)
+  state.loopEnded = on and true or false
+  return state.loopEnded
+end
+
+--- The finale (The Last Hour) is being played. A reset ends it.
+function CampaignState.inFinale()
+  return state.finale == true
+end
+
+function CampaignState.setFinale(on)
+  state.finale = on and true or false
+  return state.finale
 end
 
 --- Years a card or resolution gave during the loop, added at the next Age.

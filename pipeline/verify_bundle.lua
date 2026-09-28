@@ -283,10 +283,46 @@ local snap = env.shApiSnapshot()
 env.shApiSyncBoard()
 expect("a closed location is labelled CLOSED", cardLabel(locB, "CLOSED") ~= nil)
 env.shApiSetPartTwo({ on = true })
-env.shApiUnlockFact({ id = "what-the-almanac-hid" })
+-- the Sealed Study opens when its act 2a becomes current: act 1a (What the
+-- Almanac Hid) advancing in Part II once The Vote That Never Ends is recorded
 env.shApiUnlockFact({ id = "the-vote-that-never-ends" })
+expect("the Vote alone does not open the Sealed Study", cardLabel(locB, "CLOSED") ~= nil)
+env.shApiUnlockFact({ id = "what-the-almanac-hid" })
 expect("the CLOSED label comes off once every fact is known (Part II)", cardLabel(locB, "CLOSED") == nil)
 env.shApiRestore({ blob = snap })
+
+print("\n== a second Reset Loop, and Age after the Prologue ==")
+local buttons3 = {}
+local env3 = setmetatable({
+  self = { createButton = function(def) buttons3[#buttons3 + 1] = def ; return true end,
+           clearButtons = function() buttons3 = {} ; return true end,
+           getPosition = function() return { x = 3, y = 1, z = 0 } end },
+  getObjectsWithTag = function() return {} end,       -- no campaign log: a new campaign
+}, { __index = env })
+local last3 = ""
+env3.broadcastToAll = function(msg) last3 = msg ; print("  (broadcast) " .. msg) end
+assert(loadfile("dist/stillhour_bundle.lua", "t", env3))()
+env3.onLoad(nil)
+local function label3(prefix)
+  for _, b in ipairs(buttons3) do if b.label:sub(1, #prefix) == prefix then return b end end
+end
+env3.shReset()
+env3.shReset()
+expect("a second Reset Loop after the Prologue counts nothing and says so",
+  env3.shApiState().loops == 0 and last3:find("already been reset", 1, true) ~= nil)
+env3.shOpenInterlude()
+expect("after the Prologue each Age button reads 'No Age'", label3("No Age") ~= nil and label3("Age") == nil)
+env3[label3("No Age").click_function](nil, "White", false)
+expect("clicking it gives no Years and says why", last3:find("do not gain Years", 1, true) ~= nil
+  and env3.shApiInvestigators()[1].years == 0)
+env3.shBeginNextLoop()
+env3.shApiCounter({ name = "dissonance", delta = 12 })
+env3.shReset() ; env3.shReset()
+expect("a second Reset Loop after a loop counts one loop only", env3.shApiState().loops == 1)
+env3.shOpenInterlude()
+expect("after a real loop the Age buttons are back", label3("Age") ~= nil and label3("No Age") == nil)
+expect("the interlude Memory button says it adjusts banked Memory",
+  (label3("Memory ").tooltip or ""):find("Adjusts banked Memory", 1, true) ~= nil)
 
 expect("no board-wiring errors on a vanilla table", #errors == 0)
 for _, e in ipairs(errors) do print("    " .. e) end

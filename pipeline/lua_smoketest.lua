@@ -103,9 +103,11 @@ check("flag used again at node A -> blocked", LoopFlags.use("igetout:White") == 
 -- "travel to node B" = no reset; flag must still be blocked
 check("flag still blocked at node B (same loop)", LoopFlags.isUsed("igetout:White") == true)
 
-print("== P4/P2: Muscle Memory reads previous-loop test types ==")
+print("== P4/P2: Muscle Memory reads this loop's test types (card: 'during this loop') ==")
+check("no combat test yet this loop -> not upgraded", LoopFlags.muscleMemoryUpgraded("combat") == false)
 LoopFlags.recordTest("combat")
-check("combat not yet 'last loop'", LoopFlags.muscleMemoryUpgraded("combat") == false)
+check("a combat test earlier this loop -> upgraded", LoopFlags.muscleMemoryUpgraded("combat") == true)
+check("another skill type is not upgraded", LoopFlags.muscleMemoryUpgraded("agility") == false)
 
 print("== P2: reset persists Memory/Knowledge/Years, drops Dissonance to scar, clears flags ==")
 CampaignState.bankMemory(14)
@@ -120,7 +122,7 @@ check("Years persist across reset", CampaignState.getYears("sthrelias") == 3)
 check("Dissonance dropped to scar (1)", CampaignState.getDissonance() == 1)
 check("Hourglass reset to Hour I", CampaignState.getHour() == 1)
 check("once-per-loop flags cleared", CampaignState.isFlagSet("igetout:White") == false)
-check("Muscle Memory now sees last-loop combat", LoopFlags.muscleMemoryUpgraded("combat") == true)
+check("Muscle Memory: last loop's combat test does not count this loop", LoopFlags.muscleMemoryUpgraded("combat") == false)
 
 print("== P2: soft cap applied at loop start ==")
 CampaignState.bankMemory(30) -- 14 + 30 = 44, uncapped until startLoop
@@ -260,7 +262,17 @@ check("Sealed Study needs BOTH facts", Locations.isSealed("sealed-study") == tru
 CampaignState.unlockFact("what-the-almanac-hid")
 check("Sealed Study still sealed with only one fact", Locations.isSealed("sealed-study") == true)
 CampaignState.unlockFact("the-vote-that-never-ends")
-check("Sealed Study opens with both facts", Locations.isOpen("sealed-study") == true)
+check("Sealed Study stays closed on facts alone (act 2a never became current)", Locations.isSealed("sealed-study") == true)
+check("act 2a becomes current in Part II with both entries", Locations.markAlmanacActTwoCurrent() == true)
+check("Sealed Study opens when The Appointed's Name becomes the current act", Locations.isOpen("sealed-study") == true)
+CampaignState.reset()
+check("a reset closes it again until act 2a is current again", Locations.isSealed("sealed-study") == true)
+CampaignState.unlockFact("the-appointeds-name")
+check("once The Appointed's Name is recorded it enters play open", Locations.isOpen("sealed-study") == true)
+check("act 2a is not current again once its deep entry is recorded", Locations.markAlmanacActTwoCurrent() == false)
+CampaignState.forgetFact("the-appointeds-name")
+CampaignState.setPartTwo(false)
+check("act 2a needs Part II", Locations.markAlmanacActTwoCurrent() == false)
 check("a plain location has no back", Locations.activeFace("winding-stair") == "front")
 -- Knowledge gates
 CampaignState.init(3)
@@ -569,5 +581,312 @@ do
   Hourglass.rewind(1, c) ; Hourglass.advance(1, c)
   check("reaching Hour VI again after a rewind adds nothing", cnt == after)
 end
+
+print("== Banked Memory never goes below 0 ==")
+CampaignState.init(3)
+CampaignState.bankMemory(2)
+check("removing more banked Memory than there is clamps at 0", CampaignState.bankMemory(-3) == 0
+  and CampaignState.getBankedMemory() == 0)
+check("a spend larger than the bank is refused (no change)", CampaignState.spendMemory(1) == false
+  and CampaignState.getBankedMemory() == 0)
+CampaignState.deserialize(JSON.encode({ version = 1, investigators = 3, bankedMemory = -4 }))
+check("a save holding negative banked Memory loads as 0", CampaignState.getBankedMemory() == 0)
+check("Borrowed Time costs 3 Memory", Interlude.recollectionCost("sthr-borrowedtime") == 3)
+
+print("== Reset Loop: the loop-ended flag (guards a second Reset Loop) ==")
+CampaignState.init(3)
+check("a loop under way is not ended", CampaignState.isLoopEnded() == false)
+CampaignState.reset()
+check("a reset marks the loop ended", CampaignState.isLoopEnded() == true)
+local leblob = CampaignState.serialize()
+CampaignState.init(3) ; CampaignState.deserialize(leblob)
+check("the loop-ended flag survives save/load", CampaignState.isLoopEnded() == true)
+Interlude.beginNextLoop()
+check("Begin Next Loop clears it", CampaignState.isLoopEnded() == false)
+CampaignState.init(3) ; CampaignState.setPrologue(true) ; CampaignState.reset()
+check("the Prologue's reset marks it too (Between Loops follows)", CampaignState.isLoopEnded() == true)
+CampaignState.deserialize(JSON.encode({ version = 1, investigators = 3, loopsCompleted = 1 }))
+check("an older save without the flag loads as a loop under way", CampaignState.isLoopEnded() == false)
+
+print("== Ended in danger: decided at the reset with that loop's count ==")
+CampaignState.init(4)                  -- 4p: Noticed from 16
+CampaignState.raiseDissonance(13)
+CampaignState.reset()
+check("13 at 4 investigators is not danger", CampaignState.getLastLoopEndedInDanger() == false)
+CampaignState.setInvestigatorCount(3)  -- someone leaves before Age: 3p Noticed is 12
+check("changing Investigators before Age keeps the answer (no danger)", Interlude.loopEndedInDanger() == false)
+CampaignState.init(2)                  -- 2p: Noticed from 8
+CampaignState.raiseDissonance(9)
+CampaignState.reset()
+CampaignState.setInvestigatorCount(4)
+check("9 at 2 investigators stays danger after changing to 4", Interlude.loopEndedInDanger() == true)
+check("Age reads it: 1 base + 1 danger",
+  Interlude.age("sthrelias", { endedInDanger = Interlude.loopEndedInDanger() }).yearsGained == 2)
+CampaignState.deserialize(JSON.encode({ version = 1, investigators = 3, lastLoopEndDissonance = 12 }))
+check("an older save falls back to the loop-end Dissonance (12 at 3p: danger)", Interlude.loopEndedInDanger() == true)
+CampaignState.deserialize(JSON.encode({ version = 1, investigators = 3, lastLoopEndDissonance = 11 }))
+check("...and 11 at 3p is not", Interlude.loopEndedInDanger() == false)
+
+print("== Departed investigators: no start-of-loop Memory, nothing banked ==")
+CampaignState.init(3)
+CampaignState.addYears("sthrelias", 18)   -- aged out
+CampaignState.addYears("sthrbirdie", 12)  -- Elder, in play
+CampaignState.addYears("sthrcass", 11)    -- Elder, no longer in play
+Interlude.beginNextLoop({ sthrbirdie = true, sthrelias = true })
+check("an aged-out investigator (18 Years) gets no Elder/Ancient Memory", CampaignState.getOnCardMemory("sthrelias") == 0)
+check("an Elder no longer in play gets none", CampaignState.getOnCardMemory("sthrcass") == 0)
+check("an Elder in play begins with 1", CampaignState.getOnCardMemory("sthrbirdie") == 1)
+CampaignState.init(3)
+CampaignState.addYears("sthrelias", 18)
+CampaignState.addOnCardMemory("sthrelias", 4) ; CampaignState.addOnCardMemory("sthrbirdie", 2)
+CampaignState.addOnCardMemory("sthrcass", 3)
+local bankedN, droppedN = Interlude.bankOnCard({ sthrbirdie = true, sthrelias = true })
+check("bank on-card Memory banks only the investigators still in the campaign", bankedN == 2
+  and CampaignState.getBankedMemory() == 2)
+check("...and drops a departed investigator's Memory", droppedN == 7 and CampaignState.getOnCardMemory("sthrelias") == 0)
+CampaignState.init(3) ; CampaignState.addYears("sthrelias", 18) ; CampaignState.addOnCardMemory("sthrelias", 2)
+CampaignState.addOnCardMemory("sthrbirdie", 1)
+check("with no board list, the Years rule alone decides", Interlude.bankOnCard() == 1)
+
+print("== Band starts and scar cap at 1-4 investigators ==")
+local expectBands = { [1] = { 3, 6, 3, 9 }, [2] = { 4, 8, 4, 12 }, [3] = { 6, 12, 6, 18 }, [4] = { 8, 16, 8, 24 } }
+for n = 1, 4 do
+  local cn, e = Constants.forCount(n), expectBands[n]
+  check(string.format("%dp: Glitch from %d, Noticed from %d, scar cap %d, reset %d", n, e[1], e[2], e[3], e[4]),
+    cn.bandGlitchStart == e[1] and cn.bandNoticedStart == e[2] and cn.scarCap == e[3] and cn.resetThreshold == e[4]
+    and Constants.bandFor(e[1] - 1, n) == "Calm" and Constants.bandFor(e[1], n) == "Glitch"
+    and Constants.bandFor(e[2], n) == "Noticed" and cn.appointedThreshold == e[2])
+  CampaignState.init(n)
+  for _ = 1, e[3] + 2 do
+    CampaignState.raiseDissonance(e[4]) ; CampaignState.reset() ; CampaignState.setLoopEnded(false)
+  end
+  check(string.format("%dp: the scar stops at %d", n, e[3]), CampaignState.getDissonance() == e[3])
+end
+
+print("== Hour VI undo (a cancelled Hour VI) ==")
+do
+  local ub = ChaosBag.new()
+  ub.findBag = function() return nil end
+  local uctx = { addStatic = function(n) ub.addStatic(n) end, removeStatic = function(n) ub.removeStatic(n) end,
+                 setAlmanac = function(on) ub.setAlmanac(on ~= false) end }
+  CampaignState.init(3) ; ub.setBaselineStatic(1)
+  Hourglass.advance(5, uctx)
+  check("Hour VI adds 1 temporary Static (band 1 -> 2)", ub.count == 2 and Hourglass.hourSixResolved())
+  check("undo takes it back and clears the once-per-loop flag", Hourglass.undoHourSix(uctx) == "static"
+    and ub.count == 1 and not Hourglass.hourSixResolved())
+  Hourglass.rewind(1, uctx) ; Hourglass.advance(1, uctx)
+  check("after the undo, reaching Hour VI again resolves it", ub.count == 2)
+  Hourglass.undoHourSix(uctx)
+  check("a second undo with nothing applied is refused", Hourglass.undoHourSix(uctx) == nil and ub.count == 1)
+  CampaignState.init(3) ; ub.clearTemporary() ; ub.setBaselineStatic(2)
+  CampaignState.unlockFact("what-the-almanac-hid")
+  Hourglass.advance(5, uctx)
+  check("with What the Almanac Hid, Hour VI makes it 1 fewer (2 -> 1)", ub.count == 1 and ub.almanac == true)
+  local ablob = CampaignState.serialize()
+  CampaignState.init(3) ; CampaignState.deserialize(ablob)
+  check("what Hour VI applied survives save/load", CampaignState.isFlagSet("hour-vi-almanac") == true)
+  check("undo restores the band's count (setAlmanac false)", Hourglass.undoHourSix(uctx) == "almanac"
+    and ub.count == 2 and ub.almanac == false and not Hourglass.hourSixResolved())
+  Hourglass.rewind(1, uctx) ; Hourglass.advance(1, uctx)
+  CampaignState.reset()
+  check("a reset clears Hour VI's flags", not Hourglass.hourSixResolved() and not CampaignState.isFlagSet("hour-vi-almanac"))
+end
+
+print("== Hour IX in the finale ==")
+do
+  CampaignState.init(3)
+  CampaignState.unlockFact("the-way-the-night-breaks")
+  local said = {}
+  local fctx = { onReset = function() said.reset = true end, onFinaleAttemptable = function() said.may = true end,
+                 onFinaleEnds = function() said.ends = true end }
+  CampaignState.setHour(8) ; Hourglass.advance(1, fctx)
+  check("outside the finale, Hour IX offers the finale", said.may == true and not said.ends)
+  said = {}
+  CampaignState.setFinale(true) ; CampaignState.setHour(8) ; Hourglass.advance(1, fctx)
+  check("in the finale, Hour IX ends the finale (contest not reached)", said.ends == true and not said.may and not said.reset)
+  CampaignState.reset()
+  check("a reset ends the finale", CampaignState.inFinale() == false)
+end
+
+print("== Knowledge pays Memory (once per entry, refunded on removal) ==")
+CampaignState.init(3)
+local n0, p0 = Knowledge.unlock("the-thirteenth-toll")
+check("a surface entry pays 1 per investigator (3 at 3p)", n0 == true and p0 == 3 and CampaignState.getBankedMemory() == 3)
+local n1, p1 = Knowledge.unlock("the-thirteenth-toll")
+check("recording it again pays nothing", n1 == false and p1 == 0 and CampaignState.getBankedMemory() == 3)
+local _, pd = Knowledge.unlock("the-hour-was-wrong")
+check("a deep entry pays 3 per investigator (9 at 3p)", pd == 9 and CampaignState.getBankedMemory() == 12)
+local _, pp = Knowledge.unlock("you-are-unstuck")
+check("the prologue entry pays nothing", pp == 0 and CampaignState.getBankedMemory() == 12)
+local _, pa = Knowledge.unlock("the-way-the-night-breaks")
+check("the assembled entry pays nothing", pa == 0 and CampaignState.getBankedMemory() == 12)
+CampaignState.setInvestigatorCount(2)
+local _, p2 = Knowledge.unlock("the-road-remembers")
+check("the current investigator count is used (surface at 2p = 2)", p2 == 2 and CampaignState.getBankedMemory() == 14)
+local kblob = CampaignState.serialize()
+CampaignState.init(3) ; CampaignState.deserialize(kblob)
+check("what each entry paid survives save/load", CampaignState.getKnowledgePaid("the-hour-was-wrong") == 9)
+local rem, refund = Knowledge.forget("the-hour-was-wrong")
+check("removing an entry refunds what it paid", rem == true and refund == 9 and CampaignState.getBankedMemory() == 5
+  and not CampaignState.knows("the-hour-was-wrong"))
+check("removing it twice refunds nothing more", select(2, Knowledge.forget("the-hour-was-wrong")) == 0)
+CampaignState.setInvestigatorCount(3)
+check("recording it again pays again (net once)", select(2, Knowledge.unlock("the-hour-was-wrong")) == 9
+  and CampaignState.getBankedMemory() == 14)
+CampaignState.init(3) ; CampaignState.bankMemory(16)
+Knowledge.unlock("the-keepers-ninth-death")
+check("banked Memory may sit above the cap until the next loop begins (25 > 18)", CampaignState.getBankedMemory() == 25)
+Interlude.beginNextLoop()
+check("...and is reduced to 6n when it does", CampaignState.getBankedMemory() == 18)
+CampaignState.init(3) ; CampaignState.bankMemory(1)
+Knowledge.unlock("the-lamp-was-never-lit") ; CampaignState.spendMemory(4)
+check("a refund never takes banked Memory below 0", select(2, Knowledge.forget("the-lamp-was-never-lit")) == 3
+  and CampaignState.getBankedMemory() == 0)
+CampaignState.unlockFact("the-wheel-still-turns")
+check("an entry recorded before this rule (no payment) refunds nothing",
+  select(2, Knowledge.forget("the-wheel-still-turns")) == 0)
+
+print("== Act II status includes the after-Loop-3 route ==")
+CampaignState.init(3)
+check("no route: closed", Knowledge.actIIOpen() == false)
+for _ = 1, 3 do CampaignState.reset() end
+check("after Loop 3 with no surface entries: open", Knowledge.actIIOpen() == true)
+CampaignState.init(3) ; CampaignState.setPartTwo(true)
+check("Part II begun: open", Knowledge.actIIOpen() == true)
+
+-- ---- the Control token itself (src/tts/control.lua) on a stubbed table ----
+local function loadControl()
+  local btns = {}
+  local env = setmetatable({}, { __index = _G })
+  env.self = {
+    createButton = function(def) btns[#btns + 1] = def ; return true end,
+    clearButtons = function() for i = #btns, 1, -1 do btns[i] = nil end ; return true end,
+    getPosition = function() return { x = 0, y = 1, z = 0 } end,
+  }
+  env.print = function() end
+  env.lastBroadcast = ""
+  env.broadcastToAll = function(msg) env.lastBroadcast = msg end
+  assert(loadfile("src/tts/control.lua", "t", env))()
+  env.label = function(prefix)
+    for _, b in ipairs(btns) do if b.label:sub(1, #prefix) == prefix then return b end end
+  end
+  return env
+end
+
+print("== Control: double Reset Loop, Age after the Prologue, Hour VI undo, finale ==")
+do
+  local C = loadControl()
+  CampaignState.init(3)
+  C.onLoad(nil)
+  check("a new campaign opens in the Prologue", C.shApiState().prologue == true)
+  C.shApiReset()
+  check("the Prologue's Reset Loop starts Between Loops", C.shApiState().loopEnded == true and C.shApiState().loops == 0)
+  C.shApiReset()
+  check("a second Reset Loop after the Prologue does nothing but say so", C.shApiState().loops == 0
+    and C.lastBroadcast:find("already been reset", 1, true) ~= nil)
+  C.shApiInterlude({})
+  check("Age is refused after the Prologue", C.shApiAge({ id = "sthrelias" }) == nil
+    and CampaignState.getYears("sthrelias") == 0 and C.lastBroadcast:find("do not gain Years", 1, true) ~= nil)
+  C.shApiBeginNextLoop()
+  check("Begin Next Loop: a loop is under way again", C.shApiState().loopEnded == false)
+  C.shApiCounter({ name = "dissonance", delta = 12 })
+  C.shApiReset()
+  local st1 = C.shApiState()
+  C.shApiReset()
+  local st2 = C.shApiState()
+  check("double Reset Loop: one loop counted, scar and danger kept", st1.loops == 1 and st2.loops == 1
+    and st2.dissonance == 1 and st2.danger == true)
+  C.shApiCounter({ name = "investigators", delta = 1 })
+  check("changing Investigators between loops keeps 'ended in danger'", C.shApiState().danger == true
+    and C.shApiState().investigators == 4)
+  C.shApiCounter({ name = "investigators", delta = -1 })
+  check("Age works after a real loop (1 + danger)", (C.shApiAge({ id = "sthrelias" }) or {}).gained == 2)
+  C.shApiBeginNextLoop()
+  for _ = 1, 5 do C.shClickHour(nil, "White", false) end
+  local sv = C.shApiState()
+  check("Hour VI adds its Static token and shows Undo Hour VI", sv.hour == 6 and sv.static.extra == 1
+    and C.label("Undo Hour VI") ~= nil)
+  C.shUndoHourSix()
+  local su = C.shApiState()
+  check("Undo Hour VI takes the token back and clears the flag", su.static.extra == 0 and su.hourSix == false
+    and C.label("Undo Hour VI") == nil)
+  C.shApiCounter({ name = "dissonance", delta = 13 })   -- 14 at 3p
+  C.shApiCounter({ name = "investigators", delta = -1 }) -- 2p: reset value 12
+  check("fewer Investigators mid-loop: reaching the new reset value is announced",
+    C.lastBroadcast:find("Reset Loop", 1, true) ~= nil and C.shApiState().loopEnded == false
+    and C.shApiState().static.baseline == 2)
+  C.shApiCounter({ name = "investigators", delta = 1 })
+  CampaignState.unlockFact("the-way-the-night-breaks")
+  C.shSyncBoard()
+  check("with The Way the Night Breaks the Control offers Begin Finale", C.label("Begin Finale") ~= nil)
+  C.shBeginFinale()
+  check("Begin Finale switches to the contest", C.shApiState().finale == true and C.label("Contest 0 /") ~= nil)
+  C.shClickContest(nil, "White", true)
+  check("right-click Contest at 0 takes Begin Finale back", C.shApiState().finale == false)
+  C.shApiSetFinale({ on = true })
+  CampaignState.setHour(8)
+  C.shClickHour(nil, "White", false)
+  check("Hour IX in the finale says the finale ends", C.lastBroadcast:find("finale ends", 1, true) ~= nil)
+  CampaignState.init(3)
+  local m0 = CampaignState.getBankedMemory()
+  local r1 = C.shApiUnlockFact({ id = "the-lamp-was-never-lit" })
+  local r2 = C.shApiUnlockFact({ id = "the-lamp-was-never-lit" })
+  check("Control: recording an entry pays once (+3); ticking it again pays nothing",
+    r1.paid == 3 and r2.paid == 0 and CampaignState.getBankedMemory() == m0 + 3)
+  local r3 = C.shApiForgetFact({ id = "the-lamp-was-never-lit" })
+  check("Control: removing it refunds (-3)", r3.refund == 3 and CampaignState.getBankedMemory() == m0)
+  CampaignState.init(3) ; CampaignState.setPartTwo(true)
+  C.shApiUnlockFact({ id = "what-the-almanac-hid" })
+  C.shApiUnlockFact({ id = "the-vote-that-never-ends" })
+  check("Control: the Vote recorded after act 1a is gone -> Sealed Study stays closed this loop",
+    Locations.isSealed("sealed-study"))
+  C.shApiReset() ; C.shApiBeginNextLoop()
+  check("Control: next loop in Part II act 2a is current -> it opens", Locations.isOpen("sealed-study"))
+  CampaignState.init(3) ; CampaignState.setPartTwo(true)
+  C.shApiUnlockFact({ id = "the-vote-that-never-ends" })
+  C.shApiUnlockFact({ id = "what-the-almanac-hid" })
+  check("Control: act 1a advancing with the Vote recorded -> it opens at once", Locations.isOpen("sealed-study"))
+  CampaignState.init(3) ; CampaignState.bankMemory(7) ; CampaignState.addYears("sthrbirdie", 4)
+  local realAdvance = Hourglass.advance
+  Hourglass.advance = function() error("boom") end
+  local res = C.runStillHourTests()
+  Hourglass.advance = realAdvance
+  check("Run Tests: an error is reported as a failure", res.failed >= 1 and res.error ~= nil)
+  check("Run Tests: the live campaign is restored after the error", CampaignState.getBankedMemory() == 7
+    and CampaignState.getYears("sthrbirdie") == 4)
+  local ok2 = C.runStillHourTests()
+  check("Run Tests: every in-engine test passes (" .. ok2.passed .. ")", ok2.failed == 0 and ok2.passed > 0)
+  check("Run Tests: state restored after a clean run", CampaignState.getBankedMemory() == 7)
+end
+
+print("== Campaign log: Part II is ticked from the Control's partTwo only ==")
+do
+  local L = setmetatable({}, { __index = _G })
+  L.PAGE, L.PAGE_COUNT = 1, 2
+  L.FIELDS = { { k = "act1", t = "cb" }, { k = "act2", t = "cb" }, { k = "act3", t = "cb" },
+               { k = "loops", t = "ct" }, { k = "banked", t = "ct" }, { k = "investigators", t = "ct" } }
+  L.INVESTIGATORS = {}
+  L.FACT_LAYER = { ["the-lamp-was-never-lit"] = "surface", ["the-thirteenth-toll"] = "surface",
+                   ["the-road-remembers"] = "surface" }
+  L.self = { editButton = function() end, editInput = function() end }
+  L.broadcastToAll = function() end
+  assert(loadfile("src/tts/campaign_log.lua", "t", L))()
+  local know3 = { ["the-lamp-was-never-lit"] = true, ["the-thirteenth-toll"] = true, ["the-road-remembers"] = true }
+  L.syncFromCampaignState({ version = 1, loopsCompleted = 3, knowledge = know3, partTwo = false })
+  local v = L.getLogValues().values
+  check("3 surface entries and 3 loops, Part II not begun: Part II is not ticked", v.act1 == true and not v.act2)
+  L.syncFromCampaignState({ version = 1, loopsCompleted = 3, knowledge = know3, partTwo = true })
+  v = L.getLogValues().values
+  check("the Control's Part II ticks Part II", v.act2 == true)
+  L.values = {}
+  L.syncFromCampaignState({ version = 1, loopsCompleted = 3, knowledge = {} })
+  check("a state saved before partTwo was recorded falls back to the loop count", L.getLogValues().values.act2 == true)
+end
+
+print("== Pending Years reach Age ==")
+CampaignState.init(3)
+CampaignState.addPendingYears("sthrelias", 2)
+check("Interlude.age adds a card's pending Years (1 + 2)",
+  Interlude.age("sthrelias", { extraYears = CampaignState.getPendingYears("sthrelias") }).yearsGained == 3)
 print(string.format("RESULT: %d passed, %d failed", passed, failed))
 os.exit(failed == 0 and 0 or 1)
