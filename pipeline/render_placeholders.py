@@ -257,7 +257,8 @@ def frame_underlay(frame):
     average tone, lightened — never a black placeholder box. The template
     reads as an empty space waiting for art, per class palette."""
     small = frame.convert("RGBA").resize((40, 56))
-    px = [p for p in small.getdata() if p[3] > 200]
+    pixels = small.get_flattened_data() if hasattr(small, "get_flattened_data") else small.getdata()
+    px = [p for p in pixels if p[3] > 200]
     if not px:
         return (206, 198, 184)
     n = len(px)

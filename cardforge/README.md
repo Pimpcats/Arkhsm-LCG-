@@ -46,7 +46,7 @@ steps that check themselves off:
   fields fall back to the authored card. Spoiler shield keeps encounter cards
   hidden.
 - **Illustrate** — the backend rig (where A1111/ComfyUI live on this machine,
-  from `rig.json`): **one-click Launch backend**, and every generate job
+  from `rig.json`, with your machine's own settings in the gitignored `rig.local.json`): **one-click Launch backend**, and every generate job
   auto-launches it and waits for its API if it isn't already running. Plus
   Step-0 seeds with an in-app canonical-portrait picker, a **model picker**
   (lists the backend's installed checkpoints, one click writes the campaign
@@ -75,7 +75,8 @@ pip install requests Pillow
 # 1. Configure
 #    - campaigns/still_hour/campaign.json: set "checkpoint" to your model file,
 #      set "backend" ("a1111" | "comfy") and "base_url" if not default.
-#    - rig.json (repo root): where the backend lives + how to start it — the
+#    - rig.local.json (repo root, gitignored; rig.example.json shows the format,
+#      rig.json holds neutral defaults): where the backend lives + how to start it — the
 #      Studio launches it for you (pre-set: A1111 at C:/SD/SDXL via
 #      "webui.bat --api"; if you rely on custom COMMANDLINE_ARGS, point it at
 #      webui-user.bat and add --api to that file). Headless equivalent:
