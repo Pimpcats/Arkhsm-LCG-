@@ -537,6 +537,21 @@ def test_boxes_sharing_the_loop_board_never_stack_on_each_other(tmp_path):
             assert abs(a[1] - b[1]) >= 2.5 or abs(a[2] - b[2]) >= 2.5, (a, b)
 
 
+def test_no_box_lays_a_stack_on_sceds_own_objects(tmp_path):
+    # SCED's chaos bag sits on the mythos mat's corner snap: a stack Placed
+    # there falls into the bag (found by the headless SCED harness)
+    out = tmp_path / "c.json"
+    assert cc.compile_campaign(str(out))["ok"]
+    box = json.load(open(out, encoding="utf-8"))["ObjectStates"][0]
+    for sb in box["ContainedObjects"]:
+        if sb.get("Name") != "Custom_Model_Bag":
+            continue
+        for e in json.loads(sb["LuaScriptState"])["ml"].values():
+            for what, (x, z) in cc.SCED_FIXED_SPOTS.items():
+                assert abs(e["pos"]["x"] - x) >= 2.5 or abs(e["pos"]["z"] - z) >= 2.5, \
+                    (sb["Nickname"], what, e["pos"])
+
+
 # ------------------------------------------ replayable scenario box (fake TTS) --
 LOOP_BOX_CHUNK = r"""
 local BOX = %s

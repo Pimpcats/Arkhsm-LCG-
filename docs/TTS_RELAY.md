@@ -93,3 +93,42 @@ uses a local bare repo in place of GitHub.
 ```bash
 python3 -m pytest -q tests/test_tts_relay.py      # needs lua5.2
 ```
+
+## Headless SCED harness (no Tabletop Simulator needed)
+
+`tests/sced_real/` plays the campaign on a stand-in for Tabletop Simulator,
+so integration bugs show up before a relay run. It boots SCED's real table
+(Global and every scripted object, with SCED's own scripts), spawns
+`dist/saved_object_the_still_hour.json` the way the owner does, and then plays
+Campaign Setup, the Prologue, a loop, an interlude, Part II and the start of
+the finale using only what the owner touches: the Control token's buttons,
+each box's Place, the campaign log's boxes and page menu, and moving cards by
+hand. Along the way it checks SCED's real chaos bag after each difficulty
+button and Dissonance change, where every box lays its cards (SCED's agenda,
+act, encounter and scenario-card spots, inside the play area, no overlaps,
+nothing dropped on or into SCED's own objects), deck sizes, that Clear Board
+takes exactly what the boxes laid out (and the tokens on those cards) and
+leaves SCED's table alone, the log-to-Control link, and a full save and
+reload. Any Lua error, from the campaign or from SCED reacting to it, fails the
+step. It also runs this relay's own in-game suite (`ingame_runner.lua`) on the
+same emulated table, so both environments share one suite.
+
+```bash
+python3 -m pytest -q tests/test_sced_real.py      # lua5.2 and lua5.4
+python3 tests/sced_real/run.py                    # readable PASS/FAIL list
+python3 tests/sced_real/run.py --fake             # without SCED (stand-in)
+```
+
+SCED is pinned at commit `0e12534` (argonui/SCED). The harness uses, in order:
+`$SCED_DIR`, `third_party/sced/`, a local clone at `/home/user/argonui/sced`,
+or a copy it fetches into the git-ignored `.cache/sced/`. Without any of them
+the real-SCED tests are skipped (set `SCED_REAL=0` to skip them on purpose);
+the stand-in tests (the minimal SCED fixture above, laid out where SCED keeps
+its objects) always run.
+
+What it can NOT catch: anything visual (rendering, card faces, image loading,
+the PDF), TTS physics and snapping beyond "lands on the highest thing under
+it" (bounds are approximate), XML UI (tracked, never drawn), timing that
+depends on real frame rates or downloads, and differences between the pinned
+SCED and the SCED version installed on the owner's PC. A pass is not a
+playtest and does not replace a relay run in real TTS.

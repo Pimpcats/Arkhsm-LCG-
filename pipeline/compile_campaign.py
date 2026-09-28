@@ -97,9 +97,15 @@ DISTRICT_ROW = {"district_fairground": 15.3, "district_lighthouse": 9.18,
                 "district_almanac": 3.06, "district_square": -3.06,
                 "district_road": -9.18, "district_church": -15.3}
 DISTRICT_ACT_X, DISTRICT_SET_X = -13.8, -7.05
-# the finale shares the loop's board: its set-aside stack takes the mat's
-# other corner snap, clear of the Square's set-aside stack
-FINALE_ASIDE = {"pos": (1.6, 1.56, -13.75), "rot": 315, "face_down": True}
+# the finale shares the loop's board: its set-aside stack goes where the
+# official boxes put set-aside cards, beside the encounter discard, clear of
+# the Square's set-aside stack. Never the mat's other corner snap
+# (1.6, -13.75): SCED keeps its chaos bag there (objects/ChaosBag.fea079),
+# and a stack dropped on it falls into the bag.
+FINALE_ASIDE = {"pos": (-3.83, 1.60, 14.98), "rot": 270, "face_down": True}
+# SCED's own table objects near the mythos mat that no stack may land on
+SCED_FIXED_SPOTS = {"chaos bag": (1.6, -13.75), "trash": (3.7, -8.8),
+                    "connection markers": (3.7, -11.3), "chaos bag stat tracker": (4.19, -16.6)}
 
 
 def stack_anchor(sc, stack):
