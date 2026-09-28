@@ -20,9 +20,8 @@ load in Lua) under .cache/sced_real/<commit>/table.lua.
 SCED has no license file upstream, so this repository never contains SCED
 code. Sources, first match wins:
   1. $SCED_DIR (a checkout of argonui/SCED)
-  2. third_party/sced/ in this repository (if an owner-approved copy exists)
-  3. /home/user/argonui/sced (the session's shallow clone)
-  4. .cache/sced/<PINNED> fetched with git (the pinned commit, or the default
+  2. /home/user/argonui/sced (the session's shallow clone)
+  3. .cache/sced/<PINNED> fetched with git (the pinned commit, or the default
      branch if the host refuses a fetch by hash; the commit used is recorded)
 """
 import hashlib
@@ -97,7 +96,7 @@ def _fetch(dest_root):
 
 def find_sced(allow_fetch=True):
     """(path, commit) of a usable SCED checkout, or (None, reason)."""
-    candidates = [os.environ.get("SCED_DIR"), os.path.join(ROOT, "third_party", "sced"), LOCAL_CLONE]
+    candidates = [os.environ.get("SCED_DIR"), LOCAL_CLONE]
     for c in candidates:
         if _is_sced(c):
             return c, _commit_of(c)

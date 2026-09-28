@@ -120,7 +120,7 @@ python3 tests/sced_real/run.py --fake             # without SCED (stand-in)
 ```
 
 SCED is pinned at commit `0e12534` (argonui/SCED). The harness uses, in order:
-`$SCED_DIR`, `third_party/sced/`, a local clone at `/home/user/argonui/sced`,
+`$SCED_DIR`, a local clone at `/home/user/argonui/sced`,
 or a copy it fetches into the git-ignored `.cache/sced/`. Without any of them
 the real-SCED tests are skipped (set `SCED_REAL=0` to skip them on purpose);
 the stand-in tests (the minimal SCED fixture above, laid out where SCED keeps
