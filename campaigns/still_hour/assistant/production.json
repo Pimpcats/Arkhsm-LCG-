@@ -27,7 +27,7 @@
     "objectives_feasible_1_to_4_investigators": true,
     "sced_connection_keys_unique": true,
     "lua_rules_tests": "291/291 (Lua 5.2 and 5.4)",
-    "pytest": "68 passed, 150 subtests",
+    "pytest": "77 passed, 150 subtests (incl. 4 real-SCED tests)",
     "scenario_audit": "8/8 locked, 0 errors",
     "cardforge_selftest": "20/20 (sandboxed)",
     "studio_selftest": "258/258 (sandboxed; merged head before the final review fixes)",
@@ -39,7 +39,8 @@
     "memory_sim": "derived from cards: 3p 32-38 Memory per investigator before the finale loop; simulate.py 7-loop mean 39.9",
     "tests_leave_checkout_clean": true,
     "art_missing": 7,
-    "independent_review": "post-fix verification: 0 blockers, 0 majors; 9 minors applied"
+    "independent_review": "post-fix verification: 0 blockers, 0 majors; 9 minors applied",
+    "sced_headless_harness": "real SCED 0e12534 table (211 objects): playthrough 168/168, relay suite 129/129 (Lua 5.2 and 5.4); tests/test_sced_real.py"
   },
   "evidence": [
     "python3 pipeline/scenario_content.py: 8/8 scenarios, 0 errors (notes: one inherited stat deviation, five cross-district symbol repeats in distinct colours)",
@@ -51,7 +52,8 @@
     "2026-09-25: resolutions for every scenario (Prologue 3, loop 3, districts 4 each, finale 7 + age epilogue); 7 recorded choices tied to other districts and the finale.",
     "2026-09-25: replayable scenario boxes (loop_box.lua) + Control Clear Board; Prologue mode; difficulty buttons (SCED setChaosBagState); Knowledge/Victory ticks on the log reach the Control; unrevealed location sides; Hard/Expert reference side.",
     "2026-09-25: rules-wording pass against the Rules Reference applied to the guide and every card; renderer reports text overflow; every card checked visually.",
-    "2026-09-28: audit pass 5 applied (balance: Knowledge pays Memory, tighter districts, deck trim + The Minute Hand; cards; guide; Control guards, Undo Hour VI, Begin Finale, Knowledge Memory), dist rebuilt on hosted images 21aecea. Findings: docs/design/AUDIT_PASS5.md."
+    "2026-09-28: audit pass 5 applied (balance: Knowledge pays Memory, tighter districts, deck trim + The Minute Hand; cards; guide; Control guards, Undo Hour VI, Begin Finale, Knowledge Memory), dist rebuilt on hosted images 21aecea. Findings: docs/design/AUDIT_PASS5.md.",
+    "2026-09-28: headless SCED harness (tests/sced_real) boots the real SCED table and plays Prologue, loops, Part II, finale and save/reload through the owner's buttons; found and fixed 5 integration bugs (finale set-aside on SCED's chaos bag, Clear Board removing SCED pieces, Square set-aside over the clue counter, [static] token into a respawned bag, relay stale bag reference). Not real TTS: no rendering, approximate physics."
   ],
   "next_actions": [
     "Owner: run the TTS relay on main from local PowerShell (Start TTS Relay.bat).",
