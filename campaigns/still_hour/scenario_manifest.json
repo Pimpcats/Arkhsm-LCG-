@@ -81,7 +81,7 @@
             "id": "sthr-wrongturn",
             "name": "WRONG TURN",
             "type": "Treachery",
-            "qty": 2
+            "qty": 1
           },
           {
             "id": "sthr-rewind",
@@ -90,19 +90,19 @@
             "keywords": [
               "Peril"
             ],
-            "qty": 2
+            "qty": 1
           },
           {
             "id": "sthr-deadair",
             "name": "DEAD AIR",
             "type": "Treachery",
-            "qty": 2
+            "qty": 1
           },
           {
             "id": "sthr-loopnotices",
             "name": "THE LOOP NOTICES YOU",
             "type": "Treachery",
-            "qty": 2
+            "qty": 1
           }
         ]
       },
@@ -372,11 +372,25 @@
             "qty": 1
           }
         ]
+      },
+      "strays": {
+        "name": "Strays of the Night (hunting monsters)",
+        "source": "audit pass 5: an enemy that acts in the Calm band",
+        "cards": [
+          {
+            "id": "sthr-minutehand",
+            "name": "THE MINUTE HAND",
+            "type": "Enemy",
+            "traits": "Monster.",
+            "qty": 2
+          }
+        ]
       }
     },
     "shared_spine": [
       "occultation_skips",
       "echoes",
+      "strays",
       "static",
       "weight_of_years"
     ],
@@ -583,6 +597,7 @@
           "sets": [
             "occultation_skips",
             "echoes",
+            "strays",
             "static",
             "weight_of_years"
           ],

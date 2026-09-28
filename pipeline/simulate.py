@@ -76,16 +76,18 @@ def success_probability(delta, band):
 # --------------------------------------------------------------------------- #
 # MEMORY ECONOMY MODEL
 # --------------------------------------------------------------------------- #
-# The shared pool banks a per-loop income the docs peg at ~17 Memory/loop for a
-# 3-player table (5-95th percentile 14-20; aging_3p_v0.3 §2.1). Memory carried
+# The shared pool banks a per-loop income DERIVED FROM THE CARDS in
+# simulate_tempo.py --memory (investigator Memory reactions + Knowledge pays
+# Memory + Victory + Elder): ~5.2-6.2 per investigator per loop at 3p for the
+# weakest to strongest party (5-95th percentile ~2.5-10). Memory carried
 # into the next loop is soft-capped at 6*investigators. The campaign runs ~7
 # loops (guide §10). Total Memory EARNED across the campaign, divided per
 # investigator, is the XP-analog we benchmark against official Arkham
 # (~40-50 XP/investigator/campaign; CO-001).
 #
 # ASSUMPTION: income ~ Normal(mean per player, sd) clipped, summed over players.
-INCOME_MEAN_PER_PLAYER = 17 / 3      # ~5.67 Memory/loop/player -> ~17 at 3p
-INCOME_SD_PER_PLAYER = 1.1           # tuned so the 3p total lands 14-20 (5-95th)
+INCOME_MEAN_PER_PLAYER = 5.7        # simulate_tempo.py --memory, 3p median party
+INCOME_SD_PER_PLAYER = 2.3           # per-investigator loop spread from the same run
 BENCHMARK_LOW, BENCHMARK_HIGH = 40, 50
 
 
@@ -280,8 +282,9 @@ def simulate_stress(trials, investigators, rng, style, scar=0):
 # --------------------------------------------------------------------------- #
 # FINALE CONTEST — stage-aware model of "contest the crossing"
 # --------------------------------------------------------------------------- #
-# Target = 4 x investigators (12 at 3p). Deep facts spent add 1 contest each at
-# the start. Each round every investigator may attempt one Hold Back (wil/com 4);
+# Target = 4 x investigators (12 at 3p). Deep facts spent and each investigator's
+# first visit to the Sealed Study add 1 contest each at the start. Hold Back
+# (wil/com 4) needs a ready Appointed and a success exhausts it: one per round;
 # a success adds 1 contest, pushes the Appointed back ONE APPROACH STAGE, and
 # rewinds the Hourglass 1 Hour. The self-limiters the naive model missed:
 #   * Hold Back needs the Appointed MANIFEST (stage >= 1) — pushed to Unseen, it
@@ -299,7 +302,9 @@ def simulate_finale_staged(rng, investigators, deep_facts, holdback_p, trials,
     reset_t = 6 * investigators if investigators != 1 else 9
     reached = 0
     for _ in range(trials):
-        contest = deep_facts
+        # contest sources other than Hold Back: each deep entry spent, and the
+        # first time each investigator is at the Sealed Study (card text).
+        contest = deep_facts + investigators
         hour = start_hour
         diss = start_diss
         stage = 3                      # enters the finale Arrived
@@ -323,12 +328,14 @@ def simulate_finale_staged(rng, investigators, deep_facts, holdback_p, trials,
             diss += DECK_DISSONANCE_PER_ROUND
             if hour >= 9 or diss >= reset_t:
                 break                  # night ends or the loop closes: not reached
-            # investigators: one Hold Back attempt each while it is manifest
+            # investigators try Hold Back in turn; it is used only while the
+            # Appointed is ready and a success exhausts it: one success a round
             for _i in range(investigators):
                 if stage >= 1 and contest < target and rng.random() < holdback_p:
                     contest += 1
                     stage -= 1
                     hour = max(1.0, hour - 1)   # rewind (no re-resolve on rewind)
+                    break
             if contest >= target:
                 won = True
                 break

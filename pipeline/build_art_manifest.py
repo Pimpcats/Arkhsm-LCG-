@@ -166,6 +166,7 @@ SCENES.update({
     "sthr-barker": "a fairground barker in a striped waistcoat and straw boater under carnival lights, grin too wide, one gloved hand beckoning, the wheel lit behind him",
     "sthr-compositor": "a hunched printer at a composing stick in a dark print shop, arms black with ink to the elbow, eyes like wet type, trays of letters glinting",
     "sthr-uninvited": "a tall faceless figure in an old-fashioned mourning coat at the edge of lantern light on a hill above a small town, the stars sliding behind it",
+    "sthr-minutehand": "a gaunt stooped figure on a cobbled 1920s side street at night, one arm impossibly long and thin like the hand of a clock, its coat hung with stopped pocket watches, head cocked as if listening for a tick",
     "sthr-thirteen": "a church clock face with thirteen hour marks, the hands pointing to the extra one",
     "sthr-risingwater": "black water climbing a flight of stone stairs one step at a time",
     "sthr-bridgeremembers": "wet footprints crossing a low stone bridge that begin and end in the middle",

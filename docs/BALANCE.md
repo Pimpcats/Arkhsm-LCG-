@@ -234,3 +234,45 @@ because it waits for the Glitch band), with 2.4–6.7 Hours to spare. The race i
 this campaign is how many districts you fit into one night, not whether one
 district can be finished: a planned party completes about 1.7 objectives per
 loop.
+
+## Audit pass 5: Memory derived from the cards, tighter districts (2026-09-28)
+
+**Memory (XP) was an assumption.** `simulate.py` used a fixed ~17 Memory per
+loop at 3p. Worked out from the cards, the investigator reactions alone gave
+~25 per investigator per campaign (official ~35-45), very uneven by party, and
+Seraphine's ability earned none. Fixes:
+- **Knowledge pays Memory** (guide): first time an entry is recorded, each
+  investigator banks 1 (surface) or 3 (deep). Deep objectives are the greedy,
+  risky ones, so they pay most.
+- Seraphine: 1 Memory after her ability's second use in a round (2 Dissonance
+  per Memory, and it counts toward leaning on the loop).
+- `simulate_tempo.py --memory` now derives income from the cards (per-round
+  trigger chances per investigator, Knowledge, Victory, Elder). Result before
+  the finale loop, per investigator: 3p weakest / median / strongest party
+  32 / 36 / 38 (10-90% 24-51); 2p 33-43; 4p 34-37; solo 37-59. Per loop:
+  ~2.3 minimum, ~5-6 typical, ~9-10 maximum (5th-95th percentile).
+  `simulate.py` now uses 5.7 ± 2.3 per investigator per loop: campaign mean
+  39.9 at 3p over 7 loops (benchmark 40-50).
+
+**Districts were too loose.** One objective left 6.6-6.7 of 8 Hours in the
+Square and the Fairground. Changes: Square 1a 3 [perinv] clues (was 2),
+Square 2a 2 [perinv] (was 1), Fairground 1a and 2a now cost 1 and 2 [perinv]
+clues. Result at 3p, first-time exploring play: objectives per loop 0 / 1 / 2 /
+3 = 2 / 47 / 47 / 4%; a two-district plan succeeds ~51%; finale unlocks loop 6
+median (4-8) at 2-4p, 7 solo; 0% never. A single objective uses 40-45% of a
+loop, in line with an official act 1 against its agenda. The Square still
+leaves the most (5.9 Hours) because it needs no crossing.
+
+**Encounter deck.** Static treacheries cut to 1 copy each; The Minute Hand (×2,
+Hunter, not an Echo) joins the shared spine so the Calm band has an enemy that
+acts. Prologue deck 22, loop core 26 (enemies 9 of 26).
+
+**Finale.** Hold Back now needs a ready Appointed (a success exhausts it): at
+most one per round. The finale model now also counts each investigator's first
+visit to the Sealed Study. First-attempt reach at 3p, 4 deep entries, declared
+at Dissonance 6-9: 39-40% at Hold Back p 0.5 (25% at 0.4, 53-55% at 0.6),
+before log boosts (spoken name +2, the ring, the Uninvited) the model omits.
+Resolution 5 lets a party with 4 banked Memory per investigator try again.
+
+Validation is simulation only; none of this is a playtest.
+

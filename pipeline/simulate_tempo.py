@@ -67,7 +67,7 @@ def scar_cap(n):
     return 3 if n == 1 else 2 * n
 # ASSUMPTION: extra party actions a Named enemy costs when it guards an objective.
 NAMED_COST = {"square_deep": 8, "church_deep": 6}
-SPINE_SIZE = 25          # 24-card spine + The Crossing (CONTENT_DECISIONS D4/D5)
+SPINE_SIZE = 23          # 22-card spine + The Crossing (audit pass 5 trim)
 LOST_HOURS = 3
 
 # Districts: node-set size and Skip cards in it (count, chance it triggers).
@@ -132,14 +132,16 @@ def crossings(a, b):
 # cards. ("at", loc) marks the moment the party must stand at an objective
 # location (its "after you enter" effects apply there).
 OBJ = {
-    "square_surface": ("square", "surface", [("clues_pi", 2, [(1, 2, "square"), (2, 2, "townhall"), (2, 2, "well"),
+    "square_surface": ("square", "surface", [("clues_pi", 3, [(1, 2, "square"), (2, 2, "townhall"), (2, 2, "well"),
                                                             (3, 3, "records")]), ("at", "well"), ("act", 1)]),
-    "square_deep": ("square", "deep", [("named", "square_deep"), ("clues_pi", 1, [(4, 3, "records")])]),
+    "square_deep": ("square", "deep", [("named", "square_deep"), ("clues_pi", 2, [(4, 3, "records"), (2, 2, "townhall")])]),
     "almanac_surface": ("almanac", "surface", [("clues_pi", 2, [(2, 2, "readingroom"), (3, 3, "press")]),
                                                ("at", "press"), ("act", 1)]),
     "almanac_deep": ("almanac", "deep", [("move", 1), ("clues_pi", 1, [(4, 3, "study")])]),
-    "fairground_surface": ("fairground", "surface", [("at", "wheel"), ("test", "agi", 3, "wheel")]),
-    "fairground_deep": ("fairground", "deep", [("move", 1), ("act", 1)]),
+    "fairground_surface": ("fairground", "surface", [("clues_pi", 1, [(3, 2, "wheel"), (2, 3, "hallofmirrors")]),
+                                                     ("at", "wheel"), ("test", "agi", 3, "wheel")]),
+    "fairground_deep": ("fairground", "deep", [("clues_pi", 2, [(2, 2, "ticketbooth"), (3, 2, "wheel"), (2, 3, "hallofmirrors")]),
+                                               ("at", "ticketbooth"), ("act", 1)]),
     "church_surface": ("church", "surface", [("clues_pi", 2, [(2, 3, "nave"), (3, 2, "belfry"), (2, 2, "vestry")]),
                                              ("at", "vestry"), ("act", 1)]),
     "church_deep": ("church", "deep", [("named", "church_deep"), ("clues_pi", 1, [(4, 3, "crypt")])]),
@@ -551,7 +553,7 @@ def campaign(rng, n, tax, max_loops=15, explore=False, fx=None, log=None, greedy
         done, rounds, placed, st = play_loop(rng, n, tax, facts, act2, min(loop - 1, scar_cap(n)), explore, fx,
                                              greedy=greedy, claimed=claimed)
         if log is not None:
-            log.append(st)
+            log.append(dict(st, rounds=rounds, done=sorted(done)))
         facts.update(done)
         per_loop.append(len(done))
         districts.append(placed)
@@ -658,6 +660,63 @@ def compare(trials, seed):
                     statistics.mean(x["years"] - x.get("struck", 0) * 0 for x in log) / n))
 
 
+# --------------------------------------------------------------------------- #
+# MEMORY (XP) INCOME — derived from the cards, not assumed
+# --------------------------------------------------------------------------- #
+# Memory comes from (1) each investigator's once-per-round Memory reaction,
+# (2) Knowledge entries (guide, "Knowledge pays Memory": a surface entry gives
+# each investigator 1 banked Memory, a deep entry 2, once per campaign),
+# (3) Victory (once per campaign), (4) the Prologue (2 per investigator) and
+# (5) the Elder/Ancient bracket (+1 Memory at the start of each loop).
+# ASSUMPTION: chance per round that each investigator's Memory reaction
+# triggers in typical play (card text in comments).
+MEMORY_TRIGGER = {
+    "Ayako": 0.80,      # after you succeed at an [int] test
+    "Elias": 0.50,      # soak damage for an ally / attacked while alone (2 reactions)
+    "Birdie": 0.45,     # after you fail a skill test by 2 or more
+    "Cass": 0.35,       # 2 resources, then the named token must come up
+    "Seraphine": 0.30,  # second use of her Dissonance ability in a round
+}
+PROLOGUE_MEMORY = 2       # per investigator (the average Prologue result)
+ELDER_FROM_LOOP = 7       # ASSUMPTION: typical loop an investigator turns Elder
+
+
+def memory_report(trials, seed):
+    import itertools
+    fx = LOCATION_PROFILES["spin"]
+    names = sorted(MEMORY_TRIGGER)
+    print()
+    print("Memory (XP) income, first-time exploring play, tax 0.35 (per investigator):")
+    print("players | party                        | per loop: min  typ  max | campaign total (10-90%)")
+    for n in (1, 2, 3, 4):
+        parties = [tuple(p) for p in itertools.combinations(names, n)]
+        scored = []
+        for party in parties:
+            rng = random.Random(seed)
+            per_loop, totals = [], []
+            for _ in range(max(1, trials // len(parties))):
+                log = []
+                unlock, _, _ = campaign(rng, n, 0.35, explore=True, fx=fx, log=log)
+                total = PROLOGUE_MEMORY * n
+                for loop_i, st in enumerate(log, 1):
+                    gain = sum(1 for who in party for _ in range(st["rounds"])
+                               if rng.random() < MEMORY_TRIGGER[who])
+                    gain += sum((1 if OBJ[o][1] == "surface" else 3) * n for o in st["done"])
+                    gain += st.get("vp", 0)
+                    if loop_i >= ELDER_FROM_LOOP:
+                        gain += n
+                    per_loop.append(gain / n)
+                    total += gain
+                totals.append(total / n)
+            scored.append((statistics.mean(totals), party, per_loop, totals))
+        scored.sort()
+        rows = [scored[0], scored[len(scored) // 2], scored[-1]] if len(scored) > 2 else scored
+        for mean_total, party, per_loop, totals in rows:
+            print("   {}    | {:28} |          {:>4.1f} {:>4.1f} {:>4.1f} | {:>5.1f} ({}-{})".format(
+                n, ", ".join(party), pct(per_loop, 5), statistics.mean(per_loop), pct(per_loop, 95),
+                mean_total, round(pct(totals, 10)), round(pct(totals, 90))))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--trials", type=int, default=4000)
@@ -670,7 +729,12 @@ def main():
                     help="print only the per-district race (objective vs Hourglass)")
     ap.add_argument("--greed", action="store_true",
                     help="print only the efficient-vs-greedy Victory comparison")
+    ap.add_argument("--memory", action="store_true",
+                    help="print only the Memory (XP) income derived from the cards")
     a = ap.parse_args()
+    if a.memory:
+        memory_report(a.trials, a.seed)
+        return
     if a.compare:
         compare(a.trials, a.seed)
         return

@@ -9,6 +9,8 @@ This guide is read as you play. **Do not read ahead.** It tells you when to read
 
 The Still Hour is not a line of separate scenarios. It is **one night, lived over and over.** You will play the Prologue once, then play the night again and again (each play-through is a **loop**), learning a little more of it each time, until you know enough to end it. Every loop costs you years.
 
+Some scenario boxes also hold story and resolution cards (First Dark, The Last Hour's resolutions and others) for reading at the table. This guide prints the same text; if they ever differ, the guide governs.
+
 Along the way the guide will ask you to **make choices**. Record each one in your Campaign Log. Nothing you choose in Ambergrove stays where you left it: every choice returns somewhere else in the town, and all of them return at the end.
 
 ---
@@ -19,9 +21,9 @@ Read this section aloud before the Prologue. It explains what is new in The Stil
 
 **One night, played again and again.** Each play of the night is a **loop**. When a loop ends, the board is cleared and the night starts over at eleven o'clock in the Square. Three things always carry over: your **Campaign Log**, your shared **banked Memory** and each investigator's **Years**.
 
-**The Hourglass is the clock.** The agenda deck is nine **Hours**, Hour I to Hour IX. Every Hour has a doom threshold of 1, so from the second round on, one Hour passes in each Mythos phase. Many Hours do something the moment they arrive ("When reached"). When the Hourglass reaches **Hour IX**, the loop ends. A few effects skip Hours forward, and a few rewind them.
+**The Hourglass is the clock.** The agenda deck is nine **Hours**, Hour I to Hour IX. Hours I to VIII each have a doom threshold of 1, so from the second round on, one Hour passes in each Mythos phase. Many Hours do something the moment they arrive ("When reached"). When the Hourglass reaches **Hour IX**, the loop ends. A few effects skip Hours forward, and a few rewind them.
 
-**The town is split into districts.** Ambergrove has six **districts**, each a small cluster of locations with its own box, act deck and encounter cards. The Square is always in play. At the start of each loop, you choose which other districts to visit and lay them out. **Travel costs time:** the first time in a round that anyone crosses from one district into another, the Hourglass advances 1 Hour. In one loop you will usually finish work in two or three districts, so choosing where to go is your biggest decision.
+**The town is split into districts.** Ambergrove has six **districts**, each a small cluster of locations with its own box, act deck and encounter cards. The Square is always in play. At the start of each loop, you choose which other districts to visit and lay them out. **Travel costs time:** each round, the first crossing along each connection between two districts advances the Hourglass 1 Hour. In one loop you will usually finish work in two or three districts, so choosing where to go is your biggest decision.
 
 **Each district has its own act deck.** Its first act (a surface objective) can be completed from the start. Its second act (a deep objective) opens in **Part II** of the campaign. Several act decks can be in play at once, one per district.
 
@@ -38,13 +40,13 @@ Each loop starts Dissonance at the **scar**: the number of loops you have comple
 
 **The Static token** ([static]) is a new chaos token: **−3, and raise Dissonance by 1** when it is revealed. The band decides how many are in the bag, so rising Dissonance makes more of them likely.
 
-**The Appointed** is something that climbs toward you through four stages: Unseen, Sensed, Emerging, Arrived. Rising Dissonance and certain Hours push it up. It cannot be defeated. An investigator at its location can **Hold Back** it: a successful Hold Back pushes it down one stage and rewinds the Hourglass by 1 Hour. It hunts whoever carries the most Memory on their cards.
+**The Appointed** is something that climbs toward you through four stages: Unseen, Sensed, Emerging, Arrived. Rising Dissonance and certain Hours push it up. It cannot be defeated. An investigator at its location can **Hold Back** it while it is ready: a successful Hold Back pushes it down one stage, exhausts it and rewinds the Hourglass by 1 Hour. It hunts whoever carries the most Memory on their cards.
 
-**Memory is your experience.** During a loop you gain **Memory** tokens on your cards. Some investigators' abilities use them, but they also make you the one being hunted. At the reset, all Memory on cards goes into one shared pool, **banked Memory**, which you spend between loops like experience: on **Recollections** (cards that remember the loop) and on upgrades.
+**Memory is your experience.** During a loop you gain **Memory** tokens on your cards. Some investigators' abilities use them, but they also make you the one being hunted. At the reset, all Memory on cards goes into one shared pool, **banked Memory**, which you spend between loops like experience: on **Recollections** (cards that remember the loop) and on upgrades. Learning pays too: see Knowledge, below.
 
 **Years are the price.** No one suffers trauma or dies in this campaign. Instead, at each reset, each investigator gains **1 Year**, plus 1 more if they were defeated, plus 1 more if the loop ended in the Noticed band, plus 1 more if they **leaned on the loop** (paid "raise Dissonance" as a cost 3 or more times, or spent 4 or more of their own Memory on their own cards and abilities). Years move you through age brackets, **Prime, Weathered, Elder and Ancient**, each with a small change to your skills. At **18 Years** an investigator ages out of the campaign.
 
-**Knowledge is what you learn.** Completing a district's act records a **Knowledge** entry in your Campaign Log. Knowledge is never bought, only found, and it changes the town for good: some locations turn to a kinder side, some hazards stop, some Hours soften. Once you have **3 surface entries**, or after Loop 3, **Part II** begins. Gather enough deep entries and the way to end the night opens: **The Last Hour**, the finale.
+**Knowledge is what you learn.** Completing a district's act records a **Knowledge** entry in your Campaign Log. Knowledge is never bought, only found, and it changes the town for good: some locations turn to their calm side, some hazards stop, some Hours soften. The first time you record each entry, the party banks Memory: **1 per investigator for a surface entry, 3 per investigator for a deep entry**. Deep entries are harder to reach and pay much more. Once you have **3 surface entries**, or after Loop 3, **Part II** begins. Gather enough deep entries and the way to end the night opens: **The Last Hour**, the finale.
 
 **Locations trade one thing for another.** Many locations have an ability that lets you pay in one currency (time, Dissonance, a clue, a Year) to gain another. A few have a hazard that stops once your Campaign Log records that district's Knowledge.
 
@@ -60,7 +62,7 @@ Each loop starts Dissonance at the **scar**: the number of loops you have comple
 
 These rules add to the Arkham Horror: The Card Game Rules Reference. Where they disagree with it, these rules win. Numbers are for **three investigators**; **Difficulty and Player Count** gives the other values, and the Control token applies them for you.
 
-**Loops.** A loop is one play of the night, from Loop Setup until the loop ends. A loop ends at once when the Hourglass reaches **Hour IX** (unless you begin the finale instead; see **The Last Hour**), when every investigator has been defeated, or when Dissonance reaches the **reset value** (18). For card text, "scenario" and "game" mean the current loop, and "interlude" means **Between Loops**. The Prologue is not a loop.
+**Loops.** A loop is one play of the night, from Loop Setup until the loop ends. A loop ends at once when the Hourglass reaches **Hour IX** (unless you begin the finale instead; see **The Last Hour**), when every investigator has been defeated, or when Dissonance reaches the **reset value** (18). For card text, "scenario" and "game" mean the current loop, and "interlude" means **Between Loops**. The Prologue is not a loop, but during the Prologue, "loop" on a card means the Prologue.
 
 **Limits.** "Limit once per loop" and "Max once per loop" last until the loop ends. As in the Rules Reference, a limit applies to each investigator separately unless it says "group limit", and "Max" counts every copy of that card, for all investigators.
 
@@ -96,15 +98,16 @@ A band change takes effect at once. [static] tokens added by cards are in additi
 
 **Echoes and Sleepwalking.** An Echo is an enemy with the Echo trait. **Sleepwalking** is a keyword: while an enemy is Sleepwalking, it cannot engage or be engaged, attack, or move, and it cannot be attacked, evaded, dealt damage or chosen as the target of a card ability. It is still an enemy in play at its location. A Sleepwalking enemy that would spawn engaged with an investigator spawns unengaged at that investigator's location instead; an engaged enemy that becomes Sleepwalking disengages and stays where it is. Every Echo has the Sleepwalking keyword printed on it; that keyword applies only while Dissonance is in the Calm band, unless a card says otherwise. It **wakes** when it stops being Sleepwalking, and it can fall asleep again.
 
-**The Appointed.** Something called the Appointed climbs an **Approach**: Unseen, Sensed, Emerging, Arrived. To **advance** the Approach (to a stage) means to raise it, never lower it; to **push it back** means to lower it by one stage, never below Unseen. When the Approach becomes Sensed or later while the Appointed is set aside, it **manifests**: put it into play at the revealed location farthest from all investigators that is not closed (the lead investigator breaks ties). When it is pushed back to Unseen, set it aside. It cannot be defeated. **Hold Back** is an [action] on its card that only an investigator at its location can take. A "Hold Back success" means succeeding at its test, or resolving it without a test when a card allows. Its behaviour at each stage is on **The Appointed's Approach**, which is in play beside the Hours deck during every loop and the finale.
+**The Appointed.** Something called the Appointed climbs an **Approach**: Unseen, Sensed, Emerging, Arrived. To **advance** the Approach (to a stage) means to raise it, never lower it; to **push it back** means to lower it by one stage, never below Unseen. When the Approach becomes Sensed or later while the Appointed is set aside, it **manifests**: put it into play at the revealed location farthest from all investigators that is not closed (the lead investigator breaks ties). When it is pushed back to Unseen, set it aside. It cannot be defeated. **Hold Back** is an [action] on its card that only an investigator at its location can take, and only while the Appointed is ready; a success exhausts it, so the Appointed can be held back at most once per round. A "Hold Back success" means succeeding at its test, or resolving it without a test when a card allows. Its behaviour at each stage is on **The Appointed's Approach**, which is in play beside the Hours deck during every loop and the finale.
 
 **Memory.**
 - **Memory on cards** is Memory tokens on investigator and asset cards you control. "Most Memory" in a prey or spawn instruction means Memory on cards. Uses on Borrowed Time are not Memory.
-- **Banked Memory** is one pool the whole party shares. "Each investigator gains X banked Memory" adds X to the pool per investigator.
+- **Banked Memory** is one pool the whole party shares. "Each investigator gains X banked Memory" adds X to the pool per investigator. Banked Memory never drops below 0: an effect that would remove more removes all of it.
 - At the reset, all Memory on cards (including the cards of defeated investigators) is banked. Between loops you spend banked Memory as experience (Rules Reference, "Experience"), except: a Recollection costs its printed Memory cost; upgrading a card costs Memory equal to the new card's level (not the difference); a new level 0 card costs 1. After spending, if banked Memory is above 18, reduce it to 18.
 - Recollections are not part of a starting deck; they are bought between loops. Signature Recollections are the exception.
 
-**Knowledge.** Completing a district's objectives records **Knowledge** entries in your Campaign Log. An entry belongs to the whole party and changes the night from then on; its lasting effect is printed on the Campaign Log beside it. Entries from acts 1a are **surface** entries; entries from acts 2a are **deep** entries. Knowledge is never bought, only found. "Your Campaign Log records X" means X is written on the log; "you completed <act> this loop" means that act advanced during the loop.
+**Knowledge.** Completing a district's objectives records **Knowledge** entries in your Campaign Log. An entry belongs to the whole party and changes the night from then on; its lasting effect is printed on the Campaign Log beside it. Entries from acts 1a are **surface** entries; entries from acts 2a are **deep** entries. Knowledge is never bought, only found.
+- **Knowledge pays Memory.** The first time your Campaign Log records an entry, each investigator gains banked Memory: **1 for a surface entry, 3 for a deep entry**. The Prologue's entry and the assembled entry pay nothing. An entry pays once per campaign, and the investigator count is the count when it is recorded. "Your Campaign Log records X" means X is written on the log; "you completed <act> this loop" means that act advanced during the loop.
 - **Threads.** The Campaign Log also tracks **Seraphine's thread**: unheard, suspected or known. It starts unheard; cards tell you when to mark it. It has no rules effect; it changes one line of the epilogue.
 - **Assembled entries.** One entry is assembled from others rather than found: the act that can first complete it says what it needs. From then on, each time you record a deep entry, check it again. The Control token does this for you and tells you when to record it.
 
@@ -117,7 +120,7 @@ A band change takes effect at once. [static] tokens added by cards are in additi
 
 For finale conditions and the epilogue, an investigator's bracket is set by all their Years, including Years gained during that loop and the finale.
 
-**Victory.** Each **Victory X** pays once per campaign. When you defeat an enemy with Victory X (a **Named** enemy, an Elite that from Part II some districts add, or one of a few optional monsters), or when a loop ends with a Victory X location in play, revealed and with no clues on it: if its name is not on your Campaign Log's Victory list, record it and add X to banked Memory (X in total, not per investigator). An enemy with Victory X can be met again in a later loop, but only the first defeat pays. A defeated enemy with Victory X goes to the victory display for the rest of the loop.
+**Victory.** Each **Victory X** pays once per campaign. When you defeat an enemy with Victory X (a **Named** enemy, which some districts add from Part II, or one of a few optional monsters), or when a loop ends with a Victory X location in play, revealed and with no clues on it: if its name is not on your Campaign Log's Victory list, record it and add X to banked Memory (X in total, not per investigator). An enemy with Victory X can be met again in a later loop, but only the first defeat pays. A defeated enemy with Victory X goes to the victory display for the rest of the loop.
 
 **Closed and impassable locations.** A **closed** location is unrevealed, has no clues and is not connected to anything: investigators and enemies cannot move into it, and nothing spawns or manifests there. When it opens, it is revealed: place its clues on it. (The Rules Reference's "seal" is only for chaos tokens; the location called The Sealed Study keeps its name.) Investigators and enemies cannot move into an **impassable** location; anything already there stays unless it is told to move.
 
@@ -129,12 +132,13 @@ For finale conditions and the epilogue, an investigator's bracket is set by all 
 - **Leaning on the loop.** Each time an investigator pays "raise Dissonance" as a cost or additional cost, click **Dissonance raised** on their investigator card (as well as **Dissonance**). Each time they remove Memory from their own cards to pay for, or by choosing to on, one of their own cards or abilities (for example Foreknowledge), click **Loop-power Memory** once per Memory. The Interlude's **Age** button reads these. Click **Dissonance raised** once per payment, however much it raises (The Turning is one click here and two on **Dissonance**).
 - **Years pending.** When a card or resolution gives an investigator Years, click **Years pending** on their investigator card; **Age** adds them. When the Records Office takes one back, right-click it.
 - **Memory on cards.** Click an investigator's **Memory** row when Memory is placed on or removed from their cards (left-click +1, right-click −1).
-- **The Appointed.** When The Crossing, The Debt of Hours or the finale advances the Approach, click **Appointed** once per stage. After a Hold Back success (including the walker's ring), click **Hold Back** on its card once: it pushes the Approach back one stage and rewinds the Hour counter by 1 for you. Disengage and exhaust the card yourself. When an effect pushes it back without rewinding (The Hour I Learned Your Name), right-click **Appointed** once per stage, and right-click **Hour** once for its rewind. While it hunts, click **Hunt** once in each enemy phase while it is ready and unengaged. If the Control token places it on a closed or unrevealed location, move it to the location the rules require.
-- **Knowledge and Victory.** When you record a Knowledge entry or a Victory, tick it on the Campaign Log token. The Control token records it too: it turns the locations a Knowledge entry changes and banks a Victory's Memory the first time only.
+- **The Appointed.** When The Crossing, The Debt of Hours or the finale advances the Approach, click **Appointed** once per stage. After a Hold Back success (including the walker's ring), click **Hold Back** on its card once: it pushes the Approach back one stage and rewinds the Hour counter by 1 for you. Disengage and exhaust the card yourself. When any other effect pushes it back (The Hour I Learned Your Name), right-click **Appointed** once per stage, and right-click **Hour** once for each Hour it rewinds. While it hunts, click **Hunt** once in each enemy phase while it is ready and unengaged. If the Control token places it on a closed or unrevealed location, move it to the location the rules require.
+- **Knowledge and Victory.** When you record a Knowledge entry or a Victory, tick it on the Campaign Log token. The Control token records it too: it turns the locations a Knowledge entry changes, banks the Memory a new Knowledge entry pays, and banks a Victory's Memory, each the first time only.
 - **Contest.** In the finale, the Control token shows a **Contest** counter (left-click +1, right-click −1). No contest progress is automatic: click **Contest** for every source listed under **Contest progress**, including each Hold Back success and the Uninvited's defeat.
 - **Aging.** In the Interlude panel, set each investigator's **Defeated** toggle, and the first time they reach Weathered, their −skill and +skill buttons, before clicking **Age**.
-- **Memory.** **Begin Next Loop** adds the 1 Memory an Elder or Ancient investigator begins with to their count; put the token on their investigator card at Loop Setup step 7, and do not click their Memory row for it. Click the banked **Memory** button when banked Memory changes outside the Interlude panel (the Prologue's rewards, The House Always Wins, Resolution 1b).
-- **Between loops.** Use **Reset Loop**, **Interlude**, **Begin Next Loop** and **Clear Board** as **Between Loops** and **Loop Setup** direct.
+- **Memory.** **Begin Next Loop** adds the 1 Memory an Elder or Ancient investigator begins with to their count; put the token on their investigator card at Loop Setup step 7, and do not click their Memory row for it. Click the banked **Memory** button when banked Memory changes outside the Interlude panel (the Prologue's rewards, The House Always Wins, Resolution 1b). It never goes below 0.
+- **Between loops.** Use **Reset Loop**, **Interlude**, **Begin Next Loop** and **Clear Board** as **Between Loops** and **Loop Setup** direct. **Reset Loop** counts once per loop: a second click before **Begin Next Loop** does nothing.
+- **Other buttons.** **Status** prints the current Hour, Dissonance, band, scar, Memory and Part to the chat. **Knowledge** lists the entries recorded so far. **Sync Board** re-applies the board from the campaign state (location sides and CLOSED labels, the Appointed's position and the chaos bag's Static tokens); use it if the table and the Control token disagree. **Run Tests** checks the Control token's own rules and restores your campaign afterwards; you never need it in play.
 
 ---
 
@@ -198,7 +202,7 @@ A small inland town under a starless, snagged sky. **The Square** is the hub. Th
 3. The Control token starts a new campaign in the Prologue, at **Hour I** with Dissonance **0**. The chaos bag is in the Calm band.
 4. Each investigator takes 5 resources and draws an opening hand of 5 cards (mulligan as normal). You are ready to begin.
 
-There is no Appointed in the Prologue, and no Years are gained in it: ignore any text that refers to the Appointed, and A Year in a Night gives no Year. The Prologue ends the way a loop does: at Hour IX, when every investigator is defeated, or when Dissonance reaches the reset value. On its cards, "game" means the Prologue. Its locations belong to no district, so moving between them never advances the Hourglass.
+There is no Appointed in the Prologue, and no Years are gained in it: ignore any text that refers to the Appointed, and A Year in a Night gives no Year. The Prologue ends when The First Hour advances, or the way a loop does: at Hour IX, when every investigator is defeated, or when Dissonance reaches the reset value. On its cards, "game" and "loop" mean the Prologue. Its locations belong to no district, so moving between them never advances the Hourglass.
 
 > **Note.** The Prologue teaches the loop. It cannot be lost: however it ends, the night resets, and how well you did decides one small reward.
 
@@ -293,7 +297,7 @@ Run this after every reset, and once after the Prologue. First, if you have not 
 1. **Age.** (Skip this step after the Prologue.) Each investigator adds their reset Years for the loop just ended (see **Years**) plus their Years pending. Apply any bracket change now; the first time an investigator reaches Weathered or a later bracket, choose their locked changes on the Interlude panel (their −skill and +skill buttons) before clicking **Age**, then tick the same choices on the Campaign Log. An investigator who reaches 18 Years ages out.
 2. **Bank Memory.** On the Interlude panel, click **Bank on-card Memory** once. It moves all Memory on cards (including the cards of investigators defeated this loop) to banked Memory. Then take the Memory tokens off your cards.
 3. **Spend.** Spend banked Memory from the shared pool, as **Memory** describes: buy Recollections at their listed Memory cost, and upgrade cards (Memory equal to the new card's level), within each investigator's deckbuilding options. Upgraded cards replace their base versions. After spending, if banked Memory is above **18**, reduce it to 18. A new level 0 card costs 1: right-click the banked **Memory** button once.
-4. **Record.** Update the scar (loops completed, maximum 6 at three investigators), the Knowledge Track, the Victory list and any choices on your Campaign Log. (Knowledge entries are ticked when their acts say so. If you tick one now, do it before **Begin Next Loop**.)
+4. **Record.** Update the scar (loops completed, maximum 6 at three investigators), the Knowledge Track, the Victory list and any choices on your Campaign Log. Also write each investigator's Years and any Recollections they bought, what you spent this interlude, the current Part, and anyone who aged out under **Those Who Left the Loop** (the log token fills the numbers it tracks; the printed pages need them written). (Knowledge entries are ticked when their acts say so. If you tick one now, do it before **Begin Next Loop**.)
 5. **Check the Part.** If Part II has not begun, and your log now records **3 or more** surface Knowledge entries or you have completed **Loop 3**: Part II begins (read **The Shape of the Hour** at step 6).
 6. **Read** one interlude story: the Torn or Taken story from the loop's resolution if it applies; otherwise the story below that fits the loop just ended, with any sentence the loop's resolution adds. Then read **The Shape of the Hour** if Part II began at step 5, **Before the finale** the first time your log records The Way the Night Breaks, and any age story. On the Control token, click **Begin Next Loop**, then begin the next loop at **Loop Setup**.
 
@@ -340,7 +344,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > Far below, on the Sunken Road, the walkers have stopped. Every hood is turned toward the tower, waiting, as though someone once promised them a light.
 
-**When you Place this box:** The Lantern Room (revealed), The Winding Stair and The Keeper's Quarters join the map. Shuffle its encounter set (The Dark That Waits, Something on the Stair) into the encounter deck. Its act deck: **Light the Lamp** (1a) and **The Ninth Death** (2a).
+**When you Place this box:** The Lighthouse is reached only through the Sunken Road (The Turning connects to The Winding Stair), so Place the Sunken Road's box too. The Lantern Room (revealed), The Winding Stair and The Keeper's Quarters join the map. Shuffle its encounter set (The Dark That Waits, Something on the Stair) into the encounter deck. Its act deck: **Light the Lamp** (1a) and **The Ninth Death** (2a).
 
 **Do not read until the loop ends.**
 
@@ -564,7 +568,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 **Only once your Campaign Log records The Way the Night Breaks.** During any loop from then on, an investigator at **The Sealed Study** may begin the finale as a [free] ability during their turn. Or, when Hour IX is reached while your log records The Way the Night Breaks, you may begin the finale instead of ending the loop.
 
-**The finale and the loop.** The finale is part of the loop in which it begins: damage, horror, cards in play, the Hourglass, Dissonance and every "once per loop" limit already used stay as they are. During the finale you may still Place a district's box before moving into it, as Loop Setup step 5 allows. When the finale ends, first claim Victory, then read the finale resolution. Memory still on cards does not count as banked Memory for Resolutions 1b, 5 and 6. After Resolution 5 the loop ends as usual: read each placed district's resolution, then **Between Loops**. After Resolutions 1–4 the campaign ends and no reset Years are gained; for their conditions and the epilogue, an investigator's Years are their recorded Years plus their Years pending plus any Years the resolution gives.
+**The finale and the loop.** The finale is part of the loop in which it begins: damage, horror, cards in play, the Hourglass, Dissonance and every "once per loop" limit already used stay as they are. During the finale you may still Place a district's box before moving into it, as Loop Setup step 5 allows. When the finale ends, first claim Victory, then read the finale resolution, then fill in the **Finale Record** on your Campaign Log (the loop, banked Memory at the finale, the deep entries spent, the resolution and the Years paid). Memory still on cards does not count as banked Memory for Resolutions 1b, 5 and 6. After Resolution 5 the loop ends as usual: read each placed district's resolution, then **Between Loops**. After Resolutions 1–4 the campaign ends and no reset Years are gained; for their conditions and the epilogue, an investigator's Years are their recorded Years plus their Years pending plus any Years the resolution gives.
 
 Before the finale begins: if you completed a district's act 2a this loop, read that district's Resolution 1 now and make its choice (any Years it gives are gained now: click **Years pending**). Then read:
 
@@ -670,3 +674,22 @@ Then read **Epilogue — What the Years Took.**
 - Values given "per investigator" (the finale's contest and Memory thresholds) scale on their own.
 - The Control token applies all of these for you.
 - The campaign is tuned for about 6–8 loops.
+
+---
+
+## APPENDIX — ENCOUNTER DECK CONTENTS
+
+You never need this with the boxes: **Place** builds every deck. Use it to build the decks by hand, or to check a box.
+
+| Set | Cards (copies) | Used in |
+|---|---|---|
+| The Occultation | Lost Hour (3), Slippage (2) | Prologue, every loop |
+| Echoes of Ambergrove | The Waiting Congregation (2), The Drowned Choir (2), Familiar Face (1), The Lamplighter's Echo (1) | Prologue, every loop |
+| Strays of the Night | The Minute Hand (2) | Prologue, every loop |
+| Static | Wrong Turn (1), Stutter (1), Dead Air (1), The Loop Notices You (1) | Prologue, every loop |
+| The Weight of Years | A Year in a Night (2), What You've Forgotten (2), Old Bones (1) | Prologue, every loop |
+| The Square | The Crossing (1), The Band on the Steps (1), The Same Speech (1), The Crowd Turns (1) | every loop |
+| The Appointed | The Appointed's Whisper (2) | every loop from Part II; The Appointed and The Appointed's Approach are set aside |
+| District sets | as each district's **When you Place this box** lists | when that district is placed |
+
+The Prologue's deck is the first five sets (22 cards). A loop's deck is those five sets plus the Square's (26 cards), plus each placed district's set, plus the Whispers from Part II.

@@ -43,12 +43,14 @@ Current **Part**:  ☐ I — Learning the Rules   ☐ II — The Shape of the Ho
 ---
 
 ## BANKED MEMORY
-Banked Memory: **______**  (cap 6 × investigators: after spending, reduce to the cap)
+Banked Memory: **______**  (cap 6 × investigators: after spending, reduce to the cap; never below 0)
 Spent this interlude: ______  on: _______________________________________
 
 ---
 
 ## THE KNOWLEDGE TRACK
+*The first time you record an entry, each investigator gains banked Memory: 1 for a surface entry, 3 for a deep entry.*
+
 - ☐ **Prologue** — ________________________________
 - ☐ **Lighthouse — surface** — ________________________________
 - ☐ **Lighthouse — deep** — ________________________________
@@ -64,7 +66,7 @@ Spent this interlude: ______  on: _______________________________________
 - ☐ **Almanac — deep** — ________________________________
 - ☐ **Assembled** — ________________________________
 
-**Surface entries recorded:** ____ / 6 (Part II at 3+)   **Deep entries recorded:** ____ / 6
+**Surface entries recorded:** ____ / 6 (Part II at 3+, or after Loop 3)   **Deep entries recorded:** ____ / 6
 
 ---
 
@@ -93,10 +95,10 @@ Spent this interlude: ______  on: _______________________________________
 ## THOSE WHO LEFT THE LOOP
 | Investigator | Fate | Loop |
 |---|---|---|
-| ____________ | ☐ aged out ☐ in the finale | ____ |
-| ____________ | ☐ aged out ☐ in the finale | ____ |
-| ____________ | ☐ aged out ☐ in the finale | ____ |
-| ____________ | ☐ aged out ☐ in the finale | ____ |
+| ____________ | ☐ aged out ☐ kept as anchor | ____ |
+| ____________ | ☐ aged out ☐ kept as anchor | ____ |
+| ____________ | ☐ aged out ☐ kept as anchor | ____ |
+| ____________ | ☐ aged out ☐ kept as anchor | ____ |
 
 ---
 

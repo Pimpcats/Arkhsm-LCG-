@@ -57,8 +57,7 @@
     "damage": 1,
     "horror": 1,
     "text": "Hunter.\nSpawn \u2013 The location with the most clues. While Cass has more Memory on her cards than each other investigator, The House Always Wins cannot be evaded.\nForced \u2013 After The House Always Wins defeats an investigator: Remove 3 banked Memory.",
-    "flavor": "",
-    "_stats_note": "DRAFT statline \u2014 no source in the design docs; owner to confirm."
+    "flavor": ""
   },
   "sthrseraphine": {
     "text": "[free] During your turn, raise Dissonance by 1: Choose one \u2013 You get +2 skill value for this skill test; or gain 1 additional action this turn; or ready a Spell asset you control. Limit twice per round.\n[elder] +X, where X is Dissonance (maximum +5). After this skill test ends, lower Dissonance by the amount this token added.",

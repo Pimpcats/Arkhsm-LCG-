@@ -141,8 +141,11 @@ class ScenarioContentTests(unittest.TestCase):
 
     def test_encounter_quantities(self):
         spine = collections.Counter(ASSIGN["prologue"]["encounter"])
-        self.assertEqual(sum(spine.values()), 24)
+        self.assertEqual(sum(spine.values()), 22)
         self.assertEqual(spine["sthr-losthour"], 3)
+        self.assertEqual(spine["sthr-minutehand"], 2)
+        for once in ("sthr-wrongturn", "sthr-rewind", "sthr-deadair", "sthr-loopnotices"):
+            self.assertEqual(spine[once], 1, once)
         hub = collections.Counter(ASSIGN["district_square"]["encounter"])
         self.assertEqual(hub - spine, collections.Counter(
             {"sthr-crossing": 1, "sthr-samespeech": 1, "sthr-crowdturns": 1,

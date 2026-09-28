@@ -16,7 +16,7 @@ Spoilers: enemy names, stats and rules text. Design document, not player-facing.
 
 | Scenario | New monster | Stats (fight / health / evade, damage / horror) | What it does | Victory | Recurring |
 |---|---|---|---|---|---|
-| Prologue | the shared cast | — | introduces the Echoes | — | Congregation, Choir, Familiar Face, Lamplighter's Echo |
+| Prologue | The Minute Hand (×2) | 2 / 2 / 2, 1 / 1 | Hunter, prey most clues; not an Echo, so it acts in the Calm band | — | Congregation, Choir, Familiar Face, Lamplighter's Echo; the Minute Hand recurs every loop |
 | The Square (every loop) | The Band on the Steps | 2 / 2 / 3, 0 / 1 | Echo; while awake, no events at its location | — | shared cast |
 | The Lighthouse | Something on the Stair | 1 / 1 / 2, 0 / 1 | Echo on the Winding Stair | — | shared cast |
 | The Drowned Church | The Drowned Verger | 3 / 3 / 2, 1 / 1 | Aloof; engages whoever takes a clue at the Vestry | 1 | + a Drowned Choir; Part II: The Bell-Ringer Beneath (V2) |

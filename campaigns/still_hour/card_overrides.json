@@ -99,7 +99,7 @@
     "name": "Familiar Face",
     "traits": "Echo. Humanoid.",
     "health": 2,
-    "text": "Sleepwalking.\nPrey – Most Memory on their cards.\nSpawn – The location of the investigator with the most Memory on their cards.\nForced – After you defeat Familiar Face: Place 1 Memory on your investigator card.",
+    "text": "Sleepwalking.\nPrey – Most Memory on their cards.\nSpawn – The location of the investigator with the most Memory on their cards (the lead investigator breaks ties).\nForced – After you defeat Familiar Face: Place 1 Memory on your investigator card.",
     "flavor": "You will remember this face too.",
     "fight": 3,
     "evade": 3,
@@ -124,26 +124,26 @@
     "traits": "Static.",
     "text": "Revelation – Each investigator moves to a connecting location of the lead investigator's choice. These moves do not advance the Hourglass.",
     "flavor": "The map is not where you left it.",
-    "quantity": 2
+    "quantity": 1
   },
   "sthr-rewind": {
     "name": "Stutter",
     "traits": "Static.",
     "text": "Peril.\nRevelation – If you discovered a clue during your most recent turn and still have a clue, place 1 of your clues on the location where you last discovered a clue. Otherwise, take 2 horror.",
     "flavor": "The loop stutters backward.",
-    "quantity": 2
+    "quantity": 1
   },
   "sthr-deadair": {
     "name": "Dead Air",
     "traits": "Static.",
     "text": "Revelation – Add 1 Static token to the chaos bag until the end of your next turn. Until then, each Static token is −4 instead of −3.",
-    "quantity": 2
+    "quantity": 1
   },
   "sthr-loopnotices": {
     "name": "The Loop Notices You",
     "traits": "Static.",
     "text": "Revelation – Raise Dissonance by 1. If, during your most recent turn, you played or committed a Recollection or paid “raise Dissonance” as a cost, raise it by 2 instead.",
-    "quantity": 2
+    "quantity": 1
   },
   "sthr-yearinanight": {
     "name": "A Year in a Night",
@@ -271,7 +271,7 @@
     ],
     "flavor": "The light remembers a path the dark has forgotten.",
     "back_shroud": 3,
-    "back_text": "Calm side (your Campaign Log records The Lamp Was Never Lit).\n[action]: Light the lamp. It stays lit until the end of the loop.\nWhile the Lantern Room's lamp is lit, each Echo in the Lighthouse and Sunken Road districts is Sleepwalking while Dissonance is in the Calm or Glitch band, and The Dark That Waits treats investigators here as not at the Lantern Room.",
+    "back_text": "Calm side (your Campaign Log records The Lamp Was Never Lit).\n[action]: Light the lamp. It stays lit until the end of the loop.\nWhile the Lantern Room's lamp is lit, each Echo in the Lighthouse and Sunken Road districts is Sleepwalking while Dissonance is in the Calm or Glitch band (unless another effect says it is not Sleepwalking), and The Dark That Waits treats investigators here as not at the Lantern Room.",
     "back_flavor": "You know how to light it now. Some part of you always did."
   },
   "sthr-loc-windingstair": {
@@ -306,7 +306,7 @@
     "victory": 1,
     "shroud": 2,
     "clues": 2,
-    "text": "[action][action]: Heal 1 damage and 1 horror.",
+    "text": "[action][action]: Heal 1 damage and 1 horror. Limit once per round.",
     "clues_per_investigator": true,
     "icons": "clover",
     "color": "#960e12",
@@ -517,7 +517,7 @@
     "traits": "Ambergrove. Central.",
     "shroud": 2,
     "clues": 2,
-    "text": "When your Campaign Log records The Sheriff Is Already Dead, this location enters play other side up (revealed).",
+    "text": "When your Campaign Log records The Sheriff Is Already Dead, this location enters play calm side up (revealed).",
     "clues_per_investigator": true,
     "icons": "t",
     "color": "#2c4a7c",
@@ -537,7 +537,7 @@
     ],
     "back_shroud": 2,
     "flavor": "The sheriff gives the same speech to the same crowd. He has been giving it since ten o'clock.",
-    "back_text": "Other side (your Campaign Log records The Sheriff Is Already Dead).\n[free]: Look at the next Hour (the card beneath the current Hour). Group limit once per loop.",
+    "back_text": "Calm side (your Campaign Log records The Sheriff Is Already Dead).\n[free]: Name an Hour after the current Hour, other than Hour IX. The next time it is reached this loop, cancel its “When reached” text. Group limit once per loop.",
     "back_flavor": "The records let you read the night ahead."
   },
   "sthr-loc-recordsoffice": {
@@ -816,7 +816,7 @@
     "index": "1a",
     "number": "1/2",
     "back_flavor": "The wick takes on the third try. For the first time in more nights than anyone can count, the beam swings out across the water, and down on the Sunken Road every walker stops and turns to face the light.",
-    "back_text": "Record in your Campaign Log: The Lamp Was Never Lit.\nThe Lantern Room's lamp is lit until the end of this loop. While it is lit, each Echo in the Lighthouse and Sunken Road districts is Sleepwalking while Dissonance is in the Calm or Glitch band, and The Dark That Waits treats investigators at the Lantern Room as not at the Lantern Room.\nFrom now on the Lantern Room is calm side up: flip it now (do not add clues), and in every later loop it enters play calm side up.\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game.",
+    "back_text": "Record in your Campaign Log: The Lamp Was Never Lit.\nThe Lantern Room's lamp is lit until the end of this loop. While it is lit, each Echo in the Lighthouse and Sunken Road districts is Sleepwalking while Dissonance is in the Calm or Glitch band (unless another effect says it is not Sleepwalking), and The Dark That Waits treats investigators at the Lantern Room as not at the Lantern Room.\nFrom now on the Lantern Room is calm side up: flip it now (do not add clues), and in every later loop it enters play calm side up.\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game.",
     "clues_per_investigator": true
   },
   "sthr-act-ninthdeath": {
@@ -865,7 +865,7 @@
   },
   "sthr-act-walksbeside": {
     "name": "Who Walks Beside You",
-    "text": "Part II only.\nObjective – [action]: Stand Firm. Only an investigator at the Turning may use this ability. Choose a ready, non-Sleepwalking Echo at the Turning and test [wil] (X) or [com] (X), where X is its fight value. If you succeed, exhaust it. After an investigator evades an Echo at the Turning or succeeds at Stand Firm, advance.",
+    "text": "Part II only.\nForced – When this act becomes the current act: Search the encounter deck and discard pile for a Waiting Congregation and spawn it at the Turning. While this act is the current act, each Echo at the Turning is not Sleepwalking.\nObjective – [action]: Stand Firm. Only an investigator at the Turning may use this ability. Choose a ready Echo at the Turning and test [wil] (X) or [com] (X), where X is its fight value. If you succeed, exhaust it. After an investigator evades an Echo at the Turning or succeeds at Stand Firm, advance.",
     "flavor": "Some of them turn to look at you now.",
     "deck": 95107,
     "index": "2a",
@@ -875,20 +875,20 @@
   },
   "sthr-act-sheriffdead": {
     "name": "The Sheriff Is Already Dead",
-    "clues": 2,
-    "text": "Objective – If an investigator is at the Well, the investigators may, as a group, spend 2 [perinv] clues to advance.",
+    "clues": 3,
+    "text": "Objective – If an investigator is at the Well, the investigators may, as a group, spend 3 [perinv] clues to advance.",
     "flavor": "He has been dead since ten o'clock. No one has noticed but you.",
     "deck": 95108,
     "index": "1a",
     "number": "1/2",
     "back_flavor": "He is at the bottom of the Well, and he has been there since ten o'clock. Up on the Town Hall steps, the sheriff clears his throat and begins the speech again.",
-    "back_text": "Record in your Campaign Log: The Sheriff Is Already Dead.\nFrom now on the Town Hall Steps are other side up: flip them now (do not add clues), and in every later loop they enter play other side up.\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game.",
+    "back_text": "Record in your Campaign Log: The Sheriff Is Already Dead.\nFrom now on the Town Hall Steps are calm side up: flip them now (do not add clues), and in every later loop they enter play calm side up.\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game.",
     "clues_per_investigator": true
   },
   "sthr-act-vote": {
     "name": "The Vote That Never Ends",
-    "clues": 1,
-    "text": "Part II only.\nForced – When this act becomes the current act: Spawn the set-aside What Wears the Sheriff at the Records Office.\nObjective – Investigators at the Records Office may, as a group, spend 1 [perinv] clues to advance.",
+    "clues": 2,
+    "text": "Part II only.\nForced – When this act becomes the current act: Spawn the set-aside What Wears the Sheriff at the Records Office.\nObjective – Investigators at the Records Office may, as a group, spend 2 [perinv] clues to advance.",
     "flavor": "The Records Office keeps every decision the town ever made. It keeps this one in a locked drawer.",
     "deck": 95109,
     "index": "2a",
@@ -899,23 +899,27 @@
   },
   "sthr-act-wheelturns": {
     "name": "The Wheel Still Turns",
-    "text": "Objective – [action]: Test [agi] (3). Only an investigator at the Wheel may use this ability. If you succeed, discover up to 2 clues from among Fairground locations, and advance.",
+    "text": "Objective – [action] Spend 1 [perinv] clues: Test [agi] (3). Only an investigator at the Wheel may use this ability; investigators at the Wheel may contribute the clues. If you succeed, advance. If you fail, place 1 [perinv] clues from the token pool on the Wheel.",
     "flavor": "You see the whole town at once.",
     "deck": 95110,
     "index": "1a",
     "number": "1/2",
     "back_flavor": "From the top of the Wheel, Ambergrove lies spread out like a map on a table: the Square, the church, the road running out to the lighthouse. Every street is full, and nobody is moving.",
-    "back_text": "Record in your Campaign Log: The Wheel Still Turns.\nFrom now on, while your Campaign Log records The Wheel Still Turns: [free]: Look at the top 2 cards of the encounter deck and put them back in any order. Only an investigator at the Wheel may use this ability. Group limit once per loop.\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game."
+    "back_text": "Record in your Campaign Log: The Wheel Still Turns.\nFrom now on, while your Campaign Log records The Wheel Still Turns: [free]: Look at the top 2 cards of the encounter deck and put them back in any order. Only an investigator at the Wheel may use this ability. Group limit once per loop.\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game.",
+    "clues": 1,
+    "clues_per_investigator": true
   },
   "sthr-act-bargain": {
     "name": "The Ticket-Taker's Bargain",
-    "text": "Part II only.\nObjective – [action]: Parley. Only an investigator at the Ticket Booth may use this ability. Advance.",
+    "text": "Part II only.\nObjective – [action] Spend 2 [perinv] clues: Parley. Only an investigator at the Ticket Booth may use this ability; investigators at the Ticket Booth may contribute the clues. Advance.",
     "flavor": "He smiles at you like he's been expecting you for a very long time.",
     "deck": 95111,
     "index": "2a",
     "number": "2/2",
     "back_flavor": "He does not ask your name. He tells you there is a way out of the night, that the fare is steep, and that he has waited a very long time for someone who could afford it.",
-    "back_text": "Record in your Campaign Log: The Ticket-Taker's Bargain.\nThe Fairground's objectives are complete. From now on, do not use this act deck when you Place this box."
+    "back_text": "Record in your Campaign Log: The Ticket-Taker's Bargain.\nThe Fairground's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "clues": 2,
+    "clues_per_investigator": true
   },
   "sthr-act-almanachid": {
     "name": "What the Almanac Hid",
@@ -943,7 +947,7 @@
   },
   "sthr-act-lasthour": {
     "name": "Contest the Crossing",
-    "text": "Objective – Gain 1 contest progress each time an investigator succeeds at Hold Back or spends a deep Knowledge entry, and the first time each investigator is at the Sealed Study. When progress reaches 4 [perinv], advance.\n[action]: Spend a deep Knowledge entry your Campaign Log records (each entry once per finale).\nIf Hour IX is reached, every investigator is defeated, or Dissonance reaches the reset value, the finale ends and the contest is not reached.",
+    "text": "Objective – Gain 1 contest progress each time an investigator succeeds at Hold Back or spends a deep Knowledge entry, and the first time each investigator is at the Sealed Study. Other sources are in the Campaign Guide. When progress reaches 4 [perinv], advance.\n[action]: Spend a deep Knowledge entry your Campaign Log records (each entry once per finale).\nIf Hour IX is reached, every investigator is defeated, or Dissonance reaches the reset value, the finale ends and the contest is not reached.",
     "flavor": "An appointment made in ink and never kept.",
     "deck": 95114,
     "index": "1a",
@@ -1087,38 +1091,50 @@
     "text": "Retaliate.\nSpawn – The Flooded Crypt.\nForced – After Hour III is reached, if the Bell-Ringer Beneath is in play: Ready it. It attacks the nearest investigator, even at another location (the lead investigator breaks ties)."
   },
   "sthr-appointed-approach": {
-    "text": "The Approach advances only when an effect says so: Hour V (to at least Sensed), Hour VII (at least Emerging), Hour VIII (Arrived); Dissonance entering the Glitch band (at least Sensed) or the Noticed band (Arrived); The Crossing and The Debt of Hours (1 stage); finale setup (Arrived). It never goes above Arrived.\nWhen the Approach becomes Sensed or later while the Appointed is set aside, put it into play at the revealed location farthest from all investigators that is not closed (the lead investigator breaks ties). When it is pushed back to Unseen, set it aside.\nWhile Sensed: It gains aloof and cannot move or attack. Forced – At the end of the round: The Appointed deals 1 horror to each investigator at its location.\nWhile Emerging: It gains hunter and cannot attack. Forced – After the Appointed engages an investigator: The Appointed deals 1 horror to that investigator.\nWhile Arrived: It gains hunter. Forced – After the Appointed attacks: Raise Dissonance by 1."
+    "text": "The Approach advances only when an effect says so: Hour V (to at least Sensed), Hour VII (at least Emerging), Hour VIII (Arrived); Dissonance entering the Glitch band (at least Sensed) or the Noticed band (Arrived); The Crossing and The Debt of Hours (1 stage); finale setup (Arrived). It never goes above Arrived.\nWhen the Approach becomes Sensed or later while the Appointed is set aside, put it into play at the revealed location farthest from all investigators that is not closed (the lead investigator breaks ties). When it is pushed back to Unseen, set it aside.\nWhile Sensed: It gains aloof and cannot move or attack. Forced – At the end of the round: The Appointed deals 1 horror to each investigator at its location.\nWhile Emerging: It gains hunter and cannot attack. Forced – After the Appointed engages an investigator: The Appointed deals 1 horror to that investigator.\nWhile Arrived: It gains hunter. Forced – After the Appointed attacks: Raise Dissonance by 1.",
+    "name": "The Appointed's Approach"
   },
   "sthr-itmeanswait": {
-    "text": "Fast. Play only if there are 3 or more banked Memory, when one of these would resolve: an Hour's “When reached” text (except Hour IX); the revelation ability of Lost Hour, Slippage, The Crossing or The Appointed's Whisper; an attack by the Appointed against you; or an ability on The Appointed's Approach that would make you take horror. Cancel that effect."
+    "text": "Fast. Play only if there are 3 or more banked Memory. Play when one of these would resolve: an Hour's “When reached” text (except Hour IX); the revelation ability of Lost Hour, Slippage, The Crossing or The Appointed's Whisper; an attack by the Appointed against you; or an ability on The Appointed's Approach that would make you take horror. Cancel that effect.",
+    "intIcons": 1,
+    "wilIcons": 1
   },
   "sthr-dejavu": {
-    "text": "Fast. As an additional cost to play Déjà Vu, raise Dissonance by 1. Play during your turn, after you resolve an [action], [free] or [reaction] ability on an asset or investigator card you control, if that ability has not reached its limit. Resolve it again, paying its costs again except [action] and any cost to exhaust a card. This counts toward its limits."
+    "text": "Fast. As an additional cost to play Déjà Vu, raise Dissonance by 1. Play during your turn, after you resolve an [action], [free] or [reaction] ability on an asset or investigator card you control, if that ability has not reached its limit. Resolve it again, paying its costs again except [action] and any cost to exhaust a card. This counts toward its limits.",
+    "wildIcons": 1
   },
   "sthr-thistimeforsure": {
-    "text": "Fast. Play when you would fail a skill test. As an additional cost to play This Time For Sure, raise Dissonance by 1. Cancel that test's results and perform it again with the same skill and difficulty (committed cards stay committed; commit no more). You get +2 skill value for that test."
+    "text": "Fast. Play when you would fail a skill test. As an additional cost to play This Time For Sure, raise Dissonance by 1. Cancel that test's results, return the revealed chaos tokens to the bag and perform the test again with the same skill and difficulty (committed cards stay committed; commit no more). You get +2 skill value for that test.",
+    "wildIcons": 1
   },
   "sthr-markeddeck": {
     "text": "[free] Exhaust Marked Deck: Reveal a random chaos token without resolving it, and seal it on Marked Deck. The next time you would reveal a chaos token during a skill test this round, instead release the sealed token and treat it as the revealed token. At the end of the round, release it if it is still sealed.\n[free] Exhaust Marked Deck, raise Dissonance by 1 and remove 1 Memory from a card you control: Choose a non-symbol token in the chaos bag and seal it on Marked Deck. It cannot be revealed while sealed. Release it at the end of the round.",
     "unique": true,
-    "flavor": ""
+    "flavor": "",
+    "intIcons": 1,
+    "agiIcons": 1
   },
   "sthr-compass": {
     "text": "[action] Exhaust Lucky Compass: Move to a connecting location or, if there is 1 or more Memory on Lucky Compass, to any revealed location in a district that has a Knowledge entry recorded in your Campaign Log. This action does not provoke attacks of opportunity.",
-    "unique": true
+    "unique": true,
+    "wilIcons": 1,
+    "agiIcons": 1
   },
   "sthrcass": {
-    "text": "[free] Spend 2 resources: Name a chaos token symbol other than [autofail]. The next time you reveal a token with that symbol during a skill test this round, cancel it (it has no modifier and no symbol effect) and place 1 Memory on Cass. Limit once per round.\n[elder] +1. Gain 1 resource for each Memory on Cass (maximum 3)."
+    "text": "[free] Spend 2 resources: Name a chaos token symbol other than [autofail]. The next time you reveal a token with that symbol during a skill test this round, cancel it (it has no modifier and no symbol effect) and place 1 Memory on Cass. Limit once per round.\n[elder] +1. Gain 1 resource for each Memory on Cass (maximum 3).",
+    "elderSign": "+1. Gain 1 resource for each Memory on Cass (maximum 3)."
   },
   "sthrayako": {
-    "text": "[reaction] After you succeed at an [int] test: Place 1 Memory on Ayako. Limit once per round.\n[elder] +2. Draw 1 card. If it is a Recollection, it costs 2 fewer resources to play until the end of the round."
+    "text": "[reaction] After you succeed at an [int] test: Place 1 Memory on Ayako. Limit once per round.\n[elder] +2. Draw 1 card. If it is a Recollection, it costs 2 fewer resources to play until the end of the round.",
+    "elderSign": "+2. Draw 1 card. If it is a Recollection, it costs 2 fewer resources to play until the end of the round."
   },
   "sthr-eighthgrave": {
-    "text": "Revelation – If Elias has no Memory, search the encounter deck and discard pile for an Echo enemy, spawn it engaged with you and shuffle the encounter deck. It is not Sleepwalking this loop. (If you cannot, take 2 horror.) Otherwise, take 1 horror for each Memory on Elias (maximum 4).",
+    "text": "Revelation – If there is Memory on Elias, take 1 horror for each Memory on him (maximum 4). Otherwise, search the encounter deck and discard pile for an Echo enemy and spawn it engaged with you; it is not Sleepwalking this loop. If you cannot, take 2 horror. Shuffle the encounter deck.",
     "flavor": ""
   },
   "sthr-longwayround": {
-    "text": "Move to a connecting location, then you may move to a location connecting to that one. These moves do not provoke attacks of opportunity, do not advance the Hourglass and do not count as the first move along a district connection this round."
+    "text": "Move to a connecting location, then you may move to a location connecting to that one. These moves do not provoke attacks of opportunity, do not advance the Hourglass and do not count as the first move along a district connection this round.",
+    "wildIcons": 1
   },
   "sthrbirdie": {
     "text": "[reaction] After you fail a skill test by 2 or more: Place 1 Memory on Birdie. Limit once per round.\n[reaction] When you would fail a skill test (even because of [autofail]), remove 3 Memory from Birdie: You succeed at that test by 0 instead. Limit once per loop.\n[elder] +1. If you have already failed a skill test this round, this token is +3 instead.",
@@ -1134,31 +1150,78 @@
     "text": "Commit only to a skill test you are performing. If you have already failed a test of the same skill type during this loop, I've Done This Before has [wild][wild][wild] instead of [wild]."
   },
   "sthr-musclememory": {
-    "text": "If you have already performed a test of the same skill type as this test during this loop, Muscle Memory has [wild][wild] instead of [wild], and when you commit it, draw 1 card."
+    "text": "When you commit Muscle Memory, if you have already performed a test of this skill type during this loop, it has [wild][wild] instead of [wild] and you draw 1 card."
   },
   "sthr-rememberending": {
-    "text": "Max once per loop. Test [wil] (X), where X is Dissonance. If you succeed, look at the next 3 Hours; the next time the Hourglass would advance before the end of the next round, cancel that advance."
+    "text": "Max once per loop. Test [wil] (X), where X is Dissonance. If you succeed, look at the next 3 Hours; the next time the Hourglass would advance before the end of the next round, cancel that advance.",
+    "wilIcons": 2
   },
   "sthr-seenthishand": {
-    "text": "Fast. Play when a chaos token is revealed during your skill test. Cancel that token (it has no modifier and no effect, even if it is [autofail]) and gain 2 resources. If it was not a number token, gain 3 resources instead."
+    "text": "Fast. Play when a chaos token is revealed during your skill test. Cancel that token (it has no modifier and no effect, even if it is [autofail]) and gain 2 resources. If it was not a number token, gain 3 resources instead.",
+    "comIcons": 1,
+    "agiIcons": 1
   },
   "sthrelias": {
     "text": "[reaction] When another investigator at your location would be dealt damage that is not direct damage: That damage is dealt to Elias instead; then place 1 Memory on Elias. Limit once per round.\n[reaction] After an enemy attack deals damage to Elias or his assets while he is alone at his location: Place 1 Memory on Elias. Limit once per round.\n[elder] +1. If there are 3 or more Memory on Elias, this token is +3 instead, and heal 1 damage from Elias."
   },
   "sthr-lexicon": {
     "text": "Uses (0 secrets).\n[reaction] After you succeed at an [int] test by 2 or more: Place 1 secret on The Lexicon of the Hour (maximum 5).\n[free] Exhaust The Lexicon of the Hour and spend 1 secret: You get +2 [int] for this skill test.\n[reaction] When a Static treachery is drawn, exhaust The Lexicon of the Hour and spend 1 secret: Cancel its revelation effect.",
-    "unique": true
+    "unique": true,
+    "intIcons": 1,
+    "wilIcons": 1
   },
   "sthr-bell": {
-    "unique": true
+    "unique": true,
+    "wilIcons": 2
   },
   "sthr-borrowedtime": {
-    "text": "Uses (3 charges). These charges are not Memory.\n[free] Exhaust Borrowed Time and spend 1 charge: Choose one – Gain 1 resource; or you get +1 skill value for this skill test."
+    "text": "Uses (3 charges). These charges are not Memory.\n[free] Exhaust Borrowed Time and spend 1 charge: Choose one – Gain 1 resource; or you get +1 skill value for this skill test.",
+    "wildIcons": 1,
+    "memoryCost": 3
   },
   "sthr-housewins": {
     "text": "Hunter.\nSpawn – The location with the most clues (the lead investigator breaks ties).\nWhile Cass has more Memory on her cards than each other investigator, The House Always Wins cannot be evaded.\nForced – After an attack by The House Always Wins defeats an investigator: Remove 3 banked Memory."
   },
   "sthr-igetout": {
-    "text": "Fast. Max once per loop. Play when you would be defeated by damage and/or horror. You are not defeated: heal damage and horror from you until you have 1 remaining health and 1 remaining sanity. Disengage from each enemy engaged with you and move to a connecting location. If Lucky Compass is in play, place 1 Memory on it."
+    "text": "Fast. Max once per loop. Play when you would be defeated by damage and/or horror. You are not defeated: heal damage and horror from you until you have 1 remaining health and 1 remaining sanity. Disengage from each enemy engaged with you and move to a connecting location. If Lucky Compass is in play, place 1 Memory on it.",
+    "wilIcons": 1,
+    "agiIcons": 1
+  },
+  "sthrseraphine": {
+    "text": "[free] During your turn, raise Dissonance by 1: Choose one – You get +2 skill value for this skill test; or gain 1 additional action this turn; or ready a Spell asset you control. Limit twice per round.\n[reaction] After you use the ability above for the second time in a round: Place 1 Memory on Seraphine.\n[elder] +X, where X is Dissonance (maximum +5). After this skill test ends, lower Dissonance by the amount this token added.",
+    "elderSign": "+X, where X is Dissonance (maximum +5). After this skill test ends, lower Dissonance by the amount this token added."
+  },
+  "sthr-lamp": {
+    "wilIcons": 1,
+    "agiIcons": 1,
+    "flavor": ""
+  },
+  "sthr-rehearsedescape": {
+    "wildIcons": 1
+  },
+  "sthr-hourlearnedname": {
+    "wildIcons": 1
+  },
+  "sthr-cassandrasnotebook": {
+    "intIcons": 1,
+    "text": "[reaction] After a Knowledge entry is recorded in your Campaign Log for the first time: Draw 2 cards."
+  },
+  "sthr-appointedwhisper": {
+    "traits": "Omen."
+  },
+  "sthr-appointed": {
+    "text": "Prey – Most Memory on their cards. It moves toward its prey even if other investigators are nearer.\nThe Appointed cannot be attacked, evaded, damaged or defeated, and leaves play only when pushed back to Unseen.\n[action]: Hold Back (only while the Appointed is ready). Test [wil] (4) or [com] (4). This action does not provoke an attack of opportunity from the Appointed. If you succeed, push it back one Approach stage, disengage and exhaust it, and rewind the Hourglass by 1 Hour."
+  },
+  "sthr-minutehand": {
+    "name": "The Minute Hand",
+    "traits": "Monster.",
+    "fight": 2,
+    "health": 2,
+    "evade": 2,
+    "damage": 1,
+    "horror": 1,
+    "quantity": 2,
+    "text": "Hunter.\nPrey – Most clues.",
+    "flavor": "It keeps perfect time. It is only ever one minute behind you."
   }
 }

@@ -802,5 +802,11 @@
     "art_type": "enemy",
     "scene": "a tall faceless figure in an old-fashioned mourning coat at the edge of lantern light on a hill above a small town, the stars sliding behind it",
     "seed": 2432
+  },
+  {
+    "id": "sthr-minutehand",
+    "art_type": "enemy",
+    "scene": "a gaunt stooped figure on a cobbled 1920s side street at night, one arm impossibly long and thin like the hand of a clock, its coat hung with stopped pocket watches, head cocked as if listening for a tick",
+    "seed": 3041
   }
 ]

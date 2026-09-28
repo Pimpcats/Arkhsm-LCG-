@@ -242,7 +242,7 @@ def _pages():
     y += 6
     p2.text(90, y, "Surface entries recorded:", size=22, style="bold")
     p2.counter("surface_held", 380, y - 9, derived="surface")
-    p2.text(420, y, "/ 6 — Part II at 3+", size=20, style="italic", fill=SOFT)
+    p2.text(420, y, "/ 6 · Part II: 3+ or Loop 3", size=20, style="italic", fill=SOFT)
     p2.text(700, y, "Deep entries recorded:", size=22, style="bold")
     p2.counter("deep_held", 960, y - 9, derived="deep")
     p2.text(1000, y, "/ 6", size=20, style="italic", fill=SOFT)
@@ -290,7 +290,7 @@ def _pages():
     for i in range(1, 5):
         p3.line("dead{}_name".format(i), 90, 520, y)
         x = p3.checkbox("dead{}_aged".format(i), 560, y, "aged out", group="dead%d" % i)
-        p3.checkbox("dead{}_kept".format(i), x, y, "in the finale", group="dead%d" % i)
+        p3.checkbox("dead{}_kept".format(i), x, y, "kept as anchor", group="dead%d" % i)
         p3.line("dead{}_loop".format(i), 1070, 1185, y)
         y += 58
 

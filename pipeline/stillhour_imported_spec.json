@@ -741,5 +741,13 @@
     "name": "The Uninvited",
     "traits": "Monster.",
     "health": 4
+  },
+  {
+    "id": "sthr-minutehand",
+    "type": "Enemy",
+    "class": "Mythos",
+    "name": "The Minute Hand",
+    "traits": "Monster.",
+    "health": 2
   }
 ]
