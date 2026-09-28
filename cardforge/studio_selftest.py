@@ -2,6 +2,8 @@
 """CardForge Studio acceptance test — boots the real server and drives the
 full illustrate -> frame -> apply flow over HTTP (dry-run; no GPU/SE needed).
 Run from the repo root: python3 cardforge/studio_selftest.py
+It runs in a temporary copy of the repository (cardforge/sandbox.py), so it
+never changes tracked files or the owner's art, backends or settings.
 """
 import copy
 import json
@@ -15,17 +17,39 @@ import requests
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# runs in a throwaway copy of the repo (cardforge/sandbox.py): the test wipes
+# out/, se/, vendor/ and art/faces and rewrites campaign files and dist/, none
+# of which may ever happen to the real checkout
+from cardforge import sandbox
+sandbox.enter(__file__)
+
 from cardforge import studio, runner, se_bridge
 from http.server import ThreadingHTTPServer
+import socket as _socket
 
 ROOT = runner.repo_root()
-BASE = "http://127.0.0.1:8571"
+
+
+def _free_port():
+    """A free local port, so parallel runs (other checkouts) never collide."""
+    with _socket.socket() as sk:
+        sk.bind(("127.0.0.1", 0))
+        return sk.getsockname()[1]
+
+
+PORT = _free_port()
+BASE = "http://127.0.0.1:{}".format(PORT)
 PASS = FAIL = 0
 
 
 def check(name, cond):
     global PASS, FAIL
-    print("  [{}] {}".format("PASS" if cond else "FAIL", name))
+    # straight to the real stdout: while a Studio job runs it redirects
+    # sys.stdout into its own log, which used to swallow results (a run could
+    # count a FAIL it never printed)
+    out = sys.__stdout__
+    out.write("  [{}] {}\n".format("PASS" if cond else "FAIL", name))
+    out.flush()
     PASS, FAIL = (PASS + 1, FAIL) if cond else (PASS, FAIL + 1)
 
 
@@ -67,6 +91,10 @@ def payload_seed(body):
 
 
 def wait_idle(timeout=30):
+    # returns the moment the job ends; the ceiling only matters if one hangs.
+    # Render passes grow with the card count, so no job gets under 10 minutes
+    # (a too-short ceiling let the next request race a still-running job).
+    timeout = max(timeout, 600)
     for _ in range(timeout * 4):
         if not requests.get(BASE + "/api/status").json()["busy"]:
             return True
@@ -74,88 +102,11 @@ def wait_idle(timeout=30):
     return False
 
 
-# fresh slate — but NEVER destroy the owner's real work: everything the test
-# wipes is moved aside first and restored on exit (success, failure, or crash),
-# so chosen art, placements and composed faces survive a selftest run.
-import atexit
-
-_BACKUPS = []
-
-
-_CREATED = []   # paths the test creates where the owner had nothing: removed on exit
-
-
-def _sideline(path):
-    if not os.path.exists(path):
-        _CREATED.append(path)
-    if os.path.exists(path):
-        bak = path + ".pretest-backup"
-        shutil.rmtree(bak, ignore_errors=True)
-        if os.path.isfile(bak):
-            os.remove(bak)
-        os.rename(path, bak)
-        _BACKUPS.append((path, bak))
-
-
-_SNAPSHOTS = []
-
-
-def _snapshot(path):
-    """Keep a copy of something the test edits IN PLACE (the app needs the
-    real file present while it runs). Restored even if the run is killed
-    part-way — a half-finished test must never leave the owner's campaign
-    pointing at a stub checkpoint."""
-    if os.path.isdir(path):
-        bak = path + ".pretest-copy"
-        shutil.rmtree(bak, ignore_errors=True)
-        shutil.copytree(path, bak)
-        _SNAPSHOTS.append((path, bak, True))
-    elif os.path.isfile(path):
-        bak = path + ".pretest-copy"
-        shutil.copy2(path, bak)
-        _SNAPSHOTS.append((path, bak, False))
-
-
-def _restore_owner_state():
-    for path in _CREATED:
-        if os.path.isdir(path):
-            shutil.rmtree(path, ignore_errors=True)
-        elif os.path.isfile(path):
-            os.remove(path)
-    for path, bak in _BACKUPS:
-        if os.path.exists(bak):
-            if os.path.isdir(path):
-                shutil.rmtree(path, ignore_errors=True)
-            elif os.path.isfile(path):
-                os.remove(path)
-            os.rename(bak, path)
-    for path, bak, isdir in _SNAPSHOTS:
-        if not os.path.exists(bak):
-            continue
-        if isdir:
-            shutil.rmtree(path, ignore_errors=True)
-            os.rename(bak, path)
-        else:
-            shutil.copy2(bak, path)
-            os.remove(bak)
-    if _BACKUPS or _SNAPSHOTS:
-        print("owner state restored ({} path(s))"
-              .format(len(_BACKUPS) + len(_SNAPSHOTS)))
-
-
-atexit.register(_restore_owner_state)
-
-_sideline(os.path.join(ROOT, "out", "still_hour"))
-for f in ("state/still_hour.ledger.json", "pipeline/art_urls.json"):
-    _sideline(os.path.join(ROOT, f))
-# these the app must keep seeing while the test runs, so copy rather than move
-_snapshot(os.path.join(ROOT, "campaigns", "still_hour"))
-_snapshot(os.path.join(ROOT, "dist"))
-shutil.rmtree(se_bridge.se_dir(), ignore_errors=True)
+# the sandbox copy starts like a fresh clone: no out/, state/, se/, vendor/,
+# art/ or pipeline/art_urls.json
 faces_dir = os.path.join(ROOT, "art", "faces")
-_sideline(faces_dir)
 
-server = ThreadingHTTPServer(("127.0.0.1", 8571), studio.Handler)
+server = ThreadingHTTPServer(("127.0.0.1", PORT), studio.Handler)
 threading.Thread(target=server.serve_forever, daemon=True).start()
 
 print("== app boots, tabs render ==")
@@ -294,7 +245,9 @@ s = requests.get(BASE + "/api/status?campaign=still_hour").json()
 check("coverage sees the exported faces", len(s["se"]["coverage"]["framed"]) == 3)
 r = requests.post(BASE + "/api/apply", json={"mode": "local"}).json()
 check("apply accepted ({} cards)".format(r.get("cards")), r.get("ok") and r.get("cards") == 2)
-check("rebuild completes", wait_idle(60))
+check("rebuild completes", wait_idle(60) and requests.get(
+    BASE + "/api/status").json()["last_job"] == {"name": "apply-to-mod", "state": "ok",
+                                                 "error": ""})
 urls = json.load(open(os.path.join(ROOT, "pipeline", "art_urls.json"), encoding="utf-8"))
 check("art_urls.json: face + back for elias, face for lamp",
       urls["sthrelias"]["face"].startswith("file:///")
@@ -312,6 +265,18 @@ check("unframed cards keep placeholders",
 check("lamp face real, lamp back = the campaign player back",
       lamp["CustomDeck"]["95011"]["FaceURL"].startswith("file:///")
       and lamp["CustomDeck"]["95011"]["BackURL"].endswith("player_back.png"))
+# the release guard: without --local a build script must refuse to put
+# placeholder / file:/// images into dist/, and leave dist/ as it was
+import subprocess as _sp
+_mod_before = open(os.path.join(ROOT, "dist", "the_still_hour_mod.json"), "rb").read()
+_deck_before = open(os.path.join(ROOT, "dist", "the_still_hour.json"), "rb").read()
+_refusals = [_sp.run([sys.executable, os.path.join(ROOT, "pipeline", _scr)], cwd=ROOT,
+                     capture_output=True, text=True)
+             for _scr in ("build_cards.py", "bundle_mod.py", "package_download.py")]
+check("without --local the build scripts refuse local/placeholder URLs in dist/",
+      all(_r.returncode != 0 and "--local" in _r.stderr for _r in _refusals)
+      and open(os.path.join(ROOT, "dist", "the_still_hour_mod.json"), "rb").read() == _mod_before
+      and open(os.path.join(ROOT, "dist", "the_still_hour.json"), "rb").read() == _deck_before)
 
 print("== CARDS CATALOG (the placement section) ==")
 s = requests.get(BASE + "/api/status?campaign=still_hour").json()
@@ -405,7 +370,7 @@ r = requests.post(BASE + "/api/card_save",
 check("a huge rules string is length-capped, render survives", r.get("ok"))
 requests.post(BASE + "/api/card_save", json={"card": "sthr-appointed"})  # clear
 # malformed POST body -> 400, not a 500 / dropped connection
-conn = _hc.HTTPConnection("127.0.0.1", 8571, timeout=10)
+conn = _hc.HTTPConnection("127.0.0.1", PORT, timeout=10)
 conn.request("POST", "/api/card_save", body=b"{bad json,,,",
              headers={"Content-Type": "application/json"})
 resp = conn.getresponse(); resp.read()
@@ -722,7 +687,24 @@ check("a1111 launch gains --ckpt-dir vendor/models",
       "--ckpt-dir" in installer.ckpt_dir_args()
       and "vendor" in installer.ckpt_dir_args())
 from cardforge import rig as _rig
-rig_backup_setup = open(_rig.rig_path(), encoding="utf-8").read()
+
+
+def _read_or_none(path):
+    return open(path, encoding="utf-8").read() if os.path.exists(path) else None
+
+
+def _put_back(path, text):
+    """Restore a file read with _read_or_none (None: it did not exist)."""
+    if text is None:
+        if os.path.exists(path):
+            os.remove(path)
+    else:
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(text)
+
+
+rig_backup_setup = _read_or_none(_rig.rig_path())
+shared_rig_before = open(_rig.shared_rig_path(), encoding="utf-8").read()
 r = requests.post(BASE + "/api/install_a1111", json={"dry_run": True}).json()
 check("A1111 install job accepted", r.get("started"))
 check("A1111 install completes", wait_idle(30))
@@ -762,9 +744,10 @@ check("a real (non dry-run) install is refused off Windows",
 # default path. The installer endpoints stay for the API only.
 check("Setup offers the cloud art path and no local installers",
       "OpenAI" in page and "install_comfy" not in page and "install_a1111" not in page)
+check("installers write rig.local.json; the tracked rig.json is untouched",
+      open(_rig.shared_rig_path(), encoding="utf-8").read() == shared_rig_before)
 _sh.rmtree(os.path.join(ROOT, "vendor", "comfy"), ignore_errors=True)
-with open(_rig.rig_path(), "w", encoding="utf-8") as f:
-    f.write(rig_backup_setup)
+_put_back(_rig.rig_path(), rig_backup_setup)
 r = requests.post(BASE + "/api/install_se", json={"dry_run": True}).json()
 check("SE install job accepted", r.get("started"))
 check("SE install completes", wait_idle(30))
@@ -793,9 +776,14 @@ os.remove(os.path.join(ROOT, "state", "_test.ledger.json"))
 
 print("== BACKEND RIG: auto launch/load ==")
 from cardforge import rig
-rig_backup = open(rig.rig_path(), encoding="utf-8").read()
-# rig.json is the owner's machine-local config; test against a known fixture
-_rig_fixture = json.loads(rig_backup)
+rig_backup = _read_or_none(rig.rig_path())
+check("tracked rig.json carries no machine paths (folders live in rig.local.json)",
+      all(not v.get("cwd") for k, v in json.load(open(rig.shared_rig_path(), encoding="utf-8")).items()
+          if isinstance(v, dict)))
+check("rig.local.json is ignored by git",
+      "rig.local.json" in open(os.path.join(ROOT, ".gitignore"), encoding="utf-8").read())
+# rig.local.json is the owner's machine-local config; test against a known fixture
+_rig_fixture = rig.load_rig()
 _rig_fixture["a1111"] = dict(_rig_fixture.get("a1111", {}), cwd="C:/SD/SDXL",
                              command="webui.bat --api")
 with open(rig.rig_path(), "w", encoding="utf-8") as f:
@@ -849,8 +837,10 @@ check("second ensure_up is a no-op (already reachable)",
       rig.ensure_up({"backend": "a1111", "base_url": "http://127.0.0.1:7899",
                      "name": "still_hour", "output_dir": "out/still_hour"},
                     on_log=lines.append))
-with open(rig.rig_path(), "w", encoding="utf-8") as f:
-    f.write(rig_backup)
+_put_back(rig.rig_path(), rig_backup)
+check("with no rig.local.json the rig falls back to rig.json + defaults",
+      os.path.exists(rig.rig_path()) or (rig.load_rig()["a1111"]["cwd"] == ""
+                                         and rig.load_rig()["a1111"]["command"]))
 
 print("== INPAINT: blank frames from the region maps (dry-run) ==")
 sys.path.insert(0, os.path.join(ROOT, "pipeline"))
@@ -1590,12 +1580,9 @@ check("status()+build_jobs OK under a cp1252-like locale (Windows default)",
 if r.returncode:
     print(r.stderr[-600:])
 
-# leave the repo clean: drop the overlay and rebuild placeholders
-os.remove(os.path.join(ROOT, "pipeline", "art_urls.json"))
-for scr in ("build_cards.py", "bundle_mod.py", "package_download.py"):
-    subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", scr)],
-                   check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+# nothing to clean up: the sandbox copy is deleted when the run ends
 server.shutdown()
 
-print("\nSTUDIO SELFTEST: {} passed, {} failed".format(PASS, FAIL))
+sys.__stdout__.write("\nSTUDIO SELFTEST: {} passed, {} failed\n".format(PASS, FAIL))
+sys.__stdout__.flush()
 sys.exit(1 if FAIL else 0)

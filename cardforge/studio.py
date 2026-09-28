@@ -43,6 +43,7 @@ os.environ.setdefault("PYTHONUTF8", "1")
 _log = []                 # (seq, line)
 _log_lock = threading.Lock()
 _busy = threading.Event()
+_job_lock = threading.Lock()
 # serialize read-modify-write of the shared override JSONs + their recompose,
 # so two concurrent saves can't lose an update or read a half-written file
 _state_lock = threading.RLock()
@@ -117,10 +118,14 @@ def run_job(name, fn, *args, **kw):
     """Run a pipeline step on the worker thread, teeing prints into the log.
     The outcome is recorded in LAST_JOB so the UI can SHOW a failure instead of
     silently dropping back to idle."""
-    if _busy.is_set():
-        return False
-    def work():
+    # claim the worker atomically, before returning: a caller that polls
+    # /api/status right after starting a job must see it busy, and two
+    # requests racing here must never both start
+    with _job_lock:
+        if _busy.is_set():
+            return False
         _busy.set()
+    def work():
         LAST_JOB.clear()
         LAST_JOB.update({"name": name, "state": "running", "error": ""})
         log("=== {} started ===".format(name))
@@ -139,7 +144,11 @@ def run_job(name, fn, *args, **kw):
             LAST_JOB.update({"state": "failed", "error": str(e)[:400]})
         finally:
             _busy.clear()
-    threading.Thread(target=work, daemon=True).start()
+    try:
+        threading.Thread(target=work, daemon=True).start()
+    except Exception:
+        _busy.clear()
+        raise
     return True
 
 
@@ -147,7 +156,7 @@ def run_job(name, fn, *args, **kw):
 
 def _backend_first(_campaign, _dry, fn, *args, **kw):
     """A GPU job as one unit of work: make sure the backend is up (launching
-    it per rig.json if needed), then run the batch. Dry-run skips the check.
+    it per rig.local.json if needed), then run the batch. Dry-run skips the check.
     (Leading underscores keep these names clear of the wrapped fn's kwargs.)"""
     def work():
         rig.ensure_up(runner.load_campaign(_campaign), dry_run=_dry)
@@ -195,7 +204,7 @@ def act_backend_check(p):
 
 def act_rig_save(p):
     """Persist the backend rig fields (folder / launch command) for the
-    campaign's backend kind into rig.json."""
+    campaign's backend kind into rig.local.json."""
     camp = runner.load_campaign(p.get("campaign", "still_hour"))
     kind = camp.get("backend", "a1111")
     cfg = rig.load_rig()
@@ -1997,8 +2006,18 @@ def _apply_local_and_rebuild(campaign):
     with open(os.path.join(ROOT, "pipeline", "art_urls.json"), "w", encoding="utf-8") as f:
         json.dump(urls, f, indent=2)
     log("art_urls.json: {} card(s), local file:/// mode".format(len(urls)))
-    for script in ("build_cards.py", "bundle_mod.py", "package_download.py"):
-        subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", script)],
+    _rebuild_local()
+
+
+# The pipeline refuses to write placeholder / file:/// image URLs into the
+# release dist/ files unless asked (--local); the Studio's local modes build a
+# private test copy for this machine, so they always ask.
+REBUILD_SCRIPTS = ("build_cards.py", "bundle_mod.py", "package_download.py")
+
+
+def _rebuild_local():
+    for script in REBUILD_SCRIPTS:
+        subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", script), "--local"],
                        check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
         log("rebuilt: pipeline/" + script)
 
@@ -2039,10 +2058,7 @@ def act_export_tts(p):
         with open(os.path.join(ROOT, "pipeline", "art_urls.json"), "w", encoding="utf-8") as f:
             json.dump(urls, f, indent=2)
         log("art_urls.json: {} card(s), local file:/// mode".format(len(urls)))
-        for script in ("build_cards.py", "bundle_mod.py", "package_download.py"):
-            subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", script)],
-                           check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
-            log("rebuilt: pipeline/" + script)
+        _rebuild_local()
         log("DONE — load dist/saved_object_the_still_hour.json in Tabletop Simulator (docs/LOADING.md)")
     return run_job("export-to-tts", chain)
 
@@ -2051,6 +2067,11 @@ def act_apply(p):
     """Write pipeline/art_urls.json from framed faces, then rebuild the mod."""
     mode = p.get("mode", "local")           # local (file://) | hosted
     base = p.get("base_url", "").rstrip("/")
+    if _busy.is_set():
+        # never rewrite art_urls.json under a running job, and never report a
+        # rebuild that could not start
+        return {"ok": False, "message": "another job is still running; apply "
+                "again when it finishes"}
     cov = se_bridge.coverage(p.get("campaign", "still_hour"))
     faces_dir = os.path.join(ROOT, cov["faces_dir"])
     urls = {}
@@ -2071,15 +2092,23 @@ def act_apply(p):
     log("art_urls.json: {} card(s), mode={}".format(len(urls), mode))
 
     def rebuild():
-        for script in ("build_cards.py", "bundle_mod.py", "package_download.py"):
-            subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", script)],
-                           check=True, cwd=ROOT,
-                           stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        # local mode is a private test build (--local); hosted mode must pass
+        # the release guard like publish_hosted.py does
+        flag = ["--local"] if mode != "hosted" else []
+        for script in REBUILD_SCRIPTS:
+            r = subprocess.run([sys.executable, os.path.join(ROOT, "pipeline", script)] + flag,
+                               cwd=ROOT, capture_output=True, text=True)
+            if r.returncode:
+                why = (r.stderr or r.stdout or "").strip().splitlines()
+                raise RuntimeError("pipeline/{} failed: {}".format(
+                    script, why[-1] if why else "exit {}".format(r.returncode)))
             log("rebuilt: pipeline/" + script)
         log("mod rebuilt with {} real face(s) — load dist/saved_object_the_still_hour.json (docs/LOADING.md)".format(len(urls)))
-    run_job("apply-to-mod", rebuild)
-    return {"ok": True,
-            "cards": len([k for k in urls if not k.startswith("_")])}
+    started = run_job("apply-to-mod", rebuild)
+    out = {"ok": started, "cards": len([k for k in urls if not k.startswith("_")])}
+    if not started:
+        out["message"] = "another job is still running; apply again when it finishes"
+    return out
 
 
 # ------------------------------------------------------------------- status --

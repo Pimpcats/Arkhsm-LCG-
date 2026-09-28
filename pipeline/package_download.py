@@ -25,10 +25,13 @@ Ships the campaign the way SCED distributes custom content (SCED_BUILD_BRIEF §1
 Card images, log pages and the guide PDF carry whatever URLs
 pipeline/art_urls.json holds: hosted raw.githubusercontent URLs after
 publish_hosted.py (which passes --require-hosted, so a machine-local file:///
-URL fails the build), or local file:/// URLs for solo testing from the Studio.
+URL fails the build), or local file:/// URLs for solo testing from the Studio
+(which passes --local: without it, placeholder or file:/// image URLs in the
+release files are refused).
 
-Run: python3 pipeline/package_download.py [--require-hosted]   (from repo root)
-Outputs: dist/downloads/the_still_hour.json, dist/downloads/the_still_hour_box.json
+Run: python3 pipeline/package_download.py [--require-hosted | --local]   (from repo root)
+Outputs: dist/downloads/the_still_hour.json, dist/downloads/the_still_hour_box.json,
+         dist/saved_object_the_still_hour.json
 """
 import argparse
 import copy
@@ -41,6 +44,8 @@ import tempfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
+
+import build_cards as B  # noqa: E402  (release_guard / --local)
 
 FILENAME = "the_still_hour"   # the SCED-downloads release asset name
 
@@ -123,6 +128,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.strip().splitlines()[0])
     ap.add_argument("--require-hosted", action="store_true",
                     help="fail if any file:/// URL would ship (publish_hosted.py)")
+    B.add_local_flag(ap)
     a = ap.parse_args(argv)
 
     mod_path = os.path.join(ROOT, "dist", "the_still_hour_mod.json")
@@ -158,16 +164,21 @@ def main(argv=None):
     box["Description"] = ("An original loop-horror campaign (fan content, not for "
                           "sale). Place lays out the log, guide and minicards.")
     release_path = os.path.join(out_dir, FILENAME + ".json")
-    with open(release_path, "w", encoding="utf-8") as f:
-        json.dump(box, f, indent=2, ensure_ascii=False)
+    release_text = json.dumps(box, indent=2, ensure_ascii=False)
     # the same box as a TTS "Saved Object" (save-file shape), so the owner can
     # import the whole campaign by hand: Objects -> Saved Objects
     saved_path = os.path.join(ROOT, "dist", "saved_object_the_still_hour.json")
+    saved_text = json.dumps({"SaveName": "The Still Hour", "GameMode": "", "Date": "",
+                             "Table": "", "Sky": "", "Note": "", "Rules": "", "XmlUI": "",
+                             "LuaScript": "", "LuaScriptState": "", "ObjectStates": [box]},
+                            indent=2, ensure_ascii=False)
+    # the release files carry hosted image URLs only (see build_cards.release_guard)
+    B.release_guard(release_path, release_text, a.local)
+    B.release_guard(saved_path, saved_text, a.local)
+    with open(release_path, "w", encoding="utf-8") as f:
+        f.write(release_text)
     with open(saved_path, "w", encoding="utf-8") as f:
-        json.dump({"SaveName": "The Still Hour", "GameMode": "", "Date": "",
-                   "Table": "", "Sky": "", "Note": "", "Rules": "", "XmlUI": "",
-                   "LuaScript": "", "LuaScriptState": "", "ObjectStates": [box]},
-                  f, indent=2, ensure_ascii=False)
+        f.write(saved_text)
 
     # 2. Placeholder download box.
     box_lua = open(os.path.join(ROOT, "src", "tts", "download_box.lua"), encoding="utf-8").read()

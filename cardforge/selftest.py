@@ -4,6 +4,8 @@
 No GPU/backend needed: P0 is exercised via --dry-run payload files (the owner's
 rig does the live smoke test). Run from the repo root:
     python3 cardforge/selftest.py
+It runs in a temporary copy of the repository (cardforge/sandbox.py), so it
+never changes tracked files or the owner's generated output.
 """
 import json
 import os
@@ -11,6 +13,11 @@ import shutil
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# runs in a throwaway copy of the repo: the checkout (tracked files, the
+# owner's out/, state/ and art/) is never touched — see cardforge/sandbox.py
+from cardforge import sandbox
+sandbox.enter(__file__)
 
 from cardforge import runner
 from cardforge.compose import compose, is_text_only
@@ -25,51 +32,6 @@ def check(name, cond):
     global PASS, FAIL
     print("  [{}] {}".format("PASS" if cond else "FAIL", name))
     PASS, FAIL = (PASS + 1, FAIL) if cond else (PASS, FAIL + 1)
-
-
-# the owner's real output and resume ledgers are moved aside before the first
-# wipe and put back on exit (pass, fail or crash) — a selftest must never cost
-# generated art
-import atexit
-
-_BACKUPS = []
-
-
-_CREATED = []   # paths the test creates where the owner had nothing: removed on exit
-
-
-def _sideline(path):
-    if not os.path.exists(path):
-        _CREATED.append(path)
-    if os.path.exists(path) and path not in [p for p, _ in _BACKUPS]:
-        bak = path + ".pretest-backup"
-        shutil.rmtree(bak, ignore_errors=True)
-        if os.path.isfile(bak):
-            os.remove(bak)
-        os.rename(path, bak)
-        _BACKUPS.append((path, bak))
-
-
-def _restore():
-    for path in _CREATED:
-        if os.path.isdir(path):
-            shutil.rmtree(path, ignore_errors=True)
-        elif os.path.isfile(path):
-            os.remove(path)
-    for path, bak in _BACKUPS:
-        if os.path.isdir(path):
-            shutil.rmtree(path, ignore_errors=True)
-        elif os.path.isfile(path):
-            os.remove(path)
-        os.rename(bak, path)
-    if _BACKUPS:
-        print("owner state restored ({} path(s))".format(len(_BACKUPS)))
-
-
-atexit.register(_restore)
-for _c in ("still_hour", "demo"):
-    _sideline(os.path.join(ROOT, "out", _c))
-    _sideline(os.path.join(ROOT, "state", _c + ".ledger.json"))
 
 
 def clean(campaign):
