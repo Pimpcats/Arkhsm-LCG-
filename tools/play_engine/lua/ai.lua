@@ -542,7 +542,10 @@ return function(R, T)
       -- forward: worth trying at long odds (cards are committed to it)
       local finaleNeed = G.finale and not (G.deepToSpend and #G.deepToSpend > 0)
       if finaleNeed then s = s + 25 end
-      if p >= 0.3 or (finaleNeed and p >= 0.12) then add(s, "holdback", function() R.ACT.holdBack(inv) end, { provokes = "notAppointed" }) end
+      -- engaged by the Arrived Appointed, Hold Back is the one action it does not punish
+      local caught = G.appointed.engaged == inv and R.stage() >= 3
+      if caught then s = s + 20 end
+      if p >= 0.3 or ((finaleNeed or caught) and p >= 0.12) then add(s, "holdback", function() R.ACT.holdBack(inv) end, { provokes = "notAppointed" }) end
     end
 
     -- 3. objective actions here
@@ -749,6 +752,9 @@ return function(R, T)
     end
     table.sort(opts, function(a, b) return a.score > b.score end)
     local best = opts[1]
+    -- every action left would cost more than it gains (a lethal attack of
+    -- opportunity): end the turn instead
+    if best and best.score < -40 then return nil end
     if best and best.actions == 0 then
       -- free plays happen without spending an action
       best.actions = 0
