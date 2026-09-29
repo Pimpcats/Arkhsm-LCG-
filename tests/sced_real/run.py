@@ -86,7 +86,7 @@ def find_lua(name):
     return shutil.which(name)
 
 
-def run(lua="lua5.2", suite="playthrough", fake=False, echo=False, verbose=False, timeout=600, payload=None):
+def run(lua="lua5.2", suite="playthrough", fake=False, echo=False, verbose=False, timeout=600, payload=None, save=None):
     """Run one suite; returns dict(checks=[...], rc=, stdout=, stderr=, skipped=reason)."""
     exe = find_lua(lua)
     if not exe:
@@ -99,6 +99,11 @@ def run(lua="lua5.2", suite="playthrough", fake=False, echo=False, verbose=False
         with open(path, "w", encoding="utf-8") as f:
             json.dump(fake_table(), f)
         cmd += ["--fixture", path]
+    elif save or os.environ.get("SCED_SAVE"):
+        # the owner's own SCED save (scripts already bundled): the exact version they play
+        table, _ = sced_table.build_table_from_save(save or os.environ["SCED_SAVE"])
+        src, _c = sced_table.find_sced(allow_fetch=False)
+        cmd += ["--table", table, "--src", os.path.join(src, "src") if src else ROOT]
     else:
         src, commit = sced_table.find_sced()
         if not src:
@@ -136,11 +141,12 @@ def main(argv=None):
     ap.add_argument("--echo", action="store_true", help="print the table's chat as it happens")
     ap.add_argument("--full", action="store_true", help="print the whole log, not just the checks")
     ap.add_argument("--payload", help="a candidate Saved Object to load instead of dist/saved_object_the_still_hour.json")
+    ap.add_argument("--save", help="boot the owner's own SCED save (e.g. 'Arkham SCE 4.8.0.json') instead of the git checkout")
     a = ap.parse_args(argv)
     suites = SUITES if a.suite == "all" else (a.suite,)
     failed = 0
     for s in suites:
-        r = run(a.lua, s, a.fake, a.echo, payload=a.payload)
+        r = run(a.lua, s, a.fake, a.echo, payload=a.payload, save=a.save)
         if r.get("skipped"):
             print("SKIPPED:", r["skipped"])
             return 0

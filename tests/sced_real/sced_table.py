@@ -267,6 +267,31 @@ def build_table(sced, commit):
     return out
 
 
+def build_table_from_save(save_path):
+    """A TTS save of SCED (e.g. the owner's "Arkham SCE 4.8.0.json") used as the
+    table directly: its scripts are already bundled, so no assembly is needed.
+    Returns the .lua path (cached by the save's content hash)."""
+    raw = open(save_path, "rb").read()
+    key = hashlib.sha1(raw + ASSEMBLER_VERSION.encode()).hexdigest()[:12]
+    out_dir = os.path.join(CACHE, "sced_save", key)
+    out = os.path.join(out_dir, "table.lua")
+    if os.path.isfile(out):
+        return out, key
+    d = json.loads(raw.decode("utf-8"))
+    t = {k: d.get(k, "") for k in ("SaveName", "LuaScript", "LuaScriptState", "XmlUI")}
+    t["ObjectStates"] = d.get("ObjectStates", [])
+    t["SnapPoints"] = d.get("SnapPoints", [])
+    t["commit"] = "save:" + (d.get("SaveName") or os.path.basename(save_path))
+    os.makedirs(out_dir, exist_ok=True)
+    parts = ["return "]
+    to_lua(t, parts)
+    tmp = out + ".tmp"
+    with open(tmp, "w", encoding="latin-1") as f:
+        f.write("".join(parts))
+    os.replace(tmp, out)
+    return out, key
+
+
 if __name__ == "__main__":
     path, commit = find_sced()
     if not path:
