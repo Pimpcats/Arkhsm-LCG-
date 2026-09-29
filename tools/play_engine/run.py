@@ -39,11 +39,13 @@ PARTIES = {1: ["sthrcass"], 2: ["sthrelias", "sthrayako"], 3: ["sthrelias", "sth
            4: ["sthrelias", "sthrayako", "sthrcass", "sthrseraphine"]}
 
 
-def suite(runs3=30, runs_other=10):
-    """(scenario, players, runs) for the full balance run."""
+def suite(runs3=30, runs_other=15):
+    """(scenario, players, runs) for the full balance run: every scenario at
+    3 investigators, the district loops at 1 and 4, the finale at 1, 2 and 4."""
     jobs = [(s, 3, runs3) for s in SCENARIOS]
     for p in (1, 4):
         jobs += [(s, p, runs_other) for s in DISTRICT_LOOPS]
+    jobs += [("finale", p, runs_other) for p in (1, 2, 4)]
     return jobs
 
 
@@ -55,7 +57,21 @@ def prepare(save):
         raise SystemExit("deck problems: " + "; ".join(d["problems"]))
     dpath = os.path.join(OUT, "decks.json")
     json.dump(d, open(dpath, "w", encoding="utf-8"), indent=1)
+    payload()
     return cpath, dpath
+
+
+def payload():
+    """dist/'s Saved Object with the Control's and the campaign log's scripts
+    rebuilt from src/ (tests/sced_real/run.py candidate_payload), so the engine
+    plays the current rules code without a publish run."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("sced_harness_run", os.path.join(ROOT, "tests", "sced_real", "run.py"))
+    harness_run = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(harness_run)
+    d = os.path.join(OUT, "payload")
+    os.makedirs(d, exist_ok=True)
+    return harness_run.candidate_payload(d)
 
 
 def table_for(save):
@@ -84,6 +100,9 @@ def run_batch(save, scenario, players, runs, seed, trace=False, snapshots=None, 
     cmd = [lua, os.path.join(ROOT, "tests", "sced_real", "run.lua"), "--suite", "playthrough",
            "--suite-file", os.path.join(HERE, "lua", "engine.lua"), "--config", cfgpath,
            "--table", table, "--src", src]
+    pl = os.path.join(OUT, "payload", "candidate_saved_object.json")
+    if os.path.isfile(pl):
+        cmd += ["--payload", pl]
     if snapshots:
         os.makedirs(snapshots, exist_ok=True)
         cmd += ["--snapshots", os.path.abspath(snapshots)]
@@ -152,6 +171,7 @@ def main(argv=None):
     ap.add_argument("--save", default=os.environ.get("SCED_SAVE", DEFAULT_SAVE))
     ap.add_argument("--scenario", default="district_church", help="a scenario id, or 'all' (%s)" % ", ".join(SCENARIOS))
     ap.add_argument("--runs", type=int, default=30)
+    ap.add_argument("--runs-other", type=int, default=15, help="--suite: runs at 1, 2 and 4 investigators")
     ap.add_argument("--players", type=int, default=3, choices=(1, 2, 3, 4))
     ap.add_argument("--seed", type=int, default=1000)
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2)))
@@ -196,7 +216,7 @@ def main(argv=None):
             print(r["stderr"], r["stdout_tail"])
         return 0
     if a.suite:
-        jobs = suite(a.runs, max(10, a.runs // 3))
+        jobs = suite(a.runs, a.runs_other)
     else:
         names = SCENARIOS if a.scenario == "all" else [a.scenario]
         jobs = [(s, a.players, a.runs) for s in names]

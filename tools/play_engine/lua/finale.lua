@@ -108,17 +108,26 @@ return function(R, T)
         end
       end
       if R.FINALE_SPAWN_AT then far = R.locById(R.FINALE_SPAWN_AT) or far end     -- what-if only
+      if (R.WHATIF or {}).uninvitedAt then far = R.locById(R.WHATIF.uninvitedAt) or far end   -- what-if only
       R.spawnEnemy(unv, far, nil, { want = "the revealed location farthest from all investigators" })
     end
-    if R.FINALE_SPAWN_AT then
-      local L = R.locById(R.FINALE_SPAWN_AT)
-      if L then R.placeAppointed(L) end
-    end
-    -- 3. Begin Finale on the Control: the Contest counter
+    -- 3. Begin Finale on the Control: the Contest counter, and the Appointed
+    -- moves to the Square (it disengages)
+    local before = R.appointedLoc()
     T.ctl("Begin Finale")
     E.run(0.3)
     R.touch()
-    if G.logFlags["You have spoken the name"] then R.contest(2, "You have spoken the name") end
+    if (R.WHATIF or {}).noFinaleMove and before then R.placeAppointed(before) end   -- what-if: the old setup
+    G.appointed.engaged = nil
+    G.appointed.loc = nil
+    if R.FINALE_SPAWN_AT or (R.WHATIF or {}).finaleAppointedAt then      -- what-if only
+      local L = R.locById(R.FINALE_SPAWN_AT or R.WHATIF.finaleAppointedAt)
+      if L then R.placeAppointed(L) end
+    end
+    local AL = R.appointedLoc()
+    G.metrics.finale_appointed_at = AL and AL.id or "?"
+    R.log("The Appointed is at %s at the start of the finale", AL and AL.name or "?")
+    if G.logFlags["You have spoken the name"] then R.contest((R.WHATIF or {}).spokenValue or 1, "You have spoken the name") end
     if G.logFlags["The drowned heard the true hour"] then R.rewind(1, "The drowned heard the true hour") end
     G.nameUnspoken = G.logFlags["The name is kept unspoken"]
     G.deepToSpend = {}
@@ -126,7 +135,7 @@ return function(R, T)
     -- the first time each investigator is at the Sealed Study (those already there gain it now)
     local study = R.locById("sthr-loc-sealedstudy")
     for _, x in ipairs(R.aliveInvs()) do
-      if study and x.loc == study.guid and not G.studyVisited[x.id] then
+      if study and x.loc == study.guid and not G.studyVisited[x.id] and (R.WHATIF or {}).studyVisits then
         G.studyVisited[x.id] = true
         R.contest(1, "first time at the Sealed Study")
       end

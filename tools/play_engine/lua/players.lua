@@ -78,6 +78,9 @@ return function(R, T)
     if controlStats then
       inv.stats = { wil = controlStats.wil, int = controlStats.int, com = controlStats.com, agi = controlStats.agi }
       inv.health, inv.sanity = controlStats.health, controlStats.sanity
+      if (R.WHATIF or {}).soloBonus and R.G.n == 1 then
+        inv.health, inv.sanity = inv.health + R.WHATIF.soloBonus, inv.sanity + R.WHATIF.soloBonus
+      end
     end
     for _, card in ipairs(deckData.cards) do inv.deck[#inv.deck + 1] = card end
     for _, s in ipairs(deckData.signatures) do inv.deck[#inv.deck + 1] = s end

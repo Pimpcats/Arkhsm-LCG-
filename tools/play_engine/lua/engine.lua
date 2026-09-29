@@ -27,6 +27,7 @@ return function(H)
   local decks = J.decode(H.readFile(cfg.decks))
   R.CONTEST_PER_INV = cfg.contestPerInv
   R.FINALE_SPAWN_AT = cfg.finaleSpawnAt
+  R.WHATIF = cfg
   -- what-if runs: scenario fields replaced (e.g. the finale's log choices)
   for name, patch in pairs(cfg.scenarioPatch or {}) do
     if S[name] then for k, v in pairs(patch) do S[name][k] = v end end
@@ -59,7 +60,9 @@ return function(H)
 
   ------------------------------------------------------------ the table --
 
-  local payload = J.decode(H.readFile(H.ROOT .. "/dist/saved_object_the_still_hour.json"))
+  -- the candidate Saved Object (dist/'s, with the Control's and the log's
+  -- scripts rebuilt from src/) when run.py made one, else dist/'s
+  local payload = J.decode(H.readFile(H.payload or (H.ROOT .. "/dist/saved_object_the_still_hour.json")))
   local campaignBox = E.spawnData(payload.ObjectStates[1], {}, "campaign")
   E.run(2)
   T.click(campaignBox, "Place")

@@ -83,8 +83,9 @@ return function(R, T)
   S.SURF = { Square = SURFACE.square, Church = SURFACE.church, Road = SURFACE.road, Lighthouse = SURFACE.lighthouse,
              Fairground = SURFACE.fairground, Almanac = SURFACE.almanac }
 
-  -- aging choices when Weathered (the drifting physical skill, the rising mental one)
-  S.DRIFT = { sthrelias = { "agility", "willpower" }, sthrayako = { "combat", "intellect" }, sthrcass = { "combat", "intellect" },
+  -- aging choices when Weathered (the drifting physical skill, the rising mental one);
+  -- Cass raises willpower, her weakest skill, so she can Hold Back in the finale
+  S.DRIFT = { sthrelias = { "agility", "willpower" }, sthrayako = { "combat", "intellect" }, sthrcass = { "combat", "willpower" },
               sthrseraphine = { "agility", "willpower" }, sthrbirdie = { "combat", "intellect" } }
 
   return S

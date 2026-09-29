@@ -137,7 +137,7 @@ local HOUR_HANDLERS = {
     if ctx and ctx.roadGivesWay then
       ctx.roadGivesWay()
     end
-    return "The location with the fewest clues becomes impassable."
+    return "The lead investigator makes a revealed location with the fewest clues, other than the Square, impassable."
   end,
 
   [5] = function(ctx)

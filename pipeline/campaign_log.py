@@ -61,7 +61,7 @@ FACTS = [
     ("the-hour-was-wrong", "The Hour Was Wrong", "Church", "deep",
      "Remove Hour IV from the Hours deck."),
     ("the-road-remembers", "The Road Remembers", "Sunken Road", "surface",
-     "Group limit once per loop: Turning–Winding Stair costs no Hour."),
+     "Group limit once per loop: Square–Milestones costs no Hour."),
     ("who-walks-beside-you", "Who Walks Beside You", "Sunken Road", "deep",
      "Each Echo gets −1 fight."),
     ("the-sheriff-is-already-dead", "The Sheriff Is Already Dead", "Square", "surface",

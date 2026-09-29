@@ -1440,14 +1440,13 @@
             {
               "id": "sthr-act-lasthour",
               "name": "Contest the Crossing",
-              "at": "The Sealed Study",
               "needs": {
                 "contest": {
-                  "per_investigator": 4,
+                  "target": 6,
                   "sources": [
                     "Hold Back success (repeatable)",
                     "deep fact spent (max 6)",
-                    "first visit to the Sealed Study (1 per investigator)"
+                    "the Uninvited defeated (once)"
                   ]
                 }
               }

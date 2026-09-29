@@ -54,12 +54,16 @@ return function(R, T)
   function R.stage() return R.state().stage end
   function R.knows(fact) return R.G.knowledge[fact] == true end
 
+  -- Contest the Crossing: progress 6 at every player count (Constants.contestTarget)
+  R.CONTEST_TARGET = 6
   function R.consts()
     local n = R.G.n
     local reset, noticed = 6 * n, 4 * n
     if n == 1 then reset, noticed = 9, 6 end
     return { reset = reset, glitch = math.floor(reset / 3), noticed = noticed,
-             contest = (R.G.cfg.contestPerInv or R.CONTEST_PER_INV or 4) * n }
+             contest = (R.WHATIF or {}).contestFlat
+               or ((R.G.cfg.contestPerInv or R.CONTEST_PER_INV) and (R.G.cfg.contestPerInv or R.CONTEST_PER_INV) * n)
+               or R.CONTEST_TARGET }
   end
 
   --- Raise (or lower) Dissonance through the Control's button.
@@ -314,7 +318,12 @@ return function(R, T)
   end
 
   function R.isCrossing(a, b)
-    return a.district ~= b.district and a.district ~= "Prologue" and b.district ~= "Prologue"
+    if a.district == b.district or a.district == "Prologue" or b.district == "Prologue" then return false end
+    -- the Lighthouse stands at the end of the Sunken Road: the Turning - the
+    -- Winding Stair joins two districts but is not a district connection
+    -- (guide: Districts and travel), unless a what-if puts the old rule back
+    if R.crossKey(a, b) == "Lighthouse|Road" and not (R.WHATIF or {}).lighthouseCrossingCosts then return false end
+    return true
   end
   function R.crossKey(a, b)
     local x, y = a.district, b.district

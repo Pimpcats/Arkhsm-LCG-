@@ -387,7 +387,7 @@ return function(R, T)
       if R.hour() < before then R.rewind(0) ; R.returnHourCard(R.hour(), before) ; G.metrics.rewinds = G.metrics.rewinds + 1 end
       G.appointed.exhausted = true
       G.appointed.engaged = nil
-      R.contest(1, "Hold Back")
+      R.contest((R.WHATIF or {}).holdBackValue or 1, "Hold Back")
     end
     return ok
   end
@@ -590,6 +590,8 @@ return function(R, T)
       while #inv.hand > 8 do inv.discard[#inv.discard + 1] = table.remove(inv.hand, 1) end
     end
     -- the round ends
+    FX.endOfRound()
+    if G.ended then return end
     local L = R.appointedLoc()
     if R.stage() == 1 and L then
       for _, inv in ipairs(R.investigatorsAt(L)) do

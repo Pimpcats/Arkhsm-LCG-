@@ -107,8 +107,8 @@ def test_guide_text_is_cleaned_of_designer_asides():
     assert "`" not in text.replace("```", "")
     kinds = [k for k, _ in G.parse(open(G.SOURCE, encoding="utf-8").read())]
     assert "map" in kinds and "table" in kinds and "quote" in kinds
-    # CO-001 contest target survives the clean-up
-    assert "4 per investigator** (12 at three investigators)" in text
+    # the contest target survives the clean-up
+    assert "contest progress reaches **6** (at every player count)" in text
 
 
 def test_guide_reads_like_an_official_guide():

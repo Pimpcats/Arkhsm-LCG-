@@ -24,6 +24,7 @@
 local Aging = require("StillHour/Aging")
 local Appointed = require("StillHour/Appointed")
 local CampaignState = require("StillHour/CampaignState")
+local Constants = require("StillHour/Constants")
 local Locations = require("StillHour/Locations")
 local SCED = require("StillHour/SCED")
 
@@ -359,6 +360,12 @@ function Board.applyAging(inv, toTracker)
   local base = Board.baseStats(inv.md)
   if not base then return nil end
   local eff = Aging.applyDriftToStats(base, inv.id)
+  -- one investigator: +2 maximum health and sanity (guide: Difficulty and Player Count)
+  local c = CampaignState.constants and CampaignState.constants()
+  if c and c.investigators == 1 then
+    eff.health = eff.health + Constants.SOLO_HEALTH_BONUS
+    eff.sanity = eff.sanity + Constants.SOLO_SANITY_BONUS
+  end
   if toTracker and inv.matColor then
     SCED.setSkillTracker(inv.matColor, eff.wil, eff.int, eff.com, eff.agi)
   end
@@ -616,6 +623,24 @@ function Board.refreshAppointedButtons(card)
     end)
   end
   return true
+end
+
+--- Move the Appointed (in play) to the revealed location whose card id is
+-- cardId (the finale: "move the Appointed to The Square"); it disengages.
+-- Returns the location's name, or nil when the card or location is missing.
+function Board.moveAppointedTo(cardId)
+  if not Appointed.isManifest() then return nil end
+  for _, l in ipairs(Board.eligibleLocations()) do
+    if l.md and l.md.id == cardId then
+      local pos, rot = placePosFor(l), rotFor(l)
+      local ok = bringAppointed(pos, rot, function(card) Board.refreshAppointedButtons(card) end)
+      if not ok then return nil end
+      st.appointed.placed = true
+      st.appointed.lastPos, st.appointed.lastRot = pos, rot
+      return safe(function() return l.obj.getName() end) or "the location"
+    end
+  end
+  return nil
 end
 
 --- The board ctx the Appointed / Hourglass modules call back into.

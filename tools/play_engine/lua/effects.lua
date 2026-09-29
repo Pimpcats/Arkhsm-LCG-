@@ -28,16 +28,20 @@ return function(R, T)
   ---------------------------------------------------------- the Hours --
 
   for h = 1, 9 do cov("sthr-hour-" .. h) end
-  cov("sthr-hour-4", "full; the lead investigator picks the revealed location with the fewest clues that no investigator is at when there is one")
+  cov("sthr-hour-4", "full; the lead investigator picks the revealed location other than the Square with the fewest clues that no investigator is at when there is one")
+
+  --- Forced – At the end of the round: each investigator at the Wheel takes 1 horror.
+  function FX.endOfRound()
+    local wheel = R.locById("sthr-loc-wheel")
+    if wheel then for _, inv in ipairs(R.investigatorsAt(wheel)) do horror(inv, 1, "The Wheel") end end
+  end
 
   --- The parts of "When reached" the Control token leaves to the players.
   function FX.onHourReached(h, cancelled)
     local G = R.G
     G.metrics.hour_round[h] = G.metrics.hour_round[h] or G.round
     G.metrics.curve[#G.metrics.curve + 1] = { round = G.round, hour = h, diss = R.dissonance(), stage = R.stage() }
-    -- the Wheel: each investigator there takes 1 horror per Hour advanced
-    local wheel = R.locById("sthr-loc-wheel")
-    if wheel then for _, inv in ipairs(R.investigatorsAt(wheel)) do horror(inv, 1, "The Wheel") end end
+    -- (the Wheel's horror is at the end of the round: FX.endOfRound)
     if G.impassable then G.impassable = nil end
     if cancelled then return end
     if h == 2 then
@@ -60,13 +64,35 @@ return function(R, T)
         end
       end
     elseif h == 4 then
-      -- the lead chooses a revealed location with the fewest clues: impassable
+      -- the lead chooses a revealed location with the fewest clues, other than
+      -- the Square: impassable. Among the fewest, a careful lead spares the
+      -- places the party needs (any act's location, the next steps of each
+      -- investigator's route) and the crossroads
+      local need = {}
+      for _, act in pairs(G.acts) do
+        local spec = FX.ACTS[act.id] or {}
+        if spec.at then need[spec.at] = true end
+        for _, id in ipairs(spec.sequence or {}) do need[id] = true end
+        if spec.needLamp then need["sthr-loc-lanternroom"] = true end
+      end
+      local onRoute = {}
+      for _, inv in ipairs(R.aliveInvs()) do
+        local target = R.AI.targetFor(inv)
+        local here = R.locOf(inv)
+        if target and here and target ~= here then
+          local _, _, _, path = R.route(here, target)
+          for _, X in ipairs(path or {}) do onRoute[X.guid] = true end
+        end
+      end
       local best, bc
       for _, L in ipairs(G.locList) do
-        if L.revealed and not L.closed then
+        if L.revealed and not L.closed and L.id ~= "sthr-loc-hubsquare" and L.id ~= "sthr-loc-square" then
           local c = R.clues(L)
           local occupied = #R.investigatorsAt(L) > 0
-          local score = c * 10 + (occupied and 5 or 0) + (R.AI.valueOf(L) or 0)
+          local degree = 0
+          for _ in pairs(L.adj or {}) do degree = degree + 1 end
+          local score = c * 10 + (occupied and 3 or 0) + (need[L.id] and 6 or 0) + (onRoute[L.guid] and 4 or 0)
+                        + math.max(0, degree - 1)
           if bc == nil or score < bc then best, bc = L, score end
         end
       end
@@ -173,7 +199,7 @@ return function(R, T)
     if L.id == "sthr-loc-ticketbooth" and not G.logFlags["You hold the ticket"] then
       inv.resources = math.max(0, inv.resources - 1)
     end
-    if G.finale and L.id == "sthr-loc-sealedstudy" and not G.studyVisited[inv.id] then
+    if G.finale and L.id == "sthr-loc-sealedstudy" and not G.studyVisited[inv.id] and (R.WHATIF or {}).studyVisits then
       G.studyVisited[inv.id] = true
       R.contest(1, "first time at the Sealed Study")
     end
@@ -279,7 +305,7 @@ return function(R, T)
   function FX.freeCrossingAvailable(a, b)
     local G = R.G
     local key = R.crossKey(a, b)
-    if key == "Lighthouse|Road" and R.knows("the-road-remembers") and not G.group.roadFree then return true end
+    if key == "Road|Square" and R.knows("the-road-remembers") and not G.group.roadFree then return true end
     if key == "Almanac|Square" and G.logFlags["The true page reached the Press"] and not G.group.pressFree then return true end
     return false
   end
@@ -287,7 +313,7 @@ return function(R, T)
   function FX.freeCrossing(a, b, inv)
     local G = R.G
     local key = R.crossKey(a, b)
-    if key == "Lighthouse|Road" and R.knows("the-road-remembers") and not G.group.roadFree then
+    if key == "Road|Square" and R.knows("the-road-remembers") and not G.group.roadFree then
       G.group.roadFree = true
       return true
     end
@@ -309,7 +335,7 @@ return function(R, T)
   FX.ACTS = ACTS
   local function clueNeed(id) local c = R.card(id) return (c.clues or 0) * (c.clues_per_investigator and R.G.n or 1) end
 
-  ACTS["sthr-act-firsthour"] = { at = "sthr-loc-almanacsteps", fact = nil, spend = true }
+  ACTS["sthr-act-firsthour"] = { at = "sthr-loc-almanacsteps", contrib = true, fact = nil, spend = true }
   ACTS["sthr-act-whythirteen"] = { at = "sthr-loc-vestry", fact = "the-thirteenth-toll", spend = true }
   ACTS["sthr-act-sheriffdead"] = { at = "sthr-loc-well", fact = "the-sheriff-is-already-dead", spend = true }
   ACTS["sthr-act-almanachid"] = { at = "sthr-loc-press", fact = "what-the-almanac-hid", spend = true }

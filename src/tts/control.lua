@@ -815,6 +815,13 @@ function shBeginFinale()
     CampaignState.setContest(0)
     announce(string.format("The finale begins: contest progress 0 / %d. If Hour IX is reached, the finale ends "
       .. "and the contest is not reached.", CampaignState.constants().contestTarget))
+    -- setup step 2: the Appointed comes to The Square to keep its appointment
+    local at = Board.moveAppointedTo("sthr-loc-hubsquare")
+    if at then
+      announce("The Appointed moves to " .. at .. " to keep its appointment (it disengages).")
+    elseif Appointed.isManifest() then
+      announce("Move the Appointed to The Square (it disengages).")
+    end
   end)
   afterChange()
 end
@@ -1269,7 +1276,7 @@ local function stillHourTestBody(T)
 
   local c3 = Constants.forCount(3)
   P, F = check("reset 18 / appointed 12 at 3p", c3.resetThreshold == 18 and c3.appointedThreshold == 12, P, F)
-  P, F = check("contest target 12 at 3p (CO-001 4*n)", c3.contestTarget == 12, P, F)
+  P, F = check("contest target 6 at every count", c3.contestTarget == 6 and Constants.forCount(1).contestTarget == 6, P, F)
 
   local bag = { count = 0 }
   bag.setBaselineStatic = function(m) bag.count = m end

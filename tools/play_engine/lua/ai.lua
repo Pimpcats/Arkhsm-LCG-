@@ -39,18 +39,43 @@ return function(R, T)
   end
 
   --- Clues the party still has to collect for this act (0 when enough).
-  function A.need(act)
+  function A.need(act, inv)
     if not act then return 0 end
     local spec = FX.ACTS[act.id] or {}
     if spec.sequence or spec.standFirm or spec.contest then return 0 end
-    return math.max(0, FX.actNeed(act.id) - R.partyClues())
+    local need = math.max(0, FX.actNeed(act.id) - R.partyClues())
+    -- clues only count where they are contributed: an investigator on the way
+    -- also counts only the clues of those who will be there about as soon
+    -- (not engaged, no farther from the act's location than they are)
+    if inv and spec.contrib and need == 0 then
+      local loc = A.actLocation(act, inv)
+      if loc then
+        local mine = A.travelCost(R.locOf(inv), loc)
+        local near = 0
+        for _, x in ipairs(R.aliveInvs()) do
+          local engaged = false
+          for _, en in ipairs(R.G.enemies) do if en.engaged == x and not en.exhausted then engaged = true end end
+          if x == inv or (not engaged and A.travelCost(R.locOf(x), loc) <= mine + 1) then near = near + x.clues end
+        end
+        need = math.max(0, FX.actNeed(act.id) - near)
+      end
+    end
+    return need
   end
   function A.cluesReserved()
     local act = A.objective()
     if not act then return 0 end
     return FX.actNeed(act.id)
   end
-  function A.wantsAdvance(act) return true end
+  --- A secondary objective is paid for only when the clues also cover what
+  -- the objective the party is working on still needs.
+  function A.wantsAdvance(act)
+    local obj = A.objective()
+    if not obj or obj == act then return true end
+    local spec = FX.ACTS[obj.id] or {}
+    if spec.sequence or spec.standFirm or spec.contest then return true end
+    return R.partyClues() - FX.actNeed(act.id) >= FX.actNeed(obj.id)
+  end
 
   --- Where the act is met (location), or nil.
   function A.actLocation(act, inv)
@@ -249,7 +274,7 @@ return function(R, T)
     local loc = A.actLocation(act, inv)
     if spec.sequence then return loc, "walk" end
     if spec.standFirm then return loc, "stand firm" end
-    if A.need(act) > 0 then
+    if A.need(act, inv) > 0 then
       local spots = clueSpots(inv, act)
       if spots[1] then return spots[1].L, "clues" end
       local nxt = A.nextObjective(act)
@@ -486,6 +511,8 @@ return function(R, T)
       if (inv.health - inv.damage) <= (en.def.damage or 0) + 1 then fightScore = fightScore * 0.7 end
       if inv.id == "sthrelias" or inv.id == "sthrseraphine" and weapon then fightScore = fightScore * 1.3 end
       if wantEvade then evadeScore = evadeScore + 50 end
+      -- the finale: the Uninvited's defeat is contest progress
+      if G.finale and en.id == "sthr-uninvited" then fightScore = fightScore * 1.6 end
       add(fightScore, "fight", function() R.ACT.fight(inv, en, weapon) end, { provokes = false })
       add(evadeScore, "evade", function() R.ACT.evade(inv, en) end, { provokes = false })
       -- event answers
@@ -511,7 +538,11 @@ return function(R, T)
       local skill = (R.skillBase(inv, "wil") >= R.skillBase(inv, "com")) and "wil" or "com"
       local p = R.prob(inv, R.skillBase(inv, skill) + P.staticBonus(inv, skill, {}) - 4 + 1)
       local s = 34 * p + (G.finale and 20 or 0) + (R.hour() >= 6 and 6 or 0)
-      if p >= 0.3 then add(s, "holdback", function() R.ACT.holdBack(inv) end, { provokes = "notAppointed" }) end
+      -- in the finale, once the deep entries are spent, Hold Back is the way
+      -- forward: worth trying at long odds (cards are committed to it)
+      local finaleNeed = G.finale and not (G.deepToSpend and #G.deepToSpend > 0)
+      if finaleNeed then s = s + 25 end
+      if p >= 0.3 or (finaleNeed and p >= 0.12) then add(s, "holdback", function() R.ACT.holdBack(inv) end, { provokes = "notAppointed" }) end
     end
 
     -- 3. objective actions here
@@ -546,7 +577,7 @@ return function(R, T)
     end
 
     -- 4. clues here
-    local need = A.need(act)
+    local need = A.need(act, inv)
     local clues = L.revealed and R.clues(L) or 0
     if clues > 0 then
       local p = A.invP(inv, "int", R.shroud(L), "investigate")
@@ -559,6 +590,7 @@ return function(R, T)
         score = (nxt and A.needAfter(act, nxt) > 0) and (8 + 8 * p) or (3 + 4 * p)
       else score = 4 + 4 * p end
       if p < 0.25 then score = score * 0.6 end
+      if G.finale then score = 1 end            -- clues win nothing in the finale
       local targetHere = act and A.actLocation(act, inv) == L
       if not targetHere then score = score - 2 * A.danger(L, inv) end
       add(score, "investigate", function() R.ACT.investigate(inv, { important = need > 0 }) end)
@@ -586,8 +618,11 @@ return function(R, T)
           end
           if R.isCrossing(L, step) then
             if not G.crossedThisRound[R.crossKey(L, step)] and not FX.freeCrossingAvailable(L, step) then
-              -- the first crossing this round costs an Hour: never into Hour IX
-              if R.hour() >= 8 then s = -100 else s = s - 5 end
+              -- the first crossing this round costs an Hour: never into Hour IX.
+              -- Heading for the current objective it costs the same now as
+              -- later (go early, together); other trips are weighed harder
+              local forObjective = why == "go" or why == "walk" or why == "stand firm" or why == "clues"
+              if R.hour() >= 8 then s = -100 elseif forObjective then s = s - 1 else s = s - 5 end
             else
               s = s + 4       -- already paid this round: cross with the others
             end

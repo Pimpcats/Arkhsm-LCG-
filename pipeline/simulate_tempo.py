@@ -282,7 +282,9 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None, greedy=Fal
     districts = list(dict.fromkeys(order))
     tasks = [("district", "square")]
     here = "square"
-    free_lighthouse = "road_surface" in facts
+    # the Turning - the Winding Stair never costs an Hour (not a district
+    # connection); The Road Remembers frees the Square - the Milestones once
+    free_road = "road_surface" in facts
     placed = {"square"}
     for d in districts:
         objs = [o for o in plan if OBJ[o][0] == d]
@@ -291,11 +293,11 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None, greedy=Fal
         if not objs:
             continue
         for a, b in crossings(here, d):
-            free = free_lighthouse and "lighthouse" in (a, b)
+            free = "lighthouse" in (a, b) or (free_road and {a, b} == {"square", "road"})
             tasks.append(("travel", b, 0 if free else 1))
             tasks.append(("district", b))
-            if free:
-                free_lighthouse = False
+            if free and "lighthouse" not in (a, b):
+                free_road = False
         here = d
         for o in objs:
             tasks.append(("begin", o))
