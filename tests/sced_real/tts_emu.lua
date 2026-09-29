@@ -1979,6 +1979,12 @@ E.G = setmetatable({
   unpack = unpack,
   loadstring = load,
   print = function(...) say("print", fmtArgs(...)) end,
+  -- TTS objects (and Global) are userdata to scripts, not tables: SCED tells
+  -- an object from a list of objects by type() (DeckLib.parseObjectTable)
+  type = function(v)
+    if v ~= nil and (v == GlobalObj or S[v] ~= nil) then return "userdata" end
+    return type(v)
+  end,
   log = function(v, label) say("log", (label and (tostring(label) .. ": ") or "") .. (type(v) == "table" and J.encode(v) or tostring(v))) end,
   logString = function(v) return type(v) == "table" and J.encode(v) or tostring(v) end,
   logStyle = function() return true end,

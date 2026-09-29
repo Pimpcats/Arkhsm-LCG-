@@ -5,6 +5,8 @@
 --   lua5.2 tests/sced_real/run.lua --suite ... --fixture <fake table .json>
 --   ... --snapshots <dir>   also write a table snapshot (JSON) after boot
 --                           and after every step, for tools/godot_table
+--   ... --suite-file <path> run a suite kept elsewhere (tools/play_engine);
+--                           every --key value pair is in H.args
 --
 -- Boots the table in tests/sced_real/tts_emu.lua, then runs the suite. Each
 -- check prints a line "@@CHECK <json>"; tests/sced_real/run.py (and the
@@ -36,7 +38,8 @@ end
 
 ------------------------------------------------------------------ checks --
 
-local H = { E = E, ROOT = ROOT, passed = 0, failed = 0, checks = {}, mode = args.fixture and "fake" or "sced" }
+local H = { E = E, ROOT = ROOT, passed = 0, failed = 0, checks = {}, mode = args.fixture and "fake" or "sced",
+            args = args }
 H.readFile = readFile
 H.payload = args.payload   -- a candidate Saved Object instead of dist/'s
 
@@ -165,7 +168,7 @@ E.phase = "campaign"
 ------------------------------------------------------------------ suite --
 
 local okSuite, errSuite = xpcall(function()
-  dofile(here .. "/" .. suite .. ".lua")(H)
+  dofile(args["suite-file"] or (here .. "/" .. suite .. ".lua"))(H)
 end, function(e) return debug.traceback(tostring(e), 2) end)
 if not okSuite then H.check("suite '" .. suite .. "' ran to the end", false, errSuite) end
 
