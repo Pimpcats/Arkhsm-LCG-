@@ -34,5 +34,10 @@
     "scale": 1.0,
     "ox": 0,
     "oy": 150
+  },
+  "sthr-lamplighterecho": {
+    "scale": 1.25,
+    "ox": -100,
+    "oy": 20
   }
 }
