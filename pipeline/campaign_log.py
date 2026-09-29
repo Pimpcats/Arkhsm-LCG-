@@ -71,7 +71,7 @@ FACTS = [
     ("the-wheel-still-turns", "The Wheel Still Turns", "Fairground", "surface",
      "At The Wheel, group limit once per loop: reorder top 2 encounter cards."),
     ("the-ticket-takers-bargain", "The Ticket-Taker's Bargain", "Fairground", "deep",
-     "See Choices: The Ticket."),
+     "See Choices: The Fairground."),
     ("what-the-almanac-hid", "What the Almanac Hid", "Almanac", "surface",
      "Hour VI: the bag holds 1 fewer Static token instead of 1 more."),
     ("the-appointeds-name", "The Appointed's Name", "Almanac", "deep",

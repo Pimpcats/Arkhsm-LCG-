@@ -372,6 +372,13 @@ local function forgetFact(id)
     announce(string.format("%s removed: -%d banked Memory (%d banked).", factName(id), refund,
       CampaignState.getBankedMemory()))
   end
+  -- the assembled entry was recorded because of this one (a mis-tick): with
+  -- its inputs no longer all recorded, it goes too
+  if removed and id ~= "the-way-the-night-breaks" and CampaignState.knows("the-way-the-night-breaks")
+      and not CampaignState.inFinale() and not Knowledge.canAssembleFinale() then
+    Knowledge.forget("the-way-the-night-breaks")
+    announce("The Way the Night Breaks no longer has all its entries: untick it on the Campaign Log too.")
+  end
   local rep = guarded("locations", Board.syncLocations) or {}
   return { removed = removed, refund = refund or 0, report = rep }
 end
@@ -576,7 +583,8 @@ local function drawPlay()
     button("shClickContest", string.format("Contest %d / %d", CampaignState.getContest(), c.contestTarget),
       0.0, 2.6, 620, "The Last Hour: contest progress. " .. PLUS_MINUS
         .. ". Right-click at 0: the finale was not begun after all.")
-  elseif CampaignState.knows("the-way-the-night-breaks") then
+  elseif CampaignState.knows("the-way-the-night-breaks") and not CampaignState.isLoopEnded() then
+    -- the finale begins during a loop, never Between Loops (after Reset Loop)
     button("shBeginFinale", "Begin Finale", 0.0, 2.6, 620,
       "Click when you begin the finale (The Last Hour). Hour IX then ends the finale, not the loop.")
   end
@@ -797,6 +805,12 @@ function shAge4() ageAt(4) end
 function shBeginFinale()
   guarded("finale", function()
     if not CampaignState.knows("the-way-the-night-breaks") or CampaignState.inFinale() then return end
+    -- Between Loops (Reset Loop clicked, Begin Next Loop not yet): a finale
+    -- begun now would carry into the next loop's Hour IX and Contest counter
+    if CampaignState.isLoopEnded() then
+      announce("The finale begins during a loop: click Begin Next Loop first.")
+      return
+    end
     CampaignState.setFinale(true)
     CampaignState.setContest(0)
     announce(string.format("The finale begins: contest progress 0 / %d. If Hour IX is reached, the finale ends "

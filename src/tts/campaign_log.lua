@@ -433,6 +433,8 @@ function syncFromCampaignState(st)
         if i then
           if fresh then put("inv" .. i .. "_name", inv.name) end
           put("inv" .. i .. "_years", tonumber(years) or 0)
+          -- 18 Years at Between Loops step 1: aged out (Years)
+          if (tonumber(years) or 0) >= 18 then tick("inv" .. i .. "_agedout") end
           local br = (st.brackets or {})[inv.id]
           if type(br) == "table" then
             if DRIFT[br.physical] then tick("inv" .. i .. "_" .. DRIFT[br.physical]) end
@@ -448,8 +450,13 @@ function syncFromCampaignState(st)
     for id, claimed in pairs(st.victoryLog or {}) do
       if claimed then tick("v:" .. id) ; tick("vb:" .. id) end
     end
-    local vote, name = knowledge["the-vote-that-never-ends"], knowledge["the-appointeds-name"]
-    if vote and name then tick("sera_known") elseif vote or name then tick("sera_suspected") end
+    -- Seraphine's thread (guide: Threads) starts unheard; The Vote That Never
+    -- Ends' act marks it "suspected" and The Appointed's Name's act marks it
+    -- "known" (the boxes are one exclusive group, so a later mark replaces an
+    -- earlier one)
+    if knowledge["the-appointeds-name"] then tick("sera_known")
+    elseif knowledge["the-vote-that-never-ends"] then tick("sera_suspected")
+    elseif not (values["sera_suspected"] or values["sera_known"]) then tick("sera_unheard") end
   end
   refreshDerived()
   updateSave()

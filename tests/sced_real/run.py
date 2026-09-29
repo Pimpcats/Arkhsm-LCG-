@@ -25,8 +25,10 @@ sys.path.insert(0, os.path.join(ROOT, "tests", "tts_fake"))
 import sced_table  # noqa: E402
 
 SUITES = ("playthrough", "runner")
-# not in "all": the SCED-only demo for tools/godot_table's review renders
-EXTRA_SUITES = ("demo",)
+# not in "all": the SCED-only demo for tools/godot_table's review renders, and
+# the story-resolution suite (tests/test_sced_resolutions.py runs it on a
+# payload built from src/, see candidate_payload)
+EXTRA_SUITES = ("demo", "resolutions")
 
 PLAY_AREA_STAND_IN = """
 local enabled = false
@@ -82,6 +84,39 @@ def fake_table():
                                      "Transform": {"posX": x, "posY": 1.6, "posZ": z, "rotY": 270,
                                                    "scaleX": scale, "scaleY": 1, "scaleZ": scale}})
     return save
+
+
+def candidate_payload(dest_dir):
+    """dist/'s Saved Object with the Control's and the campaign log's scripts
+    rebuilt from src/ (pipeline/bundle_mod.py, pipeline/campaign_log.py), so a
+    suite plays the current code without a publish run. Returns its path."""
+    sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+    import bundle_mod  # noqa: E402
+    import campaign_log  # noqa: E402
+    d = json.load(open(os.path.join(ROOT, "dist", "saved_object_the_still_hour.json"), encoding="utf-8"))
+    bundle = bundle_mod.build_bundle(ROOT)
+
+    def walk(o):
+        yield o
+        for c in o.get("ContainedObjects") or []:
+            yield from walk(c)
+        for c in (o.get("States") or {}).values():
+            yield from walk(c)
+    swapped = {"control": 0, "log": 0}
+    for o in walk(d["ObjectStates"][0]):
+        tags = o.get("Tags") or []
+        if o.get("Nickname", "").endswith("Control") and "StillHour" in tags:
+            o["LuaScript"] = bundle
+            swapped["control"] += 1
+        elif "CampaignLog" in tags:
+            page = int(json.loads(o.get("GMNotes") or "{}").get("id", "STHR-LOG1")[-1])
+            o["LuaScript"] = campaign_log.lua_script(page)
+            swapped["log"] += 1
+    assert swapped["control"] == 1 and swapped["log"] == 3, swapped
+    path = os.path.join(dest_dir, "candidate_saved_object.json")
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(d, f)
+    return path
 
 
 def find_lua(name):
@@ -152,14 +187,25 @@ def main(argv=None):
     ap.add_argument("--echo", action="store_true", help="print the table's chat as it happens")
     ap.add_argument("--full", action="store_true", help="print the whole log, not just the checks")
     ap.add_argument("--payload", help="a candidate Saved Object to load instead of dist/saved_object_the_still_hour.json")
+    ap.add_argument("--from-src", action="store_true",
+                    help="load dist's Saved Object with the Control and campaign log scripts rebuilt from src/")
     ap.add_argument("--save", help="boot the owner's own SCED save (e.g. 'Arkham SCE 4.8.0.json') instead of the git checkout")
     ap.add_argument("--snapshots", help="write a table snapshot (JSON) after boot and every step into this folder "
                     "(one subfolder per suite; keep it under .cache/)")
     a = ap.parse_args(argv)
     suites = SUITES if a.suite == "all" else (a.suite,)
+    tmp = tempfile.mkdtemp(prefix="sced_candidate_") if a.from_src else None
+    try:
+        return _run_suites(a, suites, candidate_payload(tmp) if tmp else a.payload)
+    finally:
+        if tmp:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+
+def _run_suites(a, suites, payload):
     failed = 0
     for s in suites:
-        r = run(a.lua, s, a.fake, a.echo, payload=a.payload, save=a.save,
+        r = run(a.lua, s, a.fake, a.echo, payload=payload, save=a.save,
                 snapshots=os.path.join(a.snapshots, s) if a.snapshots else None)
         if r.get("skipped"):
             print("SKIPPED:", r["skipped"])
