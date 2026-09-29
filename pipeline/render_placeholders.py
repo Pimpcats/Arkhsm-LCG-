@@ -197,9 +197,15 @@ def load_placements():
     cover baseline (scale 1.0 = exactly fills the window; ox/oy pan the art in
     window pixels). Stored as data so every recomposite starts from the
     ORIGINAL image — repeated adjustments never lose quality."""
-    if os.path.exists(PLACEMENTS_PATH):
-        return json.load(open(PLACEMENTS_PATH, encoding="utf-8"))
-    return {}
+    # committed placements (campaigns/<campaign>/art_placements.json) are the
+    # base; the Studio's local drag edits (out/, gitignored) win per card
+    merged = {}
+    committed = os.path.join(ROOT, "campaigns", "still_hour", "art_placements.json")
+    for path in (committed, PLACEMENTS_PATH):
+        if os.path.exists(path):
+            merged.update({k: v for k, v in json.load(open(path, encoding="utf-8")).items()
+                           if not k.startswith("_")})
+    return merged
 
 
 # Art-window geometry per layout, shared with the Studio's placement editor.
