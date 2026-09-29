@@ -36,8 +36,53 @@
     "oy": 150
   },
   "sthr-lamplighterecho": {
-    "scale": 1.25,
-    "ox": -100,
-    "oy": 20
+    "scale": 1.4,
+    "ox": -80,
+    "oy": -100
+  },
+  "sthr-housewins": {
+    "scale": 1.0,
+    "ox": 0,
+    "oy": 150
+  },
+  "sthr-appointed": {
+    "scale": 1.0,
+    "ox": 0,
+    "oy": 150
+  },
+  "sthr-bellringer": {
+    "scale": 1.0,
+    "ox": 0,
+    "oy": 150
+  },
+  "sthr-wearssheriff": {
+    "scale": 1.0,
+    "ox": 0,
+    "oy": 150
+  },
+  "sthr-onewhorides": {
+    "scale": 1.0,
+    "ox": 0,
+    "oy": 150
+  },
+  "sthr-waitingcongregation": {
+    "scale": 1.0,
+    "ox": 0,
+    "oy": 150
+  },
+  "sthr-drownedchoir": {
+    "scale": 1.0,
+    "ox": 0,
+    "oy": 150
+  },
+  "sthr-familiarface": {
+    "scale": 1.0,
+    "ox": 0,
+    "oy": 150
+  },
+  "sthr-somethingonstair": {
+    "scale": 1.0,
+    "ox": 0,
+    "oy": 150
   }
 }
