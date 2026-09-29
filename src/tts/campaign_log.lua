@@ -454,9 +454,9 @@ function syncFromCampaignState(st)
     -- Ends' act marks it "suspected" and The Appointed's Name's act marks it
     -- "known" (the boxes are one exclusive group, so a later mark replaces an
     -- earlier one)
-    if knowledge["the-appointeds-name"] then tick("sera_known")
-    elseif knowledge["the-vote-that-never-ends"] then tick("sera_suspected")
-    elseif not (values["sera_suspected"] or values["sera_known"]) then tick("sera_unheard") end
+    -- the acts mark it only when Seraphine is present, so it is ticked by
+    -- hand; Sync only fills the starting state
+    if not (values["sera_suspected"] or values["sera_known"]) then tick("sera_unheard") end
   end
   refreshDerived()
   updateSave()

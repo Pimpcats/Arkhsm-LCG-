@@ -211,7 +211,7 @@ There is no Appointed in the Prologue, and no Years are gained in it: ignore any
 ```resolution Resolution 1 — You Saw It Coming (you advanced The First Hour)
 > You were standing on the right step at the right second. You watched the occultation complete, and you watched something reach through, and not finish reaching. When the night folds, you fold with it on purpose, and you keep more of it.
 - Each investigator gains **2 banked Memory**, and the party gains **1** more banked Memory.
-- In your Campaign Log, record **You Are Unstuck.** Part I begins.
+- In your Campaign Log, record **You Are Unstuck.** Part I begins. (On the log token, also tick this resolution in **Prologue ended**.)
 - No Years are gained from the Prologue.
 - Read **What You Saw**, below.
 ```
@@ -219,7 +219,7 @@ There is no Appointed in the Prologue, and no Years are gained in it: ignore any
 ```resolution Resolution 2 — It Caught You Unready (the Hourglass reached Hour IX, or Dissonance reached the reset value)
 > The occultation completes. Something reaches through, and does not finish reaching. The night folds. You are standing in the Square again at eleven o'clock, salt on your tongue, and you are the only ones who feel the seam.
 - Each investigator gains **2 banked Memory.**
-- In your Campaign Log, record **You Are Unstuck.** Part I begins.
+- In your Campaign Log, record **You Are Unstuck.** Part I begins. (On the log token, also tick this resolution in **Prologue ended**.)
 - No Years are gained from the Prologue.
 - Read **What You Saw**, below.
 ```
@@ -227,7 +227,7 @@ There is no Appointed in the Prologue, and no Years are gained in it: ignore any
 ```resolution No Resolution — The First Death (every investigator was defeated)
 > The last thing you see is the sky finishing what it started: the final star sliding behind the edgeless dark. There is no pain. There is a long, patient silence, like a held breath. Then a band is tuning up, and the lanterns are being lit, and it is eleven o'clock. You remember dying. You remember all of it.
 - Each investigator gains **2 banked Memory.**
-- In your Campaign Log, record **You Are Unstuck.** Part I begins.
+- In your Campaign Log, record **You Are Unstuck.** Part I begins. (On the log token, also tick this resolution in **Prologue ended**.)
 - No Years are gained from the Prologue. This first death is free. None of the others will be.
 - Read **What You Saw**, below.
 ```
@@ -295,9 +295,9 @@ A loop ends the moment one of its endings happens. Before anything else, claim V
 Run this after every reset, and once after the Prologue. First, if you have not already, click **Reset Loop** on the Control token; then click **Interlude** on it for steps 1 to 3.
 
 1. **Age.** (Skip this step after the Prologue.) Each investigator adds their reset Years for the loop just ended (see **Years**) plus their Years pending. Apply any bracket change now; the first time an investigator reaches Weathered or a later bracket, choose their locked changes on the Interlude panel (their −skill and +skill buttons) before clicking **Age**, then tick the same choices on the Campaign Log. An investigator who reaches 18 Years ages out.
-2. **Bank Memory.** On the Interlude panel, click **Bank on-card Memory** once. It moves all Memory on cards (including the cards of investigators defeated this loop) to banked Memory. Then take the Memory tokens off your cards.
+2. **Bank Memory.** On the Interlude panel, click **Bank on-card Memory** once. It moves all Memory on cards (including the cards of investigators defeated this loop) to banked Memory. Memory on the cards of an investigator who aged out at step 1 is lost with them. Then take the Memory tokens off your cards.
 3. **Spend.** Spend banked Memory from the shared pool, as **Memory** describes: buy Recollections at their listed Memory cost, and upgrade cards (Memory equal to the new card's level), within each investigator's deckbuilding options. Upgraded cards replace their base versions. After spending, if banked Memory is above **18**, reduce it to 18. A new level 0 card costs 1: right-click the banked **Memory** button once.
-4. **Record.** Update the scar (loops completed, maximum 6 at three investigators), the Knowledge Track, the Victory list and any choices on your Campaign Log. Also write each investigator's Years and any Recollections they bought, what you spent this interlude, the current Part, and anyone who aged out under **Those Who Left the Loop** (the log token fills the numbers it tracks; the printed pages need them written). (Knowledge entries are ticked when their acts say so. If you tick one now, do it before **Begin Next Loop**.)
+4. **Record.** Update the scar (loops completed, maximum 6 at three investigators), the Knowledge Track, the Victory list and any choices on your Campaign Log. Also write each investigator's Years and any Recollections they bought, what you spent this interlude, the current Part, and anyone who aged out under **Those Who Left the Loop** (on the log token, right-click it and choose **Sync from campaign** to fill the numbers the Control token tracks; the printed pages need them written). (Knowledge entries are ticked when their acts say so. If you tick one now, do it before **Begin Next Loop**.)
 5. **Check the Part.** If Part II has not begun, and your log now records **3 or more** surface Knowledge entries or you have completed **Loop 3**: Part II begins (read **The Shape of the Hour** at step 6).
 6. **Read** one interlude story: the Torn or Taken story from the loop's resolution if it applies; otherwise the story below that fits the loop just ended, with any sentence the loop's resolution adds. Then read **The Shape of the Hour** if Part II began at step 5, **Before the finale** the first time your log records The Way the Night Breaks, and any age story. On the Control token, click **Begin Next Loop**, then begin the next loop at **Loop Setup**.
 
@@ -313,7 +313,7 @@ Run this after every reset, and once after the Prologue. First, if you have not 
 - **Ancient** (15 Years): *A child in the Square takes your hand to help you down the Town Hall steps. You have known this child for a hundred nights. To them you are a kind old stranger, and always will be.*
 - If an investigator **ages out** (18 Years): *They do not wake at First Dark. You find them on the Sunken Road, walking in the same direction as the others, hood up. They do not turn when you call their name.*
 
-> **Before the finale** (once your log records The Way the Night Breaks). You know the shape of the night now. You know what it costs to end it. The only question left is who pays. You may attempt **The Last Hour** during any loop from now on, or keep looping to prepare, knowing each loop costs years.
+> **Before the finale** (once your log records The Way the Night Breaks; if you begin the finale in the loop you first record it, read this first). You know the shape of the night now. You know what it costs to end it. The only question left is who pays. You may attempt **The Last Hour** during any loop from now on, or keep looping to prepare, knowing each loop costs years.
 
 ---
 
@@ -328,7 +328,7 @@ Read a district's entry the first time you enter it in a loop (The Square's duri
 
 If act 1a would advance to an act 2a whose requirements are not met, remove the act deck from the game instead.
 
-**District resolutions.** When a loop ends, after its loop resolution, read one resolution for **each district whose box you placed this loop** (always including The Square). Check each district's resolutions **top to bottom** and read the first that applies. They tell what the night did with what you found there; anything they describe was already recorded on the act's back when you completed it, so they add nothing further to the log unless they say so.
+**District resolutions.** When a loop ends, after its loop resolution, read one resolution for **each district whose box you placed this loop** (always including The Square). Check each district's resolutions **top to bottom** and read the first that applies. They tell what the night did with what you found there; anything they describe was already recorded on the act's back when you completed it, so they add nothing further to the log unless they say so. If you defeated a district's Named enemy this loop, read the Named add-on in that district's Resolution 1 whichever of its resolutions you read.
 
 **Choices.** The first time you complete a district's deep objective, its resolution asks the investigators to decide between two courses. Record the choice in your Campaign Log (**Choices**). Every choice echoes somewhere else in Ambergrove, and every one of them is waiting for you in **The Last Hour**.
 
@@ -568,7 +568,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 **Only once your Campaign Log records The Way the Night Breaks.** During any loop from then on, an investigator at **The Sealed Study** may begin the finale as a [free] ability during their turn. Or, when Hour IX is reached while your log records The Way the Night Breaks, you may begin the finale instead of ending the loop.
 
-**The finale and the loop.** The finale is part of the loop in which it begins: damage, horror, cards in play, the Hourglass, Dissonance and every "once per loop" limit already used stay as they are. During the finale you may still Place a district's box before moving into it, as Loop Setup step 5 allows. When the finale ends, first claim Victory, then read the finale resolution, then fill in the **Finale Record** on your Campaign Log (the loop, banked Memory at the finale, the deep entries spent, the resolution and the Years paid). Memory still on cards does not count as banked Memory for Resolutions 1b, 5 and 6. After Resolution 5 the loop ends as usual: read each placed district's resolution, then **Between Loops**. After Resolutions 1–4 the campaign ends and no reset Years are gained; for their conditions and the epilogue, an investigator's Years are their recorded Years plus their Years pending plus any Years the resolution gives.
+**The finale and the loop.** The finale is part of the loop in which it begins: damage, horror, cards in play, the Hourglass, Dissonance and every "once per loop" limit already used stay as they are. During the finale you may still Place a district's box before moving into it, as Loop Setup step 5 allows. When the finale ends, first claim Victory, then read the finale resolution, then fill in the **Finale Record** on your Campaign Log (the loop, banked Memory at the finale, the deep entries spent, the resolution and the Years paid). Memory still on cards does not count as banked Memory for Resolutions 1b, 5 and 6. After Resolution 5 the loop ends as usual: read each placed district's resolution (except one whose Resolution 1 you read before the finale), then **Between Loops**. Investigators defeated during the finale are still present for the finale resolution and the epilogue: they wake at dawn with the others. After Resolutions 1–4 the campaign ends and no reset Years are gained; for their conditions and the epilogue, an investigator's Years are their recorded Years plus their Years pending plus any Years the resolution gives.
 
 Before the finale begins: if you completed a district's act 2a this loop, read that district's Resolution 1 now and make its choice (any Years it gives are gained now: click **Years pending**). Then read:
 
@@ -644,7 +644,7 @@ Then read **Epilogue — What the Years Took.**
 
 ```resolution Resolution 5 — Next Time (contest not reached, banked Memory at least 4 per investigator)
 > The loop wins tonight. The guest keeps its appointment, and the night folds along its old crease. But you have carried so much of it now that the fold does not quite close over you. You wake at First Dark closer than ever, older than ever, and certain.
-- The loop ends. Mark it **Closed at the Hour** and proceed to **Between Loops**. You may attempt the finale again.
+- The loop ends. Mark it **Closed at the Hour**, read each placed district's resolution (a district whose Resolution 1 you read before the finale reads nothing more), and proceed to **Between Loops**. You may attempt the finale again. At the next attempt, fill in the Finale Record again.
 - Do not read the epilogue yet.
 ```
 

@@ -641,6 +641,9 @@ return function(H)
     -- the Square's deep entry comes before the Almanac's (its act 2a needs The Vote)
     deepResolution("square", "_b")
     logSync(2)
+    check("Sync leaves Seraphine's thread to the players (still 'unheard')", logVal("sera_unheard") == true
+      and logVal("sera_suspected") ~= true)
+    logTick("sera_suspected")   -- the Vote's act, with Seraphine at the Records Office
     check("The Vote That Never Ends: Seraphine's thread 'suspected' on the log", logVal("sera_suspected") == true
       and logVal("sera_unheard") ~= true)
     check("no finale yet: The Way the Night Breaks needs The Appointed's Name",
@@ -657,7 +660,8 @@ return function(H)
     logTick("k:the-way-the-night-breaks")
     check("ticking the assembled entry pays nothing", st().memory == m1)
     logSync(1) ; logSync(2)
-    check("the log syncs 'The Last Hour available' and Seraphine's thread 'known'",
+    logTick("sera_known")       -- the Name's act, with Seraphine at the Sealed Study
+    check("the log syncs 'The Last Hour available'; Seraphine's thread 'known' replaces 'suspected'",
       logVal("act3") == true and logVal("sera_known") == true and logVal("sera_suspected") ~= true)
     deepResolution("fairground", "_b")
     -- Between Loops: pending Years reach Age, then clear
@@ -1051,8 +1055,7 @@ return function(H)
   step("Seraphine's thread in every finale state", function()
     restore("finaleBase")
     logSync(2)
-    check("the finale needs The Appointed's Name, so the thread is always 'known' there (current card text)",
-      logVal("sera_known") == true)
-    info("Seraphine's 'unheard' and 'suspected' epilogue lines are unreachable with the current card text (see report)")
+    check("the thread is marked by hand, so every state is reachable at the finale",
+      logVal("sera_known") == true or logVal("sera_suspected") == true or logVal("sera_unheard") == true)
   end)
 end

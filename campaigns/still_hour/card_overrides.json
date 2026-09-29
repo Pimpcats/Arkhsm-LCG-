@@ -804,7 +804,7 @@
   "sthr-story-firstreset": {
     "name": "The First Reset",
     "text": "The Prologue ends. In your Campaign Log, record You Are Unstuck.\nThen turn to the Prologue resolutions in the Campaign Guide and read the one that applies.",
-    "flavor": "The occultation completes. Something reaches through — and does not finish reaching. The night folds. You are standing in the Square again at eleven o'clock, salt on your tongue, and you are the only ones who feel the seam.",
+    "flavor": "The night folds.",
     "deck": 95102
   },
   "sthr-act-lamp": {
@@ -894,7 +894,7 @@
     "index": "2a",
     "number": "2/2",
     "back_flavor": "The minutes are dated the night of the first occultation. A motion to open the door. Every name in Ambergrove, each in its own hand. Carried, unanimous. Under the tally a clerk has written: the cost to be settled at the appointed hour.",
-    "back_text": "Record in your Campaign Log: The Vote That Never Ends. Mark Seraphine's thread “suspected.”\nThe Square's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "back_text": "Record in your Campaign Log: The Vote That Never Ends. If Seraphine Vale is at the Records Office, mark Seraphine's thread “suspected.”\nThe Square's objectives are complete. From now on, do not use this act deck when you Place this box.",
     "clues_per_investigator": true
   },
   "sthr-act-wheelturns": {
@@ -942,7 +942,7 @@
     "index": "2a",
     "number": "2/2",
     "back_flavor": "It is written once, in the middle of an otherwise blank page. You read it. You do not say it aloud. Somewhere on the hill, something pauses mid-step.",
-    "back_text": "Record in your Campaign Log: The Appointed's Name. Mark Seraphine's thread “known.”\nAt Hour VII, exhaust the Appointed.\nIf your Campaign Log records The Appointed's Name, The Vote That Never Ends and at least one other deep entry, also record The Way the Night Breaks: the finale may now be begun. If it does not yet, check again each time you record a deep entry.\nThe Almanac House's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "back_text": "Record in your Campaign Log: The Appointed's Name. If Seraphine Vale is at the Sealed Study, mark Seraphine's thread “known.”\nAt Hour VII, exhaust the Appointed.\nIf your Campaign Log records The Appointed's Name, The Vote That Never Ends and at least one other deep entry, also record The Way the Night Breaks: the finale may now be begun. If it does not yet, check again each time you record a deep entry.\nThe Almanac House's objectives are complete. From now on, do not use this act deck when you Place this box.",
     "clues_per_investigator": true
   },
   "sthr-act-lasthour": {

@@ -514,7 +514,7 @@
       {
         "id": "R2",
         "name": "The Seam Tears",
-        "condition": "Dissonance reached 18",
+        "condition": "Dissonance reached the reset value",
         "source": "campaign guide §4",
         "log": "Mark the loop Torn. Loop ended in danger (+1 Year, Aging). Second or later Torn loop: read its interlude beat."
       },
@@ -629,14 +629,14 @@
           "name": "You Saw It Coming",
           "condition": "you advanced The First Hour",
           "source": "player guide",
-          "log": "2 banked Memory each, +1 banked Memory to the party. Record \"You Are Unstuck\" (Act I)."
+          "log": "2 banked Memory each, +1 banked Memory to the party. Record \"You Are Unstuck\" (Part I)."
         },
         {
           "id": "R2",
           "name": "It Caught You Unready",
           "condition": "the Hourglass reached Hour IX, or Dissonance reached the reset value",
           "source": "player guide",
-          "log": "2 banked Memory each. Record \"You Are Unstuck\" (Act I)."
+          "log": "2 banked Memory each. Record \"You Are Unstuck\" (Part I)."
         },
         {
           "id": "NR",
