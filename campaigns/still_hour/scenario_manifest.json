@@ -1442,7 +1442,7 @@
               "name": "Contest the Crossing",
               "needs": {
                 "contest": {
-                  "target": 6,
+                  "target": 5,
                   "sources": [
                     "Hold Back success (repeatable)",
                     "deep fact spent (max 6)",

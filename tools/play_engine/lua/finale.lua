@@ -111,15 +111,10 @@ return function(R, T)
       if (R.WHATIF or {}).uninvitedAt then far = R.locById(R.WHATIF.uninvitedAt) or far end   -- what-if only
       R.spawnEnemy(unv, far, nil, { want = "the revealed location farthest from all investigators" })
     end
-    -- 3. Begin Finale on the Control: the Contest counter, and the Appointed
-    -- moves to the Square (it disengages)
-    local before = R.appointedLoc()
+    -- 3. Begin Finale on the Control: the Contest counter
     T.ctl("Begin Finale")
     E.run(0.3)
     R.touch()
-    if (R.WHATIF or {}).noFinaleMove and before then R.placeAppointed(before) end   -- what-if: the old setup
-    G.appointed.engaged = nil
-    G.appointed.loc = nil
     if R.FINALE_SPAWN_AT or (R.WHATIF or {}).finaleAppointedAt then      -- what-if only
       local L = R.locById(R.FINALE_SPAWN_AT or R.WHATIF.finaleAppointedAt)
       if L then R.placeAppointed(L) end

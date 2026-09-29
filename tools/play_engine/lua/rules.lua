@@ -54,8 +54,8 @@ return function(R, T)
   function R.stage() return R.state().stage end
   function R.knows(fact) return R.G.knowledge[fact] == true end
 
-  -- Contest the Crossing: progress 6 at every player count (Constants.contestTarget)
-  R.CONTEST_TARGET = 6
+  -- Contest the Crossing: progress 5 at every player count (Constants.contestTarget)
+  R.CONTEST_TARGET = 5
   function R.consts()
     local n = R.G.n
     local reset, noticed = 6 * n, 4 * n

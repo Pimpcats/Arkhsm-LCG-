@@ -794,15 +794,13 @@ return function(H)
       check("Setup 2: four right-clicks put Hour V back as the current Hour", st().hour == 5, st().hour)
     end
     for _ = 1, 3 do if st().stage < 3 then ctl("shClickAppointed") end end
-    local markBegin = chatMark()
     ctl("shBeginFinale")
     local s = st()
-    check("Setup 2-3: the Appointed Arrived, Begin Finale shows Contest 0 / 6", s.finale and s.stage == 3
-      and hasLabel(control(), "Contest 0 / 6"), list(s))
-    check("Setup 3: Begin Finale sends the Appointed to The Square", chatHas(markBegin, "The Square"))
+    check("Setup 2-3: the Appointed Arrived, Begin Finale shows Contest 0 / 5", s.finale and s.stage == 3
+      and hasLabel(control(), "Contest 0 / 5"), list(s))
     if logVal("name_a") then
       ctl("shClickContest")
-      check("You have spoken the name: 1 contest progress", hasLabel(control(), "Contest 1 / 6"), labels(control()))
+      check("You have spoken the name: 1 contest progress", hasLabel(control(), "Contest 1 / 5"), labels(control()))
     end
     if logVal("page_b") then
       local h = st().hour
@@ -814,10 +812,10 @@ return function(H)
   local function reachContest()
     local mark = chatMark()
     for _ = 1, 20 do
-      if hasLabel(control(), "Contest 6 / 6") then break end
+      if hasLabel(control(), "Contest 5 / 5") then break end
       ctl("shClickContest")
     end
-    check("the contest is reached at 6 (every player count)", chatHas(mark, "The contest is reached"))
+    check("the contest is reached at 5 (every player count)", chatHas(mark, "The contest is reached"))
     logTick("contest_yes") ; logType("finale_loop", tostring(st().loops + 1))
     logCount("finale_memory", st().memory)
   end
@@ -843,7 +841,7 @@ return function(H)
     logTick("name_a") ; logTick("page_b")
     local d0 = st().dissonance
     beginFinale({ atHourNine = true })
-    check("contest is reset to 1 by the spoken name, not carried", hasLabel(control(), "Contest 1 / 6"))
+    check("contest is reset to 1 by the spoken name, not carried", hasLabel(control(), "Contest 1 / 5"))
     local s0 = st()
     local mark = chatMark()
     local static0 = st().static.extra
@@ -999,7 +997,7 @@ return function(H)
     ctl("shBeginNextLoop")
     check("the next loop offers Begin Finale again", hasLabel(control(), "Begin Finale"), labels(control()))
     ctl("shBeginFinale")
-    check("a second finale starts from Contest 0", st().finale and hasLabel(control(), "Contest 0 / 6"), labels(control()))
+    check("a second finale starts from Contest 0", st().finale and hasLabel(control(), "Contest 0 / 5"), labels(control()))
   end)
 
   step("finale R5/R6 by Dissonance and by defeat; R6 (The Loop Wins) below 12 banked", function()
@@ -1027,7 +1025,7 @@ return function(H)
     ctl("shClickContest")
     check("Hold Back: Arrived -> Emerging, the Hourglass rewinds 1", st().stage == 2 and st().hour == math.max(1, h - 1),
       list(st()))
-    check("contest +1 for the Hold Back success", hasLabel(control(), "Contest 1 / 6"), labels(control()))
+    check("contest +1 for the Hold Back success", hasLabel(control(), "Contest 1 / 5"), labels(control()))
   end)
 
   ------------------------------------------------------ epilogue inputs --

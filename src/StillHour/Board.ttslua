@@ -625,24 +625,6 @@ function Board.refreshAppointedButtons(card)
   return true
 end
 
---- Move the Appointed (in play) to the revealed location whose card id is
--- cardId (the finale: "move the Appointed to The Square"); it disengages.
--- Returns the location's name, or nil when the card or location is missing.
-function Board.moveAppointedTo(cardId)
-  if not Appointed.isManifest() then return nil end
-  for _, l in ipairs(Board.eligibleLocations()) do
-    if l.md and l.md.id == cardId then
-      local pos, rot = placePosFor(l), rotFor(l)
-      local ok = bringAppointed(pos, rot, function(card) Board.refreshAppointedButtons(card) end)
-      if not ok then return nil end
-      st.appointed.placed = true
-      st.appointed.lastPos, st.appointed.lastRot = pos, rot
-      return safe(function() return l.obj.getName() end) or "the location"
-    end
-  end
-  return nil
-end
-
 --- The board ctx the Appointed / Hourglass modules call back into.
 function Board.appointedCtx(extra)
   local ctx = {}

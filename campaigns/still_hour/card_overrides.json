@@ -843,8 +843,8 @@
   },
   "sthr-act-hourwaswrong": {
     "name": "The Hour Was Wrong",
-    "clues": 1,
-    "text": "Part II only.\nForced – When this act becomes the current act: The Flooded Crypt opens. Spawn the set-aside Bell-Ringer Beneath there.\nObjective – Investigators at the Flooded Crypt may, as a group, spend 1 [perinv] clues to advance.",
+    "clues": 2,
+    "text": "Part II only.\nForced – When this act becomes the current act: The Flooded Crypt opens. Spawn the set-aside Bell-Ringer Beneath there.\nObjective – Investigators at the Flooded Crypt may, as a group, spend 2 [perinv] clues to advance.",
     "deck": 95105,
     "index": "2a",
     "number": "2/2",
@@ -923,8 +923,8 @@
   },
   "sthr-act-almanachid": {
     "name": "What the Almanac Hid",
-    "clues": 2,
-    "text": "Objective – If an investigator is at the Press, the investigators may, as a group, spend 2 [perinv] clues to advance.",
+    "clues": 3,
+    "text": "Objective – If an investigator is at the Press, the investigators may, as a group, spend 3 [perinv] clues to advance.",
     "flavor": "Where the wrong almanac was printed.",
     "deck": 95112,
     "index": "1a",
@@ -935,8 +935,8 @@
   },
   "sthr-act-appointedname": {
     "name": "The Appointed's Name",
-    "clues": 1,
-    "text": "Part II only, once your Campaign Log records What the Almanac Hid and The Vote That Never Ends.\nForced – When this act becomes the current act: The Sealed Study opens.\nObjective – Investigators at the Sealed Study may, as a group, spend 1 [perinv] clues to advance.",
+    "clues": 2,
+    "text": "Part II only, once your Campaign Log records What the Almanac Hid and The Vote That Never Ends.\nForced – When this act becomes the current act: The Sealed Study opens.\nObjective – Investigators at the Sealed Study may, as a group, spend 2 [perinv] clues to advance.",
     "flavor": "Inside is the name the town spoke to call the thing through.",
     "deck": 95113,
     "index": "2a",
@@ -947,7 +947,7 @@
   },
   "sthr-act-lasthour": {
     "name": "Contest the Crossing",
-    "text": "Objective – Gain 1 contest progress each time an investigator succeeds at Hold Back or spends a deep Knowledge entry. Other sources are in the Campaign Guide. When progress reaches 6, advance.\n[action]: Spend a deep Knowledge entry your Campaign Log records (each entry once per finale).\nIf Hour IX is reached, every investigator is defeated, or Dissonance reaches the reset value, the finale ends and the contest is not reached.",
+    "text": "Objective – Gain 1 contest progress each time an investigator succeeds at Hold Back or spends a deep Knowledge entry. Other sources are in the Campaign Guide. When progress reaches 5, advance.\n[action]: Spend a deep Knowledge entry your Campaign Log records (each entry once per finale).\nIf Hour IX is reached, every investigator is defeated, or Dissonance reaches the reset value, the finale ends and the contest is not reached.",
     "flavor": "An appointment made in ink and never kept.",
     "deck": 95114,
     "index": "1a",
