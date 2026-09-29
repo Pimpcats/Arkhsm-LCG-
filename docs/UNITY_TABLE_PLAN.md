@@ -1,5 +1,9 @@
 # Unity test table — build plan (assistant-facing)
 
+Superseded: the visual table is built with Godot instead (no Unity licence or
+account needed); see docs/GODOT_TABLE.md. The plan below is kept for its
+reasoning (AssetBundles, MoonSharp) in case a Unity table is ever wanted.
+
 Goal: a local Tabletop-Simulator-like table, built in Unity inside the cloud
 container, that loads SCED and The Still Hour, plays the campaign through the
 owner's buttons, and captures screenshots for the assistant to review. The

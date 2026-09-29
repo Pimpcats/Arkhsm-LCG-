@@ -1,0 +1,30 @@
+; Godot table renderer for the headless TTS/SCED emulator (assistant tool).
+; See docs/GODOT_TABLE.md. Run through tools/godot_table/render.py.
+
+config_version=5
+
+[application]
+
+config/name="TTS Table Renderer"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.3", "GL Compatibility")
+
+[audio]
+
+driver/driver="Dummy"
+
+[display]
+
+window/size/viewport_width=640
+window/size/viewport_height=360
+window/energy_saving/keep_screen_on=false
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/default_filters/anisotropic_filtering_level=3
+textures/canvas_textures/default_texture_filter=1
+anti_aliasing/quality/msaa_3d=2
+lights_and_shadows/directional_shadow/size=8192
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=3

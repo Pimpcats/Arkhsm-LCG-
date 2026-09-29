@@ -1494,7 +1494,14 @@ function methods.takeObject(o, p)
     for i, x in ipairs(c) do if x.GUID == p.guid then idx = i end end
     if not idx then error("takeObject: no object with guid " .. tostring(p.guid) .. " in " .. tostring(o)) end
   end
-  local cd = table.remove(c, idx)
+  local cd
+  if typeOf(st.data.Name) == "Infinite" then
+    -- an infinite bag hands out copies (each with a new GUID) and keeps its object
+    cd = c[idx] and datacopy(c[idx])
+    if cd then cd.GUID = nil end
+  else
+    cd = table.remove(c, idx)
+  end
   if not cd then return nil end
   local isDeck = typeOf(st.data.Name) == "Deck"
   if isDeck then deckIds(st) end

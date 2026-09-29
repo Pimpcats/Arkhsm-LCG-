@@ -25,6 +25,8 @@ sys.path.insert(0, os.path.join(ROOT, "tests", "tts_fake"))
 import sced_table  # noqa: E402
 
 SUITES = ("playthrough", "runner")
+# not in "all": the SCED-only demo for tools/godot_table's review renders
+EXTRA_SUITES = ("demo",)
 
 PLAY_AREA_STAND_IN = """
 local enabled = false
@@ -70,7 +72,7 @@ def fake_table():
             save["SizeOverride"][o["GUID"]] = [3.6, 0.1, 3.6]
         if o["Nickname"] == "White Playermat":
             t.update(posX=-55, posY=1.45, posZ=16.1, rotY=270, scaleX=6.43, scaleY=1, scaleZ=6.43)
-            save["SizeOverride"][o["GUID"]] = [2.1, 0.1, 1.3]
+            save["SizeOverride"][o["GUID"]] = [4.2, 0.1, 2.0]
         save["ObjectStates"].append(o)
     # two loose SCED pieces that lie in its play area on a fresh table
     # (objects/LeadInvestigator.acaa93.json, objects/SCEDTour.0e5aa8.json)
@@ -86,7 +88,8 @@ def find_lua(name):
     return shutil.which(name)
 
 
-def run(lua="lua5.2", suite="playthrough", fake=False, echo=False, verbose=False, timeout=600, payload=None, save=None):
+def run(lua="lua5.2", suite="playthrough", fake=False, echo=False, verbose=False, timeout=600, payload=None, save=None,
+        snapshots=None):
     """Run one suite; returns dict(checks=[...], rc=, stdout=, stderr=, skipped=reason)."""
     exe = find_lua(lua)
     if not exe:
@@ -116,37 +119,48 @@ def run(lua="lua5.2", suite="playthrough", fake=False, echo=False, verbose=False
         cmd += ["--payload", os.path.abspath(payload)]
     if verbose:
         cmd += ["--verbose", "1"]
+    if snapshots:
+        # a JSON snapshot of the table after boot and after every step
+        # (tools/godot_table renders them); the folder must be gitignored
+        os.makedirs(snapshots, exist_ok=True)
+        cmd += ["--snapshots", os.path.abspath(snapshots)]
     try:
         p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace",
                            timeout=timeout, cwd=ROOT)
     finally:
         if tmp:
             shutil.rmtree(tmp, ignore_errors=True)
-    checks, done = [], None
+    checks, done, snaps = [], None, []
     for line in p.stdout.splitlines():
-        if line.startswith("@@CHECK "):
+        if line.startswith("@@SNAPSHOT "):
+            snaps.append(json.loads(line[11:]))
+        elif line.startswith("@@CHECK "):
             rec = json.loads(line[8:])
             if "name" in rec:
                 checks.append(rec)
             elif rec.get("done"):
                 done = rec
-    return {"checks": checks, "done": done, "rc": p.returncode, "stdout": p.stdout, "stderr": p.stderr}
+    return {"checks": checks, "done": done, "rc": p.returncode, "stdout": p.stdout, "stderr": p.stderr,
+            "snapshots": snaps}
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--lua", default="lua5.2")
-    ap.add_argument("--suite", choices=SUITES + ("all",), default="all")
+    ap.add_argument("--suite", choices=SUITES + EXTRA_SUITES + ("all",), default="all")
     ap.add_argument("--fake", action="store_true")
     ap.add_argument("--echo", action="store_true", help="print the table's chat as it happens")
     ap.add_argument("--full", action="store_true", help="print the whole log, not just the checks")
     ap.add_argument("--payload", help="a candidate Saved Object to load instead of dist/saved_object_the_still_hour.json")
     ap.add_argument("--save", help="boot the owner's own SCED save (e.g. 'Arkham SCE 4.8.0.json') instead of the git checkout")
+    ap.add_argument("--snapshots", help="write a table snapshot (JSON) after boot and every step into this folder "
+                    "(one subfolder per suite; keep it under .cache/)")
     a = ap.parse_args(argv)
     suites = SUITES if a.suite == "all" else (a.suite,)
     failed = 0
     for s in suites:
-        r = run(a.lua, s, a.fake, a.echo, payload=a.payload, save=a.save)
+        r = run(a.lua, s, a.fake, a.echo, payload=a.payload, save=a.save,
+                snapshots=os.path.join(a.snapshots, s) if a.snapshots else None)
         if r.get("skipped"):
             print("SKIPPED:", r["skipped"])
             return 0
@@ -154,7 +168,7 @@ def main(argv=None):
             print(r["stdout"])
         else:
             for line in r["stdout"].splitlines():
-                if not line.startswith("@@CHECK"):
+                if not line.startswith("@@"):
                     print(line)
         if r["stderr"].strip():
             print(r["stderr"][-4000:], file=sys.stderr)
