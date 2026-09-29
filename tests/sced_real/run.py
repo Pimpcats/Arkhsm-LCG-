@@ -86,7 +86,8 @@ def find_lua(name):
     return shutil.which(name)
 
 
-def run(lua="lua5.2", suite="playthrough", fake=False, echo=False, verbose=False, timeout=600, payload=None, save=None):
+def run(lua="lua5.2", suite="playthrough", fake=False, echo=False, verbose=False, timeout=600, payload=None, save=None,
+        snapshots=None):
     """Run one suite; returns dict(checks=[...], rc=, stdout=, stderr=, skipped=reason)."""
     exe = find_lua(lua)
     if not exe:
@@ -116,21 +117,29 @@ def run(lua="lua5.2", suite="playthrough", fake=False, echo=False, verbose=False
         cmd += ["--payload", os.path.abspath(payload)]
     if verbose:
         cmd += ["--verbose", "1"]
+    if snapshots:
+        # a JSON snapshot of the table after boot and after every step
+        # (tools/godot_table renders them); the folder must be gitignored
+        os.makedirs(snapshots, exist_ok=True)
+        cmd += ["--snapshots", os.path.abspath(snapshots)]
     try:
         p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace",
                            timeout=timeout, cwd=ROOT)
     finally:
         if tmp:
             shutil.rmtree(tmp, ignore_errors=True)
-    checks, done = [], None
+    checks, done, snaps = [], None, []
     for line in p.stdout.splitlines():
-        if line.startswith("@@CHECK "):
+        if line.startswith("@@SNAPSHOT "):
+            snaps.append(json.loads(line[11:]))
+        elif line.startswith("@@CHECK "):
             rec = json.loads(line[8:])
             if "name" in rec:
                 checks.append(rec)
             elif rec.get("done"):
                 done = rec
-    return {"checks": checks, "done": done, "rc": p.returncode, "stdout": p.stdout, "stderr": p.stderr}
+    return {"checks": checks, "done": done, "rc": p.returncode, "stdout": p.stdout, "stderr": p.stderr,
+            "snapshots": snaps}
 
 
 def main(argv=None):
@@ -142,11 +151,14 @@ def main(argv=None):
     ap.add_argument("--full", action="store_true", help="print the whole log, not just the checks")
     ap.add_argument("--payload", help="a candidate Saved Object to load instead of dist/saved_object_the_still_hour.json")
     ap.add_argument("--save", help="boot the owner's own SCED save (e.g. 'Arkham SCE 4.8.0.json') instead of the git checkout")
+    ap.add_argument("--snapshots", help="write a table snapshot (JSON) after boot and every step into this folder "
+                    "(one subfolder per suite; keep it under .cache/)")
     a = ap.parse_args(argv)
     suites = SUITES if a.suite == "all" else (a.suite,)
     failed = 0
     for s in suites:
-        r = run(a.lua, s, a.fake, a.echo, payload=a.payload, save=a.save)
+        r = run(a.lua, s, a.fake, a.echo, payload=a.payload, save=a.save,
+                snapshots=os.path.join(a.snapshots, s) if a.snapshots else None)
         if r.get("skipped"):
             print("SKIPPED:", r["skipped"])
             return 0
@@ -154,7 +166,7 @@ def main(argv=None):
             print(r["stdout"])
         else:
             for line in r["stdout"].splitlines():
-                if not line.startswith("@@CHECK"):
+                if not line.startswith("@@"):
                     print(line)
         if r["stderr"].strip():
             print(r["stderr"][-4000:], file=sys.stderr)

@@ -24,3 +24,7 @@ rig.local.json
 # (cardforge/sandbox.py); safe to delete if any remain
 *.pretest-backup
 *.pretest-copy
+
+# Godot table renderer: editor/import caches (tools/godot_table)
+tools/godot_table/.godot/
+tools/godot_table/**/*.import

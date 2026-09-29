@@ -3,6 +3,8 @@
 --   lua5.2 tests/sced_real/run.lua --suite playthrough|runner
 --       --table <assembled SCED table.lua> --src <SCED src folder>
 --   lua5.2 tests/sced_real/run.lua --suite ... --fixture <fake table .json>
+--   ... --snapshots <dir>   also write a table snapshot (JSON) after boot
+--                           and after every step, for tools/godot_table
 --
 -- Boots the table in tests/sced_real/tts_emu.lua, then runs the suite. Each
 -- check prints a line "@@CHECK <json>"; tests/sced_real/run.py (and the
@@ -53,6 +55,23 @@ function H.check(name, ok, detail)
     detail ~= nil and ("  -- " .. tostring(detail)) or ""))
 end
 
+-- table snapshots for the Godot renderer (tools/godot_table): after boot and
+-- after every step; a suite may also call H.snapshot(label) at any moment
+H.snapDir = args.snapshots
+H.snapCount = 0
+local SNAP
+function H.snapshot(label)
+  if not H.snapDir then return nil end
+  SNAP = SNAP or dofile(here .. "/snapshot.lua")
+  local n = H.snapCount
+  H.snapCount = n + 1
+  local path = string.format("%s/%03d.json", H.snapDir, n)
+  local ok, err = pcall(SNAP.write, E, path, { index = n, label = label, suite = suite, t = E.now })
+  if not ok then io.write("[INFO] snapshot failed: " .. tostring(err) .. "\n") return nil end
+  io.write("@@SNAPSHOT ", J.encode({ index = n, label = label, file = path }), "\n")
+  return path
+end
+
 function H.info(msg) io.write("[INFO] " .. msg .. "\n") emit({ info = msg }) end
 
 -- Lua errors raised since mark (optionally only from some origins)
@@ -83,6 +102,7 @@ function H.step(name, fn)
   local errs = H.errorsSince(mark)
   H.check(name .. ": no Lua errors (campaign or SCED)", #errs == 0, #errs > 0 and H.describeErrors(errs) or nil)
   for _, e in ipairs(errs) do io.write("  [lua error] " .. tostring(e.trace) .. "\n") end
+  H.snapshot(name)
 end
 
 ------------------------------------------------------------------ table --
@@ -131,6 +151,7 @@ if args["strict-boot"] == "1" or #bootErrors == 0 then
 end
 for _, e in ipairs(bootErrors) do io.write("  [boot error] " .. tostring(e.trace) .. "\n") end
 H.bootErrorCount = #bootErrors
+H.snapshot("the bare table after boot")
 H.scedGuids = {}
 for _, o in ipairs(created) do H.scedGuids[o.getGUID()] = true end
 E.phase = "campaign"
