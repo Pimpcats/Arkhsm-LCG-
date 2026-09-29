@@ -94,6 +94,8 @@ def cameras_for(save, names):
     # TTS's default seat camera for White (sits at -x on SCED's table):
     # above the player's side, looking over the play area
     cams["player"] = {"type": "persp", "eye": [-78.0, 42.0, 0.0], "target": [-26.0, 0.0, 0.0], "fov": TTS_FOV}
+    # sitting at White's seat, looking at White's hand, playmat and the play area
+    cams["seat"] = {"type": "persp", "eye": [-80.0, 21.0, 13.0], "target": [-48.0, 0.0, 10.0], "fov": TTS_FOV}
     # the whole table from above; screen up = TTS +x (away from the players)
     cams["top"] = {"type": "ortho", "eye": [-8.0, 150.0, 0.0], "target": [-8.0, 0.0, 0.0], "up": [1, 0, 0],
                    "size": 140.0, "far": 400.0}
@@ -131,7 +133,10 @@ def write_job(path, snaps, cams, manifest, scene, width, height, out_dir, option
         stem = "%03d" % s["index"]
         shots = [{"out": os.path.join(out_dir, "%s_%s.png" % (stem, name)), "camera": cam, "name": name}
                  for name, cam in cams.items()]
-        renders.append({"snapshot": s["file"], "options": options, "shots": shots, "label": s.get("label", "")})
+        rec = {"snapshot": s["file"], "options": options, "shots": shots, "label": s.get("label", "")}
+        if s.get("ui"):
+            rec["ui"] = s["ui"]
+        renders.append(rec)
     job = {"manifest": manifest, "scene": scene, "width": width, "height": height, "renders": renders}
     json.dump(job, open(path, "w"), indent=1)
     return job
@@ -198,6 +203,8 @@ def main(argv=None):
                     help="comma list of: overview, player, play, mythos, top, playtop")
     ap.add_argument("--out", help="output folder (default .cache/godot_shots/<timestamp>)")
     ap.add_argument("--snapshots", help="render these existing snapshots (folder) instead of running the harness")
+    ap.add_argument("--closeup", action="append", default=[],
+                    help="extra top-down camera NAME=x,z,size (TTS coordinates), e.g. cleanup=8,-53,12")
     ap.add_argument("--width", type=int, default=1920)
     ap.add_argument("--height", type=int, default=1080)
     ap.add_argument("--debug", action="store_true", help="draw snap points and scripting zones")
@@ -209,7 +216,7 @@ def main(argv=None):
     out = os.path.abspath(out)
     os.makedirs(out, exist_ok=True)
     if a.snapshots:
-        files = sorted(glob.glob(os.path.join(a.snapshots, "*.json")))
+        files = sorted(f for f in glob.glob(os.path.join(a.snapshots, "*.json")) if not f.endswith(".ui.json"))
         snaps = []
         for f in files:
             meta = json.load(open(f)).get("meta", {})
@@ -225,7 +232,23 @@ def main(argv=None):
     print("rendering %d snapshot(s)" % len(snaps))
     man_path, man = fetch_assets.fetch([s["file"] for s in snaps], a.save)
     cams = cameras_for(save, [c.strip() for c in a.cameras.split(",") if c.strip()])
+    for spec in a.closeup:
+        name, _, nums = spec.partition("=")
+        x, z, size = (float(v) for v in nums.split(","))
+        cams[name] = {"type": "ortho", "eye": [x, 100.0, z], "target": [x, 0.0, z], "up": [1, 0, 0],
+                      "size": size, "far": 300.0}
     options = {"snap_points": a.debug, "zones": a.debug, "global_snap_points": a.debug, "debug_buttons": a.debug}
+    # objects' own XML UI panels, drawn per snapshot (sidecar JSON)
+    try:
+        import object_ui
+        import ui_overlay
+        ui_assets = ui_overlay.asset_files_for(save, man)
+        ui_fonts = ui_overlay.font_files_for(man)
+        object_ui.MANIFEST = man
+        for s_ in snaps:
+            s_["ui"], _items = object_ui.sidecar(s_["file"], ui_assets, ui_fonts)
+    except Exception as e:  # never fatal
+        print("object ui skipped:", e)
     job_path = os.path.join(out, "job.json")
     job = write_job(job_path, snaps, cams, man_path, scene_from_save(save), a.width, a.height, out, options)
     rc, log = run_godot(job_path)

@@ -62,7 +62,7 @@ def key(u):
 # ------------------------------------------------------------------ collect --
 
 def collect(snapshot_files, save=None):
-    need = {"image": set(), "crop": set(), "mesh": set(), "bundle": set(), "pdf": set()}
+    need = {"image": set(), "crop": set(), "mesh": set(), "bundle": set(), "pdf": set(), "uibundle": set()}
 
     def img(u):
         u = norm_url(u)
@@ -106,6 +106,11 @@ def collect(snapshot_files, save=None):
                 need["pdf"].add(norm_url(p["PDFUrl"]))
             for dc in o.get("decals") or []:
                 img(((dc or {}).get("CustomDecal") or {}).get("ImageURL"))
+            for ua in o.get("ui_assets") or []:
+                if int((ua or {}).get("Type") or 0) == 0:
+                    img(ua.get("URL"))
+                elif ua.get("URL"):
+                    need["uibundle"].add(norm_url(ua["URL"]))
         for dc in (d.get("global") or {}).get("decals") or []:
             img(((dc or {}).get("CustomDecal") or {}).get("ImageURL"))
     if save:
@@ -461,6 +466,96 @@ def prep_bundle(u):
     return rec
 
 
+# ------------------------------------------------------------- UI bundles --
+
+def prep_ui_bundle(u):
+    """A UI asset bundle's sprites/textures as PNGs: {name: file} (XML UI
+    refers to them as "<asset name>/<sprite name>")."""
+    d = os.path.join(CACHE, "uibundle", key(u))
+    idx = os.path.join(d, "index.json")
+    if os.path.isfile(idx):
+        return json.load(open(idx))
+    raw, err = download(u)
+    if not raw:
+        return {"error": err}
+    os.makedirs(d, exist_ok=True)
+    out = {}
+    try:
+        import UnityPy
+        env = UnityPy.load(raw)
+        for o in env.objects:
+            if o.type.name not in ("Sprite", "Texture2D"):
+                continue
+            try:
+                t = o.read()
+                name = t.m_Name
+                if not name or (o.type.name == "Texture2D" and name in out):
+                    continue
+                im = t.image
+                if im is None:
+                    continue
+                safe = "".join(c if c.isalnum() else "_" for c in name)
+                fp = os.path.join(d, "%s_%s.png" % (o.type.name[0], safe))
+                _save_png(im.convert("RGBA"), fp, 1024)
+                out[name] = fp
+            except Exception:
+                continue
+    except Exception as e:
+        out = {"error": "UnityPy: %s" % str(e)[:150]}
+    json.dump(out, open(idx, "w"))
+    return out
+
+
+# -------------------------------------------------------------------- fonts --
+
+def prep_fonts(save):
+    """The save's font asset bundles (CustomUIAssets Type 1) -> font files:
+    {asset name: first font, "asset/font": each font}. XML UI's font="..."
+    names an asset (or asset/font)."""
+    out = {}
+    try:
+        import UnityPy
+    except ImportError:
+        return out
+    d = os.path.join(CACHE, "fonts")
+    os.makedirs(d, exist_ok=True)
+    for a in save.get("CustomUIAssets") or []:
+        if int(a.get("Type") or 0) != 1:
+            continue
+        name = a.get("Name") or ""
+        u = norm_url(a.get("URL"))
+        raw, err = download(u)
+        if not raw:
+            continue
+        marker = os.path.join(d, key(u) + ".json")
+        if os.path.isfile(marker):
+            found = json.load(open(marker))
+        else:
+            found = []
+            try:
+                env = UnityPy.load(raw)
+                for o in env.objects:
+                    if o.type.name != "Font":
+                        continue
+                    f = o.read()
+                    data = bytes(f.m_FontData or b"")
+                    if len(data) < 100 or len(data) > 8_000_000:
+                        continue
+                    ext = ".otf" if data[:4] == b"OTTO" else ".ttc" if data[:4] == b"ttcf" else ".ttf"
+                    safe = "".join(c if c.isalnum() else "_" for c in f.m_Name)
+                    fp = os.path.join(d, "%s__%s%s" % (key(u)[:10], safe, ext))
+                    open(fp, "wb").write(data)
+                    found.append([f.m_Name, fp])
+            except Exception:
+                found = []
+            json.dump(found, open(marker, "w"))
+        for i, (fname, fp) in enumerate(found):
+            if i == 0:
+                out[name] = fp
+            out[name + "/" + fname] = fp
+    return out
+
+
 # -------------------------------------------------------------------- main --
 
 def _run(fn, *a):
@@ -477,7 +572,7 @@ def fetch(snapshot_files, save=None, workers=8, log=print):
     sheets = {}
     for (u, w, h, i) in need["crop"]:
         sheets.setdefault(u, []).append((w, h, i))
-    urls = set(need["image"]) | set(sheets) | need["mesh"] | need["bundle"] | need["pdf"]
+    urls = set(need["image"]) | set(sheets) | need["mesh"] | need["bundle"] | need["pdf"] | need["uibundle"]
     log("assets: %d urls (%d images, %d card sheets / %d cards, %d meshes, %d bundles, %d pdfs)" % (
         len(urls), len(need["image"]), len(sheets), len(need["crop"]), len(need["mesh"]), len(need["bundle"]),
         len(need["pdf"])))
@@ -489,7 +584,8 @@ def fetch(snapshot_files, save=None, workers=8, log=print):
             if err:
                 fails[u] = err
     log("downloaded in %.1fs, %d failed" % (time.time() - t0, len(fails)))
-    man = {"images": {}, "crops": {}, "meshes": {}, "bundles": {}, "pdfs": {}, "failed": dict(fails)}
+    man = {"images": {}, "crops": {}, "meshes": {}, "bundles": {}, "pdfs": {}, "uibundles": {},
+           "failed": dict(fails)}
     with cf.ProcessPoolExecutor(max(2, min(8, os.cpu_count() or 2))) as ex:
         fut = {}
         for u in need["image"]:
@@ -502,6 +598,8 @@ def fetch(snapshot_files, save=None, workers=8, log=print):
             fut[ex.submit(_run, prep_bundle, u)] = ("bundles", u)
         for u in need["pdf"]:
             fut[ex.submit(_run, prep_pdf, u)] = ("pdfs", u)
+        for u in need["uibundle"]:
+            fut[ex.submit(_run, prep_ui_bundle, u)] = ("uibundles", u)
         for f in cf.as_completed(fut):
             kind, u = fut[f]
             rec = f.result()
@@ -519,6 +617,8 @@ def fetch(snapshot_files, save=None, workers=8, log=print):
                 man[kind][u] = rec
                 if rec.get("error"):
                     man["failed"][u] = rec["error"]
+    if save:
+        man["fonts"] = prep_fonts(json.load(open(save, encoding="utf-8")))
     man["stats"] = {"urls": len(urls), "failed": len([k for k in man["failed"] if "#" not in k]),
                     "crops": len(man["crops"]), "seconds": round(time.time() - t0, 1)}
     path = os.path.join(CACHE, "manifest.json")

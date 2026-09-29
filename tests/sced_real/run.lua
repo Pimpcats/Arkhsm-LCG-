@@ -111,9 +111,15 @@ end
 local SCED_SIZES = {
   ["9f334f"] = { 5.37, 0.1, 1.97 },      -- Mythos Area (MythosArea.ttslua MYTHOS_AREA_DATA)
   ["721ba2"] = { 3.6, 0.1, 3.6 },        -- Play Area (its 9x9 snap grid + margin)
-  ["8b081b"] = { 2.1, 0.1, 1.3 }, ["bd0ff4"] = { 2.1, 0.1, 1.3 },   -- playmats
-  ["383d8b"] = { 2.1, 0.1, 1.3 }, ["0840d5"] = { 2.1, 0.1, 1.3 },
-  ["4ee1f2"] = { 200, 0.2, 200 },        -- table surface
+  -- playmats: TTS sizes a Custom_Tile from its image (short side 2, the other
+  -- by aspect); the playmat image is 4406x2098, and its snap points sit on the
+  -- printed card slots at that size (checked in tools/godot_table renders)
+  ["8b081b"] = { 4.2, 0.1, 2.0 }, ["bd0ff4"] = { 4.2, 0.1, 2.0 },
+  ["383d8b"] = { 4.2, 0.1, 2.0 }, ["0840d5"] = { 4.2, 0.1, 2.0 },
+  -- table surface (a Custom_Model at y -9 whose mesh top is 10.48 above its
+  -- origin): a box reaching up to the real surface (y 1.48), so things
+  -- dropped on the table rest on it, not 10 units below
+  ["4ee1f2"] = { 200, 20.96, 200 },
 }
 
 local save

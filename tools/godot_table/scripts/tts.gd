@@ -21,10 +21,11 @@ const CARD_CORNER := 0.1
 # createButton/createInput sizes are in "button units": world size =
 # units * BUTTON_UNIT * object scale * button scale.
 const BUTTON_UNIT := 0.002
-# TTS draws a button's local x mirrored relative to the object's transform
-# (positionToWorld); +1 would mean no mirror. Calibrated on SCED's playmat
-# hot-spots (see docs/GODOT_TABLE.md).
-const BUTTON_X := 1.0
+# TTS mirrors a button's frame in x relative to the object's transform
+# (positionToWorld): position x and the rotations about y and z change sign.
+# Calibrated on SCED's playmat hot-spots (the encounter/chaos buttons over
+# their printed spots) and the Deck Importer's option buttons.
+const BUTTON_X := -1.0
 
 # Custom_Tile at scale 1: the image's shorter side is TILE_SHORT units, the
 # longer follows the aspect ratio. Custom_Token: its longer side is TOKEN_LONG.

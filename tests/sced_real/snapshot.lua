@@ -148,6 +148,7 @@ function M.object(E, o)
     face_down = o.is_face_down,
   }
   if E.sizeOverride[st.guid] then r.size_override = E.sizeOverride[st.guid] end
+  if d.Name == "HandTrigger" then r.hand_color = d.FogColor end
   if d.Name == "Card" or d.Name == "CardCustom" then
     r.card = cardInfo(d)
     r.card.HideWhenFaceDown = d.HideWhenFaceDown
@@ -189,8 +190,13 @@ function M.object(E, o)
   if d.RotationValues and #d.RotationValues > 0 then r.rotation_values = plain(d.RotationValues) end
   if #st.buttons > 0 then r.buttons = buttonList(st.buttons) end
   if #st.inputs > 0 then r.inputs = inputList(st.inputs) end
-  local x = uiXml(st.ui)
-  if x then r.xml_ui = x end
+  -- the object's own (world-space) XML UI, as a table
+  local xt = uiTable(st.ui)
+  if xt then
+    r.xml_table = xt
+    -- the images / sprite bundles / fonts its UI refers to by name
+    if type(d.CustomUIAssets) == "table" and #d.CustomUIAssets > 0 then r.ui_assets = plain(d.CustomUIAssets) end
+  end
   if st.states then
     local n = 0
     for _ in pairs(st.states) do n = n + 1 end

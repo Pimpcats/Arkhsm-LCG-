@@ -25,6 +25,8 @@ sys.path.insert(0, os.path.join(ROOT, "tests", "tts_fake"))
 import sced_table  # noqa: E402
 
 SUITES = ("playthrough", "runner")
+# not in "all": the SCED-only demo for tools/godot_table's review renders
+EXTRA_SUITES = ("demo",)
 
 PLAY_AREA_STAND_IN = """
 local enabled = false
@@ -70,7 +72,7 @@ def fake_table():
             save["SizeOverride"][o["GUID"]] = [3.6, 0.1, 3.6]
         if o["Nickname"] == "White Playermat":
             t.update(posX=-55, posY=1.45, posZ=16.1, rotY=270, scaleX=6.43, scaleY=1, scaleZ=6.43)
-            save["SizeOverride"][o["GUID"]] = [2.1, 0.1, 1.3]
+            save["SizeOverride"][o["GUID"]] = [4.2, 0.1, 2.0]
         save["ObjectStates"].append(o)
     # two loose SCED pieces that lie in its play area on a fresh table
     # (objects/LeadInvestigator.acaa93.json, objects/SCEDTour.0e5aa8.json)
@@ -145,7 +147,7 @@ def run(lua="lua5.2", suite="playthrough", fake=False, echo=False, verbose=False
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--lua", default="lua5.2")
-    ap.add_argument("--suite", choices=SUITES + ("all",), default="all")
+    ap.add_argument("--suite", choices=SUITES + EXTRA_SUITES + ("all",), default="all")
     ap.add_argument("--fake", action="store_true")
     ap.add_argument("--echo", action="store_true", help="print the table's chat as it happens")
     ap.add_argument("--full", action="store_true", help="print the whole log, not just the checks")

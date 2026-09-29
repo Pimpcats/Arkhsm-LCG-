@@ -1,25 +1,37 @@
-"""Draw Global's XML UI (TTS screen-space UI) over rendered shots (assistant tool).
+"""TTS XML UI layout and drawing (assistant tool): Global's screen UI over
+rendered shots, and (with object_ui.py) objects' world-space UI.
 
-TTS lays its XML UI out on a 1920x1080 reference canvas (scaled to the
-screen), with Unity UI rules. This draws a practical subset with Pillow:
-Defaults (by tag and class), active/visibility (as the host seated at White),
-rectAlignment + offsetXY + width/height, scale, position, Panel,
-Vertical/Horizontal/Grid/TableLayout (padding, spacing, preferred sizes,
-childForceExpand), Button (color, text, icon), Text, Image, InputField,
-Toggle, outline and color (#rgb[a], rgba(), named). Unknown elements are laid
-out like a Panel. Scroll views, masks, tooltips, animations and fonts other
-than a stand-in are not reproduced.
+TTS lays XML UI out with Unity UI rules; this reproduces a practical subset
+with Pillow:
+  * Defaults (by tag and by class), active / visibility (as the host seated
+    at White)
+  * rectAlignment, offsetXY, position, width/height (an element without a
+    size fills its parent), scale (cumulative: children are laid out in the
+    parent's scaled space), rotation about the UI normal in steps of 180
+    degrees (the subtree is point-reflected and its text/images turned)
+  * Panel, Vertical/HorizontalLayout (padding, spacing, preferred/min sizes,
+    childForceExpand), GridLayout (cellSize, spacing), TableLayout (rows,
+    cells, columnSpan), Vertical/HorizontalScrollView (content clipped to the
+    view, scrolled to the top)
+  * Button / Toggle / InputField / Dropdown (color or colors, text,
+    textColor(s), icon), Text (color, fontSize, alignment,
+    resizeTextForBestFit), Image (image asset, color, preserveAspect),
+    outline / outlineSize
+  * fonts: the save's own font asset bundles (fetch_assets extracts them);
+    DejaVu otherwise
+Screen UI uses a 1920x1080 reference canvas. Not reproduced: tooltips,
+animations, masks other than scroll views, rich text tags, per-letter
+effects.
 """
 import json
 import os
 import re
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFont
 
 REF_W, REF_H = 1920, 1080
 FONT_FILES = ["/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
               "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"]
-FONT_SERIF = ["/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf"]
 
 NAMED = {"white": (255, 255, 255, 255), "black": (0, 0, 0, 255), "grey": (128, 128, 128, 255),
          "gray": (128, 128, 128, 255), "red": (219, 26, 24, 255), "green": (49, 179, 43, 255),
@@ -27,11 +39,16 @@ NAMED = {"white": (255, 255, 255, 255), "black": (0, 0, 0, 255), "grey": (128, 1
          "purple": (160, 32, 240, 255), "pink": (245, 112, 206, 255), "teal": (33, 177, 155, 255),
          "brown": (113, 59, 23, 255), "clear": (0, 0, 0, 0)}
 
+LAYOUT_TAGS = ("panel", "verticallayout", "horizontallayout", "tablelayout", "gridlayout", "row", "cell",
+               "verticalscrollview", "horizontalscrollview", "mask")
+
 
 def parse_color(s, default=None):
     if s is None:
         return default
     s = str(s).strip()
+    if "|" in s:                      # "normal|highlighted|pressed|disabled"
+        s = s.split("|")[0].strip()
     if not s:
         return default
     lo = s.lower()
@@ -59,7 +76,7 @@ def parse_color(s, default=None):
         v = [float(x) for x in parts]
         if len(v) >= 3:
             a = v[3] if len(v) > 3 else 1.0
-            return (int(v[0] * 255), int(v[1] * 255), int(v[2] * 255), int(a * 255))
+            return (int(v[0] * 255), int(v[1] * 255), int(v[2] * 255), int(min(1.0, a) * 255))
     except ValueError:
         pass
     return default
@@ -70,8 +87,10 @@ def _nums(s, n, default=0.0):
         v = [float(x) for x in str(s).replace(",", " ").split()]
     except ValueError:
         v = []
+    if n == 4 and len(v) == 1:
+        v = v * 4
     while len(v) < n:
-        v.append(v[-1] if v and n == 4 and len(v) == 1 else default)
+        v.append(default)
     return v[:n]
 
 
@@ -88,14 +107,28 @@ def _truthy(v, default=True):
     return str(v).strip().lower() not in ("false", "0", "no")
 
 
+def _num(v, default=None):
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return default
+
+
+class Box:
+    __slots__ = ("tag", "rect", "el", "a", "k", "flip", "clip")
+
+    def __init__(self, tag, rect, el, a, k, flip=False, clip=None):
+        self.tag, self.rect, self.el, self.a, self.k, self.flip, self.clip = tag, rect, el, a, k, flip, clip
+
+
 class Layout:
-    def __init__(self, xml_table, assets, seat="White", admin=True):
+    def __init__(self, xml_table, assets=None, seat="White", admin=True):
         self.assets = assets or {}
         self.seat = seat
         self.admin = admin
         self.tag_defaults = {}
         self.class_defaults = {}
-        self.boxes = []          # drawn items: (kind, rect, el, attrs)
+        self.boxes = []
         self.roots = []
         for el in xml_table or []:
             if not isinstance(el, dict):
@@ -138,26 +171,30 @@ class Layout:
                 return False
         return True
 
-    # ---- layout --
+    # ------------------------------------------------------------ layout --
 
-    def place(self, el, parent_rect, forced=None):
-        """Place one element inside parent_rect (x0, y0, x1, y1 in canvas px,
-        y down). forced: a rect a layout group assigned to it."""
+    def place(self, el, parent_rect, k=1.0, forced=None, clip=None):
+        """Place el in parent_rect (canvas px, y down); k: the cumulative scale
+        of the parent's space. forced: the rect a layout group assigned."""
         a = self.attrs(el)
         if not self.visible(a):
             return
+        tag = (el.get("tag") or "").lower()
         if forced is not None:
             rect = forced
         else:
             px0, py0, px1, py1 = parent_rect
             pw, ph = px1 - px0, py1 - py0
-            w = float(a["width"]) if a.get("width") not in (None, "") else pw
-            h = float(a["height"]) if a.get("height") not in (None, "") else ph
+            w = _num(a.get("width"))
+            h = _num(a.get("height"))
+            w = w * k if w is not None else pw
+            h = h * k if h is not None else ph
             align = str(a.get("rectAlignment", "MiddleCenter"))
             ox, oy = _nums(a.get("offsetXY", "0 0"), 2)
             if a.get("position"):
                 pxy = _nums(a["position"], 3)
                 ox, oy = ox + pxy[0], oy + pxy[1]
+            ox, oy = ox * k, oy * k
             if "Left" in align:
                 x0 = px0
             elif "Right" in align:
@@ -173,14 +210,15 @@ class Layout:
             x0 += ox
             y0 -= oy
             rect = (x0, y0, x0 + w, y0 + h)
-        # scale about the element's pivot (its centre)
+        # own scale about the pivot (the anchored edge for aligned elements)
         sc = _nums(a.get("scale", "1 1 1"), 3, 1.0)
-        if sc[0] != 1 or sc[1] != 1:
+        s = sc[0] if sc[0] > 0 else 1.0
+        if abs(s - 1.0) > 1e-6 or abs(sc[1] - 1.0) > 1e-6:
+            sy = sc[1] if sc[1] > 0 else s
             cx, cy = (rect[0] + rect[2]) / 2, (rect[1] + rect[3]) / 2
-            hw, hh = (rect[2] - rect[0]) / 2 * sc[0], (rect[3] - rect[1]) / 2 * sc[1]
+            hw, hh = (rect[2] - rect[0]) / 2 * s, (rect[3] - rect[1]) / 2 * sy
             if forced is None:
                 align = str(a.get("rectAlignment", "MiddleCenter"))
-                # a scaled element keeps its anchored edge (Unity pivots follow the alignment)
                 if "Right" in align:
                     cx = rect[2] - hw
                 elif "Left" in align:
@@ -190,21 +228,49 @@ class Layout:
                 elif align.startswith("Upper"):
                     cy = rect[1] + hh
             rect = (cx - hw, cy - hh, cx + hw, cy + hh)
-        self.boxes.append((el.get("tag"), rect, el, a, sc[0]))
-        self.layout_children(el, a, rect, sc[0])
+        kk = k * s
+        start = len(self.boxes)
+        self.boxes.append(Box(el.get("tag"), rect, el, a, kk, False, clip))
+        child_clip = clip
+        if tag in ("verticalscrollview", "horizontalscrollview", "mask"):
+            child_clip = _intersect(clip, rect)
+        self.layout_children(el, a, rect, kk, child_clip)
+        # rotation about the UI normal: 180 degrees point-reflects the subtree
+        rot = _nums(a.get("rotation", "0 0 0"), 3)[2] % 360.0
+        if abs(rot - 180.0) < 1.0:
+            cx, cy = (rect[0] + rect[2]) / 2, (rect[1] + rect[3]) / 2
+            for b in self.boxes[start:]:
+                r = b.rect
+                b.rect = (2 * cx - r[2], 2 * cy - r[3], 2 * cx - r[0], 2 * cy - r[1])
+                b.flip = not b.flip
+                # clips from inside the turned subtree turn with it; an
+                # ancestor's (a scroll view's viewport) does not
+                if b.clip is not None and b.clip is not clip:
+                    c = b.clip
+                    b.clip = (2 * cx - c[2], 2 * cy - c[3], 2 * cx - c[0], 2 * cy - c[1])
 
-    def layout_children(self, el, a, rect, scale):
+    def layout_children(self, el, a, rect, k, clip):
         kids = [c for c in _children(el) if isinstance(c, dict) and c.get("tag")]
         kids = [c for c in kids if self.visible(self.attrs(c))]
         if not kids:
             return
         tag = (el.get("tag") or "").lower()
         pad = _nums(a.get("padding", "0 0 0 0"), 4)   # left right top bottom
-        sp = float(_nums(a.get("spacing", "0"), 1)[0])
-        s = scale
-        x0, y0, x1, y1 = rect[0] + pad[0] * s, rect[1] + pad[2] * s, rect[2] - pad[1] * s, rect[3] - pad[3] * s
-        if tag in ("verticallayout", "horizontallayout", "verticalscrollview", "horizontalscrollview"):
-            vertical = tag.startswith("vertical")
+        x0, y0, x1, y1 = rect[0] + pad[0] * k, rect[1] + pad[2] * k, rect[2] - pad[1] * k, rect[3] - pad[3] * k
+        if tag in ("verticalscrollview", "horizontalscrollview"):
+            # the content keeps its own size, anchored at the top (scrolled to the start)
+            for c in kids:
+                ca = self.attrs(c)
+                w = _num(ca.get("width"))
+                h = _num(ca.get("height"))
+                w = w * k if w is not None else (x1 - x0)
+                h = h * k if h is not None else (y1 - y0)
+                r = (x0, y0, x0 + w, y0 + h)
+                self.place(c, r, k, forced=r, clip=clip)
+            return
+        if tag in ("verticallayout", "horizontallayout"):
+            vertical = tag == "verticallayout"
+            sp = _num(str(a.get("spacing", "0")).split()[0], 0.0) * k
             total = (y1 - y0) if vertical else (x1 - x0)
             n = len(kids)
             prefs = []
@@ -212,58 +278,73 @@ class Layout:
                 ca = self.attrs(c)
                 key = "preferredHeight" if vertical else "preferredWidth"
                 alt = "minHeight" if vertical else "minWidth"
-                v = ca.get(key) or ca.get(alt)
-                prefs.append(float(v) * s if v not in (None, "") else None)
+                v = _num(ca.get(key), None)
+                if v is None:
+                    v = _num(ca.get(alt), None)
+                if v is None and not _truthy(a.get("childForceExpandHeight" if vertical else "childForceExpandWidth"), True):
+                    v = _num(ca.get("height" if vertical else "width"), None)
+                prefs.append(v * k if v is not None else None)
             fixed = sum(p for p in prefs if p is not None)
             free = [i for i, p in enumerate(prefs) if p is None]
-            avail = total - sp * s * (n - 1) - fixed
+            avail = total - sp * (n - 1) - fixed
             each = avail / len(free) if free else 0
-            expand = _truthy(a.get("childForceExpandHeight" if vertical else "childForceExpandWidth"), True)
             sizes = [p if p is not None else max(0, each) for p in prefs]
-            if expand and not free and fixed < total:
-                extra = (total - sp * s * (n - 1) - fixed) / n
+            expand = _truthy(a.get("childForceExpandHeight" if vertical else "childForceExpandWidth"), True)
+            if expand and not free and fixed + sp * (n - 1) < total:
+                extra = (total - sp * (n - 1) - fixed) / n
                 sizes = [z + extra for z in sizes]
             pos = y0 if vertical else x0
             for c, z in zip(kids, sizes):
                 r = (x0, pos, x1, pos + z) if vertical else (pos, y0, pos + z, y1)
-                self.place(c, r, forced=r)
-                pos += z + sp * s
+                self.place(c, r, k, forced=r, clip=clip)
+                pos += z + sp
         elif tag == "tablelayout":
+            sp = _num(str(a.get("cellSpacing", a.get("spacing", "0"))).split()[0], 0.0) * k
             rows = [c for c in kids if (c.get("tag") or "").lower() == "row"]
             n = max(1, len(rows))
             prefs = []
             for r_ in rows:
-                ra = self.attrs(r_)
-                v = ra.get("preferredHeight")
-                prefs.append(float(v) * s if v not in (None, "") else None)
+                v = _num(self.attrs(r_).get("preferredHeight"), None)
+                prefs.append(v * k if v is not None else None)
             fixed = sum(p for p in prefs if p is not None)
             free = [p for p in prefs if p is None]
-            each = ((y1 - y0) - fixed - sp * s * (n - 1)) / len(free) if free else 0
+            each = ((y1 - y0) - fixed - sp * (n - 1)) / len(free) if free else 0
+            cols = 0
+            for r_ in rows:
+                cols = max(cols, sum(int(_num(self.attrs(c).get("columnSpan"), 1) or 1)
+                                     for c in _children(r_) if isinstance(c, dict)))
+            cols = max(1, cols)
             pos = y0
             for r_, p in zip(rows, prefs):
                 z = p if p is not None else each
                 rr = (x0, pos, x1, pos + z)
                 ra = self.attrs(r_)
                 if self.visible(ra):
-                    self.boxes.append(("Row", rr, r_, ra, s))
-                    cells = [c for c in _children(r_) if isinstance(c, dict)]
-                    cw = (x1 - x0) / max(1, len(cells))
-                    for i, cell in enumerate(cells):
-                        cr = (x0 + i * cw, pos, x0 + (i + 1) * cw, pos + z)
-                        self.place(cell, cr, forced=cr)
-                pos += z + sp * s
+                    self.boxes.append(Box("Row", rr, r_, ra, k, False, clip))
+                    cw = ((x1 - x0) - sp * (cols - 1)) / cols
+                    ci = 0
+                    for cell in [c for c in _children(r_) if isinstance(c, dict)]:
+                        span = int(_num(self.attrs(cell).get("columnSpan"), 1) or 1)
+                        cr = (x0 + ci * (cw + sp), pos, x0 + ci * (cw + sp) + cw * span + sp * (span - 1), pos + z)
+                        self.place(cell, cr, k, forced=cr, clip=clip)
+                        ci += span
+                pos += z + sp
         elif tag == "gridlayout":
             cs = _nums(a.get("cellSize", "100 100"), 2)
-            cs = (cs[0] * s, cs[1] * s)
+            cs = (cs[0] * k, cs[1] * k)
             spx = _nums(a.get("spacing", "0 0"), 2)
-            cols = max(1, int(((x1 - x0) + spx[0] * s) // (cs[0] + spx[0] * s)))
+            spx = (spx[0] * k, spx[1] * k)
+            cols = max(1, int(((x1 - x0) + spx[0]) // max(1e-6, cs[0] + spx[0])))
+            fixed = str(a.get("constraint", "")).lower()
+            if fixed == "fixedcolumncount":
+                cols = int(_num(a.get("constraintCount"), cols) or cols)
             for i, c in enumerate(kids):
-                cx, cy = x0 + (i % cols) * (cs[0] + spx[0] * s), y0 + (i // cols) * (cs[1] + spx[1] * s)
+                cx, cy = x0 + (i % cols) * (cs[0] + spx[0]), y0 + (i // cols) * (cs[1] + spx[1])
                 r = (cx, cy, cx + cs[0], cy + cs[1])
-                self.place(c, r, forced=r)
+                self.place(c, r, k, forced=r, clip=clip)
         else:
             for c in kids:
-                self.place(c, (x0, y0, x1, y1))
+                self.place(c, (x0, y0, x1, y1), k, clip=clip)
 
     def run(self, width=REF_W, height=REF_H):
         for el in self.roots:
@@ -271,63 +352,136 @@ class Layout:
         return self.boxes
 
 
+def _intersect(a, b):
+    if a is None:
+        return b
+    if b is None:
+        return a
+    return (max(a[0], b[0]), max(a[1], b[1]), min(a[2], b[2]), min(a[3], b[3]))
+
+
+# -------------------------------------------------------------- drawing --
+
 _font_cache = {}
 
 
-def _font(size, serif=False):
-    size = max(6, int(round(size)))
-    k = (size, serif)
+def _font(size, name=None, fonts=None):
+    size = max(4, int(round(size)))
+    path = None
+    if name and fonts:
+        path = fonts.get(name) or fonts.get(str(name).split("/")[0])
+    k = (size, path)
     if k not in _font_cache:
         f = None
-        for p in (FONT_SERIF if serif else []) + FONT_FILES:
-            if os.path.isfile(p):
-                f = ImageFont.truetype(p, size)
-                break
+        for p in ([path] if path else []) + FONT_FILES:
+            if p and os.path.isfile(p):
+                try:
+                    f = ImageFont.truetype(p, size)
+                    break
+                except OSError:
+                    continue
         _font_cache[k] = f or ImageFont.load_default()
     return _font_cache[k]
 
 
-def _text(draw, rect, text, a, scale, default_size=14, default_color=(50, 50, 50, 255)):
-    if not text:
-        return
-    size = float(a.get("fontSize", default_size)) * scale
-    serif = "teutonic" in str(a.get("font", "")).lower()
-    font = _font(size, serif)
-    col = parse_color(a.get("textColor") or a.get("color") if (a.get("_is_text")) else a.get("textColor"),
-                      default_color)
-    align = str(a.get("alignment", "MiddleCenter"))
-    x0, y0, x1, y1 = rect
+def _text_img(text, a, k, rect, fonts, default_size=14, default_color=(50, 50, 50, 255), color_key="color"):
+    """RGBA image of the text laid out in rect's size (unrotated)."""
+    w, h = int(round(rect[2] - rect[0])), int(round(rect[3] - rect[1]))
+    if not text or w < 1 or h < 1:
+        return None
+    size = (_num(a.get("fontSize"), default_size) or default_size) * k
+    name = a.get("font")
     lines = str(text).split("\n")
+    if _truthy(a.get("resizeTextForBestFit"), False):
+        mx = (_num(a.get("resizeTextMaxSize"), 40) or 40) * k
+        mn = (_num(a.get("resizeTextMinSize"), 10) or 10) * k
+        size = mx
+        while size > mn:
+            font = _font(size, name, fonts)
+            tw = max(font.getlength(ln) for ln in lines)
+            if tw <= w * 0.98 and size * 1.15 * len(lines) <= h * 1.02:
+                break
+            size *= 0.9
+    if size < 1.5:
+        return None
+    font = _font(size, name, fonts)
+    col = parse_color(a.get(color_key), default_color)
+    if col is None or col[3] == 0:
+        return None
+    align = str(a.get("alignment") or a.get("textAlignment") or "MiddleCenter")
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
     lh = size * 1.15
     th = lh * len(lines)
     if align.startswith("Upper"):
-        ty = y0
+        ty = 0
     elif align.startswith("Lower"):
-        ty = y1 - th
+        ty = h - th
     else:
-        ty = (y0 + y1) / 2 - th / 2
+        ty = h / 2 - th / 2
     for ln in lines:
-        tw = draw.textlength(ln, font=font)
+        tw = font.getlength(ln)
         if "Left" in align:
-            tx = x0 + 2
+            tx = 2
         elif "Right" in align:
-            tx = x1 - tw - 2
+            tx = w - tw - 2
         else:
-            tx = (x0 + x1) / 2 - tw / 2
-        draw.text((tx, ty), ln, font=font, fill=col)
+            tx = w / 2 - tw / 2
+        d.text((tx, ty + (lh - size) / 2), ln, font=font, fill=col)
         ty += lh
+    return img
 
 
-def draw(img, boxes, asset_files, sx=1.0, sy=1.0):
-    """Draw laid-out boxes on a PIL image (RGBA overlay composited)."""
+def _paste(over, im, rect, flip, clip, sx, sy):
+    if im is None:
+        return
+    if flip:
+        im = im.rotate(180)
+    x0, y0 = int(round(rect[0] * sx)), int(round(rect[1] * sy))
+    if im.size != (max(1, int(round((rect[2] - rect[0]) * sx))), max(1, int(round((rect[3] - rect[1]) * sy)))):
+        im = im.resize((max(1, int(round((rect[2] - rect[0]) * sx))), max(1, int(round((rect[3] - rect[1]) * sy)))))
+    if clip is not None:
+        cx0, cy0, cx1, cy1 = (int(round(clip[0] * sx)), int(round(clip[1] * sy)),
+                              int(round(clip[2] * sx)), int(round(clip[3] * sy)))
+        l, t = max(0, cx0 - x0), max(0, cy0 - y0)
+        r, b = min(im.size[0], cx1 - x0), min(im.size[1], cy1 - y0)
+        if r <= l or b <= t:
+            return
+        im = im.crop((l, t, r, b))
+        x0, y0 = x0 + l, y0 + t
+    # alpha_composite needs the destination inside the canvas
+    W, H = over.size
+    l, t = max(0, -x0), max(0, -y0)
+    r, b = min(im.size[0], W - x0), min(im.size[1], H - y0)
+    if r <= l or b <= t:
+        return
+    if (l, t, r, b) != (0, 0, im.size[0], im.size[1]):
+        im = im.crop((l, t, r, b))
+    over.alpha_composite(im, (x0 + l, y0 + t))
+
+
+def _rect_img(size, fill, radius=0, outline=None, width=1):
+    w, h = size
+    im = Image.new("RGBA", (max(1, w), max(1, h)), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    if radius > 0:
+        d.rounded_rectangle((0, 0, w - 1, h - 1), radius=radius, fill=fill, outline=outline, width=width)
+    else:
+        d.rectangle((0, 0, w - 1, h - 1), fill=fill, outline=outline, width=width)
+    return im
+
+
+def draw(img, boxes, assets, sx=1.0, sy=1.0, fonts=None):
+    """Draw laid-out boxes on a PIL RGBA image; returns how many drew."""
     over = Image.new("RGBA", img.size, (0, 0, 0, 0))
-    d = ImageDraw.Draw(over)
     icon_cache = {}
 
     def icon(name):
+        if not name:
+            return None
         if name in icon_cache:
             return icon_cache[name]
-        f = asset_files.get(name)
+        f = assets.get(name)
         im = None
         if f and os.path.isfile(f):
             try:
@@ -338,65 +492,68 @@ def draw(img, boxes, asset_files, sx=1.0, sy=1.0):
         return im
 
     drawn = 0
-    for tag, rect, el, a, scale in boxes:
-        tag = (tag or "").lower()
-        r = (rect[0] * sx, rect[1] * sy, rect[2] * sx, rect[3] * sy)
-        if r[2] - r[0] < 1 or r[3] - r[1] < 1:
+    for b in boxes:
+        tag = (b.tag or "").lower()
+        a, r, k = b.a, b.rect, b.k
+        W, H = int(round((r[2] - r[0]) * sx)), int(round((r[3] - r[1]) * sy))
+        if W < 1 or H < 1:
             continue
-        ri = tuple(int(round(v)) for v in r)
-        if tag in ("panel", "verticallayout", "horizontallayout", "tablelayout", "gridlayout", "row", "cell",
-                   "verticalscrollview", "horizontalscrollview"):
+        if tag in LAYOUT_TAGS:
             c = parse_color(a.get("color"), None)
-            if tag in ("panel", "verticallayout", "horizontallayout", "tablelayout", "gridlayout") and c is None:
-                c = None
-            if c and c[3] > 0:
-                d.rectangle(ri, fill=c)
-                drawn += 1
             oc = parse_color(a.get("outline"), None)
-            if oc and oc[3] > 0:
-                ow = max(1, int(_nums(a.get("outlineSize", "1 1"), 2)[0] * scale * sx))
-                d.rectangle(ri, outline=oc, width=min(ow, 6))
+            if (c and c[3] > 0) or (oc and oc[3] > 0):
+                ow = max(1, int(_nums(a.get("outlineSize", "1 1"), 2)[0] * k * sx))
+                _paste(over, _rect_img((W, H), c if (c and c[3] > 0) else None, 0,
+                                       oc if (oc and oc[3] > 0) else None, min(ow, 8)), r, False, b.clip, sx, sy)
+                drawn += 1
             if a.get("image"):
                 im = icon(a["image"])
                 if im is not None:
-                    over.alpha_composite(im.resize((max(1, ri[2] - ri[0]), max(1, ri[3] - ri[1]))), (ri[0], ri[1]))
-        elif tag == "button" or tag == "toggle" or tag == "inputfield" or tag == "dropdown":
-            c = parse_color(a.get("color"), (255, 255, 255, 255) if tag != "toggle" else None)
+                    _paste(over, im, r, b.flip, b.clip, sx, sy)
+        elif tag in ("button", "toggle", "inputfield", "dropdown", "togglebutton"):
+            default = (255, 255, 255, 255) if tag != "toggle" else None
+            c = parse_color(a.get("colors") or a.get("color"), default)
             if c and c[3] > 0:
-                d.rounded_rectangle(ri, radius=max(1, int(min(ri[2] - ri[0], ri[3] - ri[1]) * 0.12)), fill=c)
+                _paste(over, _rect_img((W, H), c, max(1, int(min(W, H) * 0.1))), r, False, b.clip, sx, sy)
+                drawn += 1
             ic = a.get("icon") or a.get("image")
             if ic:
                 im = icon(ic)
                 if im is not None:
-                    w, h = ri[2] - ri[0], ri[3] - ri[1]
-                    ic_c = parse_color(a.get("iconColor"), (255, 255, 255, 255))
-                    im2 = im.resize((max(1, w), max(1, h)))
-                    if ic_c[:3] != (255, 255, 255):
-                        tint = Image.new("RGBA", im2.size, ic_c)
-                        im2 = Image.composite(tint, im2, im2.getchannel("A")) if False else im2
-                    over.alpha_composite(im2, (ri[0], ri[1]))
-            text = el.get("value") if isinstance(el.get("value"), str) else a.get("text", "")
-            a2 = dict(a)
-            a2.setdefault("fontSize", 14)
-            _text(d, r, text, a2, scale * sy, 14, parse_color(a.get("textColor"), (50, 50, 50, 255)))
-            drawn += 1
+                    _paste(over, im, r, b.flip, b.clip, sx, sy)
+                    drawn += 1
+            text = b.el.get("value") if isinstance(b.el.get("value"), str) else a.get("text", "")
+            if tag == "inputfield" and not text:
+                text = a.get("placeholder", "")
+            ck = "textColors" if a.get("textColors") and not a.get("textColor") else "textColor"
+            sr = (r[0] * sx, r[1] * sy, r[2] * sx, r[3] * sy)
+            ti = _text_img(text, a, k * sy, sr, fonts, 14, (50, 50, 50, 255), ck)
+            if ti is not None:
+                _paste(over, ti, r, b.flip, b.clip, sx, sy)
+                drawn += 1
         elif tag == "text":
-            text = el.get("value") if isinstance(el.get("value"), str) else a.get("text", "")
-            _text(d, r, text, dict(a, _is_text=True), scale * sy, 14,
-                  parse_color(a.get("color"), (50, 50, 50, 255)))
-            drawn += 1
+            text = b.el.get("value") if isinstance(b.el.get("value"), str) else a.get("text", "")
+            sr = (r[0] * sx, r[1] * sy, r[2] * sx, r[3] * sy)
+            ti = _text_img(text, a, k * sy, sr, fonts, 14, (50, 50, 50, 255), "color")
+            if ti is not None:
+                _paste(over, ti, r, b.flip, b.clip, sx, sy)
+                drawn += 1
         elif tag == "image":
             im = icon(a.get("image", ""))
             c = parse_color(a.get("color"), (255, 255, 255, 255))
             if im is not None:
-                im2 = im.resize((max(1, ri[2] - ri[0]), max(1, ri[3] - ri[1])))
-                over.alpha_composite(im2, (ri[0], ri[1]))
-            elif c[3] > 0:
-                d.rectangle(ri, fill=c)
-            drawn += 1
+                if c[:3] != (255, 255, 255) or c[3] < 255:
+                    im = ImageChops.multiply(im, Image.new("RGBA", im.size, c))
+                _paste(over, im, r, b.flip, b.clip, sx, sy)
+                drawn += 1
+            elif c[3] > 0 and not a.get("image"):
+                _paste(over, _rect_img((W, H), c), r, False, b.clip, sx, sy)
+                drawn += 1
     img.alpha_composite(over)
     return drawn
 
+
+# --------------------------------------------------------------- assets --
 
 def asset_files_for(save, man):
     out = {}
@@ -408,19 +565,24 @@ def asset_files_for(save, man):
     return out
 
 
-def overlay_shot(png_path, xml_table, assets, out_path=None):
+def font_files_for(man):
+    """asset name (and asset/font) -> font file, from fetch_assets' font extraction."""
+    return dict(man.get("fonts") or {})
+
+
+def overlay_shot(png_path, xml_table, assets, fonts=None, out_path=None):
     img = Image.open(png_path).convert("RGBA")
     lay = Layout(xml_table, assets)
     boxes = lay.run()
-    n = draw(img, boxes, assets, img.size[0] / REF_W, img.size[1] / REF_H)
+    n = draw(img, boxes, assets, img.size[0] / REF_W, img.size[1] / REF_H, fonts)
     img.convert("RGB").save(out_path or png_path)
     return n
 
 
-def overlay_job(job, save, man, cameras=("overview", "player")):
-    """Draw the Global UI on the job's screen-like shots (in place). Returns
-    the number of shots drawn on."""
+def overlay_job(job, save, man, cameras=("overview", "player", "seat")):
+    """Draw the Global UI on the job's screen-like shots (in place)."""
     assets = asset_files_for(save, man)
+    fonts = font_files_for(man)
     n = 0
     for r in job["renders"]:
         snap = json.load(open(r["snapshot"], encoding="utf-8"))
@@ -429,6 +591,6 @@ def overlay_job(job, save, man, cameras=("overview", "player")):
             continue
         for s in r["shots"]:
             if s["name"] in cameras and os.path.isfile(s["out"]):
-                overlay_shot(s["out"], xt, assets)
+                overlay_shot(s["out"], xt, assets, fonts)
                 n += 1
     return n

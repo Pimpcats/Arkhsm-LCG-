@@ -63,11 +63,16 @@ func _ready() -> void:
 		var snap := _read_json(r["snapshot"])
 		var tb := Time.get_ticks_msec()
 		_build(snap)
+		if r.has("ui") and FileAccess.file_exists(r["ui"]):
+			_object_ui(JSON.parse_string(FileAccess.get_file_as_string(r["ui"])))
 		var built_ms := Time.get_ticks_msec() - tb
+		var first := true
 		for shot in r.get("shots", []):
 			_set_camera(shot["camera"])
-			for _i in range(2):
+			# a fresh build needs a frame to upload its textures
+			for _i in range(2 if first else 1):
 				await RenderingServer.frame_post_draw
+			first = false
 			var img := vp.get_texture().get_image()
 			img.save_png(shot["out"])
 			_write_shot_info(shot)
@@ -96,7 +101,9 @@ func _setup_viewport() -> void:
 	vp.size = Vector2i(int(job.get("width", 1920)), int(job.get("height", 1080)))
 	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	vp.own_world_3d = true
-	vp.msaa_3d = Viewport.MSAA_4X
+	vp.msaa_3d = [Viewport.MSAA_DISABLED, Viewport.MSAA_2X, Viewport.MSAA_4X, Viewport.MSAA_8X][clampi(int(job.get("msaa", 2)), 0, 3)]
+	if int(job.get("msaa", 2)) == 0:
+		vp.screen_space_aa = Viewport.SCREEN_SPACE_AA_FXAA
 	vp.positional_shadow_atlas_size = 0
 	add_child(vp)
 	cam = Camera3D.new()
@@ -384,22 +391,37 @@ func _obj_mesh(file: String) -> ArrayMesh:
 
 # ---------------------------------------------------------------- building --
 
+var nodes_by_guid := {}
+
 func _build(snap: Dictionary) -> void:
 	for c in world.get_children():
 		world.remove_child(c)
 		c.queue_free()
 	button_nodes.clear()
 	pending.clear()
+	nodes_by_guid.clear()
+	var hands := {}          # color -> [card objects]
+	var zones := {}          # color -> hand zone object
 	for o in snap.get("objects", []):
 		if o.has("error"):
 			_stat("snapshot error")
+			continue
+		if o.get("hand_color", null) != null:
+			zones[o["hand_color"]] = o
+		if o.get("hand", null) != null:
+			if not hands.has(o["hand"]):
+				hands[o["hand"]] = []
+			hands[o["hand"]].append(o)
 			continue
 		var node := _object(o)
 		if node == null:
 			continue
 		node.name = "%s_%s" % [o.get("name", "?"), o.get("guid", "?")]
 		world.add_child(node)
+		nodes_by_guid[o.get("guid", "")] = node
 		_buttons(o, node)
+	for color in hands:
+		_hand(hands[color], zones.get(color, {}))
 	for p in pending:
 		world.add_child(p)
 	if opts.get("global_snap_points", false):
@@ -452,6 +474,62 @@ func _object(o: Dictionary) -> Node3D:
 			# markers keep one world size: placed in world space
 			pending.append(_snap_marker(root.transform * TTS.pos(sp[0]), Color(1, 0, 1)))
 	return root
+
+## Cards in a player's hand: TTS shows them standing in a row in the hand
+## zone, faces towards the seat, leaning back a little.
+func _hand(cards: Array, zone: Dictionary) -> void:
+	if zone.is_empty():
+		_stat("hand without a zone")
+		return
+	var zt := TTS.xform(zone["pos"], zone["rot"], [1, 1, 1])
+	var width := float(zone["scale"][0])
+	var fwd := (zt.basis * Vector3(0, 0, 1)).normalized()   # TTS local +z: towards the table
+	var right := fwd.cross(Vector3.UP).normalized()
+	var tilt := deg_to_rad(18.0)
+	var up := (Vector3.UP * cos(tilt) + fwd * sin(tilt)).normalized()
+	var normal := right.cross(up).normalized()
+	var n := cards.size()
+	var step: float = min(TTS.CARD_W * 1.05, width * 0.9 / max(1, n))
+	var base := zt.origin + Vector3(0, float(zone["scale"][1]) * -0.1, 0)
+	for i in range(n):
+		var o: Dictionary = cards[i]
+		var root := Node3D.new()
+		var sc := float(o["scale"][0])
+		var b := Basis(right, normal, -up) * Basis.from_scale(Vector3(sc, 1, sc))
+		root.transform = Transform3D(b, base + right * (step * (i - (n - 1) / 2.0)) - fwd * 0.02 * i)
+		var body := _card(o)
+		root.add_child(body)
+		world.add_child(root)
+		nodes_by_guid[o.get("guid", "")] = root
+
+## Objects' XML UI (tools/godot_table/object_ui.py drew each panel).
+func _object_ui(items) -> void:
+	if not (items is Array):
+		return
+	for it in items:
+		if not (it is Dictionary) or not it.has("file"):
+			continue
+		var node: Node3D = nodes_by_guid.get(it.get("guid", ""), null)
+		if node == null:
+			continue
+		var tex := _load_tex(it["file"], false)
+		if tex == null:
+			continue
+		var q := MeshInstance3D.new()
+		q.mesh = _quad(float(it["size"][0]), float(it["size"][1]))
+		var m := StandardMaterial3D.new()
+		m.albedo_texture = tex
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		m.cull_mode = BaseMaterial3D.CULL_DISABLED
+		m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR
+		m.render_priority = 1
+		q.material_override = m
+		q.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var c: Array = it["center"]
+		q.position = TTS.pos([c[0], float(c[1]) + 0.002, c[2]])
+		node.add_child(q)
+		_stat("object ui panels")
 
 func _snap_marker(p: Vector3, c: Color) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
@@ -857,7 +935,8 @@ func _button(o: Dictionary, node: Node3D, b: Dictionary, is_input: bool) -> void
 			label = v
 	var bn := Node3D.new()
 	# button space: object local, mirrored in x (TTS quirk), own rotation/scale
-	bn.transform = TTS.xform([float(p[0]) * TTS.BUTTON_X, p[1], p[2]], r, s)
+	bn.transform = TTS.xform([float(p[0]) * TTS.BUTTON_X, p[1], p[2]],
+		[r[0], float(r[1]) * TTS.BUTTON_X, float(r[2]) * TTS.BUTTON_X], s)
 	node.add_child(bn)
 	var visible := col.a > 0.01 and w > 0.0001 and h > 0.0001
 	if opts.get("debug_buttons", false):
