@@ -136,10 +136,19 @@ local function changeInvestigators(delta)
   end
 end
 
+-- guide: Echoes and Sleepwalking (an Echo that wakes is exhausted)
+local function announceWake(bandBefore)
+  if bandBefore == Constants.BAND_CALM and CampaignState.band() ~= Constants.BAND_CALM then
+    announce("Dissonance leaves Calm: every Echo wakes. Exhaust each Echo as it wakes (it readies in the upkeep phase).")
+  end
+end
+
 local function changeDissonance(delta)
   local before = Appointed.stage()
+  local bandBefore = CampaignState.band()
   if delta > 0 then
     local info = Dissonance.raise(delta, bag)
+    announceWake(bandBefore)
     if info.appointedStage > before then
       announce("The Appointed draws nearer: " .. Appointed.stageName() .. ".")
     end
@@ -152,11 +161,13 @@ end
 local function changeHour(delta)
   if delta > 0 then
     local before = CampaignState.getHour()
+    local bandBefore = CampaignState.band()
     Hourglass.advance(delta, playCtx())
     if CampaignState.getHour() > before and CampaignState.getHour() < 9 then
       -- guide: The Hourglass (the Hour turns); doom on the Hours is on the table
-      announce("The Hour turns: remove all doom in play; each investigator heals 1 horror.")
+      announce("The Hour turns: remove all doom in play; each investigator heals 1 damage and 1 horror.")
     end
+    announceWake(bandBefore)
   else
     Hourglass.rewind(-delta, playCtx())
   end
@@ -945,7 +956,9 @@ end
 function onObjectLeaveContainer(container, obj)
   guarded("reveal", function()
     if bag.onLeave(container, obj) then
+      local bandBefore = CampaignState.band()
       local info = Dissonance.onStaticRevealed(bag)
+      announceWake(bandBefore)
       announce(string.format("[static] revealed: Dissonance %d (%s).", info.value, info.band))
       if info.reachedReset then announceResetReached() end
       afterChange()
@@ -1137,7 +1150,9 @@ end
 
 function shRaiseDissonance()
   local before = Appointed.stage()
+  local bandBefore = CampaignState.band()
   local info = Dissonance.raise(1, bag)
+  announceWake(bandBefore)
   print("Dissonance -> " .. info.value .. " (" .. info.band .. ")" ..
     (info.appointedStage > before and ("  ** the Appointed advances to " .. Appointed.stageName() .. " **") or ""))
   if info.reachedReset then print("  Dissonance hit the reset threshold — the loop ends.") ; shReset() end
@@ -1281,8 +1296,8 @@ local function stillHourTestBody(T)
 
   local c3 = Constants.forCount(3)
   P, F = check("reset 24 / appointed 16 at 3p", c3.resetThreshold == 24 and c3.appointedThreshold == 16, P, F)
-  P, F = check("contest target 7 (6 solo)", c3.contestTarget == 7 and Constants.forCount(1).contestTarget == 6
-    and Constants.forCount(4).contestTarget == 7, P, F)
+  P, F = check("contest target 7 (6 solo, 8 at four)", c3.contestTarget == 7 and Constants.forCount(1).contestTarget == 6
+    and Constants.forCount(4).contestTarget == 8, P, F)
 
   local bag = { count = 0 }
   bag.setBaselineStatic = function(m) bag.count = m end

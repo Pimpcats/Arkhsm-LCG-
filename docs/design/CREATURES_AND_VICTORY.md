@@ -16,7 +16,7 @@ Spoilers: enemy names, stats and rules text. Design document, not player-facing.
 
 | Scenario | New monster | Stats (fight / health / evade, damage / horror) | What it does | Victory | Recurring |
 |---|---|---|---|---|---|
-| Prologue | The Minute Hand (×2) | 2 / 2 / 2, 1 / 1 | Hunter, prey most clues; not an Echo, so it acts in the Calm band | — | Congregation, Choir, Familiar Face, Lamplighter's Echo; the Minute Hand recurs every loop |
+| Prologue | The Minute Hand (×1) | 2 / 2 / 2, 1 / 1 | Hunter, prey most clues; not an Echo, so it acts in the Calm band | — | Congregation, Choir, Familiar Face, Lamplighter's Echo; the Minute Hand recurs every loop |
 | The Square (every loop) | The Band on the Steps | 2 / 2 / 3, 0 / 1 | Echo; while awake, no events at its location | — | shared cast |
 | The Lighthouse | Something on the Stair | 1 / 1 / 2, 0 / 1 | Echo on the Winding Stair | — | shared cast |
 | The Drowned Church | The Drowned Verger | 3 / 3 / 2, 1 / 1 | Aloof; engages whoever takes a clue at the Vestry | 1 | + a Drowned Choir; Part II: The Bell-Ringer Beneath (V2) |
@@ -24,7 +24,7 @@ Spoilers: enemy names, stats and rules text. Design document, not player-facing.
 | The Fairground | The Barker | 3 / 2 / 3, 1 / 1 | Hunter, prey most resources; costs 2 resources per attack | — | Part II: The One Who Rides Forever (V2) |
 | The Almanac House | The Compositor | 2 / 4 / 2, 1 / 1 | Retaliate; failed tests beside it raise Dissonance | 1 | — |
 | The Square, Part II | What Wears the Sheriff | 4 / 6 / 2, 2 / 1 | Named | 3 | — |
-| Finale | The Uninvited | 3 / 4 / 2, 1 / 2 | Hunter, prey most Memory; defeating it gains contest progress | — | The Appointed |
+| Finale | The Uninvited | 3 / 4 / 2, 1 / 1 | Hunter, prey most Memory; defeating it gains contest progress | — | The Appointed |
 
 ## Victory map
 

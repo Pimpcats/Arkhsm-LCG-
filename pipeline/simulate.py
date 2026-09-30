@@ -283,7 +283,7 @@ def simulate_stress(trials, investigators, rng, style, scar=0):
 # --------------------------------------------------------------------------- #
 # FINALE CONTEST — stage-aware model of "Contest the Crossing"
 # --------------------------------------------------------------------------- #
-# Target FINALE_CONTEST (7; 6 with one investigator). Each deep Knowledge entry
+# Target FINALE_CONTEST (7; 6 with one investigator, 8 with four). Each deep Knowledge entry
 # spent adds 1. Hold Back (wil/com 4) needs a ready Appointed and a success
 # exhausts it: one per round; a success adds 1 contest and pushes the Appointed
 # back ONE APPROACH STAGE. During the finale Hold Back does not rewind the
@@ -303,7 +303,7 @@ FINALE_CONTEST = 7
 
 def simulate_finale_staged(rng, investigators, deep_facts, holdback_p, trials,
                            start_hour=5.0, start_diss=12.0):
-    target = FINALE_CONTEST - 1 if investigators == 1 else FINALE_CONTEST
+    target = FINALE_CONTEST - 1 if investigators == 1 else (FINALE_CONTEST + 1 if investigators >= 4 else FINALE_CONTEST)
     reset_t = 8 * investigators if investigators != 1 else 16     # bands at 8 x investigators
     reached = 0
     for _ in range(trials):
@@ -499,7 +499,7 @@ def main():
                               for st in ("cautious", "typical", "greedy"))
             print("      {}      |  {}".format(scar, cells))
         print("\n  Finale contest reach % — STAGE-AWARE model (target {};".format(
-            FINALE_CONTEST - 1 if n == 1 else FINALE_CONTEST))
+            FINALE_CONTEST - 1 if n == 1 else (FINALE_CONTEST + 1 if n >= 4 else FINALE_CONTEST)))
         print("  Approach stages, Hour crossings and the Dissonance-reset loss modelled).")
         print("  The declared-at Dissonance dominates — declaring early in a calm loop vs")
         print("  at the Noticed band is the strategic choice the numbers reward:")

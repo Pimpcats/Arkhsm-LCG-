@@ -781,8 +781,9 @@ return function(R, T)
         en.wokeOnce = true
         for _, x in ipairs(R.investigatorsAt(G.locs[en.loc] or {})) do horror(x, 1, "The Drowned Choir wakes") end
       end
-      -- what-if: an Echo that wakes is exhausted (it engages no one until it readies)
-      if en.wasAsleep and not asleep and (R.WHATIF or {}).wakeExhausted and not en.dead then
+      -- an Echo that wakes is exhausted: it engages no one until it readies
+      -- (guide: Echoes and Sleepwalking; what-if wakeExhausted = false: the old rule)
+      if en.wasAsleep and not asleep and (R.WHATIF or {}).wakeExhausted ~= false and not en.dead then
         en.exhausted = true
         en.engaged = nil
         G.metrics.woke_exhausted = (G.metrics.woke_exhausted or 0) + 1

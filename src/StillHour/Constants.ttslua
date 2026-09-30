@@ -7,7 +7,7 @@
 --   reset threshold R  = 8 x investigators   (Dissonance hits R -> loop resets)
 --   Appointed Arrived  = floor(2R / 3)       (Noticed band; the Appointed arrives)
 --   Memory soft cap    = 6 x investigators
---   contest target     = 7, 6 solo            (finale; was 4 x investigators, CO-001)
+--   contest target     = 7, 6 solo, 8 at four (finale; was 4 x investigators, CO-001)
 --   scar cap           = 2 x investigators    (start-of-loop Dissonance ceiling; 4 solo)
 --   bands              = thirds of R: Calm / Glitch / Noticed
 --
@@ -42,7 +42,7 @@ Constants.HOLD_BACK_REWINDS_PER_LOOP = 3
 --- Compute the full constant set for a given investigator count.
 -- @param n integer number of investigators (>= 1)
 -- @return table of thresholds
-Constants.CONTEST_TARGET = 7          -- 6 with one investigator
+Constants.CONTEST_TARGET = 7          -- 6 with one investigator, 8 with four
 -- the solo rule (guide: Difficulty and Player Count): +3 maximum health and sanity
 -- (and a second wind once a loop, a table rule)
 Constants.SOLO_HEALTH_BONUS = 3
@@ -68,12 +68,13 @@ function Constants.forCount(n)
     resetThreshold = reset,
     appointedThreshold = appointed,
     memoryCap = 6 * n,
-    -- Finale contest target: 7, or 6 with one investigator (12-round loops) (tuning 2026-09,
+    -- Finale contest target: 7; 6 with one investigator, 8 with four (tuning 2026-09,
     -- docs/design/PLAYTEST_SIM.md). Its sources (deep entries, Hold Back
-    -- successes, the Uninvited) do not grow with the party, so the old
+    -- successes, the Uninvited) barely grow with the party, so the old
     -- 4 x investigators (CO-001) was out of reach at 3-4 investigators and
-    -- nearly automatic solo.
-    contestTarget = (n == 1) and 6 or 7,
+    -- nearly automatic solo; four investigators get more Hold Back tries a
+    -- round and reached 7 in 92% of engine finales (8: 76%).
+    contestTarget = (n == 1) and 6 or ((n >= 4) and 8 or 7),
     scarCap = scarCap,
     bandGlitchStart = math.floor(reset / 3),
     bandNoticedStart = math.floor(2 * reset / 3),

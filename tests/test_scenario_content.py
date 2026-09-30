@@ -141,9 +141,9 @@ class ScenarioContentTests(unittest.TestCase):
 
     def test_encounter_quantities(self):
         spine = collections.Counter(ASSIGN["prologue"]["encounter"])
-        self.assertEqual(sum(spine.values()), 22)
+        self.assertEqual(sum(spine.values()), 21)
         self.assertEqual(spine["sthr-losthour"], 3)
-        self.assertEqual(spine["sthr-minutehand"], 2)
+        self.assertEqual(spine["sthr-minutehand"], 1)     # one hunting Stray: two decided most late wipes
         for once in ("sthr-wrongturn", "sthr-rewind", "sthr-deadair", "sthr-loopnotices"):
             self.assertEqual(spine[once], 1, once)
         hub = collections.Counter(ASSIGN["district_square"]["encounter"])
@@ -278,13 +278,15 @@ class ContentGapTests(unittest.TestCase):
     def test_contest_target_matches_the_engine(self):
         lua = open(os.path.join(ROOT, "src", "StillHour", "Constants.ttslua"),
                    encoding="utf-8").read()
-        self.assertIn("contestTarget = (n == 1) and 6 or 7,", lua)
+        self.assertIn("contestTarget = (n == 1) and 6 or ((n >= 4) and 8 or 7),", lua)
         need = next(a for s in MANIFEST["scenarios"] if s["id"] == "finale"
                     for a in s["stacks"]["act_deck"]["cards"])["needs"]["contest"]
-        self.assertEqual((need["target"], need["target_one_investigator"]), (7, 6))
+        self.assertEqual((need["target"], need["target_one_investigator"], need["target_four_investigators"]),
+                         (7, 6, 8))
         act = CARDS["sthr-act-lasthour"]
         text = act["text"] + "\n" + act["back_text"]    # b side: the resolutions
-        for part in ("reaches 7 (6 with one investigator)", "Hold Back", "deep Knowledge entry", "Hour IX", "R1b"):
+        for part in ("reaches 7 (6 with one investigator, 8 with four)", "Hold Back", "deep Knowledge entry", "Hour IX",
+                     "R1b"):
             self.assertIn(part, text)
 
     def test_sced_draws_only_the_printed_lines(self):

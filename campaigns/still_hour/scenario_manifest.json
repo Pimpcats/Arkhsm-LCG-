@@ -382,7 +382,7 @@
             "name": "THE MINUTE HAND",
             "type": "Enemy",
             "traits": "Monster.",
-            "qty": 2
+            "qty": 1
           }
         ]
       }
@@ -1458,6 +1458,7 @@
                 "contest": {
                   "target": 7,
                   "target_one_investigator": 6,
+                  "target_four_investigators": 8,
                   "sources": [
                     "Hold Back success (repeatable)",
                     "deep fact spent (max 6)",

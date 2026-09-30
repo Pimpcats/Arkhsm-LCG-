@@ -54,7 +54,7 @@ return function(R, T)
   function R.stage() return R.state().stage end
   function R.knows(fact) return R.G.knowledge[fact] == true end
 
-  -- Contest the Crossing: progress 7, 6 with one investigator (Constants.contestTarget)
+  -- Contest the Crossing: progress 7, 6 with one investigator, 8 with four (Constants.contestTarget)
   R.CONTEST_TARGET = 7
   function R.consts()
     local n = R.G.n
@@ -64,7 +64,7 @@ return function(R, T)
     return { reset = reset, glitch = math.floor(reset / 3), noticed = noticed, scar = (n == 1) and 4 or 2 * n,
              contest = (R.WHATIF or {}).contestFlat
                or ((R.G.cfg.contestPerInv or R.CONTEST_PER_INV) and (R.G.cfg.contestPerInv or R.CONTEST_PER_INV) * n)
-               or (n == 1 and R.CONTEST_TARGET - 1 or R.CONTEST_TARGET) }
+               or (n == 1 and R.CONTEST_TARGET - 1 or (n >= 4 and R.CONTEST_TARGET + 1 or R.CONTEST_TARGET)) }
   end
 
   --- Raise (or lower) Dissonance through the Control's button.
@@ -177,7 +177,7 @@ return function(R, T)
         end
         R.G.metrics.hour_sources[why or "?"] = (R.G.metrics.hour_sources[why or "?"] or 0) + 1
         turned = true
-        -- the Hour turns: each investigator heals 1 horror (guide: The Hourglass)
+        -- the Hour turns: each investigator heals 1 damage and 1 horror (guide: The Hourglass)
         local heal = (R.WHATIF or {}).hourHeal or 1
         -- what-if: with one investigator, the Hour turning also heals damage
         local soloDmg = (R.G.n == 1) and ((R.WHATIF or {}).soloHourDamage or 0) or 0
@@ -187,8 +187,8 @@ return function(R, T)
             R.G.metrics.hour_heal = (R.G.metrics.hour_heal or 0) + 1
           end
           if soloDmg > 0 and x.damage > 0 then R.heal(x, math.min(soloDmg, x.damage), 0) end
-          -- what-if: the Hour turning also heals damage, at every player count
-          local hd = (R.WHATIF or {}).hourHealDamage or 0
+          -- ... and 1 damage (what-if hourHealDamage: another amount; 0 = the horror-only rule)
+          local hd = (R.WHATIF or {}).hourHealDamage or 1
           if hd > 0 and x.damage > 0 then R.heal(x, math.min(hd, x.damage), 0) end
         end
         R.log("Hourglass advances (%s): Hour %d -> %d", why or "?", before, now)
@@ -700,7 +700,7 @@ return function(R, T)
     if not L then return end
     local here = R.investigatorsAt(L)
     if #here == 0 then return end
-    if (R.WHATIF or {}).wakeExhausted then R.FX.checkWakes() end     -- what-if: a waking Echo is exhausted first
+    if (R.WHATIF or {}).wakeExhausted ~= false then R.FX.checkWakes() end     -- a waking Echo is exhausted first
     for _, en in ipairs(R.G.enemies) do
       if en.loc == L.guid and not en.engaged and not en.exhausted and not R.sleepwalking(en) and not R.isAloof(en) then
         en.engaged = R.prey(en, here)
