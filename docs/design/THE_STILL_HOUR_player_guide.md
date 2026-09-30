@@ -21,20 +21,20 @@ Read this section aloud before the Prologue. It explains what is new in The Stil
 
 **One night, played again and again.** Each play of the night is a **loop**. When a loop ends, the board is cleared and the night starts over at eleven o'clock in the Square. Three things always carry over: your **Campaign Log**, your shared **banked Memory** and each investigator's **Years**.
 
-**The Hourglass is the clock.** The agenda deck is nine **Hours**, Hour I to Hour IX. Hours I to VIII each have a doom threshold of 1, so from the second round on, one Hour passes in each Mythos phase. Many Hours do something the moment they arrive ("When reached"). When the Hourglass reaches **Hour IX**, the loop ends. A few effects skip Hours forward, and a few rewind them.
+**The Hourglass is the clock.** The agenda deck is nine **Hours**, Hour I to Hour IX. Hour I has a doom threshold of 3 and Hours II to VIII of 2. From the second round on, each Mythos phase places 1 doom on the current Hour, so an Hour passes about every second round and a loop runs about twelve rounds. Each time an Hour passes, each investigator heals 1 horror. Many Hours do something the moment they arrive ("When reached"). When the Hourglass reaches **Hour IX**, the loop ends. A few effects skip Hours forward, and a few rewind them.
 
-**The town is split into districts.** Ambergrove has six **districts**, each a small cluster of locations with its own box, act deck and encounter cards. The Square is always in play. At the start of each loop, you choose which other districts to visit and lay them out. **Travel costs time:** each round, the first crossing along each connection between two districts advances the Hourglass 1 Hour (the Lighthouse, at the end of the Sunken Road, is reached without one). In one loop you will usually finish work in two or three districts, so choosing where to go is your biggest decision.
+**The town is split into districts.** Ambergrove has six **districts**, each a small cluster of locations with its own box, act deck and encounter cards. The Square is always in play. At the start of each loop, you choose which other districts to visit and lay them out. **Travel costs time:** each round, the first crossing along each connection between two districts places 1 doom on the current Hour, half an Hour (the Lighthouse, at the end of the Sunken Road, is reached without one). In one loop you will usually finish work in two or three districts, so choosing where to go is your biggest decision.
 
 **Each district has its own act deck.** Its first act (a surface objective) can be completed from the start. Its second act (a deep objective) opens in **Part II** of the campaign. Several act decks can be in play at once, one per district.
 
-**Dissonance is how much the night has noticed you.** It is one shared number from 0 to 18, and it only changes when an effect says to raise or lower it. Its **band** sets how dangerous the night is:
+**Dissonance is how much the night has noticed you.** It is one shared number from 0 to 24, and it only changes when an effect says to raise or lower it. Its **band** sets how dangerous the night is:
 
 | Band | Dissonance | What changes |
 |---|---|---|
-| Calm | 0–5 | Echo enemies are Sleepwalking (harmless). |
-| Glitch | 6–11 | 1 Static token joins the chaos bag. Echoes wake. The Appointed draws closer. |
-| Noticed | 12–17 | 2 Static tokens. The Appointed arrives. Each investigator ages 1 extra Year at the reset. |
-| Reset | 18 | The loop ends at once. |
+| Calm | 0–7 | Echo enemies are Sleepwalking (harmless). |
+| Glitch | 8–15 | 1 Static token joins the chaos bag. Echoes wake. The Appointed draws closer. |
+| Noticed | 16–23 | 2 Static tokens. The Appointed arrives. Each investigator ages 1 extra Year at the reset. |
+| Reset | 24 | The loop ends at once. |
 
 Each loop starts Dissonance at the **scar**: the number of loops you have completed, up to 6. Later loops start closer to danger.
 
@@ -62,7 +62,7 @@ Each loop starts Dissonance at the **scar**: the number of loops you have comple
 
 These rules add to the Arkham Horror: The Card Game Rules Reference. Where they disagree with it, these rules win. Numbers are for **three investigators**; **Difficulty and Player Count** gives the other values, and the Control token applies them for you.
 
-**Loops.** A loop is one play of the night, from Loop Setup until the loop ends. A loop ends at once when the Hourglass reaches **Hour IX** (unless you begin the finale instead; see **The Last Hour**), when every investigator has been defeated, or when Dissonance reaches the **reset value** (18). For card text, "scenario" and "game" mean the current loop, and "interlude" means **Between Loops**. The Prologue is not a loop, but during the Prologue, "loop" on a card means the Prologue.
+**Loops.** A loop is one play of the night, from Loop Setup until the loop ends. A loop ends at once when the Hourglass reaches **Hour IX** (unless you begin the finale instead; see **The Last Hour**), when every investigator has been defeated, or when Dissonance reaches the **reset value** (24). For card text, "scenario" and "game" mean the current loop, and "interlude" means **Between Loops**. The Prologue is not a loop, but during the Prologue, "loop" on a card means the Prologue.
 
 **Limits.** "Limit once per loop" and "Max once per loop" last until the loop ends. As in the Rules Reference, a limit applies to each investigator separately unless it says "group limit", and "Max" counts every copy of that card, for all investigators.
 
@@ -75,22 +75,24 @@ These rules add to the Arkham Horror: The Card Game Rules Reference. Where they 
 - **Part II — The Shape of the Hour.** It begins at **Between Loops** step 5. Each district's second objective (act 2a) opens, the Appointed's Whispers join the encounter deck, and the Named enter the night.
 - **The Last Hour.** The finale, once your Campaign Log records **The Way the Night Breaks**.
 
-**The Hourglass.** The Hours (I–IX) are the agenda deck: "the Hourglass" is that deck, and the current Hour is the current agenda. Hours I–VIII have a doom threshold of 1, so from the second round on the Hourglass advances 1 Hour in each Mythos phase (step 1.3).
+**The Hourglass.** The Hours (I–IX) are the agenda deck: "the Hourglass" is that deck, and the current Hour is the current agenda. Hour I has a doom threshold of 3 and Hours II–VIII of 2. From the second round on, the Mythos phase places 1 doom on the current Hour (step 1.2) and then checks its threshold (step 1.3): when the doom on it meets its threshold, the Hourglass advances 1 Hour.
+- **Place X doom on the current Hour** (district crossings and small costs of time) puts doom tokens on the current Hour; its threshold is checked only in the Mythos phase, as in the Rules Reference. When the Hourglass advances or rewinds for any reason, remove all doom in play.
+- **The Hour turns.** Each time the Hourglass advances to a new Hour (by doom or by a Skip, not when an advance is cancelled), each investigator heals 1 horror.
 - **Advance the Hourglass by X Hours** (a **Skip**) advances the agenda at once, one Hour at a time: remove all doom in play, turn the current Hour over and read its back, then make the next Hour the current agenda. Set each advanced Hour aside, in order, beside the Hours deck instead of removing it from the game. The Hourglass never advances past Hour IX. Any effect that advances the Hourglass is a Skip.
 - **When reached.** Each time an Hour becomes the current agenda by advancing (by doom or by a Skip), resolve its "When reached" text. A Skip of several Hours resolves each Hour in order. If the Hourglass reaches an Hour again after a rewind, its text resolves again.
 - **Rewind the Hourglass by X Hours:** X times, put the current Hour back on top of the Hours deck and make the last Hour you set aside the current agenda again, with no doom on it. Rewinding never resolves "When reached" text and does not end effects an Hour already created. The Hourglass never rewinds before Hour I. An Hour removed from the Hours deck is stepped over in both directions.
 - **Cancel an advance:** cancel all of it, however many Hours it would advance. The current Hour stays current; remove all doom from it.
 
-**Districts and travel.** Ambergrove has six **districts**; each is a cluster of locations laid out from its own box, and every location belongs to one district. **The Square** is the hub. The district connections are The Square–The Nave, The Square–The Milestones, The Square–The Ticket Booth and The Square–The Reading Room. The first time in a round that any investigator moves along a given district connection (in either direction, by any means), advance the Hourglass by 1 Hour after that move. Other investigators may move along that same connection later in the round without advancing it. A move that is not along a connection, or that says it does not advance the Hourglass, costs no Hours, and it does not count as the first move along that connection this round. Enemy moves never cost Hours. You will reach only two or three districts before time runs out. Connection symbols match by shape **and** colour: some shapes repeat in other districts in a different colour, and a location connects only to locations whose symbol matches both. The district connections listed here, and The Turning–The Winding Stair, are the only connections between districts. The Turning–The Winding Stair is not a district connection: the Lighthouse stands at the end of the Sunken Road, and moving between them never advances the Hourglass.
+**Districts and travel.** Ambergrove has six **districts**; each is a cluster of locations laid out from its own box, and every location belongs to one district. **The Square** is the hub. The district connections are The Square–The Nave, The Square–The Milestones, The Square–The Ticket Booth and The Square–The Reading Room. The first time in a round that any investigator moves along a given district connection (in either direction, by any means), place 1 doom on the current Hour after that move. Other investigators may move along that same connection later in the round without placing more. A move that is not along a connection, or that says it does not place doom, costs no time, and it does not count as the first move along that connection this round. Enemy moves never cost time. You will reach only two or three districts before time runs out. Connection symbols match by shape **and** colour: some shapes repeat in other districts in a different colour, and a location connects only to locations whose symbol matches both. The district connections listed here, and The Turning–The Winding Stair, are the only connections between districts. The Turning–The Winding Stair is not a district connection: the Lighthouse stands at the end of the Sunken Road, and moving between them never places doom.
 
-**Dissonance.** A shared value from 0 to the reset value (18). Apart from Loop Setup, where it is set to the scar, it changes only when an effect says to **raise** or **lower** it. Dissonance sets the band:
+**Dissonance.** A shared value from 0 to the reset value (24). Apart from Loop Setup, where it is set to the scar, it changes only when an effect says to **raise** or **lower** it. Dissonance sets the band:
 
 | Band | Dissonance | While in this band | On entering this band |
 |---|---|---|---|
-| Calm | 0–5 | No band [static] tokens. Echoes are Sleepwalking. | — |
-| Glitch | 6–11 | 1 band [static] token in the chaos bag. | The Appointed's Approach advances to at least Sensed. |
-| Noticed | 12–17 | 2 band [static] tokens in the chaos bag. | The Appointed's Approach advances to Arrived. |
-| Reset | 18 | — | The loop ends at once, even during a skill test or the finale. |
+| Calm | 0–7 | No band [static] tokens. Echoes are Sleepwalking. | — |
+| Glitch | 8–15 | 1 band [static] token in the chaos bag. | The Appointed's Approach advances to at least Sensed. |
+| Noticed | 16–23 | 2 band [static] tokens in the chaos bag. | The Appointed's Approach advances to Arrived. |
+| Reset | 24 | — | The loop ends at once, even during a skill test or the finale. |
 
 A band change takes effect at once. [static] tokens added by cards are in addition to the band's. Lowering Dissonance never pushes the Approach back. Setting Dissonance at Loop Setup does not count as entering a band.
 
@@ -111,7 +113,7 @@ A band change takes effect at once. [static] tokens added by cards are in additi
 - **Threads.** The Campaign Log also tracks **Seraphine's thread**: unheard, suspected or known. It starts unheard; cards tell you when to mark it. It has no rules effect; it changes one line of the epilogue.
 - **Assembled entries.** One entry is assembled from others rather than found: the act that can first complete it says what it needs. From then on, each time you record a deep entry, check it again. The Control token does this for you and tells you when to record it.
 
-**Years.** At each reset, each investigator gains **Years**: 1 always; 1 more if they were defeated during the loop; 1 more if the loop ended in the Noticed band or higher (12+); and 1 more if they **leaned on the loop** (during the loop, they paid "raise Dissonance" as a cost 3 or more times, or removed 4 or more Memory from their own cards to pay for, or by choosing to on, their own cards and abilities, such as Foreknowledge). Years that a card or resolution gives (A Year in a Night, the Hall of Mirrors, the ninth line, the name) are recorded when gained with the **Years pending** button on that investigator's card, and added at Between Loops step 1 with the reset Years. The Records Office can take back one Year a card gave during the current loop. Years set an investigator's age bracket, and a higher bracket replaces the lower. Bracket changes apply only Between Loops. Skills and maximum health and sanity never drop below 1.
+**Years.** At each reset, each investigator gains **Years**: 1 always; 1 more if they were defeated during the loop; 1 more if the loop ended in the Noticed band or higher (16+); and 1 more if they **leaned on the loop** (during the loop, they paid "raise Dissonance" as a cost 3 or more times, or removed 4 or more Memory from their own cards to pay for, or by choosing to on, their own cards and abilities, such as Foreknowledge). Years that a card or resolution gives (A Year in a Night, the Hall of Mirrors, the ninth line, the name) are recorded when gained with the **Years pending** button on that investigator's card, and added at Between Loops step 1 with the reset Years. The Records Office can take back one Year a card gave during the current loop. Years set an investigator's age bracket, and a higher bracket replaces the lower. Bracket changes apply only Between Loops. Skills and maximum health and sanity never drop below 1.
 - **Prime (0–4 Years):** no change.
 - **Weathered (5–9):** the first time an investigator reaches Weathered or a later bracket, choose and record −1 [com] or −1 [agi], and +1 [wil] or +1 [int]. These choices are locked.
 - **Elder (10–14):** the Weathered changes, +1 more to the same mental skill, −1 maximum health, and they begin each loop with 1 Memory on their investigator card.
@@ -125,7 +127,7 @@ For finale conditions and the epilogue, an investigator's bracket is set by all 
 **Closed and impassable locations.** A **closed** location is unrevealed, has no clues and is not connected to anything: investigators and enemies cannot move into it, and nothing spawns or manifests there. When it opens, it is revealed: place its clues on it. (The Rules Reference's "seal" is only for chaos tokens; the location called The Sealed Study keeps its name.) Investigators and enemies cannot move into an **impassable** location; anything already there stays unless it is told to move.
 
 **The Control token.** The Control token keeps the campaign's books. Use it like this, and do not also apply by hand what it applies for you:
-- **Hour.** Each time the Hourglass advances or rewinds, move the Hours deck to match and click **Hour** once per Hour (left-click advance, right-click rewind). On an advance it applies Hour III's base +1 Dissonance, the Approach at Hours V, VII and VIII, Hour VI's [static] token and Hour VIII's +2 Dissonance. Resolve the rest yourself: Hour II's encounter draws, Hour III's extra +1 at a Church location (click Dissonance), Hour IV, Hour VII's exhaust, Hour VIII's +1 fight and Hour IX. (Exception: **Hold Back** on the Appointed's card rewinds the Hour counter itself; move the Hours deck, but do not also right-click **Hour**.)
+- **Hour.** Put doom tokens on the current Hour as the Mythos phase and cards place them (the Control token does not count doom). Each time the Hourglass advances or rewinds, remove all doom in play, move the Hours deck to match and click **Hour** once per Hour (left-click advance, right-click rewind). On an advance it applies Hour III's base +1 Dissonance, the Approach at Hours V, VII and VIII, Hour VI's [static] token and Hour VIII's +2 Dissonance. Resolve the rest yourself: each investigator's 1 horror healed when an Hour passes, Hour II's encounter draws, Hour III's extra +1 at a Church location (click Dissonance), Hour IV, Hour VII's exhaust, Hour VIII's +1 fight and Hour IX. (Exception: **Hold Back** on the Appointed's card rewinds the Hour counter itself; move the Hours deck, but do not also right-click **Hour**.)
 - **Cancelled effects.** If an effect the Control token already applied is cancelled (for example an Hour's "When reached" text cancelled by It Means 'Wait'), undo it with the matching button: right-click **Dissonance** for Dissonance it added, right-click **[static]** for a Static token, and click **Appointed** back if the Approach moved. If Hour VI is cancelled, click **Undo Hour VI** instead (it appears once Hour VI has resolved this loop): it takes back Hour VI's change to the chaos bag, and Hour VI resolves again if it is reached again this loop.
 - **Dissonance.** Each time a card or ability raises or lowers Dissonance, click **Dissonance** (left-click +1, right-click −1). It adds and removes the band's [static] tokens and advances the Approach when a band is entered. Exception: when a [static] token is drawn from the chaos bag, the Control token raises Dissonance by 1 itself; do not click for it. If that token is then canceled, or was revealed outside a skill test (for example by Marked Deck, which reveals without resolving), right-click **Dissonance** once. When a sealed [static] token is later treated as the revealed token (Marked Deck), left-click **Dissonance** yourself.
 - **Temporary Static tokens.** When a card adds a Static token for a limited time, left-click **[static]**; when that time ends, or the Press removes it, right-click it. (Hour VI's change is applied by **Hour**; see **Cancelled effects** to undo it.)
@@ -163,7 +165,7 @@ For finale conditions and the epilogue, an investigator's bracket is set by all 
 
 ## THE AMBERGROVE MAP
 
-A small inland town under a starless, snagged sky. **The Square** is the hub. The first move each round along a connection between two districts advances the Hourglass by 1 Hour (see **Districts and travel**).
+A small inland town under a starless, snagged sky. **The Square** is the hub. The first move each round along a connection between two districts places 1 doom on the current Hour (see **Districts and travel**).
 
 ```
                  THE LIGHTHOUSE
@@ -176,7 +178,7 @@ A small inland town under a starless, snagged sky. **The Square** is the hub. Th
 ```
 
 - **The Square** connects to the Fairground, the Drowned Church, the Almanac House and the Sunken Road.
-- **The Sunken Road** connects the Square to the **Lighthouse**. The road runs on into the Lighthouse: moving between the Turning and the Winding Stair costs no Hour.
+- **The Sunken Road** connects the Square to the **Lighthouse**. The road runs on into the Lighthouse: moving between the Turning and the Winding Stair costs no time.
 - Each district is a cluster of 2–4 locations. They enter play unrevealed unless their entry says otherwise. As the Rules Reference describes, when an investigator enters an unrevealed location, it is revealed: flip it, and SCED places its clues.
 
 ---
@@ -202,7 +204,7 @@ A small inland town under a starless, snagged sky. **The Square** is the hub. Th
 3. The Control token starts a new campaign in the Prologue, at **Hour I** with Dissonance **0**. The chaos bag is in the Calm band.
 4. Each investigator takes 5 resources and draws an opening hand of 5 cards (mulligan as normal). You are ready to begin.
 
-There is no Appointed in the Prologue, and no Years are gained in it: ignore any text that refers to the Appointed, and A Year in a Night gives no Year. The Prologue ends when The First Hour advances, or the way a loop does: at Hour IX, when every investigator is defeated, or when Dissonance reaches the reset value. On its cards, "game" and "loop" mean the Prologue. Its locations belong to no district, so moving between them never advances the Hourglass.
+There is no Appointed in the Prologue, and no Years are gained in it: ignore any text that refers to the Appointed, and A Year in a Night gives no Year. The Prologue ends when The First Hour advances, or the way a loop does: at Hour IX, when every investigator is defeated, or when Dissonance reaches the reset value. On its cards, "game" and "loop" mean the Prologue. Its locations belong to no district, so moving between them never places doom.
 
 > **Note.** The Prologue teaches the loop. It cannot be lost: however it ends, the night resets, and how well you did decides one small reward.
 
@@ -257,7 +259,7 @@ Play every loop from here on the same way: set it up, play the night across the 
 6. **Part II onward:** shuffle the Appointed's Whispers into the encounter deck.
 7. Put **The Appointed's Approach** into play faceup beside the Hours deck; its text is active for the whole loop. The Appointed begins **Unseen**, set aside. Each investigator begins at **The Square**. Each "At the start of each loop" ability (Anchor Point) resolves now.
 8. Read The Square's entry in **The Districts** now. The first time you enter any other district in this loop, read its entry.
-9. If your Campaign Log records *You refused the ticket*: the first time a **Lost Hour** is drawn this loop, cancel its revelation effect. The fair's clock stops for you, once. If it records *The true page reached the Press*: group limit once per loop, moving between The Square and The Reading Room does not advance the Hourglass.
+9. If your Campaign Log records *You refused the ticket*: the first time a **Lost Hour** is drawn this loop, cancel its revelation effect. The fair's clock stops for you, once. If it records *The true page reached the Press*: group limit once per loop, moving between The Square and The Reading Room does not place doom.
 
 > Salt on your tongue. Lanterns across the Square. A band tuning up. It is eleven o'clock, and you have been here before.
 
@@ -344,7 +346,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > Far below, on the Sunken Road, the walkers have stopped. Every hood is turned toward the tower, waiting, as though someone once promised them a light.
 
-**When you Place this box:** The Lighthouse is reached only through the Sunken Road (The Turning connects to The Winding Stair; moving between them does not advance the Hourglass), so Place the Sunken Road's box too. The Lantern Room (revealed), The Winding Stair and The Keeper's Quarters join the map. Shuffle its encounter set (The Dark That Waits, Something on the Stair) into the encounter deck. Its act deck: **Light the Lamp** (1a) and **The Ninth Death** (2a).
+**When you Place this box:** The Lighthouse is reached only through the Sunken Road (The Turning connects to The Winding Stair; moving between them places no doom), so Place the Sunken Road's box too. The Lantern Room (revealed), The Winding Stair and The Keeper's Quarters join the map. Shuffle its encounter set (The Dark That Waits, Something on the Stair) into the encounter deck. Its act deck: **Light the Lamp** (1a) and **The Ninth Death** (2a).
 
 **Do not read until the loop ends.**
 
@@ -667,9 +669,9 @@ Then read **Epilogue — What the Years Took.**
 
 ## DIFFICULTY AND PLAYER COUNT
 
-- **3 investigators:** every value as printed (Dissonance bands at 6 / 12, reset at 18, Memory cap 18, scar cap 6).
-- **2 or 4 investigators:** the reset comes at **6 × investigators**; the Glitch band starts at one-third of the reset and the Noticed band at two-thirds (**4 × investigators**). The Memory cap is **6 × investigators**, and the scar cap is one-third of the reset.
-- **1 investigator:** use the two-investigator bands: the reset comes at **12**, the Noticed band at **8** and Glitch at **4**; the scar cap is **4**. The Memory cap is **6**. Your investigator gets **+3 maximum health** and **+3 maximum sanity** (the Control token shows the new maximums on their card).
+- **3 investigators:** every value as printed (Dissonance bands at 8 / 16, reset at 24, Memory cap 18, scar cap 6).
+- **2 or 4 investigators:** the reset comes at **8 × investigators**; the Glitch band starts at one-third of the reset and the Noticed band at two-thirds (rounded down: 5 / 10 at two, 10 / 21 at four). The Memory cap is **6 × investigators**, and the scar cap is **2 × investigators**.
+- **1 investigator:** use the two-investigator bands: the reset comes at **16**, the Noticed band at **10** and Glitch at **5**; the scar cap is **4**. The Memory cap is **6**. Your investigator gets **+3 maximum health** and **+3 maximum sanity** (the Control token shows the new maximums on their card).
 - The finale's contest is **7** at 1 to 3 investigators and **8** at 4: its sources do not grow with the party.
 - Values given "per investigator" (the finale's Memory thresholds) scale on their own.
 - The Control token applies all of these for you.
