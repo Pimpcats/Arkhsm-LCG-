@@ -75,7 +75,7 @@ check("scar cap = 6", c3.scarCap == 6)
 check("band of 5 is Calm", Constants.bandFor(5, 3) == "Calm")
 check("band of 6 is Glitch", Constants.bandFor(6, 3) == "Glitch")
 check("band of 12 is Noticed", Constants.bandFor(12, 3) == "Noticed")
-check("solo override 6/9", Constants.forCount(1).resetThreshold == 9 and Constants.forCount(1).appointedThreshold == 6)
+check("solo override 8/12", Constants.forCount(1).resetThreshold == 12 and Constants.forCount(1).appointedThreshold == 8)
 
 print("== P3: Dissonance bands drive the [static] baseline ==")
 CampaignState.init(3)

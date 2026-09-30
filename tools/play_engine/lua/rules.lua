@@ -59,7 +59,7 @@ return function(R, T)
   function R.consts()
     local n = R.G.n
     local reset, noticed = 6 * n, 4 * n
-    if n == 1 then reset, noticed = 9, 6 end
+    if n == 1 then reset, noticed = 12, 8 end   -- solo: the two-investigator bands
     return { reset = reset, glitch = math.floor(reset / 3), noticed = noticed,
              contest = (R.WHATIF or {}).contestFlat
                or ((R.G.cfg.contestPerInv or R.CONTEST_PER_INV) and (R.G.cfg.contestPerInv or R.CONTEST_PER_INV) * n)
