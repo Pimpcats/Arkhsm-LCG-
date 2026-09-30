@@ -151,7 +151,12 @@ end
 
 local function changeHour(delta)
   if delta > 0 then
+    local before = CampaignState.getHour()
     Hourglass.advance(delta, playCtx())
+    if CampaignState.getHour() > before and CampaignState.getHour() < 9 then
+      -- guide: The Hourglass (the Hour turns); doom on the Hours is on the table
+      announce("The Hour turns: remove all doom in play; each investigator heals 1 horror.")
+    end
   else
     Hourglass.rewind(-delta, playCtx())
   end
