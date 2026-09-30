@@ -321,3 +321,33 @@ Still outside the targets: the finale is at the top of the band at 3p
 keep 4–5 Hours to spare (raising both breaks the three-district loop), and
 Part II deep objectives are quick except the Lighthouse. Simulation only; not a
 playtest.
+
+## Twelve-round loops (2026-09-30)
+
+Owner requirement: a loop plays like an official scenario, about 3 hours at
+three investigators (11-13 rounds), the Prologue 6-8 rounds; the campaign
+keeps ~2 objectives a loop and a finale unlock around loop 6. Levers: Hours
+of 2 doom (Hour I 3); crossings and small time costs place 1 doom instead of
+a whole Hour; Lost Hour a flat 1-Hour Skip; bands at 8 × investigators (reset
+24 at 3p) with the scar cap kept at 2 × investigators; a new rule, "the Hour
+turns: each investigator heals 1 horror"; Tablet and Cultist softened on the
+Standard side; A Year in a Night and What You've Forgotten halved; the Wheel
+once per Hourglass advance; What Wears the Sheriff no longer a Hunter; act
+costs about 2.5× (surface 5 [perinv], deep 5, Lamp / Wheel / Ninth Death 3,
+Walk It Backward 2 clues a step, The First Hour from Hour V); the finale runs
+from Hour V, Hold Back gives no Hours back there, contest 7 (6 solo);
+Knowledge pays 2 per investigator for a deep entry and nothing for a surface
+entry.
+
+Engine, 3 investigators, Standard (before → after): loop rounds 4.3-5.9 →
+10.5-11.9 (Square alone 16.1), about 150-165 minutes at 14 a round; Prologue
+2.9 → 5.9 rounds, 97%; district objectives 70-100% → 87-100% with 4.1-4.9
+Hours (5.2-6.8 rounds) to spare (Road II 7.1); any defeat 10-70% → 23-53%,
+wipes 0-7% → 0-7% (Square alone 17%); resets 0% → 0-3% (Square alone
+10-13%); three-district loop, two objectives 47% → 73% (50-73% over three
+suites); finale contest 53% → 63% (1p 67%, 2p 53%, 4p 67%). Reshuffles
+0.4-1.0 a loop. Memory (`simulate_tempo.py --memory`): 34-45 per investigator
+before the finale loop at 3p. Finale unlock (tempo, first-time play, 3p):
+loop 5-6 (4-8). Years per investigator per loop 1.3-1.9. `simulate.py`: 0
+failed assertions (its greedy style, leaning every round, now resets 76% of
+fresh loops; cautious and typical 0%). Simulation only; not a playtest.

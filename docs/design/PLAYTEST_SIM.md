@@ -178,6 +178,75 @@ another (55% pooled); with the Bell-Ringer's shorter reach it is 40–43%. Memor
 1.1–1.4 (finale 2.3 → 1.5); the tempo model's first-time finale unlock at 3p
 moves from loop 6 to loop 7 (5 for a finale-first party).
 
+## Twelve-round loops (2026-09-30)
+
+The owner wants each loop to take about three hours at three investigators,
+like an official scenario: about 12 rounds (the Prologue 6-8). The loop was
+lengthened and everything that scales with it re-tuned. Changes (card ids to
+re-render: `sthr-hour-1` to `sthr-hour-8`, `sthr-loc-hubsquare`,
+`sthr-thirteen`, `sthr-bridgeremembers`, `sthr-wheelsturn`,
+`sthr-milecounter`, `sthr-losthour`, `sthr-yearinanight`, `sthr-forgotten`,
+`sthr-wrongturn`, `sthr-longwayround`, `sthr-scn-stillhour`, `sthr-loc-wheel`,
+`sthr-wearssheriff`, `sthr-appointed`, every act but The Ninth Death's and
+Who Walks Beside You's text is re-costed; see BALANCE.md):
+
+| lever | before | after |
+|---|---|---|
+| Hours | doom threshold 1 | Hour I **3**, Hours II–VIII **2** (an Hour every second Mythos phase) |
+| District crossings, Thirteen, The Bridge Remembers, The Wheel's Turn, The Mile-Counter, the Elder Thing token | advance the Hourglass by 1 Hour | **place 1 doom on the current Hour** (checked in the Mythos phase) |
+| Lost Hour | 1 Hour (2 from Hour VI) | a 1-Hour Skip at any Hour |
+| The Hour turns (new rule) | – | each time the Hourglass advances, each investigator heals 1 horror |
+| Dissonance | reset 6 × investigators (18), bands 6 / 12 | reset **8 ×** investigators (24), bands 8 / 16; scar cap 2 × investigators (6 at 3p); solo 16 / 10 / 5 |
+| Tokens (Standard side) | Tablet from Sensed; Cultist on any fail | Tablet horror from **Emerging**; Cultist raises Dissonance on a fail **by 2 or more** |
+| A Year in a Night / What You've Forgotten | horror per point failed, Year on any fail / remove 2 Memory | 1 horror, a Year only on a fail by 2+ / remove 1 Memory |
+| The Wheel | 1 horror at the end of the round | 1 horror after the Hourglass advances |
+| What Wears the Sheriff | Hunter | keeps the Records Office |
+| The First Hour | 3 [perinv] at the Steps | **Hour V or later**, 4 [perinv] |
+| Surface acts | 5 / 2 / 3 / 1 / 1 [perinv] (Square / Church / Almanac / Wheel / Lamp) | 5 / 5 / 5 / 3 / 3; Walk It Backward 2 clues at each step |
+| Deep acts | 2 [perinv] (Vote, Crypt, Name, Bargain), 1 (Ninth Death) | 5 [perinv]; Ninth Death 3 (the district's clues pay; manifest updated) |
+| Finale | contest 5 (6 at four), Hold Back rewinds | contest **7 (6 solo)**; a finale begun before Hour V skips to Hour V; Hold Back does not rewind during the finale |
+| Knowledge pays Memory | surface 1, deep 3 per investigator | surface 0, deep **2** |
+
+The Control token applies the bands, the contest target, the finale's Hold
+Back and the solo maxima, and reminds the table when the Hour turns; doom on
+the Hours is on the table (the engine tracks it). `simulate.py` and
+`simulate_tempo.py` model the new clock (half an Hour a round, crossings and
+small costs as doom).
+
+### Results (final suite, Standard; 30 runs at 3p, 15 at 1p/4p)
+
+Minutes use 14 a round at 3p (first-time group), 10 solo, 17 at four.
+
+| 3 investigators | rounds (min) | objective, spare Hours/rounds | any defeat | wiped | Dissonance max / resets |
+|---|---|---|---|---|---|
+| Prologue | 5.9 (83) | 97% | 0% | 0% | 7.8 / 0% |
+| Square I / II | 16.1 / 11.7 (226 / 163) | 100 / 93%, 6.3H/12.5R / 4.9H/6.3R | 53 / 50% | 17 / 0% | 13.6 / 13%; 13.8 / 10% |
+| Church I / II | 11.5 / 10.7 | 100 / 93%, 4.7/6.7 · 4.1/5.2 | 33 / 30% | 0 / 0% | 10.6 / 3%; 12.0 / 3% |
+| Road I / II | 11.5 / 10.9 | 97 / 100%, 4.8/6.8 · 7.1/8.6 | 43 / 37% | 3 / 0% | 8.6 / 0%; 11.0 / 0% |
+| Lighthouse I / II | 10.7 / 11.2 | 87 / 100%, 4.5/5.5 · 4.3/5.9 | 43 / 50% | 3 / 7% | 10.2 / 0%; 11.8 / 3% |
+| Fairground I / II | 10.5 / 11.0 | 87 / 97%, 4.9/6.6 · 4.3/5.4 | 23 / 40% | 0 / 7% | 9.3 / 0%; 11.3 / 0% |
+| Almanac I / II | 11.2 / 11.0 | 100 / 100%, 4.9/6.3 · 4.3/5.5 | 30 / 27% | 0 / 3% | 11.8 / 3%; 9.2 / 0% |
+| Square + Church + Almanac | 11.9 (167) | 2+ objectives 73% (62% over three suites) | 53% | 3% | 14.2 / 3% |
+| Finale (declared at the Study) | 7.7 (108) | contest 63% | 67% | 7% | 11.3 / 0% |
+| Finale begun at Hour IX | 13.1 (184) | contest 73% | 70% | 23% | 16.7 / 3% |
+
+Finale contest by count: 1 investigator 67%, 2 53%, 3 63%, 4 67%; per 3p
+finale: deep entries 4.0, Hold Back ~2.7. Deck reshuffles 0.4-1.0 a loop
+(2.0 when the Square is played alone). Solo loops run 11-15 rounds (about
+two hours); four investigators 9-13 (2.5-3.5 hours). Memory: `simulate_tempo.py
+--memory` puts the campaign total per investigator before the finale loop at
+34-45 at three investigators (was 44-56 with the old Knowledge payments);
+first-time finale unlock at 3p loop 5-6 (4-8). Years per investigator per loop
+1.3-1.9 (1.1-1.4 before): more encounter draws and defeats in longer loops.
+
+Missed or loose: districts stay a little generous (87-100%, 4-5 Hours to
+spare where 2-4 was asked; raising more acts drops the three-district loop
+below 45%); the three-district loop gives two objectives in 50-73% (three
+suites); the Square alone runs 15-16 rounds with 13% resets and 17% wipes;
+solo wipes average about 30% in Part I (Fairground 53%, Road 47%) and 12% in
+Part II; the two-investigator finale wipes 40%; the finale begun at Hour IX
+wipes 23%; Years per loop rose.
+
 ## Assumptions and limits
 
 - One AI party, greedy but competent; real players differ (they talk and plan
@@ -188,7 +257,7 @@ moves from loop 6 to loop 7 (5 for a finale-first party).
 - Player cards are engine data, not physical cards; damage, horror and
   resources are tracked by the engine. Level-0 decks only; no Recollections
   beyond Foreknowledge, Muscle Memory and I've Done This Before.
-- Standard difficulty only.
+- Standard difficulty only. Doom on the Hours is tracked by the engine (the table's tokens are not moved).
 - Approximated: choices on Hour IV, Wrong Turn and Town Hall (AI picks);
   the Appointed's engagement (Control position plus engine engagement); the
   order of "last Hour" act effects; Lucky Compass and Nobody Believes Her
