@@ -64,7 +64,7 @@ Placed the way the owner does it. It is the successor of the abstract models
 
     python3 tools/play_engine/run.py --scenario district_church --runs 30 --players 3
     python3 tools/play_engine/run.py --scenario all --runs 30 --players 3 --jobs 4
-    python3 tools/play_engine/run.py --suite --jobs 4        # the full balance suite (about 20 minutes)
+    python3 tools/play_engine/run.py --suite --jobs 3        # the full balance suite (about 45 minutes; --runs-other 15)
     python3 tools/play_engine/run.py --scenario prologue --trace   # one game, play by play
     python3 tools/play_engine/run.py --scenario loop_multi --render .cache/play_engine/render/multi
     python3 tools/play_engine/run.py --report                # rebuild report.md / metrics.json
@@ -73,9 +73,11 @@ Scenarios: `prologue`; `district_<square|church|road|lighthouse|fairground|alman
 (Part I, the Square plus that district; the Lighthouse also places the Sunken
 Road); the same with `_p2` (Part II, the deep act); `loop_multi` (the Square,
 the Drowned Church and the Almanac House); `finale` (declared at the Sealed
-Study) and `finale_h9` (the same state, begun when Hour IX is reached). Parties: solo Cass;
+Study; the suite plays it at 1-4 investigators) and `finale_h9` (the same state, begun when Hour IX is reached). Parties: solo Cass;
 Elias and Ayako; Elias, Ayako and Cass; the four with Seraphine. Outputs stay
-in `.cache/play_engine/` (gitignored): `games/*.jsonl` (one JSON per game with
+in `.cache/play_engine/` (gitignored); the engine plays dist/'s Saved Object with the Control's and
+the log's scripts rebuilt from `src/` (`.cache/play_engine/payload/`), so rules code changes need no publish.
+Outputs: `games/*.jsonl` (one JSON per game with
 every metric), `report.md`, `metrics.json`, `coverage.json`. Needs `lua5.2` and
 the save at `/home/user/sce480/Arkham SCE 4.8.0.json` (or `--save` /
 `$SCED_SAVE`).
@@ -95,48 +97,86 @@ there (Square and Almanac House placed); the log records *the name is kept
 unspoken*, *the drowned heard the true hour*, *the vote still stands*, *the
 ninth line was left blank* and *the town was warned*.
 
-## Headline results (suite of 2026-09-29, Standard, 3 players, 30 runs)
+## Tuning round (2026-09-30)
 
-| scenario | objective | Hours to spare | rounds | defeat games | Dissonance max |
-|---|---|---|---|---|---|
-| prologue | 100% | 7.7 (done Hour 1.3) | 1.1 | 0% | 1.2 |
-| Square I / II | 100% / 100% | 5.7 / 5.7 | 5.6 / 5.8 | 30% / 43% | 4.0 / 7.9 |
-| Drowned Church I / II | 90% / 100% | 4.9 / 5.3 | 5.0 / 4.5 | 17% / 37% | 4.2 / 6.9 |
-| Sunken Road I / II | 87% / 97% | 2.7 / 5.2 | 4.8 / 4.7 | 27% / 47% | 5.3 / 6.6 |
-| Lighthouse I / II | 37% / 57% | 1.7 / 2.1 | 4.0 / 4.4 | 0% / 17% | 5.2 / 7.8 |
-| Fairground I / II | 87% / 100% | 4.8 / 5.0 | 4.6 / 4.6 | 50% / 47% | 4.7 / 6.9 |
-| Almanac House I / II | 93% / 100% | 5.2 / 5.5 | 5.4 / 5.1 | 17% / 23% | 4.3 / 8.3 |
-| loop_multi | 1.93 objectives/loop | – | 5.3 | 40% | 7.3 |
-| finale / finale_h9 | contest 0% / 0% | – | 6.0 / 7.8 | 57% / 70% | 13 / 15.7 |
+The first suite (2026-09-29) found a Prologue that ended in round 1, an
+unreachable finale, a slow Lighthouse, a lethal Wheel, Hour IV closing the
+hub and a deadly solo game. The tuning round changed these cards and rules
+(card ids for re-rendering: `sthr-act-firsthour`, `sthr-act-walkbackward`,
+`sthr-loc-wheel`, `sthr-hour-4`, `sthr-act-lasthour`, `sthr-act-almanachid`,
+`sthr-act-hourwaswrong`, `sthr-act-appointedname`):
 
-Solo (Cass) district loops lose all investigators in 30–80% of games; four
-players play like three. Full per-count tables, Hour sources, spawns by card,
-damage/horror sources, Memory/Years and the comparison with
-`simulate_tempo.py --race` are in `.cache/play_engine/report.md`.
+| lever | before | after |
+|---|---|---|
+| The First Hour (Prologue act) | an investigator at the Almanac Steps; the group spends 2 [perinv] | investigators **at the Almanac Steps** spend **3 [perinv]** |
+| The Turning–The Winding Stair | a district connection (1 Hour) | not a district connection: never costs an Hour (guide: Districts and travel, map, Lighthouse box) |
+| The Road Remembers (Walk It Backward back) | once per loop, the Turning–the Winding Stair costs no Hour | once per loop, **the Square–the Milestones** costs no Hour (log token text too) |
+| The Wheel | 1 horror per Hour advanced | **Forced – At the end of the round:** 1 horror |
+| Hour IV | fewest-clue revealed location | fewest-clue revealed location **other than the Square** |
+| Contest the Crossing | 4 [perinv] (12 at 3p); +1 per Hold Back, deep entry, Uninvited, and each investigator's first Study visit | **5 at every player count**; Study visits no longer count; the spoken name gives 1 (was 2) |
+| What the Almanac Hid | 2 [perinv] | **3 [perinv]** |
+| The Hour Was Wrong / The Appointed's Name | 1 [perinv] | **2 [perinv]** |
+| Solo (Difficulty and Player Count) | reset 9, Noticed 6, Glitch 3, scar cap 3 | the two-investigator bands (reset 12, Noticed 8, Glitch 4, scar cap 4) and **+3 maximum health and sanity** (the Control token applies both) |
 
-Findings (proposals only; nothing in the campaign was changed):
+The Control token applies the new contest target (`Constants.contestTarget
+= 5`), the solo bands and the solo maxima (shown on the investigator card
+and read by `shApiInvestigators`); its Hour IV reminder names the Square.
+The engine was also improved (these lift or lower rates without any card
+change): clues for a contributed objective count only when their carrier
+will be there; a secondary objective is paid for only when the current one
+stays covered; crossings for the current objective are taken early and
+together; the lead's Hour IV choice spares the party's routes and objective
+locations; investigators Hold Back when the Arrived Appointed engages them
+and end their turn instead of taking a lethal attack of opportunity; in the
+finale they Hold Back at long odds once the deep entries are spent and do
+not investigate. The Part II and finale states now raise Cass's willpower
+at Weathered (with intellect she could not Hold Back at all).
 
-- **The Prologue ends in round 1.** Six shroud-1 clues in the Square pay the
-  act before any mythos phase. What-ifs: act contributed only at the Steps
-  (3 per investigator) 93%, round 3.2; "not before Hour IV" 100%, round 2.9.
-- **The finale contest is out of reach** (mean 7.5 of 12: deep entries 4,
-  Study visits 3, Hold Back 0.4, the Uninvited 0.1). Contest 3 per
-  investigator: 10%; Appointed and Uninvited spawned at the Reading Room:
-  3% (93% defeats); both: 30%. Begun at Hour IX it is worse (40% reset).
-  Needs a lower threshold plus nearer sources or softer Arrived attacks.
-- **Lighthouse and Road are the slow districts** (tempo model 99%/98%;
-  engine 37%/87%). Lighthouse crossings cost 2.9 Hours a loop and Light the
-  Lamp needs the Lamp carrier's own clues; letting any investigator spend
-  raises it only to 57%. A cheaper Road–Lighthouse crossing or a lower
-  Lamp threshold is the lever.
-- **The Wheel** is the Fairground's main defeat source (6.6 horror a game).
-- **Hour IV often closes the harvested Square**, the hub, leaving
-  crossings as the only route.
-- Doom supplies about 4 Hours a loop, the Lost Hour 1.4–2.1, Elder Thing
-  tokens 0.5–1.4; Hold Back is rarely worth an action in district loops.
-- No impossible spawns, no reshuffles, no placement overlaps and no Lua
-  errors in the suite. The district act row covers SCED's "Investigators
-  playing" panel (cosmetic).
+## Results after tuning (final suite, Standard; 30 runs at 3p, 15 at 1p/4p)
+
+| scenario (3p) | objective before → after | Hours to spare | defeat games | party wiped |
+|---|---|---|---|---|
+| Prologue | 100% (round 1.1) → **100%**, round 2.9 (93% in a second run) | 7.7 → 4.5 | 0% → 0% | 0% |
+| Square I / II | 100 / 100% → 100 / 97% | 5.7 / 5.7 → 5.5 / 5.5 | 30 / 43% → 33 / 43% | 0 / 3% |
+| Drowned Church I / II | 90 / 100% → 100 / 97% | 4.9 / 5.3 → 5.0 / 4.3 | 17 / 37% → 13 / 70% | 0 / 7% |
+| Sunken Road I / II | 87 / 97% → 90 / 100% | 2.7 / 5.2 → 3.5 / 5.3 | 27 / 47% → 37 / 30% | 0 / 0% |
+| Lighthouse I / II | 37 / 57% → **70 / 63%** | 1.7 / 2.1 → 2.6 / 2.2 | 0 / 17% → 13 / 47% | 0 / 3% |
+| Fairground I / II | 87 / 100% → 97 / 97% | 4.8 / 5.0 → 3.9 / 3.8 | 50 / 47% → 33 / 20% | 0 / 0% |
+| Almanac House I / II | 93 / 100% → 97 / 97% | 5.2 / 5.5 → 4.1 / 4.2 | 17 / 23% → 27 / 10% | 0 / 0% |
+| Square + Church + Almanac | 2+ objectives 77% → **47%** (0/1/2/3: 0/53/43/3%) | – | 40% → 30% | 0% |
+| Finale (declared at the Study) | contest 0% → **62%** (60 runs) | – | 57% → 33% | 17% → 2% |
+| Finale begun at Hour IX | 0% → 43% (33% end by Dissonance reset) | – | 70% → 60% | 27% → 3% |
+
+Finale contest at other counts (45 runs each, two seed sets): 1 investigator
+60%, 2 investigators 60%, 4 investigators 76% (4p before: out of reach, 16 to
+find). Sources at 3p per finale: deep entries spent 3.9, Hold Back 0.6, the
+Uninvited 0.0; 21 of the 23 failures in 60 runs at 3p end at Hour IX one short (4 of 5).
+
+Solo (Cass, 15 runs a district): party wiped 7–27% in Part I (mean 16%, was
+30–70%) and 0–20% in Part II (mean 14%, was 10–80%), Dissonance resets 0%
+(22% in Part II with the old bands once solo survived longer). Four
+investigators: 53–100% objectives, defeat games 20–53%, no wipes but one.
+
+The Wheel now deals 3.6 horror a game (was 6.6) and defeated 0.03
+investigators a game (was 0.37). Hour IV no longer closes the Square; the
+hub then stays open to the Appointed too, which the engine offsets by
+Holding Back when caught (Appointed attacks a game in the Almanac House
+loop: 0.17 before, 0.63 with the Square open under the old policy, 0.23 now).
+
+Targets not met (3p): the Prologue ends mostly in round 3 but succeeds
+93–100% (4 [perinv] gave 80%, round 3.4); the Drowned Church and the Almanac
+House keep 4–5 Hours to spare (3 [perinv] on Why Thirteen? drops the
+three-district loop to 27% two-objective loops, below the 45–60% band, so
+only the Almanac House was raised); the Lighthouse is at 70% (Part II 63%);
+Part II deep objectives still finish with 4–5 Hours to spare except the
+Lighthouse; the Drowned Church's Part II loop defeats someone in 70% of
+games (the Bell-Ringer Beneath and What Wears the Sheriff); the finale is
+above the band (62% at 3p, 76% at 4p with Seraphine's Hold Back): a
+contest of 6 falls to about 20–25% at 3p, so the step between 5 and 6 is
+coarse. Memory and Years: Knowledge-driven Memory per loop is unchanged
+(Lighthouse 2.5 → 4.6 banked a game); Years per investigator per loop stay
+1.1–1.4 (finale 2.3 → 1.5); the tempo model's first-time finale unlock at 3p
+moves from loop 6 to loop 7 (5 for a finale-first party).
 
 ## Assumptions and limits
 
@@ -156,6 +196,10 @@ Findings (proposals only; nothing in the campaign was changed):
   rarely drawn): Old Book of Lore, Stubborn Detective, Silver Twilight
   Acolyte, Leo De Luca, Opportunist, Medical Texts, Marked Deck, the
   Ambergrove Lamp action.
-- What-if runs (`--what-if file.json`: card/act overrides, contest per
-  investigator, finale spawn location) change the engine's reading only;
-  results land in `.cache/play_engine/whatif/<tag>/`.
+- What-if runs (`--what-if file.json`: card/act overrides, scenario patches,
+  contest target, finale spawn locations, a two-action deep entry, the old
+  Lighthouse crossing) change the engine's reading only; results land in
+  `.cache/play_engine/whatif/<tag>/`.
+- The finale is sensitive to the party: an investigator who cannot Hold Back
+  (willpower and combat 2) cannot reach it alone; the four-investigator
+  party with Seraphine reaches it most.
