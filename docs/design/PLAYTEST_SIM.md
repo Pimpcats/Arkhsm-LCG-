@@ -104,7 +104,7 @@ unreachable finale, a slow Lighthouse, a lethal Wheel, Hour IV closing the
 hub and a deadly solo game. The tuning round changed these cards and rules
 (card ids for re-rendering: `sthr-act-firsthour`, `sthr-act-walkbackward`,
 `sthr-loc-wheel`, `sthr-hour-4`, `sthr-act-lasthour`, `sthr-act-almanachid`,
-`sthr-act-hourwaswrong`, `sthr-act-appointedname`):
+`sthr-act-hourwaswrong`, `sthr-act-appointedname`, `sthr-bellringer`):
 
 | lever | before | after |
 |---|---|---|
@@ -113,13 +113,14 @@ hub and a deadly solo game. The tuning round changed these cards and rules
 | The Road Remembers (Walk It Backward back) | once per loop, the Turning–the Winding Stair costs no Hour | once per loop, **the Square–the Milestones** costs no Hour (log token text too) |
 | The Wheel | 1 horror per Hour advanced | **Forced – At the end of the round:** 1 horror |
 | Hour IV | fewest-clue revealed location | fewest-clue revealed location **other than the Square** |
-| Contest the Crossing | 4 [perinv] (12 at 3p); +1 per Hold Back, deep entry, Uninvited, and each investigator's first Study visit | **5 at every player count**; Study visits no longer count; the spoken name gives 1 (was 2) |
+| Contest the Crossing | 4 [perinv] (12 at 3p); +1 per Hold Back, deep entry, Uninvited, and each investigator's first Study visit | **5 (6 with four investigators)**; Study visits no longer count; the spoken name gives 1 (was 2) |
+| The Bell-Ringer Beneath's Hour III attack | the nearest investigator, even at another location | the nearest investigator **at its location or a connecting location** (Victory 2 kept) |
 | What the Almanac Hid | 2 [perinv] | **3 [perinv]** |
 | The Hour Was Wrong / The Appointed's Name | 1 [perinv] | **2 [perinv]** |
 | Solo (Difficulty and Player Count) | reset 9, Noticed 6, Glitch 3, scar cap 3 | the two-investigator bands (reset 12, Noticed 8, Glitch 4, scar cap 4) and **+3 maximum health and sanity** (the Control token applies both) |
 
 The Control token applies the new contest target (`Constants.contestTarget
-= 5`), the solo bands and the solo maxima (shown on the investigator card
+= 5`, 6 at four investigators), the solo bands and the solo maxima (shown on the investigator card
 and read by `shApiInvestigators`); its Hour IV reminder names the Square.
 The engine was also improved (these lift or lower rates without any card
 change): clues for a contributed objective count only when their carrier
@@ -137,19 +138,19 @@ at Weathered (with intellect she could not Hold Back at all).
 | scenario (3p) | objective before → after | Hours to spare | defeat games | party wiped |
 |---|---|---|---|---|
 | Prologue | 100% (round 1.1) → **100%**, round 2.9 (93% in a second run) | 7.7 → 4.5 | 0% → 0% | 0% |
-| Square I / II | 100 / 100% → 100 / 97% | 5.7 / 5.7 → 5.5 / 5.5 | 30 / 43% → 33 / 43% | 0 / 3% |
-| Drowned Church I / II | 90 / 100% → 100 / 97% | 4.9 / 5.3 → 5.0 / 4.3 | 17 / 37% → 13 / 70% | 0 / 7% |
+| Square I / II | 100 / 100% → 100 / 97% | 5.7 / 5.7 → 5.5 / 5.3 | 30 / 43% → 33 / 47% | 0 / 3% |
+| Drowned Church I / II | 90 / 100% → 100 / 100% | 4.9 / 5.3 → 5.0 / 4.6 | 17 / 37% → 13 / 40% | 0 / 3% |
 | Sunken Road I / II | 87 / 97% → 90 / 100% | 2.7 / 5.2 → 3.5 / 5.3 | 27 / 47% → 37 / 30% | 0 / 0% |
 | Lighthouse I / II | 37 / 57% → **70 / 63%** | 1.7 / 2.1 → 2.6 / 2.2 | 0 / 17% → 13 / 47% | 0 / 3% |
 | Fairground I / II | 87 / 100% → 97 / 97% | 4.8 / 5.0 → 3.9 / 3.8 | 50 / 47% → 33 / 20% | 0 / 0% |
 | Almanac House I / II | 93 / 100% → 97 / 97% | 5.2 / 5.5 → 4.1 / 4.2 | 17 / 23% → 27 / 10% | 0 / 0% |
 | Square + Church + Almanac | 2+ objectives 77% → **47%** (0/1/2/3: 0/53/43/3%) | – | 40% → 30% | 0% |
-| Finale (declared at the Study) | contest 0% → **62%** (60 runs) | – | 57% → 33% | 17% → 2% |
+| Finale (declared at the Study) | contest 0% → **53%** (62% over 60 runs) | – | 57% → 33% | 17% → 3% |
 | Finale begun at Hour IX | 0% → 43% (33% end by Dissonance reset) | – | 70% → 60% | 27% → 3% |
 
-Finale contest at other counts (45 runs each, two seed sets): 1 investigator
-60%, 2 investigators 60%, 4 investigators 76% (4p before: out of reach, 16 to
-find). Sources at 3p per finale: deep entries spent 3.9, Hold Back 0.6, the
+Finale contest at other counts (30 runs; two seed sets agree within ±10):
+1 investigator 60%, 2 investigators 60%, 4 investigators 48% over 60 runs
+with the 4p target of 6 (76% with 5; before: out of reach, 16 to find). Sources at 3p per finale: deep entries spent 3.9, Hold Back 0.6, the
 Uninvited 0.0; 21 of the 23 failures in 60 runs at 3p end at Hour IX one short (4 of 5).
 
 Solo (Cass, 15 runs a district): party wiped 7–27% in Part I (mean 16%, was
@@ -169,11 +170,10 @@ House keep 4–5 Hours to spare (3 [perinv] on Why Thirteen? drops the
 three-district loop to 27% two-objective loops, below the 45–60% band, so
 only the Almanac House was raised); the Lighthouse is at 70% (Part II 63%);
 Part II deep objectives still finish with 4–5 Hours to spare except the
-Lighthouse; the Drowned Church's Part II loop defeats someone in 70% of
-games (the Bell-Ringer Beneath and What Wears the Sheriff); the finale is
-above the band (62% at 3p, 76% at 4p with Seraphine's Hold Back): a
-contest of 6 falls to about 20–25% at 3p, so the step between 5 and 6 is
-coarse. Memory and Years: Knowledge-driven Memory per loop is unchanged
+Lighthouse; the finale sits at the top of the band at 3p (53–62%; a contest
+of 6 falls to about 20–25% at 3p, so the step is coarse). The Drowned
+Church's Part II loop defeated someone in 70% of one seed set and 40% of
+another (55% pooled); with the Bell-Ringer's shorter reach it is 40–43%. Memory and Years: Knowledge-driven Memory per loop is unchanged
 (Lighthouse 2.5 → 4.6 banked a game); Years per investigator per loop stay
 1.1–1.4 (finale 2.3 → 1.5); the tempo model's first-time finale unlock at 3p
 moves from loop 6 to loop 7 (5 for a finale-first party).

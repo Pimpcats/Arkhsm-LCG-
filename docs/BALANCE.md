@@ -285,13 +285,14 @@ party. Its first suite contradicted several model results above (Prologue
 over in round 1, finale contest 0% at 3p, Lighthouse 37%). Changes (card ids
 `sthr-act-firsthour`, `sthr-act-walkbackward`, `sthr-loc-wheel`,
 `sthr-hour-4`, `sthr-act-lasthour`, `sthr-act-almanachid`,
-`sthr-act-hourwaswrong`, `sthr-act-appointedname`; guide, Control token and
+`sthr-act-hourwaswrong`, `sthr-act-appointedname`, `sthr-bellringer`; guide, Control token and
 log token updated to match):
 - The First Hour: 3 [perinv] clues spent by investigators at the Almanac Steps (was 2 [perinv], anyone).
 - The Turning–The Winding Stair costs no Hour; The Road Remembers now frees the Square–the Milestones once per loop.
 - The Wheel: 1 horror at the end of the round (was 1 per Hour advanced).
 - Hour IV never picks the Square.
-- Contest the Crossing: 5 at every player count (was 4 [perinv]); first Study visits no longer count; the spoken name gives 1.
+- Contest the Crossing: 5, or 6 with four investigators (was 4 [perinv]); first Study visits no longer count; the spoken name gives 1.
+- The Bell-Ringer Beneath's Hour III attack reaches only an investigator at its location or a connecting location.
 - What the Almanac Hid 3 [perinv] (was 2); The Hour Was Wrong and The Appointed's Name 2 [perinv] (were 1).
 - Solo: the two-investigator bands (reset 12, Noticed 8, scar cap 4) and +3 maximum health and sanity.
 
@@ -300,14 +301,14 @@ Engine results, 3 investigators, Standard, 30 runs (before → after):
 | scenario | objective | Hours to spare | defeat games |
 |---|---|---|---|
 | Prologue | 100% (round 1.1) → 100% (round 2.9; 93% in a second run) | 7.7 → 4.5 | 0% → 0% |
-| Square I / II | 100 / 100% → 100 / 97% | 5.7 / 5.7 → 5.5 / 5.5 | 30 / 43% → 33 / 43% |
-| Drowned Church I / II | 90 / 100% → 100 / 97% | 4.9 / 5.3 → 5.0 / 4.3 | 17 / 37% → 13 / 70% |
+| Square I / II | 100 / 100% → 100 / 97% | 5.7 / 5.7 → 5.5 / 5.3 | 30 / 43% → 33 / 47% |
+| Drowned Church I / II | 90 / 100% → 100 / 100% | 4.9 / 5.3 → 5.0 / 4.6 | 17 / 37% → 13 / 40% |
 | Sunken Road I / II | 87 / 97% → 90 / 100% | 2.7 / 5.2 → 3.5 / 5.3 | 27 / 47% → 37 / 30% |
 | Lighthouse I / II | 37 / 57% → 70 / 63% | 1.7 / 2.1 → 2.6 / 2.2 | 0 / 17% → 13 / 47% |
 | Fairground I / II | 87 / 100% → 97 / 97% | 4.8 / 5.0 → 3.9 / 3.8 | 50 / 47% → 33 / 20% |
 | Almanac House I / II | 93 / 100% → 97 / 97% | 5.2 / 5.5 → 4.1 / 4.2 | 17 / 23% → 27 / 10% |
 | Square + Church + Almanac, 2+ objectives | 77% → 47% | – | 40% → 30% |
-| Finale contest (1 / 2 / 3 / 4 investigators) | – / – / 0% / – → 60 / 60 / 62 / 76% | – | 3p 57% → 33% |
+| Finale contest (1 / 2 / 3 / 4 investigators) | – / – / 0% / – → 60 / 60 / 53–62 / 48% | – | 3p 57% → 33% |
 
 Solo party wipes in district loops fell from 30–80% to a mean of 16% (Part I)
 and 14% (Part II), with no Dissonance resets. The Wheel's horror fell from
@@ -315,9 +316,8 @@ and 14% (Part II), with no Dissonance resets. The Wheel's horror fell from
 investigator per loop stay 1.1–1.4. `simulate_tempo.py` (updated for the
 crossing and threshold changes): first-time finale unlock at 3p, action tax
 0.35, median loop 7 (5-10), was 6 (4-8); finale-first play loop 5 (4-6).
-Still outside the targets: the finale is a little generous (62% at 3p; a
-contest of 6 gives about 20–25%), the Church and Almanac House keep 4–5
-Hours to spare (raising both breaks the three-district loop), Part II
-deep objectives are quick except the Lighthouse, and the Drowned Church's
-Part II loop defeats someone in 70% of games. Simulation only; not a
+Still outside the targets: the finale is at the top of the band at 3p
+(53–62%; a contest of 6 gives about 20–25%), the Church and Almanac House
+keep 4–5 Hours to spare (raising both breaks the three-district loop), and
+Part II deep objectives are quick except the Lighthouse. Simulation only; not a
 playtest.
