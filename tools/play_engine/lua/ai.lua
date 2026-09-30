@@ -576,7 +576,10 @@ return function(R, T)
     end
     if G.finale and G.deepToSpend and #G.deepToSpend > 0 then
       -- no hurry: spent while nothing is engaged with you
-      add(#eng > 0 and 12 or 48, "objective", function() R.spendDeep(inv) end)
+      local cost = (R.WHATIF or {}).deepActions or 1                      -- what-if: [action][action]
+      if (inv.actionsLeft or 3) >= cost then
+        add(#eng > 0 and 12 or 48, "objective", function() R.spendDeep(inv) end, { actions = cost })
+      end
     end
 
     -- 4. clues here
