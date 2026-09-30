@@ -120,10 +120,35 @@ return function(R, T)
   --- Advance the Hourglass by n Hours (a Skip, or doom): the Control's Hour
   -- button once per Hour, the Hours deck moved to match, then the parts of
   -- each Hour's "When reached" text the Control leaves to the players.
+  --- Doom on the current Hour (engine-tracked; the table's doom tokens).
+  -- The Mythos phase places 1 and checks the threshold (the Hour card's doom
+  -- value); card effects that "place 1 doom on the current Hour" wait for
+  -- that check, as in the Rules Reference.
+  function R.threshold()
+    local c = R.card("sthr-hour-" .. R.hour()) or {}
+    return tonumber(c.doom) or 1
+  end
+  function R.placeDoom(n, why)
+    local G = R.G
+    if G.ended or n <= 0 then return end
+    G.doom = (G.doom or 0) + n
+    local m = G.metrics
+    m.doom_sources[why or "?"] = (m.doom_sources[why or "?"] or 0) + n
+    R.log("%d doom on Hour %d (%s): %d / %d", n, R.hour(), why or "?", G.doom, R.threshold())
+  end
+  --- Mythos step: check the doom threshold.
+  function R.checkDoom()
+    local G = R.G
+    if (G.doom or 0) >= R.threshold() then
+      R.advance(1, "doom")
+    end
+  end
+
   function R.advance(n, why)
     local G = R.G
     for _ = 1, n do
       if G.ended then return end
+      G.doom = 0            -- an advance removes all doom in play (cancelled or not)
       -- cancel effects: I Remember the Ending, the name kept unspoken, It Means 'Wait'
       if R.cancelAdvance(why) then
         R.log("Hourglass advance (%s) cancelled", why)
@@ -149,6 +174,14 @@ return function(R, T)
           R.touch()
         end
         R.G.metrics.hour_sources[why or "?"] = (R.G.metrics.hour_sources[why or "?"] or 0) + 1
+        -- the Hour turns: each investigator heals 1 horror (guide: The Hourglass)
+        local heal = (R.WHATIF or {}).hourHeal or 1
+        for _, x in ipairs(R.aliveInvs()) do
+          if heal > 0 and x.horror > 0 then
+            R.heal(x, 0, math.min(heal, x.horror))
+            R.G.metrics.hour_heal = (R.G.metrics.hour_heal or 0) + 1
+          end
+        end
         R.log("Hourglass advances (%s): Hour %d -> %d", why or "?", before, now)
         do
           -- what the Control applied (Hour III's and VIII's Dissonance)
@@ -171,6 +204,7 @@ return function(R, T)
   end
 
   function R.rewind(n, why, alreadyCounted)
+    R.G.doom = 0
     for _ = 1, n do
       local before = R.hour()
       if before <= 1 then return end
@@ -539,7 +573,7 @@ return function(R, T)
       if not opts.noHour and not G.crossedThisRound[key] and not R.FX.freeCrossing(a, b, inv) then
         G.crossedThisRound[key] = true
         G.metrics.crossing_hours = G.metrics.crossing_hours + 1
-        R.advance(1, "district crossing")
+        R.placeDoom(1, "district crossing")
       end
     end
     return true

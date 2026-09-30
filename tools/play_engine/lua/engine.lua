@@ -102,7 +102,7 @@ return function(H)
       crossings = 0, crossing_hours = 0, rewinds = 0, holdbacks = 0, holdback_attempts = 0, attacks = 0, aoo = 0,
       appointed_attacks = 0, appointed_hunts = 0, appointed_engagements = 0, stage_max = 0, cards_played = 0,
       weaknesses_drawn = 0, card_years = 0, cancelled_hours = {}, cancelled_advances = 0, cancelled_treacheries = 0,
-      itmeanswait = 0, evades = 0, enemy_moves = 0, contest_sources = {}, approach_by_card = 0,
+      itmeanswait = 0, evades = 0, enemy_moves = 0, contest_sources = {}, approach_by_card = 0, doom_sources = {},
       damage_by = {}, horror_by = {}, defeated_by = {}, defeated_who = {},
     }
   end

@@ -131,6 +131,8 @@ def summarize(name, players, games):
         s["completed_hour"] = mean([d["hour"] for d in ok])
         s["completed_round"] = mean([d["round"] for d in ok])
         s["hours_to_spare"] = mean([9 - d["hour"] for d in ok])
+        # rounds the loop still ran after the objective was met (the loop ends at Hour IX)
+        s["rounds_to_spare"] = mean([g.get("round") - d["round"] for g, d in zip(games, done) if d])
     if name in MULTI:
         counts = collections.Counter(sum(1 for a in MULTI[name] if act_done(g, a)) for g in games)
         s["objectives_per_loop"] = {k: counts.get(k, 0) / n for k in range(len(MULTI[name]) + 1)}
@@ -198,6 +200,11 @@ def summarize(name, players, games):
         for k, v in D(m.get("dissonance_sources")).items():
             ds[k] += v
     s["hour_sources"] = {k: v / n for k, v in hs.most_common()}
+    dm = collections.Counter()
+    for m in ms:
+        for k, v in D(m.get("doom_sources")).items():
+            dm[k] += v
+    s["doom_sources"] = {k: v / n for k, v in dm.most_common()}
     s["dissonance_sources"] = {k: v / n for k, v in ds.most_common()}
     sp = collections.Counter()
     where = collections.defaultdict(collections.Counter)

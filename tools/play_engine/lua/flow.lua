@@ -255,7 +255,7 @@ return function(R, T)
       R.addMemory(inv, 1, "Elias: attacked while alone")
     end
     FX.afterAttack(en, inv)
-    if en.id == "weakness:Silver Twilight Acolyte" or en.name == "Silver Twilight Acolyte" then R.advance(1, "Silver Twilight Acolyte (doom)") end
+    if en.id == "weakness:Silver Twilight Acolyte" or en.name == "Silver Twilight Acolyte" then R.placeDoom(1, "Silver Twilight Acolyte (doom)") end
   end
 
   --- Attacks of opportunity before a provoking action.
@@ -465,7 +465,8 @@ return function(R, T)
     local G = R.G
     G.phase = "mythos"
     if G.round >= 2 then
-      R.advance(1, "doom")
+      R.placeDoom(1, "Mythos phase")
+      R.checkDoom()
     end
     for _, inv in ipairs(R.aliveInvs()) do
       R.drawEncounter(inv)

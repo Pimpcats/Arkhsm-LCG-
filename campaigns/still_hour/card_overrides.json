@@ -2,56 +2,56 @@
   "sthr-hour-1": {
     "name": "Hour I — First Dark",
     "text": "The night begins.",
-    "doom": 1,
+    "doom": 2,
     "back_flavor": "Lanterns bob across the Square. Somewhere a band is tuning up for midnight. Above it all, one by one, the stars begin to go out.",
     "back_text": "Set this Hour aside beside the Hours deck. Hour II becomes the current agenda: resolve its “When reached” text."
   },
   "sthr-hour-2": {
     "name": "Hour II — Low Water",
     "text": "When reached: Each investigator draws 1 encounter card.",
-    "doom": 1,
+    "doom": 2,
     "back_flavor": "The tide draws back from the Long Pier, farther than any tide should, and does not come in again. The harbour smells of something left too long in the dark.",
     "back_text": "Set this Hour aside beside the Hours deck. Hour III becomes the current agenda: resolve its “When reached” text."
   },
   "sthr-hour-3": {
     "name": "Hour III — The Thirteenth Toll",
     "text": "When reached: Raise Dissonance by 1. If any investigator is at a Church location and your Campaign Log does not record The Thirteenth Toll, raise it by 2 instead.",
-    "doom": 1,
+    "doom": 2,
     "back_flavor": "The church bell counts the hour. Twelve. A pause, long enough to hope. Thirteen.",
     "back_text": "Set this Hour aside beside the Hours deck. Hour IV becomes the current agenda (if Hour IV has been removed, Hour V does): resolve its “When reached” text."
   },
   "sthr-hour-4": {
     "name": "Hour IV — The Road Gives Way",
-    "text": "When reached: The lead investigator chooses a revealed location other than the Square with the fewest clues. Until the Hourglass next advances or rewinds, it is impassable. Each investigator there moves to a connecting location of their choice (this does not advance the Hourglass).",
-    "doom": 1,
+    "text": "When reached: The lead investigator chooses a revealed location other than the Square with the fewest clues. Until the Hourglass next advances or rewinds, it is impassable. Each investigator there moves to a connecting location of their choice (this does not place doom).",
+    "doom": 2,
     "back_flavor": "Out past the Milestones the road simply stops being there. The walkers on it do not break stride.",
     "back_text": "Set this Hour aside beside the Hours deck. Hour V becomes the current agenda: resolve its “When reached” text."
   },
   "sthr-hour-5": {
     "name": "Hour V — The Streets Empty",
     "text": "When reached: The Appointed's Approach advances to at least Sensed.",
-    "doom": 1,
+    "doom": 2,
     "back_flavor": "The fair's music plays on for no one. Doors stand open along every street. The town has gone somewhere without moving.",
     "back_text": "Set this Hour aside beside the Hours deck. Hour VI becomes the current agenda: resolve its “When reached” text."
   },
   "sthr-hour-6": {
     "name": "Hour VI — The Wrong Sky",
     "text": "When reached: Add 1 Static token to the chaos bag until the end of the loop. If your Campaign Log records What the Almanac Hid, instead: until the end of the loop, the chaos bag holds 1 fewer Static token than its band calls for (never fewer than 0). (This does not stack: if Hour VI has already resolved this loop, it has no further effect.)",
-    "doom": 1,
+    "doom": 2,
     "back_flavor": "The sky is wrong in a new way now: a starless patch the shape of an open door, fraying at its edges.",
     "back_text": "Set this Hour aside beside the Hours deck. Hour VII becomes the current agenda: resolve its “When reached” text."
   },
   "sthr-hour-7": {
     "name": "Hour VII — The Guest Approaches",
     "text": "When reached: The Appointed's Approach advances to at least Emerging. If your Campaign Log records The Appointed's Name, exhaust the Appointed.",
-    "doom": 1,
+    "doom": 2,
     "back_flavor": "Every dog in Ambergrove faces the same way. Something is coming up the hill toward the Square, politely, with all the time in the world.",
     "back_text": "Set this Hour aside beside the Hours deck. Hour VIII becomes the current agenda: resolve its “When reached” text."
   },
   "sthr-hour-8": {
     "name": "Hour VIII — Almost",
     "text": "When reached: Raise Dissonance by 2. The Appointed's Approach advances to Arrived. Until the end of the loop, each enemy gets +1 fight (including enemies that enter play later; this does not stack).",
-    "doom": 1,
+    "doom": 2,
     "back_flavor": "One minute to midnight. It has been one minute to midnight for a very long time. The seam in the sky pulls taut.",
     "back_text": "Set this Hour aside beside the Hours deck. Hour IX becomes the current agenda: resolve its “When reached” text."
   },
@@ -64,7 +64,7 @@
   "sthr-losthour": {
     "name": "Lost Hour",
     "traits": "Static.",
-    "text": "Revelation – If the current Hour is Hour VI or later, advance the Hourglass by 2 Hours. Otherwise, advance it by 1 Hour.",
+    "text": "Revelation – Advance the Hourglass by 1 Hour.",
     "quantity": 3
   },
   "sthr-slippage": {
@@ -122,7 +122,7 @@
   "sthr-wrongturn": {
     "name": "Wrong Turn",
     "traits": "Static.",
-    "text": "Revelation – Each investigator moves to a connecting location of the lead investigator's choice. These moves do not advance the Hourglass.",
+    "text": "Revelation – Each investigator moves to a connecting location of the lead investigator's choice. These moves do not place doom on the current Hour.",
     "flavor": "The map is not where you left it.",
     "quantity": 1
   },
@@ -148,13 +148,13 @@
   "sthr-yearinanight": {
     "name": "A Year in a Night",
     "traits": "Hex.",
-    "text": "Peril.\nRevelation – Test [wil] (3). For each point you fail by, take 1 horror. If you fail, you gain 1 Year (record it now; it takes effect Between Loops).",
+    "text": "Peril.\nRevelation – Test [wil] (3). If you fail, take 1 horror and gain 1 Year (record it now; it takes effect Between Loops).",
     "quantity": 2
   },
   "sthr-forgotten": {
     "name": "What You've Forgotten",
     "traits": "Hex.",
-    "text": "Revelation – Remove 2 Memory from among the cards you control. For each Memory you cannot remove, take 1 horror.",
+    "text": "Revelation – Remove 1 Memory from among the cards you control. If you cannot, take 1 horror.",
     "quantity": 2
   },
   "sthr-oldbones": {
@@ -246,11 +246,33 @@
       },
       {
         "token": "elderthing",
-        "text": "-3. If you fail, advance the Hourglass by 1 Hour."
+        "text": "-3. If you fail, place 1 doom on the current Hour."
       },
       {
         "token": "static",
         "text": "-3. Raise Dissonance by 1."
+      }
+    ],
+    "back_tokens": [
+      {
+        "text": "-2. If Dissonance is in the Glitch band or higher, -3 instead.",
+        "token": "skull"
+      },
+      {
+        "text": "-3. Raise Dissonance by 1.",
+        "token": "cultist"
+      },
+      {
+        "text": "-4. If the Appointed is Sensed or later, take 1 horror. If it is Arrived, also take 1 damage.",
+        "token": "tablet"
+      },
+      {
+        "text": "-5. If you fail, place 1 doom on the current Hour.",
+        "token": "elderthing"
+      },
+      {
+        "text": "-3. Raise Dissonance by 1.",
+        "token": "static"
       }
     ]
   },
@@ -428,7 +450,7 @@
   "sthr-thirteen": {
     "name": "Thirteen",
     "traits": "Omen.",
-    "text": "Revelation – Advance the Hourglass by 1 Hour. If you are at a Church location, also raise Dissonance by 1.",
+    "text": "Revelation – Place 1 doom on the current Hour. If you are at a Church location, also raise Dissonance by 1.",
     "quantity": 1
   },
   "sthr-risingwater": {
@@ -509,7 +531,7 @@
   "sthr-bridgeremembers": {
     "name": "The Bridge Remembers",
     "traits": "Omen.",
-    "text": "Revelation – If you moved into or out of the Low Bridge during your most recent turn or since it ended, advance the Hourglass by 1 Hour. Otherwise, The Bridge Remembers gains surge.",
+    "text": "Revelation – If you moved into or out of the Low Bridge during your most recent turn or since it ended, place 1 doom on the current Hour. Otherwise, The Bridge Remembers gains surge.",
     "quantity": 1
   },
   "sthr-loc-townhallsteps": {
@@ -661,7 +683,7 @@
   "sthr-wheelsturn": {
     "name": "The Wheel's Turn",
     "traits": "Omen.",
-    "text": "Revelation – Advance the Hourglass by 1 Hour. Then each investigator gains 1 resource.",
+    "text": "Revelation – Place 1 doom on the current Hour. Then each investigator gains 1 resource.",
     "quantity": 1
   },
   "sthr-reflectionlies": {
@@ -760,7 +782,7 @@
     "traits": "Ambergrove. Central.",
     "shroud": 1,
     "clues": 2,
-    "text": "Each loop begins here. The first time each round any investigator moves along a given connection between two districts, advance the Hourglass by 1 Hour (see the Campaign Guide).",
+    "text": "Each loop begins here. The first time each round any investigator moves along a given connection between two districts, place 1 doom on the current Hour (see the Campaign Guide).",
     "flavor": "Everyone is out for the occultation. None of them will look at you twice — not this time, not ever.",
     "icons": "star",
     "color": "#1a605e",
@@ -861,7 +883,7 @@
     "index": "1a",
     "number": "1/2",
     "back_flavor": "Walking against them, you see the road the way the walkers never do: from the shore back toward town. The milestones count down instead of up. You will not lose your way on this road again.",
-    "back_text": "Record in your Campaign Log: The Road Remembers.\nGroup limit once per loop: moving between the Square and the Milestones does not advance the Hourglass.\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game."
+    "back_text": "Record in your Campaign Log: The Road Remembers.\nGroup limit once per loop: moving between the Square and the Milestones does not place doom on the current Hour.\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game."
   },
   "sthr-act-walksbeside": {
     "name": "Who Walks Beside You",
@@ -1041,7 +1063,7 @@
     "name": "The Mile-Counter",
     "traits": "Monster.",
     "health": 3,
-    "text": "Hunter.\nSpawn – The Milestones.\nForced – After the Mile-Counter moves: Place 1 resource on it from the token pool. If there are 3 or more resources on it, remove them and advance the Hourglass by 1 Hour.",
+    "text": "Hunter.\nSpawn – The Milestones.\nForced – After the Mile-Counter moves: Place 1 resource on it from the token pool. If there are 3 or more resources on it, remove them and place 1 doom on the current Hour.",
     "fight": 2,
     "evade": 3,
     "damage": 1,
@@ -1133,7 +1155,7 @@
     "flavor": ""
   },
   "sthr-longwayround": {
-    "text": "Move to a connecting location, then you may move to a location connecting to that one. These moves do not provoke attacks of opportunity, do not advance the Hourglass and do not count as the first move along a district connection this round.",
+    "text": "Move to a connecting location, then you may move to a location connecting to that one. These moves do not provoke attacks of opportunity, do not place doom on the current Hour and do not count as the first move along a district connection this round.",
     "wildIcons": 1
   },
   "sthrbirdie": {

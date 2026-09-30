@@ -178,7 +178,7 @@ return function(R, T)
   function FX.tokenAfter(name, inv, success, test)
     if name == "Cultist" and not success then R.raise(1, "Cultist token") end
     if name == "Tablet" and R.stage() >= 1 then horror(inv, 1, "Tablet token") end
-    if name == "Elder Thing" and not success then R.advance(1, "Elder Thing token") end
+    if name == "Elder Thing" and not success then R.placeDoom(1, "Elder Thing token") end
     -- Static: the Control raised Dissonance when it left the bag
   end
 
@@ -475,7 +475,10 @@ return function(R, T)
       G.group.refusedTicket = true
       return "discard"
     end
-    R.advance(R.hour() >= 6 and 2 or 1, "Lost Hour")
+    local mode = (R.WHATIF or {}).lostHour                           -- what-if: "doom" / "old"
+    if mode == "doom" then R.placeDoom(R.hour() >= 6 and 2 or 1, "Lost Hour")
+    elseif mode == "old" then R.advance(R.hour() >= 6 and 2 or 1, "Lost Hour")
+    else R.advance(1, "Lost Hour") end
     return "discard"
   end
 
@@ -529,7 +532,7 @@ return function(R, T)
   ENC["sthr-yearinanight"] = function(inv)
     local ok, margin = R.test(inv, "wil", 3, { kind = "treachery", peril = true })
     if not ok then
-      horror(inv, math.max(1, -margin), "A Year in a Night")
+      horror(inv, (R.WHATIF or {}).oldYear and math.max(1, -margin) or 1, "A Year in a Night")
       if not R.G.prologue then R.pendingYear(inv, 1, "A Year in a Night") end
     end
     return "discard"
@@ -538,9 +541,10 @@ return function(R, T)
   cov("sthr-forgotten")
   ENC["sthr-forgotten"] = function(inv)
     local have = inv.memory or 0
-    local take = math.min(2, have)
+    local want = (R.WHATIF or {}).oldForgotten and 2 or 1
+    local take = math.min(want, have)
     if take > 0 then R.addMemory(inv, -take, "What You've Forgotten") end
-    if take < 2 then horror(inv, 2 - take, "What You've Forgotten") end
+    if take < want then horror(inv, want - take, "What You've Forgotten") end
     return "discard"
   end
 
@@ -602,7 +606,7 @@ return function(R, T)
 
   cov("sthr-thirteen")
   ENC["sthr-thirteen"] = function(inv)
-    R.advance(1, "Thirteen")
+    R.placeDoom(1, "Thirteen")
     if (R.locOf(inv) or {}).district == "Church" then R.raise(1, "Thirteen (Church)") end
     return "discard"
   end
@@ -619,7 +623,7 @@ return function(R, T)
   ENC["sthr-bridgeremembers"] = function(inv)
     local G = R.G
     if inv.bridgeFlag then
-      R.advance(1, "The Bridge Remembers")
+      R.placeDoom(1, "The Bridge Remembers")
       return "discard"
     end
     return "surge"
@@ -627,7 +631,7 @@ return function(R, T)
 
   cov("sthr-wheelsturn")
   ENC["sthr-wheelsturn"] = function(inv)
-    R.advance(1, "The Wheel's Turn")
+    R.placeDoom(1, "The Wheel's Turn")
     for _, x in ipairs(R.aliveInvs()) do x.resources = x.resources + 1 end
     return "discard"
   end
@@ -752,7 +756,7 @@ return function(R, T)
       en.res = (en.res or 0) + 1
       if en.res >= 3 then
         en.res = 0
-        R.advance(1, "The Mile-Counter")
+        R.placeDoom(1, "The Mile-Counter")
       end
     end
   end
