@@ -34,8 +34,29 @@ return function(R, T)
     end
   end
 
+  --- Who Walks Beside You's clue cost: the act's clues (what-if walksBesideClues [perinv])
+  function R.walksBesideCost()
+    local w = (R.WHATIF or {}).walksBesideClues
+    if w then return w * R.G.n end
+    local c = R.card("sthr-act-walksbeside") or {}
+    return (c.clues or 0) * (c.clues_per_investigator and R.G.n or 1)
+  end
+  local function cluesAt(L)
+    local have = 0
+    for _, x in ipairs(R.investigatorsAt(L)) do have = have + x.clues end
+    return have
+  end
+
   --- Who Walks Beside You: Stand Firm against a ready Echo at the Turning.
+  -- With a clue cost, the investigators there spend it first; a failed test
+  -- puts the clues on the Turning (as the Lamp and the Wheel do).
   function R.standFirm(inv, en)
+    local L = R.locOf(inv)
+    local need = R.walksBesideCost()
+    if need > 0 then
+      if cluesAt(L) < need then return end
+      R.spendClues(R.investigatorsAt(L), need)
+    end
     local x = R.enemyFight(en)
     local skill = (R.skillBase(inv, "wil") >= R.skillBase(inv, "com")) and "wil" or "com"
     local ok = R.test(inv, skill, x, { kind = "act", important = true })
@@ -45,6 +66,9 @@ return function(R, T)
       R.placeEnemy(en)
       local act = R.G.acts.Road
       if act and act.id == "sthr-act-walksbeside" then R.advanceAct(act, inv) end
+    elseif need > 0 then
+      T.spawnClueOn(L.obj, need)
+      R.G.metrics.objective_fails = (R.G.metrics.objective_fails or 0) + 1
     end
   end
 
@@ -54,6 +78,11 @@ return function(R, T)
     if G.walksBesideCurrent and L and L.id == "sthr-loc-turning" and R.hasTrait(en.def, "Echo") then
       local act = G.acts.Road
       if act and act.id == "sthr-act-walksbeside" and not act.completed then
+        local need = R.walksBesideCost()
+        if need > 0 then
+          if cluesAt(L) < need then return end
+          R.spendClues(R.investigatorsAt(L), need)
+        end
         G.walksBesideCurrent = false
         R.advanceAct(act, inv)
       end

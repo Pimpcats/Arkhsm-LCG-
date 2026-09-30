@@ -42,7 +42,8 @@ return function(R, T)
   function A.need(act, inv)
     if not act then return 0 end
     local spec = FX.ACTS[act.id] or {}
-    if spec.sequence or spec.standFirm or spec.contest then return 0 end
+    if spec.sequence or spec.contest then return 0 end
+    if spec.standFirm then return math.max(0, R.walksBesideCost() - R.partyClues()) end
     local need = math.max(0, FX.actNeed(act.id) - R.partyClues())
     -- clues only count where they are contributed: an investigator on the way
     -- also counts only the clues of those who will be there about as soon
@@ -73,8 +74,9 @@ return function(R, T)
     local obj = A.objective()
     if not obj or obj == act then return true end
     local spec = FX.ACTS[obj.id] or {}
-    if spec.sequence or spec.standFirm or spec.contest then return true end
-    return R.partyClues() - FX.actNeed(act.id) >= FX.actNeed(obj.id)
+    if spec.sequence or spec.contest then return true end
+    local objNeed = spec.standFirm and R.walksBesideCost() or FX.actNeed(obj.id)
+    return R.partyClues() - FX.actNeed(act.id) >= objNeed
   end
 
   --- Where the act is met (location), or nil.
@@ -583,7 +585,10 @@ return function(R, T)
           add(60, "objective", function() R.objectiveAction(inv, act) end)
         end
       end
-      if spec.standFirm and target == L then
+      local sfNeed = spec.standFirm and R.walksBesideCost() or 0
+      local sfHave = 0
+      for _, x in ipairs(R.investigatorsAt(L)) do sfHave = sfHave + x.clues end
+      if spec.standFirm and target == L and sfHave >= sfNeed then
         for _, en in ipairs(G.enemies) do
           if en.loc == L.guid and R.hasTrait(en.def, "Echo") and not en.exhausted and not R.sleepwalking(en) then
             add(55, "objective", function() R.standFirm(inv, en) end)
