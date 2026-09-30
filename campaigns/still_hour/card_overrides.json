@@ -853,8 +853,8 @@
   },
   "sthr-act-whythirteen": {
     "name": "Why Thirteen?",
-    "clues": 6,
-    "text": "Objective – If an investigator is at the Vestry, the investigators may, as a group, spend 6 [perinv] clues to advance.",
+    "clues": 5,
+    "text": "Objective – If an investigator is at the Vestry, the investigators may, as a group, spend 5 [perinv] clues to advance.",
     "flavor": "The bell tolled thirteen times at the first occultation. It should toll twelve.",
     "deck": 95104,
     "index": "1a",
@@ -897,8 +897,8 @@
   },
   "sthr-act-sheriffdead": {
     "name": "The Sheriff Is Already Dead",
-    "clues": 7,
-    "text": "Objective – If an investigator is at the Well, the investigators may, as a group, spend 7 [perinv] clues to advance.",
+    "clues": 5,
+    "text": "Objective – If an investigator is at the Well, the investigators may, as a group, spend 5 [perinv] clues to advance.",
     "flavor": "He has been dead since ten o'clock. No one has noticed but you.",
     "deck": 95108,
     "index": "1a",
@@ -945,8 +945,8 @@
   },
   "sthr-act-almanachid": {
     "name": "What the Almanac Hid",
-    "clues": 6,
-    "text": "Objective – If an investigator is at the Press, the investigators may, as a group, spend 6 [perinv] clues to advance.",
+    "clues": 5,
+    "text": "Objective – If an investigator is at the Press, the investigators may, as a group, spend 5 [perinv] clues to advance.",
     "flavor": "Where the wrong almanac was printed.",
     "deck": 95112,
     "index": "1a",
