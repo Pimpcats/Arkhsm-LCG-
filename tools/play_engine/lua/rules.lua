@@ -179,11 +179,14 @@ return function(R, T)
         turned = true
         -- the Hour turns: each investigator heals 1 horror (guide: The Hourglass)
         local heal = (R.WHATIF or {}).hourHeal or 1
+        -- what-if: with one investigator, the Hour turning also heals damage
+        local soloDmg = (R.G.n == 1) and ((R.WHATIF or {}).soloHourDamage or 0) or 0
         for _, x in ipairs(R.aliveInvs()) do
           if heal > 0 and x.horror > 0 then
             R.heal(x, 0, math.min(heal, x.horror))
             R.G.metrics.hour_heal = (R.G.metrics.hour_heal or 0) + 1
           end
+          if soloDmg > 0 and x.damage > 0 then R.heal(x, math.min(soloDmg, x.damage), 0) end
         end
         R.log("Hourglass advances (%s): Hour %d -> %d", why or "?", before, now)
         do
@@ -514,6 +517,15 @@ return function(R, T)
     if inv.defeated then return end
     -- "I Get Out" (Birdie): not defeated
     if R.P.tryIGetOut(inv) then return end
+    -- what-if: with one investigator, the first defeat of a loop is a second wind
+    if (R.WHATIF or {}).soloSecondWind and G.n == 1 and not inv.secondWind then
+      inv.secondWind = true
+      inv.damage, inv.horror = 0, 0
+      G.metrics.second_wind = (G.metrics.second_wind or 0) + 1
+      R.log("%s is not defeated: second wind (%s)", inv.name, source or "?")
+      R.pendingYear(inv, R.WHATIF.soloSecondWind, "second wind")
+      return
+    end
     inv.defeated = true
     G.metrics.defeats = G.metrics.defeats + 1
     G.metrics.defeated[inv.id] = true
