@@ -200,9 +200,16 @@ return function(R, T)
     if L.id == "sthr-loc-wheel" then d = d + 3 end
     local AL = R.appointedLoc()
     if AL == L and R.stage() >= 2 and not G.appointed.exhausted then d = d + 4 end
+    -- sleeping Echoes all wake when Dissonance leaves Calm: a careful party
+    -- counts them once the band is close to turning (Hour VIII raises it by 2)
+    local wakeSoon = R.band() == "Calm" and (R.dissonance() >= R.consts().glitch - 3 or R.hour() >= 7)
     for _, en in ipairs(G.enemies) do
-      if en.loc == L.guid and not en.engaged and not en.exhausted and not R.sleepwalking(en) and not R.isAloof(en) then
-        d = d + (en.def.damage or 0) + (en.def.horror or 0)
+      if en.loc == L.guid and not en.engaged and not en.exhausted and not R.isAloof(en) then
+        if not R.sleepwalking(en) then
+          d = d + (en.def.damage or 0) + (en.def.horror or 0)
+        elseif wakeSoon then
+          d = d + (en.def.damage or 0) + (en.def.horror or 0)
+        end
       end
     end
     if inv and ((inv.sanity - inv.horror) <= 3 or (inv.health - inv.damage) <= 3) then d = d * 2 end
@@ -326,6 +333,16 @@ return function(R, T)
     if best and bs < 6 then return best, "victory" end
     local vestry = R.locById("sthr-loc-vestry")
     if vestry and R.dissonance() >= R.consts().glitch - 1 and R.partyClues() > 0 then return vestry, "vestry" end
+    -- nothing left to do: wait out the night at the safest place a step away
+    -- (inside the district, so no crossing), not in a crowd of enemies
+    local safest, sd = here, A.danger(here, inv)
+    for _, L in pairs((here and here.adj) or {}) do
+      if not L.closed and G.impassable ~= L.guid and R.canEnter(here, L) and not R.isCrossing(here, L) then
+        local dl = A.danger(L, inv)
+        if dl < sd then safest, sd = L, dl end
+      end
+    end
+    if safest ~= here then return safest, "safety" end
     return here, "hold"
   end
 
@@ -623,6 +640,7 @@ return function(R, T)
           if why == "finale" or why == "to the finale" then s = 30 end
           if why == "victory" then s = 9 end
           if why == "hold" then s = 0 end
+          if why == "safety" then s = 14 end
           local AL2 = R.appointedLoc()
           if AL2 == step and R.stage() >= 2 and not G.appointed.exhausted and why ~= "hold back" then
             local frail = (inv.sanity - inv.horror) <= 3 or (inv.health - inv.damage) <= 3

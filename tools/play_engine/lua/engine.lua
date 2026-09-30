@@ -306,6 +306,23 @@ return function(H)
         end
       end
     end
+    -- what-if: fewer copies of an encounter card ({id = copies to remove})
+    for id, k in pairs((R.WHATIF or {}).removeFromEncounter or {}) do
+      for _ = 1, k do
+        local d = T.encounterDeck()
+        if d and d.type == "Deck" then
+          for _, e in ipairs(d.getObjects()) do
+            if (T.decode(e.gm_notes) or {}).id == id then
+              local p = d.getPosition()
+              local c = d.takeObject({ guid = e.guid, position = { p.x + 40, p.y + 2, p.z }, smooth = false })
+              E.run(0.1)
+              if c then c.destruct() end
+              break
+            end
+          end
+        end
+      end
+    end
     main = T.encounterDeck()
     if main and main.type == "Deck" then main.shuffle() end
     G.metrics.deck_size = T.deckCount(main)
