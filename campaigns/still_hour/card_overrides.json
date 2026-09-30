@@ -947,7 +947,7 @@
   },
   "sthr-act-lasthour": {
     "name": "Contest the Crossing",
-    "text": "Objective – Gain 1 contest progress each time an investigator succeeds at Hold Back or spends a deep Knowledge entry. Other sources are in the Campaign Guide. When progress reaches 5, advance.\n[action]: Spend a deep Knowledge entry your Campaign Log records (each entry once per finale).\nIf Hour IX is reached, every investigator is defeated, or Dissonance reaches the reset value, the finale ends and the contest is not reached.",
+    "text": "Objective – Gain 1 contest progress each time an investigator succeeds at Hold Back or spends a deep Knowledge entry. Other sources are in the Campaign Guide. When progress reaches 5 (6 with four investigators), advance.\n[action]: Spend a deep Knowledge entry your Campaign Log records (each entry once per finale).\nIf Hour IX is reached, every investigator is defeated, or Dissonance reaches the reset value, the finale ends and the contest is not reached.",
     "flavor": "An appointment made in ink and never kept.",
     "deck": 95114,
     "index": "1a",

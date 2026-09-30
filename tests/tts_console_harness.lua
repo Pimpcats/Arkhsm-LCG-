@@ -65,7 +65,7 @@ function runStillHourTests()
     return
   end
 
-  -- 1. Constants (contest = 5 at every count; tuning 2026-09).
+  -- 1. Constants (contest = 5, 6 at 4p; tuning 2026-09).
   local c3 = Constants.forCount(3)
   check("reset threshold 18 / appointed 12 at 3p",
     c3.resetThreshold == 18 and c3.appointedThreshold == 12)

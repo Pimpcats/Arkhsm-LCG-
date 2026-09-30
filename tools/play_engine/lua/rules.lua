@@ -55,7 +55,7 @@ return function(R, T)
   function R.knows(fact) return R.G.knowledge[fact] == true end
 
   -- Contest the Crossing: progress 5 at every player count (Constants.contestTarget)
-  R.CONTEST_TARGET = 5
+  R.CONTEST_TARGET = 5                        -- 6 with four investigators
   function R.consts()
     local n = R.G.n
     local reset, noticed = 6 * n, 4 * n
@@ -63,7 +63,7 @@ return function(R, T)
     return { reset = reset, glitch = math.floor(reset / 3), noticed = noticed,
              contest = (R.WHATIF or {}).contestFlat
                or ((R.G.cfg.contestPerInv or R.CONTEST_PER_INV) and (R.G.cfg.contestPerInv or R.CONTEST_PER_INV) * n)
-               or R.CONTEST_TARGET }
+               or (n >= 4 and R.CONTEST_TARGET + 1 or R.CONTEST_TARGET) }
   end
 
   --- Raise (or lower) Dissonance through the Control's button.
