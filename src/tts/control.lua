@@ -168,9 +168,12 @@ local function advanceAppointedByCard()
 end
 
 local function holdBack()
-  local s = Appointed.holdBack(playCtx())
+  local s, rewound = Appointed.holdBack(playCtx())
   if CampaignState.inFinale() then
     announce("Held back: the Appointed is " .. Appointed.stageName() .. " (in the finale the Hourglass does not rewind).")
+  elseif not rewound then
+    announce("Held back: the Appointed is " .. Appointed.stageName() .. " (Hold Back has rewound the Hourglass "
+      .. Constants.HOLD_BACK_REWINDS_PER_LOOP .. " times this loop: no more rewinds until the next loop).")
   else
     announce("Held back: the Appointed is " .. Appointed.stageName() .. "; the Hourglass rewinds to Hour "
       .. CampaignState.getHour() .. ".")
@@ -1312,6 +1315,14 @@ local function stillHourTestBody(T)
   local newStage = Appointed.holdBack({})
   P, F = check("Hold Back drops one stage and rewinds one Hour",
     newStage == 2 and CampaignState.getHour() == hourBefore - 1, P, F)
+  -- the loop must always end: Hold Back rewinds at most 3 times a loop
+  for _ = 2, Constants.HOLD_BACK_REWINDS_PER_LOOP do CampaignState.advanceAppointed(3); Appointed.holdBack({}) end
+  local hourCapped = CampaignState.getHour()
+  CampaignState.advanceAppointed(3)
+  local _, rewoundAgain = Appointed.holdBack({})
+  P, F = check("a fourth Hold Back in a loop does not rewind the Hourglass",
+    rewoundAgain == false and CampaignState.getHour() == hourCapped
+      and CampaignState.getHoldBackRewinds() == Constants.HOLD_BACK_REWINDS_PER_LOOP, P, F)
   P, F = check("Appointed cannot be defeated", Appointed.attemptDefeat() == false, P, F)
   local restored = false
   Appointed.onRemovalAttempt({ returnToPlay = function() restored = true end })

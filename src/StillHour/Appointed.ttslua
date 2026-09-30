@@ -136,14 +136,21 @@ end
 ----------------------------------------------------------------- counterplay --
 
 --- Hold Back — call this on a SUCCESSFUL [wil]/[com] (4) test. Pushes the
--- Approach back one stage AND rewinds the Hourglass by 1 Hour, then reconciles
--- the board. Returns the new stage.
+-- Approach back one stage AND rewinds the Hourglass by 1 Hour (at most
+-- Constants.HOLD_BACK_REWINDS_PER_LOOP times a loop, never in the finale), then
+-- reconciles the board. Returns the new stage and whether the Hourglass rewound.
 function Appointed.holdBack(ctx)
   local newStage = CampaignState.pushBackAppointed()
   -- during the finale the night gives no Hours back (guide: The Last Hour)
-  if not CampaignState.inFinale() then Hourglass.rewind(1, ctx) end
+  local rewound = false
+  if not CampaignState.inFinale()
+      and CampaignState.getHoldBackRewinds() < Constants.HOLD_BACK_REWINDS_PER_LOOP then
+    CampaignState.useHoldBackRewind()
+    Hourglass.rewind(1, ctx)
+    rewound = true
+  end
   Appointed.syncBoard(ctx)
-  return newStage
+  return newStage, rewound
 end
 
 --- It cannot be defeated. Any effect that would defeat or remove it is replaced

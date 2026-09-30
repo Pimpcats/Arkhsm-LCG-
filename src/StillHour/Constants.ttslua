@@ -12,8 +12,9 @@
 --   bands              = thirds of R: Calm / Glitch / Noticed
 --
 -- Solo (n = 1) uses the two-investigator bands (Noticed 10 / reset 16
--- instead of 5 / 8) and +5 maximum health and sanity to keep true solo
--- playable (guide: Difficulty and Player Count; tuning 2026-09, was 6 / 9).
+-- instead of 5 / 8), +3 maximum health and sanity and a second wind once a
+-- loop to keep true solo playable (guide: Difficulty and Player Count;
+-- tuning 2026-09, was 6 / 9).
 local Constants = {}
 
 Constants.BAND_CALM = "Calm"
@@ -33,13 +34,19 @@ Constants.HOUR_LAST = 9
 -- At this many Years an investigator ages out of the campaign (aging v0.3).
 Constants.AGE_OUT_YEARS = 18
 
+-- Hold Back rewinds the Hourglass at most this many times a loop (the
+-- Appointed readies every round: unlimited rewinds could hold the night at
+-- Hour VIII forever once an Hour took two Mythos phases)
+Constants.HOLD_BACK_REWINDS_PER_LOOP = 3
+
 --- Compute the full constant set for a given investigator count.
 -- @param n integer number of investigators (>= 1)
 -- @return table of thresholds
 Constants.CONTEST_TARGET = 7          -- 6 with one investigator
--- the solo rule (guide: Difficulty and Player Count): +5 maximum health and sanity
-Constants.SOLO_HEALTH_BONUS = 5
-Constants.SOLO_SANITY_BONUS = 5
+-- the solo rule (guide: Difficulty and Player Count): +3 maximum health and sanity
+-- (and a second wind once a loop, a table rule)
+Constants.SOLO_HEALTH_BONUS = 3
+Constants.SOLO_SANITY_BONUS = 3
 -- two investigators: +2 maximum health and sanity (guide: Difficulty and Player Count)
 Constants.DUO_HEALTH_SANITY_BONUS = 2
 

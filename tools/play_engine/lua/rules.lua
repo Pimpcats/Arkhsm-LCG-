@@ -514,6 +514,16 @@ return function(R, T)
     if inv.defeated then return end
     -- "I Get Out" (Birdie): not defeated
     if R.P.tryIGetOut(inv) then return end
+    -- solo second wind (guide: Difficulty and Player Count): once a loop, the
+    -- defeat is replaced: all damage and horror removed, 1 Year
+    if G.n == 1 and not inv.secondWind and not (R.WHATIF or {}).oldSolo then
+      inv.secondWind = true
+      inv.damage, inv.horror = 0, 0
+      G.metrics.second_wind = (G.metrics.second_wind or 0) + 1
+      R.log("%s is not defeated: second wind (%s)", inv.name, source or "?")
+      R.pendingYear(inv, 1, "second wind")
+      return
+    end
     inv.defeated = true
     G.metrics.defeats = G.metrics.defeats + 1
     G.metrics.defeated[inv.id] = true

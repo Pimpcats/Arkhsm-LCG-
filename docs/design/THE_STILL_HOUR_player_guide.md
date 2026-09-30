@@ -40,7 +40,7 @@ Each loop starts Dissonance at the **scar**: the number of loops you have comple
 
 **The Static token** ([static]) is a new chaos token: **−3, and raise Dissonance by 1** when it is revealed. The band decides how many are in the bag, so rising Dissonance makes more of them likely.
 
-**The Appointed** is something that climbs toward you through four stages: Unseen, Sensed, Emerging, Arrived. Rising Dissonance and certain Hours push it up. It cannot be defeated. An investigator at its location can **Hold Back** it while it is ready: a successful Hold Back pushes it down one stage, exhausts it and rewinds the Hourglass by 1 Hour. It hunts whoever carries the most Memory on their cards.
+**The Appointed** is something that climbs toward you through four stages: Unseen, Sensed, Emerging, Arrived. Rising Dissonance and certain Hours push it up. It cannot be defeated. An investigator at its location can **Hold Back** it while it is ready: a successful Hold Back pushes it down one stage, exhausts it and rewinds the Hourglass by 1 Hour (at most 3 times each loop; the Control token counts). It hunts whoever carries the most Memory on their cards.
 
 **Memory is your experience.** During a loop you gain **Memory** tokens on your cards. Some investigators' abilities use them, but they also make you the one being hunted. At the reset, all Memory on cards goes into one shared pool, **banked Memory**, which you spend between loops like experience: on **Recollections** (cards that remember the loop) and on upgrades. Learning pays too: see Knowledge, below.
 
@@ -671,7 +671,7 @@ Then read **Epilogue — What the Years Took.**
 
 - **3 investigators:** every value as printed (Dissonance bands at 8 / 16, reset at 24, Memory cap 18, scar cap 6).
 - **2 or 4 investigators:** the reset comes at **8 × investigators**; the Glitch band starts at one-third of the reset and the Noticed band at two-thirds (rounded down: 5 / 10 at two, 10 / 21 at four). The Memory cap is **6 × investigators**, and the scar cap is **2 × investigators**. With **2 investigators**, each gets **+2 maximum health** and **+2 maximum sanity** (the Control token shows them).
-- **1 investigator:** use the two-investigator bands: the reset comes at **16**, the Noticed band at **10** and Glitch at **5**; the scar cap is **4**. The Memory cap is **6**. Your investigator gets **+5 maximum health** and **+5 maximum sanity** (the Control token shows the new maximums on their card).
+- **1 investigator:** use the two-investigator bands: the reset comes at **16**, the Noticed band at **10** and Glitch at **5**; the scar cap is **4**. The Memory cap is **6**. Your investigator gets **+3 maximum health** and **+3 maximum sanity** (the Control token shows the new maximums on their card). **Second wind:** once each loop (and once in the finale), when your investigator would be defeated, they are not: remove all damage and horror from them, and they gain **1 Year** (click **Years pending**).
 - The finale's contest is **7** at 2 to 4 investigators and **6** with one: its sources do not grow with the party.
 - Values given "per investigator" (the finale's Memory thresholds) scale on their own.
 - The Control token applies all of these for you.

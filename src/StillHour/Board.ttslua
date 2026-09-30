@@ -360,7 +360,7 @@ function Board.applyAging(inv, toTracker)
   local base = Board.baseStats(inv.md)
   if not base then return nil end
   local eff = Aging.applyDriftToStats(base, inv.id)
-  -- one investigator: +5 maximum health and sanity; two: +2 (guide: Difficulty and Player Count)
+  -- one investigator: +3 maximum health and sanity; two: +2 (guide: Difficulty and Player Count)
   local c = CampaignState.constants and CampaignState.constants()
   if c and c.investigators == 1 then
     eff.health = eff.health + Constants.SOLO_HEALTH_BONUS
@@ -600,7 +600,7 @@ local STAGE_BUTTONS = {
   { fn = "shAppointedInfo", label = function() return "The Appointed: " .. Appointed.stageName() end,
     z = 1.75, w = 1100, fs = 120, tip = "Approach stage (CO-002)" },
   { fn = "shHoldBack", label = function() return "Hold Back (success)" end, z = 2.2, w = 1100, fs = 120,
-    tip = "Click after a SUCCESSFUL [willpower] or [combat] (4) test: back one stage, rewind one Hour." },
+    tip = "Click after a SUCCESSFUL [willpower] or [combat] (4) test: back one stage, rewind one Hour (3 rewinds a loop)." },
 }
 
 --- Put the Hold Back / Hunt buttons on the Appointed card (idempotent).

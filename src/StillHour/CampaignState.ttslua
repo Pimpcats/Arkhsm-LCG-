@@ -56,6 +56,7 @@ local function freshState(n)
     contest = 0,             -- finale contest progress (Contest the Crossing)
     partTwo = false,         -- Part II (The Shape of the Hour) has begun
     pendingYears = {},       -- investigatorId -> Years a card gave this loop (added at Age)
+    holdBackRewinds = 0,     -- Hold Back rewinds this loop (at most Constants.HOLD_BACK_REWINDS_PER_LOOP)
   }
 end
 
@@ -424,6 +425,17 @@ function CampaignState.pushBackAppointed()
   return state.appointedStage
 end
 
+--- Hold Back rewinds used this loop (a reset clears them).
+function CampaignState.getHoldBackRewinds()
+  return state.holdBackRewinds or 0
+end
+
+--- Count one Hold Back rewind; returns the new count.
+function CampaignState.useHoldBackRewind()
+  state.holdBackRewinds = (state.holdBackRewinds or 0) + 1
+  return state.holdBackRewinds
+end
+
 --- Is the Appointed manifested on the board (stage >= 1)?
 function CampaignState.isAppointedInPlay()
   return state.appointedStage >= 1
@@ -469,6 +481,7 @@ function CampaignState.reset()
     state.dissonance = 0
     state.hourglass = Constants.HOUR_FIRST
     state.oncePerLoopFlags = {}
+    state.holdBackRewinds = 0
     state.testTypesLastLoop = state.testTypesThisLoop
     state.testTypesThisLoop = {}
     state.appointedStage = 0
@@ -493,6 +506,7 @@ function CampaignState.reset()
 
   state.hourglass = Constants.HOUR_FIRST
   state.oncePerLoopFlags = {}
+  state.holdBackRewinds = 0
   state.testTypesLastLoop = state.testTypesThisLoop
   state.testTypesThisLoop = {}
   state.appointedStage = 0

@@ -1232,7 +1232,7 @@
     "traits": "Omen."
   },
   "sthr-appointed": {
-    "text": "Prey – Most Memory on their cards. It moves toward its prey even if other investigators are nearer.\nThe Appointed cannot be attacked, evaded, damaged or defeated, and leaves play only when pushed back to Unseen.\n[action]: Hold Back (only while the Appointed is ready). Test [wil] (4) or [com] (4). This action does not provoke an attack of opportunity from the Appointed. If you succeed, push it back one Approach stage, disengage and exhaust it, and (except during the finale) rewind the Hourglass by 1 Hour."
+    "text": "Prey – Most Memory on their cards. It moves toward its prey even if other investigators are nearer.\nThe Appointed cannot be attacked, evaded, damaged or defeated, and leaves play only when pushed back to Unseen.\n[action]: Hold Back (only while the Appointed is ready). Test [wil] (4) or [com] (4). This action does not provoke an attack of opportunity from the Appointed. If you succeed, push it back one Approach stage, disengage and exhaust it, and rewind the Hourglass by 1 Hour (not during the finale, and at most 3 times each loop)."
   },
   "sthr-minutehand": {
     "name": "The Minute Hand",

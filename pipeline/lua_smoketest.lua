@@ -208,6 +208,35 @@ local hourBefore = CampaignState.getHour()
 local newStage = Appointed.holdBack({})
 check("Hold Back drops exactly one stage", newStage == 2)
 check("Hold Back rewinds exactly one Hour", CampaignState.getHour() == hourBefore - 1)
+-- A loop must always end: Hold Back rewinds the Hourglass at most 3 times a
+-- loop (the Appointed readies every round), and a reset gives them back.
+do
+  local saved = CampaignState.getHour()
+  for _ = 2, Constants.HOLD_BACK_REWINDS_PER_LOOP do CampaignState.advanceAppointed(3) ; Appointed.holdBack({}) end
+  check("Hold Back: three rewinds a loop", CampaignState.getHour() == hourBefore - Constants.HOLD_BACK_REWINDS_PER_LOOP)
+  local capped = CampaignState.getHour()
+  CampaignState.advanceAppointed(3)
+  local _, rewound = Appointed.holdBack({})
+  check("Hold Back: a fourth success in the loop does not rewind", rewound == false and CampaignState.getHour() == capped)
+  Hourglass.advance(Constants.HOUR_LAST - capped, {})
+  check("Hold Back: the loop still reaches Hour IX", CampaignState.getHour() == Constants.HOUR_LAST)
+  CampaignState.reset()
+  check("Hold Back: a reset gives the rewinds back", CampaignState.getHoldBackRewinds() == 0)
+  -- Worst case: a party that succeeds at Hold Back every round against an
+  -- Arrived Appointed. One doom a Mythos phase (Hour I 3 doom, the others 2):
+  -- the loop still reaches Hour IX, at most 3 rewinds (6 rounds) late.
+  local doom, round = 0, 0
+  while CampaignState.getHour() < Constants.HOUR_LAST and round < 60 do
+    round = round + 1
+    CampaignState.advanceAppointed(3) ; Appointed.holdBack({})
+    doom = doom + 1
+    if doom >= (CampaignState.getHour() == 1 and 3 or 2) then doom = 0 ; Hourglass.advance(1, {}) end
+  end
+  check("Hold Back every round: the loop still ends at Hour IX (round " .. round .. ")",
+    CampaignState.getHour() == Constants.HOUR_LAST and round <= 3 + 2 * 7 + 2 * Constants.HOLD_BACK_REWINDS_PER_LOOP)
+  CampaignState.reset()
+  CampaignState.setHour(saved)
+end
 -- Sensed figure deals no attack damage; undefeatable; reset -> 0.
 CampaignState.init(3); CampaignState.advanceAppointed(1)
 check("Sensed figure deals no attack damage", Appointed.onAttack({}).damage == 0)
