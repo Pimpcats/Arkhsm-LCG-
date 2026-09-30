@@ -1,18 +1,18 @@
 --- THE STILL HOUR — campaign constants (derived from investigator count).
 -- Every threshold in the campaign is a function of the number of investigators,
 -- per aging_3p_v0.3 §2 and campaign_guide_v0.5 §10. Nothing here is hardcoded to
--- three players; three players is simply the tuned baseline (n = 3 -> 12 / 18).
+-- three players; three players is simply the tuned baseline (n = 3 -> 16 / 24).
 --
 -- Rules encoded:
---   reset threshold R  = 6 x investigators   (Dissonance hits R -> loop resets)
---   Appointed Arrived  = 4 x investigators   (Noticed band; the Appointed arrives)
+--   reset threshold R  = 8 x investigators   (Dissonance hits R -> loop resets)
+--   Appointed Arrived  = floor(2R / 3)       (Noticed band; the Appointed arrives)
 --   Memory soft cap    = 6 x investigators
 --   contest target     = 7, 6 solo            (finale; was 4 x investigators, CO-001)
---   scar cap           = floor(R / 3)         (start-of-loop Dissonance ceiling)
+--   scar cap           = 2 x investigators    (start-of-loop Dissonance ceiling; 4 solo)
 --   bands              = thirds of R: Calm / Glitch / Noticed
 --
--- Solo (n = 1) uses the two-investigator bands (Noticed 8 / reset 12
--- instead of 4 / 6) and +3 maximum health and sanity to keep true solo
+-- Solo (n = 1) uses the two-investigator bands (Noticed 10 / reset 16
+-- instead of 5 / 8) and +5 maximum health and sanity to keep true solo
 -- playable (guide: Difficulty and Player Count; tuning 2026-09, was 6 / 9).
 local Constants = {}
 
@@ -37,9 +37,9 @@ Constants.AGE_OUT_YEARS = 18
 -- @param n integer number of investigators (>= 1)
 -- @return table of thresholds
 Constants.CONTEST_TARGET = 7          -- 6 with one investigator
--- the solo rule (guide: Difficulty and Player Count): +3 maximum health and sanity
-Constants.SOLO_HEALTH_BONUS = 3
-Constants.SOLO_SANITY_BONUS = 3
+-- the solo rule (guide: Difficulty and Player Count): +5 maximum health and sanity
+Constants.SOLO_HEALTH_BONUS = 5
+Constants.SOLO_SANITY_BONUS = 5
 
 function Constants.forCount(n)
   n = math.max(1, math.floor(n or 3))

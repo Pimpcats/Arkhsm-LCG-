@@ -167,7 +167,7 @@
   "sthr-crossing": {
     "name": "The Crossing",
     "traits": "Omen.",
-    "text": "Revelation – Advance the Appointed's Approach by 1 stage. Then raise Dissonance by 1.",
+    "text": "Revelation – Advance the Appointed's Approach by 1 stage. Then place 1 doom on the current Hour.",
     "quantity": 1
   },
   "sthr-loc-square": {

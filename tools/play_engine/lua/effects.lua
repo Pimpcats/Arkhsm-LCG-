@@ -567,7 +567,7 @@ return function(R, T)
     E.run(0.3)
     R.touch()
     R.G.metrics.approach_by_card = R.G.metrics.approach_by_card + (R.stage() - s0)
-    R.raise(1, "The Crossing")
+    if (R.WHATIF or {}).oldCrossing then R.raise(1, "The Crossing") else R.placeDoom(1, "The Crossing") end
     return "discard"
   end
 
