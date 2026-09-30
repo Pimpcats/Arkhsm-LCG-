@@ -493,10 +493,13 @@ return function(R, T)
       opts[#opts + 1] = o
     end
 
-    -- 1. engaged enemies
+    -- 1. engaged enemies: fight or evade any of them (the most dangerous or the
+    -- easiest to remove scores best), not only the first to engage
     local eng = engagedWith(inv)
-    if #eng > 0 then
-      local en = eng[1]
+    local worst, worstThreat = nil, -1
+    for _, en in ipairs(eng) do
+      local threat = (en.def.damage or 0) + (en.def.horror or 0)
+      if threat > worstThreat then worst, worstThreat = en, threat end
       local weapon = bestWeapon(inv)
       local skill = weapon and (P.WEAPON[weapon.name][4] or "com") or "com"
       local pf = R.prob(inv, R.skillBase(inv, skill) + P.staticBonus(inv, skill, { kind = "fight", weapon = weapon }) - R.enemyFight(en) + 1)
@@ -506,8 +509,9 @@ return function(R, T)
       local hits = math.ceil(left / per)
       local wantEvade = (en.id == "sthr-onewhorides" and not en.exhausted)
         or (G.walksBesideCurrent and L.id == "sthr-loc-turning" and R.hasTrait(en.def, "Echo"))
-      local fightScore = 30 * pf / hits
-      local evadeScore = R.cannotEvade(en) and 0 or 26 * pe
+      -- an enemy that hits harder is worth more to be rid of (+1 a point of damage or horror)
+      local fightScore = (30 + threat) * pf / hits
+      local evadeScore = R.cannotEvade(en) and 0 or (26 + threat) * pe
       if (inv.health - inv.damage) <= (en.def.damage or 0) + 1 then fightScore = fightScore * 0.7 end
       if inv.id == "sthrelias" or inv.id == "sthrseraphine" and weapon then fightScore = fightScore * 1.3 end
       if wantEvade then evadeScore = evadeScore + 50 end
@@ -515,9 +519,11 @@ return function(R, T)
       if G.finale and en.id == "sthr-uninvited" then fightScore = fightScore * 1.6 end
       add(fightScore, "fight", function() R.ACT.fight(inv, en, weapon) end, { provokes = false })
       add(evadeScore, "evade", function() R.ACT.evade(inv, en) end, { provokes = false })
+    end
+    if worst then
+      local en = worst
       -- event answers
       for _, c in ipairs(inv.hand) do
-        if c.name == "Stray Cat" then end
         if c.name == "Cunning Distraction" and inv.resources >= 5 and #eng >= 2 then
           add(40, "play", function() R.ACT.play(inv, c) end, { provokes = false })
         end
