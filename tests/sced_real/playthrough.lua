@@ -671,16 +671,18 @@ return function(H)
   end)
 
   step("Loop 1: Dissonance bands move [static] in SCED's chaos bag", function()
-    -- bands scale with the party (Constants.forCount): reset 6n, Glitch from
-    -- 2n, Noticed from 4n
+    -- bands scale with the party (Constants.forCount): reset 8n (16 solo),
+    -- Glitch from a third of it, Noticed from two-thirds
     local n = st().investigators
+    local reset = (n == 1) and 16 or 8 * n
+    local glitchAt, noticedAt = math.floor(reset / 3), math.floor(2 * reset / 3)
     local d0 = st().dissonance
-    for _ = 1, math.max(0, 2 * n - d0) do click(control(), "Dissonance") end
+    for _ = 1, math.max(0, glitchAt - d0) do click(control(), "Dissonance") end
     E.run(3)
     check("Glitch band: 1 [static] in SCED's chaos bag", staticInBag() == 1 and st().band == "Glitch",
       staticInBag() .. " at " .. st().dissonance .. " " .. st().band)
     check("SCED's own bag state still reads (unknown [static] skipped)", #bagState() == 17, #bagState())
-    for _ = 1, 4 * n - st().dissonance do click(control(), "Dissonance") end
+    for _ = 1, noticedAt - st().dissonance do click(control(), "Dissonance") end
     E.run(3)
     check("Noticed band: 2 [static] in SCED's chaos bag", staticInBag() == 2 and st().band == "Noticed",
       staticInBag() .. " at " .. st().dissonance .. " " .. st().band)
@@ -718,7 +720,7 @@ return function(H)
     tickLog("k:the-lamp-was-never-lit")
     E.run(1)
     local m1 = st().memory
-    check("a surface entry pays 1 per investigator (+2)", m1 == m0 + 2, m0 .. " -> " .. m1)
+    check("a surface entry pays nothing (Knowledge pays Memory for deep entries only)", m1 == m0, m0 .. " -> " .. m1)
     check("the log shows it ticked", logValue("k:the-lamp-was-never-lit") == true)
     tickLog("k:the-lamp-was-never-lit")      -- a mis-tick cleared: refund
     E.run(1)

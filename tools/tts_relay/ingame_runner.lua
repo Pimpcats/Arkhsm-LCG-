@@ -335,6 +335,14 @@ step("board: touchable counters", function(go)
   end, 90)
 end)
 
+-- Dissonance band starts for the table's current investigator count (Constants.forCount:
+-- reset 8n, 16 solo; Glitch from a third of it, Noticed from two-thirds)
+local function bandStarts(ctl)
+  local n = (ctl.call("shApiState") or {}).investigators or 3
+  local reset = (n == 1) and 16 or 8 * n
+  return math.floor(reset / 3), math.floor(2 * reset / 3)
+end
+
 local function staticInBag(bag)
   -- SCED respawns its chaos bag when a difficulty is set (setChaosBagState),
   -- so a bag found earlier can be gone: look it up again
@@ -352,7 +360,7 @@ step("board: [static] in the chaos bag", function(go)
   if not ctl then return go() end
   ctl.call("shApiRestore", { blob = snapshot })
   if not scedHere then
-    local s = ctl.call("shApiCounter", { name = "dissonance", delta = 6 })
+    local s = ctl.call("shApiCounter", { name = "dissonance", delta = (bandStarts(ctl)) })
     check("vanilla table: [static] counted without touching any bag",
       s.static.target == 1 and s.static.mode ~= "sced", s.static.mode .. " target " .. s.static.target)
     ctl.call("shApiRestore", { blob = snapshot })
@@ -363,11 +371,12 @@ step("board: [static] in the chaos bag", function(go)
   if not bag then return go() end
   local start = staticInBag(bag)
   local d0 = ctl.call("shApiState").dissonance
-  local toGlitch = math.max(0, 6 - d0)
+  local glitchAt, noticedAt = bandStarts(ctl)
+  local toGlitch = math.max(0, glitchAt - d0)
   ctl.call("shApiCounter", { name = "dissonance", delta = toGlitch })
   waitFor(function() return staticInBag(bag) == 1 end, 15, function(ok1)
     check("entering Glitch puts 1 [static] in the chaos bag", ok1, start .. " -> " .. staticInBag(bag))
-    ctl.call("shApiCounter", { name = "dissonance", delta = 6 })
+    ctl.call("shApiCounter", { name = "dissonance", delta = noticedAt - glitchAt })
     waitFor(function() return staticInBag(bag) == 2 end, 15, function(ok2)
       check("entering Noticed puts a 2nd [static] in the chaos bag", ok2, "in bag: " .. staticInBag(bag))
       local state = Global.call("getChaosBagState")
@@ -648,7 +657,8 @@ step("board: Aging on the investigator", function(go)
   local ctl = findControl()
   if not ctl or not INV.elias then return go() end
   ctl.call("shApiRestore", { blob = snapshot })
-  ctl.call("shApiCounter", { name = "dissonance", delta = 12 })
+  local _, noticedAt = bandStarts(ctl)
+  ctl.call("shApiCounter", { name = "dissonance", delta = noticedAt })
   ctl.call("shApiReset")                                   -- the loop ends in danger
   -- leaning is derived from the investigator's own tallies, clicked on the card
   local card = INV.elias
@@ -760,7 +770,7 @@ step("board: chaos bag difficulty presets", function(go)
   -- the owner's bag is put back exactly as it was afterwards
   local before = {}
   for i, id in ipairs(Global.call("getChaosBagState") or {}) do before[i] = id end
-  ctl.call("shApiCounter", { name = "dissonance", delta = 6 })     -- Glitch: 1 [static]
+  ctl.call("shApiCounter", { name = "dissonance", delta = (bandStarts(ctl)) })     -- Glitch: 1 [static]
   local ok1 = ctl.call("shApiDifficulty", { i = 1 })              -- Easy: 17 tokens
   waitFor(function()
     local st = Global.call("getChaosBagState") or {}

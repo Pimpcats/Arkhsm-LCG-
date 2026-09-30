@@ -92,17 +92,17 @@ expect("script_state is kept current (TTS only writes it on save; reload() reads
   and env.self.script_state:find('"campaign"', 1, true) ~= nil)
 env.shClickMemory(nil, "White", true)
 expect("Memory right-click -1", env.shApiState().memory == 1)
-for _ = 1, 6 do env.shClickDissonance(nil, "White", false) end
+for _ = 1, 8 do env.shClickDissonance(nil, "White", false) end
 local s = env.shApiState()
-expect("Dissonance 6 -> Glitch, Appointed Sensed, 1 [static] (virtual bag)",
-  s.dissonance == 6 and s.band == "Glitch" and s.stage == 1 and s.static.target == 1 and s.static.mode == "virtual")
+expect("Dissonance 8 -> Glitch, Appointed Sensed, 1 [static] (virtual bag)",
+  s.dissonance == 8 and s.band == "Glitch" and s.stage == 1 and s.static.target == 1 and s.static.mode == "virtual")
 env.shClickDissonance(nil, "White", true)
-expect("Dissonance right-click reduces", env.shApiState().dissonance == 5)
+expect("Dissonance right-click reduces", env.shApiState().dissonance == 7)
 env.shClickHour(nil, "White", false)
 expect("Hour left-click advances", env.shApiState().hour == 2)
 env.shClickHour(nil, "White", true)
 expect("Hour right-click rewinds", env.shApiState().hour == 1)
-expect("Dissonance button label tracks state", hasLabel("Dissonance 5 / 18") ~= nil)
+expect("Dissonance button label tracks state", hasLabel("Dissonance 7 / 24") ~= nil)
 env.shClickAppointed(nil, "White", false)
 expect("Appointed card-advance ratchets up a stage", env.shApiState().stage == 2)
 env.shHoldBack()
@@ -216,7 +216,7 @@ local mirror = env.shApiLogMirror()
 expect("state is mirrored into the campaign log memo", mirror ~= nil and mirror.bytes > 0)
 
 -- interlude: bank, age with a locked choice, visible Years
-env.shApiCounter({ name = "dissonance", delta = 12 })
+env.shApiCounter({ name = "dissonance", delta = 16 })
 env.shApiReset()
 env.shOpenInterlude()
 expect("interlude shows Bank on-card Memory (2)", hasLabel("Bank on-card Memory (2)") ~= nil)
@@ -316,7 +316,7 @@ env3[label3("No Age").click_function](nil, "White", false)
 expect("clicking it gives no Years and says why", last3:find("do not gain Years", 1, true) ~= nil
   and env3.shApiInvestigators()[1].years == 0)
 env3.shBeginNextLoop()
-env3.shApiCounter({ name = "dissonance", delta = 12 })
+env3.shApiCounter({ name = "dissonance", delta = 16 })
 env3.shReset() ; env3.shReset()
 expect("a second Reset Loop after a loop counts one loop only", env3.shApiState().loops == 1)
 env3.shOpenInterlude()
