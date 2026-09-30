@@ -281,31 +281,34 @@ def simulate_stress(trials, investigators, rng, style, scar=0):
 
 
 # --------------------------------------------------------------------------- #
-# FINALE CONTEST — stage-aware model of "contest the crossing"
+# FINALE CONTEST — stage-aware model of "Contest the Crossing"
 # --------------------------------------------------------------------------- #
-# Target = 4 x investigators (12 at 3p). Deep facts spent and each investigator's
-# first visit to the Sealed Study add 1 contest each at the start. Hold Back
-# (wil/com 4) needs a ready Appointed and a success exhausts it: one per round;
-# a success adds 1 contest, pushes the Appointed back ONE APPROACH STAGE, and
-# rewinds the Hourglass 1 Hour. The self-limiters the naive model missed:
+# Target FINALE_CONTEST (7; 6 with one investigator). Each deep Knowledge entry
+# spent adds 1. Hold Back (wil/com 4) needs a ready Appointed and a success
+# exhausts it: one per round; a success adds 1 contest and pushes the Appointed
+# back ONE APPROACH STAGE. During the finale Hold Back does not rewind the
+# Hourglass. The self-limiters:
 #   * Hold Back needs the Appointed MANIFEST (stage >= 1) — pushed to Unseen, it
 #     can't be farmed until the clock re-raises it.
-#   * Hour "when reached" effects re-fire on re-crossing after a rewind
-#     (Hourglass.advance resolves every newly stepped Hour): re-crossing VIII
+#   * Hour "when reached" effects fire as the clock crosses them: VIII
 #     re-Arrives it AND raises Dissonance +2; III adds +1.
 #   * Dissonance does not reset in the finale and still climbs from the deck; at
-#     the reset threshold (18) the finale is LOST (the loop closes its hand).
+#     the reset value the finale is LOST (the loop closes its hand).
 # ASSUMPTIONS: Hold Back success p; deck Dissonance 0.8/round; finale declared at
 # start_hour with Dissonance = start_diss; one attempt per investigator per round.
+# The play engine (tools/play_engine) plays the finale card by card; this model
+# is the quick what-if.
+FINALE_CONTEST = 7
+
+
 def simulate_finale_staged(rng, investigators, deep_facts, holdback_p, trials,
                            start_hour=5.0, start_diss=12.0):
-    target = 4 * investigators
+    target = FINALE_CONTEST - 1 if investigators == 1 else FINALE_CONTEST
     reset_t = 8 * investigators if investigators != 1 else 16     # bands at 8 x investigators
     reached = 0
     for _ in range(trials):
-        # contest sources other than Hold Back: each deep entry spent, and the
-        # first time each investigator is at the Sealed Study (card text).
-        contest = deep_facts + investigators
+        # contest sources other than Hold Back: each deep entry spent
+        contest = deep_facts
         hour = start_hour
         diss = start_diss
         stage = 3                      # enters the finale Arrived
@@ -334,8 +337,7 @@ def simulate_finale_staged(rng, investigators, deep_facts, holdback_p, trials,
             for _i in range(investigators):
                 if stage >= 1 and contest < target and rng.random() < holdback_p:
                     contest += 1
-                    stage -= 1
-                    hour = max(1.0, hour - 1)   # rewind (no re-resolve on rewind)
+                    stage -= 1                  # no rewind during the finale
                     break
             if contest >= target:
                 won = True
@@ -496,8 +498,9 @@ def main():
             cells = "  ".join("{:6.1%}".format(simulate_stress(args.trials // 2, n, rng, st, scar)["hard_reset_rate"])
                               for st in ("cautious", "typical", "greedy"))
             print("      {}      |  {}".format(scar, cells))
-        print("\n  Finale contest reach % — STAGE-AWARE model (target {} = 4x inv;".format(4 * n))
-        print("  Approach stages, re-fired Hour crossings, Dissonance-18 loss all modelled).")
+        print("\n  Finale contest reach % — STAGE-AWARE model (target {};".format(
+            FINALE_CONTEST - 1 if n == 1 else FINALE_CONTEST))
+        print("  Approach stages, Hour crossings and the Dissonance-reset loss modelled).")
         print("  The declared-at Dissonance dominates — declaring early in a calm loop vs")
         print("  at the Noticed band is the strategic choice the numbers reward:")
         print("  declared at Dissonance \\ Hold-Back p |  0.40   0.50   0.60   (4 deep facts)")

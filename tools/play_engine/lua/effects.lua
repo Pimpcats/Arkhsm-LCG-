@@ -146,6 +146,8 @@ return function(R, T)
 
   function R.cancelAdvance(why)
     local G = R.G
+    -- the finale's setup Skip to Hour V is an instruction, not an advance to cancel
+    if why == "the finale begins" then return false end
     if G.rememberEnding and G.round <= G.rememberEnding then
       G.rememberEnding = nil
       G.metrics.cancelled_advances = G.metrics.cancelled_advances + 1

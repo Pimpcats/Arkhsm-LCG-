@@ -85,6 +85,21 @@ io.write(r.selfType, " ", r.globalType, " ", r.listType, " ", r.strType)
 """
 
 
+def test_no_truncating_list_copies():
+    # { t and table.unpack(x) or unpack(x) } keeps only the first value (an
+    # and/or expression is one value): the enemy phase once copied G.enemies
+    # that way, and every enemy but the first skipped moving and attacking
+    import re
+    bad = re.compile(r"\{\s*table\.unpack\s+and\s+table\.unpack\(")
+    hits = []
+    for name in sorted(os.listdir(os.path.join(ENGINE, "lua"))):
+        if name.endswith(".lua"):
+            for i, line in enumerate(open(os.path.join(ENGINE, "lua", name), encoding="utf-8"), 1):
+                if bad.search(line):
+                    hits.append("%s:%d" % (name, i))
+    assert not hits, "list copies that keep one element: %s" % hits
+
+
 @pytest.mark.skipif(not LUA, reason="no lua5.2 installed")
 def test_emulator_objects_are_userdata_to_scripts(tmp_path):
     # SCED tells an object from a list of objects by type() (DeckLib.parseObjectTable):
@@ -139,3 +154,21 @@ def test_one_short_game_per_scenario(clean_tree):
         assert not errs, "%s: Lua errors: %s" % (g["scenario"], errs[:3])
         assert not g.get("engine_error"), "%s: engine error: %s" % (g["scenario"], g["engine_error"])
     assert not r["failed_checks"], json.dumps(r["failed_checks"])[:2000]
+
+
+def test_finale_skip_stops_at_hour_five(clean_tree):
+    # a finale begun before Hour V skips to Hour V; with Hour IV removed the
+    # Control steps over it, so the Skip takes one click fewer (the engine once
+    # clicked a fixed count and began the finale at Hour VI)
+    why = _real()
+    if why:
+        pytest.skip(why)
+    run = _engine_run()
+    run.prepare(SAVE)
+    r = run.run_batch(SAVE, "finale", 3, 1, 1000, trace=True, max_rounds=3, timeout=1800)
+    games = r["games"]
+    assert games, r["stderr"][-3000:] or r["stdout_tail"]
+    trace = games[0].get("trace") or []
+    skips = [line for line in trace if "(the finale begins)" in line and "Hourglass advances" in line]
+    assert skips, "the finale did not begin with a Skip: %s" % trace[-20:]
+    assert skips[-1].endswith("-> 5"), skips

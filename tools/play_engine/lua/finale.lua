@@ -94,9 +94,17 @@ return function(R, T)
     -- begun at Hour IX: Hours IX to VI go back on the deck, Hour V is current,
     -- no Hour resolves (right-click Hour four times)
     if atNine then R.rewind(4, "the finale begins at Hour IX") end
-    -- a finale begun before Hour V skips to Hour V (each Hour resolves)
+    -- a finale begun before Hour V skips to Hour V (each Hour resolves). The
+    -- Control steps over a removed Hour (The Hour Was Wrong removes Hour IV),
+    -- so advance until Hour V is current rather than a fixed number of clicks.
     local fromHour = (R.WHATIF or {}).finaleFrom or 5
-    if not atNine and R.hour() < fromHour then R.advance(fromHour - R.hour(), "the finale begins") end
+    if not atNine then
+      local guard = 0
+      while R.hour() < fromHour and not G.ended and guard < 9 do
+        guard = guard + 1
+        R.advance(1, "the finale begins")
+      end
+    end
     -- the Uninvited at the revealed location farthest from all investigators, not closed
     if unv then
       local far, fd
@@ -128,6 +136,13 @@ return function(R, T)
     if G.logFlags["You have spoken the name"] then R.contest((R.WHATIF or {}).spokenValue or 1, "You have spoken the name") end
     if G.logFlags["The drowned heard the true hour"] then R.rewind(1, "The drowned heard the true hour") end
     G.nameUnspoken = G.logFlags["The name is kept unspoken"]
+    -- what-if: each investigator heals when the finale begins ({damage, horror})
+    local fh = (R.WHATIF or {}).finaleHeal
+    if fh then
+      for _, x in ipairs(R.aliveInvs()) do
+        R.heal(x, math.min(fh[1] or 0, x.damage), math.min(fh[2] or 0, x.horror))
+      end
+    end
     G.deepToSpend = {}
     for _, f in ipairs(DEEP) do if R.knows(f) then G.deepToSpend[#G.deepToSpend + 1] = f end end
     -- the first time each investigator is at the Sealed Study (those already there gain it now)

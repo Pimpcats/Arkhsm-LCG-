@@ -260,7 +260,7 @@ return function(R, T)
       if AL and R.stage() >= 1 and not G.appointed.exhausted and here and AL ~= here and not A.frail(inv) and not engagedNow then
         local _, d, crossings = R.route(here, AL)
         local skill = (R.skillBase(inv, "wil") >= R.skillBase(inv, "com")) and "wil" or "com"
-        local p = R.prob(inv, R.skillBase(inv, skill) + P.staticBonus(inv, skill, {}) - 4 + 1)
+        local p = R.prob(inv, R.skillBase(inv, skill) + P.staticBonus(inv, skill, {}) - R.holdBackDiff() + 1)
         if d and d <= 1 and (crossings or 0) == 0 and p >= 0.4 then return AL, "hold back" end
       end
       return study, "finale"
@@ -536,7 +536,7 @@ return function(R, T)
     -- (waiting to begin the finale at Hour IX, the party lets the Appointed come)
     if AL == L and R.stage() >= 1 and not G.appointed.exhausted and not (G.cfg.finaleAtNine and not G.finale) then
       local skill = (R.skillBase(inv, "wil") >= R.skillBase(inv, "com")) and "wil" or "com"
-      local p = R.prob(inv, R.skillBase(inv, skill) + P.staticBonus(inv, skill, {}) - 4 + 1)
+      local p = R.prob(inv, R.skillBase(inv, skill) + P.staticBonus(inv, skill, {}) - R.holdBackDiff() + 1)
       local s = 34 * p + (G.finale and 20 or 0) + (R.hour() >= 6 and 6 or 0)
       -- in the finale, once the deep entries are spent, Hold Back is the way
       -- forward: worth trying at long odds (cards are committed to it)

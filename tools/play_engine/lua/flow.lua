@@ -374,11 +374,16 @@ return function(R, T)
     R.placeEnemy(en)
   end
 
+  --- Hold Back's test difficulty (4; what-if: another value during the finale).
+  function R.holdBackDiff()
+    return (R.G.finale and (R.WHATIF or {}).finaleHoldBackDiff) or 4
+  end
+
   function A_.holdBack(inv)
     local G = R.G
     local skill = (R.skillBase(inv, "wil") + P.staticBonus(inv, "wil", {}) >= R.skillBase(inv, "com") + P.staticBonus(inv, "com", {})) and "wil" or "com"
     G.metrics.holdback_attempts = G.metrics.holdback_attempts + 1
-    local ok = R.test(inv, skill, 4, { kind = "holdback", important = true })
+    local ok = R.test(inv, skill, R.holdBackDiff(), { kind = "holdback", important = true })
     if ok then
       G.metrics.holdbacks = G.metrics.holdbacks + 1
       local card = R.appointedCard()
@@ -531,12 +536,22 @@ return function(R, T)
     inv.turnDone = true
   end
 
+  -- a copy of a list to iterate while it changes (a move, attack or defeat can
+  -- add or remove enemies). Not { a and table.unpack(t) or unpack(t) }: an
+  -- and/or expression keeps only the first value, so that copy held one enemy
+  -- and every other enemy skipped the enemy phase.
+  local function copyList(t)
+    local c = {}
+    for i, v in ipairs(t) do c[i] = v end
+    return c
+  end
+
   function R.enemyPhase()
     local G = R.G
     G.phase = "enemy"
     FX.checkWakes()
     -- hunters move
-    for _, en in ipairs({ table.unpack and table.unpack(G.enemies) or unpack(G.enemies) }) do
+    for _, en in ipairs(copyList(G.enemies)) do
       if not en.dead and not en.engaged and not en.exhausted and not R.sleepwalking(en) and R.isHunter(en) then
         local here = G.locs[en.loc]
         if here and #R.investigatorsAt(here) == 0 then
@@ -567,7 +582,7 @@ return function(R, T)
       end
     end
     -- engaged enemies attack
-    for _, en in ipairs({ table.unpack and table.unpack(G.enemies) or unpack(G.enemies) }) do
+    for _, en in ipairs(copyList(G.enemies)) do
       if not en.dead and en.engaged and not en.exhausted and not R.sleepwalking(en) then
         R.enemyAttack(en, en.engaged, "enemy phase")
         en.exhausted = true
