@@ -28,12 +28,13 @@ __modules["StillHour/Constants"] = function()
 --   reset threshold R  = 6 x investigators   (Dissonance hits R -> loop resets)
 --   Appointed Arrived  = 4 x investigators   (Noticed band; the Appointed arrives)
 --   Memory soft cap    = 6 x investigators
---   contest target     = 4 x investigators   (finale; 8/12/16 at 2/3/4p — CO-001)
+--   contest target     = 5, 6 at 4p           (finale; was 4 x investigators, CO-001)
 --   scar cap           = floor(R / 3)         (start-of-loop Dissonance ceiling)
 --   bands              = thirds of R: Calm / Glitch / Noticed
 --
--- Solo (n = 1) is intentionally looser than the pure 4x/6x rule
--- (6 / 9 instead of 4 / 6) to keep true-solo playable — guide §10.
+-- Solo (n = 1) uses the two-investigator bands (Noticed 8 / reset 12
+-- instead of 4 / 6) and +3 maximum health and sanity to keep true solo
+-- playable (guide: Difficulty and Player Count; tuning 2026-09, was 6 / 9).
 local Constants = {}
 
 Constants.BAND_CALM = "Calm"
@@ -56,25 +57,31 @@ Constants.AGE_OUT_YEARS = 18
 --- Compute the full constant set for a given investigator count.
 -- @param n integer number of investigators (>= 1)
 -- @return table of thresholds
+Constants.CONTEST_TARGET = 5          -- 6 with four investigators
+-- the solo rule (guide: Difficulty and Player Count): +3 maximum health and sanity
+Constants.SOLO_HEALTH_BONUS = 3
+Constants.SOLO_SANITY_BONUS = 3
+
 function Constants.forCount(n)
   n = math.max(1, math.floor(n or 3))
   local reset = 6 * n
   local appointed = 4 * n
   if n == 1 then
-    -- Documented solo override (guide §10): looser than 4/6.
-    reset = 9
-    appointed = 6
+    -- Documented solo override: the two-investigator bands (was 6 / 9).
+    reset = 12
+    appointed = 8
   end
   return {
     investigators = n,
     resetThreshold = reset,
     appointedThreshold = appointed,
     memoryCap = 6 * n,
-    -- Finale contest target = 4 x investigators (8 / 12 / 16 at 2 / 3 / 4p).
-    -- Resolved by CO-001: the guide's "12 at three players" was intended and
-    -- "3 x investigators" was an arithmetic slip (3 x 3 = 9). Nine made the
-    -- finale too easy and undercut the "cost is age" payoff.
-    contestTarget = 4 * n,
+    -- Finale contest target: 5, or 6 with four investigators (tuning 2026-09,
+    -- docs/design/PLAYTEST_SIM.md). Its sources (deep entries, Hold Back
+    -- successes, the Uninvited) do not grow with the party, so the old
+    -- 4 x investigators (CO-001) was out of reach at 3-4 investigators and
+    -- nearly automatic solo.
+    contestTarget = (n >= 4) and 6 or 5,
     scarCap = math.floor(reset / 3),
     bandGlitchStart = math.floor(reset / 3),
     bandNoticedStart = math.floor(2 * reset / 3),
@@ -993,7 +1000,7 @@ local HOUR_HANDLERS = {
     if ctx and ctx.roadGivesWay then
       ctx.roadGivesWay()
     end
-    return "The location with the fewest clues becomes impassable."
+    return "The lead investigator makes a revealed location with the fewest clues, other than the Square, impassable."
   end,
 
   [5] = function(ctx)
@@ -2282,7 +2289,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/a1535f0fa631e78ccabed3f7880645606cf0a51a/dist/cards/sthr-static-token.jpg?v=a556271511"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/c58adaf024d745b328ac11fc21f710aba0f96ba9/dist/cards/sthr-static-token.jpg?v=a556271511"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -2588,6 +2595,7 @@ __modules["StillHour/Board"] = function()
 local Aging = require("StillHour/Aging")
 local Appointed = require("StillHour/Appointed")
 local CampaignState = require("StillHour/CampaignState")
+local Constants = require("StillHour/Constants")
 local Locations = require("StillHour/Locations")
 local SCED = require("StillHour/SCED")
 
@@ -2923,6 +2931,12 @@ function Board.applyAging(inv, toTracker)
   local base = Board.baseStats(inv.md)
   if not base then return nil end
   local eff = Aging.applyDriftToStats(base, inv.id)
+  -- one investigator: +2 maximum health and sanity (guide: Difficulty and Player Count)
+  local c = CampaignState.constants and CampaignState.constants()
+  if c and c.investigators == 1 then
+    eff.health = eff.health + Constants.SOLO_HEALTH_BONUS
+    eff.sanity = eff.sanity + Constants.SOLO_SANITY_BONUS
+  end
   if toTracker and inv.matColor then
     SCED.setSkillTracker(inv.matColor, eff.wil, eff.int, eff.com, eff.agi)
   end
@@ -3789,6 +3803,13 @@ local function forgetFact(id)
     announce(string.format("%s removed: -%d banked Memory (%d banked).", factName(id), refund,
       CampaignState.getBankedMemory()))
   end
+  -- the assembled entry was recorded because of this one (a mis-tick): with
+  -- its inputs no longer all recorded, it goes too
+  if removed and id ~= "the-way-the-night-breaks" and CampaignState.knows("the-way-the-night-breaks")
+      and not CampaignState.inFinale() and not Knowledge.canAssembleFinale() then
+    Knowledge.forget("the-way-the-night-breaks")
+    announce("The Way the Night Breaks no longer has all its entries: untick it on the Campaign Log too.")
+  end
   local rep = guarded("locations", Board.syncLocations) or {}
   return { removed = removed, refund = refund or 0, report = rep }
 end
@@ -3993,7 +4014,8 @@ local function drawPlay()
     button("shClickContest", string.format("Contest %d / %d", CampaignState.getContest(), c.contestTarget),
       0.0, 2.6, 620, "The Last Hour: contest progress. " .. PLUS_MINUS
         .. ". Right-click at 0: the finale was not begun after all.")
-  elseif CampaignState.knows("the-way-the-night-breaks") then
+  elseif CampaignState.knows("the-way-the-night-breaks") and not CampaignState.isLoopEnded() then
+    -- the finale begins during a loop, never Between Loops (after Reset Loop)
     button("shBeginFinale", "Begin Finale", 0.0, 2.6, 620,
       "Click when you begin the finale (The Last Hour). Hour IX then ends the finale, not the loop.")
   end
@@ -4214,6 +4236,12 @@ function shAge4() ageAt(4) end
 function shBeginFinale()
   guarded("finale", function()
     if not CampaignState.knows("the-way-the-night-breaks") or CampaignState.inFinale() then return end
+    -- Between Loops (Reset Loop clicked, Begin Next Loop not yet): a finale
+    -- begun now would carry into the next loop's Hour IX and Contest counter
+    if CampaignState.isLoopEnded() then
+      announce("The finale begins during a loop: click Begin Next Loop first.")
+      return
+    end
     CampaignState.setFinale(true)
     CampaignState.setContest(0)
     announce(string.format("The finale begins: contest progress 0 / %d. If Hour IX is reached, the finale ends "
@@ -4672,7 +4700,8 @@ local function stillHourTestBody(T)
 
   local c3 = Constants.forCount(3)
   P, F = check("reset 18 / appointed 12 at 3p", c3.resetThreshold == 18 and c3.appointedThreshold == 12, P, F)
-  P, F = check("contest target 12 at 3p (CO-001 4*n)", c3.contestTarget == 12, P, F)
+  P, F = check("contest target 5 (6 at 4p)", c3.contestTarget == 5 and Constants.forCount(1).contestTarget == 5
+    and Constants.forCount(4).contestTarget == 6, P, F)
 
   local bag = { count = 0 }
   bag.setBaselineStatic = function(m) bag.count = m end
