@@ -351,3 +351,28 @@ before the finale loop at 3p. Finale unlock (tempo, first-time play, 3p):
 loop 5-6 (4-8). Years per investigator per loop 1.3-1.9. `simulate.py`: 0
 failed assertions (its greedy style, leaning every round, now resets 76% of
 fresh loops; cautious and typical 0%). Simulation only; not a playtest.
+
+### Targeted pass (2026-09-30)
+
+- The Crossing (`sthr-crossing`): "Then raise Dissonance by 1" → "Then place
+  1 doom on the current Hour". The Square alone (60 games at 3p): resets
+  13% → 0%, wipes 17% → 3%; three-district loop two objectives 73% (one
+  seed set) → 60% / 40% on two seed sets of 30 (50%); Lighthouse 87% → 80%,
+  Road 97% → 100%.
+- Hold Back (`sthr-appointed`): rewinds the Hourglass at most 3 times each
+  loop (Control: `Constants.HOLD_BACK_REWINDS_PER_LOOP`, counted in
+  CampaignState, cleared by a reset). Closes a stall: with Hours of 2 doom a
+  Hold Back every round held the Square at Hour VIII forever (3 of 30 engine
+  games at 3p, 1 of 15 at 4p hit the 30-round cap). Square alone 15-16 →
+  11.5 rounds; smoke tests check the cap and that a loop with a Hold Back
+  every round still reaches Hour IX.
+- Solo: +3 maximum health and sanity kept, plus a second wind once a loop
+  (and once in the finale): a defeat is replaced by removing all damage and
+  horror, for 1 Year. Part I wipes about 30% (Fairground 53%, Road 47%) →
+  6% (worst 13%); solo finale wipes 33% → 20%, contest 67%.
+- Two investigators: +2 maximum health and sanity (Control applies it).
+  2p finale wipes 40% → 13%, contest 53% → 63-67%.
+- Years per investigator per loop at 3p 1.58 → 1.46: age-out (18) after
+  about 12 loops, Elder after about 7.
+
+Simulation only; not a playtest.

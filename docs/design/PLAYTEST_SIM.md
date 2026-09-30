@@ -187,7 +187,7 @@ re-render: `sthr-hour-1` to `sthr-hour-8`, `sthr-loc-hubsquare`,
 `sthr-thirteen`, `sthr-bridgeremembers`, `sthr-wheelsturn`,
 `sthr-milecounter`, `sthr-losthour`, `sthr-yearinanight`, `sthr-forgotten`,
 `sthr-wrongturn`, `sthr-longwayround`, `sthr-scn-stillhour`, `sthr-loc-wheel`,
-`sthr-wearssheriff`, `sthr-appointed` and every act except Who Walks Beside You;
+`sthr-wearssheriff`, `sthr-appointed`, `sthr-crossing` and every act except Who Walks Beside You;
 see BALANCE.md):
 
 | lever | before | after |
@@ -206,46 +206,65 @@ see BALANCE.md):
 | Deep acts | 2 [perinv] (Vote, Crypt, Name, Bargain), 1 (Ninth Death) | 5 [perinv]; Ninth Death 3 (the district's clues pay; manifest updated) |
 | Finale | contest 5 (6 at four), Hold Back rewinds | contest **7 (6 solo)**; a finale begun before Hour V skips to Hour V; Hold Back does not rewind during the finale |
 | Knowledge pays Memory | surface 1, deep 3 per investigator | surface 0, deep **2** |
+| The Crossing (`sthr-crossing`) | advance the Approach, raise Dissonance by 1 | advance the Approach, **place 1 doom on the current Hour** |
+| Hold Back (`sthr-appointed`) | rewind the Hourglass by 1 Hour (not in the finale) | at most **3 times each loop** (the Control counts; a reset gives them back) |
+| Solo | +3 maximum health and sanity | +3 and a **second wind**: once a loop (and once in the finale) a defeat is replaced by removing all damage and horror, for 1 Year |
+| Two investigators (new) | – | **+2 maximum health and sanity** each (the Control applies it) |
 
 The Control token applies the bands, the contest target, the finale's Hold
-Back and the solo maxima, and reminds the table when the Hour turns; doom on
+Back, the 3-rewind Hold Back limit and the solo and two-investigator maxima,
+and reminds the table when the Hour turns (the solo second wind is a table
+rule; the engine applies it); doom on
 the Hours is on the table (the engine tracks it). `simulate.py` and
 `simulate_tempo.py` model the new clock (half an Hour a round, crossings and
 small costs as doom).
 
 ### Results (final suite, Standard; 30 runs at 3p, 15 at 1p/4p)
 
-Minutes use 14 a round at 3p (first-time group), 10 solo, 17 at four.
+Minutes use 14 a round at 3p (first-time group), 10 solo, 17 at four. The
+Square alone and the three-district loop were also played on a second seed
+set (seed 5000, 30 games; the Square at 4p on a third, 15): both columns are
+given where they were.
 
 | 3 investigators | rounds (min) | objective, spare Hours/rounds | any defeat | wiped | Dissonance max / resets |
 |---|---|---|---|---|---|
 | Prologue | 5.9 (83) | 97% | 0% | 0% | 7.8 / 0% |
-| Square I / II | 16.1 / 11.7 (226 / 163) | 100 / 93%, 6.3H/12.5R / 4.9H/6.3R | 53 / 50% | 17 / 0% | 13.6 / 13%; 13.8 / 10% |
-| Church I / II | 11.5 / 10.7 | 100 / 93%, 4.7/6.7 · 4.1/5.2 | 33 / 30% | 0 / 0% | 10.6 / 3%; 12.0 / 3% |
-| Road I / II | 11.5 / 10.9 | 97 / 100%, 4.8/6.8 · 7.1/8.6 | 43 / 37% | 3 / 0% | 8.6 / 0%; 11.0 / 0% |
-| Lighthouse I / II | 10.7 / 11.2 | 87 / 100%, 4.5/5.5 · 4.3/5.9 | 43 / 50% | 3 / 7% | 10.2 / 0%; 11.8 / 3% |
-| Fairground I / II | 10.5 / 11.0 | 87 / 97%, 4.9/6.6 · 4.3/5.4 | 23 / 40% | 0 / 7% | 9.3 / 0%; 11.3 / 0% |
-| Almanac I / II | 11.2 / 11.0 | 100 / 100%, 4.9/6.3 · 4.3/5.5 | 30 / 27% | 0 / 3% | 11.8 / 3%; 9.2 / 0% |
-| Square + Church + Almanac | 11.9 (167) | 2+ objectives 73% (62% over three suites) | 53% | 3% | 14.2 / 3% |
-| Finale (declared at the Study) | 7.7 (108) | contest 63% | 67% | 7% | 11.3 / 0% |
-| Finale begun at Hour IX | 13.1 (184) | contest 73% | 70% | 23% | 16.7 / 3% |
+| Square I (two seed sets) | 11.5 / 11.6 (161 / 162) | 97 / 100%, 5.9H/7.9R · 6.0H/7.7R | 17 / 20% | 7 / 0% | 7.0 / 0%; 7.3 / 0% |
+| Square II | 11.7 (164) | 100%, 4.7H/6.5R | 50% | 13% | 11.9 / 3% |
+| Church I / II | 10.7 / 11.0 | 100 / 100%, 4.5/5.7 · 3.8/5.2 | 43 / 27% | 0 / 0% | 9.2 / 0%; 11.4 / 3% |
+| Road I / II | 11.4 / 10.6 | 100 / 100%, 5.0/6.8 · 7.3/8.2 | 37 / 27% | 0 / 0% | 8.6 / 0%; 10.1 / 0% |
+| Lighthouse I / II | 10.7 / 10.7 | 80 / 100%, 4.4/5.7 · 4.6/5.7 | 47 / 30% | 10 / 0% | 8.9 / 0%; 10.2 / 0% |
+| Fairground I / II | 9.8 / 10.6 | 80 / 97%, 4.5/5.5 · 4.4/5.3 | 30 / 30% | 0 / 3% | 8.2 / 0%; 9.3 / 0% |
+| Almanac I / II | 11.6 / 10.4 | 100 / 97%, 4.3/6.1 · 4.2/4.9 | 57 / 13% | 3 / 0% | 12.0 / 3%; 8.0 / 0% |
+| Square + Church + Almanac (two seed sets) | 11.0 / 10.6 (154 / 148) | 2+ objectives 60 / 40% (50% of 60) | 40 / 30% | 0 / 3% | 11.8 / 3%; 11.4 / 3% |
+| Finale (declared at the Study) | 7.8 (109) | contest 53% | 57% | 3% | 10.9 / 0% |
+| Finale begun at Hour IX | 13.2 (184) | contest 63% | 83% | 33% | 15.2 / 3% |
 
-Finale contest by count: 1 investigator 67%, 2 53%, 3 63%, 4 67%; per 3p
-finale: deep entries 4.0, Hold Back 2.4, the Uninvited 0.07 (1p: 3.8 / 1.6). Deck reshuffles 0.4-1.0 a loop
-(2.0 when the Square is played alone). Solo loops run 11-15 rounds (about
-two hours); four investigators 9-13 (2.5-3.5 hours). Memory: `simulate_tempo.py
---memory` puts the campaign total per investigator before the finale loop at
-34-45 at three investigators (was 44-56 with the old Knowledge payments);
-first-time finale unlock at 3p loop 5-6 (4-8). Years per investigator per loop
-1.3-1.9 (1.1-1.4 before): more encounter draws and defeats in longer loops.
+No game in the suite, or in the 60 extra Square games at 3p and 4p, reached
+the engine's 30-round cap (before the Hold Back limit, 3 of 30 Square games at
+3p and 1 of 15 at 4p did: a party holding the Appointed back every round kept
+the night at Hour VIII). The Square at 4p: 10.6-11.1 rounds, 0 resets, 0
+wipes over 60 games.
 
-Missed or loose: districts stay a little generous (87-100%, 4-5 Hours to
-spare where 2-4 was asked; raising more acts drops the three-district loop
-below 45%); the three-district loop gives two objectives in 50-73% (three
-suites); the Square alone runs 15-16 rounds with 13% resets and 17% wipes;
-solo wipes average about 30% in Part I (Fairground 53%, Road 47%) and 12% in
-Part II; the two-investigator finale wipes 40%; the finale begun at Hour IX
-wipes 23%; Years per loop rose.
+Solo (1 investigator, 15 games each): Part I wipes Square 0%, Church 7%, Road
+0%, Lighthouse 13%, Fairground 7%, Almanac 7% (6% average; 30%, 27-53%
+before), Part II 0%; loops 12.6-15.0 rounds. The second wind is used in most
+solo loops; solo now loses about as often as a larger party is wiped.
+
+Finale by count: contest 1 investigator 67% (wiped 20%), 2 67% (13%; 40%
+before, 63% contest over 30 games of each seed set), 3 53% (3%), 4 60% (0%).
+
+Years per investigator per loop at 3p (district and three-district loops,
+450 games): 1.46 (Part I 1.51, Part II 1.38; 1.58 before this pass). At that
+rate an investigator reaches Elder (10 Years) after about 7 loops and ages
+out (18) after about 12, against a first-time finale unlock around loop 5-6
+(`simulate_tempo.py`). Memory: 34-45 per investigator before the finale loop
+(unchanged). Deck reshuffles 0.2-1.2 a loop (1.2-1.7 in the Square alone).
+
+Missed or loose: districts stay a little generous (80-100%, 4-6 Hours to
+spare where 2-4 was asked); the three-district loop's two-objective rate
+swings by seed set (40-60%); the Hour IX finale wipes 33%; solo defeats are
+now rarer than party defeats.
 
 ## Assumptions and limits
 
