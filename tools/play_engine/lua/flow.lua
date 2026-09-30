@@ -90,7 +90,7 @@ return function(R, T)
     R.touch()
     if not cancelled then
       if name == "Elder Sign" then P.elderSignAfter(inv) end
-      FX.tokenAfter(name, inv, ok, opts)
+      FX.tokenAfter(name, inv, ok, opts, margin)
     end
     R.syncAppointedArrival()
     R.checkReset()

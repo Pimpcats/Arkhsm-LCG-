@@ -238,11 +238,11 @@
       },
       {
         "token": "cultist",
-        "text": "-2. If you fail, raise Dissonance by 1."
+        "text": "-2. If you fail by 2 or more, raise Dissonance by 1."
       },
       {
         "token": "tablet",
-        "text": "-2. If the Appointed is Sensed or later, take 1 horror."
+        "text": "-2. If the Appointed is Emerging or later, take 1 horror."
       },
       {
         "token": "elderthing",

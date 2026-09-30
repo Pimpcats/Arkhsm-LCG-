@@ -175,9 +175,11 @@ return function(R, T)
     if name == "Elder Sign" then return R.P.elderSign(inv) end
     return tonumber(name) or 0
   end
-  function FX.tokenAfter(name, inv, success, test)
-    if name == "Cultist" and not success then R.raise(1, "Cultist token") end
-    if name == "Tablet" and R.stage() >= 1 then horror(inv, 1, "Tablet token") end
+  function FX.tokenAfter(name, inv, success, test, margin)
+    local W = R.WHATIF or {}
+    -- (Easy / Standard side; W.oldTokens: the side before the 12-round loops)
+    if name == "Cultist" and not success and (W.oldTokens or (margin or -9) <= -2) then R.raise(1, "Cultist token") end
+    if name == "Tablet" and R.stage() >= (W.oldTokens and 1 or 2) then horror(inv, 1, "Tablet token") end
     if name == "Elder Thing" and not success then R.placeDoom(1, "Elder Thing token") end
     -- Static: the Control raised Dissonance when it left the bag
   end
