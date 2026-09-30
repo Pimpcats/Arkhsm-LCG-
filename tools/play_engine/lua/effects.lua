@@ -53,14 +53,16 @@ return function(R, T)
       for _, en in ipairs(G.enemies) do
         if en.id == "sthr-bellringer" then
           en.exhausted = false
-          -- it attacks the nearest investigator, even at another location
+          -- it attacks the nearest investigator at its location or a connecting location
           local here = G.locs[en.loc]
           local best, bd
           for _, inv in ipairs(R.aliveInvs()) do
             local d = here and (R.paths(here, { enemy = true })[inv.loc]) or 99
             if d and (bd == nil or d < bd) then best, bd = inv, d end
           end
-          if best then R.enemyAttack(en, best, "Hour III") end
+          local reach = (R.WHATIF or {}).bellReach or 1                    -- what-if: another distance
+          if best and reach and bd > reach then best = nil end
+          if best and not (R.WHATIF or {}).bellNoAttack then R.enemyAttack(en, best, "Hour III") end
         end
       end
     elseif h == 4 then

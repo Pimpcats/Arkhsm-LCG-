@@ -1088,7 +1088,7 @@
     "flavor": "It followed the guest in. It has not been asked to leave."
   },
   "sthr-bellringer": {
-    "text": "Retaliate.\nSpawn – The Flooded Crypt.\nForced – After Hour III is reached, if the Bell-Ringer Beneath is in play: Ready it. It attacks the nearest investigator, even at another location (the lead investigator breaks ties)."
+    "text": "Retaliate.\nSpawn – The Flooded Crypt.\nForced – After Hour III is reached, if the Bell-Ringer Beneath is in play: Ready it. It attacks the nearest investigator at its location or a connecting location (the lead investigator breaks ties)."
   },
   "sthr-appointed-approach": {
     "text": "The Approach advances only when an effect says so: Hour V (to at least Sensed), Hour VII (at least Emerging), Hour VIII (Arrived); Dissonance entering the Glitch band (at least Sensed) or the Noticed band (Arrived); The Crossing and The Debt of Hours (1 stage); finale setup (Arrived). It never goes above Arrived.\nWhen the Approach becomes Sensed or later while the Appointed is set aside, put it into play at the revealed location farthest from all investigators that is not closed (the lead investigator breaks ties). When it is pushed back to Unseen, set it aside.\nWhile Sensed: It gains aloof and cannot move or attack. Forced – At the end of the round: The Appointed deals 1 horror to each investigator at its location.\nWhile Emerging: It gains hunter and cannot attack. Forced – After the Appointed engages an investigator: The Appointed deals 1 horror to that investigator.\nWhile Arrived: It gains hunter. Forced – After the Appointed attacks: Raise Dissonance by 1.",
