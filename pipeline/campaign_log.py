@@ -232,7 +232,7 @@ def _pages():
             "(or write its name on the line). It lasts through every reset.",
             size=20, style="italic", fill=SOFT, anchor="ms")
     p2.text(PAGE_W // 2, 177, "The first time you record an entry, each investigator gains "
-            "banked Memory: 1 for a surface entry, 3 for a deep entry.",
+            "banked Memory: 2 for a deep entry (a surface entry pays nothing).",
             size=18, style="italic", fill=SOFT, anchor="ms")
     y = 212
     for fid, name, district, layer, summary in FACTS:

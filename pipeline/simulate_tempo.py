@@ -7,7 +7,8 @@ finale; it never asks whether a party can actually travel, gather clues and
 complete objectives before the Hourglass reaches Hour IX. This does.
 
 One loop is played round by round:
-  * Mythos (from round 2): the current Hour's doom threshold is 1, so the
+  * Mythos (from round 2): 1 doom on the current Hour (Hour I holds 3,
+    Hours II-VIII 2: half an Hour a round), so the
     Hourglass advances 1 Hour; each investigator draws an encounter card, and
     a Lost Hour (or a placed district's Skip card) advances it further.
   * Investigation: the party has 3 actions per investigator, minus a tax for
@@ -55,7 +56,7 @@ BOOST = 1
 # ASSUMPTION: Dissonance gained per round at three investigators (deck +
 # typical foreknowledge use). It comes from encounter draws and chaos-token
 # pulls, so it scales with the number of investigators (dissonance_rate).
-DISSONANCE_PER_ROUND = 1.3
+DISSONANCE_PER_ROUND = 1.1        # 12-round loops: Cultist raises only on a fail by 2+
 
 
 def dissonance_rate(n):
@@ -63,8 +64,13 @@ def dissonance_rate(n):
 
 
 def scar_cap(n):
-    """Guide, Difficulty and Player Count: one-third of the reset value."""
-    return 3 if n == 1 else 2 * n
+    """Guide, Difficulty and Player Count: 2 x investigators (4 solo)."""
+    return 4 if n == 1 else 2 * n
+
+
+def reset_value(n):
+    """Guide, Difficulty and Player Count: 8 x investigators (16 solo)."""
+    return 16 if n == 1 else 8 * n
 # ASSUMPTION: extra party actions a Named enemy costs when it guards an objective.
 NAMED_COST = {"square_deep": 8, "church_deep": 6}
 SPINE_SIZE = 23          # 22-card spine + The Crossing (audit pass 5 trim)
@@ -132,26 +138,29 @@ def crossings(a, b):
 # cards. ("at", loc) marks the moment the party must stand at an objective
 # location (its "after you enter" effects apply there).
 OBJ = {
-    "square_surface": ("square", "surface", [("clues_pi", 3, [(1, 2, "square"), (2, 2, "townhall"), (2, 2, "well"),
+    "square_surface": ("square", "surface", [("clues_pi", 5, [(1, 2, "square"), (2, 2, "townhall"), (2, 2, "well"),
                                                             (3, 3, "records")]), ("at", "well"), ("act", 1)]),
-    "square_deep": ("square", "deep", [("named", "square_deep"), ("clues_pi", 2, [(4, 3, "records"), (2, 2, "townhall")])]),
-    "almanac_surface": ("almanac", "surface", [("clues_pi", 3, [(2, 2, "readingroom"), (3, 3, "press")]),
+    "square_deep": ("square", "deep", [("named", "square_deep"), ("clues_pi", 5, [(4, 3, "records"), (2, 2, "townhall"),
+                                                                            (2, 2, "well"), (1, 2, "square")])]),
+    "almanac_surface": ("almanac", "surface", [("clues_pi", 5, [(2, 2, "readingroom"), (3, 3, "press")]),
                                                ("at", "press"), ("act", 1)]),
-    "almanac_deep": ("almanac", "deep", [("move", 1), ("clues_pi", 2, [(4, 3, "study")])]),
-    "fairground_surface": ("fairground", "surface", [("clues_pi", 1, [(3, 2, "wheel"), (2, 3, "hallofmirrors")]),
+    "almanac_deep": ("almanac", "deep", [("move", 1), ("clues_pi", 5, [(4, 3, "study"), (2, 2, "readingroom"), (3, 3, "press")])]),
+    "fairground_surface": ("fairground", "surface", [("clues_pi", 3, [(3, 2, "wheel"), (2, 3, "hallofmirrors")]),
                                                      ("at", "wheel"), ("test", "agi", 3, "wheel")]),
-    "fairground_deep": ("fairground", "deep", [("clues_pi", 2, [(2, 2, "ticketbooth"), (3, 2, "wheel"), (2, 3, "hallofmirrors")]),
+    "fairground_deep": ("fairground", "deep", [("clues_pi", 5, [(2, 2, "ticketbooth"), (3, 2, "wheel"), (2, 3, "hallofmirrors")]),
                                                ("at", "ticketbooth"), ("act", 1)]),
-    "church_surface": ("church", "surface", [("clues_pi", 2, [(2, 3, "nave"), (3, 2, "belfry"), (2, 2, "vestry")]),
+    "church_surface": ("church", "surface", [("clues_pi", 5, [(2, 3, "nave"), (3, 2, "belfry"), (2, 2, "vestry")]),
                                              ("at", "vestry"), ("act", 1)]),
-    "church_deep": ("church", "deep", [("named", "church_deep"), ("clues_pi", 2, [(4, 3, "crypt")])]),
-    "road_surface": ("road", "surface", [("move", 1), ("clues", 1, [(2, 3, "turning")]), ("move", 1),
-                                         ("clues", 1, [(3, 2, "lowbridge")]), ("move", 1),
-                                         ("clues", 1, [(1, 2, "milestones")])]),
+    "church_deep": ("church", "deep", [("named", "church_deep"), ("clues_pi", 5, [(4, 3, "crypt"), (2, 3, "nave"),
+                                                                            (3, 2, "belfry"), (2, 2, "vestry")])]),
+    "road_surface": ("road", "surface", [("move", 1), ("clues", 3, [(2, 3, "turning")]), ("move", 1),
+                                         ("clues", 3, [(3, 2, "lowbridge")]), ("move", 1),
+                                         ("clues", 3, [(1, 2, "milestones")])]),
     "road_deep": ("road", "deep", [("glitch",), ("move", 1), ("test", "agi", 3, "turning")]),
-    "lighthouse_surface": ("lighthouse", "surface", [("clues_pi", 1, [(2, 1, "stair"), (2, 2, "keepers"),
+    "lighthouse_surface": ("lighthouse", "surface", [("clues_pi", 3, [(2, 1, "stair"), (2, 2, "keepers"),
                                                                    (4, 2, "lantern")]), ("test", "wil", 3, "lantern")]),
-    "lighthouse_deep": ("lighthouse", "deep", [("act", 1), ("move", 1), ("clues_pi", 1, [(2, 2, "keepers")])]),
+    "lighthouse_deep": ("lighthouse", "deep", [("act", 1), ("move", 1), ("clues_pi", 3, [(2, 2, "keepers"), (2, 1, "stair"),
+                                                                                       (3, 2, "lantern")])]),
 }
 # Location card effects the pacing can feel, per profile. Keys:
 #   extra_action  - investigating here costs this many more actions
@@ -206,7 +215,7 @@ PRIORITY = ["square_surface", "almanac_surface", "fairground_surface",
 
 
 def band_for(diss, n):
-    reset = 9 if n == 1 else 6 * n
+    reset = reset_value(n)
     if diss >= reset * 2 / 3:
         return "Noticed"
     if diss >= reset / 3:
@@ -245,7 +254,7 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None, greedy=Fal
     clearing = {}              # VP location -> clues still on it (greedy)
     rider_hp = None
     party = PARTY[n]
-    reset_at = 9 if n == 1 else 6 * n
+    reset_at = reset_value(n)
     stats = {"reset": False, "harm": 0, "diss_fx": 0, "memory": 0, "years": 0,
              "rewinds": 0, "lowered": 0}
     levers = fx.get("levers", {})
@@ -316,21 +325,21 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None, greedy=Fal
     while True:
         rounds += 1
         if rounds > 1:
-            draws = n + (n if hour == 1 else 0)          # Hour II: extra draw
-            adv = 1
+            draws = n + (n if 1 <= hour < 1.5 else 0)    # Hour II: extra draw
+            adv = 1 / 3 if hour < 1 else 0.5              # 1 doom: Hour I holds 3, the others 2
             for _ in range(draws):
                 if rng.random() < 2 / deck and rng.random() < 0.45:
                     year_in_night += 1
                 r = rng.random() * deck
                 if r < LOST_HOURS:
-                    adv += 2 if hour >= 5 else 1
+                    adv += 1                                  # Lost Hour: a 1-Hour Skip
                 else:
                     r -= LOST_HOURS
                     drawn_skip = False
                     for cnt, p in skip_cards:
                         if r < cnt:
                             if rng.random() < p:
-                                adv += 1
+                                adv += 0.5                            # Thirteen / Bridge / Wheel's Turn: 1 doom
                             drawn_skip = True
                             break
                         r -= cnt
@@ -372,8 +381,8 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None, greedy=Fal
         budget -= paid
         pending_cost -= paid
         actor = 0
-        glitch_at = 3 if n == 1 else 2 * n
-        noticed_at = 6 if n == 1 else 4 * n
+        glitch_at = reset_at // 3
+        noticed_at = 2 * reset_at // 3
         def district_clear():
             """ASSUMPTION: optional levers (Memory, striking a Year) are used only
             once this district's objectives for the loop are done, before moving on."""
@@ -442,7 +451,7 @@ def play_loop(rng, n, tax, facts, act2, scar, explore=False, fx=None, greedy=Fal
             k = t[0]
             if k == "travel":
                 budget -= min(budget, n)          # everyone moves
-                hour += t[2]
+                hour += 0.5 * t[2]                        # a paid crossing: 1 doom
                 d = t[1]
                 if d not in placed:
                     placed.add(d)
@@ -680,6 +689,8 @@ MEMORY_TRIGGER = {
     "Seraphine": 0.30,  # second use of her Dissonance ability in a round
 }
 PROLOGUE_MEMORY = 2       # per investigator (the average Prologue result)
+# guide, "Knowledge pays Memory": per investigator, the first time an entry is recorded
+KNOWLEDGE_PAYS = {"surface": int(os.environ.get("STHR_PAY_SURFACE", 0)), "deep": int(os.environ.get("STHR_PAY_DEEP", 2))}
 ELDER_FROM_LOOP = 7       # ASSUMPTION: typical loop an investigator turns Elder
 
 
@@ -703,7 +714,8 @@ def memory_report(trials, seed):
                 for loop_i, st in enumerate(log, 1):
                     gain = sum(1 for who in party for _ in range(st["rounds"])
                                if rng.random() < MEMORY_TRIGGER[who])
-                    gain += sum((1 if OBJ[o][1] == "surface" else 3) * n for o in st["done"])
+                    gain += sum((KNOWLEDGE_PAYS["surface"] if OBJ[o][1] == "surface" else KNOWLEDGE_PAYS["deep"]) * n
+                                for o in st["done"])
                     gain += st.get("vp", 0)
                     if loop_i >= ELDER_FROM_LOOP:
                         gain += n

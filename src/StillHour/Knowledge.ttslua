@@ -31,7 +31,9 @@ Knowledge.FACTS = {
 
 -- Knowledge pays Memory: the first time an entry is recorded in the campaign
 -- it adds banked Memory, per investigator (current count), by layer.
-Knowledge.MEMORY_PER_INVESTIGATOR = { prologue = 0, surface = 1, deep = 3, assembled = 0 }
+-- (12-round loops, where the investigators' own reactions earn about twice as
+-- much: surface entries pay nothing, deep entries 2)
+Knowledge.MEMORY_PER_INVESTIGATOR = { prologue = 0, surface = 0, deep = 2, assembled = 0 }
 
 function Knowledge.knows(factId)
   return CampaignState.knows(factId)

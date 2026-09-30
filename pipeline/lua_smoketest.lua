@@ -711,44 +711,44 @@ end
 print("== Knowledge pays Memory (once per entry, refunded on removal) ==")
 CampaignState.init(3)
 local n0, p0 = Knowledge.unlock("the-thirteenth-toll")
-check("a surface entry pays 1 per investigator (3 at 3p)", n0 == true and p0 == 3 and CampaignState.getBankedMemory() == 3)
+check("a surface entry pays nothing", n0 == true and p0 == 0 and CampaignState.getBankedMemory() == 0)
 local n1, p1 = Knowledge.unlock("the-thirteenth-toll")
-check("recording it again pays nothing", n1 == false and p1 == 0 and CampaignState.getBankedMemory() == 3)
+check("recording it again pays nothing", n1 == false and p1 == 0 and CampaignState.getBankedMemory() == 0)
 local _, pd = Knowledge.unlock("the-hour-was-wrong")
-check("a deep entry pays 3 per investigator (9 at 3p)", pd == 9 and CampaignState.getBankedMemory() == 12)
+check("a deep entry pays 2 per investigator (6 at 3p)", pd == 6 and CampaignState.getBankedMemory() == 6)
 local _, pp = Knowledge.unlock("you-are-unstuck")
-check("the prologue entry pays nothing", pp == 0 and CampaignState.getBankedMemory() == 12)
+check("the prologue entry pays nothing", pp == 0 and CampaignState.getBankedMemory() == 6)
 local _, pa = Knowledge.unlock("the-way-the-night-breaks")
-check("the assembled entry pays nothing", pa == 0 and CampaignState.getBankedMemory() == 12)
+check("the assembled entry pays nothing", pa == 0 and CampaignState.getBankedMemory() == 6)
 CampaignState.setInvestigatorCount(2)
-local _, p2 = Knowledge.unlock("the-road-remembers")
-check("the current investigator count is used (surface at 2p = 2)", p2 == 2 and CampaignState.getBankedMemory() == 14)
+local _, p2 = Knowledge.unlock("the-keepers-ninth-death")
+check("the current investigator count is used (deep at 2p = 4)", p2 == 4 and CampaignState.getBankedMemory() == 10)
 local kblob = CampaignState.serialize()
 CampaignState.init(3) ; CampaignState.deserialize(kblob)
-check("what each entry paid survives save/load", CampaignState.getKnowledgePaid("the-hour-was-wrong") == 9)
+check("what each entry paid survives save/load", CampaignState.getKnowledgePaid("the-hour-was-wrong") == 6)
 local rem, refund = Knowledge.forget("the-hour-was-wrong")
-check("removing an entry refunds what it paid", rem == true and refund == 9 and CampaignState.getBankedMemory() == 5
+check("removing an entry refunds what it paid", rem == true and refund == 6 and CampaignState.getBankedMemory() == 4
   and not CampaignState.knows("the-hour-was-wrong"))
 check("removing it twice refunds nothing more", select(2, Knowledge.forget("the-hour-was-wrong")) == 0)
 CampaignState.setInvestigatorCount(3)
-check("recording it again pays again (net once)", select(2, Knowledge.unlock("the-hour-was-wrong")) == 9
-  and CampaignState.getBankedMemory() == 14)
+check("recording it again pays again (net once)", select(2, Knowledge.unlock("the-hour-was-wrong")) == 6
+  and CampaignState.getBankedMemory() == 10)
 CampaignState.init(3) ; CampaignState.bankMemory(16)
-Knowledge.unlock("the-keepers-ninth-death")
-check("banked Memory may sit above the cap until the next loop begins (25 > 18)", CampaignState.getBankedMemory() == 25)
+Knowledge.unlock("the-vote-that-never-ends")
+check("banked Memory may sit above the cap until the next loop begins (22 > 18)", CampaignState.getBankedMemory() == 22)
 Interlude.beginNextLoop()
 check("...and is reduced to 6n when it does", CampaignState.getBankedMemory() == 18)
 CampaignState.init(3) ; CampaignState.bankMemory(1)
-Knowledge.unlock("the-lamp-was-never-lit") ; CampaignState.spendMemory(4)
-check("a refund never takes banked Memory below 0", select(2, Knowledge.forget("the-lamp-was-never-lit")) == 0
+Knowledge.unlock("the-appointeds-name") ; CampaignState.spendMemory(7)
+check("a refund never takes banked Memory below 0", select(2, Knowledge.forget("the-appointeds-name")) == 0
   and CampaignState.getBankedMemory() == 0)
 check("re-ticking an entry whose Memory was spent pays nothing again",
-  select(2, Knowledge.unlock("the-lamp-was-never-lit")) == 0 and CampaignState.getBankedMemory() == 0)
+  select(2, Knowledge.unlock("the-appointeds-name")) == 0 and CampaignState.getBankedMemory() == 0)
 CampaignState.init(3) ; CampaignState.bankMemory(1)
-Knowledge.unlock("the-lamp-was-never-lit") ; CampaignState.spendMemory(3)
-check("a partial refund takes back what the bank holds", select(2, Knowledge.forget("the-lamp-was-never-lit")) == 1
+Knowledge.unlock("the-appointeds-name") ; CampaignState.spendMemory(6)
+check("a partial refund takes back what the bank holds", select(2, Knowledge.forget("the-appointeds-name")) == 1
   and CampaignState.getBankedMemory() == 0)
-check("...and a re-tick pays back only that part", select(2, Knowledge.unlock("the-lamp-was-never-lit")) == 1
+check("...and a re-tick pays back only that part", select(2, Knowledge.unlock("the-appointeds-name")) == 1
   and CampaignState.getBankedMemory() == 1)
 CampaignState.unlockFact("the-wheel-still-turns")
 check("an entry recorded before this rule (no payment) refunds nothing",
@@ -837,12 +837,12 @@ do
   check("Hour IX in the finale says the finale ends", C.lastBroadcast:find("finale ends", 1, true) ~= nil)
   CampaignState.init(3)
   local m0 = CampaignState.getBankedMemory()
-  local r1 = C.shApiUnlockFact({ id = "the-lamp-was-never-lit" })
-  local r2 = C.shApiUnlockFact({ id = "the-lamp-was-never-lit" })
-  check("Control: recording an entry pays once (+3); ticking it again pays nothing",
-    r1.paid == 3 and r2.paid == 0 and CampaignState.getBankedMemory() == m0 + 3)
-  local r3 = C.shApiForgetFact({ id = "the-lamp-was-never-lit" })
-  check("Control: removing it refunds (-3)", r3.refund == 3 and CampaignState.getBankedMemory() == m0)
+  local r1 = C.shApiUnlockFact({ id = "the-keepers-ninth-death" })
+  local r2 = C.shApiUnlockFact({ id = "the-keepers-ninth-death" })
+  check("Control: recording a deep entry pays once (+6); ticking it again pays nothing",
+    r1.paid == 6 and r2.paid == 0 and CampaignState.getBankedMemory() == m0 + 6)
+  local r3 = C.shApiForgetFact({ id = "the-keepers-ninth-death" })
+  check("Control: removing it refunds (-6)", r3.refund == 6 and CampaignState.getBankedMemory() == m0)
   CampaignState.init(3) ; CampaignState.setPartTwo(true)
   C.shApiUnlockFact({ id = "what-the-almanac-hid" })
   C.shApiUnlockFact({ id = "the-vote-that-never-ends" })
