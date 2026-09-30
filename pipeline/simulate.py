@@ -225,8 +225,9 @@ def simulate_xp_distribution(trials, investigators, rng):
 # reset — the loop closed its hand on you). The Appointed's stage is derived from
 # the clock (V/VII/VIII) and bands (Glitch/Noticed), matching Appointed.ttslua.
 # ASSUMPTION: per-round Hour advance and the playstyle Dissonance gains.
-HOUR_PER_ROUND_MEAN = 1.5
-HOUR_PER_ROUND_SD = 0.3
+# Hours of 2 doom (Hour I 3): about 0.75 Hour a round with the skips
+HOUR_PER_ROUND_MEAN = 0.75
+HOUR_PER_ROUND_SD = 0.15
 STRESS_STYLES = {           # extra Dissonance/round from foreknowledge use
     "cautious": (0.15, 0.20),
     "typical":  (0.70, 0.40),
@@ -235,7 +236,7 @@ STRESS_STYLES = {           # extra Dissonance/round from foreknowledge use
 
 
 def simulate_stress_loop(rng, investigators, style, scar=0):
-    reset_t = 6 * investigators if investigators != 1 else 9
+    reset_t = 8 * investigators if investigators != 1 else 16     # bands at 8 x investigators
     glitch = reset_t // 3
     noticed = 2 * reset_t // 3
     mean_extra, sd_extra = STRESS_STYLES[style]
@@ -299,7 +300,7 @@ def simulate_stress(trials, investigators, rng, style, scar=0):
 def simulate_finale_staged(rng, investigators, deep_facts, holdback_p, trials,
                            start_hour=5.0, start_diss=12.0):
     target = 4 * investigators
-    reset_t = 6 * investigators if investigators != 1 else 9
+    reset_t = 8 * investigators if investigators != 1 else 16     # bands at 8 x investigators
     reached = 0
     for _ in range(trials):
         # contest sources other than Hold Back: each deep entry spent, and the
@@ -425,8 +426,8 @@ def main():
                 any(BENCHMARK_LOW <= v <= BENCHMARK_HIGH for v in window.values()))
 
     # ---- 3. pacing ----
-    reset_threshold = 6 * n if n != 1 else 9
-    appointed_threshold = 4 * n if n != 1 else 6
+    reset_threshold = 8 * n if n != 1 else 16
+    appointed_threshold = 2 * reset_threshold // 3
     cautious = simulate_pacing(args.trials, n, rng, "cautious", appointed_threshold)
     greedy_late = simulate_pacing(args.trials, n, rng, "greedy", appointed_threshold)
     greedy_reset = simulate_pacing(args.trials, n, rng, "greedy", reset_threshold)
@@ -513,12 +514,17 @@ def main():
     # stress-test sanity assertions — hard-resets are clock-gated (Hour IX ends the
     # night first), so the reset threat is a CAMPAIGN pressure via the scar, not a
     # single-loop one. Verify the scar makes greedy degrade.
+    # 12-round loops (Hours of 2 doom): leaning on Dissonance every round now
+    # reaches the reset in a fresh loop; cautious and typical play still do not
     fresh_greedy = simulate_stress(args.trials, n, rng, "greedy", 0)
-    scarred_greedy = simulate_stress(args.trials, n, rng, "greedy", scar_cap)
-    assert_("fresh loop rarely hard-resets for any style (clock ends it first, < 10%)",
-            fresh_greedy["hard_reset_rate"] < 0.10)
-    assert_("the scar floor makes greedy hard-reset materially more late-campaign",
-            scarred_greedy["hard_reset_rate"] > fresh_greedy["hard_reset_rate"] + 0.10)
+    fresh_typical = simulate_stress(args.trials, n, rng, "typical", 0)
+    scarred_typical = simulate_stress(args.trials, n, rng, "typical", scar_cap)
+    assert_("fresh loop rarely hard-resets for cautious or typical play (< 10%)",
+            fresh_typical["hard_reset_rate"] < 0.10)
+    assert_("greedy leaning is a real reset threat in a 12-round loop (> 25%)",
+            fresh_greedy["hard_reset_rate"] > 0.25)
+    assert_("the scar floor makes typical play hard-reset materially more late-campaign",
+            scarred_typical["hard_reset_rate"] > fresh_typical["hard_reset_rate"] + 0.10)
     assert_("the Appointed arrives almost every loop (clock-driven, > 90%)",
             fresh_greedy["appointed_arrival_rate"] > 0.90)
 
