@@ -128,8 +128,11 @@ return function(R, T)
         -- Walk It Backward: the Turning, the Low Bridge, the Milestones, in that order
         local seq = { "sthr-loc-turning", "sthr-loc-lowbridge", "sthr-loc-milestones" }
         local step = (inv.walk or 0) + 1
-        if seq[step] == L.id then
+        local per = (R.WHATIF or {}).walkPer or 3                     -- clues per step (Walk It Backward)
+        if seq[step] == L.id then inv.walkCount = (inv.walkCount or 0) + 1 end
+        if seq[step] == L.id and inv.walkCount >= per then
           inv.walk = step
+          inv.walkCount = 0
           R.log("%s: Walk It Backward step %d (%s)", inv.name, step, L.name)
           local act = G.acts.Road
           if step == 3 and act and act.id == "sthr-act-walkbackward" and not act.completed then

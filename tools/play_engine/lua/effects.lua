@@ -337,7 +337,7 @@ return function(R, T)
   FX.ACTS = ACTS
   local function clueNeed(id) local c = R.card(id) return (c.clues or 0) * (c.clues_per_investigator and R.G.n or 1) end
 
-  ACTS["sthr-act-firsthour"] = { at = "sthr-loc-almanacsteps", contrib = true, fact = nil, spend = true }
+  ACTS["sthr-act-firsthour"] = { at = "sthr-loc-almanacsteps", contrib = true, fact = nil, spend = true, minHour = 5 }
   ACTS["sthr-act-whythirteen"] = { at = "sthr-loc-vestry", fact = "the-thirteenth-toll", spend = true }
   ACTS["sthr-act-sheriffdead"] = { at = "sthr-loc-well", fact = "the-sheriff-is-already-dead", spend = true }
   ACTS["sthr-act-almanachid"] = { at = "sthr-loc-press", fact = "what-the-almanac-hid", spend = true }
@@ -366,7 +366,7 @@ return function(R, T)
     local A = ACTS[act.id]
     if not A or A.action or A.sequence or A.standFirm or A.contest then return nil end
     if A.needLamp and not G.lampLit then return nil end
-    if A.minHour and R.hour() < A.minHour then return nil end       -- what-if term only
+    if A.minHour and R.hour() < A.minHour then return nil end       -- "Hour V or later" (The First Hour)
     local L = R.locById(A.at)
     if not L or L.closed then return nil end
     local here = R.investigatorsAt(L)
@@ -477,6 +477,7 @@ return function(R, T)
     end
     local mode = (R.WHATIF or {}).lostHour                           -- what-if: "doom" / "old"
     if mode == "doom" then R.placeDoom(R.hour() >= 6 and 2 or 1, "Lost Hour")
+    elseif mode == "doom2" then R.placeDoom(2, "Lost Hour")
     elseif mode == "old" then R.advance(R.hour() >= 6 and 2 or 1, "Lost Hour")
     else R.advance(1, "Lost Hour") end
     return "discard"
