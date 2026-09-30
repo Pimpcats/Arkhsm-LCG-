@@ -187,8 +187,8 @@ re-render: `sthr-hour-1` to `sthr-hour-8`, `sthr-loc-hubsquare`,
 `sthr-thirteen`, `sthr-bridgeremembers`, `sthr-wheelsturn`,
 `sthr-milecounter`, `sthr-losthour`, `sthr-yearinanight`, `sthr-forgotten`,
 `sthr-wrongturn`, `sthr-longwayround`, `sthr-scn-stillhour`, `sthr-loc-wheel`,
-`sthr-wearssheriff`, `sthr-appointed`, every act but The Ninth Death's and
-Who Walks Beside You's text is re-costed; see BALANCE.md):
+`sthr-wearssheriff`, `sthr-appointed` and every act except Who Walks Beside You;
+see BALANCE.md):
 
 | lever | before | after |
 |---|---|---|
@@ -231,7 +231,7 @@ Minutes use 14 a round at 3p (first-time group), 10 solo, 17 at four.
 | Finale begun at Hour IX | 13.1 (184) | contest 73% | 70% | 23% | 16.7 / 3% |
 
 Finale contest by count: 1 investigator 67%, 2 53%, 3 63%, 4 67%; per 3p
-finale: deep entries 4.0, Hold Back ~2.7. Deck reshuffles 0.4-1.0 a loop
+finale: deep entries 4.0, Hold Back 2.4, the Uninvited 0.07 (1p: 3.8 / 1.6). Deck reshuffles 0.4-1.0 a loop
 (2.0 when the Square is played alone). Solo loops run 11-15 rounds (about
 two hours); four investigators 9-13 (2.5-3.5 hours). Memory: `simulate_tempo.py
 --memory` puts the campaign total per investigator before the finale loop at
