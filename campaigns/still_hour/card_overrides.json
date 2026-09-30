@@ -877,7 +877,7 @@
   },
   "sthr-act-walkbackward": {
     "name": "Walk It Backward",
-    "text": "Objective – Advance when one investigator has discovered 3 clues at the Turning, then 3 clues at the Low Bridge, then 3 clues at the Milestones, in that order, during this loop. (Keep a separate pile of resources from the token pool on this act for each investigator, 1 per clue that counts.)",
+    "text": "Objective – Advance when one investigator has discovered 1 [perinv] clues at the Turning, then 1 [perinv] clues at the Low Bridge, then 1 [perinv] clues at the Milestones, in that order, during this loop. (Keep a separate pile of resources from the token pool on this act for each investigator, 1 per clue that counts.)",
     "flavor": "The same figures walk it every loop, in the same direction, never arriving.",
     "deck": 95106,
     "index": "1a",
