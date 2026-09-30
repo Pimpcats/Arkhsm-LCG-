@@ -58,9 +58,10 @@ return function(R, T)
   R.CONTEST_TARGET = 5                        -- 6 with four investigators
   function R.consts()
     local n = R.G.n
-    local reset, noticed = 6 * n, 4 * n
-    if n == 1 then reset, noticed = 12, 8 end   -- solo: the two-investigator bands
-    return { reset = reset, glitch = math.floor(reset / 3), noticed = noticed,
+    local reset = 8 * n                         -- Constants.forCount
+    if n == 1 then reset = 16 end               -- solo: the two-investigator bands
+    local noticed = math.floor(2 * reset / 3)
+    return { reset = reset, glitch = math.floor(reset / 3), noticed = noticed, scar = (n == 1) and 4 or 2 * n,
              contest = (R.WHATIF or {}).contestFlat
                or ((R.G.cfg.contestPerInv or R.CONTEST_PER_INV) and (R.G.cfg.contestPerInv or R.CONTEST_PER_INV) * n)
                or (n >= 4 and R.CONTEST_TARGET + 1 or R.CONTEST_TARGET) }

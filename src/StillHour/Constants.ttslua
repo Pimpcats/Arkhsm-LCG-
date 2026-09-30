@@ -43,13 +43,17 @@ Constants.SOLO_SANITY_BONUS = 3
 
 function Constants.forCount(n)
   n = math.max(1, math.floor(n or 3))
-  local reset = 6 * n
-  local appointed = 4 * n
+  -- loops run about 12 rounds (Hours of 2 doom): the reset is 8 x investigators
+  -- (24 at three), the Noticed band two-thirds of it; the scar cap stays 2 x
+  -- investigators (6 at three)
+  local reset = 8 * n
+  local scarCap = 2 * n
   if n == 1 then
-    -- Documented solo override: the two-investigator bands (was 6 / 9).
-    reset = 12
-    appointed = 8
+    -- Documented solo override: the two-investigator bands.
+    reset = 16
+    scarCap = 4
   end
+  local appointed = math.floor(2 * reset / 3)
   return {
     investigators = n,
     resetThreshold = reset,
@@ -61,7 +65,7 @@ function Constants.forCount(n)
     -- 4 x investigators (CO-001) was out of reach at 3-4 investigators and
     -- nearly automatic solo.
     contestTarget = (n >= 4) and 6 or 5,
-    scarCap = math.floor(reset / 3),
+    scarCap = scarCap,
     bandGlitchStart = math.floor(reset / 3),
     bandNoticedStart = math.floor(2 * reset / 3),
   }

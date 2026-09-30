@@ -116,8 +116,8 @@ return function(H)
     c.investigators = n
     c.prologue = sc.prologue == true
     c.loopsCompleted = sc.loops or 0
-    local reset = (n == 1) and 9 or 6 * n
-    c.dissonance = math.min(sc.loops or 0, math.floor(reset / 3))
+    local scarCap = (n == 1) and 4 or 2 * n     -- Constants.forCount scarCap
+    c.dissonance = math.min(sc.loops or 0, scarCap)
     c.hourglass = 1
     c.knowledge = {}
     c.knowledgePaid = {}
