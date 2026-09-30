@@ -539,8 +539,8 @@ return function(R, T)
 
     -- 2. the Appointed here: Hold Back
     local AL = R.appointedLoc()
-    -- (waiting to begin the finale at Hour IX, the party lets the Appointed come)
-    if AL == L and R.stage() >= 1 and not G.appointed.exhausted and not (G.cfg.finaleAtNine and not G.finale) then
+    -- (camping at the Sealed Study for Hour IX, finale_h9, the party lets the Appointed come)
+    if AL == L and R.stage() >= 1 and not G.appointed.exhausted and not (G.cfg.finaleAtNine and G.cfg.finaleGoal and not G.finale) then
       local skill = (R.skillBase(inv, "wil") >= R.skillBase(inv, "com")) and "wil" or "com"
       local p = R.prob(inv, R.skillBase(inv, skill) + P.staticBonus(inv, skill, {}) - R.holdBackDiff() + 1)
       local s = 34 * p + (G.finale and 20 or 0) + (R.hour() >= 6 and 6 or 0)

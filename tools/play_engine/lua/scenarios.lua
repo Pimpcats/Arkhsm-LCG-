@@ -70,9 +70,21 @@ return function(R, T)
   for k, v in pairs(S.finale) do S.finale_h9[k] = v end
   S.finale_h9.finaleAtNine = true
 
+  -- the other way in as a group plays it: a normal Part II loop spent on one
+  -- more deep entry (the Fairground's Bargain), the finale begun when Hour IX
+  -- is reached, wherever the party stands (finale_h9 camps at the Sealed Study
+  -- all loop and lets the Appointed come: the worst case)
+  S.finale_late = {}
+  for k, v in pairs(S.finale) do S.finale_late[k] = v end
+  S.finale_late.boxes = { "district_square", "district_almanac", "district_fairground" }
+  S.finale_late.finaleGoal = nil
+  S.finale_late.finaleAtNine = true
+  S.finale_late.objectives = { "sthr-act-bargain" }
+
   S.ORDER = { "prologue", "district_square", "district_church", "district_road", "district_lighthouse",
               "district_fairground", "district_almanac", "district_square_p2", "district_church_p2", "district_road_p2",
-              "district_lighthouse_p2", "district_fairground_p2", "district_almanac_p2", "loop_multi", "finale", "finale_h9" }
+              "district_lighthouse_p2", "district_fairground_p2", "district_almanac_p2", "loop_multi", "finale", "finale_h9",
+              "finale_late" }
 
   S.BOX_DISTRICT = { district_square = "Square", district_church = "Church", district_road = "Road",
                      district_lighthouse = "Lighthouse", district_fairground = "Fairground", district_almanac = "Almanac",

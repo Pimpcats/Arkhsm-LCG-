@@ -32,7 +32,8 @@ DEFAULT_SAVE = "/home/user/sce480/Arkham SCE 4.8.0.json"
 OUT = os.path.join(ROOT, ".cache", "play_engine")
 SCENARIOS = ["prologue", "district_square", "district_church", "district_road", "district_lighthouse",
              "district_fairground", "district_almanac", "district_square_p2", "district_church_p2", "district_road_p2",
-             "district_lighthouse_p2", "district_fairground_p2", "district_almanac_p2", "loop_multi", "finale", "finale_h9"]
+             "district_lighthouse_p2", "district_fairground_p2", "district_almanac_p2", "loop_multi", "finale", "finale_h9",
+             "finale_late"]
 DISTRICT_LOOPS = [s for s in SCENARIOS if s.startswith("district_")]
 WHAT_IF = {}          # {"cardOverrides": {id: {field: value}}, "actOverrides": {id: {...}}, "tag": name}
 PARTIES = {1: ["sthrcass"], 2: ["sthrelias", "sthrayako"], 3: ["sthrelias", "sthrayako", "sthrcass"],
