@@ -148,7 +148,7 @@
   "sthr-yearinanight": {
     "name": "A Year in a Night",
     "traits": "Hex.",
-    "text": "Peril.\nRevelation – Test [wil] (3). If you fail, take 1 horror and gain 1 Year (record it now; it takes effect Between Loops).",
+    "text": "Peril.\nRevelation – Test [wil] (3). If you fail, take 1 horror. If you fail by 2 or more, also gain 1 Year (record it now; it takes effect Between Loops).",
     "quantity": 2
   },
   "sthr-forgotten": {
@@ -619,7 +619,7 @@
     "traits": "Fairground.",
     "shroud": 3,
     "clues": 2,
-    "text": "Forced – At the end of the round: Each investigator at the Wheel takes 1 horror.",
+    "text": "Forced – After the Hourglass advances: Each investigator at the Wheel takes 1 horror.",
     "clues_per_investigator": true,
     "icons": "spade",
     "color": "#7c2a5c",

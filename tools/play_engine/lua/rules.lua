@@ -147,6 +147,7 @@ return function(R, T)
 
   function R.advance(n, why)
     local G = R.G
+    local turned = false
     for _ = 1, n do
       if G.ended then return end
       G.doom = 0            -- an advance removes all doom in play (cancelled or not)
@@ -175,6 +176,7 @@ return function(R, T)
           R.touch()
         end
         R.G.metrics.hour_sources[why or "?"] = (R.G.metrics.hour_sources[why or "?"] or 0) + 1
+        turned = true
         -- the Hour turns: each investigator heals 1 horror (guide: The Hourglass)
         local heal = (R.WHATIF or {}).hourHeal or 1
         for _, x in ipairs(R.aliveInvs()) do
@@ -202,6 +204,7 @@ return function(R, T)
         if now >= 9 then return end
       end
     end
+    if turned and not G.ended and R.FX.afterAdvance then R.FX.afterAdvance() end
   end
 
   function R.rewind(n, why, alreadyCounted)

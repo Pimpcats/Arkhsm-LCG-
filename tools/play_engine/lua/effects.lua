@@ -30,11 +30,12 @@ return function(R, T)
   for h = 1, 9 do cov("sthr-hour-" .. h) end
   cov("sthr-hour-4", "full; the lead investigator picks the revealed location other than the Square with the fewest clues that no investigator is at when there is one")
 
-  --- Forced – At the end of the round: each investigator at the Wheel takes 1 horror.
-  function FX.endOfRound()
+  --- The Wheel: "Forced – After the Hourglass advances: Each investigator at the Wheel takes 1 horror."
+  function FX.afterAdvance()
     local wheel = R.locById("sthr-loc-wheel")
     if wheel then for _, inv in ipairs(R.investigatorsAt(wheel)) do horror(inv, 1, "The Wheel") end end
   end
+  function FX.endOfRound() end
 
   --- The parts of "When reached" the Control token leaves to the players.
   function FX.onHourReached(h, cancelled)
@@ -536,7 +537,7 @@ return function(R, T)
     local ok, margin = R.test(inv, "wil", 3, { kind = "treachery", peril = true })
     if not ok then
       horror(inv, (R.WHATIF or {}).oldYear and math.max(1, -margin) or 1, "A Year in a Night")
-      if not R.G.prologue then R.pendingYear(inv, 1, "A Year in a Night") end
+      if not R.G.prologue and ((R.WHATIF or {}).oldYear or (margin or -9) <= -2) then R.pendingYear(inv, 1, "A Year in a Night") end
     end
     return "discard"
   end
