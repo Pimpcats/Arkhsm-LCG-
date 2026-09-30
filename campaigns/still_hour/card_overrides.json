@@ -1245,5 +1245,8 @@
     "quantity": 2,
     "text": "Hunter.\nPrey – Most clues.",
     "flavor": "It keeps perfect time. It is only ever one minute behind you."
+  },
+  "sthr-wearssheriff": {
+    "text": "Spawn – The Records Office.\nWhile What Wears the Sheriff is in play, the Records Office gets +1 shroud."
   }
 }
