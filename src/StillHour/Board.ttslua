@@ -360,11 +360,14 @@ function Board.applyAging(inv, toTracker)
   local base = Board.baseStats(inv.md)
   if not base then return nil end
   local eff = Aging.applyDriftToStats(base, inv.id)
-  -- one investigator: +2 maximum health and sanity (guide: Difficulty and Player Count)
+  -- one investigator: +5 maximum health and sanity; two: +2 (guide: Difficulty and Player Count)
   local c = CampaignState.constants and CampaignState.constants()
   if c and c.investigators == 1 then
     eff.health = eff.health + Constants.SOLO_HEALTH_BONUS
     eff.sanity = eff.sanity + Constants.SOLO_SANITY_BONUS
+  elseif c and c.investigators == 2 then
+    eff.health = eff.health + Constants.DUO_HEALTH_SANITY_BONUS
+    eff.sanity = eff.sanity + Constants.DUO_HEALTH_SANITY_BONUS
   end
   if toTracker and inv.matColor then
     SCED.setSkillTracker(inv.matColor, eff.wil, eff.int, eff.com, eff.agi)

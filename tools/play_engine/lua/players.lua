@@ -81,6 +81,9 @@ return function(R, T)
       if (R.WHATIF or {}).soloBonus and R.G.n == 1 then
         inv.health, inv.sanity = inv.health + R.WHATIF.soloBonus, inv.sanity + R.WHATIF.soloBonus
       end
+      if (R.WHATIF or {}).duoBonus and R.G.n == 2 then
+        inv.health, inv.sanity = inv.health + R.WHATIF.duoBonus, inv.sanity + R.WHATIF.duoBonus
+      end
     end
     for _, card in ipairs(deckData.cards) do inv.deck[#inv.deck + 1] = card end
     for _, s in ipairs(deckData.signatures) do inv.deck[#inv.deck + 1] = s end
@@ -205,7 +208,7 @@ return function(R, T)
       end
     elseif card.id == "sthr-untranslatable" then
       local banked = R.state().memory or 0
-      local n2 = math.min(5, math.ceil(banked / 2))
+      local n2 = math.min((R.WHATIF or {}).untransMax or 5, math.ceil(banked / 2))
       if n2 > 0 then R.hurt(inv, 0, n2, "Untranslatable") end
     elseif card.id == "sthr-debtofhours" then
       local band = R.band()

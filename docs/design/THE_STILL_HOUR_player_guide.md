@@ -670,7 +670,7 @@ Then read **Epilogue — What the Years Took.**
 ## DIFFICULTY AND PLAYER COUNT
 
 - **3 investigators:** every value as printed (Dissonance bands at 8 / 16, reset at 24, Memory cap 18, scar cap 6).
-- **2 or 4 investigators:** the reset comes at **8 × investigators**; the Glitch band starts at one-third of the reset and the Noticed band at two-thirds (rounded down: 5 / 10 at two, 10 / 21 at four). The Memory cap is **6 × investigators**, and the scar cap is **2 × investigators**.
+- **2 or 4 investigators:** the reset comes at **8 × investigators**; the Glitch band starts at one-third of the reset and the Noticed band at two-thirds (rounded down: 5 / 10 at two, 10 / 21 at four). The Memory cap is **6 × investigators**, and the scar cap is **2 × investigators**. With **2 investigators**, each gets **+2 maximum health** and **+2 maximum sanity** (the Control token shows them).
 - **1 investigator:** use the two-investigator bands: the reset comes at **16**, the Noticed band at **10** and Glitch at **5**; the scar cap is **4**. The Memory cap is **6**. Your investigator gets **+5 maximum health** and **+5 maximum sanity** (the Control token shows the new maximums on their card).
 - The finale's contest is **7** at 2 to 4 investigators and **6** with one: its sources do not grow with the party.
 - Values given "per investigator" (the finale's Memory thresholds) scale on their own.

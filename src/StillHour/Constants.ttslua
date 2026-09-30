@@ -40,6 +40,8 @@ Constants.CONTEST_TARGET = 7          -- 6 with one investigator
 -- the solo rule (guide: Difficulty and Player Count): +5 maximum health and sanity
 Constants.SOLO_HEALTH_BONUS = 5
 Constants.SOLO_SANITY_BONUS = 5
+-- two investigators: +2 maximum health and sanity (guide: Difficulty and Player Count)
+Constants.DUO_HEALTH_SANITY_BONUS = 2
 
 function Constants.forCount(n)
   n = math.max(1, math.floor(n or 3))
