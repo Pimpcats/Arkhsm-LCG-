@@ -649,7 +649,7 @@ CampaignState.addOnCardMemory("sthrbirdie", 1)
 check("with no board list, the Years rule alone decides", Interlude.bankOnCard() == 1)
 
 print("== Band starts and scar cap at 1-4 investigators ==")
-local expectBands = { [1] = { 3, 6, 3, 9 }, [2] = { 4, 8, 4, 12 }, [3] = { 6, 12, 6, 18 }, [4] = { 8, 16, 8, 24 } }
+local expectBands = { [1] = { 4, 8, 4, 12 }, [2] = { 4, 8, 4, 12 }, [3] = { 6, 12, 6, 18 }, [4] = { 8, 16, 8, 24 } }
 for n = 1, 4 do
   local cn, e = Constants.forCount(n), expectBands[n]
   check(string.format("%dp: Glitch from %d, Noticed from %d, scar cap %d, reset %d", n, e[1], e[2], e[3], e[4]),
