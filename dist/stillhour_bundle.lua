@@ -22,19 +22,20 @@ __modules["StillHour/Constants"] = function()
 --- THE STILL HOUR — campaign constants (derived from investigator count).
 -- Every threshold in the campaign is a function of the number of investigators,
 -- per aging_3p_v0.3 §2 and campaign_guide_v0.5 §10. Nothing here is hardcoded to
--- three players; three players is simply the tuned baseline (n = 3 -> 12 / 18).
+-- three players; three players is simply the tuned baseline (n = 3 -> 16 / 24).
 --
 -- Rules encoded:
---   reset threshold R  = 6 x investigators   (Dissonance hits R -> loop resets)
---   Appointed Arrived  = 4 x investigators   (Noticed band; the Appointed arrives)
+--   reset threshold R  = 8 x investigators   (Dissonance hits R -> loop resets)
+--   Appointed Arrived  = floor(2R / 3)       (Noticed band; the Appointed arrives)
 --   Memory soft cap    = 6 x investigators
---   contest target     = 5, 6 at 4p           (finale; was 4 x investigators, CO-001)
---   scar cap           = floor(R / 3)         (start-of-loop Dissonance ceiling)
+--   contest target     = 7, 6 solo            (finale; was 4 x investigators, CO-001)
+--   scar cap           = 2 x investigators    (start-of-loop Dissonance ceiling; 4 solo)
 --   bands              = thirds of R: Calm / Glitch / Noticed
 --
--- Solo (n = 1) uses the two-investigator bands (Noticed 8 / reset 12
--- instead of 4 / 6) and +3 maximum health and sanity to keep true solo
--- playable (guide: Difficulty and Player Count; tuning 2026-09, was 6 / 9).
+-- Solo (n = 1) uses the two-investigator bands (Noticed 10 / reset 16
+-- instead of 5 / 8), +3 maximum health and sanity and a second wind once a
+-- loop to keep true solo playable (guide: Difficulty and Player Count;
+-- tuning 2026-09, was 6 / 9).
 local Constants = {}
 
 Constants.BAND_CALM = "Calm"
@@ -54,35 +55,47 @@ Constants.HOUR_LAST = 9
 -- At this many Years an investigator ages out of the campaign (aging v0.3).
 Constants.AGE_OUT_YEARS = 18
 
+-- Hold Back rewinds the Hourglass at most this many times a loop (the
+-- Appointed readies every round: unlimited rewinds could hold the night at
+-- Hour VIII forever once an Hour took two Mythos phases)
+Constants.HOLD_BACK_REWINDS_PER_LOOP = 3
+
 --- Compute the full constant set for a given investigator count.
 -- @param n integer number of investigators (>= 1)
 -- @return table of thresholds
-Constants.CONTEST_TARGET = 5          -- 6 with four investigators
+Constants.CONTEST_TARGET = 7          -- 6 with one investigator
 -- the solo rule (guide: Difficulty and Player Count): +3 maximum health and sanity
+-- (and a second wind once a loop, a table rule)
 Constants.SOLO_HEALTH_BONUS = 3
 Constants.SOLO_SANITY_BONUS = 3
+-- two investigators: +2 maximum health and sanity (guide: Difficulty and Player Count)
+Constants.DUO_HEALTH_SANITY_BONUS = 2
 
 function Constants.forCount(n)
   n = math.max(1, math.floor(n or 3))
-  local reset = 6 * n
-  local appointed = 4 * n
+  -- loops run about 12 rounds (Hours of 2 doom): the reset is 8 x investigators
+  -- (24 at three), the Noticed band two-thirds of it; the scar cap stays 2 x
+  -- investigators (6 at three)
+  local reset = 8 * n
+  local scarCap = 2 * n
   if n == 1 then
-    -- Documented solo override: the two-investigator bands (was 6 / 9).
-    reset = 12
-    appointed = 8
+    -- Documented solo override: the two-investigator bands.
+    reset = 16
+    scarCap = 4
   end
+  local appointed = math.floor(2 * reset / 3)
   return {
     investigators = n,
     resetThreshold = reset,
     appointedThreshold = appointed,
     memoryCap = 6 * n,
-    -- Finale contest target: 5, or 6 with four investigators (tuning 2026-09,
+    -- Finale contest target: 7, or 6 with one investigator (12-round loops) (tuning 2026-09,
     -- docs/design/PLAYTEST_SIM.md). Its sources (deep entries, Hold Back
     -- successes, the Uninvited) do not grow with the party, so the old
     -- 4 x investigators (CO-001) was out of reach at 3-4 investigators and
     -- nearly automatic solo.
-    contestTarget = (n >= 4) and 6 or 5,
-    scarCap = math.floor(reset / 3),
+    contestTarget = (n == 1) and 6 or 7,
+    scarCap = scarCap,
     bandGlitchStart = math.floor(reset / 3),
     bandNoticedStart = math.floor(2 * reset / 3),
   }
@@ -165,6 +178,7 @@ local function freshState(n)
     contest = 0,             -- finale contest progress (Contest the Crossing)
     partTwo = false,         -- Part II (The Shape of the Hour) has begun
     pendingYears = {},       -- investigatorId -> Years a card gave this loop (added at Age)
+    holdBackRewinds = 0,     -- Hold Back rewinds this loop (at most Constants.HOLD_BACK_REWINDS_PER_LOOP)
   }
 end
 
@@ -533,6 +547,17 @@ function CampaignState.pushBackAppointed()
   return state.appointedStage
 end
 
+--- Hold Back rewinds used this loop (a reset clears them).
+function CampaignState.getHoldBackRewinds()
+  return state.holdBackRewinds or 0
+end
+
+--- Count one Hold Back rewind; returns the new count.
+function CampaignState.useHoldBackRewind()
+  state.holdBackRewinds = (state.holdBackRewinds or 0) + 1
+  return state.holdBackRewinds
+end
+
 --- Is the Appointed manifested on the board (stage >= 1)?
 function CampaignState.isAppointedInPlay()
   return state.appointedStage >= 1
@@ -578,6 +603,7 @@ function CampaignState.reset()
     state.dissonance = 0
     state.hourglass = Constants.HOUR_FIRST
     state.oncePerLoopFlags = {}
+    state.holdBackRewinds = 0
     state.testTypesLastLoop = state.testTypesThisLoop
     state.testTypesThisLoop = {}
     state.appointedStage = 0
@@ -602,6 +628,7 @@ function CampaignState.reset()
 
   state.hourglass = Constants.HOUR_FIRST
   state.oncePerLoopFlags = {}
+  state.holdBackRewinds = 0
   state.testTypesLastLoop = state.testTypesThisLoop
   state.testTypesThisLoop = {}
   state.appointedStage = 0
@@ -1455,13 +1482,21 @@ end
 ----------------------------------------------------------------- counterplay --
 
 --- Hold Back — call this on a SUCCESSFUL [wil]/[com] (4) test. Pushes the
--- Approach back one stage AND rewinds the Hourglass by 1 Hour, then reconciles
--- the board. Returns the new stage.
+-- Approach back one stage AND rewinds the Hourglass by 1 Hour (at most
+-- Constants.HOLD_BACK_REWINDS_PER_LOOP times a loop, never in the finale), then
+-- reconciles the board. Returns the new stage and whether the Hourglass rewound.
 function Appointed.holdBack(ctx)
   local newStage = CampaignState.pushBackAppointed()
-  Hourglass.rewind(1, ctx)
+  -- during the finale the night gives no Hours back (guide: The Last Hour)
+  local rewound = false
+  if not CampaignState.inFinale()
+      and CampaignState.getHoldBackRewinds() < Constants.HOLD_BACK_REWINDS_PER_LOOP then
+    CampaignState.useHoldBackRewind()
+    Hourglass.rewind(1, ctx)
+    rewound = true
+  end
   Appointed.syncBoard(ctx)
-  return newStage
+  return newStage, rewound
 end
 
 --- It cannot be defeated. Any effect that would defeat or remove it is replaced
@@ -1553,7 +1588,9 @@ Knowledge.FACTS = {
 
 -- Knowledge pays Memory: the first time an entry is recorded in the campaign
 -- it adds banked Memory, per investigator (current count), by layer.
-Knowledge.MEMORY_PER_INVESTIGATOR = { prologue = 0, surface = 1, deep = 3, assembled = 0 }
+-- (12-round loops, where the investigators' own reactions earn about twice as
+-- much: surface entries pay nothing, deep entries 2)
+Knowledge.MEMORY_PER_INVESTIGATOR = { prologue = 0, surface = 0, deep = 2, assembled = 0 }
 
 function Knowledge.knows(factId)
   return CampaignState.knows(factId)
@@ -2289,7 +2326,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/c58adaf024d745b328ac11fc21f710aba0f96ba9/dist/cards/sthr-static-token.jpg?v=a556271511"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/87430324c772d6dd65c56445390c482f8f385a69/dist/cards/sthr-static-token.jpg?v=a556271511"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -2931,11 +2968,14 @@ function Board.applyAging(inv, toTracker)
   local base = Board.baseStats(inv.md)
   if not base then return nil end
   local eff = Aging.applyDriftToStats(base, inv.id)
-  -- one investigator: +2 maximum health and sanity (guide: Difficulty and Player Count)
+  -- one investigator: +3 maximum health and sanity; two: +2 (guide: Difficulty and Player Count)
   local c = CampaignState.constants and CampaignState.constants()
   if c and c.investigators == 1 then
     eff.health = eff.health + Constants.SOLO_HEALTH_BONUS
     eff.sanity = eff.sanity + Constants.SOLO_SANITY_BONUS
+  elseif c and c.investigators == 2 then
+    eff.health = eff.health + Constants.DUO_HEALTH_SANITY_BONUS
+    eff.sanity = eff.sanity + Constants.DUO_HEALTH_SANITY_BONUS
   end
   if toTracker and inv.matColor then
     SCED.setSkillTracker(inv.matColor, eff.wil, eff.int, eff.com, eff.agi)
@@ -3168,7 +3208,7 @@ local STAGE_BUTTONS = {
   { fn = "shAppointedInfo", label = function() return "The Appointed: " .. Appointed.stageName() end,
     z = 1.75, w = 1100, fs = 120, tip = "Approach stage (CO-002)" },
   { fn = "shHoldBack", label = function() return "Hold Back (success)" end, z = 2.2, w = 1100, fs = 120,
-    tip = "Click after a SUCCESSFUL [willpower] or [combat] (4) test: back one stage, rewind one Hour." },
+    tip = "Click after a SUCCESSFUL [willpower] or [combat] (4) test: back one stage, rewind one Hour (3 rewinds a loop)." },
 }
 
 --- Put the Hold Back / Hunt buttons on the Appointed card (idempotent).
@@ -3582,7 +3622,12 @@ end
 
 local function changeHour(delta)
   if delta > 0 then
+    local before = CampaignState.getHour()
     Hourglass.advance(delta, playCtx())
+    if CampaignState.getHour() > before and CampaignState.getHour() < 9 then
+      -- guide: The Hourglass (the Hour turns); doom on the Hours is on the table
+      announce("The Hour turns: remove all doom in play; each investigator heals 1 horror.")
+    end
   else
     Hourglass.rewind(-delta, playCtx())
   end
@@ -3594,9 +3639,16 @@ local function advanceAppointedByCard()
 end
 
 local function holdBack()
-  local s = Appointed.holdBack(playCtx())
-  announce("Held back: the Appointed is " .. Appointed.stageName() .. "; the Hourglass rewinds to Hour "
-    .. CampaignState.getHour() .. ".")
+  local s, rewound = Appointed.holdBack(playCtx())
+  if CampaignState.inFinale() then
+    announce("Held back: the Appointed is " .. Appointed.stageName() .. " (in the finale the Hourglass does not rewind).")
+  elseif not rewound then
+    announce("Held back: the Appointed is " .. Appointed.stageName() .. " (Hold Back has rewound the Hourglass "
+      .. Constants.HOLD_BACK_REWINDS_PER_LOOP .. " times this loop: no more rewinds until the next loop).")
+  else
+    announce("Held back: the Appointed is " .. Appointed.stageName() .. "; the Hourglass rewinds to Hour "
+      .. CampaignState.getHour() .. ".")
+  end
   return s
 end
 
@@ -4699,17 +4751,17 @@ local function stillHourTestBody(T)
   end
 
   local c3 = Constants.forCount(3)
-  P, F = check("reset 18 / appointed 12 at 3p", c3.resetThreshold == 18 and c3.appointedThreshold == 12, P, F)
-  P, F = check("contest target 5 (6 at 4p)", c3.contestTarget == 5 and Constants.forCount(1).contestTarget == 5
-    and Constants.forCount(4).contestTarget == 6, P, F)
+  P, F = check("reset 24 / appointed 16 at 3p", c3.resetThreshold == 24 and c3.appointedThreshold == 16, P, F)
+  P, F = check("contest target 7 (6 solo)", c3.contestTarget == 7 and Constants.forCount(1).contestTarget == 6
+    and Constants.forCount(4).contestTarget == 7, P, F)
 
   local bag = { count = 0 }
   bag.setBaselineStatic = function(m) bag.count = m end
   CampaignState.init(3); Dissonance.syncBag(bag)
   P, F = check("Calm -> 0 [static]; Appointed Unseen", bag.count == 0 and Appointed.stage() == 0, P, F)
-  Dissonance.raise(6, bag)
+  Dissonance.raise(8, bag)
   P, F = check("Glitch -> 1 [static]; Appointed Sensed (1)", bag.count == 1 and Appointed.stage() == 1, P, F)
-  local info = Dissonance.raise(6, bag)
+  local info = Dissonance.raise(8, bag)
   P, F = check("Noticed -> 2 [static]; Appointed Arrived (3)", bag.count == 2 and info.appointedStage == 3, P, F)
   local before = CampaignState.getDissonance(); Dissonance.onStaticRevealed(bag)
   P, F = check("[static] reveal raises Dissonance", CampaignState.getDissonance() == before + 1, P, F)
@@ -4734,6 +4786,14 @@ local function stillHourTestBody(T)
   local newStage = Appointed.holdBack({})
   P, F = check("Hold Back drops one stage and rewinds one Hour",
     newStage == 2 and CampaignState.getHour() == hourBefore - 1, P, F)
+  -- the loop must always end: Hold Back rewinds at most 3 times a loop
+  for _ = 2, Constants.HOLD_BACK_REWINDS_PER_LOOP do CampaignState.advanceAppointed(3); Appointed.holdBack({}) end
+  local hourCapped = CampaignState.getHour()
+  CampaignState.advanceAppointed(3)
+  local _, rewoundAgain = Appointed.holdBack({})
+  P, F = check("a fourth Hold Back in a loop does not rewind the Hourglass",
+    rewoundAgain == false and CampaignState.getHour() == hourCapped
+      and CampaignState.getHoldBackRewinds() == Constants.HOLD_BACK_REWINDS_PER_LOOP, P, F)
   P, F = check("Appointed cannot be defeated", Appointed.attemptDefeat() == false, P, F)
   local restored = false
   Appointed.onRemovalAttempt({ returnToPlay = function() restored = true end })
