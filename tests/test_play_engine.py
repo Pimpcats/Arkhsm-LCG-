@@ -22,6 +22,16 @@ ENGINE = os.path.join(ROOT, "tools", "play_engine")
 sys.path.insert(0, ENGINE)
 
 SAVE = os.environ.get("SCED_SAVE", "/home/user/sce480/Arkham SCE 4.8.0.json")
+
+
+def _engine_run():
+    # tests/sced_real/run.py is also a module called "run" (test_sced_resolutions):
+    # load the engine's under its own name
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("play_engine_run", os.path.join(ENGINE, "run.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 LUA = shutil.which("lua5.2")
 
 
@@ -101,7 +111,7 @@ def test_decks_are_legal():
     why = _real()
     if why:
         pytest.skip(why)
-    import run
+    run = _engine_run()
     import decks
     cpath, _ = run.prepare(SAVE)
     d = decks.build(SAVE, cpath)
@@ -115,7 +125,7 @@ def test_one_short_game_per_scenario(clean_tree):
     why = _real()
     if why:
         pytest.skip(why)
-    import run
+    run = _engine_run()
     run.prepare(SAVE)
     jobs = [{"scenario": s, "runs": 1, "seed": 4242 + i} for i, s in enumerate(run.SCENARIOS)]
     r = run.run_batch(SAVE, None, 3, 0, 0, jobs=jobs, max_rounds=2, timeout=1800)
