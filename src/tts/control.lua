@@ -164,8 +164,12 @@ end
 
 local function holdBack()
   local s = Appointed.holdBack(playCtx())
-  announce("Held back: the Appointed is " .. Appointed.stageName() .. "; the Hourglass rewinds to Hour "
-    .. CampaignState.getHour() .. ".")
+  if CampaignState.inFinale() then
+    announce("Held back: the Appointed is " .. Appointed.stageName() .. " (in the finale the Hourglass does not rewind).")
+  else
+    announce("Held back: the Appointed is " .. Appointed.stageName() .. "; the Hourglass rewinds to Hour "
+      .. CampaignState.getHour() .. ".")
+  end
   return s
 end
 
@@ -1268,17 +1272,17 @@ local function stillHourTestBody(T)
   end
 
   local c3 = Constants.forCount(3)
-  P, F = check("reset 18 / appointed 12 at 3p", c3.resetThreshold == 18 and c3.appointedThreshold == 12, P, F)
-  P, F = check("contest target 5 (6 at 4p)", c3.contestTarget == 5 and Constants.forCount(1).contestTarget == 5
-    and Constants.forCount(4).contestTarget == 6, P, F)
+  P, F = check("reset 24 / appointed 16 at 3p", c3.resetThreshold == 24 and c3.appointedThreshold == 16, P, F)
+  P, F = check("contest target 7 (8 at 4p)", c3.contestTarget == 7 and Constants.forCount(1).contestTarget == 7
+    and Constants.forCount(4).contestTarget == 8, P, F)
 
   local bag = { count = 0 }
   bag.setBaselineStatic = function(m) bag.count = m end
   CampaignState.init(3); Dissonance.syncBag(bag)
   P, F = check("Calm -> 0 [static]; Appointed Unseen", bag.count == 0 and Appointed.stage() == 0, P, F)
-  Dissonance.raise(6, bag)
+  Dissonance.raise(8, bag)
   P, F = check("Glitch -> 1 [static]; Appointed Sensed (1)", bag.count == 1 and Appointed.stage() == 1, P, F)
-  local info = Dissonance.raise(6, bag)
+  local info = Dissonance.raise(8, bag)
   P, F = check("Noticed -> 2 [static]; Appointed Arrived (3)", bag.count == 2 and info.appointedStage == 3, P, F)
   local before = CampaignState.getDissonance(); Dissonance.onStaticRevealed(bag)
   P, F = check("[static] reveal raises Dissonance", CampaignState.getDissonance() == before + 1, P, F)

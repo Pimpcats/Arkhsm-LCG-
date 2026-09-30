@@ -580,7 +580,7 @@ Before the finale begins: if you completed a district's act 2a this loop, read t
 
 **Setup**
 1. Press **Place** on **The Last Hour** box. **Contest the Crossing** becomes the current act, in the act spot on the mythos mat. Set every district's act deck aside: no district objective can be completed during the finale. The box also lays out a face-down set-aside stack in the mythos area's lower corner. Take **The Uninvited** (an enemy) from it without looking at the other cards, and leave the rest face down until the guide sends you to them.
-2. Advance the Appointed's Approach to **Arrived** (click **Appointed** on the Control token until it shows Arrived). If it is set aside, it manifests. Dissonance keeps its current value. If the finale began at Hour IX, put Hours IX, VIII, VII and VI back on the Hours deck in that order (Hour VI on top) and make Hour V the current agenda. No Hour resolves: right-click **Hour** four times. Hours VII and VIII resolve again when they are reached (Hour VIII raises Dissonance by 2 again); Hour VI does not stack. Then spawn the set-aside **Uninvited** at the revealed location farthest from all investigators that is not closed (the lead investigator breaks ties).
+2. Advance the Appointed's Approach to **Arrived** (click **Appointed** on the Control token until it shows Arrived). If it is set aside, it manifests. Dissonance keeps its current value. If the finale began at Hour IX, put Hours IX, VIII, VII and VI back on the Hours deck in that order (Hour VI on top) and make Hour V the current agenda. No Hour resolves: right-click **Hour** four times. Hours VII and VIII resolve again when they are reached (Hour VIII raises Dissonance by 2 again); Hour VI does not stack. If the finale began before Hour V, advance the Hourglass to Hour V instead (a Skip: each Hour resolves; click **Hour** once for each). Then spawn the set-aside **Uninvited** at the revealed location farthest from all investigators that is not closed (the lead investigator breaks ties).
 3. On the Control token, click **Begin Finale**: the **Contest** counter appears at 0. Then apply each of these your Campaign Log records:
    - *You have spoken the name:* gain 1 contest progress. It already knows that you know.
    - *The drowned heard the true hour:* rewind the Hourglass by 1 Hour. Below the church, a congregation is keeping time for you.
@@ -590,10 +590,10 @@ Before the finale begins: if you completed a district's act 2a this loop, read t
 - when the Uninvited is defeated (its card says so);
 - each time a deep Knowledge entry is spent with the [action] on Contest the Crossing. Each entry can be spent once per finale. Note it on the Finale Record; it stays recorded for every other purpose, including the resolutions.
 
-When contest progress reaches **5** (**6** with four investigators), advance Contest the Crossing: the contest is reached. Every deep entry you carry into the finale is one step of it; the rest must be taken from the Appointed. The finale also ends, with the contest **not** reached, when Hour IX is reached, when every investigator has been defeated, or when Dissonance reaches the reset value.
+When contest progress reaches **7** (**8** with four investigators), advance Contest the Crossing: the contest is reached. Every deep entry you carry into the finale is one step of it; the rest must be taken from the Appointed. During the finale, a Hold Back success does not rewind the Hourglass (the Control token knows this). The finale also ends, with the contest **not** reached, when Hour IX is reached, when every investigator has been defeated, or when Dissonance reaches the reset value.
 
 During the finale, if your log records:
-- *You carry the walker's ring:* once during the finale, when an investigator takes the Hold Back action, they may resolve it without a skill test: push the Appointed back one stage, disengage and exhaust it, and rewind the Hourglass by 1 Hour. This counts as succeeding at Hold Back.
+- *You carry the walker's ring:* once during the finale, when an investigator takes the Hold Back action, they may resolve it without a skill test: push the Appointed back one stage, disengage and exhaust it. This counts as succeeding at Hold Back.
 - *The name is kept unspoken:* once during the finale, when the Hourglass would advance for any reason, the investigators may speak the name to cancel that entire advance (remove all doom from the current Hour).
 
 > **Halfway.** The first time your contest progress reaches half its target, read aloud: *Every clock in Ambergrove stops, then starts again, ticking backward. For one breath you are all the ages you have ever been at once: young and tired and old, standing on every step of every stair you ever climbed in this town. Then the moment passes, and the thing on the hill is closer, and so is the dawn.*
@@ -670,7 +670,7 @@ Then read **Epilogue — What the Years Took.**
 - **3 investigators:** every value as printed (Dissonance bands at 6 / 12, reset at 18, Memory cap 18, scar cap 6).
 - **2 or 4 investigators:** the reset comes at **6 × investigators**; the Glitch band starts at one-third of the reset and the Noticed band at two-thirds (**4 × investigators**). The Memory cap is **6 × investigators**, and the scar cap is one-third of the reset.
 - **1 investigator:** use the two-investigator bands: the reset comes at **12**, the Noticed band at **8** and Glitch at **4**; the scar cap is **4**. The Memory cap is **6**. Your investigator gets **+3 maximum health** and **+3 maximum sanity** (the Control token shows the new maximums on their card).
-- The finale's contest is **5** at 1 to 3 investigators and **6** at 4: its sources do not grow with the party.
+- The finale's contest is **7** at 1 to 3 investigators and **8** at 4: its sources do not grow with the party.
 - Values given "per investigator" (the finale's Memory thresholds) scale on their own.
 - The Control token applies all of these for you.
 - The campaign is tuned for about 6–8 loops.

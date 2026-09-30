@@ -64,31 +64,31 @@ bag.setBaselineStatic = function(n) bag.count = n end
 
 print("== Constants (3-player baseline) ==")
 local c3 = Constants.forCount(3)
-check("reset threshold = 18", c3.resetThreshold == 18)
-check("appointed threshold = 12", c3.appointedThreshold == 12)
+check("reset threshold = 24", c3.resetThreshold == 24)
+check("appointed threshold = 16", c3.appointedThreshold == 16)
 check("memory cap = 18", c3.memoryCap == 18)
--- finale contest target = 5, 6 with four investigators (tuning 2026-09; was 4 x investigators, CO-001)
-check("contest target = 5 at n=3", c3.contestTarget == 5)
-check("contest target = 5 at n=1", Constants.forCount(1).contestTarget == 5)
-check("contest target = 6 at n=4", Constants.forCount(4).contestTarget == 6)
+-- finale contest target = 7, 8 with four investigators (12-round loops; was 4 x investigators, CO-001)
+check("contest target = 7 at n=3", c3.contestTarget == 7)
+check("contest target = 7 at n=1", Constants.forCount(1).contestTarget == 7)
+check("contest target = 8 at n=4", Constants.forCount(4).contestTarget == 8)
 check("scar cap = 6", c3.scarCap == 6)
-check("band of 5 is Calm", Constants.bandFor(5, 3) == "Calm")
-check("band of 6 is Glitch", Constants.bandFor(6, 3) == "Glitch")
-check("band of 12 is Noticed", Constants.bandFor(12, 3) == "Noticed")
-check("solo override 8/12", Constants.forCount(1).resetThreshold == 12 and Constants.forCount(1).appointedThreshold == 8)
+check("band of 7 is Calm", Constants.bandFor(7, 3) == "Calm")
+check("band of 8 is Glitch", Constants.bandFor(8, 3) == "Glitch")
+check("band of 16 is Noticed", Constants.bandFor(16, 3) == "Noticed")
+check("solo override 10/16", Constants.forCount(1).resetThreshold == 16 and Constants.forCount(1).appointedThreshold == 10)
 
 print("== P3: Dissonance bands drive the [static] baseline ==")
 CampaignState.init(3)
 Dissonance.syncBag(bag)
 check("Calm -> 0 static", bag.count == 0)
-Dissonance.raise(6, bag) -- cross into Glitch (6)
-check("Dissonance now 6", CampaignState.getDissonance() == 6)
+Dissonance.raise(8, bag) -- cross into Glitch (8)
+check("Dissonance now 8", CampaignState.getDissonance() == 8)
 check("Glitch -> 1 static", bag.count == 1)
-local info = Dissonance.raise(6, bag) -- 12 -> Noticed
+local info = Dissonance.raise(8, bag) -- 16 -> Noticed
 check("Noticed -> 2 static", bag.count == 2)
 check("entering Noticed drives Appointed to Arrived (3)", info.appointedStage == 3)
-Dissonance.reduce(7, bag) -- back to 5 -> Calm
-check("reduce back to Calm -> 0 static", bag.count == 0 and CampaignState.getDissonance() == 5)
+Dissonance.reduce(9, bag) -- back to 7 -> Calm
+check("reduce back to Calm -> 0 static", bag.count == 0 and CampaignState.getDissonance() == 7)
 check("reducing Dissonance does NOT lower the Appointed (ratchet up only)", CampaignState.getAppointedStage() == 3)
 
 print("== P3: revealing [static] raises Dissonance ==")
@@ -218,9 +218,9 @@ CampaignState.reset()
 check("reset() zeroes the Approach", Appointed.stage() == 0)
 -- Dissonance-band driver: entering Glitch -> Sensed, Noticed -> Arrived.
 CampaignState.init(3)
-Dissonance.raise(6, {}) -- into Glitch
+Dissonance.raise(8, {}) -- into Glitch
 check("entering Glitch -> Sensed (1)", Appointed.stage() == 1)
-Dissonance.raise(6, {}) -- into Noticed
+Dissonance.raise(8, {}) -- into Noticed
 check("entering Noticed -> Arrived (3)", Appointed.stage() == 3)
 -- Persists across serialize/deserialize and node travel (no reset).
 CampaignState.advanceAppointed(3)
@@ -387,10 +387,10 @@ check("a single most-Memory investigator is the prey", Appointed.prey(CampaignSt
 local blob2 = CampaignState.serialize()
 CampaignState.init(3) ; CampaignState.deserialize(blob2)
 check("on-card Memory survives save/load (node travel)", CampaignState.getOnCardMemory("sthrcass") == 4)
-CampaignState.raiseDissonance(13) ; CampaignState.reset()
+CampaignState.raiseDissonance(17) ; CampaignState.reset()
 check("a reset keeps on-card Memory until the interlude banks it", CampaignState.getOnCardMemory("sthrcass") == 4)
-check("the loop-end Dissonance is recorded for Aging", CampaignState.getLastLoopEndDissonance() == 13)
-check("...and reads as ended in danger (>= 12 at 3p)", Interlude.loopEndedInDanger() == true)
+check("the loop-end Dissonance is recorded for Aging", CampaignState.getLastLoopEndDissonance() == 17)
+check("...and reads as ended in danger (>= 16 at 3p)", Interlude.loopEndedInDanger() == true)
 local banked0 = CampaignState.getBankedMemory()
 check("interlude banks all on-card Memory", Interlude.bankOnCard() == 7
   and CampaignState.getBankedMemory() == banked0 + 7 and CampaignState.getOnCardMemory("sthrcass") == 0)
@@ -609,23 +609,23 @@ CampaignState.deserialize(JSON.encode({ version = 1, investigators = 3, loopsCom
 check("an older save without the flag loads as a loop under way", CampaignState.isLoopEnded() == false)
 
 print("== Ended in danger: decided at the reset with that loop's count ==")
-CampaignState.init(4)                  -- 4p: Noticed from 16
-CampaignState.raiseDissonance(13)
+CampaignState.init(4)                  -- 4p: Noticed from 21
+CampaignState.raiseDissonance(17)
 CampaignState.reset()
-check("13 at 4 investigators is not danger", CampaignState.getLastLoopEndedInDanger() == false)
-CampaignState.setInvestigatorCount(3)  -- someone leaves before Age: 3p Noticed is 12
+check("17 at 4 investigators is not danger", CampaignState.getLastLoopEndedInDanger() == false)
+CampaignState.setInvestigatorCount(3)  -- someone leaves before Age: 3p Noticed is 16
 check("changing Investigators before Age keeps the answer (no danger)", Interlude.loopEndedInDanger() == false)
-CampaignState.init(2)                  -- 2p: Noticed from 8
-CampaignState.raiseDissonance(9)
+CampaignState.init(2)                  -- 2p: Noticed from 10
+CampaignState.raiseDissonance(11)
 CampaignState.reset()
 CampaignState.setInvestigatorCount(4)
-check("9 at 2 investigators stays danger after changing to 4", Interlude.loopEndedInDanger() == true)
+check("11 at 2 investigators stays danger after changing to 4", Interlude.loopEndedInDanger() == true)
 check("Age reads it: 1 base + 1 danger",
   Interlude.age("sthrelias", { endedInDanger = Interlude.loopEndedInDanger() }).yearsGained == 2)
-CampaignState.deserialize(JSON.encode({ version = 1, investigators = 3, lastLoopEndDissonance = 12 }))
-check("an older save falls back to the loop-end Dissonance (12 at 3p: danger)", Interlude.loopEndedInDanger() == true)
-CampaignState.deserialize(JSON.encode({ version = 1, investigators = 3, lastLoopEndDissonance = 11 }))
-check("...and 11 at 3p is not", Interlude.loopEndedInDanger() == false)
+CampaignState.deserialize(JSON.encode({ version = 1, investigators = 3, lastLoopEndDissonance = 16 }))
+check("an older save falls back to the loop-end Dissonance (16 at 3p: danger)", Interlude.loopEndedInDanger() == true)
+CampaignState.deserialize(JSON.encode({ version = 1, investigators = 3, lastLoopEndDissonance = 15 }))
+check("...and 15 at 3p is not", Interlude.loopEndedInDanger() == false)
 
 print("== Departed investigators: no start-of-loop Memory, nothing banked ==")
 CampaignState.init(3)
@@ -649,7 +649,7 @@ CampaignState.addOnCardMemory("sthrbirdie", 1)
 check("with no board list, the Years rule alone decides", Interlude.bankOnCard() == 1)
 
 print("== Band starts and scar cap at 1-4 investigators ==")
-local expectBands = { [1] = { 4, 8, 4, 12 }, [2] = { 4, 8, 4, 12 }, [3] = { 6, 12, 6, 18 }, [4] = { 8, 16, 8, 24 } }
+local expectBands = { [1] = { 5, 10, 4, 16 }, [2] = { 5, 10, 4, 16 }, [3] = { 8, 16, 6, 24 }, [4] = { 10, 21, 8, 32 } }
 for n = 1, 4 do
   local cn, e = Constants.forCount(n), expectBands[n]
   check(string.format("%dp: Glitch from %d, Noticed from %d, scar cap %d, reset %d", n, e[1], e[2], e[3], e[4]),
@@ -797,7 +797,7 @@ do
     and CampaignState.getYears("sthrelias") == 0 and C.lastBroadcast:find("do not gain Years", 1, true) ~= nil)
   C.shApiBeginNextLoop()
   check("Begin Next Loop: a loop is under way again", C.shApiState().loopEnded == false)
-  C.shApiCounter({ name = "dissonance", delta = 12 })
+  C.shApiCounter({ name = "dissonance", delta = 16 })
   C.shApiReset()
   local st1 = C.shApiState()
   C.shApiReset()
@@ -818,8 +818,8 @@ do
   local su = C.shApiState()
   check("Undo Hour VI takes the token back and clears the flag", su.static.extra == 0 and su.hourSix == false
     and C.label("Undo Hour VI") == nil)
-  C.shApiCounter({ name = "dissonance", delta = 13 })   -- 14 at 3p
-  C.shApiCounter({ name = "investigators", delta = -1 }) -- 2p: reset value 12
+  C.shApiCounter({ name = "dissonance", delta = 17 })   -- 18 at 3p
+  C.shApiCounter({ name = "investigators", delta = -1 }) -- 2p: reset value 16
   check("fewer Investigators mid-loop: reaching the new reset value is announced",
     C.lastBroadcast:find("Reset Loop", 1, true) ~= nil and C.shApiState().loopEnded == false
     and C.shApiState().static.baseline == 2)

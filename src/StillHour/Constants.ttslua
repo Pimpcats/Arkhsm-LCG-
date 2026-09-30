@@ -7,7 +7,7 @@
 --   reset threshold R  = 6 x investigators   (Dissonance hits R -> loop resets)
 --   Appointed Arrived  = 4 x investigators   (Noticed band; the Appointed arrives)
 --   Memory soft cap    = 6 x investigators
---   contest target     = 5, 6 at 4p           (finale; was 4 x investigators, CO-001)
+--   contest target     = 7, 8 at 4p           (finale; was 4 x investigators, CO-001)
 --   scar cap           = floor(R / 3)         (start-of-loop Dissonance ceiling)
 --   bands              = thirds of R: Calm / Glitch / Noticed
 --
@@ -36,7 +36,7 @@ Constants.AGE_OUT_YEARS = 18
 --- Compute the full constant set for a given investigator count.
 -- @param n integer number of investigators (>= 1)
 -- @return table of thresholds
-Constants.CONTEST_TARGET = 5          -- 6 with four investigators
+Constants.CONTEST_TARGET = 7          -- 8 with four investigators
 -- the solo rule (guide: Difficulty and Player Count): +3 maximum health and sanity
 Constants.SOLO_HEALTH_BONUS = 3
 Constants.SOLO_SANITY_BONUS = 3
@@ -59,12 +59,12 @@ function Constants.forCount(n)
     resetThreshold = reset,
     appointedThreshold = appointed,
     memoryCap = 6 * n,
-    -- Finale contest target: 5, or 6 with four investigators (tuning 2026-09,
+    -- Finale contest target: 7, or 8 with four investigators (12-round loops) (tuning 2026-09,
     -- docs/design/PLAYTEST_SIM.md). Its sources (deep entries, Hold Back
     -- successes, the Uninvited) do not grow with the party, so the old
     -- 4 x investigators (CO-001) was out of reach at 3-4 investigators and
     -- nearly automatic solo.
-    contestTarget = (n >= 4) and 6 or 5,
+    contestTarget = (n >= 4) and 8 or 7,
     scarCap = scarCap,
     bandGlitchStart = math.floor(reset / 3),
     bandNoticedStart = math.floor(2 * reset / 3),

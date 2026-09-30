@@ -94,6 +94,9 @@ return function(R, T)
     -- begun at Hour IX: Hours IX to VI go back on the deck, Hour V is current,
     -- no Hour resolves (right-click Hour four times)
     if atNine then R.rewind(4, "the finale begins at Hour IX") end
+    -- a finale begun before Hour V skips to Hour V (each Hour resolves)
+    local fromHour = (R.WHATIF or {}).finaleFrom or 5
+    if not atNine and R.hour() < fromHour then R.advance(fromHour - R.hour(), "the finale begins") end
     -- the Uninvited at the revealed location farthest from all investigators, not closed
     if unv then
       local far, fd

@@ -715,8 +715,11 @@
               "needs": {
                 "clues": "card",
                 "from": [
-                  "The Keeper's Quarters"
-                ]
+                  "The Keeper's Quarters",
+                  "The Winding Stair",
+                  "The Lantern Room"
+                ],
+                "note": "clues are portable: the district's clues pay for its deep act (12-round loops)"
               }
             }
           ]
@@ -841,8 +844,12 @@
               "needs": {
                 "clues": "card",
                 "from": [
-                  "The Flooded Crypt"
-                ]
+                  "The Flooded Crypt",
+                  "The Nave",
+                  "The Belfry",
+                  "The Vestry"
+                ],
+                "note": "clues are portable: the district's clues pay for its deep act (12-round loops)"
               }
             }
           ]
@@ -1094,8 +1101,12 @@
               "needs": {
                 "clues": "card",
                 "from": [
-                  "The Records Office"
-                ]
+                  "The Records Office",
+                  "The Square",
+                  "The Town Hall Steps",
+                  "The Well"
+                ],
+                "note": "clues are portable: the district's clues pay for its deep act (12-round loops)"
               }
             }
           ]
@@ -1366,8 +1377,11 @@
               "needs": {
                 "clues": "card",
                 "from": [
-                  "The Sealed Study"
-                ]
+                  "The Sealed Study",
+                  "The Reading Room",
+                  "The Press"
+                ],
+                "note": "clues are portable: the district's clues pay for its deep act (12-round loops)"
               }
             }
           ]
@@ -1442,8 +1456,8 @@
               "name": "Contest the Crossing",
               "needs": {
                 "contest": {
-                  "target": 5,
-                  "target_four_investigators": 6,
+                  "target": 7,
+                  "target_four_investigators": 8,
                   "sources": [
                     "Hold Back success (repeatable)",
                     "deep fact spent (max 6)",

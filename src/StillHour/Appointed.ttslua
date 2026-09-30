@@ -140,7 +140,8 @@ end
 -- the board. Returns the new stage.
 function Appointed.holdBack(ctx)
   local newStage = CampaignState.pushBackAppointed()
-  Hourglass.rewind(1, ctx)
+  -- during the finale the night gives no Hours back (guide: The Last Hour)
+  if not CampaignState.inFinale() then Hourglass.rewind(1, ctx) end
   Appointed.syncBoard(ctx)
   return newStage
 end

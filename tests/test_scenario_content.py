@@ -175,7 +175,8 @@ class ScenarioContentTests(unittest.TestCase):
                 if m["type"] == "Location":
                     self.assertTrue(m["locationFront"]["connections"])
                 if m["type"] == "Agenda" and m["id"] != "sthr-hour-9":
-                    self.assertEqual(m["doomThreshold"], 1)
+                    # Hours of 2 doom (Hour I 3): loops of about 12 rounds
+                    self.assertEqual(m["doomThreshold"], 3 if m["id"] == "sthr-hour-1" else 2)
                 if m["type"] == "ScenarioReference":
                     self.assertIn("Skull", m["tokens"]["front"])
             for c in o.get("ContainedObjects") or []:
@@ -277,13 +278,13 @@ class ContentGapTests(unittest.TestCase):
     def test_contest_target_matches_the_engine(self):
         lua = open(os.path.join(ROOT, "src", "StillHour", "Constants.ttslua"),
                    encoding="utf-8").read()
-        self.assertIn("contestTarget = (n >= 4) and 6 or 5,", lua)
+        self.assertIn("contestTarget = (n >= 4) and 8 or 7,", lua)
         need = next(a for s in MANIFEST["scenarios"] if s["id"] == "finale"
                     for a in s["stacks"]["act_deck"]["cards"])["needs"]["contest"]
-        self.assertEqual((need["target"], need["target_four_investigators"]), (5, 6))
+        self.assertEqual((need["target"], need["target_four_investigators"]), (7, 8))
         act = CARDS["sthr-act-lasthour"]
         text = act["text"] + "\n" + act["back_text"]    # b side: the resolutions
-        for part in ("reaches 5 (6 with four investigators)", "Hold Back", "deep Knowledge entry", "Hour IX", "R1b"):
+        for part in ("reaches 7 (8 with four investigators)", "Hold Back", "deep Knowledge entry", "Hour IX", "R1b"):
             self.assertIn(part, text)
 
     def test_sced_draws_only_the_printed_lines(self):

@@ -969,7 +969,7 @@
   },
   "sthr-act-lasthour": {
     "name": "Contest the Crossing",
-    "text": "Objective – Gain 1 contest progress each time an investigator succeeds at Hold Back or spends a deep Knowledge entry. Other sources are in the Campaign Guide. When progress reaches 5 (6 with four investigators), advance.\n[action]: Spend a deep Knowledge entry your Campaign Log records (each entry once per finale).\nIf Hour IX is reached, every investigator is defeated, or Dissonance reaches the reset value, the finale ends and the contest is not reached.",
+    "text": "Objective – Gain 1 contest progress each time an investigator succeeds at Hold Back or spends a deep Knowledge entry. Other sources are in the Campaign Guide. When progress reaches 7 (8 with four investigators), advance.\n[action]: Spend a deep Knowledge entry your Campaign Log records (each entry once per finale).\nIf Hour IX is reached, every investigator is defeated, or Dissonance reaches the reset value, the finale ends and the contest is not reached.",
     "flavor": "An appointment made in ink and never kept.",
     "deck": 95114,
     "index": "1a",
@@ -1232,7 +1232,7 @@
     "traits": "Omen."
   },
   "sthr-appointed": {
-    "text": "Prey – Most Memory on their cards. It moves toward its prey even if other investigators are nearer.\nThe Appointed cannot be attacked, evaded, damaged or defeated, and leaves play only when pushed back to Unseen.\n[action]: Hold Back (only while the Appointed is ready). Test [wil] (4) or [com] (4). This action does not provoke an attack of opportunity from the Appointed. If you succeed, push it back one Approach stage, disengage and exhaust it, and rewind the Hourglass by 1 Hour."
+    "text": "Prey – Most Memory on their cards. It moves toward its prey even if other investigators are nearer.\nThe Appointed cannot be attacked, evaded, damaged or defeated, and leaves play only when pushed back to Unseen.\n[action]: Hold Back (only while the Appointed is ready). Test [wil] (4) or [com] (4). This action does not provoke an attack of opportunity from the Appointed. If you succeed, push it back one Approach stage, disengage and exhaust it, and (except during the finale) rewind the Hourglass by 1 Hour."
   },
   "sthr-minutehand": {
     "name": "The Minute Hand",

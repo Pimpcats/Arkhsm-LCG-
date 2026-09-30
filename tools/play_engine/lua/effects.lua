@@ -573,7 +573,7 @@ return function(R, T)
   cov("sthr-samespeech")
   ENC["sthr-samespeech"] = function(inv)
     local loops = R.G.loopsCompleted or 0
-    horror(inv, 1 + math.min(3, math.floor(loops / 3)), "The Same Speech")
+    horror(inv, 1 + math.min((R.WHATIF or {}).speechMax or 3, math.floor(loops / 3)), "The Same Speech")
     return "discard"
   end
 
@@ -654,7 +654,7 @@ return function(R, T)
   cov("sthr-pagethatwasnt")
   ENC["sthr-pagethatwasnt"] = function(inv)
     local banked = R.state().memory or 0
-    local n = math.min(3, math.ceil(banked / 6))
+    local n = math.min((R.WHATIF or {}).pageMax or 3, math.ceil(banked / 6))
     if n > 0 then horror(inv, n, "The Page That Wasn't") end
     return "discard"
   end
