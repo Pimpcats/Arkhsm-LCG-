@@ -187,6 +187,9 @@ return function(R, T)
             R.G.metrics.hour_heal = (R.G.metrics.hour_heal or 0) + 1
           end
           if soloDmg > 0 and x.damage > 0 then R.heal(x, math.min(soloDmg, x.damage), 0) end
+          -- what-if: the Hour turning also heals damage, at every player count
+          local hd = (R.WHATIF or {}).hourHealDamage or 0
+          if hd > 0 and x.damage > 0 then R.heal(x, math.min(hd, x.damage), 0) end
         end
         R.log("Hourglass advances (%s): Hour %d -> %d", why or "?", before, now)
         do
@@ -674,6 +677,7 @@ return function(R, T)
                  exhausted = false, engaged = nil, uid = (G.nextEnemy or 0) + 1, res = 0 }
     G.nextEnemy = en.uid
     G.enemies[#G.enemies + 1] = en
+    en.wasAsleep = R.sleepwalking(en)        -- so a wake is seen even before the next enemy phase
     card.setRotation({ 0, 270, 0 })
     local m = G.metrics
     m.spawns[#m.spawns + 1] = { id = en.id, at = L and L.id or "?", want = meta and meta.want or "engaged", ok = meta and meta.ok ~= false,
@@ -696,6 +700,7 @@ return function(R, T)
     if not L then return end
     local here = R.investigatorsAt(L)
     if #here == 0 then return end
+    if (R.WHATIF or {}).wakeExhausted then R.FX.checkWakes() end     -- what-if: a waking Echo is exhausted first
     for _, en in ipairs(R.G.enemies) do
       if en.loc == L.guid and not en.engaged and not en.exhausted and not R.sleepwalking(en) and not R.isAloof(en) then
         en.engaged = R.prey(en, here)
