@@ -278,13 +278,13 @@ class ContentGapTests(unittest.TestCase):
     def test_contest_target_matches_the_engine(self):
         lua = open(os.path.join(ROOT, "src", "StillHour", "Constants.ttslua"),
                    encoding="utf-8").read()
-        self.assertIn("contestTarget = (n >= 4) and 8 or 7,", lua)
+        self.assertIn("contestTarget = (n == 1) and 6 or 7,", lua)
         need = next(a for s in MANIFEST["scenarios"] if s["id"] == "finale"
                     for a in s["stacks"]["act_deck"]["cards"])["needs"]["contest"]
-        self.assertEqual((need["target"], need["target_four_investigators"]), (7, 8))
+        self.assertEqual((need["target"], need["target_one_investigator"]), (7, 6))
         act = CARDS["sthr-act-lasthour"]
         text = act["text"] + "\n" + act["back_text"]    # b side: the resolutions
-        for part in ("reaches 7 (8 with four investigators)", "Hold Back", "deep Knowledge entry", "Hour IX", "R1b"):
+        for part in ("reaches 7 (6 with one investigator)", "Hold Back", "deep Knowledge entry", "Hour IX", "R1b"):
             self.assertIn(part, text)
 
     def test_sced_draws_only_the_printed_lines(self):

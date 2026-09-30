@@ -128,7 +128,7 @@ return function(R, T)
         -- Walk It Backward: the Turning, the Low Bridge, the Milestones, in that order
         local seq = { "sthr-loc-turning", "sthr-loc-lowbridge", "sthr-loc-milestones" }
         local step = (inv.walk or 0) + 1
-        local per = (R.WHATIF or {}).walkPer or G.n                   -- 1 [perinv] clues per step (Walk It Backward)
+        local per = (R.WHATIF or {}).walkPer or 2                     -- 2 clues per step (Walk It Backward)
         if seq[step] == L.id then inv.walkCount = (inv.walkCount or 0) + 1 end
         if seq[step] == L.id and inv.walkCount >= per then
           inv.walk = step

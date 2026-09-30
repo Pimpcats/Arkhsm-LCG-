@@ -815,7 +815,7 @@ return function(H)
       if hasLabel(control(), "Contest 7 / 7") then break end
       ctl("shClickContest")
     end
-    check("the contest is reached at 7 (8 at four)", chatHas(mark, "The contest is reached"))
+    check("the contest is reached at 7 (6 solo)", chatHas(mark, "The contest is reached"))
     logTick("contest_yes") ; logType("finale_loop", tostring(st().loops + 1))
     logCount("finale_memory", st().memory)
   end

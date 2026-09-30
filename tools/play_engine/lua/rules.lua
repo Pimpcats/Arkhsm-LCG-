@@ -54,7 +54,7 @@ return function(R, T)
   function R.stage() return R.state().stage end
   function R.knows(fact) return R.G.knowledge[fact] == true end
 
-  -- Contest the Crossing: progress 7, 8 with four investigators (Constants.contestTarget)
+  -- Contest the Crossing: progress 7, 6 with one investigator (Constants.contestTarget)
   R.CONTEST_TARGET = 7
   function R.consts()
     local n = R.G.n
@@ -64,7 +64,7 @@ return function(R, T)
     return { reset = reset, glitch = math.floor(reset / 3), noticed = noticed, scar = (n == 1) and 4 or 2 * n,
              contest = (R.WHATIF or {}).contestFlat
                or ((R.G.cfg.contestPerInv or R.CONTEST_PER_INV) and (R.G.cfg.contestPerInv or R.CONTEST_PER_INV) * n)
-               or (n >= 4 and R.CONTEST_TARGET + 1 or R.CONTEST_TARGET) }
+               or (n == 1 and R.CONTEST_TARGET - 1 or R.CONTEST_TARGET) }
   end
 
   --- Raise (or lower) Dissonance through the Control's button.

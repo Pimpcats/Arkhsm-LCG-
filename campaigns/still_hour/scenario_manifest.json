@@ -1457,7 +1457,7 @@
               "needs": {
                 "contest": {
                   "target": 7,
-                  "target_four_investigators": 8,
+                  "target_one_investigator": 6,
                   "sources": [
                     "Hold Back success (repeatable)",
                     "deep fact spent (max 6)",

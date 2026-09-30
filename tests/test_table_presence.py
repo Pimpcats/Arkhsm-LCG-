@@ -108,7 +108,7 @@ def test_guide_text_is_cleaned_of_designer_asides():
     kinds = [k for k, _ in G.parse(open(G.SOURCE, encoding="utf-8").read())]
     assert "map" in kinds and "table" in kinds and "quote" in kinds
     # the contest target survives the clean-up
-    assert "contest progress reaches **7** (**8** with four investigators)" in text
+    assert "contest progress reaches **7** (**6** with one investigator)" in text
 
 
 def test_guide_reads_like_an_official_guide():
