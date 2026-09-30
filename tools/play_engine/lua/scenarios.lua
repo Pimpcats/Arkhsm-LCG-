@@ -51,6 +51,20 @@ return function(R, T)
   S.district_almanac_p2 = partTwo({ "district_square", "district_almanac" },
     { SURFACE.almanac, SURFACE.square, SURFACE.church, "the-vote-that-never-ends" }, { "sthr-act-appointedname" })
 
+  -- the same districts on later nights (the owner's curve: Part I about 80% on
+  -- night 1 and 70% by night 3; Part II about 60% on night 4 and 50% by nights
+  -- 6-7): that night's scar, Years and banked Memory, same boxes and objectives
+  local function later(base, loops, years, banked)
+    local c = {}
+    for k, v in pairs(base) do c[k] = v end
+    c.loops, c.years, c.banked = loops, years, banked
+    return c
+  end
+  for _, d in ipairs({ "square", "church", "road", "lighthouse", "fairground", "almanac" }) do
+    S["district_" .. d .. "_n3"] = later(S["district_" .. d], 2, 3, 4)
+    S["district_" .. d .. "_p2_n6"] = later(S["district_" .. d .. "_p2"], 5, 9, 9)
+  end
+
   -- a typical Part I loop: the Square and two districts (loop 2, scar 1)
   S.loop_multi = partOne({ "district_square", "district_church", "district_almanac" },
     { "sthr-act-whythirteen", "sthr-act-almanachid", "sthr-act-sheriffdead" }, { loops = 1, years = 1, banked = 3 })
