@@ -91,7 +91,12 @@ def render_static_token(path, size=SIZE):
     return path
 
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from campaign_config import CFG  # noqa: E402
+
+
 if __name__ == "__main__":
     out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "art", "tokens", "sthr-static-token.png")
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "art", "tokens",
+        ((CFG.static_token or {}).get("id") or CFG.prefix + "-static-token") + ".png")
     print(render_static_token(out))

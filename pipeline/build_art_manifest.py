@@ -17,6 +17,7 @@ Out: pipeline/art_manifest.json          (full set)
 """
 import json
 import os
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -212,8 +213,16 @@ SCENES.update({
 TEXT_ONLY = {"sthr-scn-stillhour": "scenario reference: chaos-token template, no art window",
              "sthr-campaign-log": "campaign log: a fillable form"}
 
-CARD_SPECS = ("stillhour_cards_spec.json", "stillhour_encounter_spec.json",
-              "stillhour_scenario_spec.json", "stillhour_imported_spec.json")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from campaign_config import CFG  # noqa: E402
+CARD_SPECS = tuple(CFG.path("specs"))
+
+# a campaign other than The Still Hour keeps its scenes as data
+# (build.json "art_scenes": {"scenes": {id: subject}, "characters": {id: ref},
+# "text_only": {id: reason}}); The Still Hour's are the tables above
+if os.path.exists(CFG.path("art_scenes")):
+    _art = json.load(open(CFG.path("art_scenes"), encoding="utf-8"))
+    SCENES, CHARACTER, TEXT_ONLY = _art.get("scenes", {}), _art.get("characters", {}), _art.get("text_only", {})
 
 
 # deterministic seeds: stable per card id, spaced so variants don't collide
@@ -222,7 +231,8 @@ def seed_for(card_id):
 
 
 def load_spec(name):
-    return json.load(open(os.path.join(HERE, name), encoding="utf-8"))
+    path = os.path.join(HERE, name)
+    return json.load(open(path, encoding="utf-8")) if os.path.exists(path) else []
 
 
 def main():
@@ -260,17 +270,17 @@ def main():
     if missing:
         raise SystemExit("cards in the spec with NO SCENE (add them to SCENES): " + ", ".join(missing))
 
-    out = os.path.join(HERE, "art_manifest.json")
-    json.dump(manifest, open(out, "w", encoding="utf-8"), indent=2)
+    for out in CFG.path("art_manifest_copies"):
+        json.dump(manifest, open(out, "w", encoding="utf-8"), indent=2)
     # the campaign folder CardForge and the assistant bridge read
-    camp = os.path.join(os.path.dirname(HERE), "campaigns", "still_hour")
+    camp = os.path.join(os.path.dirname(HERE), "campaigns", CFG.id)
     json.dump(manifest, open(os.path.join(camp, "manifest.json"), "w", encoding="utf-8"), indent=2)
 
     # first-milestone subset (ART_PIPELINE_BRIEF Part D): the Elias slice + the boss
-    starter_ids = {"sthrelias", "sthrelias-back", "sthr-lamp", "sthr-donebefore",
-                   "sthr-eighthgrave", "sthr-appointed"}
+    starter_ids = set(CFG.art_starter)
     starter = [j for j in manifest if j["id"] in starter_ids]
-    json.dump(starter, open(os.path.join(HERE, "art_manifest_starter.json"), "w", encoding="utf-8"), indent=2)
+    for out in CFG.path("art_starter_copies"):
+        json.dump(starter, open(out, "w", encoding="utf-8"), indent=2)
     json.dump(starter, open(os.path.join(camp, "manifest_starter.json"), "w", encoding="utf-8"), indent=2)
 
     art = [j for j in manifest if not j.get("no_art")]

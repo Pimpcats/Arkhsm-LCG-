@@ -40,17 +40,22 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 FACES = os.path.join(ROOT, "art", "faces")
 OUT = os.path.join(ROOT, "dist", "cards")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from campaign_config import CFG  # noqa: E402
+# every build step this script starts builds the same campaign
+os.environ["CAMPAIGN"] = CFG.id
+
 REPO = "Pimpcats/Arkhsm-LCG-"
-PREFIX = "sthr"   # sthr-* cards and the hyphen-free investigator ids (sthrelias)
+PREFIX = CFG.prefix   # <prefix>-* cards and the hyphen-free investigator ids (sthrelias)
 JPEG_QUALITY = 88
-STATIC_TOKEN = "sthr-static-token"
+STATIC_TOKEN = (CFG.static_token or {}).get("id")   # campaign-specific chaos token, if any
 
 # the one-investigator starter slice (dist/stillhour_starter.json) rebuilds too
-STARTER = ("sthrelias", "sthr-lamp", "sthr-donebefore", "sthr-eighthgrave")
-REBUILD = (("build_cards.py",), ("build_cards.py", "--only") + STARTER,
+STARTER = tuple(CFG.starter)
+REBUILD = (("build_cards.py",),) + ((("build_cards.py", "--only") + STARTER,) if STARTER else ()) + (
            ("bundle_mod.py",), ("table_presence.py",),
            ("package_download.py", "--require-hosted"))
-GUIDE = os.path.join(ROOT, "dist", "guide", "the_still_hour_campaign_guide.pdf")
+GUIDE = os.path.join(ROOT, "dist", "guide", CFG.slug + "_campaign_guide.pdf")
 
 
 def to_jpeg(src, name):
@@ -65,7 +70,7 @@ def placeholder_art():
     """Chosen illustrations (CardForge's out/still_hour/index.json) that are
     dry-run stubs (1x1 PNGs) rather than real art. A test or dry-run leaves
     these behind; they must never be composited into a published face."""
-    idx = os.path.join(ROOT, "out", "still_hour", "index.json")
+    idx = os.path.join(CFG.path("out_dir"), "index.json")
     if not os.path.exists(idx):
         return []
     bad = []
@@ -114,10 +119,11 @@ def publish(ref, render=True):
 
     # the [static] chaos token face (pipeline/render_token.py); bundle_mod.py
     # reads "_static_token" to give the control script and token object its URL
-    token_png = os.path.join(ROOT, "art", "tokens", STATIC_TOKEN + ".png")
-    render_static_token(token_png)
-    hashes[STATIC_TOKEN] = to_jpeg(token_png, STATIC_TOKEN)
-    plan["_static_token"] = STATIC_TOKEN
+    if STATIC_TOKEN:
+        token_png = os.path.join(ROOT, "art", "tokens", STATIC_TOKEN + ".png")
+        render_static_token(token_png)
+        hashes[STATIC_TOKEN] = to_jpeg(token_png, STATIC_TOKEN)
+        plan["_static_token"] = STATIC_TOKEN
     written = set(hashes)
 
     # drop images from earlier builds that no longer belong to any card
@@ -154,7 +160,7 @@ def publish(ref, render=True):
     compiled = comp.returncode == 0 and '"ok": false' not in comp.stdout
 
     bad = local_urls()
-    stale = "dist/the_still_hour_campaign.json"
+    stale = "dist/" + CFG.slug + "_campaign.json"
     if not compiled and stale in bad:
         bad.remove(stale)       # not rebuilt this run; reported, not judged
     return {"ref": ref, "images": len(written), "guide": guide, "cards": len(
@@ -217,6 +223,7 @@ def local_urls():
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--campaign", help="campaign id (campaigns/<id>/build.json); default $CAMPAIGN or still_hour")
     ap.add_argument("--ref", help="branch/commit the URLs point at (default: pin to the "
                                   "commit holding the hosted files, committing them if changed)")
     ap.add_argument("--no-render", action="store_true",

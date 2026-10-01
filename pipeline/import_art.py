@@ -23,8 +23,10 @@ from PIL import Image
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-DEST = os.path.join(ROOT, "assets", "illustrations", "still_hour")
-PACK = os.path.join(HERE, "chatgpt_art_pack.json")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from campaign_config import CFG  # noqa: E402
+DEST = CFG.path("illustrations")
+PACK = CFG.path("art_pack_json")
 # longest side kept: comfortably above the largest art window (1050px frames)
 # while keeping ~120 committed illustrations small
 MAX_SIDE = 1600
@@ -33,7 +35,7 @@ MIN_SIDE = 480
 
 
 def card_ids():
-    manifest = json.load(open(os.path.join(ROOT, "campaigns", "still_hour",
+    manifest = json.load(open(os.path.join(ROOT, "campaigns", CFG.id,
                                            "manifest.json"), encoding="utf-8"))
     return {j["id"] for j in manifest if j.get("scene") and not j.get("no_art")}
 

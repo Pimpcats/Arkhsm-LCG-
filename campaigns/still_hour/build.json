@@ -13,21 +13,49 @@
   "box_texture_id": "sthr-box",
   "control_guid": "sthr-control",
   "download_box_guid": "sthr-download-box",
-  "log_pages": ["sthr-log-page1", "sthr-log-page2", "sthr-log-page3"],
-  "specs": ["pipeline/stillhour_cards_spec.json", "pipeline/stillhour_encounter_spec.json",
-            "pipeline/stillhour_scenario_spec.json", "pipeline/stillhour_imported_spec.json",
-            "pipeline/stillhour_handmade_spec.json"],
+  "log_pages": [
+    "sthr-log-page1",
+    "sthr-log-page2",
+    "sthr-log-page3"
+  ],
+  "specs": [
+    "pipeline/stillhour_cards_spec.json",
+    "pipeline/stillhour_encounter_spec.json",
+    "pipeline/stillhour_scenario_spec.json",
+    "pipeline/stillhour_imported_spec.json",
+    "pipeline/stillhour_handmade_spec.json"
+  ],
   "cards_spec": "pipeline/stillhour_cards_spec.json",
   "encounter_spec": "pipeline/stillhour_encounter_spec.json",
   "print_text": "pipeline/stillhour_print_text.json",
   "guide_md": "docs/design/THE_STILL_HOUR_player_guide.md",
-  "starter": ["sthrelias", "sthr-lamp", "sthr-donebefore", "sthr-eighthgrave"],
+  "starter": [
+    "sthrelias",
+    "sthr-lamp",
+    "sthr-donebefore",
+    "sthr-eighthgrave"
+  ],
   "starter_out": "stillhour_starter.json",
   "bundle_out": "stillhour_bundle.lua",
   "encounter_bag_name": "THE STILL HOUR — The Appointed",
-  "skip_bags": ["The Appointed"],
-  "lua_modules": ["Constants", "CampaignState", "Dissonance", "LoopFlags", "Hourglass", "Aging", "Appointed",
-                  "Knowledge", "Locations", "Interlude", "SCED", "ChaosBag", "Board"],
+  "skip_bags": [
+    "The Appointed"
+  ],
+  "lua_modules": [
+    "Constants",
+    "CampaignState",
+    "Dissonance",
+    "LoopFlags",
+    "Hourglass",
+    "Aging",
+    "Appointed",
+    "Knowledge",
+    "Locations",
+    "Interlude",
+    "SCED",
+    "ChaosBag",
+    "Board"
+  ],
   "control_lua": "src/tts/control.lua",
   "tests_entry": "runStillHourTests",
   "static_token": {
@@ -41,5 +69,22 @@
   "mod_note": "THE STILL HOUR — vertical slice. Card bag + scripted control token (state manager, Dissonance/[static], Hourglass, Aging, loop flags) with an in-engine test harness. See docs/INTEGRATION.md.",
   "genre": "loop-horror",
   "illustrations": "assets/illustrations/still_hour",
-  "out_dir": "out/still_hour"
+  "out_dir": "out/still_hour",
+  "art_setting": "1920s New England coastal town, cosmic horror, uncanny rather than gory",
+  "art_pack_json": "pipeline/chatgpt_art_pack.json",
+  "art_pack_md": "docs/CHATGPT_ART_PACK.md",
+  "art_manifest_copies": [
+    "pipeline/art_manifest.json"
+  ],
+  "art_starter": [
+    "sthrelias",
+    "sthrelias-back",
+    "sthr-lamp",
+    "sthr-donebefore",
+    "sthr-eighthgrave",
+    "sthr-appointed"
+  ],
+  "art_starter_copies": [
+    "pipeline/art_manifest_starter.json"
+  ]
 }

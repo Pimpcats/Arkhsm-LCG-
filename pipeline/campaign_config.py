@@ -89,6 +89,13 @@ def load(cid=None):
     c.setdefault("illustrations", "assets/illustrations/" + cid)
     c.setdefault("out_dir", "out/" + cid)
     c.setdefault("genre", "custom campaign")
+    c.setdefault("art_setting", "1920s New England, cosmic horror, uncanny rather than gory")
+    c.setdefault("art_scenes", "campaigns/%s/art_scenes.json" % cid)   # {scenes, characters, text_only}
+    c.setdefault("art_pack_json", "campaigns/%s/art/chatgpt_art_pack.json" % cid)
+    c.setdefault("art_pack_md", "campaigns/%s/art/ART_PACK.md" % cid)
+    c.setdefault("art_manifest_copies", [])
+    c.setdefault("art_starter", [])
+    c.setdefault("art_starter_copies", [])
     return c
 
 
