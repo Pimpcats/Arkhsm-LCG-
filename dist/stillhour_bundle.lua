@@ -2355,7 +2355,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d7f6781627e974c6b370752a0246e0e78d243b51/dist/cards/sthr-static-token.jpg?v=a556271511"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/97803ea6a1b05343bd02022319c20c997ba8eda6/dist/cards/sthr-static-token.jpg?v=a556271511"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -3346,16 +3346,9 @@ function Board.appointedCtx(extra)
     local byGuid = {}
     for _, l in ipairs(locs) do byGuid[l.guid] = l end
     local here = locationAt(locs, vec(safe(function() return card.getPosition() end)), 3.0)
-    -- Rules Reference, Hunter: an enemy at a location with an investigator
-    -- does not move
-    if here then
-      for _, g in ipairs(Board.occupied(locs)) do
-        if g == here.guid then
-          say("The Appointed is with an investigator: it does not move.")
-          return false
-        end
-      end
-    end
+    -- "Prey – ... only" (Rules Reference, Prey): it moves toward and engages
+    -- only its prey, as if no other investigator were in play, so another
+    -- investigator at its location does not stop it
     local target, why = Board.preyLocation(locs, graph, here)
     if not target then say("The Appointed hunts, but no investigator minicard is on a location.") ; return false end
     local nextKey = here and Locations.stepToward(graph, here.guid, target) or target

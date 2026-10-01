@@ -28,3 +28,4 @@ rig.local.json
 # Godot table renderer: editor/import caches (tools/godot_table)
 tools/godot_table/.godot/
 tools/godot_table/**/*.import
+/library/
