@@ -28,7 +28,7 @@ __modules["StillHour/Constants"] = function()
 --   reset threshold R  = 8 x investigators   (Dissonance hits R -> loop resets)
 --   Appointed Arrived  = floor(2R / 3)       (Noticed band; the Appointed arrives)
 --   Memory soft cap    = 6 x investigators
---   contest target     = 6, 5 with one or two investigators (finale; was 4 x investigators, CO-001)
+--   contest target     = 6, 5 solo, 7 at four (finale; was 4 x investigators, CO-001)
 --   scar cap           = 2 x investigators    (start-of-loop Dissonance ceiling; 4 solo)
 --   bands              = thirds of R: Calm / Glitch / Noticed
 --
@@ -63,7 +63,7 @@ Constants.HOLD_BACK_REWINDS_PER_LOOP = 3
 --- Compute the full constant set for a given investigator count.
 -- @param n integer number of investigators (>= 1)
 -- @return table of thresholds
-Constants.CONTEST_TARGET = 6          -- 5 with one or two investigators
+Constants.CONTEST_TARGET = 6          -- 5 with one investigator, 7 with four
 -- the solo rule (guide: Difficulty and Player Count): +3 maximum health and sanity
 -- (and a second wind once a loop, a table rule)
 Constants.SOLO_HEALTH_BONUS = 3
@@ -89,14 +89,14 @@ function Constants.forCount(n)
     resetThreshold = reset,
     appointedThreshold = appointed,
     memoryCap = 6 * n,
-    -- Finale contest target: 6; 5 with one or two investigators (tuning 2026-10: the finale
+    -- Finale contest target: 6; 5 with one investigator, 7 with four (tuning 2026-10: the finale
     -- opens with the Name and the Vote, so a party brings two deep entries; owner curve: about
     -- 40% won, docs/design/PLAYTEST_SIM.md). Its sources (deep entries, Hold Back
     -- successes, the Uninvited) barely grow with the party, so the old
     -- 4 x investigators (CO-001) was out of reach at 3-4 investigators and
-    -- nearly automatic solo. Engine finales won: 1p 52% (5), 2p 52% (5; 27% at 6),
-    -- 3p 35% (6), 4p 63% (6; 13% at 7, where four mostly run out of time).
-    contestTarget = (n <= 2) and 5 or 6,
+    -- nearly automatic solo. Engine finales won (60 each, XP decks): 1p 55% at 5
+    -- (23% at 6), 2p 38% at 6 (67% at 5), 3p 43% at 6, 4p 37% at 7 (70% at 6).
+    contestTarget = (n == 1) and 5 or ((n >= 4) and 7 or 6),
     scarCap = scarCap,
     bandGlitchStart = math.floor(reset / 3),
     bandNoticedStart = math.floor(2 * reset / 3),
@@ -2321,7 +2321,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/aa0134bc9e5d7243bf3c6a8730a5c5e9e1669c81/dist/cards/sthr-static-token.jpg?v=a556271511"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/6c9865b6d89559b05b9723ee7b32bbc0b1a5f9f1/dist/cards/sthr-static-token.jpg?v=a556271511"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -4762,8 +4762,8 @@ local function stillHourTestBody(T)
 
   local c3 = Constants.forCount(3)
   P, F = check("reset 24 / appointed 16 at 3p", c3.resetThreshold == 24 and c3.appointedThreshold == 16, P, F)
-  P, F = check("contest target 6 (5 with one or two)", c3.contestTarget == 6 and Constants.forCount(1).contestTarget == 5
-    and Constants.forCount(2).contestTarget == 5 and Constants.forCount(4).contestTarget == 6, P, F)
+  P, F = check("contest target 6 (5 solo, 7 at four)", c3.contestTarget == 6 and Constants.forCount(1).contestTarget == 5
+    and Constants.forCount(2).contestTarget == 6 and Constants.forCount(4).contestTarget == 7, P, F)
 
   local bag = { count = 0 }
   bag.setBaselineStatic = function(m) bag.count = m end

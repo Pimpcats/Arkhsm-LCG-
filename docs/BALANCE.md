@@ -376,3 +376,17 @@ fresh loops; cautious and typical 0%). Simulation only; not a playtest.
   about 12 loops, Elder after about 7.
 
 Simulation only; not a playtest.
+
+## The owner's curve by night (2026-10-01)
+
+Play engine, 3 investigators, XP decks from night 2 (details and per-district
+results: docs/design/PLAYTEST_SIM.md). Target → result: Prologue 80 → 80%,
+night 1 80 → 73%, night 3 70 → 71%, nights 4-5 60 → 66%, nights 6-7 50 →
+49.5%, finale 40 → 43% (1p 55%, 2p 38%, 4p 37%). Two engine bugs (one enemy
+per enemy phase; the finale starting an Hour late) made every earlier engine
+result kinder than the cards and are fixed. Act costs roughly doubled again
+(surface 9-10 [perinv], deep 6-8), finale contest 6 (5 solo, 7 at four), the
+finale opens with The Appointed's Name and The Vote That Never Ends,
+the Uninvited 1 horror, the Minute Hand ×1, a waking Echo is exhausted and the
+Hour turning heals 1 damage and 1 horror. `simulate.py`: 0 failed assertions.
+Simulation only; not a playtest.

@@ -274,6 +274,92 @@ spare where 2-4 was asked); the three-district loop's two-objective rate
 swings by seed set (40-60%); the Hour IX finale wipes 33%; solo defeats are
 now rarer than party defeats.
 
+## Engine corrections and the finale retune (2026-09-30, evening)
+
+**Every engine result above this section was measured with two engine bugs
+and is superseded by the tables below.** Both made the game look kinder than
+its cards are:
+
+- **One enemy per enemy phase.** `R.enemyPhase` copied `G.enemies` with
+  `{ table.unpack and table.unpack(t) or unpack(t) }`; an and/or expression
+  keeps one value, so only the first enemy in play hunted and attacked in
+  each enemy phase. Every other enemy only ever hit through attacks of
+  opportunity. Fixed (`copyList`); `tests/test_play_engine.py` fails on the
+  idiom.
+- **The finale started an Hour late.** A finale begun before Hour V clicked
+  the Hour a fixed number of times; with Hour IV removed (The Hour Was Wrong,
+  in the finale state) the Control steps over it and the Skip ended on
+  Hour VI. It now advances until Hour V is current (test: the Skip ends on
+  Hour V). The guide's instruction had the same trap and now says to click
+  until the Control token shows Hour V.
+- The AI now fights or evades any engaged enemy (the most dangerous or the
+  easiest to remove scores best), not only the first one to engage.
+
+The two bugs pulled in opposite directions in the finale (an Hour of time
+missing, most enemy attacks missing): 3 investigators, normal start,
+contest 55% (120 games) with both bugs, 87% with only the Hour fixed, 47.5%
+with both fixed (120 games; 50% of finales wiped the party).
+
+## The owner's curve by night, XP decks and the unlock rule (2026-10-01)
+
+**Supersedes every result above.** The owner asked for a win-rate curve at
+three investigators **by night**, never above 80%: Prologue and night 1
+**80%**, nights 2-3 **70%**, nights 4-5 **60%**, nights 6-7 **50%**, finale
+**40%**. Changes:
+
+- **XP decks.** Later nights play upgraded decks (`decks.py` `UPGRADES`,
+  tiers n2-n7 and fin: 4, 8, 12, 16, 20, 24, 26 XP), from that night's state
+  (scenarios `district_*_n3`, `_p2`, `_p2_n5`, `_p2_n6`, `_p2_n7`; table in
+  Representative campaign states).
+- **Unlock rule.** The finale opens once the log records The Appointed's Name
+  and The Vote That Never Ends (`Knowledge.canAssembleFinale`); with the old
+  rule a first-time group needed a median of 10 nights.
+- **Rules.** The Minute Hand ×1; an Echo that wakes is exhausted; when the
+  Hour turns each investigator heals 1 damage and 1 horror; the Uninvited 1
+  horror; finale contest **6, 5 solo, 7 at four**.
+- **Act costs** ([perinv] unless noted; before → after): The First Hour Hour V
+  4 → **Hour VI 7**; The Sheriff Is Already Dead 5 → **9**; The Thirteenth
+  Toll 5 → **10**; What the Almanac Hid 5 → **9**; Light the Lamp 3 → **4**;
+  The Wheel Still Turns 3 → **5**; Walk It Backward 2 a step → **3, 3, 4**
+  clues; The Vote 5 → **8**; The Hour Was Wrong 5 → **7**; The Keeper's Ninth
+  Death 3 → **6**; The Ticket-Taker's Bargain 5 → **8**; The Appointed's Name
+  5 → **7**; Who Walks Beside You **7** (new cost). A failed Lamp, Wheel or
+  Stand Firm test puts the spent clues on the location.
+
+Results (engine, Standard, 3 investigators, 30 games a district, 60 for the
+finale; the published cards, no what-ifs except the last three Part II
+costs, measured as overrides before they were printed):
+
+| night | target | won | Square / Church / Road / Lighthouse / Fairground / Almanac |
+|---|---|---|---|
+| Prologue | 80% | **80%** | – |
+| 1 | 80% | **73%** | 73 / 57 / 73 / 77 / 83 / 77 |
+| 3 | 70% | **71%** | 53 / 63 / 60 / 87 / 80 / 80 |
+| 4 | 60% | **69%** | 67 / 73 / 57 / 60 / 77 / 80 |
+| 5 | 60% | **63%** | 67 / 63 / 60 / 67 / 60 / 63 |
+| 6 | 50% | **59%** | 60 / 60 / 60 / 60 / 63 / 53 |
+| 7 | 50% | **40%** | 37 / 47 / 57 / 30 / 30 / 40 |
+| Finale | 40% | **43%** | – |
+
+Pairs: nights 4-5 66% (target 60), nights 6-7 49.5% (50). Square + Church +
+Almanac in one night: one objective 77%, two 0% (with the Name-and-Vote
+unlock that still reaches the finale in about 7-8 nights).
+
+Finale by count (60 games each): 1 investigator 55% at contest 5 (23% at 6),
+2: 38% at 6 (67% at 5), 3: 43% at 6 (28% with the 2-horror Uninvited), 4:
+37% at 7 (70% at 6). One contest step moves the finale 25-35 points, so each
+count takes the goal nearest 40%.
+
+Method note: the engine builds its table from `dist/`'s Saved Object; five
+sets that started before a publish played the old encounter deck and were
+rerun. Engine results from different builds are not comparable game by game
+(a changed deck changes every shuffle), only as rates.
+
+Missed or loose: night 1 sits 7 under (the Church 57%); night 4 9 over;
+the night-7 Lighthouse and Fairground 30%; one AI party and one upgrade path
+per investigator. Simulation only; not a playtest.
+
+
 ## Assumptions and limits
 
 - One AI party, greedy but competent; real players differ (they talk and plan
