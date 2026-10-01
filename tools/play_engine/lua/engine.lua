@@ -366,7 +366,9 @@ return function(H)
     for i, s in ipairs(seats) do
       local w = R.pick(decks.weaknesses)
       local mini = T.minicard(s.id)
-      local inv = R.P.newInvestigator(i, s.id, s.color, s.card, mini, invStats[s.id], decks.decks[s.id], w)
+      -- later nights play the XP deck of that night (decks.py TIERS: n2, n3, n4, n6, fin)
+      local deck = (sc.xp and decks.tiers and decks.tiers[sc.xp] and decks.tiers[sc.xp][s.id]) or decks.decks[s.id]
+      local inv = R.P.newInvestigator(i, s.id, s.color, s.card, mini, invStats[s.id], deck, w)
       inv.bracket = (sc.years or 0) >= 15 and "Ancient" or (sc.years or 0) >= 10 and "Elder" or (sc.years or 0) >= 5 and "Weathered" or "Prime"
       inv.loc = start.guid
       if mini then T.moveMini(mini, start.obj, i) end

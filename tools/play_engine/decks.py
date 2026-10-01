@@ -46,6 +46,37 @@ LISTS = {
         ("Flashlight", 2), ("Magnifying Glass", 1)],
 }
 
+# XP upgrades in the order a careful player buys them: (xp, level-0 card it
+# replaces, upgraded card's SCED name, copies). Same-title upgrades keep the
+# base name (the engine's effects apply; icons and uses come from the upgraded
+# printing); cards the engine encodes under their full name keep it (FULL).
+UPGRADES = {
+    "sthrelias": [(4, "Vicious Blow", "Vicious Blow (2)", 2), (4, "Beat Cop", "Beat Cop (2)", 2),
+                  (4, ".45 Automatic", "Shotgun (4)", 1), (3, "Lucky!", "Elder Sign Amulet (3)", 1),
+                  (5, ".45 Automatic", "Lightning Gun (5)", 1), (3, "Leather Coat", "Bulletproof Vest (3)", 1)],
+    "sthrayako": [(4, "Deduction", "Deduction (2)", 2), (2, "Magnifying Glass", "Magnifying Glass (1)", 2),
+                  (3, "Arcane Studies", "Higher Education (3)", 1), (3, "Old Book of Lore", "Elder Sign Amulet (3)", 1),
+                  (2, "Medical Texts", "Encyclopedia (2)", 1), (3, "Old Book of Lore", "Bulletproof Vest (3)", 1),
+                  (2, "Medical Texts", "Encyclopedia (2)", 1)],
+    "sthrcass": [(4, "Switchblade", "Switchblade (2)", 2), (1, "Leo De Luca", "Leo De Luca (1)", 1),
+                 (4, "Opportunist", "Opportunist (2)", 2), (2, "Knife", ".41 Derringer (2)", 1),
+                 (1, "Pickpocketing", "Hired Muscle (1)", 1), (4, "Knife", "Chicago Typewriter (4)", 1),
+                 (3, "Pickpocketing", "Streetwise (3)", 1), (3, "Lucky!", "Elder Sign Amulet (3)", 1)],
+    "sthrseraphine": [(6, "Shrivelling", "Shrivelling (3)", 2), (4, "Fearless", "Fearless (2)", 2),
+                      (4, "Blinding Light", "Blinding Light (2)", 2), (2, "Shrivelling (3)", "Shrivelling (5)", 1),
+                      (3, "Drawn to the Flame", "Elder Sign Amulet (3)", 1),
+                      (3, "Drawn to the Flame", "Bulletproof Vest (3)", 1)],
+    "sthrbirdie": [(4, "Lucky!", "Lucky! (2)", 2), (4, "Survival Instinct", "Survival Instinct (2)", 2),
+                   (2, "Stray Cat", "Peter Sylvestre (2)", 1), (3, "Dig Deep", "Scrapper (3)", 1),
+                   (3, "Rabbit's Foot", "Elder Sign Amulet (3)", 1), (3, "Leather Coat", "Bulletproof Vest (3)", 1)],
+}
+FULL = {"Shotgun (4)", "Lightning Gun (5)", "Elder Sign Amulet (3)", "Bulletproof Vest (3)", "Higher Education (3)",
+        "Encyclopedia (2)", "Switchblade (2)", ".41 Derringer (2)", "Hired Muscle (1)", "Chicago Typewriter (4)",
+        "Streetwise (3)", "Shrivelling (3)", "Shrivelling (5)", "Peter Sylvestre (2)", "Scrapper (3)"}
+# XP each investigator has spent on cards by that night (about two-thirds of the
+# Memory they earn; the rest buys Recollections): night 2, 3, 4, 6 and the finale
+TIERS = {"n2": 4, "n3": 8, "n4": 12, "n6": 20, "fin": 26}
+
 # basic weaknesses the engine encodes (one is drawn per investigator per game)
 WEAKNESSES = ["Paranoia", "Amnesia", "Haunted", "Psychosis", "Hypochondria", "Mob Enforcer",
               "Silver Twilight Acolyte", "Stubborn Detective", "Indebted", "Internal Injury", "Chronophobia"]
@@ -62,8 +93,8 @@ def player_bag(save):
     raise SystemExit("no 'All Player Cards' bag in " + save)
 
 
-def pool(save):
-    """name -> SCED metadata (level 0, preferred printing)."""
+def pool(save, upgraded=False):
+    """name -> SCED metadata (level 0, preferred printing; upgraded=True: levels 1-5)."""
     best = {}
     for x in player_bag(save):
         try:
@@ -71,7 +102,8 @@ def pool(save):
         except ValueError:
             continue
         name = x.get("Nickname")
-        if not name or md.get("level", 0) not in (0, None):
+        lv = md.get("level", 0) or 0
+        if not name or (lv > 0) != upgraded or "Taboo" in name:
             continue
         rank = PREFERRED_CYCLES.index(md["cycle"]) if md.get("cycle") in PREFERRED_CYCLES else 9
         if name not in best or rank < best[name][0]:
@@ -97,6 +129,7 @@ def build(save, cards_json=None):
     cards_json = cards_json or os.path.join(ROOT, ".cache", "play_engine", "cards.json")
     campaign = json.load(open(cards_json, encoding="utf-8"))["cards"]
     p = pool(save)
+    up = pool(save, upgraded=True)
     out = {"decks": {}, "weaknesses": [], "problems": []}
     for inv, picks in LISTS.items():
         c = campaign[inv]
@@ -136,6 +169,34 @@ def build(save, cards_json=None):
                                    "com": sc.get("comIcons", 0), "agi": sc.get("agiIcons", 0),
                                    "wild": sc.get("wildIcons", 0)}})
         out["decks"][inv] = {"cards": deck, "signatures": sigs, "offclass": off, "limit": opt["limit"]}
+        # upgraded decks for later nights: buy UPGRADES in order while the tier's XP lasts
+        for tier, budget in TIERS.items():
+            cur, spent = [dict(c) for c in deck], 0
+            for xp, old, new, n in UPGRADES.get(inv, []):
+                if spent + xp > budget:
+                    break
+                md = up.get(new)
+                if not md:
+                    out["problems"].append("%s: %s not in SCED's player cards" % (inv, new))
+                    break
+                k = md.get("class")
+                if k not in (klass, "Neutral") and (k not in opt["classes"] or md.get("level", 0) > opt["level"]):
+                    out["problems"].append("%s: %s (%s) is not allowed" % (inv, new, k))
+                    break
+                for _ in range(n):
+                    i = next((j for j, c in enumerate(cur) if old in (c["name"], c.get("full"))), None)
+                    if i is None:
+                        out["problems"].append("%s: no %s to replace with %s" % (inv, old, new))
+                        break
+                    base = re.sub(r" \(\d\)$", "", new)
+                    cur[i] = {"name": new if new in FULL else base, "full": new, "level": md.get("level"),
+                              "sced": md.get("id"), "type": md.get("type"), "class": k, "cost": md.get("cost"),
+                              "traits": md.get("traits", ""), "slot": md.get("slot"), "uses": md.get("uses"),
+                              "icons": {"wil": md.get("willpowerIcons", 0), "int": md.get("intellectIcons", 0),
+                                        "com": md.get("combatIcons", 0), "agi": md.get("agilityIcons", 0),
+                                        "wild": md.get("wildIcons", 0)}}
+                spent += xp
+            out.setdefault("tiers", {}).setdefault(tier, {})[inv] = {"cards": cur, "signatures": sigs, "xp": spent}
     for name in WEAKNESSES:
         md = p.get(name)
         if md and md.get("weakness"):

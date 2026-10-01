@@ -62,12 +62,15 @@ return function(R, T)
   end
   for _, d in ipairs({ "square", "church", "road", "lighthouse", "fairground", "almanac" }) do
     S["district_" .. d .. "_n3"] = later(S["district_" .. d], 2, 3, 4)
+    S["district_" .. d .. "_n3"].xp = "n3"
+    S["district_" .. d .. "_p2"].xp = "n4"
     S["district_" .. d .. "_p2_n6"] = later(S["district_" .. d .. "_p2"], 5, 9, 9)
+    S["district_" .. d .. "_p2_n6"].xp = "n6"
   end
 
   -- a typical Part I loop: the Square and two districts (loop 2, scar 1)
   S.loop_multi = partOne({ "district_square", "district_church", "district_almanac" },
-    { "sthr-act-whythirteen", "sthr-act-almanachid", "sthr-act-sheriffdead" }, { loops = 1, years = 1, banked = 3 })
+    { "sthr-act-whythirteen", "sthr-act-almanachid", "sthr-act-sheriffdead" }, { loops = 1, years = 1, banked = 3, xp = "n2" })
 
   -- the finale from a representative campaign state: night 7 (6 loops done, scar 6,
   -- 10 Years: Elder) with what a first-time party holds by then at objectives won
@@ -77,7 +80,7 @@ return function(R, T)
                knowledge = { "you-are-unstuck", SURFACE.church, SURFACE.square, SURFACE.almanac,
                              "the-vote-that-never-ends", "the-appointeds-name", "the-way-the-night-breaks" },
                logFlags = { ["The name is kept unspoken"] = true, ["The vote still stands"] = true },
-               objectives = {} }
+               objectives = {}, xp = "fin" }
 
   -- the same state, the finale begun when Hour IX is reached (the guide's other way in)
   S.finale_h9 = {}

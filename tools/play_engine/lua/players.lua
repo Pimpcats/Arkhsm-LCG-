@@ -12,22 +12,33 @@ return function(R, T)
   -- soak (health, sanity) of allies and armor
   local SOAK = { ["Guard Dog"] = { 3, 1 }, ["Beat Cop"] = { 2, 2 }, ["Dr. Milan Christopher"] = { 1, 2 },
                  ["Stray Cat"] = { 1, 1 }, ["Leo De Luca"] = { 2, 2 }, ["Leather Coat"] = { 2, 0 },
-                 ["Holy Rosary"] = { 0, 2 } }
+                 ["Holy Rosary"] = { 0, 2 },
+                 -- XP cards (decks.py UPGRADES)
+                 ["Elder Sign Amulet (3)"] = { 0, 4 }, ["Bulletproof Vest (3)"] = { 4, 0 }, ["Hired Muscle (1)"] = { 3, 1 },
+                 ["Peter Sylvestre (2)"] = { 1, 2 } }
   -- uses when played
   local USES = { [".45 Automatic"] = 4, ["Flashlight"] = 3, ["First Aid"] = 3, ["Shrivelling"] = 4,
-                 ["The Bell of Ambergrove"] = 3, ["The Lexicon of the Hour"] = 0 }
+                 ["The Bell of Ambergrove"] = 3, ["The Lexicon of the Hour"] = 0,
+                 ["Shotgun (4)"] = 2, ["Lightning Gun (5)"] = 3, [".41 Derringer (2)"] = 3, ["Chicago Typewriter (4)"] = 4,
+                 ["Shrivelling (3)"] = 4, ["Shrivelling (5)"] = 4 }
   -- constant +skill while in play: name -> {skill, amount, when}
   local CONST = {
     ["Holy Rosary"] = { "wil", 1 }, ["Beat Cop"] = { "com", 1 }, ["Dr. Milan Christopher"] = { "int", 1 },
     ["Magnifying Glass"] = { "int", 1, "investigate" },
+    ["Hired Muscle (1)"] = { "com", 1 }, ["Peter Sylvestre (2)"] = { "agi", 1 }, ["Encyclopedia (2)"] = { "int", 1 },
   }
   -- resource-for-skill talents: name -> skills they boost (1 resource: +1)
   local TALENT = { ["Physical Training"] = { wil = true, com = true }, ["Hard Knocks"] = { com = true, agi = true },
                    ["Dig Deep"] = { wil = true, agi = true }, ["Hyperawareness"] = { int = true, agi = true },
-                   ["Arcane Studies"] = { wil = true, int = true } }
+                   ["Arcane Studies"] = { wil = true, int = true },
+                   ["Higher Education (3)"] = { wil = true, int = true }, ["Scrapper (3)"] = { com = true, agi = true },
+                   ["Streetwise (3)"] = { int = true, agi = true } }
   -- weapons: name -> {skill bonus, extra damage, uses?, skill used}
   local WEAPON = { ["Machete"] = { 1, 1 }, [".45 Automatic"] = { 1, 1, true }, ["Knife"] = { 1, 0 },
-                   ["Switchblade"] = { 0, 0 }, ["Baseball Bat"] = { 2, 1 }, ["Shrivelling"] = { 2, 1, true, "wil" } }
+                   ["Switchblade"] = { 0, 0 }, ["Baseball Bat"] = { 2, 1 }, ["Shrivelling"] = { 2, 1, true, "wil" },
+                   ["Shotgun (4)"] = { 3, 2, true }, ["Lightning Gun (5)"] = { 5, 2, true }, [".41 Derringer (2)"] = { 2, 1, true },
+                   ["Chicago Typewriter (4)"] = { 2, 2, true }, ["Switchblade (2)"] = { 2, 1 },
+                   ["Shrivelling (3)"] = { 2, 1, true, "wil" }, ["Shrivelling (5)"] = { 3, 1, true, "wil" } }
   P.WEAPON = WEAPON
   P.CODED = {}
   for _, t in ipairs({ SOAK, USES, CONST, TALENT, WEAPON }) do for k in pairs(t) do P.CODED[k] = true end end
@@ -54,6 +65,14 @@ return function(R, T)
     ["Recollections"] = "not in the starting decks (bought between loops); only Foreknowledge, Muscle Memory and I've Done This Before are encoded",
     ["The walker's ring / The walkers keep their ring"] = "not in any representative campaign state, so not encoded",
     ["The Ambergrove Lamp"] = "+1 [agi] to evade at its location; its [action] (peek and move) is not used by the AI",
+    ["Shotgun (4)"] = "+3 [com], +2 damage (damage by margin, 1-5, averaged)",
+    [".41 Derringer (2)"] = "+2 [com], +1 damage (the +1 only on a margin of 2 is averaged)",
+    ["Chicago Typewriter (4)"] = "+2 [com], +2 damage (extra actions spent for more not modelled)",
+    ["Switchblade (2)"] = "+2 [com], +1 damage (the +1 only on a margin of 2 is averaged)",
+    ["Encyclopedia (2)"] = "+1 [int] while in play (the exhaust-for-+2 to anyone is averaged)",
+    ["Higher Education (3)"] = "resource for +1 [wil]/[int] (its 5-cards-in-hand condition is not checked)",
+    ["Streetwise (3)"] = "resource for +1 [int]/[agi] (2 resources for +3 averaged)",
+    ["Beat Cop (2) / Vicious Blow (2) / other same-title upgrades"] = "play as the level-0 card with the upgraded icons and uses",
   }
 
   local BASIC_ENEMY = {

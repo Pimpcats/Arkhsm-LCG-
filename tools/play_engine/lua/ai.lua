@@ -487,6 +487,12 @@ return function(R, T)
     ["Pickpocketing"] = { nil, 2 }, ["Leo De Luca"] = { nil, 6 }, ["First Aid"] = { nil, 2 }, ["Medical Texts"] = { nil, 1 },
     ["Old Book of Lore"] = { nil, 1 }, ["The Lexicon of the Hour"] = { nil, 5 }, ["Marked Deck"] = { nil, 1 },
     ["The Bell of Ambergrove"] = { nil, 4 }, ["Lucky Compass"] = { nil, 2 }, ["The Ambergrove Lamp"] = { nil, 3 },
+    -- XP cards
+    ["Shotgun (4)"] = { "sthrelias", 9 }, ["Lightning Gun (5)"] = { "sthrelias", 10 }, ["Elder Sign Amulet (3)"] = { nil, 6 },
+    ["Bulletproof Vest (3)"] = { nil, 6 }, ["Higher Education (3)"] = { nil, 5 }, ["Encyclopedia (2)"] = { nil, 5 },
+    ["Switchblade (2)"] = { "sthrcass", 5 }, [".41 Derringer (2)"] = { "sthrcass", 7 }, ["Hired Muscle (1)"] = { nil, 5 },
+    ["Chicago Typewriter (4)"] = { "sthrcass", 9 }, ["Streetwise (3)"] = { nil, 5 }, ["Shrivelling (3)"] = { "sthrseraphine", 8 },
+    ["Shrivelling (5)"] = { "sthrseraphine", 9 }, ["Peter Sylvestre (2)"] = { nil, 6 }, ["Scrapper (3)"] = { nil, 4 },
   }
   local function assetScore(inv, c)
     local w = WANT[c.name]
