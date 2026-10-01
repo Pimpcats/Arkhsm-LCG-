@@ -165,6 +165,7 @@ return function(R, T)
         E.run(0.2)
         R.touch()
         local now = R.hour()
+        G.risingWater = {}                     -- Rising Water: discarded when the Hourglass advances
         if fx then
           -- its "When reached" was cancelled: undo what the Control applied
           -- (guide: Cancelled effects)

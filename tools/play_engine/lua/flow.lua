@@ -621,7 +621,6 @@ return function(R, T)
     end
     for _, t in ipairs(G.tempStatic) do for _ = 1, t.n do T.ctl("[static]", true) end end
     G.tempStatic = {}
-    G.risingWater = {}
     G.crowdTurns = false
     G.inkRuns = {}
     G.roundGroup = {}

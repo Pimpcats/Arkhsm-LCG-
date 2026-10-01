@@ -187,13 +187,13 @@ def simulate_aging(trials, loops, rng, style):
 # XP (MEMORY) DISTRIBUTION — how often a loop yields max vs minimal Memory
 # --------------------------------------------------------------------------- #
 # "A scenario" in this campaign is a loop (it spans 2-3 nodes). Memory is the
-# XP-analog. "Max" = income at/above the carry cap (6 x investigators = 18 at
+# XP-analog. "Max" = income at/above the carry cap (10 x investigators = 30 at
 # 3p). NOTE the rules order (bank -> spend -> cap at next loop start): income
 # above the cap is NOT wasted — it must be SPENT that interlude or lost. The
 # cap is a forced-spend line, and it only destroys Memory a party hoards past
 # it. Minimal = the low-income tail. Same income model as simulate_economy.
 def simulate_xp_distribution(trials, investigators, rng):
-    cap = 6 * investigators
+    cap = 10 * investigators
     per_loop = []
     for _ in range(trials):
         income = 0.0

@@ -57,6 +57,8 @@ local function freshState(n)
     partTwo = false,         -- Part II (The Shape of the Hour) has begun
     pendingYears = {},       -- investigatorId -> Years a card gave this loop (added at Age)
     holdBackRewinds = 0,     -- Hold Back rewinds this loop (at most Constants.HOLD_BACK_REWINDS_PER_LOOP)
+    marks = {},              -- markId -> true: campaign-long marks a reset never clears (e.g. "torn")
+    difficulty = nil,        -- the chaos bag preset last chosen on the Control (1 Easy .. 4 Expert)
   }
 end
 
@@ -118,6 +120,7 @@ function CampaignState.deserialize(saved, decoder)
     state.onCardMemory = state.onCardMemory or {}
     state.loopTallies = state.loopTallies or {}
     state.knowledgePaid = state.knowledgePaid or {}
+    state.marks = state.marks or {}
     state.bankedMemory = math.max(0, math.floor(tonumber(state.bankedMemory) or 0))
     state.loopEnded = state.loopEnded == true
     state.finale = state.finale == true
@@ -339,6 +342,36 @@ function CampaignState.knownFacts()
   end
   table.sort(list)
   return list
+end
+
+----------------------------------------------------------- campaign marks --
+
+--- Set a campaign-long mark (never cleared by a reset). Returns true if new.
+function CampaignState.addMark(markId)
+  state.marks = state.marks or {}
+  if state.marks[markId] then return false end
+  state.marks[markId] = true
+  return true
+end
+
+function CampaignState.hasMark(markId)
+  return (state.marks or {})[markId] == true
+end
+
+--- Any investigator has reached the age-out Years (Those Who Left the Loop).
+function CampaignState.anyAgedOut()
+  for _, y in pairs(state.years or {}) do
+    if (tonumber(y) or 0) >= Constants.AGE_OUT_YEARS then return true end
+  end
+  return false
+end
+
+function CampaignState.setDifficulty(i)
+  state.difficulty = i
+end
+
+function CampaignState.getDifficulty()
+  return state.difficulty
 end
 
 ----------------------------------------------------------- once-per-loop flags --

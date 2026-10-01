@@ -70,7 +70,7 @@ function runStillHourTests()
   check("reset threshold 18 / appointed 12 at 3p",
     c3.resetThreshold == 18 and c3.appointedThreshold == 12)
   check("contest target 6 at 3p", c3.contestTarget == 6)
-  check("memory cap 18, scar cap 6", c3.memoryCap == 18 and c3.scarCap == 6)
+  check("memory cap 30, scar cap 6", c3.memoryCap == 30 and c3.scarCap == 6)
 
   -- 2. Dissonance bands drive the [static] baseline (fake bag adapter).
   local bag = { count = 0 }

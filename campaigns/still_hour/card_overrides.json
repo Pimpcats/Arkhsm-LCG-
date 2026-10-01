@@ -122,27 +122,27 @@
   "sthr-wrongturn": {
     "name": "Wrong Turn",
     "traits": "Static.",
-    "text": "Revelation – Each investigator moves to a connecting location of the lead investigator's choice. These moves do not place doom on the current Hour.",
+    "text": "Revelation – Test [agi] (3). If you fail, move to a connecting location of the lead investigator's choice. This move does not place doom on the current Hour.",
     "flavor": "The map is not where you left it.",
     "quantity": 1
   },
   "sthr-rewind": {
     "name": "Stutter",
     "traits": "Static.",
-    "text": "Peril.\nRevelation – If you discovered a clue during your most recent turn and still have a clue, place 1 of your clues on the location where you last discovered a clue. Otherwise, take 2 horror.",
+    "text": "Peril.\nRevelation – Test [int] (3). If you fail and you discovered a clue during your most recent turn and still have a clue, place 1 of your clues on the location where you last discovered a clue. If you fail otherwise, take 2 horror.",
     "flavor": "The loop stutters backward.",
     "quantity": 1
   },
   "sthr-deadair": {
     "name": "Dead Air",
     "traits": "Static.",
-    "text": "Revelation – Add 1 Static token to the chaos bag until the end of your next turn. Until then, each Static token is −4 instead of −3.",
+    "text": "Revelation – Test [wil] (3). If you fail, add 1 Static token to the chaos bag until the end of your next turn. Until then, each Static token is −4 instead of −3.",
     "quantity": 1
   },
   "sthr-loopnotices": {
     "name": "The Loop Notices You",
     "traits": "Static.",
-    "text": "Revelation – Raise Dissonance by 1. If, during your most recent turn, you played or committed a Recollection or paid “raise Dissonance” as a cost, raise it by 2 instead.",
+    "text": "Revelation – Test [wil] (3). If you fail, raise Dissonance by 1. If, during your most recent turn, you played or committed a Recollection or paid “raise Dissonance” as a cost, raise it by 2 instead.",
     "quantity": 1
   },
   "sthr-yearinanight": {
@@ -154,13 +154,13 @@
   "sthr-forgotten": {
     "name": "What You've Forgotten",
     "traits": "Hex.",
-    "text": "Revelation – Remove 1 Memory from among the cards you control. If you cannot, take 1 horror.",
+    "text": "Revelation – Test [int] (3). If you fail, remove 1 Memory from among the cards you control. If you cannot, take 1 horror.",
     "quantity": 2
   },
   "sthr-oldbones": {
     "name": "Old Bones",
     "traits": "Hex.",
-    "text": "Peril.\nRevelation – If you are Elder or Ancient, take 2 damage; otherwise, take 1 damage. If you are Elder or Ancient and no card in your hand has a [com], [agi] or [wild] icon (reveal your hand), take 1 horror.",
+    "text": "Peril.\nRevelation – Test [com] (3). If you fail, take 1 damage. If you are Elder or Ancient, take 2 damage instead.",
     "flavor": "Your body remembers what your mind won't.",
     "quantity": 1
   },
@@ -344,7 +344,7 @@
   "sthr-darkthatwaits": {
     "name": "The Dark That Waits",
     "traits": "Terror.",
-    "text": "Revelation – If you are at the Lantern Room, take 2 horror. Otherwise, take 1 horror.",
+    "text": "Revelation – Test [wil] (3). If you fail, take 1 horror. If you are at the Lantern Room, take 2 horror instead.",
     "quantity": 1
   },
   "sthr-somethingonstair": {
@@ -456,7 +456,7 @@
   "sthr-risingwater": {
     "name": "Rising Water",
     "traits": "Hazard.",
-    "text": "Revelation – Your location gets +1 shroud until the end of the round.",
+    "text": "Revelation – Attach Rising Water to your location. Attached location gets +1 shroud.\nForced – When the Hourglass advances: Discard Rising Water.",
     "quantity": 1
   },
   "sthr-loc-milestones": {
@@ -604,7 +604,7 @@
   "sthr-samespeech": {
     "name": "The Same Speech",
     "traits": "Terror.",
-    "text": "Peril.\nRevelation – Take 1 horror, plus 1 horror for every 3 completed loops (maximum 3 more).",
+    "text": "Peril.\nRevelation – Test [wil] (3). If you fail, take 1 horror, plus 1 horror for every 3 completed loops (maximum 3 more).",
     "flavor": "He has been dead since ten o'clock. No one has noticed but you.",
     "quantity": 1
   },
@@ -689,7 +689,7 @@
   "sthr-reflectionlies": {
     "name": "Your Reflection Lies",
     "traits": "Terror.",
-    "text": "Revelation – If you are at the Hall of Mirrors, take 2 horror and add 1 Static token to the chaos bag until the end of the round. Otherwise, take 1 horror.",
+    "text": "Revelation – Test [wil] (3). If you fail, take 1 horror. If you are at the Hall of Mirrors, take 2 horror instead and add 1 Static token to the chaos bag until the end of the round.",
     "quantity": 1
   },
   "sthr-loc-readingroom": {
@@ -761,7 +761,7 @@
   "sthr-pagethatwasnt": {
     "name": "The Page That Wasn't",
     "traits": "Hex.",
-    "text": "Peril.\nRevelation – Take 1 horror for every 6 banked Memory, rounded up (maximum 3).",
+    "text": "Peril.\nRevelation – Test [int] (3). If you fail, take 1 horror for every 6 banked Memory, rounded up (maximum 3).",
     "flavor": "In one loop she found a page that was not there in the others.",
     "quantity": 1
   },
@@ -848,7 +848,7 @@
     "number": "2/2",
     "flavor": "Elias kept the log for years. He does not remember writing most of it.",
     "back_flavor": "Eight deaths in Elias's own careful hand, each one dated tonight. The ninth line is ruled and waiting.",
-    "back_text": "Record in your Campaign Log: The Keeper's Ninth Death.\nFrom now on, when Elias's [elder] heals damage, it also heals 1 horror.\nThe Lighthouse's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "back_text": "Record in your Campaign Log: The Keeper's Ninth Death.\nRemove 1 [tablet] token from the chaos bag for the rest of the campaign.\nFrom now on, when Elias's [elder] heals damage, it also heals 1 horror.\nThe Lighthouse's objectives are complete. From now on, do not use this act deck when you Place this box.",
     "clues_per_investigator": true
   },
   "sthr-act-whythirteen": {
@@ -872,7 +872,7 @@
     "number": "2/2",
     "flavor": "Below the bell, below the water, the church keeps what it was told to keep.",
     "back_flavor": "The page is soft as wet cloth, but the ink held. The same almanac, the same night, and a different hour. Someone set the occultation an hour wrong, and the town has been standing in the gap ever since.",
-    "back_text": "Record in your Campaign Log: The Hour Was Wrong.\nRemove Hour IV from the game now unless it is the current Hour (if it is, remove it as soon as it stops being the current Hour), and during every later Loop Setup. The Hourglass steps over it in both directions.\nThe Drowned Church's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "back_text": "Record in your Campaign Log: The Hour Was Wrong.\nRemove 1 [elderthing] token from the chaos bag for the rest of the campaign.\nRemove Hour IV from the game now unless it is the current Hour (if it is, remove it as soon as it stops being the current Hour), and during every later Loop Setup. The Hourglass steps over it in both directions.\nThe Drowned Church's objectives are complete. From now on, do not use this act deck when you Place this box.",
     "clues_per_investigator": true
   },
   "sthr-act-walkbackward": {
@@ -893,7 +893,7 @@
     "index": "2a",
     "number": "2/2",
     "back_flavor": "The face under the hood is worn almost smooth, like a step a thousand feet have climbed. You know the coat. You know the ring on the hand that lifts to stop you. They were here before you, and they looped until there was nothing left to loop.",
-    "back_text": "Record in your Campaign Log: Who Walks Beside You.\nWhile your Campaign Log records Who Walks Beside You, each Echo gets −1 fight.\nThe Sunken Road's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "back_text": "Record in your Campaign Log: Who Walks Beside You.\nRemove 1 [cultist] token from the chaos bag for the rest of the campaign.\nWhile your Campaign Log records Who Walks Beside You, each Echo gets −1 fight.\nThe Sunken Road's objectives are complete. From now on, do not use this act deck when you Place this box.",
     "clues": 7,
     "clues_per_investigator": true
   },

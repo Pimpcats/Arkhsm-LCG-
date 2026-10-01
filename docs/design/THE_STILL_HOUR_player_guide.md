@@ -50,7 +50,7 @@ Each loop starts Dissonance at the **scar**: the number of loops you have comple
 
 **Locations trade one thing for another.** Many locations have an ability that lets you pay in one currency (time, Dissonance, a clue, a Year) to gain another. A few have a hazard that stops once your Campaign Log records that district's Knowledge.
 
-**Victory.** Some locations and some enemies have **Victory X**. The first time you claim each one in the campaign, add X to banked Memory. Claiming them takes time that the Hourglass will not give back, so being greedy always has a cost.
+**Victory.** Some locations and some enemies have **Victory X**. The first time you claim each one in the campaign, each investigator gains X banked Memory. Claiming them takes time that the Hourglass will not give back, so being greedy always has a cost.
 
 **A first loop, in short.** Set up the Square and pick one or two districts. Investigate, gather clues and work toward each district's act. Watch the Hourglass: every district crossing costs an Hour. Watch Dissonance: the Glitch band wakes the Echoes and brings the Appointed. When the loop ends, read its resolutions, age, bank your Memory, spend it and record what you learned. Then the night begins again, and you are a little older than the town.
 
@@ -105,11 +105,11 @@ A band change takes effect at once. [static] tokens added by cards are in additi
 **Memory.**
 - **Memory on cards** is Memory tokens on investigator and asset cards you control. "Most Memory" in a prey or spawn instruction means Memory on cards. Uses on Borrowed Time are not Memory.
 - **Banked Memory** is one pool the whole party shares. "Each investigator gains X banked Memory" adds X to the pool per investigator. Banked Memory never drops below 0: an effect that would remove more removes all of it.
-- At the reset, all Memory on cards (including the cards of defeated investigators) is banked. Between loops you spend banked Memory as experience (Rules Reference, "Experience"), except: a Recollection costs its printed Memory cost; upgrading a card costs Memory equal to the new card's level (not the difference); a new level 0 card costs 1. After spending, if banked Memory is above 18, reduce it to 18.
+- At the reset, all Memory on cards (including the cards of defeated investigators) is banked. Between loops you spend banked Memory as experience (Rules Reference, "Experience"), except: a Recollection costs its printed Memory cost; upgrading a card costs Memory equal to the new card's level (not the difference); a new level 0 card costs 1. After spending, if banked Memory is above 30, reduce it to 30.
 - Recollections are not part of a starting deck; they are bought between loops. Signature Recollections are the exception.
 
 **Knowledge.** Completing a district's objectives records **Knowledge** entries in your Campaign Log. An entry belongs to the whole party and changes the night from then on; its lasting effect is printed on the Campaign Log beside it. Entries from acts 1a are **surface** entries; entries from acts 2a are **deep** entries. Knowledge is never bought, only found. "Your Campaign Log records X" means X is written on the log; "you completed <act> this loop" means that act advanced during the loop.
-- **Knowledge pays Memory.** The first time your Campaign Log records an entry, each investigator gains banked Memory: **2 for a deep entry** (a surface entry pays nothing). The Prologue's entry and the assembled entry pay nothing. An entry pays once per campaign, and the investigator count is the count when it is recorded.
+- **Knowledge pays Memory.** The first time your Campaign Log records an entry, each investigator gains banked Memory: **1 for a surface entry** and **3 for a deep entry**. The Prologue's entry and the assembled entry pay nothing. An entry pays once per campaign, and the investigator count is the count when it is recorded.
 - **Threads.** The Campaign Log also tracks **Seraphine's thread**: unheard, suspected or known. It starts unheard; cards tell you when to mark it. It has no rules effect; it changes one line of the epilogue.
 - **Assembled entries.** One entry is assembled from others rather than found: the act that can first complete it says what it needs. From then on, each time you record a deep entry, check it again. The Control token does this for you and tells you when to record it.
 
@@ -118,11 +118,16 @@ A band change takes effect at once. [static] tokens added by cards are in additi
 - **Weathered (5–9):** the first time an investigator reaches Weathered or a later bracket, choose and record −1 [com] or −1 [agi], and +1 [wil] or +1 [int]. These choices are locked.
 - **Elder (10–14):** the Weathered changes, +1 more to the same mental skill, −1 maximum health, and they begin each loop with 1 Memory on their investigator card.
 - **Ancient (15+):** the Elder changes and −1 maximum sanity.
-- An investigator whose Years reach **18** at **Between Loops** step 1 ages out at once and does not play the next loop. Their player may begin the next loop with a new investigator not yet used in this campaign (0 Years, new deck), or the party continues without them: set **Investigators** on the Control token to the new number.
+- An investigator whose Years reach **18** at **Between Loops** step 1 ages out at once and does not play the next loop. The first time an investigator ages out, add 1 [elderthing] token to the chaos bag for the rest of the campaign. Their player may begin the next loop with a new investigator not yet used in this campaign (0 Years, new deck), or the party continues without them: set **Investigators** on the Control token to the new number.
 
 For finale conditions and the epilogue, an investigator's bracket is set by all their Years, including Years gained during that loop and the finale.
 
-**Victory.** Each **Victory X** pays once per campaign. When you defeat an enemy with Victory X (a **Named** enemy, which some districts add from Part II, or one of a few optional monsters), or when a loop ends with a Victory X location in play, revealed and with no clues on it: if its name is not on your Campaign Log's Victory list, record it and add X to banked Memory (X in total, not per investigator). An enemy with Victory X can be met again in a later loop, but only the first defeat pays. A defeated enemy with Victory X goes to the victory display for the rest of the loop.
+**Victory.** Each **Victory X** pays once per campaign. When you defeat an enemy with Victory X (a **Named** enemy, which some districts add from Part II, or one of a few optional monsters), or when a loop ends with a Victory X location in play, revealed and with no clues on it: if its name is not on your Campaign Log's Victory list, record it and each investigator gains X banked Memory. An enemy with Victory X can be met again in a later loop, but only the first defeat pays. A defeated enemy with Victory X goes to the victory display for the rest of the loop.
+
+**Campaign chaos-bag changes.** Some story results add or remove a [cultist], [tablet] or [elderthing] token for the rest of the campaign, on top of your difficulty's tokens; the text that causes one says so. Remove a token only if one is in the chaos bag. If you set the difficulty with the Control token's buttons, it makes every change for you and tells you in the chat; otherwise make each change by hand and note it on your Campaign Log. Three are public:
+- Part II begins: add 1 [tablet].
+- The first time a loop is marked **Torn**: add 1 [cultist].
+- The first time an investigator ages out: add 1 [elderthing].
 
 **Closed and impassable locations.** A **closed** location is unrevealed, has no clues and is not connected to anything: investigators and enemies cannot move into it, and nothing spawns or manifests there. When it opens, it is revealed: place its clues on it. (The Rules Reference's "seal" is only for chaos tokens; the location called The Sealed Study keeps its name.) Investigators and enemies cannot move into an **impassable** location; anything already there stays unless it is told to move.
 
@@ -148,7 +153,7 @@ For finale conditions and the epilogue, an investigator's bracket is set by all 
 
 1. **Choose investigators.** The campaign is tuned for 3; it scales from 1 to 4.
 2. **Build decks.** Each investigator builds a deck under their deckbuilding rules, adding 1 random basic weakness as normal.
-3. **Choose a difficulty** and assemble the chaos bag. On the Control token, click your difficulty's button (**Easy**, **Standard**, **Hard** or **Expert**): it fills SCED's chaos bag with the tokens below. Without SCED, build the bag by hand. Then set **Investigators** on the Control token to the number of investigators.
+3. **Choose a difficulty** and assemble the chaos bag. On the Control token, click your difficulty's button (**Easy**, **Standard**, **Hard** or **Expert**): it fills SCED's chaos bag with the tokens below, plus any campaign chaos-bag changes so far (see **Campaign chaos-bag changes**). Without SCED, build the bag by hand. Then set **Investigators** on the Control token to the number of investigators.
 
 | Difficulty | Chaos tokens |
 |---|---|
@@ -270,7 +275,7 @@ A loop ends the moment one of its endings happens. Before anything else, claim V
 ```resolution Resolution 2 — The Seam Tears (Dissonance reached the reset value)
 > You leaned on what you remembered until the night could feel the weight. Every clock in Ambergrove stops on the same wrong second. The sky does not fold this time. It splits, and you fall back through the gap to eleven o'clock, bleeding time.
 - The loop ended in danger: each investigator's **+1 Year** for ending in the Noticed band or higher applies.
-- In your Campaign Log, mark this loop **Torn**.
+- In your Campaign Log, mark this loop **Torn**. If it is the first Torn loop, add 1 [cultist] token to the chaos bag for the rest of the campaign.
 - If this is the **second or later** Torn loop, read this instead of the usual interlude story: *The town has learned your shape. Strangers at the fair stop mid-laugh when you pass, and do not know why.*
 - Read the district resolutions, then proceed to **Between Loops.**
 ```
@@ -298,9 +303,9 @@ Run this after every reset, and once after the Prologue. First, if you have not 
 
 1. **Age.** (Skip this step after the Prologue.) Each investigator adds their reset Years for the loop just ended (see **Years**) plus their Years pending. Apply any bracket change now; the first time an investigator reaches Weathered or a later bracket, choose their locked changes on the Interlude panel (their −skill and +skill buttons) before clicking **Age**, then tick the same choices on the Campaign Log. An investigator who reaches 18 Years ages out.
 2. **Bank Memory.** On the Interlude panel, click **Bank on-card Memory** once. It moves all Memory on cards (including the cards of investigators defeated this loop) to banked Memory. Memory on the cards of an investigator who aged out at step 1 is lost with them. Then take the Memory tokens off your cards.
-3. **Spend.** Spend banked Memory from the shared pool, as **Memory** describes: buy Recollections at their listed Memory cost, and upgrade cards (Memory equal to the new card's level), within each investigator's deckbuilding options. Upgraded cards replace their base versions. After spending, if banked Memory is above **18**, reduce it to 18. A new level 0 card costs 1: right-click the banked **Memory** button once.
-4. **Record.** Update the scar (loops completed, maximum 6 at three investigators), the Knowledge Track, the Victory list and any choices on your Campaign Log. Also write each investigator's Years and any Recollections they bought, what you spent this interlude, the current Part, and anyone who aged out under **Those Who Left the Loop** (on the log token, right-click it and choose **Sync from campaign** to fill the numbers the Control token tracks; the printed pages need them written). (Knowledge entries are ticked when their acts say so. If you tick one now, do it before **Begin Next Loop**.)
-5. **Check the Part.** If Part II has not begun, and your log now records **3 or more** surface Knowledge entries or you have completed **Loop 3**: Part II begins (read **The Shape of the Hour** at step 6).
+3. **Spend.** Spend banked Memory from the shared pool, as **Memory** describes: buy Recollections at their listed Memory cost, and upgrade cards (Memory equal to the new card's level), within each investigator's deckbuilding options. Upgraded cards replace their base versions. After spending, if banked Memory is above **30**, reduce it to 30. A new level 0 card costs 1: right-click the banked **Memory** button once.
+4. **Record.** Update the scar (loops completed, maximum 6 at three investigators), the Knowledge Track, the Victory list, any campaign chaos-bag changes and any choices on your Campaign Log. Also write each investigator's Years and any Recollections they bought, what you spent this interlude, the current Part, and anyone who aged out under **Those Who Left the Loop** (on the log token, right-click it and choose **Sync from campaign** to fill the numbers the Control token tracks; the printed pages need them written). (Knowledge entries are ticked when their acts say so. If you tick one now, do it before **Begin Next Loop**.)
+5. **Check the Part.** If Part II has not begun, and your log now records **3 or more** surface Knowledge entries or you have completed **Loop 3**: Part II begins (read **The Shape of the Hour** at step 6) and you add 1 [tablet] token to the chaos bag for the rest of the campaign.
 6. **Read** one interlude story: the Torn or Taken story from the loop's resolution if it applies; otherwise the story below that fits the loop just ended, with any sentence the loop's resolution adds. Then read **The Shape of the Hour** if Part II began at step 5, **Before the finale** the first time your log records The Way the Night Breaks, and any age story. On the Control token, click **Begin Next Loop**, then begin the next loop at **Loop Setup**.
 
 > **After the Prologue and each of the first three loops.** You wake at First Dark with the taste of salt and the certainty that you have done this before. The others feel it too. No one in Ambergrove will believe you.
@@ -669,9 +674,9 @@ Then read **Epilogue — What the Years Took.**
 
 ## DIFFICULTY AND PLAYER COUNT
 
-- **3 investigators:** every value as printed (Dissonance bands at 8 / 16, reset at 24, Memory cap 18, scar cap 6).
-- **2 or 4 investigators:** the reset comes at **8 × investigators**; the Glitch band starts at one-third of the reset and the Noticed band at two-thirds (rounded down: 5 / 10 at two, 10 / 21 at four). The Memory cap is **6 × investigators**, and the scar cap is **2 × investigators**. With **2 investigators**, each gets **+2 maximum health** and **+2 maximum sanity** (the Control token shows them).
-- **1 investigator:** use the two-investigator bands: the reset comes at **16**, the Noticed band at **10** and Glitch at **5**; the scar cap is **4**. The Memory cap is **6**. Your investigator gets **+3 maximum health** and **+3 maximum sanity** (the Control token shows the new maximums on their card). **Second wind:** once each loop (and once in the finale), when your investigator would be defeated, they are not: remove all damage and horror from them, and they gain **1 Year** (click **Years pending**).
+- **3 investigators:** every value as printed (Dissonance bands at 8 / 16, reset at 24, Memory cap 30, scar cap 6).
+- **2 or 4 investigators:** the reset comes at **8 × investigators**; the Glitch band starts at one-third of the reset and the Noticed band at two-thirds (rounded down: 5 / 10 at two, 10 / 21 at four). The Memory cap is **10 × investigators**, and the scar cap is **2 × investigators**. With **2 investigators**, each gets **+2 maximum health** and **+2 maximum sanity** (the Control token shows them).
+- **1 investigator:** use the two-investigator bands: the reset comes at **16**, the Noticed band at **10** and Glitch at **5**; the scar cap is **4**. The Memory cap is **10**. Your investigator gets **+3 maximum health** and **+3 maximum sanity** (the Control token shows the new maximums on their card). **Second wind:** once each loop (and once in the finale), when your investigator would be defeated, they are not: remove all damage and horror from them, and they gain **1 Year** (click **Years pending**).
 - The finale's contest is **6** at 2 or 3 investigators, **5** with one and **7** with four: its sources barely grow with the party, but four investigators get more tries at Hold Back each round.
 - Values given "per investigator" (the finale's Memory thresholds) scale on their own.
 - The Control token applies all of these for you.

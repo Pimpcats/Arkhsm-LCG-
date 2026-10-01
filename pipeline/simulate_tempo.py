@@ -690,7 +690,7 @@ MEMORY_TRIGGER = {
 }
 PROLOGUE_MEMORY = 2       # per investigator (the average Prologue result)
 # guide, "Knowledge pays Memory": per investigator, the first time an entry is recorded
-KNOWLEDGE_PAYS = {"surface": int(os.environ.get("STHR_PAY_SURFACE", 0)), "deep": int(os.environ.get("STHR_PAY_DEEP", 2))}
+KNOWLEDGE_PAYS = {"surface": int(os.environ.get("STHR_PAY_SURFACE", 1)), "deep": int(os.environ.get("STHR_PAY_DEEP", 3))}
 ELDER_FROM_LOOP = 7       # ASSUMPTION: typical loop an investigator turns Elder
 
 
@@ -716,7 +716,7 @@ def memory_report(trials, seed):
                                if rng.random() < MEMORY_TRIGGER[who])
                     gain += sum((KNOWLEDGE_PAYS["surface"] if OBJ[o][1] == "surface" else KNOWLEDGE_PAYS["deep"]) * n
                                 for o in st["done"])
-                    gain += st.get("vp", 0)
+                    gain += st.get("vp", 0) * n              # Victory X: X per investigator
                     if loop_i >= ELDER_FROM_LOOP:
                         gain += n
                     per_loop.append(gain / n)

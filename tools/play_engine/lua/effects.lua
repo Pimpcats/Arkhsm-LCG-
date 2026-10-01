@@ -494,18 +494,17 @@ return function(R, T)
     return "surge"
   end
 
-  cov("sthr-wrongturn", "full; the lead investigator chooses each destination toward that investigator's goal")
+  cov("sthr-wrongturn", "full; the lead investigator chooses the destination toward that investigator's goal")
   ENC["sthr-wrongturn"] = function(inv)
-    for _, x in ipairs(R.aliveInvs()) do
-      local here = R.locOf(x)
-      local to = R.AI.chooseMove(x, here, true)
-      if to then R.moveInv(x, to, { noHour = true }) end
-    end
+    if R.test(inv, "agi", 3, { kind = "treachery" }) then return "discard" end
+    local to = R.AI.chooseMove(inv, R.locOf(inv), true)
+    if to then R.moveInv(inv, to, { noHour = true }) end
     return "discard"
   end
 
   cov("sthr-rewind")
   ENC["sthr-rewind"] = function(inv)
+    if R.test(inv, "int", 3, { kind = "treachery", peril = true }) then return "discard" end
     local last = inv.lastTurn and inv.lastTurn.clueAt
     if last and inv.clues > 0 then
       local L = R.G.locs[last]
@@ -520,6 +519,7 @@ return function(R, T)
   cov("sthr-deadair")
   ENC["sthr-deadair"] = function(inv)
     local G = R.G
+    if R.test(inv, "wil", 3, { kind = "treachery" }) then return "discard" end
     T.ctl("[static]")
     R.touch()
     G.deadAir = { active = true, inv = inv, turnsLeft = (G.phase == "investigation" and inv.turnDone ~= true) and 1 or 1,
@@ -530,6 +530,7 @@ return function(R, T)
   cov("sthr-loopnotices")
   ENC["sthr-loopnotices"] = function(inv)
     local lt = inv.lastTurn or {}
+    if R.test(inv, "wil", 3, { kind = "treachery" }) then return "discard" end
     R.raise((lt.recollection or lt.paidDiss) and 2 or 1, "The Loop Notices You")
     return "discard"
   end
@@ -546,6 +547,7 @@ return function(R, T)
 
   cov("sthr-forgotten")
   ENC["sthr-forgotten"] = function(inv)
+    if R.test(inv, "int", 3, { kind = "treachery" }) then return "discard" end
     local have = inv.memory or 0
     local want = (R.WHATIF or {}).oldForgotten and 2 or 1
     local take = math.min(want, have)
@@ -556,9 +558,9 @@ return function(R, T)
 
   cov("sthr-oldbones")
   ENC["sthr-oldbones"] = function(inv)
+    if R.test(inv, "com", 3, { kind = "treachery", peril = true }) then return "discard" end
     local old = inv.bracket == "Elder" or inv.bracket == "Ancient"
     R.hurt(inv, old and 2 or 1, 0, "Old Bones")
-    if old and not R.P.handHasIcon(inv, { "com", "agi", "wild" }) then horror(inv, 1, "Old Bones") end
     return "discard"
   end
 
@@ -575,6 +577,7 @@ return function(R, T)
 
   cov("sthr-samespeech")
   ENC["sthr-samespeech"] = function(inv)
+    if R.test(inv, "wil", 3, { kind = "treachery", peril = true }) then return "discard" end
     local loops = R.G.loopsCompleted or 0
     horror(inv, 1 + math.min((R.WHATIF or {}).speechMax or 3, math.floor(loops / 3)), "The Same Speech")
     return "discard"
@@ -604,6 +607,7 @@ return function(R, T)
 
   cov("sthr-darkthatwaits")
   ENC["sthr-darkthatwaits"] = function(inv)
+    if R.test(inv, "wil", 3, { kind = "treachery" }) then return "discard" end
     local L = R.locOf(inv)
     local there = L and L.id == "sthr-loc-lanternroom" and not R.G.lampLit
     horror(inv, there and 2 or 1, "The Dark That Waits")
@@ -617,7 +621,7 @@ return function(R, T)
     return "discard"
   end
 
-  cov("sthr-risingwater")
+  cov("sthr-risingwater", "attached to the location until the Hourglass advances")
   ENC["sthr-risingwater"] = function(inv)
     local G = R.G
     local L = R.locOf(inv)
@@ -644,6 +648,7 @@ return function(R, T)
 
   cov("sthr-reflectionlies")
   ENC["sthr-reflectionlies"] = function(inv)
+    if R.test(inv, "wil", 3, { kind = "treachery" }) then return "discard" end
     local L = R.locOf(inv)
     if L and L.id == "sthr-loc-hallofmirrors" then
       horror(inv, 2, "Your Reflection Lies")
@@ -656,6 +661,7 @@ return function(R, T)
 
   cov("sthr-pagethatwasnt")
   ENC["sthr-pagethatwasnt"] = function(inv)
+    if R.test(inv, "int", 3, { kind = "treachery", peril = true }) then return "discard" end
     local banked = R.state().memory or 0
     local n = math.min((R.WHATIF or {}).pageMax or 3, math.ceil(banked / 6))
     if n > 0 then horror(inv, n, "The Page That Wasn't") end

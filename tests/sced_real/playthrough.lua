@@ -779,6 +779,15 @@ return function(H)
     click(control(), "Begin Next Loop")
     E.run(2)
     check("Part II has begun", st().partTwo == true, J.encode(st()))
+    E.run(3)
+    local function symbols(t)
+      local n = 0
+      for _, x in ipairs(bagState()) do if x == t then n = n + 1 end end
+      return n
+    end
+    check("Part II adds 1 Tablet token to the chaos bag (campaign chaos-bag change)", symbols("tablet") == 2,
+      table.concat(sortedCopy(bagState()), ","))
+    check("the rest of the Standard bag is unchanged", #bagState() == 18, tostring(#bagState()))
     click(control(), "Clear Board")
     E.run(2)
     placeBox("district_square")
@@ -799,7 +808,11 @@ return function(H)
     for _, k in ipairs({ "k:the-vote-that-never-ends", "k:what-the-almanac-hid", "k:the-appointeds-name", "k:the-hour-was-wrong" }) do
       tickLog(k)
     end
-    E.run(2)
+    E.run(3)
+    local elder = 0
+    for _, x in ipairs(bagState()) do if x == "elder" then elder = elder + 1 end end
+    check("The Hour Was Wrong removes the Elder Thing token (campaign chaos-bag change)", elder == 0,
+      table.concat(sortedCopy(bagState()), ","))
     local study = cardWithId("sthr-loc-sealedstudy")
     check("once opened, the location loses its CLOSED label", study ~= nil and not hasLabel(study, "CLOSED"), labels(study))
     check("once opened, SCED spawns its clues", tokensOn(study) > 0, tokensOn(study) .. " token(s)")

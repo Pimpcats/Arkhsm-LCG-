@@ -480,7 +480,7 @@ return function(H)
     restore("loop1")
     local mark = chatMark()
     logTick("k:the-lamp-was-never-lit")        -- a new entry this loop (Light the Lamp)
-    check("a new surface entry pays no Memory", st().memory == 7, st().memory)
+    check("a new surface entry pays 1 per investigator", st().memory == 7 + st().investigators, st().memory)
     times(8, function() ctl("shClickHour") end)
     local s = st()
     check("Hour IX: Hour V/VII/VIII brought the Appointed to Arrived; Dissonance 0 + 1 + 2", s.hour == 9
@@ -493,11 +493,12 @@ return function(H)
     -- "Before anything else, claim Victory for each Victory X location in
     -- play, revealed and with no clues on it"
     local m = st().memory
+    local vn = st().investigators
     logTick("v:sthr-loc-keepersquarters")
-    check("a Victory 1 location claimed at the loop's end banks 1, marked banked",
-      st().memory == m + 1 and logVal("vb:sthr-loc-keepersquarters") == true, m .. " -> " .. st().memory)
+    check("a Victory 1 location claimed at the loop's end banks 1 per investigator, marked banked",
+      st().memory == m + vn and logVal("vb:sthr-loc-keepersquarters") == true, m .. " -> " .. st().memory)
     logTick("v:sthr-loc-keepersquarters", false) ; logTick("v:sthr-loc-keepersquarters", true)
-    check("...once per campaign", st().memory == m + 1, st().memory)
+    check("...once per campaign", st().memory == m + vn, st().memory)
     check("a Lighthouse district resolution: R2 (Light the Lamp completed)",
       ORACLE.district("lighthouse", { surface = true }) == "R2")
     check("an unvisited district: No Resolution", ORACLE.district("church", {}) == "NR")
@@ -586,13 +587,13 @@ return function(H)
     logTick("k:the-lamp-was-never-lit")
     logTick("k:the-thirteenth-toll")
     logTick("k:the-road-remembers")
-    check("three surface entries pay no banked Memory", st().memory == 7, st().memory)
+    check("three surface entries pay 1 banked Memory per investigator each", st().memory == 7 + 3 * st().investigators, st().memory)
     check("still Part I during the loop", st().partTwo == false)
     local mark = chatMark()
     endLoop()
     check("Reset Loop starts Part II (step 5)", st().partTwo == true and chatHas(mark, "Part II begins"))
     ctl("shBeginNextLoop")
-    check("Begin Next Loop caps banked Memory at 18", st().memory <= 18, st().memory)
+    check("Begin Next Loop caps banked Memory at 10 per investigator", st().memory <= 10 * st().investigators, st().memory)
     save("part2")                       -- Loop 2, Part II, 3 surface entries, no Years yet
   end)
 
@@ -601,7 +602,7 @@ return function(H)
   local function deepResolution(d, choice, extra)
     local m0 = st().memory
     logTick("k:" .. DEEP[d])
-    check(d .. " R1: the deep entry pays 2 per investigator", st().memory == m0 + 6, m0 .. " -> " .. st().memory)
+    check(d .. " R1: the deep entry pays 3 per investigator", st().memory == m0 + 3 * st().investigators, m0 .. " -> " .. st().memory)
     check(d .. " R1: oracle reads R1", ORACLE.district(d, { deep = true, surface = true }) == "R1")
     logTick(CHOICE_ROW[d] .. choice)
     local other = CHOICE_ROW[d] .. (choice == "_a" and "_b" or "_a")
@@ -621,7 +622,7 @@ return function(H)
     for _, d in ipairs({ "square", "fairground", "almanac" }) do
       local m = st().memory
       logTick("k:" .. SURFACE[d])
-      check(d .. " R2: the surface entry pays nothing", st().memory == m, m .. " -> " .. st().memory)
+      check(d .. " R2: the surface entry pays 1 per investigator", st().memory == m + st().investigators, m .. " -> " .. st().memory)
       check(d .. " R2: oracle reads R2", ORACLE.district(d, { surface = true }) == "R2")
     end
     -- a mis-tick un-ticked: refunded, and re-ticking pays nothing twice

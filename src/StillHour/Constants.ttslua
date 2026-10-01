@@ -67,7 +67,7 @@ function Constants.forCount(n)
     investigators = n,
     resetThreshold = reset,
     appointedThreshold = appointed,
-    memoryCap = 6 * n,
+    memoryCap = 10 * n,
     -- Finale contest target: 6; 5 with one investigator, 7 with four (tuning 2026-10: the finale
     -- opens with the Name and the Vote, so a party brings two deep entries; owner curve: about
     -- 40% won, docs/design/PLAYTEST_SIM.md). Its sources (deep entries, Hold Back
