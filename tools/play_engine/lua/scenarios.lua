@@ -69,14 +69,14 @@ return function(R, T)
   S.loop_multi = partOne({ "district_square", "district_church", "district_almanac" },
     { "sthr-act-whythirteen", "sthr-act-almanachid", "sthr-act-sheriffdead" }, { loops = 1, years = 1, banked = 3 })
 
-  -- the finale from a representative campaign state (loop 7, scar 6, Elder)
-  S.finale = { boxes = { "district_square", "district_almanac" }, part = 2, loops = 6, finaleGoal = true, banked = 14, years = 11,
-               knowledge = { "you-are-unstuck", SURFACE.church, SURFACE.road, SURFACE.lighthouse, SURFACE.square,
-                             SURFACE.fairground, SURFACE.almanac, "the-vote-that-never-ends", "the-appointeds-name",
-                             "the-hour-was-wrong", "the-keepers-ninth-death", "the-way-the-night-breaks" },
-               logFlags = { ["The name is kept unspoken"] = true, ["The drowned heard the true hour"] = true,
-                            ["The vote still stands"] = true, ["The ninth line was left blank"] = true,
-                            ["The town was warned"] = true },
+  -- the finale from a representative campaign state: night 7 (6 loops done, scar 6,
+  -- 10 Years: Elder) with what a first-time party holds by then at objectives won
+  -- 80% to 50% by night: the Square's, the Almanac House's and the Church's
+  -- surface entries and the two deep entries the finale needs (the Vote, the Name)
+  S.finale = { boxes = { "district_square", "district_almanac" }, part = 2, loops = 6, finaleGoal = true, banked = 12, years = 10,
+               knowledge = { "you-are-unstuck", SURFACE.church, SURFACE.square, SURFACE.almanac,
+                             "the-vote-that-never-ends", "the-appointeds-name", "the-way-the-night-breaks" },
+               logFlags = { ["The name is kept unspoken"] = true, ["The vote still stands"] = true },
                objectives = {} }
 
   -- the same state, the finale begun when Hour IX is reached (the guide's other way in)

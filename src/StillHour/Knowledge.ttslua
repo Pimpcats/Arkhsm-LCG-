@@ -110,19 +110,12 @@ function Knowledge.actIIOpen()
   return CampaignState.inPartTwo() or Knowledge.partTwoDue()
 end
 
---- "The Way the Night Breaks" assembles when you know The Appointed's Name, The
--- Vote That Never Ends, and any ONE OTHER deep fact (guide §6.6).
+--- "The Way the Night Breaks" assembles when you know The Appointed's Name and The
+-- Vote That Never Ends (the Name's act needs the Vote, so recording the Name opens
+-- the finale). Was: and one other deep fact; with objectives won 80% to 50% by
+-- night that took a median of 10 nights, past the 6-8 the campaign is built for.
 function Knowledge.canAssembleFinale()
-  if not (CampaignState.knows("the-appointeds-name") and CampaignState.knows("the-vote-that-never-ends")) then
-    return false
-  end
-  for id, f in pairs(Knowledge.FACTS) do
-    if f.layer == "deep" and id ~= "the-appointeds-name" and id ~= "the-vote-that-never-ends"
-        and CampaignState.knows(id) then
-      return true
-    end
-  end
-  return false
+  return CampaignState.knows("the-appointeds-name") and CampaignState.knows("the-vote-that-never-ends")
 end
 
 --- Unlock the assembled finale fact if its inputs are present. Returns true if it
