@@ -67,8 +67,8 @@ def load_full_cards(paths):
     cards = CC.load_cards(paths)
     ovp = os.path.join(paths["dir"], "card_overrides.json")
     ov = json.load(open(ovp, encoding="utf-8")) if os.path.exists(ovp) else {}
-    ptp = os.path.join(HERE, "stillhour_print_text.json")
-    print_text = json.load(open(ptp, encoding="utf-8")) if os.path.exists(ptp) else {}
+    ptp = paths.get("print_text")
+    print_text = json.load(open(ptp, encoding="utf-8")) if ptp and os.path.exists(ptp) else {}
     full = {}
     for cid, c in cards.items():
         _, pt = rp.apply_card_overrides(c, dict(print_text.get(cid, {})), ov.get(cid))
@@ -78,7 +78,7 @@ def load_full_cards(paths):
     return full
 
 
-def load(campaign="still_hour"):
+def load(campaign=None):
     paths = CC.campaign_paths(campaign)
     cards = load_full_cards(paths)
     assign = json.load(open(paths["assignments"], encoding="utf-8"))
@@ -280,7 +280,7 @@ def objective_feasibility(cards, assign, manifest, n):
     return out
 
 
-def audit(campaign="still_hour"):
+def audit(campaign=None):
     cards, assign, manifest = load(campaign)
     rep = Report()
     scen = {sc["id"]: sc for sc in manifest["scenarios"]}
@@ -616,10 +616,11 @@ def summary(rep, manifest, assign):
     return "\n".join(lines)
 
 
-def apply_feed(campaign="still_hour"):
+def apply_feed(campaign=None):
     """Pour campaigns/<id>/scenario_content_feed.json in through the Studio's
     own import (the manual-first contract: the feed only fills the fields the
     card editor edits)."""
+    campaign = campaign or CC.campaign_config.campaign_id()
     sys.path.insert(0, ROOT)
     from cardforge import studio
     feed = json.load(open(os.path.join(ROOT, "campaigns", campaign,
@@ -629,7 +630,7 @@ def apply_feed(campaign="still_hour"):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--campaign", default="still_hour")
+    ap.add_argument("--campaign", default=CC.campaign_config.campaign_id())
     ap.add_argument("--lock", action="store_true",
                     help="set _locked on every scenario with zero errors")
     ap.add_argument("--apply-feed", action="store_true")

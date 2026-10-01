@@ -44,12 +44,14 @@ import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-SOURCE = os.path.join(ROOT, "docs", "design", "THE_STILL_HOUR_player_guide.md")
-OUT = os.path.join(ROOT, "dist", "guide", "the_still_hour_campaign_guide.pdf")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from campaign_config import CFG  # noqa: E402
+SOURCE = CFG.path("guide_md")
+OUT = os.path.join(ROOT, "dist", "guide", CFG.slug + "_campaign_guide.pdf")
 GUIDE_DIR = os.path.join(ROOT, "assets", "frames", "se", "guide")
 FONTS = os.path.join(ROOT, "assets", "fonts")
 FACES = os.path.join(ROOT, "art", "faces")
-LOG_PAGES = ["sthr-log-page1", "sthr-log-page2", "sthr-log-page3"]
+LOG_PAGES = list(CFG.log_pages)
 
 PX = 72.0 / 150.0           # template pixels -> PDF points
 PAGE_W, PAGE_H = 1275 * PX, 1650 * PX
@@ -252,7 +254,7 @@ def build(out=OUT, source=SOURCE, log_pages=True):
 
     # a fixed scratch dir: reportlab names image XObjects from their source
     # path, so a random temp dir would make every build differ
-    tmp = os.path.join(tempfile.gettempdir(), "sthr_guide_build")
+    tmp = os.path.join(tempfile.gettempdir(), CFG.prefix + "_guide_build")
     os.makedirs(tmp, exist_ok=True)
     body = register_fonts(tmp)
 
@@ -265,7 +267,7 @@ def build(out=OUT, source=SOURCE, log_pages=True):
     tpl_empty = os.path.join(GUIDE_DIR, "AHLCG-GuideLetterEmpty.jpg")
     mirrored = os.path.join(tmp, "empty_mirror.jpg")
     Image.open(tpl_empty).transpose(Image.FLIP_LEFT_RIGHT).save(mirrored, quality=90)
-    campaign = "The Still Hour"
+    campaign = CFG.name
 
     def page_bg(c, doc, title=False):
         n = doc.page
@@ -288,8 +290,8 @@ def build(out=OUT, source=SOURCE, log_pages=True):
         doc._log_i += 1
         c.drawImage(doc._log_pages[i], 0, 0, PAGE_W, PAGE_H)
 
-    doc = BaseDocTemplate(out, pagesize=(PAGE_W, PAGE_H), title="The Still Hour — Campaign Guide",
-                          author="The Still Hour (fan campaign)", subject="Campaign Guide",
+    doc = BaseDocTemplate(out, pagesize=(PAGE_W, PAGE_H), title=CFG.name + " — Campaign Guide",
+                          author=CFG.name + " (fan campaign)", subject="Campaign Guide",
                           creator="pipeline/build_guide_pdf.py")
     doc.addPageTemplates([
         PageTemplate("title", [frame_px(R_LEFT_TITLE, "tl"), frame_px(R_RIGHT_TITLE, "tr")],
@@ -582,6 +584,7 @@ def main():
         sys.exit(subprocess.call([sys.executable] + sys.argv, env=env))
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--out", default=OUT)
+    ap.add_argument("--campaign", help="campaign id (campaigns/<id>/build.json); default $CAMPAIGN or still_hour")
     ap.add_argument("--no-log", action="store_true",
                     help="leave the campaign-log pages off the end")
     a = ap.parse_args()

@@ -32,6 +32,7 @@ import hashlib
 import re
 import json
 import os
+import sys
 
 ARKHAM_ICONS = {
     "Name": "font_arkhamicons", "Type": 1,
@@ -39,6 +40,9 @@ ARKHAM_ICONS = {
 }
 
 # --- PLACEHOLDER art (swap for Strange Eons frames + generated art hosted on a CDN) ---
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from campaign_config import CFG  # noqa: E402
+
 PH = "https://placehold.co"
 
 
@@ -47,8 +51,8 @@ def face_ph(name, land=False):
     return f"{PH}/{dim}/141428/e8b24a/png?text={name.replace(' ', '+')}"
 
 
-PLAYER_BACK = f"{PH}/419x600/0c0c14/8a8a99/png?text=The+Still+Hour"
-ENCOUNTER_BACK = f"{PH}/419x600/1a0f0f/8a8a99/png?text=The+Still+Hour+(Encounter)"
+PLAYER_BACK = f"{PH}/419x600/0c0c14/8a8a99/png?text=" + CFG.name.replace(" ", "+")
+ENCOUNTER_BACK = f"{PH}/419x600/1a0f0f/8a8a99/png?text=" + CFG.name.replace(" ", "+") + "+(Encounter)"
 
 # GMNotes icon-field name map (spec key -> metadata key)
 ICON_FIELDS = {
@@ -74,7 +78,7 @@ def build_gmnotes(c):
     # sced_objects/campaign_box_memory_bag.json); our editor calls it Scenario.
     meta_type = "ScenarioReference" if t == "Scenario" else t
     m = {"id": c["id"], "type": meta_type, "class": c["class"],
-         "traits": c["traits"], "cycle": "The Still Hour"}
+         "traits": c["traits"], "cycle": CFG.name}
     if t in SCENARIO_SIDE_TYPES and not c.get("traits"):
         # real agendas/acts/references carry no traits key at all
         del m["traits"]
@@ -364,7 +368,7 @@ def build_card(c):
 def build_bag(cards, nickname):
     return {
         "Name": "Bag", "Nickname": nickname, "Description": "",
-        "GUID": guid("bag:" + nickname), "Tags": ["StillHour"], "Transform": transform(),
+        "GUID": guid("bag:" + nickname), "Tags": [CFG.tag], "Transform": transform(),
         "ContainedObjects": cards,
     }
 
@@ -395,15 +399,16 @@ def with_overrides(spec):
     card_overrides.json) exactly as compile_campaign.py does, so the player
     bag, the encounter bag and the campaign box never disagree about a card."""
     import compile_campaign as CC     # lazy: compile_campaign imports this module
-    effective = CC.load_cards(CC.campaign_paths("still_hour"))
+    effective = CC.load_cards(CC.campaign_paths(CFG.id))
     return [dict(effective.get(c["id"], c)) for c in spec]
 
 
 def main():
     here = os.path.dirname(os.path.abspath(__file__))
     root = os.path.dirname(here)
-    ap = argparse.ArgumentParser(description="Generate SCED Card objects for THE STILL HOUR.")
-    ap.add_argument("--spec", default=os.path.join(here, "stillhour_cards_spec.json"))
+    ap = argparse.ArgumentParser(description="Generate SCED Card objects for " + CFG.upper_name + ".")
+    ap.add_argument("--campaign", help="campaign id (campaigns/<id>/build.json); default $CAMPAIGN or still_hour")
+    ap.add_argument("--spec", default=CFG.path("cards_spec"))
     ap.add_argument("--out", default=None)
     ap.add_argument("--only", nargs="*", default=None,
                     help="Restrict output to these card ids (e.g. the Elias starter slice).")
@@ -417,18 +422,18 @@ def main():
         missing = wanted - {c["id"] for c in spec}
         if missing:
             raise SystemExit(f"--only referenced unknown card ids: {sorted(missing)}")
-        generate(spec, args.out or os.path.join(root, "dist", "stillhour_starter.json"),
-                 "THE STILL HOUR — Starter Slice", args.local)
+        generate(spec, args.out or os.path.join(root, "dist", CFG.starter_out),
+                 CFG.upper_name + " — Starter Slice", args.local)
         return
 
     # Default full build: player cards, plus the encounter deck if its spec exists.
-    generate(spec, args.out or os.path.join(root, "dist", "the_still_hour.json"),
-             "THE STILL HOUR — Player Cards", args.local)
-    enc_spec_path = os.path.join(here, "stillhour_encounter_spec.json")
-    if args.out is None and os.path.exists(enc_spec_path):
+    generate(spec, args.out or os.path.join(root, "dist", CFG.slug + ".json"),
+             CFG.upper_name + " — Player Cards", args.local)
+    enc_spec_path = CFG.path("encounter_spec")
+    if args.out is None and enc_spec_path and os.path.exists(enc_spec_path):
         generate(with_overrides(json.load(open(enc_spec_path, encoding="utf-8"))),
-                 os.path.join(root, "dist", "the_still_hour_encounter.json"),
-                 "THE STILL HOUR — The Appointed", args.local)
+                 os.path.join(root, "dist", CFG.slug + "_encounter.json"),
+                 CFG.encounter_bag_name, args.local)
 
 
 if __name__ == "__main__":

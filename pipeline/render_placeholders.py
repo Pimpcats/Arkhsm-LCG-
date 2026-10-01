@@ -48,7 +48,9 @@ FURNITURE = False
 BLANK = False
 
 
-ILLUSTRATIONS_DIR = os.path.join(ROOT, "assets", "illustrations", "still_hour")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from campaign_config import CFG  # noqa: E402  (which campaign: build.json)
+ILLUSTRATIONS_DIR = CFG.path("illustrations")
 
 
 def load_art_index():
@@ -61,20 +63,20 @@ def load_art_index():
             stem, ext = os.path.splitext(f)
             if ext.lower() in (".jpg", ".jpeg", ".png", ".webp"):
                 index[stem] = os.path.relpath(os.path.join(ILLUSTRATIONS_DIR, f), ROOT)
-    path = os.path.join(ROOT, "out", "still_hour", "index.json")
+    path = os.path.join(CFG.path("out_dir"), "index.json")
     if os.path.exists(path):
         index.update(json.load(open(path, encoding="utf-8")))
     return index
 
 
-PLACEMENTS_PATH = os.path.join(ROOT, "out", "still_hour", "placements.json")
+PLACEMENTS_PATH = os.path.join(CFG.path("out_dir"), "placements.json")
 
 
 def overrides_path(campaign=None):
     """Where a campaign's hand edits live. Every campaign keeps its own, so
     deleting one can never take another's work with it — and so the compiler,
     which reads the campaign's own folder, sees exactly what the editor wrote."""
-    return os.path.join(ROOT, "campaigns", campaign or "still_hour",
+    return os.path.join(ROOT, "campaigns", campaign or CFG.id,
                         "card_overrides.json")
 
 
@@ -200,7 +202,7 @@ def load_placements():
     # committed placements (campaigns/<campaign>/art_placements.json) are the
     # base; the Studio's local drag edits (out/, gitignored) win per card
     merged = {}
-    committed = os.path.join(ROOT, "campaigns", "still_hour", "art_placements.json")
+    committed = os.path.join(ROOT, "campaigns", CFG.id, "art_placements.json")
     for path in (committed, PLACEMENTS_PATH):
         if os.path.exists(path):
             merged.update({k: v for k, v in json.load(open(path, encoding="utf-8")).items()
@@ -343,7 +345,7 @@ TITLE_FONT = os.path.join(FONTS_DIR, "Teutonic.ttf")
 # font_overrides.json {card_id: {"title": file, "body": file}} — files are
 # names inside assets/fonts/. Set per card by the render loop (serial).
 FONT_OVERRIDE = {}
-FONT_OVERRIDES_PATH = os.path.join(ROOT, "campaigns", "still_hour",
+FONT_OVERRIDES_PATH = os.path.join(ROOT, "campaigns", CFG.id,
                                    "font_overrides.json")
 
 
@@ -624,7 +626,7 @@ def pips(draw, x, y, n, color, r=9):
 
 def footer(draw, w, h, card_id):
     draw.rectangle([0, h - 26, w, h], fill=(14, 13, 18))
-    draw.text((10, h - 22), WATERMARK + " · THE STILL HOUR", font=_font(12), fill=DIM)
+    draw.text((10, h - 22), WATERMARK + " · " + CFG.upper_name, font=_font(12), fill=DIM)
     t = card_id + " · placeholder"
     draw.text((w - 10 - draw.textlength(t, font=_font(12)), h - 22), t,
               font=_font(12), fill=DIM)
@@ -1706,7 +1708,7 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
 
     _box_text(d, _wm(art_path), se_reg(kind, "Artist"),
               fill=(225, 218, 202), grow=1.0)
-    _box_text(d, "THE STILL HOUR", se_reg(kind, "Copyright"),
+    _box_text(d, CFG.upper_name, se_reg(kind, "Copyright"),
               fill=(225, 218, 202), grow=1.0)
     img.save(dest)
 
@@ -1845,7 +1847,7 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
             _box_text(d, str(val), box, fill=(240, 240, 240), stat=True, grow=0.9)
     _box_text(d, _wm(art_path), se_reg("Investigator", "Artist"),
               fill=(70, 58, 46), max_size=18, align="left")
-    _box_text(d, "THE STILL HOUR", se_reg("Investigator", "Copyright"),
+    _box_text(d, CFG.upper_name, se_reg("Investigator", "Copyright"),
               fill=(70, 58, 46), max_size=18, align="right")
     img.save(dest)
 
@@ -2308,7 +2310,7 @@ def s_scenario_ref(c, pt, dest, art_path=None, placement=None):
             elif tok == "static":
                 # the campaign's own [static] token face (render_token.py)
                 from render_token import render_static_token
-                tpath = os.path.join(FACES_DIR, "sthr-static-token.png")
+                tpath = os.path.join(FACES_DIR, (CFG.static_token or {}).get("id", CFG.prefix + "-static-token") + ".png")
                 if not os.path.exists(tpath):
                     render_static_token(tpath)
                 icon = Image.open(tpath).convert("RGBA")
@@ -2365,7 +2367,7 @@ def s_campaign_log(c, pt, dest, art_path=None, placement=None):
         return ly + 42
 
     y = field("Player", pt.get("player", ""), y)
-    y = field("Campaign", c.get("campaign_name", "The Still Hour"), y)
+    y = field("Campaign", c.get("campaign_name", CFG.name), y)
     y += 6
     for i in range(1, 4):
         inv = pt.get("investigator{}".format(i), "")
@@ -2531,6 +2533,7 @@ def content_regions(card_type):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", nargs="*", help="render only these card ids")
+    ap.add_argument("--campaign", help="campaign id (campaigns/<id>/build.json); default $CAMPAIGN or still_hour")
     ap.add_argument("--no-template", action="store_true",
                     help="force the drawn (non-template) placeholder look")
     ap.add_argument("--furniture", action="store_true",
@@ -2548,7 +2551,10 @@ def main():
     # <campaign>_*_spec.json written by the app (hand-made or imported cards),
     # so a campaign built from scratch renders exactly like the authored one
     cards, seen = [], set()
-    for sp in sorted(glob.glob(os.path.join(HERE, "*_spec.json"))):
+    # (a campaign with "render_all_pipeline_specs": false renders its own specs only)
+    spec_files = (sorted(glob.glob(os.path.join(HERE, "*_spec.json")))
+                  if CFG.get("render_all_pipeline_specs", True) else CFG.path("specs"))
+    for sp in spec_files:
         try:
             for c in json.load(open(sp, encoding="utf-8")):
                 if c.get("id") and c["id"] not in seen:
@@ -2559,7 +2565,7 @@ def main():
     if args.only:
         cards = [c for c in cards if c["id"] in set(args.only)]
     print_text = {k: v for k, v in
-                  json.load(open(os.path.join(HERE, "stillhour_print_text.json"), encoding="utf-8")).items()
+                  json.load(open(CFG.path("print_text"), encoding="utf-8")).items()
                   if not k.startswith("_")}
     art_index = load_art_index()
     placements = load_placements()

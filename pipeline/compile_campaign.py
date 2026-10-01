@@ -26,16 +26,24 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 
 import build_cards as B  # noqa: E402  (card object builder, ground-truth aligned)
+import campaign_config  # noqa: E402
 import table_presence as T  # noqa: E402  (boxes, log, guide, minicards)
 
-def campaign_paths(campaign="still_hour"):
+def campaign_paths(campaign=None):
     """Every path this compiler reads for ONE campaign, so any campaign - not
-    just The Still Hour - compiles to its own box."""
+    just The Still Hour - compiles to its own box. A campaign with a
+    campaigns/<id>/build.json takes its spec files, name and print layer from
+    it (pipeline/campaign_config.py); Studio test campaigns without one keep
+    the pipeline/<id>_*_spec.json convention."""
+    campaign = campaign or campaign_config.campaign_id()
     cdir = os.path.join(ROOT, "campaigns", campaign)
-    if campaign == "still_hour":
-        specs = ("stillhour_cards_spec.json", "stillhour_encounter_spec.json",
-                 "stillhour_scenario_spec.json", "stillhour_imported_spec.json",
-                 "stillhour_handmade_spec.json")
+    if os.path.exists(os.path.join(cdir, "build.json")):
+        cfg = campaign_config.load(campaign)
+        return {"dir": cdir, "name": cfg.box_name,
+                "assignments": os.path.join(cdir, "scenario_assignments.json"),
+                "manifest": os.path.join(cdir, "scenario_manifest.json"),
+                "specs": tuple(cfg.path("specs")), "print_text": cfg.path("print_text"),
+                "build": cfg}
     else:
         specs = ("{}_cards_spec.json".format(campaign),
                  "{}_imported_spec.json".format(campaign))
@@ -49,7 +57,7 @@ def campaign_paths(campaign="still_hour"):
     return {"dir": cdir, "name": name,
             "assignments": os.path.join(cdir, "scenario_assignments.json"),
             "manifest": os.path.join(cdir, "scenario_manifest.json"),
-            "specs": specs}
+            "specs": specs, "print_text": None, "build": None}
 
 # stack -> deck nickname, in the order a scenario book lays out
 STACK_ORDER = [
@@ -191,8 +199,8 @@ def load_cards(paths):
         except ValueError:
             ov = {}
     print_text = {}
-    ptp = os.path.join(HERE, "stillhour_print_text.json")
-    if os.path.exists(ptp):
+    ptp = paths.get("print_text")
+    if ptp and os.path.exists(ptp):
         print_text = json.load(open(ptp, encoding="utf-8"))
     out = {}
     for cid, c in cards.items():
@@ -317,7 +325,7 @@ def build_guide_pdf(campaign_name=None):
     return T.build_guide(T.PLACE_GUIDE)
 
 
-def compile_campaign(out_path, require_locked=True, campaign="still_hour"):
+def compile_campaign(out_path, require_locked=True, campaign=None):
     paths = campaign_paths(campaign)
     cards = load_cards(paths)
     assignments = {}
@@ -347,11 +355,11 @@ def compile_campaign(out_path, require_locked=True, campaign="still_hour"):
         placed += 1
     # the campaign box carries the scenario books plus (for The Still Hour)
     # the investigator minicards, the campaign log and the campaign guide
-    still = campaign == "still_hour"
+    cfg = paths["build"]
     box = T.campaign_box(boxes, name=paths["name"],
-                         filename=T.FILENAME if still else campaign,
-                         box_id="CB-STHR" if still else "CB-" + campaign[:8].upper(),
-                         table=still)
+                         filename=cfg.slug if cfg else campaign,
+                         box_id=cfg.box_id if cfg else "CB-" + campaign[:8].upper(),
+                         table=cfg is not None)
     save = {"SaveName": paths["name"], "GameMode": paths["name"],
             "ObjectStates": [box]}
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
@@ -377,14 +385,13 @@ def compile_campaign(out_path, require_locked=True, campaign="still_hour"):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default=os.path.join(
-        ROOT, "dist", "the_still_hour_campaign.json"))
-    ap.add_argument("--campaign", default="still_hour")
+    ap.add_argument("--out", default=None, help="default dist/<slug>_campaign.json")
+    ap.add_argument("--campaign", default=campaign_config.campaign_id())
     ap.add_argument("--force", action="store_true",
                     help="compile even if scenarios aren't all locked")
     a = ap.parse_args()
-    out = a.out if a.campaign == "still_hour" else os.path.join(
-        ROOT, "dist", a.campaign + "_campaign.json")
+    cfg = campaign_paths(a.campaign)["build"]
+    out = a.out or os.path.join(ROOT, "dist", (cfg.slug if cfg else a.campaign) + "_campaign.json")
     r = compile_campaign(out, require_locked=not a.force, campaign=a.campaign)
     print(json.dumps(r, indent=2))
     return 0 if r.get("ok") else 1

@@ -39,15 +39,16 @@ sys.path.insert(0, HERE)
 
 import build_cards as B          # noqa: E402
 import campaign_log as L          # noqa: E402
+from campaign_config import CFG   # noqa: E402
 
-CAMPAIGN = "The Still Hour"
-FILENAME = "the_still_hour"        # SCED download key (GMNotes filename)
-OUT = os.path.join(ROOT, "dist", "the_still_hour_table.json")
-GUIDE_PDF = os.path.join(ROOT, "dist", "guide", "the_still_hour_campaign_guide.pdf")
+CAMPAIGN = CFG.name
+FILENAME = CFG.slug                # SCED download key (GMNotes filename)
+OUT = os.path.join(ROOT, "dist", CFG.slug + "_table.json")
+GUIDE_PDF = os.path.join(ROOT, "dist", "guide", CFG.slug + "_campaign_guide.pdf")
 MEMORY_BAG_LUA = os.path.join(ROOT, "src", "tts", "memory_bag.lua")
 # scenario books are laid out again every loop: a replayable memory bag
 LOOP_BOX_LUA = os.path.join(ROOT, "src", "tts", "loop_box.lua")
-BOX_TEXTURE_ID = "sthr-box"
+BOX_TEXTURE_ID = CFG.box_texture_id
 
 # SCED's own box meshes (src/Global/Global.ttslua meshTable; the same URLs the
 # exported campaign/scenario boxes carry) and their scales.
@@ -111,7 +112,7 @@ def _url(key, part="face"):
 
 # ------------------------------------------------------------- minicards --
 def investigator_specs():
-    spec = json.load(open(os.path.join(HERE, "stillhour_cards_spec.json"), encoding="utf-8"))
+    spec = json.load(open(CFG.path("cards_spec"), encoding="utf-8"))
     return [c for c in spec if c.get("type") == "Investigator"]
 
 
@@ -166,10 +167,10 @@ def guide_url():
 
 def build_guide(pos=None):
     return _common(
-        GUID=guid("guide:the_still_hour"), Name="Custom_PDF",
+        GUID=guid("guide:" + CFG.slug), Name="Custom_PDF",
         Transform=transform(pos, ry=270, scale=(2.2, 1.0, 2.2)),
         Nickname=CAMPAIGN + " - Campaign Guide", Description="",
-        GMNotes=gmnotes({"id": "STHR-CG", "type": "CampaignGuide"}),
+        GMNotes=gmnotes({"id": CFG.guide_id, "type": "CampaignGuide"}),
         ColorDiffuse=dict(WHITE), Tags=["CampaignGuide"],
         CustomPDF={"PDFUrl": guide_url(), "PDFPassword": "", "PDFPage": 0,
                    "PDFPageOffset": 0},
@@ -223,7 +224,8 @@ def ml_entry(pos, ry=270, rz=0):
 
 
 def loop_box_script():
-    return open(LOOP_BOX_LUA, encoding="utf-8").read()
+    import campaign_config
+    return campaign_config.lua_text(LOOP_BOX_LUA)
 
 
 def memory_bag(name, gm, tags, mesh, scale, contained, ml, desc="", script=None):
@@ -252,7 +254,7 @@ def scenario_box(name, sid, contained, ml):
 
 
 def campaign_box(scenario_boxes=(), name=CAMPAIGN, filename=FILENAME,
-                 box_id="CB-STHR", table=True):
+                 box_id=CFG.box_id, table=True):
     """The campaign box: scenario books (+ for The Still Hour: minicards, log,
     guide), each with a Place spot. Returns the Custom_Model_Bag object."""
     contained, ml = [], {}
@@ -297,7 +299,7 @@ def render_box_texture(dest=None):
             rp.paste_cover(img, os.path.relpath(banner, ROOT), (x, y, x + w, y + h))
     hsv = band.convert("RGB").convert("HSV")
     hch, s, v = hsv.split()
-    hch = hch.point(lambda _: 168)                      # ~0.66 turn: indigo
+    hch = hch.point(lambda _: CFG.get("box_hue", 168))  # 168 ~0.66 turn: indigo (The Still Hour)
     s = s.point(lambda x: int(x * 0.55))
     v = v.point(lambda x: int(x * 0.8))
     band = Image.merge("RGBA", (*Image.merge("HSV", (hch, s, v)).convert("RGB").split(),
@@ -335,6 +337,7 @@ def build(out=OUT, allow_local=False):
 def main(argv=None):
     import argparse
     ap = argparse.ArgumentParser(description="Build the campaign's table-presence box.")
+    ap.add_argument("--campaign", help="campaign id (campaigns/<id>/build.json); default $CAMPAIGN or still_hour")
     B.add_local_flag(ap)
     args = ap.parse_args(argv)
     print(json.dumps(build(allow_local=args.local), indent=2))

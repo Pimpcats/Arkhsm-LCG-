@@ -46,8 +46,10 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 
 import build_cards as B  # noqa: E402  (release_guard / --local)
+import campaign_config  # noqa: E402
+from campaign_config import CFG  # noqa: E402
 
-FILENAME = "the_still_hour"   # the SCED-downloads release asset name
+FILENAME = CFG.slug   # the SCED-downloads release asset name
 
 # The mod's Global fetches {filename}.json from this base (verify in your fork;
 # for a custom campaign, host the asset at your own releases and point SOURCE_REPO
@@ -126,14 +128,15 @@ def add_recollection_copies(bag):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.strip().splitlines()[0])
+    ap.add_argument("--campaign", help="campaign id (campaigns/<id>/build.json); default $CAMPAIGN or still_hour")
     ap.add_argument("--require-hosted", action="store_true",
                     help="fail if any file:/// URL would ship (publish_hosted.py)")
     B.add_local_flag(ap)
     a = ap.parse_args(argv)
 
-    mod_path = os.path.join(ROOT, "dist", "the_still_hour_mod.json")
+    mod_path = os.path.join(ROOT, "dist", CFG.slug + "_mod.json")
     if not os.path.exists(mod_path):
-        raise SystemExit("dist/the_still_hour_mod.json not found — run build_cards.py then bundle_mod.py first.")
+        raise SystemExit("dist/%s_mod.json not found — run build_cards.py then bundle_mod.py first." % CFG.slug)
     objs = json.load(open(mod_path, encoding="utf-8"))["ObjectStates"]
 
     out_dir = os.path.join(ROOT, "dist", "downloads")
@@ -149,7 +152,7 @@ def main(argv=None):
         # the mod's loose "The Appointed" bag is a test fixture for the relay;
         # every one of its cards already ships in the scenario boxes, and a
         # bag by that name in the campaign box would spoil the boss
-        if "The Appointed" in (o.get("Nickname") or ""):
+        if any(n in (o.get("Nickname") or "") for n in CFG.skip_bags):
             continue
         o = copy.deepcopy(o)
         if "Player Cards" in (o.get("Nickname") or ""):
@@ -161,14 +164,14 @@ def main(argv=None):
         box["ContainedObjects"].append(o)
         ml[o["GUID"]] = T.ml_entry(pos)
     box["LuaScriptState"] = json.dumps(state, indent=2)
-    box["Description"] = ("An original loop-horror campaign (fan content, not for "
+    box["Description"] = ("An original " + CFG.genre + " campaign (fan content, not for "
                           "sale). Place lays out the log, guide and minicards.")
     release_path = os.path.join(out_dir, FILENAME + ".json")
     release_text = json.dumps(box, indent=2, ensure_ascii=False)
     # the same box as a TTS "Saved Object" (save-file shape), so the owner can
     # import the whole campaign by hand: Objects -> Saved Objects
-    saved_path = os.path.join(ROOT, "dist", "saved_object_the_still_hour.json")
-    saved_text = json.dumps({"SaveName": "The Still Hour", "GameMode": "", "Date": "",
+    saved_path = os.path.join(ROOT, "dist", "saved_object_" + CFG.slug + ".json")
+    saved_text = json.dumps({"SaveName": CFG.name, "GameMode": "", "Date": "",
                              "Table": "", "Sky": "", "Note": "", "Rules": "", "XmlUI": "",
                              "LuaScript": "", "LuaScriptState": "", "ObjectStates": [box]},
                             indent=2, ensure_ascii=False)
@@ -181,20 +184,20 @@ def main(argv=None):
         f.write(saved_text)
 
     # 2. Placeholder download box.
-    box_lua = open(os.path.join(ROOT, "src", "tts", "download_box.lua"), encoding="utf-8").read()
+    box_lua = campaign_config.lua_text(os.path.join(ROOT, "src", "tts", "download_box.lua"))
     placeholder = {
         "Name": "Bag",
-        "Nickname": "THE STILL HOUR — Download Box",
+        "Nickname": CFG.upper_name + " — Download Box",
         "Description": "Click Download inside the SCED mod to fetch the campaign.",
-        "GUID": guid("sthr-download-box"),
+        "GUID": guid(CFG.download_box_guid),
         # real campaign-box tagging + GMNotes shape: docs/art_reference/
         # sced_objects/campaign_box_memory_bag.json ("Reloadable" lets SCED
         # re-fetch the download; "filename" is the placeholderDownload key)
-        "Tags": ["CampaignBox", "Reloadable", "StillHour"],
+        "Tags": ["CampaignBox", "Reloadable", CFG.tag],
         "ColorDiffuse": {"r": 0.13, "g": 0.11, "b": 0.18},
         # campaign-box area at the top of the SCED table, off the mats
         "Transform": dict(transform(63.0), posZ=8.0),
-        "GMNotes": json.dumps({"filename": FILENAME, "id": "CB-STHR",
+        "GMNotes": json.dumps({"filename": FILENAME, "id": CFG.box_id,
                                "type": "CampaignBox"}, separators=(",", ":")),
         "LuaScript": box_lua,
         "LuaScriptState": "",
