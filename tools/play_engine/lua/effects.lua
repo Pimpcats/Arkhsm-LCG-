@@ -381,7 +381,7 @@ return function(R, T)
   FX.ACTS = ACTS
   local function clueNeed(id) local c = R.card(id) return (c.clues or 0) * (c.clues_per_investigator and R.G.n or 1) end
 
-  ACTS["sthr-act-firsthour"] = { at = "sthr-loc-almanacsteps", contrib = true, fact = nil, spend = true, minHour = 7 }
+  ACTS["sthr-act-firsthour"] = { at = "sthr-loc-almanacsteps", contrib = true, fact = nil, spend = true, minHour = 8 }
   -- carry = a take-and-deliver objective: an [action] at carry.take spends the
   -- act's clues (any investigator contributes when carry.any, else those at
   -- carry.take) to take control of a set-aside story asset; the act advances
@@ -399,7 +399,7 @@ return function(R, T)
   ACTS["sthr-act-vote"] = { at = "sthr-loc-townhallsteps", contrib = true, fact = "the-vote-that-never-ends", spend = true,
                             carry = { asset = "sthr-item-ledger", take = "sthr-loc-recordsoffice" } }
   ACTS["sthr-act-appointedname"] = { at = "sthr-loc-sealedstudy", contrib = true, fact = "the-appointeds-name", spend = true,
-                                     minStage = 2 }
+                                     minStage = 3 }
   ACTS["sthr-act-ninthdeath"] = { at = "sthr-loc-lanternroom", contrib = true, fact = "the-keepers-ninth-death", spend = true,
                                   needLamp = true, carry = { asset = "sthr-item-logbook", take = "sthr-loc-keepersquarters" } }
   ACTS["sthr-act-lamp"] = { at = "sthr-loc-lanternroom", contrib = true, fact = "the-lamp-was-never-lit", action = true,
@@ -500,8 +500,8 @@ return function(R, T)
       if h and not h.defeated and R.locOf(h) == R.locById(A.at) then return {} end
       return nil
     end
-    if A.minHour and R.hour() < A.minHour then return nil end       -- "Hour VII or later" (The First Hour)
-    if A.minStage and R.stage() < A.minStage then return nil end    -- "while the Approach is Emerging or Arrived"
+    if A.minHour and R.hour() < A.minHour then return nil end       -- "Hour VIII or later" (The First Hour)
+    if A.minStage and R.stage() < A.minStage then return nil end    -- "while the Approach is Arrived"
     if A.twoPlace then
       -- one investigator at each location at once; solo: at the second, having been at the first this round
       local a, b = R.locById(A.twoPlace[1]), R.locById(A.twoPlace[2])

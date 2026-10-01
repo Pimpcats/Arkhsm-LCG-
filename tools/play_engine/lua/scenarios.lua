@@ -29,26 +29,28 @@ return function(R, T)
                  banked = 0, years = 0 }
 
   -- Part I: the Square plus one district (the Lighthouse needs the Sunken Road).
-  -- Objectives in the party's order: the night's goal (the district's act and
-  -- the Square's current act) first, a passed-through district's act last.
+  -- Objectives in the party's order: the Square's current act first (every
+  -- loop starts at the Square), then the district's act, a passed-through
+  -- district's act last. Measured: Square-first wins more on every far
+  -- district (Lighthouse 50% -> 67%, Fairground 63% -> 90% at night 1).
   S.district_square = partOne({ "district_square" }, { "sthr-act-sheriffdead" })
-  S.district_church = partOne({ "district_square", "district_church" }, { "sthr-act-whythirteen", "sthr-act-sheriffdead" })
-  S.district_road = partOne({ "district_square", "district_road" }, { "sthr-act-walkbackward", "sthr-act-sheriffdead" })
+  S.district_church = partOne({ "district_square", "district_church" }, { "sthr-act-sheriffdead", "sthr-act-whythirteen" })
+  S.district_road = partOne({ "district_square", "district_road" }, { "sthr-act-sheriffdead", "sthr-act-walkbackward" })
   S.district_lighthouse = partOne({ "district_square", "district_road", "district_lighthouse" },
-    { "sthr-act-lamp", "sthr-act-sheriffdead", "sthr-act-walkbackward" })
-  S.district_fairground = partOne({ "district_square", "district_fairground" }, { "sthr-act-wheelturns", "sthr-act-sheriffdead" })
-  S.district_almanac = partOne({ "district_square", "district_almanac" }, { "sthr-act-almanachid", "sthr-act-sheriffdead" })
+    { "sthr-act-sheriffdead", "sthr-act-lamp", "sthr-act-walkbackward" })
+  S.district_fairground = partOne({ "district_square", "district_fairground" }, { "sthr-act-sheriffdead", "sthr-act-wheelturns" })
+  S.district_almanac = partOne({ "district_square", "district_almanac" }, { "sthr-act-sheriffdead", "sthr-act-almanachid" })
 
   -- Part II (loop 4, scar 3, Weathered): the district's surface entry and two others recorded
   S.district_square_p2 = partTwo({ "district_square" }, { SURFACE.square, SURFACE.church, SURFACE.road }, { "sthr-act-vote" })
   S.district_church_p2 = partTwo({ "district_square", "district_church" }, { SURFACE.church, SURFACE.square, SURFACE.road },
-    { "sthr-act-hourwaswrong", "sthr-act-vote" })
+    { "sthr-act-vote", "sthr-act-hourwaswrong" })
   S.district_road_p2 = partTwo({ "district_square", "district_road" }, { SURFACE.road, SURFACE.square, SURFACE.church },
-    { "sthr-act-walksbeside", "sthr-act-vote" })
+    { "sthr-act-vote", "sthr-act-walksbeside" })
   S.district_lighthouse_p2 = partTwo({ "district_square", "district_road", "district_lighthouse" },
-    { SURFACE.lighthouse, SURFACE.road, SURFACE.square }, { "sthr-act-ninthdeath", "sthr-act-vote", "sthr-act-walksbeside" })
+    { SURFACE.lighthouse, SURFACE.road, SURFACE.square }, { "sthr-act-vote", "sthr-act-ninthdeath", "sthr-act-walksbeside" })
   S.district_fairground_p2 = partTwo({ "district_square", "district_fairground" }, { SURFACE.fairground, SURFACE.square, SURFACE.church },
-    { "sthr-act-bargain", "sthr-act-vote" })
+    { "sthr-act-vote", "sthr-act-bargain" })
   -- the Almanac House's deep act also needs The Vote That Never Ends
   S.district_almanac_p2 = partTwo({ "district_square", "district_almanac" },
     { SURFACE.almanac, SURFACE.square, SURFACE.church, "the-vote-that-never-ends" }, { "sthr-act-appointedname" })
@@ -76,7 +78,7 @@ return function(R, T)
 
   -- a typical Part I loop: the Square and two districts (loop 2, scar 1)
   S.loop_multi = partOne({ "district_square", "district_church", "district_almanac" },
-    { "sthr-act-whythirteen", "sthr-act-almanachid", "sthr-act-sheriffdead" }, { loops = 1, years = 1, banked = 3, xp = "n2" })
+    { "sthr-act-sheriffdead", "sthr-act-whythirteen", "sthr-act-almanachid" }, { loops = 1, years = 1, banked = 3, xp = "n2" })
 
   -- the finale from a representative campaign state: night 7 (6 loops done, scar 6,
   -- 10 Years: Elder) with what a first-time party holds by then at objectives won

@@ -138,7 +138,7 @@ return function(R, T)
         local step = (inv.walk or 0) + 1
         -- clues per step (Walk It Backward); what-if walkSteps {a, b, c} or walkPer n
         local steps = (R.WHATIF or {}).walkSteps
-        local per = (steps and steps[step]) or (R.WHATIF or {}).walkPer or ({ 2, 1, 1 })[step]
+        local per = (steps and steps[step]) or (R.WHATIF or {}).walkPer or (G.n == 1 and { 2, 1, 1 } or { 2, 2, 2 })[step]   -- the card's one-investigator clause
         if seq[step] == L.id then inv.walkCount = (inv.walkCount or 0) + 1 end
         if seq[step] == L.id and inv.walkCount >= per then
           inv.walk = step

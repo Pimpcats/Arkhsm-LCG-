@@ -271,7 +271,9 @@ def objective_feasibility(cards, assign, manifest, n):
                         label, need["fixed"], sum(got))))
             elif "sequence" in need:
                 # one investigator discovers k clues at each named location, in order
-                for name, k in need["sequence"]:
+                # (solo_sequence: the act's one-investigator clause)
+                seq = need["solo_sequence"] if n == 1 and "solo_sequence" in need else need["sequence"]
+                for name, k in seq:
                     have = clues_at(name)
                     if have is None or have < k:
                         out.append((sid, "{}: {} holds {} clue(s), the sequence needs {}".format(label, name, have, k)))
