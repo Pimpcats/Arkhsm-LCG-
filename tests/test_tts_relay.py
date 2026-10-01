@@ -126,7 +126,7 @@ BOARD_CHECKS = (
     "the card's Memory button follows the count",
     "it manifests at the location away from both investigators",
     "it hunts the investigator with the most Memory (not merely the nearest)",
-    "an investigator at its location holds it there (Rules Reference: Hunter)",
+    "the investigator it engaged holds it there after the prey changes (Rules Reference: Hunter)",
     "when another investigator has more Memory, the prey changes",
     "Age adds Years for defeat, danger and leaning (4)",
     "a second Age in the same interlude is refused",

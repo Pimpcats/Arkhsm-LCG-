@@ -635,7 +635,7 @@ step("board: prey follows on-card Memory", function(go)
       check("it hunts the investigator with the most Memory (not merely the nearest)", appointedAt(LOC_B.obj))
       ctl.call("shApiOnCardMemory", { id = "sthrelias", delta = 4 })
       ctl.call("shApiHunt")
-      check("an investigator at its location holds it there (Rules Reference: Hunter)", appointedAt(LOC_B.obj))
+      check("the investigator it engaged holds it there after the prey changes (Rules Reference: Hunter)", appointedAt(LOC_B.obj))
       -- Birdie leaves; now it goes for the investigator with the most Memory
       if alive(miniB) then miniB.destruct() end
       Wait.frames(function()

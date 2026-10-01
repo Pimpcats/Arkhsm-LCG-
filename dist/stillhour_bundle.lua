@@ -3332,6 +3332,7 @@ function Board.appointedCtx(extra)
     st.appointed.placed = false
     st.appointed.lastPos = nil
     st.appointed.noticeStage = nil
+    st.appointed.engagedAt = nil
     say("The Appointed recedes into shadow (Unseen).")
     return ok
   end
@@ -3347,19 +3348,36 @@ function Board.appointedCtx(extra)
     for _, l in ipairs(locs) do byGuid[l.guid] = l end
     local here = locationAt(locs, vec(safe(function() return card.getPosition() end)), 3.0)
     -- "Prey – ... only" (Rules Reference, Prey): it moves toward and engages
-    -- only its prey, as if no other investigator were in play, so another
-    -- investigator at its location does not stop it
+    -- only its prey, so an investigator it never engaged does not stop it.
+    -- Rules Reference, Hunter: an engaged enemy does not move, so the
+    -- investigator it engaged on arriving holds it there even after the prey
+    -- changes, until that location is empty.
+    if here and st.appointed.engagedAt == here.guid then
+      for _, g in ipairs(Board.occupied(locs)) do
+        if g == here.guid then
+          say("The Appointed is engaged with an investigator: it does not move.")
+          return false
+        end
+      end
+    end
+    st.appointed.engagedAt = nil
     local target, why = Board.preyLocation(locs, graph, here)
     if not target then say("The Appointed hunts, but no investigator minicard is on a location.") ; return false end
     local nextKey = here and Locations.stepToward(graph, here.guid, target) or target
     if nextKey == nil then say("The Appointed cannot reach its prey from here.") ; return false end
-    if here and nextKey == here.guid then say("The Appointed is already with its prey.") ; return false end
+    if here and nextKey == here.guid then
+      st.appointed.engagedAt = here.guid
+      say("The Appointed is already with its prey.")
+      return false
+    end
     local l = byGuid[nextKey]
     local pos, rot = placePosFor(l), rotFor(l)
     safe(function() card.setPosition({ pos.x, pos.y, pos.z }) end)
     safe(function() card.setRotation(rot) end)
     st.appointed.placed = true
     st.appointed.lastPos, st.appointed.lastRot = pos, rot
+    -- it engages its prey on arriving at the prey's location
+    if nextKey == target then st.appointed.engagedAt = nextKey end
     say("The Appointed moves to " .. (safe(function() return l.obj.getName() end) or "the next location")
       .. " (" .. why .. ").")
     return true
@@ -3891,6 +3909,26 @@ local function setDifficulty(i)
   return true
 end
 
+-- SCED respawns its bag on each setChaosBagState; a second refill sent while the
+-- first is still landing is lost, so changes that arrive together (two entries
+-- recorded in a row) wait for the refill in flight and then refill once more.
+local bagBusy, bagAgain = false, false
+local function refillBag(i)
+  if bagBusy then bagAgain = true ; return end
+  bagBusy = true
+  SCED.globalCall("setChaosBagState", bagFor(i))
+  Wait.time(function()
+    guarded("chaos bag", Dissonance.syncBag, bag)
+    bagBusy = false
+    if bagAgain then
+      bagAgain = false
+      refillBag(CampaignState.getDifficulty() or i)
+    else
+      refreshControl()
+    end
+  end, 1.5)
+end
+
 --- When a story result changes the campaign's chaos-bag tokens, refill SCED's
 -- bag (the chosen difficulty plus every change) and tell the table.
 refreshBag = function()
@@ -3912,11 +3950,7 @@ refreshBag = function()
   local what = table.concat(parts, ", ")
   local i = CampaignState.getDifficulty()
   if i and DIFFICULTY[i] and SCED.isPresent() then
-    SCED.globalCall("setChaosBagState", bagFor(i))
-    Wait.time(function()
-      guarded("chaos bag", Dissonance.syncBag, bag)
-      refreshControl()
-    end, 1.5)
+    refillBag(i)
     announce("Campaign chaos-bag change: " .. what .. " for the rest of the campaign (done on the chaos bag).")
   else
     announce("Campaign chaos-bag change: " .. what .. " for the rest of the campaign. Change the chaos bag by hand.")

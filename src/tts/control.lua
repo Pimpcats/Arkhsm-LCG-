@@ -398,6 +398,26 @@ local function setDifficulty(i)
   return true
 end
 
+-- SCED respawns its bag on each setChaosBagState; a second refill sent while the
+-- first is still landing is lost, so changes that arrive together (two entries
+-- recorded in a row) wait for the refill in flight and then refill once more.
+local bagBusy, bagAgain = false, false
+local function refillBag(i)
+  if bagBusy then bagAgain = true ; return end
+  bagBusy = true
+  SCED.globalCall("setChaosBagState", bagFor(i))
+  Wait.time(function()
+    guarded("chaos bag", Dissonance.syncBag, bag)
+    bagBusy = false
+    if bagAgain then
+      bagAgain = false
+      refillBag(CampaignState.getDifficulty() or i)
+    else
+      refreshControl()
+    end
+  end, 1.5)
+end
+
 --- When a story result changes the campaign's chaos-bag tokens, refill SCED's
 -- bag (the chosen difficulty plus every change) and tell the table.
 refreshBag = function()
@@ -419,11 +439,7 @@ refreshBag = function()
   local what = table.concat(parts, ", ")
   local i = CampaignState.getDifficulty()
   if i and DIFFICULTY[i] and SCED.isPresent() then
-    SCED.globalCall("setChaosBagState", bagFor(i))
-    Wait.time(function()
-      guarded("chaos bag", Dissonance.syncBag, bag)
-      refreshControl()
-    end, 1.5)
+    refillBag(i)
     announce("Campaign chaos-bag change: " .. what .. " for the rest of the campaign (done on the chaos bag).")
   else
     announce("Campaign chaos-bag change: " .. what .. " for the rest of the campaign. Change the chaos bag by hand.")

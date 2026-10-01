@@ -698,14 +698,17 @@ return function(H)
     ctl("shClickHour") ; ctl("shClickHour")
     check("The Thirteenth Toll: Hour III raises only the base 1", st().hour == 3 and st().dissonance == s0.dissonance + 1,
       list(st()))
+    local markIV = chatMark()
     ctl("shClickHour")
-    check("The Hour Was Wrong: the Hourglass steps from Hour III to Hour V; the Appointed Sensed",
-      st().hour == 5 and st().stage >= 1, list(st()))
-    ctl("shClickHour", true)
+    check("The Hour Was Wrong: Hour IV is reached, but its When reached does not resolve",
+      st().hour == 4 and chatHas(markIV, "does not resolve"), list(st()))
+    ctl("shClickHour")
+    check("...Hour V follows; the Appointed Sensed", st().hour == 5 and st().stage >= 1, list(st()))
+    ctl("shClickHour", true) ; ctl("shClickHour", true)
     check("...and rewinds from Hour V to Hour III", st().hour == 3, st().hour)
     times(8 - st().dissonance, function() ctl("shClickDissonance") end)
     check("Glitch band: 1 band Static token", st().static.baseline == 1 and st().static.target == 1, list(st().static))
-    times(2, function() ctl("shClickHour") end)
+    times(3, function() ctl("shClickHour") end)
     check("What the Almanac Hid: Hour VI leaves the bag 1 Static token short of its band (0)",
       st().hour == 6 and st().static.almanac == true and st().static.target == 0, list(st().static))
     local markVII = chatMark()

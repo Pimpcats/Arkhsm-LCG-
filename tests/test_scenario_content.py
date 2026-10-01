@@ -356,7 +356,8 @@ class ContentGapTests(unittest.TestCase):
     def test_hold_is_defined_where_it_is_used(self):
         text = CARDS["sthr-act-walksbeside"]["text"]
         self.assertRegex(text, r"\[action\][^.]*: Stand Firm\.")
-        self.assertIn("[wil] (X) or [com] (X)", text)
+        # official templating: "test [willpower] or [combat] (X)"
+        self.assertIn("[wil] or [com] (X)", text)
 
     def test_no_dead_cards_in_the_pool(self):
         """Every Still Hour card is played: in a scenario stack, in the player
