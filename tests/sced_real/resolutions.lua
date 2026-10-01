@@ -229,6 +229,7 @@ return function(H)
     local out = {}
     if ev.dissonance >= ev.reset then out[#out + 1] = "R2" end
     if ev.allDefeated then out[#out + 1] = "NR" end
+    if ev.allOut and not ev.allDefeated then out[#out + 1] = "R3" end   -- everyone resigned or was defeated
     if ev.hour >= 9 then out[#out + 1] = "R1" end
     return out[1], out
   end
@@ -565,6 +566,23 @@ return function(H)
     loopStart("NR")
     check("Begin Next Loop clears the tallies", hasLabel(cards.sthrelias, "Dissonance raised 0"), labels(cards.sthrelias))
     check("the log counts one Taken loop", logVal("taken") == 1)
+  end)
+
+  step("Loop R3 (You Walk Out of the Night): everyone resigned or was defeated", function()
+    restore("loop1")
+    local s = st()
+    local first, all = ORACLE.loop({ dissonance = s.dissonance, reset = 24, hour = s.hour, allOut = true })
+    check("oracle: R3", first == "R3" and #all == 1, list(all))
+    first = ORACLE.loop({ dissonance = s.dissonance, reset = 24, hour = 9, allOut = true })
+    check("oracle: R3 is read before R1 when both happened", first == "R3")
+    logClick("closed")
+    endLoop()
+    for _, id in ipairs(PARTY) do age(id, false) end          -- resigned: no defeat Year
+    check("resigned: 1 Year each, none for defeat", years("sthrbirdie") == 1 and years("sthrseraphine") == 1,
+      list({ years("sthrbirdie"), years("sthrseraphine") }))
+    ctl("shBeginNextLoop")
+    loopStart("R3")
+    check("the log counts one Closed at the Hour loop", logVal("closed") == 1, logVal("closed"))
   end)
 
   step("Part II begins after Loop 3 (Between Loops step 5)", function()

@@ -116,6 +116,9 @@ OV_PROP_KEYS = ("class", "deck", "difficulty", "encounter", "uses",
                 "elderSign", "signatures", "campaign_name", "index", "number",
                 "take")
 
+# card id -> (encounter set id, "a/total") — filled in main() (encounter_sets.py)
+ENC_MARKS = {}
+
 # owner watermark, printed in the official footer text/format on every card
 WATERMARK = "Pimpcats ACE"
 
@@ -1712,6 +1715,12 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
               fill=(225, 218, 202), grow=1.0)
     _box_text(d, CFG.upper_name, se_reg(kind, "Copyright"),
               fill=(225, 218, 202), grow=1.0)
+    if kind == "Asset" and c.get("encounter_set"):
+        # a story asset: its scenario's set symbol (top right) and number
+        _encounter_mark(img, d, "AssetStory", c, number=False)
+        en = se_reg("Asset", "EncounterNumber")
+        if c.get("number") and en:
+            _box_text(d, str(c["number"]), en, fill=(225, 218, 202), max_size=13, align="right")
     img.save(dest)
 
 
@@ -1941,6 +1950,33 @@ def _flow_rich(d, paras, box, obstacle, start=22, min_size=13, leading=1.24, gap
             cx += d.textlength(piece, font=font)
 
 
+def _encounter_mark(img, d, kind, c, number=True):
+    """The encounter-set symbol in the frame's set slot and the encounter
+    number ("4/18") in its footer, as official scenario cards print them
+    (pipeline/encounter_sets.py decides both; no drawing, no symbol)."""
+    sid = c.get("encounter_set")
+    if sid:
+        import encounter_sets
+        path = encounter_sets.icon_path(sid)
+        box = se_reg(kind, "Encounter-portrait-clip")
+        if path and box:
+            icon = Image.open(path).convert("RGBA")
+            w, h = box[2] - box[0], box[3] - box[1]
+            pad = int(min(w, h) * 0.12)
+            if kind in ("Location", "LocationBack"):
+                # the location frame prints no disc for the symbol: a small
+                # parchment one, as official locations show, so it reads on art
+                g = int(min(w, h) * 0.10)
+                d.ellipse([box[0] - g, box[1] - g, box[2] + g, box[3] + g],
+                          fill=(236, 226, 204), outline=(74, 60, 46), width=max(2, g // 2))
+                pad = int(min(w, h) * 0.16)
+            _paste_icon_fit(img, icon, (box[0] + pad, box[1] + pad, box[2] - pad, box[3] - pad))
+    if number and c.get("number") and kind not in ("Agenda", "Act"):
+        en = se_reg(kind, "EncounterNumber")
+        if en:
+            _box_text(d, str(c["number"]), en, fill=(110, 92, 72), max_size=13, align="right")
+
+
 def s_enemy(c, pt, dest, art_path=None, placement=None):
     tpl = "AHLCG-WeaknessEnemy" if c.get("weakness") else "AHLCG-Enemy"
     img, d = _se_frame_compose(tpl, "Enemy", "Portrait-portrait-clip",
@@ -1979,6 +2015,7 @@ def s_enemy(c, pt, dest, art_path=None, placement=None):
                           se_reg("Enemy", "{}{}".format(kind_key, i + 1)))
     _box_text(d, _wm(art_path), se_reg("Enemy", "Artist"),
               fill=(225, 218, 202), grow=1.0)
+    _encounter_mark(img, d, "Enemy", c)
     img.save(dest)
 
 
@@ -1999,6 +2036,7 @@ def s_treachery(c, pt, dest, art_path=None, placement=None):
     _box_text(d, _wm(art_path),
               se_reg(kind, "Artist") or se_reg("Treachery", "Artist"),
               fill=(225, 218, 202), grow=1.0)
+    _encounter_mark(img, d, kind, c)
     img.save(dest)
 
 
@@ -2132,6 +2170,7 @@ def s_location(c, pt, dest, art_path=None, placement=None):
                    fill=(84, 66, 50), italic=True, start=FLAVOR_PX, key="flavor")
     _box_text(d, _wm(art_path), se_reg(kind, "Copyright"),
               fill=(120, 100, 80), max_size=14)
+    _encounter_mark(img, d, kind, c)
     img.save(dest)
 
 
@@ -2171,6 +2210,7 @@ def s_agenda(c, pt, dest, art_path=None, placement=None):
                   fill=(238, 232, 216), pos_key="doom")
     _scenario_body(d, "Agenda", c, pt)
     _scenario_footer(d, "Agenda", c, art_path)
+    _encounter_mark(img, d, "Agenda", c)
     img.save(dest)
 
 
@@ -2211,6 +2251,7 @@ def s_act(c, pt, dest, art_path=None, placement=None):
                       fill=(238, 232, 216), pos_key="clues")
     _scenario_body(d, "Act", c, pt)
     _scenario_footer(d, "Act", c, art_path)
+    _encounter_mark(img, d, "Act", c)
     img.save(dest)
 
 
@@ -2264,6 +2305,7 @@ def s_scenario_back(kind, c, pt, dest):
     if rules:
         draw_wrapped(d, rules, bb[0], y, size, bb[2] - bb[0], PSD_INK,
                      leading=1.24)
+    _encounter_mark(img, d, kind + "Back", c, number=False)
     img.save(dest)
 
 
@@ -2333,6 +2375,7 @@ def s_scenario_ref(c, pt, dest, art_path=None, placement=None):
     else:
         _box_block(d, pt.get("text", ""), (body[0], y, body[2], body[3]),
                    start=BODY_PX, key="text")
+    _encounter_mark(img, d, "Chaos", c)
     img.save(dest)
 
 
@@ -2342,6 +2385,7 @@ def s_story(c, pt, dest, art_path=None, placement=None):
                                art_path, placement)
     _box_text(d, c["name"], se_reg("Story", "Name"), title=True, grow=1.15, key="name")
     _scenario_body(d, "Story", c, pt, traits=True)
+    _encounter_mark(img, d, "Story", c)
     img.save(dest)
 
 
@@ -2585,6 +2629,13 @@ def main():
     font_overrides = load_font_overrides()
     global FONT_OVERRIDE, FIELD_STYLE
     card_overrides = load_card_overrides()
+    global ENC_MARKS
+    try:
+        import encounter_sets
+        ENC_MARKS = encounter_sets.load()
+    except Exception as e:  # noqa: BLE001 - a campaign without sets prints none
+        print("encounter symbols skipped: {}".format(e))
+        ENC_MARKS = {}
     font_default = font_overrides.get("_default", {})
     fields_default = font_default.get("fields", {})
     for c in cards:
@@ -2596,6 +2647,11 @@ def main():
                        for k in set(fields_default) | set(fields_card)}
         pt = print_text.get(c["id"], {})
         c, pt = apply_card_overrides(c, pt, card_overrides.get(c["id"]))
+        if c["id"] in ENC_MARKS:
+            sid, num = ENC_MARKS[c["id"]]
+            c = dict(c, encounter_set=sid)
+            if "number" not in (card_overrides.get(c["id"]) or {}):
+                c["number"] = num
         if not pt.get("text"):
             missing_text.append(c["id"])
         art = art_index.get(c["id"])

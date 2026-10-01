@@ -105,6 +105,15 @@ def inline(text, size=None):
     for tok, letter in ICONS.items():
         t = t.replace(tok, '<font name="AHIcons">{}</font>'.format(letter))
     t = t.replace("[static]", "<b>[static]</b>")
+    # [set:<id>]: that encounter set's symbol (pipeline/render_set_icons.py)
+    def _set_icon(m):
+        import encounter_sets
+        path = encounter_sets.icon_path(m.group(1))
+        if not path:
+            return ""
+        h = (size or 10) * 0.95
+        return '<img src="{}" width="{:.1f}" height="{:.1f}" valign="-1"/>'.format(path, h, h)
+    t = re.sub(r"\[set:([a-z0-9_]+)\]", _set_icon, t)
     return t
 
 

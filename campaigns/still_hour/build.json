@@ -87,5 +87,20 @@
   "art_starter_copies": [
     "pipeline/art_manifest_starter.json"
   ],
-  "art_urls": "pipeline/art_urls.json"
+  "art_urls": "pipeline/art_urls.json",
+  "encounter_symbols": {
+    "_doc": "Encounter-set symbol per box (pipeline/encounter_sets.py): a box's own locations, acts and set-aside cards print this set's symbol; agendas, the reference and story cards print _default. Drawings: pipeline/render_set_icons.py.",
+    "_default": "occultation_skips",
+    "district_square": "node_square",
+    "district_lighthouse": "node_lighthouse",
+    "district_church": "node_church",
+    "district_road": "node_road",
+    "district_fairground": "node_fairground",
+    "district_almanac": "node_almanac",
+    "prologue": "occultation_skips",
+    "finale": "appointed",
+    "_cards": {
+      "sthr-crossing": "node_square"
+    }
+  }
 }

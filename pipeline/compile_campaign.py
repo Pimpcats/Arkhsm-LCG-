@@ -109,6 +109,8 @@ DISTRICT_ROW = {"district_fairground": 15.3, "district_lighthouse": 9.18,
 # OtherDoominPlay, MasterClueCounter); at -7.05 the Square's Named enemy lay
 # over the Master Clue Counter.
 DISTRICT_ACT_X, DISTRICT_SET_X = -13.8, -8.0
+# a district's set-aside stack (story assets), midway between the two
+DISTRICT_ASIDE_X = -10.9
 # the finale shares the loop's board: its set-aside stack goes where the
 # official boxes put set-aside cards, beside the encounter discard, clear of
 # the Square's set-aside stack. Never the mat's other corner snap
@@ -136,6 +138,11 @@ def stack_anchor(sc, stack):
                     "face_down": True}
         if stack == "named":
             return {"pos": (DISTRICT_SET_X, 1.62, z - 1.4), "rot": 270,
+                    "face_down": True}
+        if stack == "setup_aside" and sc.get("shared_from"):
+            # a district's set-aside cards (its story assets): face down in
+            # its own column, between its act deck and its encounter set
+            return {"pos": (DISTRICT_ASIDE_X, 1.62, z), "rot": 270,
                     "face_down": True}
     if sid == "finale" and stack == "setup_aside":
         return FINALE_ASIDE

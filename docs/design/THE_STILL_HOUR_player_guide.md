@@ -62,13 +62,17 @@ Each loop starts Dissonance at the **scar**: the number of loops you have comple
 
 These rules add to the Arkham Horror: The Card Game Rules Reference. Where they disagree with it, these rules win. Numbers are for **three investigators**; **Difficulty and Player Count** gives the other values, and the Control token applies them for you.
 
-**Loops.** A loop is one play of the night, from Loop Setup until the loop ends. A loop ends at once when the Hourglass reaches **Hour IX** (unless you begin the finale instead; see **The Last Hour**), when every investigator has been defeated, or when Dissonance reaches the **reset value** (24). For card text, "scenario" and "game" mean the current loop, and "interlude" means **Between Loops**. The Prologue is not a loop, but during the Prologue, "loop" on a card means the Prologue.
+**Loops.** A loop is one play of the night, from Loop Setup until the loop ends. A loop ends at once when the Hourglass reaches **Hour IX** (unless you begin the finale instead; see **The Last Hour**), when every investigator has been defeated or has resigned, or when Dissonance reaches the **reset value** (24). For card text, "scenario" and "game" mean the current loop, and "interlude" means **Between Loops**. The Prologue is not a loop, but during the Prologue, "loop" on a card means the Prologue.
 
 **Limits.** "Limit once per loop" and "Max once per loop" last until the loop ends. As in the Rules Reference, a limit applies to each investigator separately unless it says "group limit", and "Max" counts every copy of that card, for all investigators.
 
 **The reset.** When a loop ends, read its resolutions, then **Between Loops**. The board is cleared: every card the boxes laid out, and every token on those cards, leaves the table, and every [static] token leaves the chaos bag; then the scar's band puts back its own (see **Dissonance**). The Hourglass returns to Hour I, the Appointed returns to Unseen, and Dissonance restarts at the **scar**: the number of loops completed so far, maximum 6 at three investigators (see **Difficulty and Player Count**). Banked Memory, the Campaign Log and Years carry forward. Within a loop nothing resets: damage, horror, resources and cards in play stay as they are when you travel between districts.
 
 **Defeat.** Investigators do not suffer trauma in The Still Hour and are never killed. A defeated investigator is eliminated for the rest of the loop, as the Rules Reference describes; Memory on their cards is still banked at the reset. Defeat costs Years instead (see **Years**). An investigator leaves the campaign only by aging out, or in the finale.
+
+**Resigning.** The Square (the hub) has "[action]: Resign." A resigned investigator leaves the loop as the Rules Reference describes; Memory on their cards is still banked at the reset, and resigning is not a defeat (no Year for being defeated). No one can resign during the finale or the Prologue.
+
+**Story assets.** Some objectives ask you to take control of a set-aside **story asset** (an asset with an encounter-card back) with an [action] on the act, and bring it to another location. A story asset has no cost and no slot, and you cannot discard it or give it away. If its controller is defeated or resigns, place it at their location; as an [action], any investigator there may take control of it. When its act advances, it leaves the game; at the reset it returns to its box.
 
 **Parts of the campaign.** The campaign has three parts. They are not act cards.
 - **Part I — Learning the Rules.** Only each district's first objective (act 1a) can be completed.
@@ -257,7 +261,7 @@ Play every loop from here on the same way: set it up, play the night across the 
 
 **Loop Setup**
 1. If a loop or the Prologue just ended, click **Clear Board** on the Control token. Every card the boxes laid out, and every token on those cards, leaves the table. Each investigator heals all damage and horror, removes all clues, resources and Memory (it was banked Between Loops) from their cards and discards all resources, shuffles every card they own except permanent cards back into their deck, takes 5 resources and draws an opening hand of 5 cards (mulligan as normal).
-2. Press **Place** on **The Square (Town Hall)** box. It lays out the Square's locations, the **Hours** (agenda deck, Hour I on top), the scenario reference card, the shared encounter deck, the Square's act deck (in the district row between the mythos area and the map) and, set aside, the Appointed's cards (the Appointed, The Appointed's Approach, its Whispers, and two story cards whose text this guide gives).
+2. Press **Place** on **The Square (Town Hall)** box. It lays out the Square's locations, the **Hours** (agenda deck, Hour I on top), the scenario reference card, the shared encounter deck, the Square's act deck (in the district row between the mythos area and the map) and, set aside, the Appointed's cards (the Appointed, The Appointed's Approach, its Whispers, and two story cards whose text this guide gives) and the story asset **The Town Ledger**.
 3. Apply every Knowledge entry on your Campaign Log that changes the Hours (for example, an Hour removed from the Hours deck is taken out now).
 4. The Control token now shows **Hour I** and Dissonance at the **scar**: the number of loops completed so far, maximum **6** at three investigators (Reset Loop set both).
 5. **Choose the districts** you mean to visit this loop. For each one, press **Place** on its box: its locations join the map unrevealed (except any its entry says are revealed), its act deck takes its own spot in the district row, and its encounter set and any Named enemy go face down just below the mythos area. Shuffle each district's encounter set into the encounter deck. Leave each Named enemy set aside unless its district's entry says otherwise. Set up each district's act deck as **The Districts** describes. You may also Place another district's box later in the loop, immediately before an investigator moves into it; no investigator can move into a district whose box is not placed.
@@ -285,6 +289,13 @@ A loop ends the moment one of its endings happens. Before anything else, claim V
 - Each investigator gains the **+1 Year** for being defeated.
 - In your Campaign Log, mark this loop **Taken**.
 - If this is the **second or later** Taken loop, read this instead of the usual interlude story: *You have died in this town more times than you can hold in your head at once. Each of you keeps one of those deaths close, like a stone in a pocket, and it is heavier every time.*
+- Read the district resolutions, then proceed to **Between Loops.**
+```
+
+```resolution Resolution 3 — You Walk Out of the Night (every investigator resigned or was defeated, and at least one resigned)
+> You leave the Square by the hill road while the band is still playing. Behind you the night goes on without you, hour after hour, and at midnight it closes on an empty Square. Then the lanterns are being lit again, and you are standing where you always stand.
+- Each defeated investigator gains the **+1 Year** for being defeated; an investigator who resigned does not.
+- In your Campaign Log, mark this loop **Closed at the Hour**.
 - Read the district resolutions, then proceed to **Between Loops.**
 ```
 
@@ -351,7 +362,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > Far below, on the Sunken Road, the walkers have stopped. Every hood is turned toward the tower, waiting, as though someone once promised them a light.
 
-**When you Place this box:** The Lighthouse is reached only through the Sunken Road (The Turning connects to The Winding Stair; moving between them places no doom), so Place the Sunken Road's box too. The Lantern Room (revealed), The Winding Stair and The Keeper's Quarters join the map. Shuffle its encounter set (The Dark That Waits, Something on the Stair) into the encounter deck. Its act deck: **Light the Lamp** (1a) and **The Ninth Death** (2a).
+**When you Place this box:** The Lighthouse is reached only through the Sunken Road (The Turning connects to The Winding Stair; moving between them places no doom), so Place the Sunken Road's box too. The Lantern Room (revealed), The Winding Stair and The Keeper's Quarters join the map. Shuffle its encounter set ([set:node_lighthouse] The Dark That Waits, Something on the Stair) into the encounter deck. Its act deck: **Light the Lamp** (1a) and **The Ninth Death** (2a). Set aside **The Keeper's Logbook** (a story asset).
 
 **Do not read until the loop ends.**
 
@@ -388,7 +399,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > The kneeling congregation is murmuring now, all of them, the same two syllables over and over under the black water. You know the word. You were the one who said it first.
 
-**When you Place this box:** The Nave, The Belfry, The Vestry and The Flooded Crypt join the map. The Flooded Crypt enters play closed; it opens when **The Hour Was Wrong** becomes the current act, and enters play open (revealed) in every loop once your Campaign Log records The Hour Was Wrong. Shuffle its encounter set (The Drowned Choir, The Drowned Verger, Thirteen, Rising Water) into the encounter deck. Its act deck: **Why Thirteen?** (1a) and **The Hour Was Wrong** (2a). **Part II:** its Named enemy stays set aside until its act spawns it.
+**When you Place this box:** The Nave, The Belfry, The Vestry and The Flooded Crypt join the map. The Flooded Crypt enters play closed; it opens when **The Hour Was Wrong** becomes the current act, and enters play open (revealed) in every loop once your Campaign Log records The Hour Was Wrong. Shuffle its encounter set ([set:node_church] The Drowned Choir, The Drowned Verger, Thirteen, Rising Water) into the encounter deck. Its act deck: **Why Thirteen?** (1a) and **The Hour Was Wrong** (2a). Set aside **The Parish Register** and **The Drowned Page** (story assets). **Part II:** its Named enemy stays set aside until its act spawns it.
 
 **Do not read until the loop ends.**
 
@@ -427,7 +438,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > One of the walkers carries a book under their arm, bound in oilcloth like the keeper's log. As you pass, they turn it so you can see the spine. There is fresh ink on it.
 
-**When you Place this box:** The Milestones, The Low Bridge and The Turning join the map. Shuffle its encounter set (The Waiting Congregation, The Mile-Counter, The Bridge Remembers) into the encounter deck. Its act deck: **Walk It Backward** (1a) and **Who Walks Beside You** (2a).
+**When you Place this box:** The Milestones, The Low Bridge and The Turning join the map. Shuffle its encounter set ([set:node_road] The Waiting Congregation, The Mile-Counter, The Bridge Remembers) into the encounter deck. Its act deck: **Walk It Backward** (1a) and **Who Walks Beside You** (2a).
 
 **Do not read until the loop ends.**
 
@@ -464,7 +475,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > Near the back of the crowd a woman in a green shawl is not watching the sheriff. She is watching you, frowning, the way you frown at a word on the tip of your tongue.
 
-**Every loop:** the Square's box is placed in Loop Setup, so its locations (The Square and The Town Hall Steps revealed; The Well and The Records Office unrevealed), encounter set (The Crossing, The Band on the Steps, The Same Speech, The Crowd Turns) and act deck are always in play. Its act deck: **The Sheriff Is Already Dead** (1a) and **The Vote That Never Ends** (2a). **Part II:** its Named enemy stays set aside until its act spawns it.
+**Every loop:** the Square's box is placed in Loop Setup, so its locations (The Square and The Town Hall Steps revealed; The Well and The Records Office unrevealed), encounter set ([set:node_square] The Crossing, The Band on the Steps, The Same Speech, The Crowd Turns) and act deck are always in play. Its act deck: **The Sheriff Is Already Dead** (1a) and **The Vote That Never Ends** (2a). The Town Ledger (a story asset) is in the Square's set-aside stack. **Part II:** its Named enemy stays set aside until its act spawns it.
 
 **Do not read until the loop ends.**
 
@@ -503,7 +514,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > The ticket-taker catches your eye across the crowd and touches one finger to the side of his nose. A man who keeps a secret knows another who does.
 
-**When you Place this box:** The Wheel, The Hall of Mirrors and The Ticket Booth join the map. Shuffle its encounter set (The Barker, The Wheel's Turn, Your Reflection Lies) into the encounter deck. Its act deck: **The Wheel Still Turns** (1a) and **The Ticket-Taker's Bargain** (2a). **Part II:** shuffle its Named enemy into the encounter deck with its encounter set; it spawns at **The Wheel** when drawn.
+**When you Place this box:** The Wheel, The Hall of Mirrors and The Ticket Booth join the map. Shuffle its encounter set ([set:node_fairground] The Barker, The Wheel's Turn, Your Reflection Lies) into the encounter deck. Its act deck: **The Wheel Still Turns** (1a) and **The Ticket-Taker's Bargain** (2a). **Part II:** shuffle its Named enemy into the encounter deck with its encounter set; it spawns at **The Wheel** when drawn.
 
 **Do not read until the loop ends.**
 
@@ -542,7 +553,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > The page you brought up out of the flooded crypt lies on the bed of the press, dry now, and the type beside it has been set in the right order. Someone has been working here in the loops you were not watching.
 
-**When you Place this box:** The Reading Room, The Press and The Sealed Study join the map. The Sealed Study enters play closed; it opens when **The Appointed's Name** becomes the current act, and enters play open (revealed) in every loop once your Campaign Log records The Appointed's Name. Shuffle its encounter set (The Compositor, The Page That Wasn't, Ink Runs Backward, The Study Door) into the encounter deck. Its act deck: **What the Almanac Hid** (1a) and **The Appointed's Name** (2a).
+**When you Place this box:** The Reading Room, The Press and The Sealed Study join the map. The Sealed Study enters play closed; it opens when **The Appointed's Name** becomes the current act, and enters play open (revealed) in every loop once your Campaign Log records The Appointed's Name. Shuffle its encounter set ([set:node_almanac] The Compositor, The Page That Wasn't, Ink Runs Backward, The Study Door) into the encounter deck. Its act deck: **What the Almanac Hid** (1a) and **The Appointed's Name** (2a). Set aside **The Bound Almanac** (a story asset).
 
 **Do not read until the loop ends.**
 
@@ -690,13 +701,15 @@ You never need this with the boxes: **Place** builds every deck. Use it to build
 
 | Set | Cards (copies) | Used in |
 |---|---|---|
-| The Occultation | Lost Hour (3), Slippage (2) | Prologue, every loop |
-| Echoes of Ambergrove | The Waiting Congregation (2), The Drowned Choir (2), Familiar Face (1), The Lamplighter's Echo (1) | Prologue, every loop |
-| Strays of the Night | The Minute Hand (1) | Prologue, every loop |
-| Static | Wrong Turn (1), Stutter (1), Dead Air (1), The Loop Notices You (1) | Prologue, every loop |
-| The Weight of Years | A Year in a Night (2), What You've Forgotten (2), Old Bones (1) | Prologue, every loop |
-| The Square | The Crossing (1), The Band on the Steps (1), The Same Speech (1), The Crowd Turns (1) | every loop |
-| The Appointed | The Appointed's Whisper (2) | every loop from Part II; The Appointed and The Appointed's Approach are set aside |
+| [set:occultation_skips] The Occultation | Lost Hour (3), Slippage (2) | Prologue, every loop |
+| [set:echoes] Echoes of Ambergrove | The Waiting Congregation (2), The Drowned Choir (2), Familiar Face (1), The Lamplighter's Echo (1) | Prologue, every loop |
+| [set:strays] Strays of the Night | The Minute Hand (1) | Prologue, every loop |
+| [set:static] Static | Wrong Turn (1), Stutter (1), Dead Air (1), The Loop Notices You (1) | Prologue, every loop |
+| [set:weight_of_years] The Weight of Years | A Year in a Night (2), What You've Forgotten (2), Old Bones (1) | Prologue, every loop |
+| [set:node_square] The Square | The Crossing (1), The Band on the Steps (1), The Same Speech (1), The Crowd Turns (1) | every loop |
+| [set:appointed] The Appointed | The Appointed's Whisper (2) | every loop from Part II; The Appointed and The Appointed's Approach are set aside |
 | District sets | as each district's **When you Place this box** lists | when that district is placed |
+
+Every scenario card prints its set's symbol. A district's locations, acts and story assets print its district's symbol ([set:node_square] The Square, [set:node_lighthouse] The Lighthouse, [set:node_church] The Drowned Church, [set:node_road] The Sunken Road, [set:node_fairground] The Fairground, [set:node_almanac] The Almanac House); the Hours, the Prologue's cards and the story cards print [set:occultation_skips]; the Named print [set:named]; The Last Hour's cards print [set:appointed].
 
 The Prologue's deck is the first five sets (21 cards). A loop's deck is those five sets plus the Square's (25 cards), plus each placed district's set, plus the Whispers from Part II.
