@@ -171,7 +171,8 @@ Rules of thumb that follow from it:
 9. **Ramp the difficulty and teach first.** The first scenario teaches the
    signature verb with a forgiving clock. Pressure ramps up, and the finale is
    the hardest (the Circle Undone lesson). Target win rates by scenario come
-   from the owner's curve (docs/design/BALANCE.md).
+   from the owner's curve (the default is in the `/new-campaign` skill, step 4;
+   The Still Hour's measured curve is in docs/design/PLAYTEST_SIM.md).
 10. **Readable rules on every card.** Official templating, with the Rules
     Reference and errata in `library/rules/` as the authority. Check
     `python3 tools/library/search.py "<phrase>"` before inventing wording.

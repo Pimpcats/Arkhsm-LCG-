@@ -94,4 +94,4 @@ Official figures: 973 locations and 93 scenarios from 11 campaigns
 
 Measured with the play engine (`tools/play_engine/report.py`: a night counts
 as won only when every act of its goal is done) against the owner's curve:
-docs/design/BALANCE.md.
+docs/design/PLAYTEST_SIM.md.
