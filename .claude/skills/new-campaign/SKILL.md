@@ -41,8 +41,11 @@ carry on from the recorded stage. Report the stage in one line, then work.
 
 1. **Brief** (owner, 2 min). Theme, tone, players (default 3), length (default 8
    scenarios), must/never. Record in production.json.
-2. **Pitch.** 2–3 spoiler-free pitches: premise, the core mechanic in one
-   sentence, how scenarios connect, length. The owner picks (AskUserQuestion).
+2. **Pitch.** Read `docs/design/CAMPAIGN_DESIGN_LESSONS.md` first (what the
+   official campaigns do well and badly, and the official scenario shape). Then
+   write 2–3 spoiler-free pitches: premise, the core mechanic in one sentence, how
+   scenarios connect, length. Each passes that doc's pre-brief checklist. The
+   owner picks (AskUserQuestion).
 3. **Scaffold.**
    `python3 tools/new_campaign.py <id> "<Name>" --prefix <4 letters>`
    writes `campaigns/<id>/` (build.json, house art style, an EXAMPLE scenario,

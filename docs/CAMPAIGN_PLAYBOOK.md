@@ -53,8 +53,11 @@ The owner's view is `docs/NEW_CAMPAIGN.md`; the assistant's runbook is the
 ## 2. Brief and pitch (owner: 5 minutes)
 
 1. Owner gives theme, tone, player count, length and any must/never items.
-2. Assistant proposes 2–3 **non-spoiler** pitches: premise, the core mechanic
-   in one sentence, how scenarios connect, target length. Owner picks one.
+2. Assistant reads docs/design/CAMPAIGN_DESIGN_LESSONS.md (what the top and
+   mid-tier official campaigns do well, what the bottom tier does poorly, and
+   the official scenario shape), then proposes 2–3 **non-spoiler** pitches:
+   premise, the core mechanic in one sentence, how scenarios connect, target
+   length. Each pitch passes that doc's pre-brief checklist. Owner picks one.
 3. Record the brief in `campaigns/<id>/assistant/production.json`.
 
 Keep asks to the owner to real creative forks. Never ask the owner to author
