@@ -52,7 +52,7 @@ return function(R, T)
     { SURFACE.almanac, SURFACE.square, SURFACE.church, "the-vote-that-never-ends" }, { "sthr-act-appointedname" })
 
   -- the same districts on later nights (the owner's curve: Part I about 80% on
-  -- night 1 and 70% by night 3; Part II about 60% on night 4 and 50% by nights
+  -- night 1 and 70% by night 3; Part II about 60% on nights 4-5 and 50% on nights
   -- 6-7): that night's scar, Years and banked Memory, same boxes and objectives
   local function later(base, loops, years, banked)
     local c = {}
@@ -64,8 +64,12 @@ return function(R, T)
     S["district_" .. d .. "_n3"] = later(S["district_" .. d], 2, 3, 4)
     S["district_" .. d .. "_n3"].xp = "n3"
     S["district_" .. d .. "_p2"].xp = "n4"
+    S["district_" .. d .. "_p2_n5"] = later(S["district_" .. d .. "_p2"], 4, 7, 7)
+    S["district_" .. d .. "_p2_n5"].xp = "n5"
     S["district_" .. d .. "_p2_n6"] = later(S["district_" .. d .. "_p2"], 5, 9, 9)
     S["district_" .. d .. "_p2_n6"].xp = "n6"
+    S["district_" .. d .. "_p2_n7"] = later(S["district_" .. d .. "_p2"], 6, 10, 11)
+    S["district_" .. d .. "_p2_n7"].xp = "n7"
   end
 
   -- a typical Part I loop: the Square and two districts (loop 2, scar 1)

@@ -717,9 +717,16 @@
                 "from": [
                   "The Keeper's Quarters",
                   "The Winding Stair",
-                  "The Lantern Room"
+                  "The Lantern Room",
+                  "The Turning",
+                  "The Low Bridge",
+                  "The Milestones",
+                  "The Square",
+                  "The Town Hall Steps",
+                  "The Records Office",
+                  "The Well"
                 ],
-                "note": "clues are portable: the district's clues pay for its deep act (12-round loops)"
+                "note": "clues are portable: the Square is always in play (and the Sunken Road, the way to the Lighthouse), so its clues count toward this act"
               }
             }
           ]
@@ -831,9 +838,13 @@
                 "from": [
                   "The Nave",
                   "The Belfry",
-                  "The Vestry"
+                  "The Vestry",
+                  "The Square",
+                  "The Town Hall Steps",
+                  "The Records Office",
+                  "The Well"
                 ],
-                "note": "the Flooded Crypt is sealed until this fact"
+                "note": "the Flooded Crypt is sealed until this fact; clues are portable: the Square is always in play, so its clues count toward this act"
               }
             },
             {
@@ -1089,8 +1100,10 @@
                 "from": [
                   "The Town Hall Steps",
                   "The Records Office",
-                  "The Well"
-                ]
+                  "The Well",
+                  "The Square"
+                ],
+                "note": "clues are portable: the Square is always in play, so its clues count toward this act"
               }
             },
             {
@@ -1247,8 +1260,13 @@
                 "from": [
                   "The Wheel",
                   "The Hall of Mirrors",
-                  "The Ticket Booth"
-                ]
+                  "The Ticket Booth",
+                  "The Square",
+                  "The Town Hall Steps",
+                  "The Records Office",
+                  "The Well"
+                ],
+                "note": "clues are portable: the Square is always in play, so its clues count toward this act"
               }
             }
           ]
@@ -1360,9 +1378,13 @@
                 "clues": "card",
                 "from": [
                   "The Reading Room",
-                  "The Press"
+                  "The Press",
+                  "The Square",
+                  "The Town Hall Steps",
+                  "The Records Office",
+                  "The Well"
                 ],
-                "note": "the Sealed Study is sealed until this fact"
+                "note": "the Sealed Study is sealed until this fact; clues are portable: the Square is always in play, so its clues count toward this act"
               }
             },
             {
@@ -1456,9 +1478,10 @@
               "name": "Contest the Crossing",
               "needs": {
                 "contest": {
-                  "target": 7,
-                  "target_one_investigator": 6,
-                  "target_four_investigators": 8,
+                  "target": 6,
+                  "target_one_investigator": 5,
+                  "target_two_investigators": 5,
+                  "target_four_investigators": 6,
                   "sources": [
                     "Hold Back success (repeatable)",
                     "deep fact spent (max 6)",

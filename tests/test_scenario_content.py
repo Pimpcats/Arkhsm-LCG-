@@ -270,7 +270,7 @@ class ContentGapTests(unittest.TestCase):
 
     def test_feasibility_catches_a_solo_dead_end(self):
         cards = copy.deepcopy(CARDS)
-        cards["sthr-act-almanachid"].update(clues=6, clues_per_investigator=False)
+        cards["sthr-act-almanachid"].update(clues=15, clues_per_investigator=False)
         probs = SC.objective_feasibility(cards, ASSIGN, MANIFEST, 1)
         self.assertTrue(any("almanachid" in m for _, m in probs), probs)
         self.assertEqual(SC.objective_feasibility(cards, ASSIGN, MANIFEST, 3), [])
@@ -278,14 +278,14 @@ class ContentGapTests(unittest.TestCase):
     def test_contest_target_matches_the_engine(self):
         lua = open(os.path.join(ROOT, "src", "StillHour", "Constants.ttslua"),
                    encoding="utf-8").read()
-        self.assertIn("contestTarget = (n == 1) and 6 or ((n >= 4) and 8 or 7),", lua)
+        self.assertIn("contestTarget = (n <= 2) and 5 or 6,", lua)
         need = next(a for s in MANIFEST["scenarios"] if s["id"] == "finale"
                     for a in s["stacks"]["act_deck"]["cards"])["needs"]["contest"]
-        self.assertEqual((need["target"], need["target_one_investigator"], need["target_four_investigators"]),
-                         (7, 6, 8))
+        self.assertEqual((need["target"], need["target_one_investigator"], need["target_two_investigators"],
+                          need["target_four_investigators"]), (6, 5, 5, 6))
         act = CARDS["sthr-act-lasthour"]
         text = act["text"] + "\n" + act["back_text"]    # b side: the resolutions
-        for part in ("reaches 7 (6 with one investigator, 8 with four)", "Hold Back", "deep Knowledge entry", "Hour IX",
+        for part in ("reaches 6 (5 with one or two investigators)", "Hold Back", "deep Knowledge entry", "Hour IX",
                      "R1b"):
             self.assertIn(part, text)
 
@@ -345,7 +345,7 @@ class ContentGapTests(unittest.TestCase):
 
     def test_hold_is_defined_where_it_is_used(self):
         text = CARDS["sthr-act-walksbeside"]["text"]
-        self.assertIn("[action]: Stand Firm", text)
+        self.assertRegex(text, r"\[action\][^.]*: Stand Firm\.")
         self.assertIn("[wil] (X) or [com] (X)", text)
 
     def test_no_dead_cards_in_the_pool(self):

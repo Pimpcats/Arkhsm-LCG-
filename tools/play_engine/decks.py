@@ -74,8 +74,8 @@ FULL = {"Shotgun (4)", "Lightning Gun (5)", "Elder Sign Amulet (3)", "Bulletproo
         "Encyclopedia (2)", "Switchblade (2)", ".41 Derringer (2)", "Hired Muscle (1)", "Chicago Typewriter (4)",
         "Streetwise (3)", "Shrivelling (3)", "Shrivelling (5)", "Peter Sylvestre (2)", "Scrapper (3)"}
 # XP each investigator has spent on cards by that night (about two-thirds of the
-# Memory they earn; the rest buys Recollections): night 2, 3, 4, 6 and the finale
-TIERS = {"n2": 4, "n3": 8, "n4": 12, "n6": 20, "fin": 26}
+# Memory they earn; the rest buys Recollections): nights 2 to 7 and the finale
+TIERS = {"n2": 4, "n3": 8, "n4": 12, "n5": 16, "n6": 20, "n7": 24, "fin": 26}
 
 # basic weaknesses the engine encodes (one is drawn per investigator per game)
 WEAKNESSES = ["Paranoia", "Amnesia", "Haunted", "Psychosis", "Hypochondria", "Mob Enforcer",

@@ -592,7 +592,7 @@ Before the finale begins: if you completed a district's act 2a this loop, read t
 - when the Uninvited is defeated (its card says so);
 - each time a deep Knowledge entry is spent with the [action] on Contest the Crossing. Each entry can be spent once per finale. Note it on the Finale Record; it stays recorded for every other purpose, including the resolutions.
 
-When contest progress reaches **7** (**6** with one investigator, **8** with four), advance Contest the Crossing: the contest is reached. Every deep entry you carry into the finale is one step of it; the rest must be taken from the Appointed. During the finale, a Hold Back success does not rewind the Hourglass (the Control token knows this). The finale also ends, with the contest **not** reached, when Hour IX is reached, when every investigator has been defeated, or when Dissonance reaches the reset value.
+When contest progress reaches **6** (**5** with one or two investigators), advance Contest the Crossing: the contest is reached. Every deep entry you carry into the finale is one step of it; the rest must be taken from the Appointed. During the finale, a Hold Back success does not rewind the Hourglass (the Control token knows this). The finale also ends, with the contest **not** reached, when Hour IX is reached, when every investigator has been defeated, or when Dissonance reaches the reset value.
 
 During the finale, if your log records:
 - *You carry the walker's ring:* once during the finale, when an investigator takes the Hold Back action, they may resolve it without a skill test: push the Appointed back one stage, disengage and exhaust it. This counts as succeeding at Hold Back.
@@ -672,7 +672,7 @@ Then read **Epilogue — What the Years Took.**
 - **3 investigators:** every value as printed (Dissonance bands at 8 / 16, reset at 24, Memory cap 18, scar cap 6).
 - **2 or 4 investigators:** the reset comes at **8 × investigators**; the Glitch band starts at one-third of the reset and the Noticed band at two-thirds (rounded down: 5 / 10 at two, 10 / 21 at four). The Memory cap is **6 × investigators**, and the scar cap is **2 × investigators**. With **2 investigators**, each gets **+2 maximum health** and **+2 maximum sanity** (the Control token shows them).
 - **1 investigator:** use the two-investigator bands: the reset comes at **16**, the Noticed band at **10** and Glitch at **5**; the scar cap is **4**. The Memory cap is **6**. Your investigator gets **+3 maximum health** and **+3 maximum sanity** (the Control token shows the new maximums on their card). **Second wind:** once each loop (and once in the finale), when your investigator would be defeated, they are not: remove all damage and horror from them, and they gain **1 Year** (click **Years pending**).
-- The finale's contest is **7** at 2 or 3 investigators, **6** with one and **8** with four: its sources barely grow with the party, but four investigators get more tries at Hold Back each round.
+- The finale's contest is **6** at 3 or 4 investigators and **5** with one or two: its sources barely grow with the party, and a smaller party is worn down faster.
 - Values given "per investigator" (the finale's Memory thresholds) scale on their own.
 - The Control token applies all of these for you.
 - The campaign is tuned for about 6–8 loops.

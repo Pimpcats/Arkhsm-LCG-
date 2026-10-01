@@ -28,8 +28,9 @@ PRIMARY = {
     "district_lighthouse_p2": "sthr-act-ninthdeath", "district_fairground_p2": "sthr-act-bargain",
     "district_almanac_p2": "sthr-act-appointedname",
 }
-for _k in list(PRIMARY):                  # later-night variants (scenarios.lua: _n3, _p2_n6)
-    PRIMARY[_k + ("_n6" if _k.endswith("_p2") else "_n3")] = PRIMARY[_k]
+for _k in list(PRIMARY):                  # later-night variants (scenarios.lua: _n3, _p2_n5/_n6/_n7)
+    for _v in (("_n5", "_n6", "_n7") if _k.endswith("_p2") else ("_n3",)):
+        PRIMARY[_k + _v] = PRIMARY[_k]
 MULTI = {"loop_multi": ["sthr-act-whythirteen", "sthr-act-almanachid", "sthr-act-sheriffdead"]}
 TEMPO_KEY = {
     "district_square": ("square_surface", 0), "district_church": ("church_surface", 0),
