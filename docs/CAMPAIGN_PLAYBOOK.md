@@ -134,6 +134,16 @@ Coverage checklist:
 - Check that the model covers the fail states (Dissonance reset) and scales
   with player count. Still Hour's first model did neither.
 - Say plainly that a simulator checks the arithmetic of the pace, not play.
+- Then calibrate on the play engine (`tools/play_engine`, docs/design/PLAYTEST_SIM.md)
+  against the owner's win-rate curve **by night** (Still Hour: Prologue and
+  night 1 80%, nights 2–3 70%, 4–5 60%, 6–7 50%, finale 40% at three
+  investigators; never above 80%). Later nights must play from that night's
+  state (scar, Years, banked Memory) **with upgraded XP decks**; measure every
+  night of each pair, not one per pair, since the state can move a night by
+  10–25 points. Report to the owner by night, not by scenario variant.
+- Check every player count where a target is an integer (the finale's
+  contest goal): one step can move the win rate 25–50 points, so choose the
+  goal closest to the target per count and report the residual.
 
 ## 7. Guide and log
 
@@ -242,6 +252,17 @@ check misses text that runs under frame art. Known trouble spots:
 - A test that waits on a background job must check the job's outcome, not
   just that the worker went idle, and must not let its own output be
   captured by the app's log redirection.
+
+- The play engine lays out the table from `dist/`'s Saved Object (deck
+  contents and counts) while card values come from the campaign data. Publish
+  before a final verification run, and never publish while engine runs are
+  in progress: runs that start before the new `dist/` play the old decks.
+- Lua: `{ table.unpack and table.unpack(t) or unpack(t) }` keeps only the
+  first value (an and/or expression returns one). It made the engine's
+  enemies attack one at a time; copy lists with a loop.
+- Objective feasibility checks must count every clue source really in play
+  (the hub is always placed and clues are portable), or they flag costs the
+  engine meets.
 
 ## Definition of done (per campaign)
 

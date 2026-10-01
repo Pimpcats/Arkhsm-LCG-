@@ -90,12 +90,20 @@ the save at `/home/user/sce480/Arkham SCE 4.8.0.json` (or `--save` /
 | district_* | loop 1, scar 0 | I | You Are Unstuck | 2 (after interlude spending) | 0 |
 | district_*_p2 | loop 4, scar 3 | II | the district's surface entry and two others (the Almanac House also The Vote That Never Ends) | 5 | 6 (Weathered) |
 | loop_multi | loop 2, scar 1 | I | You Are Unstuck | 3 | 1 |
-| finale | loop 7, scar 6 | II | all six surface entries; deep: the Vote, the Name, the Hour Was Wrong, the Ninth Death; The Way the Night Breaks | 14 | 11 (Elder) |
+| district_*_n3 | loop 3, scar 2 (night 3) | I | You Are Unstuck | 4 | 3 |
+| district_*_p2_n5 / _n6 / _n7 | loops 5 / 6 / 7, scar 4 / 5 / 6 (nights 5-7) | II | as district_*_p2 | 7 / 9 / 11 | 7 / 9 / 10 |
+| finale | loop 7, scar 6 | II | the Square's, the Church's and the Almanac House's surface entries; deep: the Vote, the Name; The Way the Night Breaks | 12 | 10 (Elder) |
+
+Investigators play level-0 decks on nights 1-2 and upgraded decks after
+(`decks.py` `UPGRADES`, bought in order while the night's XP lasts:
+night 2 4 XP, 3 8, 4 12, 5 16, 6 20, 7 24, finale 26 per investigator,
+about two-thirds of the Memory earned; level 1-5 cards from SCED's own
+player cards, legal for each investigator).
 
 The finale is declared at the Sealed Study as soon as the whole party stands
 there (Square and Almanac House placed); the log records *the name is kept
-unspoken*, *the drowned heard the true hour*, *the vote still stands*, *the
-ninth line was left blank* and *the town was warned*.
+unspoken* and *the vote still stands*. Before 2026-10 the finale state held
+all six surface and four deep entries (the old unlock rule).
 
 ## Tuning round (2026-09-30)
 
@@ -274,8 +282,10 @@ now rarer than party defeats.
 - Campaign states are representative, not played through: each scenario
   restores a fixed Control blob and log (table above).
 - Player cards are engine data, not physical cards; damage, horror and
-  resources are tracked by the engine. Level-0 decks only; no Recollections
-  beyond Foreknowledge, Muscle Memory and I've Done This Before.
+  resources are tracked by the engine. Level-0 decks on nights 1-2, then a
+  fixed upgrade path per investigator (one path, not every combination a
+  group might build); no Recollections beyond Foreknowledge, Muscle Memory
+  and I've Done This Before.
 - Standard difficulty only. Doom on the Hours is tracked by the engine (the table's tokens are not moved).
 - Approximated: choices on Hour IV, Wrong Turn and Town Hall (AI picks);
   the Appointed's engagement (Control position plus engine engagement); the
