@@ -88,7 +88,8 @@ OV_SPEC_KEYS = ("name", "subtitle", "traits", "cost", "level", "victory",
                 "shroud", "clues", "doom", "back_shroud")
 OV_PT_KEYS = ("text", "flavor", "back_text", "back_flavor", "fight", "evade",
               "damage", "horror", "player", "investigator1", "xp1",
-              "investigator2", "xp2", "investigator3", "xp3", "unrevealed_flavor")
+              "investigator2", "xp2", "investigator3", "xp3", "unrevealed_flavor",
+              "unrevealed_text")
 # fields that are only ever str()-formatted onto the card (an "X" cost or "—"
 # is legal, so these aren't forced to int)…
 OV_NUMERIC_KEYS = ("cost", "level", "victory", "wil", "int", "com", "agi",
@@ -2639,10 +2640,12 @@ def main():
                                pt, back_dest)
             if c["type"] == "Location" and c.get("unrevealed"):
                 # the unrevealed side, as the card's back: name, traits, its
-                # own symbol, connections and a line of flavour; no shroud or
-                # clues (SCED spawns them when the location is revealed)
+                # own symbol, connections, its own rules (if any) and a line
+                # of flavour; no shroud or clues (SCED spawns them when the
+                # location is revealed)
                 s_location(dict(c, revealed=True),
-                           dict(pt, text="", flavor=pt.get("unrevealed_flavor", "")),
+                           dict(pt, text=pt.get("unrevealed_text", ""),
+                                flavor=pt.get("unrevealed_flavor", "")),
                            back_dest, art_path=art, placement=place)
             elif c["type"] == "Location" and (pt.get("back_text")
                                             or c.get("back_shroud") not in (None, "")):

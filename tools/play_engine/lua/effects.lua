@@ -35,7 +35,16 @@ return function(R, T)
     local wheel = R.locById("sthr-loc-wheel")
     if wheel then for _, inv in ipairs(R.investigatorsAt(wheel)) do horror(inv, 1, "The Wheel") end end
   end
-  function FX.endOfRound() end
+  --- The Flooded Crypt: "Forced – At the end of the round: Each investigator at the Flooded Crypt takes 1 damage."
+  function FX.endOfRound()
+    local crypt = R.locById("sthr-loc-floodedcrypt")
+    if crypt and crypt.revealed and not crypt.closed then
+      for _, inv in ipairs(R.investigatorsAt(crypt)) do
+        R.hurt(inv, 1, 0, "The Flooded Crypt")
+        if R.G.ended then return end
+      end
+    end
+  end
 
   --- The parts of "When reached" the Control token leaves to the players.
   function FX.onHourReached(h, cancelled)
@@ -48,6 +57,9 @@ return function(R, T)
     if h == 2 then
       for _, inv in ipairs(R.aliveInvs()) do R.drawEncounter(inv) end
     elseif h == 3 then
+      -- the Belfry's unrevealed side: "Forced – When Hour III is reached: Reveal the Belfry."
+      local belfry = R.locById("sthr-loc-belfry")
+      if belfry and not belfry.revealed and not belfry.closed then R.reveal(belfry) end
       local atChurch = false
       for _, inv in ipairs(R.aliveInvs()) do if (R.locOf(inv) or {}).district == "Church" then atChurch = true end end
       if atChurch and not R.knows("the-thirteenth-toll") then R.raise(1, "Hour III (Church)") end
@@ -196,6 +208,8 @@ return function(R, T)
   cov("sthr-loc-turning") ; cov("sthr-loc-lanternroom") ; cov("sthr-loc-windingstair") ; cov("sthr-loc-keepersquarters")
   cov("sthr-loc-wheel") ; cov("sthr-loc-hallofmirrors") ; cov("sthr-loc-ticketbooth") ; cov("sthr-loc-readingroom")
   cov("sthr-loc-press") ; cov("sthr-loc-sealedstudy") ; cov("sthr-loc-longpier")
+  cov("sthr-loc-readingroom", "full; the [reaction] is always taken")
+  cov("sthr-loc-hubsquare", "full; the party never resigns (a resigned investigator cannot win the loop's objectives)")
 
   function FX.onEnter(inv, L)
     local G = R.G
@@ -203,6 +217,10 @@ return function(R, T)
     if L.id == "sthr-loc-almanacsteps" then R.raise(1, "The Almanac Steps") end
     if L.id == "sthr-loc-belfry" and not R.knows("the-thirteenth-toll") then R.raise(1, "The Belfry") end
     if L.id == "sthr-loc-well" and not R.knows("the-sheriff-is-already-dead") then horror(inv, 1, "The Well") end
+    if L.id == "sthr-loc-nave" and not R.test(inv, "wil", 2, { kind = "location" }) then horror(inv, 1, "The Nave") end
+    if L.id == "sthr-loc-lowbridge" and not R.test(inv, "agi", 2, { kind = "location" }) then
+      R.hurt(inv, 1, 0, "The Low Bridge")
+    end
     if L.id == "sthr-loc-ticketbooth" and not G.logFlags["You hold the ticket"] then
       inv.resources = math.max(0, inv.resources - 1)
     end
@@ -811,6 +829,12 @@ return function(R, T)
 
   --- The Drowned Verger: after you discover a clue at the Vestry, it engages you.
   function FX.afterDiscover(inv, L)
+    if L.id == "sthr-loc-milestones" and not R.knows("the-road-remembers") then
+      if not R.test(inv, "wil", 2, { kind = "location" }) then horror(inv, 1, "The Milestones") end
+      return
+    end
+    -- the Reading Room's [reaction] (always taken): the last clue places 1 Memory
+    if L.id == "sthr-loc-readingroom" and R.clues(L) == 0 then R.addMemory(inv, 1, "The Reading Room") return end
     if L.id ~= "sthr-loc-vestry" then return end
     for _, en in ipairs(R.G.enemies) do
       if en.id == "sthr-drownedverger" and en.loc == L.guid and not en.exhausted and not en.engaged then

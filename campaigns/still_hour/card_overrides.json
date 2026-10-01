@@ -4,62 +4,71 @@
     "text": "The night begins.",
     "doom": 3,
     "back_flavor": "Lanterns bob across the Square. Somewhere a band is tuning up for midnight. Above it all, one by one, the stars begin to go out.",
-    "back_text": "Set this Hour aside beside the Hours deck. Hour II becomes the current agenda: resolve its “When reached” text."
+    "back_text": "Set this Hour aside beside the Hours deck. Hour II becomes the current agenda: resolve its “When reached” text.",
+    "flavor": "It is eleven o'clock. The almanac promised the occultation at midnight, and the whole town has come out to watch the sky."
   },
   "sthr-hour-2": {
     "name": "Hour II — Low Water",
     "text": "When reached: Each investigator draws 1 encounter card.",
     "doom": 2,
     "back_flavor": "The tide draws back from the Long Pier, farther than any tide should, and does not come in again. The harbour smells of something left too long in the dark.",
-    "back_text": "Set this Hour aside beside the Hours deck. Hour III becomes the current agenda: resolve its “When reached” text."
+    "back_text": "Set this Hour aside beside the Hours deck. Hour III becomes the current agenda: resolve its “When reached” text.",
+    "flavor": "Down at the harbour a bell is ringing, though there is no wind to ring it."
   },
   "sthr-hour-3": {
     "name": "Hour III — The Thirteenth Toll",
     "text": "When reached: Raise Dissonance by 1. If any investigator is at a Church location and your Campaign Log does not record The Thirteenth Toll, raise it by 2 instead.",
     "doom": 2,
     "back_flavor": "The church bell counts the hour. Twelve. A pause, long enough to hope. Thirteen.",
-    "back_text": "Set this Hour aside beside the Hours deck. Hour IV becomes the current agenda (if Hour IV has been removed, Hour V does): resolve its “When reached” text."
+    "back_text": "Set this Hour aside beside the Hours deck. Hour IV becomes the current agenda (if Hour IV has been removed, Hour V does): resolve its “When reached” text.",
+    "flavor": "Somewhere above the rooftops, a bell begins to count."
   },
   "sthr-hour-4": {
     "name": "Hour IV — The Road Gives Way",
     "text": "When reached: The lead investigator chooses a revealed location other than the Square with the fewest clues. Until the Hourglass next advances or rewinds, it is impassable. Each investigator there moves to a connecting location of their choice (this does not place doom).",
     "doom": 2,
     "back_flavor": "Out past the Milestones the road simply stops being there. The walkers on it do not break stride.",
-    "back_text": "Set this Hour aside beside the Hours deck. Hour V becomes the current agenda: resolve its “When reached” text."
+    "back_text": "Set this Hour aside beside the Hours deck. Hour V becomes the current agenda: resolve its “When reached” text.",
+    "flavor": "Out at the edge of town, the lamps go out one street at a time."
   },
   "sthr-hour-5": {
     "name": "Hour V — The Streets Empty",
     "text": "When reached: The Appointed's Approach advances to at least Sensed.",
     "doom": 2,
     "back_flavor": "The fair's music plays on for no one. Doors stand open along every street. The town has gone somewhere without moving.",
-    "back_text": "Set this Hour aside beside the Hours deck. Hour VI becomes the current agenda: resolve its “When reached” text."
+    "back_text": "Set this Hour aside beside the Hours deck. Hour VI becomes the current agenda: resolve its “When reached” text.",
+    "flavor": "The crowd in the Square thins. Nobody remembers going home."
   },
   "sthr-hour-6": {
     "name": "Hour VI — The Wrong Sky",
     "text": "When reached: Add 1 Static token to the chaos bag until the end of the loop. If your Campaign Log records What the Almanac Hid, instead: until the end of the loop, the chaos bag holds 1 fewer Static token than its band calls for (never fewer than 0). (This does not stack: if Hour VI has already resolved this loop, it has no further effect.)",
     "doom": 2,
     "back_flavor": "The sky is wrong in a new way now: a starless patch the shape of an open door, fraying at its edges.",
-    "back_text": "Set this Hour aside beside the Hours deck. Hour VII becomes the current agenda: resolve its “When reached” text."
+    "back_text": "Set this Hour aside beside the Hours deck. Hour VII becomes the current agenda: resolve its “When reached” text.",
+    "flavor": "Look up. Count the stars. Count them again."
   },
   "sthr-hour-7": {
     "name": "Hour VII — The Guest Approaches",
     "text": "When reached: The Appointed's Approach advances to at least Emerging. If your Campaign Log records The Appointed's Name, exhaust the Appointed.",
     "doom": 2,
     "back_flavor": "Every dog in Ambergrove faces the same way. Something is coming up the hill toward the Square, politely, with all the time in the world.",
-    "back_text": "Set this Hour aside beside the Hours deck. Hour VIII becomes the current agenda: resolve its “When reached” text."
+    "back_text": "Set this Hour aside beside the Hours deck. Hour VIII becomes the current agenda: resolve its “When reached” text.",
+    "flavor": "Somewhere below the Square, footsteps on the hill road: unhurried, certain."
   },
   "sthr-hour-8": {
     "name": "Hour VIII — Almost",
     "text": "When reached: Raise Dissonance by 2. The Appointed's Approach advances to Arrived. Until the end of the loop, each enemy gets +1 fight (including enemies that enter play later; this does not stack).",
     "doom": 2,
     "back_flavor": "One minute to midnight. It has been one minute to midnight for a very long time. The seam in the sky pulls taut.",
-    "back_text": "Set this Hour aside beside the Hours deck. Hour IX becomes the current agenda: resolve its “When reached” text."
+    "back_text": "Set this Hour aside beside the Hours deck. Hour IX becomes the current agenda: resolve its “When reached” text.",
+    "flavor": "The minute hand of the town clock trembles at the twelve and does not fall."
   },
   "sthr-hour-9": {
     "name": "Hour IX — The Appointed Hour",
     "text": "When reached: In the Prologue, (→R2). In the finale, the finale ends and the contest is not reached. Otherwise, the loop ends (→Loop Resolution 1), unless your Campaign Log records The Way the Night Breaks and you begin the finale instead.",
     "back_flavor": "The occultation completes, exactly as the almanac promised.",
-    "back_text": ""
+    "back_text": "",
+    "flavor": "The last of the stars goes out."
   },
   "sthr-losthour": {
     "name": "Lost Hour",
@@ -320,7 +329,8 @@
     ],
     "text": "Investigators cannot move from the Winding Stair to the Lantern Room except with this ability.\n[action]: Test [agi] (2). If you succeed, move to the Lantern Room. If you fail, take 1 damage.",
     "unrevealed": true,
-    "unrevealed_flavor": "Iron steps spiral up into the dark. You can hear them ring under feet that are not yours."
+    "unrevealed_flavor": "Iron steps spiral up into the dark. You can hear them ring under feet that are not yours.",
+    "unrevealed_text": "The Lantern Room can be entered only from the Winding Stair."
   },
   "sthr-loc-keepersquarters": {
     "name": "The Keeper's Quarters",
@@ -387,7 +397,7 @@
     "flavor": "The congregation is still here. They have been kneeling since the first toll.",
     "unrevealed": true,
     "unrevealed_flavor": "Water laps at the church doors. Inside, lamplight lies on it like oil.",
-    "text": ""
+    "text": "Forced – After you enter the Nave: Test [wil] (2). If you fail, take 1 horror."
   },
   "sthr-loc-belfry": {
     "name": "The Belfry",
@@ -406,7 +416,8 @@
     ],
     "unrevealed": true,
     "unrevealed_flavor": "The bell rope disappears up through a hole in the ceiling. It is swaying, though there is no wind.",
-    "text": "Forced – After you enter the Belfry: If your Campaign Log does not record The Thirteenth Toll, raise Dissonance by 1."
+    "text": "Forced – After you enter the Belfry: If your Campaign Log does not record The Thirteenth Toll, raise Dissonance by 1.",
+    "unrevealed_text": "Forced – When Hour III is reached: Reveal the Belfry."
   },
   "sthr-loc-floodedcrypt": {
     "name": "The Flooded Crypt",
@@ -414,7 +425,7 @@
     "victory": 1,
     "shroud": 4,
     "clues": 3,
-    "text": "Closed. It opens when The Hour Was Wrong becomes the current act. Once your Campaign Log records The Hour Was Wrong, it enters play open (revealed).",
+    "text": "Forced – At the end of the round: Each investigator at the Flooded Crypt takes 1 damage.",
     "clues_per_investigator": true,
     "icons": "spade",
     "color": "#1c2a52",
@@ -426,7 +437,8 @@
     ],
     "unrevealed": true,
     "unrevealed_flavor": "Steps go down into the water and do not come up again.",
-    "flavor": "The water is colder than the sea it came from."
+    "flavor": "The water is colder than the sea it came from.",
+    "unrevealed_text": "Closed. It opens when The Hour Was Wrong becomes the current act. Once your Campaign Log records The Hour Was Wrong, it enters play open (revealed)."
   },
   "sthr-loc-vestry": {
     "name": "The Vestry",
@@ -480,7 +492,7 @@
     "flavor": "The road between the town and the shore, counted out in stones that never change.",
     "unrevealed": true,
     "unrevealed_flavor": "Stone markers along the verge, each one carved with a number. The numbers do not go in order.",
-    "text": ""
+    "text": "Forced – After you discover a clue at the Milestones: If your Campaign Log does not record The Road Remembers, test [wil] (2). If you fail, take 1 horror."
   },
   "sthr-loc-lowbridge": {
     "name": "The Low Bridge",
@@ -503,7 +515,7 @@
     "flavor": "The water never quite reaches the top. It never quite goes down.",
     "unrevealed": true,
     "unrevealed_flavor": "A humpbacked bridge over a stream that should not be this deep.",
-    "text": ""
+    "text": "Forced – After you enter the Low Bridge: Test [agi] (2). If you fail, take 1 damage."
   },
   "sthr-loc-turning": {
     "name": "The Turning",
@@ -717,7 +729,7 @@
     "flavor": "Ayako has read every book in it a hundred times.",
     "unrevealed": true,
     "unrevealed_flavor": "Shelves to the ceiling, and a long table laid with open almanacs, all turned to the same page.",
-    "text": ""
+    "text": "[reaction] After you discover the last clue at the Reading Room: Place 1 Memory on your investigator card."
   },
   "sthr-loc-press": {
     "name": "The Press",
@@ -744,7 +756,7 @@
     "victory": 1,
     "shroud": 4,
     "clues": 3,
-    "text": "Closed. It opens when The Appointed's Name becomes the current act. Once your Campaign Log records The Appointed's Name, it enters play open (revealed).\n[free]: Begin the finale. Only during your turn, and only if your Campaign Log records The Way the Night Breaks.",
+    "text": "[free]: Begin the finale. Only during your turn, and only if your Campaign Log records The Way the Night Breaks.",
     "clues_per_investigator": true,
     "icons": "doubleslash",
     "color": "#5c4a2a",
@@ -756,7 +768,8 @@
     ],
     "unrevealed": true,
     "unrevealed_flavor": "A study door that no key in Ambergrove fits.",
-    "flavor": "Inside, it is eleven o'clock exactly, and always has been."
+    "flavor": "Inside, it is eleven o'clock exactly, and always has been.",
+    "unrevealed_text": "Closed. It opens when The Appointed's Name becomes the current act. Once your Campaign Log records The Appointed's Name, it enters play open (revealed)."
   },
   "sthr-pagethatwasnt": {
     "name": "The Page That Wasn't",
@@ -782,7 +795,7 @@
     "traits": "Ambergrove. Central.",
     "shroud": 1,
     "clues": 2,
-    "text": "Each loop begins here. The first time each round any investigator moves along a given connection between two districts, place 1 doom on the current Hour (see the Campaign Guide).",
+    "text": "Each loop begins here. The first time each round any investigator moves along a given connection between two districts, place 1 doom on the current Hour.\n[action]: Resign. You cannot resign during the finale.",
     "flavor": "Everyone is out for the occultation. None of them will look at you twice — not this time, not ever.",
     "icons": "star",
     "color": "#1a605e",

@@ -353,7 +353,7 @@ return function(R, T)
   function A.prepareTest(inv, skill, diff, base, opts)
     local G = R.G
     local target = opts.target or (opts.important and 0.72 or 0.6)
-    if opts.kind == "treachery" then target = 0.7 end
+    if opts.kind == "treachery" or opts.kind == "location" then target = 0.7 end
     local committed, boost = {}, 0
     inv.lastCommitted = {}
     local function p() local t = base + boost for _, c in ipairs(committed) do t = t + c.icons end return R.prob(inv, t - diff) end

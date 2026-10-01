@@ -32,7 +32,7 @@ return function(R, T)
   ------------------------------------------------------------ skill tests --
 
   --- Perform a skill test. opts.kind: investigate | fight | evade | treachery |
-  -- ability | holdback | act; opts.peril: no help from others;
+  -- location | ability | holdback | act; opts.peril: no help from others;
   -- opts.important: worth resources and cards; opts.target: wanted P(success).
   -- Returns success, margin, token name.
   function R.test(inv, skill, diff, opts)
