@@ -890,7 +890,7 @@
   "sthr-act-hourwaswrong": {
     "name": "The Hour Was Wrong",
     "clues": 2,
-    "text": "Part II only.\nForced – When this act becomes the current act: The Flooded Crypt opens. Spawn the set-aside The Bell-Ringer Beneath enemy at The Flooded Crypt.\n[action] Investigators at The Flooded Crypt spend 2 [perinv] clues, as a group: Take control of the set-aside Drowned Page asset. Only an investigator at The Flooded Crypt may trigger this ability.\nObjective – If the investigator who controls Drowned Page is at The Vestry, advance.",
+    "text": "Part II only.\nForced – When this act becomes the current act: The Flooded Crypt opens. Spawn the set-aside The Bell-Ringer Beneath at The Flooded Crypt.\n[action] Investigators at The Flooded Crypt spend 2 [perinv] clues, as a group: Take control of the set-aside Drowned Page asset. Only an investigator at The Flooded Crypt may trigger this ability.\nObjective – If the investigator who controls Drowned Page is at The Vestry, advance.",
     "deck": 95105,
     "index": "2a",
     "flavor": "Below the bell, below the water, the church keeps what it was told to keep. Bring it up to the Vestry and read it against the register before the water takes the ink.",
@@ -915,7 +915,7 @@
   },
   "sthr-act-walksbeside": {
     "name": "Who Walks Beside You",
-    "text": "Part II only.\nForced – When this act becomes the current act: Search the encounter deck and discard pile for a Waiting Congregation, spawn it at The Turning and shuffle the encounter deck.\nWhile this act is the current act, each Echo at The Turning is not Sleepwalking.\nObjective – [action] Investigators at The Turning spend 2 [perinv] clues, as a group: Stand Firm. Choose a ready Echo at The Turning and test [wil] or [com] (X), where X is its fight value. If you succeed, exhaust it and advance. If you fail, place the spent clues on The Turning.\n[reaction] After an investigator at The Turning evades an Echo there, investigators at The Turning spend 2 [perinv] clues, as a group: Advance.",
+    "text": "Part II only.\nForced – When this act becomes the current act: Search the encounter deck and discard pile for a Waiting Congregation, spawn it at The Turning and shuffle the encounter deck.\nEach Echo at The Turning is not Sleepwalking.\nObjective – [action] Investigators at The Turning spend 2 [perinv] clues, as a group: Stand Firm. Choose a ready Echo at The Turning and test [wil] or [com] (X), where X is its fight value. If you succeed, exhaust it and advance. If you fail, place the spent clues on The Turning.\n[reaction] After an investigator at The Turning evades an Echo there, investigators at The Turning spend 2 [perinv] clues, as a group: Advance.",
     "flavor": "Some of them turn to look at you now.",
     "deck": 95107,
     "index": "2a",
@@ -939,7 +939,7 @@
   "sthr-act-vote": {
     "name": "The Vote That Never Ends",
     "clues": 2,
-    "text": "Part II only.\nForced – When this act becomes the current act: Spawn the set-aside What Wears the Sheriff enemy at The Town Hall Steps.\n[action] Investigators at The Records Office spend 2 [perinv] clues, as a group: Take control of the set-aside Town Ledger asset. Only an investigator at The Records Office may trigger this ability.\nObjective – If the investigator who controls Town Ledger is at The Town Hall Steps, advance.",
+    "text": "Part II only.\nForced – When this act becomes the current act: Spawn the set-aside What Wears the Sheriff at The Town Hall Steps.\n[action] Investigators at The Records Office spend 2 [perinv] clues, as a group: Take control of the set-aside Town Ledger asset. Only an investigator at The Records Office may trigger this ability.\nObjective – If the investigator who controls Town Ledger is at The Town Hall Steps, advance.",
     "flavor": "The Records Office keeps every decision the town ever made. The speech on the steps is one of them, read again every night.",
     "deck": 95109,
     "index": "2a",

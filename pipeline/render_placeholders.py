@@ -502,16 +502,29 @@ def _trigger_lead(paragraph):
 
 
 def _para_lines(draw, text, size, max_width, italic=False, bold=False,
-                font_file=None):
+                font_file=None, y0=0, narrow=None, leading=1.25):
     """Wrap [markup] text into a list of paragraphs, each a list of lines of
     (is_glyph, chunk) runs. Paragraph structure is preserved so callers can put
-    a gap between abilities."""
+    a gap between abilities.
+
+    `narrow` = (y, width): a line drawn from `y0` that would reach below y wraps
+    at `width` instead (text flowing beside an act's clue circle)."""
+    lh_ = int(size * leading)
+    pgap_ = int(lh_ * PARA_GAP_FRAC)
+    ycur = [y0]
+
+    def width_now():
+        if narrow and ycur[0] + lh_ > narrow[0]:
+            return narrow[1]
+        return max_width
     tfont = _font(size, italic=italic, bold=bold, font_file=font_file)
     kfont = _font(size, italic=italic, bold=True, font_file=font_file)
     gfont = _font(size, glyph=True)
     gpad = int(size * GLYPH_PAD_FRAC)
     paras = []
-    for paragraph in _abilities(text).split("\n"):
+    for pn, paragraph in enumerate(_abilities(text).split("\n")):
+        if pn:
+            ycur[0] += pgap_
         paragraph, nkey = _trigger_lead(paragraph)
         words = []
         for is_glyph, chunk in glyphify(paragraph):
@@ -535,12 +548,14 @@ def _para_lines(draw, text, size, max_width, italic=False, bold=False,
             glyph = is_glyph is True
             piece = w if glyph else (w + " ")
             plen = draw.textlength(piece, font=font) + (gpad if glyph else 0)
-            if line and width + plen > max_width:
+            if line and width + plen > width_now():
                 lines.append(line)
+                ycur[0] += lh_
                 line, width = [], 0.0
             line.append((is_glyph, piece))
             width += plen
         lines.append(line or [(False, "")])
+        ycur[0] += lh_
         paras.append(lines)
     return paras
 
@@ -565,7 +580,7 @@ def _wrapped_height(text, size, nlines, leading):
 
 
 def draw_wrapped(draw, text, x, y, size, max_width, fill, italic=False,
-                 leading=1.25, bold=False, font_file=None):
+                 leading=1.25, bold=False, font_file=None, narrow=None):
     tfont = _font(size, italic=italic, bold=bold, font_file=font_file)
     kfont = _font(size, italic=italic, bold=True, font_file=font_file)
     gfont = _font(size, glyph=True)
@@ -579,7 +594,8 @@ def draw_wrapped(draw, text, x, y, size, max_width, fill, italic=False,
     pgap = int(lh * PARA_GAP_FRAC)
     for pi, lines in enumerate(_para_lines(draw, text, size, max_width,
                                            italic=italic, bold=bold,
-                                           font_file=font_file)):
+                                           font_file=font_file, y0=y,
+                                           narrow=narrow, leading=leading)):
         if pi:
             y += pgap
         for line in lines:
@@ -2070,29 +2086,51 @@ def _scenario_body(d, kind, c, pt, traits=False, top=None):
     if not b:
         return
     y = top if top is not None else b[1]
-    bottom = b[3]
-    clues = se_reg(kind, "Clues") if kind == "Act" else None
-    if clues:
-        # keep act-front text above the clue-threshold icon
-        bottom = min(bottom, clues[1] - 6)
-    b = (b[0], y, b[2], bottom)
+    b = (b[0], y, b[2], b[3])
     if traits and c.get("traits"):
         _box_text(d, c["traits"], (b[0], y, b[2], y + 36),
                   bold=True, italic=True, max_size=BODY_PX, key="traits")
         y += 40
+    both = None
     if kind in ("Agenda", "Act") and pt.get("flavor") and pt.get("text"):
+        both = "{}\n{}".format(pt["flavor"], pt["text"])
+
+    # the act's clue circle sits in the body's lower-right corner: official
+    # acts run the text full width above it and wrap the lines beside it short
+    clues = se_reg(kind, "Clues") if kind == "Act" else None
+    narrow = (clues[1] - 6, clues[0] - 8 - b[0]) if clues else None
+    bw = b[2] - b[0]
+
+    def end_y(txt, size, y0, italic=False):
+        n_lines, n_paras = 0, 0
+        for para in _para_lines(d, txt, size, bw, italic=italic, y0=y0,
+                                narrow=narrow, leading=1.24):
+            n_paras += 1
+            n_lines += len(para)
+        lh = int(size * 1.24)
+        return y0 + n_lines * lh + max(0, n_paras - 1) * int(lh * PARA_GAP_FRAC)
+
+    def fits(size):
+        if both:
+            yy = end_y(pt["flavor"], size, y, italic=True)
+            return end_y(pt["text"], size, yy + 10) <= b[3]
+        return end_y(pt.get("text", ""), size, y) <= b[3]
+
+    if both or (narrow and pt.get("text") and not pt.get("flavor")):
         # official agenda/act fronts: the story in italics first, rules below
         # it; both share one size so neither crowds the other out
-        both = "{}\n{}".format(pt["flavor"], pt["text"])
-        size = BODY_PX
+        size = 15
         for size in range(BODY_PX, 14, -1):
-            n = len(wrap_runs(d, both, size, b[2] - b[0]))
-            if _wrapped_height(both, size, n, 1.24) + 10 <= b[3] - y:
+            if fits(size):
                 break
-        y = draw_wrapped(d, pt["flavor"], b[0], y, size, b[2] - b[0],
-                         (84, 66, 50), italic=True, leading=1.24)
-        draw_wrapped(d, pt["text"], b[0], y + 10, size, b[2] - b[0],
-                     PSD_INK, leading=1.24)
+        else:
+            OVERFLOWS.append((CURRENT_CARD[0], "text", size))
+        if both:
+            y = draw_wrapped(d, pt["flavor"], b[0], y, size, bw,
+                             (84, 66, 50), italic=True, leading=1.24, narrow=narrow)
+            y += 10
+        draw_wrapped(d, pt.get("text", ""), b[0], y, size, bw,
+                     PSD_INK, leading=1.24, narrow=narrow)
         return
     y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3]), start=BODY_PX, key="text")
     if pt.get("flavor") and y + 30 < b[3]:
