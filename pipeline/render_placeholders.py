@@ -341,6 +341,7 @@ INV_ART_UNDERLAY = (208, 196, 173)
 # the display title fonts don't carry macron vowels (Japanese romanisation etc.)
 TITLE_FOLD = str.maketrans({"ō": "o", "ū": "u", "ā": "a", "ī": "i", "ē": "e",
                             "Ō": "O", "Ū": "U", "Ā": "A", "Ī": "I", "Ē": "E"})
+TITLE_FOLD_KEYS = {chr(k) for k in TITLE_FOLD}
 # Bolton is the official cards' big stat-numeral face (enemy fight/health/
 # evade, investigator skill values, health/sanity chits)
 STAT_FONT_CANDIDATES = ["BoltonBold.ttf", "Bolton.ttf"]
@@ -1071,10 +1072,13 @@ def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
     if max_w_factor is None:
         max_w_factor = 1.02 if title else 1.45
     if title:
-        # the display title fonts (Arkhamic/Teutonic) lack macron vowels; fold
-        # them to their ASCII base so names like "Sōma" read as "Soma" instead
-        # of dropping the glyph
+        # the display title fonts (Arkhamic/Teutonic) lack macron vowels: set
+        # the base letter and draw the macron over it (below), so "Sōma" on
+        # the title matches the rules text instead of reading "Soma"
+        macrons = [i for i, ch in enumerate(text) if ch in TITLE_FOLD_KEYS]
         text = text.translate(TITLE_FOLD)
+    else:
+        macrons = []
     bw = box[2] - box[0]
     size = max(int((box[3] - box[1]) * grow), min_size)
     if max_size:
@@ -1097,8 +1101,15 @@ def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
         x = box[2] - w
     else:
         x = (box[0] + box[2]) / 2 - w / 2
-    d.text((x, (box[1] + box[3]) / 2 - (bb[1] + bb[3]) / 2),
-           text, font=f, fill=fill)
+    y = (box[1] + box[3]) / 2 - (bb[1] + bb[3]) / 2
+    d.text((x, y), text, font=f, fill=fill)
+    for i in macrons:
+        x0 = x + d.textlength(text[:i], font=f)
+        cw = d.textlength(text[i], font=f)
+        top = y + f.getbbox(text[i])[1]
+        th = max(2, int(round(size * 0.07)))
+        gap = max(2, int(round(size * 0.08)))
+        d.rectangle((x0 + cw * 0.18, top - gap - th, x0 + cw * 0.82, top - gap), fill=fill)
 
 
 # text that did not fit its box even at the smallest size: (card id, area, size)
