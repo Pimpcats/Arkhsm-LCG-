@@ -1296,8 +1296,8 @@ local function stillHourTestBody(T)
 
   local c3 = Constants.forCount(3)
   P, F = check("reset 24 / appointed 16 at 3p", c3.resetThreshold == 24 and c3.appointedThreshold == 16, P, F)
-  P, F = check("contest target 6 (5 with one or two)", c3.contestTarget == 6 and Constants.forCount(1).contestTarget == 5
-    and Constants.forCount(2).contestTarget == 5 and Constants.forCount(4).contestTarget == 6, P, F)
+  P, F = check("contest target 6 (5 solo, 7 at four)", c3.contestTarget == 6 and Constants.forCount(1).contestTarget == 5
+    and Constants.forCount(2).contestTarget == 6 and Constants.forCount(4).contestTarget == 7, P, F)
 
   local bag = { count = 0 }
   bag.setBaselineStatic = function(m) bag.count = m end

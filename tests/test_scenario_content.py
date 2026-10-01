@@ -278,14 +278,14 @@ class ContentGapTests(unittest.TestCase):
     def test_contest_target_matches_the_engine(self):
         lua = open(os.path.join(ROOT, "src", "StillHour", "Constants.ttslua"),
                    encoding="utf-8").read()
-        self.assertIn("contestTarget = (n <= 2) and 5 or 6,", lua)
+        self.assertIn("contestTarget = (n == 1) and 5 or ((n >= 4) and 7 or 6),", lua)
         need = next(a for s in MANIFEST["scenarios"] if s["id"] == "finale"
                     for a in s["stacks"]["act_deck"]["cards"])["needs"]["contest"]
         self.assertEqual((need["target"], need["target_one_investigator"], need["target_two_investigators"],
-                          need["target_four_investigators"]), (6, 5, 5, 6))
+                          need["target_four_investigators"]), (6, 5, 6, 7))
         act = CARDS["sthr-act-lasthour"]
         text = act["text"] + "\n" + act["back_text"]    # b side: the resolutions
-        for part in ("reaches 6 (5 with one or two investigators)", "Hold Back", "deep Knowledge entry", "Hour IX",
+        for part in ("reaches 6 (5 with one investigator, 7 with four)", "Hold Back", "deep Knowledge entry", "Hour IX",
                      "R1b"):
             self.assertIn(part, text)
 
