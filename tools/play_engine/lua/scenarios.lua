@@ -28,12 +28,14 @@ return function(R, T)
   S.prologue = { boxes = { "prologue" }, prologue = true, loops = 0, knowledge = {}, objectives = { "sthr-act-firsthour" },
                  banked = 0, years = 0 }
 
-  -- Part I: the Square plus one district (the Lighthouse needs the Sunken Road)
+  -- Part I: the Square plus one district (the Lighthouse needs the Sunken Road).
+  -- Objectives in the party's order: the night's goal (the district's act and
+  -- the Square's current act) first, a passed-through district's act last.
   S.district_square = partOne({ "district_square" }, { "sthr-act-sheriffdead" })
   S.district_church = partOne({ "district_square", "district_church" }, { "sthr-act-whythirteen", "sthr-act-sheriffdead" })
   S.district_road = partOne({ "district_square", "district_road" }, { "sthr-act-walkbackward", "sthr-act-sheriffdead" })
   S.district_lighthouse = partOne({ "district_square", "district_road", "district_lighthouse" },
-    { "sthr-act-lamp", "sthr-act-walkbackward", "sthr-act-sheriffdead" })
+    { "sthr-act-lamp", "sthr-act-sheriffdead", "sthr-act-walkbackward" })
   S.district_fairground = partOne({ "district_square", "district_fairground" }, { "sthr-act-wheelturns", "sthr-act-sheriffdead" })
   S.district_almanac = partOne({ "district_square", "district_almanac" }, { "sthr-act-almanachid", "sthr-act-sheriffdead" })
 
@@ -44,7 +46,7 @@ return function(R, T)
   S.district_road_p2 = partTwo({ "district_square", "district_road" }, { SURFACE.road, SURFACE.square, SURFACE.church },
     { "sthr-act-walksbeside", "sthr-act-vote" })
   S.district_lighthouse_p2 = partTwo({ "district_square", "district_road", "district_lighthouse" },
-    { SURFACE.lighthouse, SURFACE.road, SURFACE.square }, { "sthr-act-ninthdeath", "sthr-act-walksbeside", "sthr-act-vote" })
+    { SURFACE.lighthouse, SURFACE.road, SURFACE.square }, { "sthr-act-ninthdeath", "sthr-act-vote", "sthr-act-walksbeside" })
   S.district_fairground_p2 = partTwo({ "district_square", "district_fairground" }, { SURFACE.fairground, SURFACE.square, SURFACE.church },
     { "sthr-act-bargain", "sthr-act-vote" })
   -- the Almanac House's deep act also needs The Vote That Never Ends
