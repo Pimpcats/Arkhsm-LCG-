@@ -708,7 +708,7 @@ return function(H)
     tickLog("v:sthr-bellringer")
     E.run(1)
     local m1 = st().memory
-    check("ticking a Named enemy's Victory banks it (+2)", m1 == m0 + 2, m0 .. " -> " .. m1)
+    check("ticking a Named enemy's Victory banks 2 per investigator", m1 == m0 + 2 * st().investigators, m0 .. " -> " .. m1)
     tickLog("v:sthr-bellringer")      -- untick
     tickLog("v:sthr-bellringer")      -- tick again
     E.run(1)
@@ -720,7 +720,7 @@ return function(H)
     tickLog("k:the-lamp-was-never-lit")
     E.run(1)
     local m1 = st().memory
-    check("a surface entry pays nothing (Knowledge pays Memory for deep entries only)", m1 == m0, m0 .. " -> " .. m1)
+    check("a surface entry pays 1 per investigator", m1 == m0 + st().investigators, m0 .. " -> " .. m1)
     check("the log shows it ticked", logValue("k:the-lamp-was-never-lit") == true)
     tickLog("k:the-lamp-was-never-lit")      -- a mis-tick cleared: refund
     E.run(1)

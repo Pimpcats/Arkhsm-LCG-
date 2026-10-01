@@ -138,7 +138,7 @@ BOARD_CHECKS = (
     "the next interlude reaches Weathered",
     "the investigator card shows Years and bracket",
     "Years persist through save+reload",
-    "claiming a Named enemy's Victory banks its Memory (+2)",
+    "claiming a Named enemy's Victory banks 2 per investigator",
     "a second claim of the same Victory banks nothing",
     "buying a Recollection spends its Memory",
     "an unaffordable level-up is refused",

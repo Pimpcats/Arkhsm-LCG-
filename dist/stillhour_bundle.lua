@@ -88,7 +88,7 @@ function Constants.forCount(n)
     investigators = n,
     resetThreshold = reset,
     appointedThreshold = appointed,
-    memoryCap = 6 * n,
+    memoryCap = 10 * n,
     -- Finale contest target: 6; 5 with one investigator, 7 with four (tuning 2026-10: the finale
     -- opens with the Name and the Vote, so a party brings two deep entries; owner curve: about
     -- 40% won, docs/design/PLAYTEST_SIM.md). Its sources (deep entries, Hold Back
@@ -181,6 +181,8 @@ local function freshState(n)
     partTwo = false,         -- Part II (The Shape of the Hour) has begun
     pendingYears = {},       -- investigatorId -> Years a card gave this loop (added at Age)
     holdBackRewinds = 0,     -- Hold Back rewinds this loop (at most Constants.HOLD_BACK_REWINDS_PER_LOOP)
+    marks = {},              -- markId -> true: campaign-long marks a reset never clears (e.g. "torn")
+    difficulty = nil,        -- the chaos bag preset last chosen on the Control (1 Easy .. 4 Expert)
   }
 end
 
@@ -242,6 +244,7 @@ function CampaignState.deserialize(saved, decoder)
     state.onCardMemory = state.onCardMemory or {}
     state.loopTallies = state.loopTallies or {}
     state.knowledgePaid = state.knowledgePaid or {}
+    state.marks = state.marks or {}
     state.bankedMemory = math.max(0, math.floor(tonumber(state.bankedMemory) or 0))
     state.loopEnded = state.loopEnded == true
     state.finale = state.finale == true
@@ -463,6 +466,36 @@ function CampaignState.knownFacts()
   end
   table.sort(list)
   return list
+end
+
+----------------------------------------------------------- campaign marks --
+
+--- Set a campaign-long mark (never cleared by a reset). Returns true if new.
+function CampaignState.addMark(markId)
+  state.marks = state.marks or {}
+  if state.marks[markId] then return false end
+  state.marks[markId] = true
+  return true
+end
+
+function CampaignState.hasMark(markId)
+  return (state.marks or {})[markId] == true
+end
+
+--- Any investigator has reached the age-out Years (Those Who Left the Loop).
+function CampaignState.anyAgedOut()
+  for _, y in pairs(state.years or {}) do
+    if (tonumber(y) or 0) >= Constants.AGE_OUT_YEARS then return true end
+  end
+  return false
+end
+
+function CampaignState.setDifficulty(i)
+  state.difficulty = i
+end
+
+function CampaignState.getDifficulty()
+  return state.difficulty
 end
 
 ----------------------------------------------------------- once-per-loop flags --
@@ -1590,9 +1623,9 @@ Knowledge.FACTS = {
 
 -- Knowledge pays Memory: the first time an entry is recorded in the campaign
 -- it adds banked Memory, per investigator (current count), by layer.
--- (12-round loops, where the investigators' own reactions earn about twice as
--- much: surface entries pay nothing, deep entries 2)
-Knowledge.MEMORY_PER_INVESTIGATOR = { prologue = 0, surface = 0, deep = 2, assembled = 0 }
+-- (official XP per campaign, about 35-45 per investigator: surface entries pay 1,
+-- deep entries 3; Victory also pays each investigator)
+Knowledge.MEMORY_PER_INVESTIGATOR = { prologue = 0, surface = 1, deep = 3, assembled = 0 }
 
 function Knowledge.knows(factId)
   return CampaignState.knows(factId)
@@ -2321,7 +2354,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/6c9865b6d89559b05b9723ee7b32bbc0b1a5f9f1/dist/cards/sthr-static-token.jpg?v=a556271511"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d7f6781627e974c6b370752a0246e0e78d243b51/dist/cards/sthr-static-token.jpg?v=a556271511"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -3527,6 +3560,7 @@ local function hourLog(h, name, msg)
 end
 
 local refreshControl  -- forward
+local refreshBag      -- forward (the campaign's chaos-bag changes)
 
 local function syncBoard()
   guarded("Appointed", Board.syncAppointed, { log = hourLog })
@@ -3567,6 +3601,7 @@ local function announceResetReached()
 end
 
 local function afterChange()
+  if refreshBag then guarded("chaos bag", refreshBag) end
   syncBoard()
   guarded("investigators", Board.refreshInvestigators, false)
   refreshControl()
@@ -3692,6 +3727,10 @@ local function resetLoop()
     return false
   end
   local prologue = CampaignState.inPrologue()
+  -- a loop that ended at the reset value is Torn (campaign chaos-bag change)
+  if not prologue and CampaignState.getDissonance() >= CampaignState.constants().resetThreshold then
+    CampaignState.addMark("torn")
+  end
   CampaignState.reset()
   if not prologue then checkPartTwo() end
   bag.clearTemporary()
@@ -3798,23 +3837,96 @@ local DIFFICULTY = {
             "skull", "skull", "cultist", "tablet", "elder", "red", "blue" } },
 }
 
+-- The campaign's chaos-bag changes (guide: Campaign chaos-bag changes): story
+-- results add or remove a Cultist, Tablet or Elder Thing token for the rest of
+-- the campaign. Derived from the campaign state, so a restore or Sync gives the
+-- same bag.
+local BAG_SYMBOLS = { { key = "cultist", name = "Cultist" }, { key = "tablet", name = "Tablet" },
+  { key = "elder", name = "Elder Thing" } }
+
+local function bagChanges()
+  local c = { cultist = 0, tablet = 0, elder = 0 }
+  if CampaignState.hasMark("torn") then c.cultist = c.cultist + 1 end
+  if CampaignState.inPartTwo() then c.tablet = c.tablet + 1 end
+  if CampaignState.anyAgedOut() then c.elder = c.elder + 1 end
+  if CampaignState.knows("who-walks-beside-you") then c.cultist = c.cultist - 1 end
+  if CampaignState.knows("the-keepers-ninth-death") then c.tablet = c.tablet - 1 end
+  if CampaignState.knows("the-hour-was-wrong") then c.elder = c.elder - 1 end
+  return c
+end
+
+local function changeSig(c)
+  return string.format("%d/%d/%d", c.cultist, c.tablet, c.elder)
+end
+
+--- A difficulty's tokens with the campaign's changes applied (never below 0).
+local function bagFor(i)
+  local d = DIFFICULTY[i]
+  local c = bagChanges()
+  local out, count = {}, { cultist = 0, tablet = 0, elder = 0 }
+  for _, t in ipairs(d.bag) do
+    if count[t] ~= nil then count[t] = count[t] + 1 else out[#out + 1] = t end
+  end
+  for _, sym in ipairs(BAG_SYMBOLS) do
+    for _ = 1, math.max(0, count[sym.key] + c[sym.key]) do out[#out + 1] = sym.key end
+  end
+  return out
+end
+
+local appliedSig  -- the changes the physical bag holds (set at load and on each refill)
+
 --- Fill SCED's chaos bag for a difficulty, then put the band's [static] back.
 local function setDifficulty(i)
   local d = DIFFICULTY[i]
   if not d then return false end
+  CampaignState.setDifficulty(i)
   if not SCED.isPresent() then
     announce("Chaos bag presets need the SCED mod: build the " .. d.label
-      .. " bag by hand from the Campaign Guide (Campaign Setup).")
+      .. " bag by hand from the Campaign Guide (Campaign Setup and Campaign chaos-bag changes).")
     return false
   end
-  SCED.globalCall("setChaosBagState", d.bag)
+  local tokens = bagFor(i)
+  appliedSig = changeSig(bagChanges())
+  SCED.globalCall("setChaosBagState", tokens)
   -- SCED respawns the bag; once it has landed, re-add the band's [static] tokens
   Wait.time(function()
     guarded("chaos bag", Dissonance.syncBag, bag)
     refreshControl()
   end, 1.5)
-  announce("Chaos bag set to " .. d.label .. " (" .. #d.bag .. " tokens), plus the Dissonance band's [static].")
+  announce("Chaos bag set to " .. d.label .. " (" .. #tokens .. " tokens), plus the Dissonance band's [static].")
   return true
+end
+
+--- When a story result changes the campaign's chaos-bag tokens, refill SCED's
+-- bag (the chosen difficulty plus every change) and tell the table.
+refreshBag = function()
+  local c = bagChanges()
+  local sig = changeSig(c)
+  if appliedSig == nil then appliedSig = sig ; return end
+  if sig == appliedSig then return end
+  local before = {}
+  before.cultist, before.tablet, before.elder = appliedSig:match("(-?%d+)/(-?%d+)/(-?%d+)")
+  local parts = {}
+  for _, sym in ipairs(BAG_SYMBOLS) do
+    local delta = c[sym.key] - (tonumber(before[sym.key]) or 0)
+    local n = math.abs(delta)
+    if n > 0 then
+      parts[#parts + 1] = string.format("%s %d %s token%s", delta > 0 and "add" or "remove", n, sym.name, n > 1 and "s" or "")
+    end
+  end
+  appliedSig = sig
+  local what = table.concat(parts, ", ")
+  local i = CampaignState.getDifficulty()
+  if i and DIFFICULTY[i] and SCED.isPresent() then
+    SCED.globalCall("setChaosBagState", bagFor(i))
+    Wait.time(function()
+      guarded("chaos bag", Dissonance.syncBag, bag)
+      refreshControl()
+    end, 1.5)
+    announce("Campaign chaos-bag change: " .. what .. " for the rest of the campaign (done on the chaos bag).")
+  else
+    announce("Campaign chaos-bag change: " .. what .. " for the rest of the campaign. Change the chaos bag by hand.")
+  end
 end
 
 local function factName(id)
@@ -4546,9 +4658,9 @@ function shApiHoldBack() local s = guarded("hold back", holdBack) ; afterChange(
 function shApiHunt() local m = guarded("hunt", hunt) ; afterChange() ; return m end
 function shApiReset() guarded("reset", resetLoop) ; afterChange() ; return shApiState() end
 function shApiSyncBoard() return shSyncBoard() end
-function shApiUnlockFact(p) local r = unlockFact(p and p.id) ; refreshControl() ; return r end
+function shApiUnlockFact(p) local r = unlockFact(p and p.id) ; guarded("chaos bag", refreshBag) ; refreshControl() ; return r end
 --- A Campaign Log Knowledge box un-ticked: p = {id}
-function shApiForgetFact(p) local r = forgetFact(p and p.id) ; refreshControl() ; return r end
+function shApiForgetFact(p) local r = forgetFact(p and p.id) ; guarded("chaos bag", refreshBag) ; refreshControl() ; return r end
 --- p = {on}: the finale begins (on ~= false) or was not begun after all
 function shApiSetFinale(p)
   if p == nil or p.on ~= false then
@@ -4649,9 +4761,12 @@ local VICTORY = { ["sthr-bellringer"] = 2, ["sthr-wearssheriff"] = 3, ["sthr-one
 function shApiClaimVictory(p)
   local id = p and p.id
   if not VICTORY[id] then return false end
-  local newly = CampaignState.claimVictory(id, VICTORY[id])
+  -- Victory X: each investigator gains X banked Memory (as official XP)
+  local n = CampaignState.constants().investigators
+  local newly = CampaignState.claimVictory(id, VICTORY[id] * n)
   if newly then
-    announce(string.format("Victory: %d banked Memory (%d banked).", VICTORY[id], CampaignState.getBankedMemory()))
+    announce(string.format("Victory %d: each investigator gains %d banked Memory (%d banked).", VICTORY[id], VICTORY[id],
+      CampaignState.getBankedMemory()))
   end
   afterChange()
   return newly
@@ -4831,10 +4946,10 @@ local function stillHourTestBody(T)
   P, F = check("Muscle Memory: last loop's test does not count this loop", not LoopFlags.muscleMemoryUpgraded("combat"), P, F)
 
   CampaignState.bankMemory(30); CampaignState.startLoop()
-  P, F = check("Memory soft-capped to 18 at loop start", CampaignState.getBankedMemory() == 18, P, F)
+  P, F = check("Memory soft-capped to 30 at loop start", CampaignState.getBankedMemory() == 30, P, F)
   local blob = CampaignState.serialize()
   CampaignState.init(3); CampaignState.deserialize(blob)
-  P, F = check("serialize round-trip (real TTS JSON)", CampaignState.getBankedMemory() == 18
+  P, F = check("serialize round-trip (real TTS JSON)", CampaignState.getBankedMemory() == 30
     and CampaignState.knows("the-thirteenth-toll"), P, F)
 
   CampaignState.init(3); CampaignState.bankMemory(10)

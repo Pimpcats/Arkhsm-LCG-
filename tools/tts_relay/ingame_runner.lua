@@ -806,7 +806,8 @@ step("board: claiming a Victory banks it once", function(go)
   local m0 = ctl.call("shApiState").memory
   local first = ctl.call("shApiClaimVictory", { id = "sthr-bellringer" })
   local m1 = ctl.call("shApiState").memory
-  check("claiming a Named enemy's Victory banks its Memory (+2)", first == true and m1 == m0 + 2, m0 .. " -> " .. m1)
+  local vn = ctl.call("shApiState").investigators
+  check("claiming a Named enemy's Victory banks 2 per investigator", first == true and m1 == m0 + 2 * vn, m0 .. " -> " .. m1)
   local second = ctl.call("shApiClaimVictory", { id = "sthr-bellringer" })
   local m2 = ctl.call("shApiState").memory
   check("a second claim of the same Victory banks nothing", second == false and m2 == m1, m1 .. " -> " .. m2)
