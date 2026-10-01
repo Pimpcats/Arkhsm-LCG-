@@ -216,7 +216,7 @@ def _pages():
     y = 1368
     p1.text(90, y, "Banked Memory", size=24, style="bold")
     p1.counter("banked", 300, y - 9, 0, 99)
-    p1.text(345, y, "(cap 6 × investigators after spending; never below 0)",
+    p1.text(345, y, "(cap 10 × investigators after spending; never below 0)",
             size=20, style="italic", fill=SOFT)
     p1.text(900, y, "Spent this interlude", size=24, style="bold")
     p1.counter("spent", 1150, y - 9, 0, 99)
@@ -233,7 +233,7 @@ def _pages():
             "(or write its name on the line). It lasts through every reset.",
             size=20, style="italic", fill=SOFT, anchor="ms")
     p2.text(PAGE_W // 2, 177, "The first time you record an entry, each investigator gains "
-            "banked Memory: 2 for a deep entry (a surface entry pays nothing).",
+            "banked Memory: 1 for a surface entry, 3 for a deep entry.",
             size=18, style="italic", fill=SOFT, anchor="ms")
     y = 212
     for fid, name, district, layer, summary in FACTS:
