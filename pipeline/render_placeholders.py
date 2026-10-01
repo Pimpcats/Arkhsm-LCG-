@@ -1795,11 +1795,11 @@ def _se_frame_compose(tpl_name, kind, clip_key, art_path, placement,
 
 
 def _se_body(d, c, pt, kind, letter="", extra_bottom=26, text_start=BODY_PX,
-             victory=True):
+             victory=True, box=None):
     """Traits + rules + flavor (+ Victory) stacked in the Body region. Pass
     victory=False when the card places its Victory line at a fixed spot (enemies
     print it centred just above the damage/horror row, not after the text)."""
-    b = se_reg(kind, "Body", letter)
+    b = box or se_reg(kind, "Body", letter)
     if kind == "Enemy":
         # the enemy text circle narrows toward its lower edge: keep lines clear
         b = (b[0] + 18, b[1], b[2] - 18, b[3])
@@ -1840,14 +1840,21 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
                       ("Combat", "com"), ("Agility", "agi")):
         _box_text(d, str(c.get(stat, "-")), se_reg("Investigator", key),
                   stat=True, grow=1.0, pos_key=stat)
-    _se_body(d, c, pt, "Investigator", extra_bottom=0)
+    # the text box ends above the health/sanity chits (their tops sit about
+    # 62 px above their centres) and keeps a margin inside the parchment's
+    # right edge, so no line runs under a chit or off the border
+    VITAL_GAP = 14
+    VITAL_RISE = 12
+    b = se_reg("Investigator", "Body")
+    st_ = se_reg("Investigator", "Stamina")
+    chit_top = (st_[1] + st_[3]) // 2 - VITAL_RISE - 62
+    _se_body(d, c, pt, "Investigator", extra_bottom=0,
+             box=(b[0] + 4, b[1], b[2] - 22, min(b[3], chit_top - 10)))
     # health (red heart) + sanity (blue brain) chits from the official stat kit
     # — the plugin's own SanityBase is corrupt, so these are the clean source.
     # Push them apart (health left, sanity right) so the two big chits get a
     # small gap between them instead of hugging, and lift them a touch off the
     # bottom border, like the reference cards.
-    VITAL_GAP = 14
-    VITAL_RISE = 12
     for kind, key, fld, val, off in (
             ("health_heart", "Stamina", "health", c.get("health"), -VITAL_GAP),
             ("sanity_brain", "Sanity", "sanity", c.get("sanity"), VITAL_GAP)):
@@ -1862,10 +1869,10 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
         else:
             # only reachable if a chit file is missing from the kit
             _box_text(d, str(val), box, fill=(240, 240, 240), stat=True, grow=0.9)
-    _box_text(d, _wm(art_path), se_reg("Investigator", "Artist"),
-              fill=(70, 58, 46), max_size=18, align="left")
+    _box_text(d, ("Illus. " + WATERMARK) if art_path else "", se_reg("Investigator", "Artist"),
+              fill=(238, 234, 226), bold=True, max_size=18, align="left")
     _box_text(d, CFG.upper_name, se_reg("Investigator", "Copyright"),
-              fill=(70, 58, 46), max_size=18, align="right")
+              fill=(238, 234, 226), bold=True, max_size=18, align="right")
     img.save(dest)
 
 
@@ -2182,22 +2189,63 @@ def s_location(c, pt, dest, art_path=None, placement=None):
 
 
 
+FOOTER_IMG = [None]       # the image the footer's set symbol is pasted on (set per card)
+
+
+def _a_index(c):
+    """'1a' from an index of 1 (official agenda/act fronts print the a side)."""
+    idx = str(c.get("index", "")).strip()
+    if idx and idx[-1:] not in ("a", "b"):
+        idx += "a"
+    return idx
+
+
+def _hdr_box(kind):
+    """The 'Act 1a' / 'Agenda 1a' line, centred above the set symbol as on
+    official cards (the plugin's region is the left-aligned example text)."""
+    r = se_reg(kind, "ScenarioIndex")
+    clip = se_reg(kind, "Encounter-portrait-clip")
+    cx = (clip[0] + clip[2]) // 2 if clip else (r[0] + r[2]) // 2
+    half = max(r[2] - r[0], 220) // 2
+    return (cx - half, r[1] - 6, cx + half, r[3] + 10)
+
+
 def _scenario_footer(d, kind, c, art_path=None):
     """Illustrator (left) / (c) (centre) / card number (right), in the frame's
     tiny footer band - the official credit line."""
+    # official: bold white type on the dark footer band, "Illus. <artist>",
+    # "© <year> FFG", the encounter number, then the set symbol and the
+    # card's own index (e.g. "4-5a")
+    FOOT = (238, 234, 226)
     a = se_reg(kind, "Artist")
-    if a:
-        _box_text(d, _wm(art_path), a, fill=(110, 92, 72),
-                  max_size=13, align="left")
+    if a and art_path:
+        _box_text(d, "Illus. " + WATERMARK, (a[0], a[1] - 4, a[2] + 60, a[3] + 4), fill=FOOT, bold=True,
+                  max_size=19, align="left")
     cp = se_reg(kind, "Copyright")
     if cp:
-        _box_text(d, ("\u00a9 " + WATERMARK) if art_path else "", cp, fill=(110, 92, 72), max_size=13)
+        _box_text(d, ("\u00a9 " + WATERMARK) if art_path else "", (cp[0], cp[1] - 4, cp[2], cp[3] + 4),
+                  fill=FOOT, bold=True, max_size=19)
     num = c.get("number")
-    if num:
-        en = se_reg(kind, "EncounterNumber")
-        if en:
-            _box_text(d, str(num), en, fill=(110, 92, 72), max_size=13,
-                      align="right")
+    en = se_reg(kind, "EncounterNumber")
+    if num and en:
+        _box_text(d, str(num), (en[0], en[1] - 4, en[2], en[3] + 4), fill=FOOT, bold=True, max_size=19,
+                  align="right")
+    if en and c.get("encounter_set") and FOOTER_IMG[0] is not None:
+        import encounter_sets
+        path = encounter_sets.icon_path(c["encounter_set"])
+        h = en[3] - en[1] + 14
+        x0 = en[2] + 14
+        if path:
+            icon = Image.open(path).convert("RGBA")
+            white = Image.new("RGBA", icon.size, FOOT + (255,))
+            white.putalpha(icon.getchannel("A"))
+            _paste_icon_fit(FOOTER_IMG[0], white, (x0, en[1] - 7, x0 + h, en[3] + 7))
+        idx = str(c.get("index", "")).strip()
+        if idx and idx[-1:] not in ("a", "b"):
+            idx += "a"
+        if idx:
+            _box_text(d, idx, (x0 + h + 6, en[1] - 4, x0 + h + 90, en[3] + 4), fill=FOOT, bold=True,
+                      max_size=19, align="left")
 
 
 def s_agenda(c, pt, dest, art_path=None, placement=None):
@@ -2205,15 +2253,15 @@ def s_agenda(c, pt, dest, art_path=None, placement=None):
     header top-right, doom on the frame, credit footer."""
     img, d = _se_frame_compose("AHLCG-Agenda", "Agenda", "Portrait-portrait-clip",
                                art_path, placement, landscape=True)
-    hdr = ("Agenda " + str(c.get("index", ""))).strip()
-    _box_text(d, hdr, se_reg("Agenda", "ScenarioIndex"), bold=True, max_size=15,
-              fill=(74, 60, 46), align="right")
-    _box_text(d, c["name"], se_reg("Agenda", "Name"), title=True, grow=1.15, key="name")
+    FOOTER_IMG[0] = img
+    hdr = ("Agenda " + _a_index(c)).strip()
+    _box_text(d, hdr, _hdr_box("Agenda"), bold=True, max_size=28, fill=(58, 44, 32))
+    _box_text(d, c["name"], se_reg("Agenda", "Name"), title=True, grow=1.0, max_size=46, key="name")
     if c.get("doom") not in (None, ""):
         db = se_reg("Agenda", "Doom")
         # sized to sit inside the doom circle, not spill over its rim
         _box_text(d, str(c["doom"]), db, stat=True, grow=1.0,
-                  max_size=int((db[3] - db[1]) * 0.56),
+                  max_size=int((db[3] - db[1]) * 0.60),
                   fill=(238, 232, 216), pos_key="doom")
     _scenario_body(d, "Agenda", c, pt)
     _scenario_footer(d, "Agenda", c, art_path)
@@ -2226,10 +2274,10 @@ def s_act(c, pt, dest, art_path=None, placement=None):
     header top-left, clue threshold on the frame, credit footer."""
     img, d = _se_frame_compose("AHLCG-Act", "Act", "Portrait-portrait-clip",
                                art_path, placement, landscape=True)
-    hdr = ("Act " + str(c.get("index", ""))).strip()
-    _box_text(d, hdr, se_reg("Act", "ScenarioIndex"), bold=True, max_size=15,
-              fill=(74, 60, 46), align="left")
-    _box_text(d, c["name"], se_reg("Act", "Name"), title=True, grow=1.15, key="name")
+    FOOTER_IMG[0] = img
+    hdr = ("Act " + _a_index(c)).strip()
+    _box_text(d, hdr, _hdr_box("Act"), bold=True, max_size=28, fill=(58, 44, 32))
+    _box_text(d, c["name"], se_reg("Act", "Name"), title=True, grow=1.0, max_size=46, key="name")
     if c.get("take") or c.get("no_threshold"):
         # an objective with no clue threshold (a take-and-deliver act, or a
         # clue cost paid on the act's [action]): the circle prints a dash, as
@@ -2279,8 +2327,9 @@ def s_scenario_back(kind, c, pt, dest):
     W, H = 525 * SE_SCALE, 375 * SE_SCALE
     img = frame.resize((W, H), Image.LANCZOS).convert("RGB")
     d = ImageDraw.Draw(img)
-    _box_text(d, _b_index(kind, c), se_reg(kind + "Back", "BackScenarioIndex"),
-              bold=True, max_size=15, fill=(74, 60, 46))
+    bi = se_reg(kind + "Back", "BackScenarioIndex")
+    _box_text(d, _b_index(kind, c), (bi[0] - 10, bi[1] - 4, bi[2] + 10, bi[3] + 6),
+              bold=True, max_size=24, fill=(58, 44, 32))
     # the name, reading bottom to top in the tall left column
     nb = se_reg(kind + "Back", "Name")
     if nb:
