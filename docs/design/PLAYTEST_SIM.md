@@ -398,6 +398,47 @@ Prologue (83%); the steps either side were much further off. Memory: about
 5.6 per investigator on a Part II night (4.0 before the XP change).
 Simulation only; not a playtest.
 
+## Official clue scale, the night's goal and the party's order (2026-10-01, night)
+
+**Supersedes the calibration sections above.** Locations now carry official
+clue/shroud ranges and acts official clue costs (docs/design/OFFICIAL_COMPARISON.md,
+third pass). A night counts as won only when every act of its goal is done:
+the district's act and the Square's current act (`tools/play_engine/report.py`,
+NIGHT). The party does the Square's act first (everyone starts there): on the
+far districts that order won more (Lighthouse 50% -> 67%, Fairground 63% -> 90%
+on night 1). Values chosen with single-act what-if sweeps, then confirmed.
+
+Final costs ([perinv] unless noted): The First Hour 1 from **Hour VIII**; The
+Sheriff Is Already Dead 3; Why Thirteen? 4 (take); What the Almanac Hid 4
+(take); Light the Lamp 2 (and a test); The Wheel Still Turns 3; Walk It
+Backward 3, 1, 1 clues (2, 1, 1 solo); The Vote 2 (take); The Hour Was Wrong 2
+(take); The Keeper's Ninth Death 2 (take); Who Walks Beside You 3; The
+Ticket-Taker's Bargain fare 5 (resources 3 for 1); The Appointed's Name 2
+**while Arrived**. The Uninvited 4 health. Finale contest 6 (5 solo, 7 at four).
+
+Results (3 investigators, Standard, XP decks, 30 games a cell, 60 for the
+finale; about ±9 points at 30 games):
+
+| night | target | won | Church / Road / Lighthouse / Fairground / Almanac |
+|---|---|---|---|
+| Prologue | 80% | **80%** | – |
+| 1 | 80% | **79%** | 73 / 80 / 73 / 80 / 87 |
+| 3 | 70% | **77%** | 77 / 73 / 77 / 73 / 87 |
+| 4 | 60% | **59%** | 70 / 63 / 57 / 67 / 37 |
+| 5 | 60% | **59%** | 70 / 63 / 57 / 63 / 40 |
+| 6 | 50% | **57%** | 60 / 60 / 47 / 73 / 47 |
+| 7 | 50% | **42%** | 53 / 50 / 20 / 47 / 40 |
+| Finale | 40% | **37%** | – |
+
+The Square alone (97-100%) is left out of the night averages: a loop is the
+Square plus one or two districts (guide, "A first loop"). Off the curve: the
+Almanac House's deep act (37-47%: "while Emerging or Arrived" measured 97%,
+"while Arrived" about 40%; the clue cost does not move it, the one-Hour window
+does), the Lighthouse on night 7 (20%; 47-57% on nights 4-6), the Almanac
+House's surface act at 87% (within noise of the 80% cap). A three-district
+night (Square, Church, Almanac): 2 or more of 3 acts in 80% of loops.
+Simulation only; not a playtest.
+
 ## Assumptions and limits
 
 - One AI party, greedy but competent; real players differ (they talk and plan
