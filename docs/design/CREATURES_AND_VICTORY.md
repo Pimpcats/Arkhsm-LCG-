@@ -24,7 +24,7 @@ Spoilers: enemy names, stats and rules text. Design document, not player-facing.
 | The Fairground | The Barker | 3 / 3 / 3, 1 / 1 | Hunter, prey most resources; costs 2 resources per attack | — | Part II: The One Who Rides Forever (V2) |
 | The Almanac House | The Compositor | 3 / 4 / 2, 1 / 1 | Retaliate; failed tests beside it raise Dissonance | 1 | — |
 | The Square, Part II | What Wears the Sheriff | 4 / 6 / 3, 2 / 1 | Named | 3 | — |
-| Finale | The Uninvited | 3 / 4 / 2, 1 / 1 | Hunter, prey most Memory; defeating it gains contest progress | — | The Appointed |
+| Finale | The Uninvited | 2 / 3 / 2, 1 / 1 | Hunter, prey most Memory; defeating it gains contest progress | — | The Appointed |
 
 Recurring cast (fight / health / evade): The Waiting Congregation 3 / 3 / 2,
 The Drowned Choir 2 / 3 / 2, Familiar Face 3 / 3 / 3, The Lamplighter's Echo

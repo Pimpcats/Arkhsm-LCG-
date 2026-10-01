@@ -814,7 +814,7 @@
   "sthr-act-firsthour": {
     "name": "The First Hour",
     "clues": 7,
-    "text": "Objective – If the current Hour is Hour VI or later, investigators at the Almanac Steps may, as a group, spend 7 [perinv] clues to advance.\nIf Hour IX is reached first, (→R2).",
+    "text": "Objective – If the current Hour is Hour VII or later, investigators at the Almanac Steps may, as a group, spend 7 [perinv] clues to advance.\nIf Hour IX is reached first, (→R2).",
     "flavor": "The almanac promised the occultation at midnight. It is eleven, and the sky is already wrong.",
     "deck": 95101,
     "index": "1a",
@@ -1102,9 +1102,9 @@
   "sthr-uninvited": {
     "name": "The Uninvited",
     "traits": "Monster.",
-    "health": 4,
+    "health": 3,
     "text": "Hunter.\nPrey – Most Memory on their cards.\nForced – After the Uninvited is defeated: Gain 1 contest progress. Remove it from the game.",
-    "fight": 3,
+    "fight": 2,
     "evade": 2,
     "damage": 1,
     "horror": 1,
