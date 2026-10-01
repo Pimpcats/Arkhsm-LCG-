@@ -76,9 +76,9 @@
   "sthr-waitingcongregation": {
     "name": "The Waiting Congregation",
     "traits": "Echo. Humanoid.",
-    "health": 2,
+    "health": 3,
     "text": "Sleepwalking.\nPrey – Most Memory on their cards.\nWhile Dissonance is in the Glitch band or higher, the Waiting Congregation gains hunter.",
-    "fight": 2,
+    "fight": 3,
     "evade": 2,
     "damage": 1,
     "horror": 1,
@@ -89,8 +89,8 @@
     "traits": "Echo. Monster.",
     "health": 3,
     "text": "Sleepwalking. Aloof.\nForced – After the Drowned Choir wakes: Each investigator at its location takes 1 horror. Limit once per loop.",
-    "fight": 1,
-    "evade": 1,
+    "fight": 2,
+    "evade": 2,
     "damage": 0,
     "horror": 2,
     "quantity": 2
@@ -98,7 +98,7 @@
   "sthr-familiarface": {
     "name": "Familiar Face",
     "traits": "Echo. Humanoid.",
-    "health": 2,
+    "health": 3,
     "text": "Sleepwalking.\nPrey – Most Memory on their cards.\nSpawn – The location of the investigator with the most Memory on their cards (the lead investigator breaks ties).\nForced – After you defeat Familiar Face: Place 1 Memory on your investigator card.",
     "flavor": "You will remember this face too.",
     "fight": 3,
@@ -113,8 +113,8 @@
     "health": 3,
     "text": "Sleepwalking.\nWhile the Ambergrove Lamp (the asset) is in play, the Lamplighter's Echo is not Sleepwalking, even while the Lantern Room's lamp is lit, and gains retaliate.",
     "flavor": "The light wakes him first.",
-    "fight": 2,
-    "evade": 2,
+    "fight": 3,
+    "evade": 3,
     "damage": 1,
     "horror": 1,
     "quantity": 1
@@ -350,10 +350,10 @@
   "sthr-somethingonstair": {
     "name": "Something on the Stair",
     "traits": "Echo. Humanoid.",
-    "health": 1,
+    "health": 2,
     "text": "Sleepwalking.\nSpawn – The Winding Stair.",
-    "fight": 1,
-    "evade": 2,
+    "fight": 2,
+    "evade": 3,
     "damage": 0,
     "horror": 1,
     "quantity": 1
@@ -1039,9 +1039,9 @@
   "sthr-bandonsteps": {
     "name": "The Band on the Steps",
     "traits": "Echo. Humanoid.",
-    "health": 2,
+    "health": 3,
     "text": "Sleepwalking.\nSpawn – The Town Hall Steps.\nWhile the Band on the Steps is not Sleepwalking, investigators at its location cannot play events.",
-    "fight": 2,
+    "fight": 3,
     "evade": 3,
     "damage": 0,
     "horror": 1,
@@ -1054,7 +1054,7 @@
     "health": 3,
     "text": "Aloof.\nSpawn – The Vestry.\nForced – After you discover a clue at the Vestry: If the Drowned Verger is at the Vestry, ready and unengaged, it engages you.",
     "fight": 3,
-    "evade": 2,
+    "evade": 3,
     "damage": 1,
     "horror": 1,
     "quantity": 1,
@@ -1066,7 +1066,7 @@
     "traits": "Monster.",
     "health": 3,
     "text": "Hunter.\nSpawn – The Milestones.\nForced – After the Mile-Counter moves: Place 1 resource on it from the token pool. If there are 3 or more resources on it, remove them and place 1 doom on the current Hour.",
-    "fight": 2,
+    "fight": 3,
     "evade": 3,
     "damage": 1,
     "horror": 1,
@@ -1077,7 +1077,7 @@
   "sthr-barker": {
     "name": "The Barker",
     "traits": "Humanoid.",
-    "health": 2,
+    "health": 3,
     "text": "Hunter.\nPrey – Most resources.\nSpawn – The Ticket Booth.\nForced – After the Barker attacks you: Lose 2 resources.",
     "fight": 3,
     "evade": 3,
@@ -1091,7 +1091,7 @@
     "traits": "Humanoid. Monster.",
     "health": 4,
     "text": "Retaliate.\nSpawn – The Press.\nForced – After an investigator at the Compositor's location fails a skill test: Raise Dissonance by 1. Limit once per round.",
-    "fight": 2,
+    "fight": 3,
     "evade": 2,
     "damage": 1,
     "horror": 1,
@@ -1112,7 +1112,10 @@
     "flavor": "It followed the guest in. It has not been asked to leave."
   },
   "sthr-bellringer": {
-    "text": "Retaliate.\nSpawn – The Flooded Crypt.\nForced – After Hour III is reached, if the Bell-Ringer Beneath is in play: Ready it. It attacks the nearest investigator at its location or a connecting location (the lead investigator breaks ties)."
+    "text": "Retaliate.\nSpawn – The Flooded Crypt.\nForced – After Hour III is reached, if the Bell-Ringer Beneath is in play: Ready it. It attacks the nearest investigator at its location or a connecting location (the lead investigator breaks ties).",
+    "fight": 4,
+    "evade": 3,
+    "health": 5
   },
   "sthr-appointed-approach": {
     "text": "The Approach advances only when an effect says so: Hour V (to at least Sensed), Hour VII (at least Emerging), Hour VIII (Arrived); Dissonance entering the Glitch band (at least Sensed) or the Noticed band (Arrived); The Crossing and The Debt of Hours (1 stage); finale setup (Arrived). It never goes above Arrived.\nWhen the Approach becomes Sensed or later while the Appointed is set aside, put it into play at the revealed location farthest from all investigators that is not closed (the lead investigator breaks ties). When it is pushed back to Unseen, set it aside.\nWhile Sensed: It gains aloof and cannot move or attack. Forced – At the end of the round: The Appointed deals 1 horror to each investigator at its location.\nWhile Emerging: It gains hunter and cannot attack. Forced – After the Appointed engages an investigator: The Appointed deals 1 horror to that investigator.\nWhile Arrived: It gains hunter. Forced – After the Appointed attacks: Raise Dissonance by 1.",
@@ -1239,9 +1242,9 @@
   "sthr-minutehand": {
     "name": "The Minute Hand",
     "traits": "Monster.",
-    "fight": 2,
+    "fight": 3,
     "health": 2,
-    "evade": 2,
+    "evade": 3,
     "damage": 1,
     "horror": 1,
     "quantity": 1,
@@ -1249,6 +1252,14 @@
     "flavor": "It keeps perfect time. It is only ever one minute behind you."
   },
   "sthr-wearssheriff": {
-    "text": "Spawn – The Records Office.\nWhile What Wears the Sheriff is in play, the Records Office gets +1 shroud."
+    "text": "Spawn – The Records Office.\nWhile What Wears the Sheriff is in play, the Records Office gets +1 shroud.",
+    "fight": 4,
+    "evade": 3,
+    "health": 6
+  },
+  "sthr-onewhorides": {
+    "fight": 4,
+    "evade": 3,
+    "health": 4
   }
 }
