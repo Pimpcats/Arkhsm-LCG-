@@ -17,8 +17,11 @@ little production work as possible. Read docs/ASSISTANT_WORKFLOW.md first.
   approved artwork when available; do not promise identical results.
 - Art approval is not campaign/playtest approval. Report validation honestly.
 - Never imply GitHub access gives access to the owner's running desktop app.
-- To make a new campaign, follow docs/CAMPAIGN_PLAYBOOK.md (order of work,
-  checks, lessons learned). Read docs/ASSISTANT_WORKFLOW.md first.
+- To make a new campaign, use the /new-campaign skill
+  (.claude/skills/new-campaign/SKILL.md): scaffold with tools/new_campaign.py,
+  then follow docs/CAMPAIGN_PLAYBOOK.md (order of work, checks, lessons
+  learned). Build commands take the campaign from CAMPAIGN=<id>; without it
+  they build The Still Hour. Read docs/ASSISTANT_WORKFLOW.md first.
 
 ## Working branch
 

@@ -7,8 +7,9 @@ first; this playbook adds the order of work, the checks at each stage and the
 lessons learned.
 
 **How to start one (owner):** open a session on this repo and say:
-> Start a new campaign using docs/CAMPAIGN_PLAYBOOK.md. Theme: … Tone: …
-> Players: … Length: … Anything I want or don't want: …
+> /new-campaign Theme: … Tone: … Players: … Length: … Anything I want or don't want: …
+
+(docs/NEW_CAMPAIGN.md is the one-page version for the owner.)
 
 **How to resume (owner):** "Continue the <name> campaign from the playbook."
 The assistant finds the phase from `campaigns/<id>/assistant/production.json`.
@@ -25,25 +26,29 @@ The assistant finds the phase from `campaigns/<id>/assistant/production.json`.
   (the review gallery does this).
 - Report validation honestly: "renders fit" is not "playtested".
 
-## 1. Before campaign #2: make the pipeline campaign-generic (one-time)
+## 1. The pipeline is campaign-generic (done 2026-10-01)
 
-The Still Hour was built first, so parts of the pipeline name it directly.
-Current state:
+Every build script reads the campaign from `campaigns/<id>/build.json`
+(`pipeline/campaign_config.py`); choose it with `CAMPAIGN=<id>` or `--campaign
+<id>`. Without either, commands build The Still Hour, the reference campaign;
+its `build.json` reproduces its dist/ files and card faces byte for byte (the
+refactor was checked against all 214 outputs).
 
-| Piece | State | Work for a new campaign |
-|---|---|---|
-| Card renderer, frames, fonts, glyphs (`pipeline/render_placeholders.py`, `cardforge/`) | generic | none |
-| Card specs (`pipeline/stillhour_*_spec.json`), overrides (`campaigns/<id>/card_overrides.json`) | file names are Still Hour's | move specs under `campaigns/<id>/` and read the path from `--campaign` |
-| `compile_campaign.py`, `scenario_content.py`, `assistant_bridge.py` | take `--campaign` | none |
-| `build_cards.py`, `table_presence.py`, `package_download.py`, `publish_hosted.py`, `build_guide_pdf.py`, `bundle_mod.py`, `campaign_log.py` | name Still Hour files/ids | parameterize by campaign |
-| Control token rules engine (`src/tts/control.lua`, `src/StillHour/*.ttslua`) | Still Hour's own mechanics (loops, Hourglass, Dissonance, Years) | a new campaign with new mechanics needs its own engine modules; reuse the board, SCED and UI helpers |
-| Campaign log token layout (`pipeline/campaign_log.py`) | Still Hour's fields | new field list; the renderer and Lua are reusable (field types cb/ct/tx/dv/rv) |
-| Tempo/economy simulators (`pipeline/simulate*.py`) | Still Hour's map, objectives and currencies | reuse the structure; replace the data tables and currency rules |
-| Loop box, memory bags, relay (`src/tts/loop_box.lua`, `tools/tts_relay/`) | generic | point at the new package |
+| Piece | Per campaign |
+|---|---|
+| Names, file names, ids, specs, guide, starter slice, hosted URLs | `campaigns/<id>/build.json` |
+| Card specs, print layer, overrides, scenarios, assignments | `campaigns/<id>/specs/`, `card_overrides.json`, `scenario_manifest.json`, `scenario_assignments.json` |
+| Campaign log content | `campaigns/<id>/log_layout.py` (drawing and token Lua are shared) |
+| Art scenes, re-shoots, prompt pack | `campaigns/<id>/art_scenes.json`, `campaign.json` (house style), `art/ART_PACK.md` |
+| Control token rules | `src/tts/<id>_control.lua` (+ optional modules under `src/<lua_dir>/`) |
+| Play engine rules, arithmetic models | `tools/play_engine/lua/{effects,scenarios,rules,finale}.lua`, `pipeline/simulate*.py` — written per campaign |
+| Shared table scripts (loop box, download box, log) | shared; the build swaps in the campaign's names |
 
-Do this first, as its own branch, with the Still Hour build as the regression
-test: after the refactor it must rebuild byte-identical cards and pass every
-test.
+**Scaffold:** `python3 tools/new_campaign.py <id> "<Name>" --prefix abcd` writes
+a starter campaign that already passes the content check, builds, and passes
+`pipeline/verify_control.lua`; `tests/test_new_campaign.py` keeps that true.
+The owner's view is `docs/NEW_CAMPAIGN.md`; the assistant's runbook is the
+`/new-campaign` skill (`.claude/skills/new-campaign/SKILL.md`).
 
 ## 2. Brief and pitch (owner: 5 minutes)
 
@@ -185,10 +190,12 @@ Follow `docs/ASSISTANT_WORKFLOW.md`:
 ## 9. Build, render and check fit
 
 ```bash
-PUBLISH_COMMIT_TRAILER="<attribution lines>" python3 pipeline/publish_hosted.py
+export CAMPAIGN=<id>
+python3 pipeline/scenario_content.py --lock             # every scenario LOCKED, 0 errors
+CAMPAIGN=<id> PUBLISH_COMMIT_TRAILER="<attribution lines>" python3 pipeline/publish_hosted.py
 python3 -m pytest -q tests
-python3 pipeline/scenario_content.py --campaign <id>     # every scenario LOCKED, 0 errors
-lua5.4 pipeline/lua_smoketest.lua && lua5.4 pipeline/verify_bundle.lua
+lua5.4 pipeline/verify_control.lua dist/<slug>_bundle.lua runCampaignTests
+# The Still Hour only: lua5.4 pipeline/lua_smoketest.lua && lua5.4 pipeline/verify_bundle.lua
 ```
 
 Then **look** at every changed card (contact sheets). The automatic overflow

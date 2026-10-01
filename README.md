@@ -12,6 +12,13 @@ in `docs/design/` and contain spoilers.
 **To play:** load `dist/saved_object_the_still_hour.json` as a Saved Object in
 SCED. See **`docs/LOADING.md`**. New here? Start with **`START_HERE.md`**.
 
+## Make a new campaign
+
+Type `/new-campaign` with your idea in a Claude Code session on this repo; see
+**`docs/NEW_CAMPAIGN.md`** (your checkpoints) and `docs/CAMPAIGN_PLAYBOOK.md`
+(the process). `python3 tools/new_campaign.py <id> "<Name>"` scaffolds a
+campaign that already builds; every build command takes `CAMPAIGN=<id>`.
+
 ## Layout
 
 ```

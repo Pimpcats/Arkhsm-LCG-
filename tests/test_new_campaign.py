@@ -72,6 +72,17 @@ def test_scaffold_builds_and_passes(repo):
         assert "verify_control: OK" in res, res
 
 
+def test_art_track(repo):
+    """Scenes -> art manifest -> ChatGPT prompt pack, per campaign."""
+    if not os.path.exists(os.path.join(repo, "campaigns", "kit_test")):
+        run(repo, "tools/new_campaign.py", "kit_test", "The Kit Test", "--prefix", "ktst")
+    run(repo, "pipeline/build_art_manifest.py")
+    assert os.path.exists(os.path.join(repo, "campaigns", "kit_test", "manifest.json"))
+    run(repo, "pipeline/chatgpt_art_pack.py")
+    pack = open(os.path.join(repo, "campaigns", "kit_test", "art", "ART_PACK.md"), encoding="utf-8").read()
+    assert "The Kit Test" in pack and "SHARED HOUSE STYLE" in pack
+
+
 def test_still_hour_is_the_default(repo):
     out = subprocess.run([sys.executable, "-c", "import sys; sys.path.insert(0, 'pipeline');"
                           "from campaign_config import load; c = load('still_hour');"

@@ -112,6 +112,10 @@ REDO_SCENES = {
         "with a large moon-and-clock emblem and bands of abstract ornament (no letters, no "
         "digits, no calendar grid)",
 }
+# a campaign other than The Still Hour keeps its re-shoots with its scenes
+# (art_scenes.json "redo": {card id: rewritten scene})
+if os.path.exists(CFG.path("art_scenes")):
+    REDO_SCENES = json.load(open(CFG.path("art_scenes"), encoding="utf-8")).get("redo", {})
 
 
 def scene_text(job):
