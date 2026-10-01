@@ -853,8 +853,8 @@
   },
   "sthr-act-whythirteen": {
     "name": "Why Thirteen?",
-    "clues": 10,
-    "text": "Objective – If an investigator is at the Vestry, the investigators may, as a group, spend 10 [perinv] clues to advance.",
+    "clues": 9,
+    "text": "Objective – If an investigator is at the Vestry, the investigators may, as a group, spend 9 [perinv] clues to advance.",
     "flavor": "The bell tolled thirteen times at the first occultation. It should toll twelve.",
     "deck": 95104,
     "index": "1a",
@@ -877,7 +877,7 @@
   },
   "sthr-act-walkbackward": {
     "name": "Walk It Backward",
-    "text": "Objective – Advance when one investigator has discovered 3 clues at the Turning, then 3 clues at the Low Bridge, then 4 clues at the Milestones, in that order, during this loop. (Keep a separate pile of resources from the token pool on this act for each investigator, 1 per clue that counts.)",
+    "text": "Objective – Advance when one investigator has discovered 4 clues at the Turning, then 4 clues at the Low Bridge, then 4 clues at the Milestones, in that order, during this loop. (Keep a separate pile of resources from the token pool on this act for each investigator, 1 per clue that counts.)",
     "flavor": "The same figures walk it every loop, in the same direction, never arriving.",
     "deck": 95106,
     "index": "1a",
@@ -887,14 +887,14 @@
   },
   "sthr-act-walksbeside": {
     "name": "Who Walks Beside You",
-    "text": "Part II only.\nForced – When this act becomes the current act: Search the encounter deck and discard pile for a Waiting Congregation, spawn it at the Turning and shuffle the encounter deck. While this act is the current act, each Echo at the Turning is not Sleepwalking.\nObjective – [action] Spend 7 [perinv] clues: Stand Firm. Only an investigator at the Turning may use this ability; investigators at the Turning may contribute the clues. Choose a ready Echo at the Turning and test [wil] (X) or [com] (X), where X is its fight value. If you succeed, exhaust it and advance. If you fail, place the spent clues on the Turning. Investigators at the Turning may also spend 7 [perinv] clues after one of them evades an Echo there, to advance.",
+    "text": "Part II only.\nForced – When this act becomes the current act: Search the encounter deck and discard pile for a Waiting Congregation, spawn it at the Turning and shuffle the encounter deck. While this act is the current act, each Echo at the Turning is not Sleepwalking.\nObjective – [action] Spend 8 [perinv] clues: Stand Firm. Only an investigator at the Turning may use this ability; investigators at the Turning may contribute the clues. Choose a ready Echo at the Turning and test [wil] (X) or [com] (X), where X is its fight value. If you succeed, exhaust it and advance. If you fail, place the spent clues on the Turning. Investigators at the Turning may also spend 8 [perinv] clues after one of them evades an Echo there, to advance.",
     "flavor": "Some of them turn to look at you now.",
     "deck": 95107,
     "index": "2a",
     "number": "2/2",
     "back_flavor": "The face under the hood is worn almost smooth, like a step a thousand feet have climbed. You know the coat. You know the ring on the hand that lifts to stop you. They were here before you, and they looped until there was nothing left to loop.",
     "back_text": "Record in your Campaign Log: Who Walks Beside You.\nRemove 1 [cultist] token from the chaos bag for the rest of the campaign.\nWhile your Campaign Log records Who Walks Beside You, each Echo gets −1 fight.\nThe Sunken Road's objectives are complete. From now on, do not use this act deck when you Place this box.",
-    "clues": 7,
+    "clues": 8,
     "clues_per_investigator": true
   },
   "sthr-act-sheriffdead": {
@@ -923,26 +923,26 @@
   },
   "sthr-act-wheelturns": {
     "name": "The Wheel Still Turns",
-    "text": "Objective – [action] Spend 5 [perinv] clues: Test [agi] (3). Only an investigator at the Wheel may use this ability; investigators at the Wheel may contribute the clues. If you succeed, advance. If you fail, place the spent clues on the Wheel.",
+    "text": "Objective – [action] Spend 4 [perinv] clues: Test [agi] (3). Only an investigator at the Wheel may use this ability; investigators at the Wheel may contribute the clues. If you succeed, advance. If you fail, place the spent clues on the Wheel.",
     "flavor": "You see the whole town at once.",
     "deck": 95110,
     "index": "1a",
     "number": "1/2",
     "back_flavor": "From the top of the Wheel, Ambergrove lies spread out like a map on a table: the Square, the church, the road running out to the lighthouse. Every street is full, and nobody is moving.",
     "back_text": "Record in your Campaign Log: The Wheel Still Turns.\nFrom now on, while your Campaign Log records The Wheel Still Turns: [free]: Look at the top 2 cards of the encounter deck and put them back in any order. Only an investigator at the Wheel may use this ability. Group limit once per loop.\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game.",
-    "clues": 5,
+    "clues": 4,
     "clues_per_investigator": true
   },
   "sthr-act-bargain": {
     "name": "The Ticket-Taker's Bargain",
-    "text": "Part II only.\nObjective – [action] Spend 8 [perinv] clues: Parley. Only an investigator at the Ticket Booth may use this ability; investigators at the Ticket Booth may contribute the clues. Advance.",
+    "text": "Part II only.\nObjective – [action] Spend 7 [perinv] clues: Parley. Only an investigator at the Ticket Booth may use this ability; investigators at the Ticket Booth may contribute the clues. Advance.",
     "flavor": "He smiles at you like he's been expecting you for a very long time.",
     "deck": 95111,
     "index": "2a",
     "number": "2/2",
     "back_flavor": "He does not ask your name. He tells you there is a way out of the night, that the fare is steep, and that he has waited a very long time for someone who could afford it.",
     "back_text": "Record in your Campaign Log: The Ticket-Taker's Bargain.\nThe Fairground's objectives are complete. From now on, do not use this act deck when you Place this box.",
-    "clues": 8,
+    "clues": 7,
     "clues_per_investigator": true
   },
   "sthr-act-almanachid": {

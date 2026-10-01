@@ -130,7 +130,7 @@ return function(R, T)
         local step = (inv.walk or 0) + 1
         -- clues per step (Walk It Backward); what-if walkSteps {a, b, c} or walkPer n
         local steps = (R.WHATIF or {}).walkSteps
-        local per = (steps and steps[step]) or (R.WHATIF or {}).walkPer or ({ 3, 3, 4 })[step]
+        local per = (steps and steps[step]) or (R.WHATIF or {}).walkPer or ({ 4, 4, 4 })[step]
         if seq[step] == L.id then inv.walkCount = (inv.walkCount or 0) + 1 end
         if seq[step] == L.id and inv.walkCount >= per then
           inv.walk = step
