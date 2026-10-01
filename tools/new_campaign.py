@@ -436,6 +436,9 @@ def scaffold(cid, name, prefix, force=False):
         "log_pages": [p + "-log-page1"],
         "starter": [], "render_all_pipeline_specs": False,
         "skip_bags": ["Encounter Cards"],   # the loose encounter bag would spoil the scenarios
+        # encounter-set symbols (pipeline/render_set_icons.py, encounter_sets.py)
+        "encounter_symbols": {"_default": "example_set", "example": "example_set"},
+        "set_icon_shapes": {"example_set": "eclipse"},
         "encounter_bag_name": name.upper() + " — Encounter Cards",
         "genre": "cosmic-horror", "art_setting": "1920s New England, cosmic horror, uncanny rather than gory",
         "box_hue": 168,

@@ -111,9 +111,21 @@ For each card type:
    encounter deck already punishes, and quiet hubs.
 4. **Test it (section 6)** before it goes on a card.
 
-Coverage checklist:
-- agendas and acts, fronts and backs (the back resolves or continues);
-- locations, both sides (unrevealed: flavor only);
+Coverage checklist (official rates in brackets, NotZ–TIC; see
+`docs/design/OFFICIAL_COMPARISON.md`):
+- agendas: flavor and rules on the front (100%), story and rules on the back;
+- acts: fronts and backs (the back resolves or continues); vary the
+  objectives — about a third ask for a clue threshold, the rest are
+  take-and-deliver story assets, tests, enemies, sequences (manifest act
+  `carry`: {asset, take_at, deliver_to}; the audit checks it);
+- story assets (median 1 per scenario), set aside in their box;
+- locations, both sides: rules text on nearly all (98%), Forced on about 40%,
+  a rare [reaction], text on about a fifth of unrevealed sides (Closed rules
+  go there, `unrevealed_text`);
+- a Resign ability somewhere on most scenarios' maps;
+- an encounter-set symbol and number on every scenario card: pick a shape per
+  set in build.json `set_icon_shapes`, map boxes in `encounter_symbols`, run
+  `python3 pipeline/render_set_icons.py`;
 - enemies, treacheries, story and resolution cards;
 - scenario reference card (Easy/Standard and Hard/Expert sides);
 - player cards, signature weaknesses;
@@ -191,6 +203,7 @@ Follow `docs/ASSISTANT_WORKFLOW.md`:
 
 ```bash
 export CAMPAIGN=<id>
+python3 pipeline/render_set_icons.py                    # the encounter-set symbols
 python3 pipeline/scenario_content.py --lock             # every scenario LOCKED, 0 errors
 CAMPAIGN=<id> PUBLISH_COMMIT_TRAILER="<attribution lines>" python3 pipeline/publish_hosted.py
 python3 -m pytest -q tests
@@ -278,6 +291,9 @@ check misses text that runs under frame art. Known trouble spots:
 - Lua: `{ table.unpack and table.unpack(t) or unpack(t) }` keeps only the
   first value (an and/or expression returns one). It made the engine's
   enemies attack one at a time; copy lists with a loop.
+- Audit components against official cards, not just numbers: The Still
+  Hour first shipped with no agenda flavor, no set symbols, no story assets,
+  no resign and nearly all clue-threshold acts (fixed in the parity pass).
 - Objective feasibility checks must count every clue source really in play
   (the hub is always placed and clues are portable), or they flag costs the
   engine meets.

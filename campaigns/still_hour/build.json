@@ -102,5 +102,21 @@
     "_cards": {
       "sthr-crossing": "node_square"
     }
+  },
+  "set_icon_shapes": {
+    "_doc": "Encounter-set symbol shapes (pipeline/render_set_icons.py SHAPES).",
+    "occultation_skips": "eclipse",
+    "echoes": "ripples",
+    "static": "jagged",
+    "weight_of_years": "hourglass",
+    "appointed": "door",
+    "named": "seal",
+    "node_lighthouse": "lighthouse",
+    "node_church": "bell",
+    "node_road": "milestone",
+    "node_square": "clock",
+    "node_fairground": "wheel",
+    "node_almanac": "book",
+    "strays": "hand"
   }
 }

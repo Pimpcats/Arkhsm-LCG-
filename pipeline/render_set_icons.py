@@ -9,8 +9,9 @@ art, no lettering) and saved as transparent PNGs:
 
 The renderer (render_placeholders.py) pastes them into each frame's
 encounter-symbol slot; pipeline/encounter_sets.py decides which set every
-card shows. A new campaign adds its own drawings to DRAW (keyed by the set
-ids in its scenario_manifest.json); a set with no drawing prints no symbol.
+card shows. A campaign picks a shape for each of its sets in build.json
+("set_icon_shapes": {set id: shape}, shapes below; add a drawing function to
+SHAPES for a new one); a set with no symbol prints none.
 
 Run: python3 pipeline/render_set_icons.py [--campaign ID]
 """
@@ -198,21 +199,11 @@ def hand():
     return img
 
 
-# set id -> drawing (The Still Hour's sets; another campaign adds its own)
-DRAW = {
-    "occultation_skips": occultation,
-    "echoes": echoes,
-    "static": static,
-    "weight_of_years": hourglass,
-    "appointed": door,
-    "named": seal,
-    "node_lighthouse": lighthouse,
-    "node_church": bell,
-    "node_road": milestone,
-    "node_square": clock,
-    "node_fairground": wheel,
-    "node_almanac": book,
-    "strays": hand,
+# the shapes a campaign can pick from (build.json "set_icon_shapes": {set id: shape})
+SHAPES = {
+    "eclipse": occultation, "ripples": echoes, "jagged": static, "hourglass": hourglass,
+    "door": door, "seal": seal, "lighthouse": lighthouse, "bell": bell,
+    "milestone": milestone, "clock": clock, "wheel": wheel, "book": book, "hand": hand,
 }
 
 
@@ -223,9 +214,12 @@ def out_dir(campaign=None):
 def main():
     out = out_dir()
     os.makedirs(out, exist_ok=True)
-    for sid, fn in DRAW.items():
-        fn().save(os.path.join(out, sid + ".png"))
-    print("drew {} set symbol(s) -> {}".format(len(DRAW), os.path.relpath(out)))
+    shapes = {k: v for k, v in (CFG.get("set_icon_shapes") or {}).items() if not k.startswith("_")}
+    for sid, shape in shapes.items():
+        if shape not in SHAPES:
+            raise SystemExit("set {}: unknown shape '{}' (have: {})".format(sid, shape, ", ".join(sorted(SHAPES))))
+        SHAPES[shape]().save(os.path.join(out, sid + ".png"))
+    print("drew {} set symbol(s) -> {}".format(len(shapes), os.path.relpath(out)))
 
 
 if __name__ == "__main__":

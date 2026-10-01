@@ -48,3 +48,28 @@ investigators (the Square plus one district unless noted), measured
 - Treacheries: `tools/play_engine/lua/effects.lua` resolves the new tests.
 - XP: `Knowledge.MEMORY_PER_INVESTIGATOR`, `Constants.forCount().memoryCap`,
   `shApiClaimVictory` (X per investigator).
+
+## Card components (second pass, 2026-10-01)
+
+The owner's follow-up: everything an official scenario prints, front and
+back. Official figures: SCED's TTS files and arkhamdb-json-data, Night of the
+Zealot to The Innsmouth Conspiracy (same sources as above).
+
+| component | official | The Still Hour before | change |
+|---|---|---|---|
+| Agenda front flavor | 100% of agendas | 0 of 9 Hours | **added** to all nine Hours |
+| Location rules text | 98% | 83% (4 blank) | **every location** has text |
+| Location Forced effects | 44% | 22% (5 of 23) | **39%** (9 of 23): the Nave, the Milestones, the Low Bridge, the Flooded Crypt added |
+| Location [reaction] | 4% | 0 | the Reading Room (1 of 23) |
+| Unrevealed-side text | 18% | 0 | **17%** (4 of 23): Closed rules moved to the Flooded Crypt's and the Sealed Study's unrevealed sides (where official Closed locations print them), the Belfry, the Winding Stair |
+| Acts with a clue threshold | 36% | 86% (12 of 14) | **50%** (7 of 14); five acts became take-and-deliver objectives (an [action] spends the clues to take control of a set-aside story asset; the act advances when its controller reaches another location; the clue circle prints a dash) |
+| Story assets | median 1 per scenario | 0 | **5**: The Keeper's Logbook, The Parish Register, The Drowned Page, The Town Ledger, The Bound Almanac (each with a small skill bonus; the illustration is the act's) |
+| Resign | median 1 per scenario | none | **[action]: Resign** on the hub Square (not in the finale or the Prologue); a loop ending for when everyone resigned or was defeated |
+| Encounter-set symbol and number | every scenario card | none | **13 set symbols** (drawn in code, `pipeline/render_set_icons.py`) printed in each frame's set slot, with "n/total" in the footer (`pipeline/encounter_sets.py`); shown in the guide's district setup and appendix |
+| Act / agenda backs | story and rules on every b side | present on all | story assets' acts add "Remove the X from the game." |
+
+The play engine encodes every new effect (COVERAGE in
+`tools/play_engine/lua/effects.lua`): the location Forced effects and
+reaction, the Belfry's unrevealed Forced, taking, carrying, dropping on
+defeat and delivering a story asset, and the assets' skill bonuses. The
+party never resigns (it cannot win a loop that way).
