@@ -20,15 +20,15 @@ local Interlude = {}
 -- In-engine the panel can instead read memoryCost off each card's GMNotes; this
 -- table keeps the logic layer self-contained and testable.
 Interlude.RECOLLECTION_COST = {
-  ["sthr-foreknowledge"]      = 3,
-  ["sthr-dejavu"]             = 4,
-  ["sthr-musclememory"]       = 3,
-  ["sthr-rehearsedescape"]    = 3,
+  ["sthr-foreknowledge"]      = 2,
+  ["sthr-dejavu"]             = 2,
+  ["sthr-musclememory"]       = 2,
+  ["sthr-rehearsedescape"]    = 2,
   ["sthr-longwayround"]       = 2,
   ["sthr-borrowedtime"]       = 3,
-  ["sthr-thistimeforsure"]    = 4,
-  ["sthr-anchorpoint"]        = 3,
-  ["sthr-cassandrasnotebook"] = 4,
+  ["sthr-thistimeforsure"]    = 2,
+  ["sthr-anchorpoint"]        = 4,
+  ["sthr-cassandrasnotebook"] = 3,
   ["sthr-hourlearnedname"]    = 5,
 }
 

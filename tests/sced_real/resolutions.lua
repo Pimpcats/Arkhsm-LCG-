@@ -824,8 +824,8 @@ return function(H)
     if logVal("page_b") then
       local h = st().hour
       ctl("shClickHour", true)
-      check("The drowned heard the true hour: the Hourglass rewinds 1 (stepping over Hour IV)",
-        st().hour == (h == 5 and 3 or h - 1), h .. " -> " .. st().hour)
+      check("The drowned heard the true hour: the Hourglass rewinds 1",
+        st().hour == h - 1, h .. " -> " .. st().hour)
     end
   end
   local function reachContest()

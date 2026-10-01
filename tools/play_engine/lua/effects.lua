@@ -32,8 +32,21 @@ return function(R, T)
 
   --- The Wheel: "Forced – After the Hourglass advances: Each investigator at the Wheel takes 1 horror."
   function FX.afterAdvance()
+    local G = R.G
     local wheel = R.locById("sthr-loc-wheel")
-    if wheel then for _, inv in ipairs(R.investigatorsAt(wheel)) do horror(inv, 1, "The Wheel") end end
+    if wheel and not G.riderDefeated then
+      for _, inv in ipairs(R.investigatorsAt(wheel)) do horror(inv, 1, "The Wheel") end
+    end
+    -- Why Thirteen?: "After the Hourglass advances, if the investigator who
+    -- controls Parish Register is at The Belfry, advance."
+    for _, act in pairs(G.acts) do
+      local A = FX.ACTS[act.id] or {}
+      if A.onAdvance and act.holder and not act.completed and not act.holder.defeated
+         and R.locOf(act.holder) == R.locById(A.at) then
+        R.advanceAct(act, act.holder)
+        if G.ended then return end
+      end
+    end
   end
   --- The Flooded Crypt: "Forced – At the end of the round: Each investigator at the Flooded Crypt takes 1 damage."
   function FX.endOfRound()
@@ -56,6 +69,10 @@ return function(R, T)
     if cancelled then return end
     if h == 2 then
       for _, inv in ipairs(R.aliveInvs()) do R.drawEncounter(inv) end
+    elseif h == 3 and G.bellDefeated then
+      -- The Bell-Ringer Beneath was defeated: Hour III's text does not resolve
+      -- (undo the +1 the Control applied)
+      R.lower(1, "Hour III does not resolve (the Bell-Ringer is defeated)")
     elseif h == 3 then
       -- the Belfry's unrevealed side: "Forced – When Hour III is reached: Reveal the Belfry."
       local belfry = R.locById("sthr-loc-belfry")
@@ -78,6 +95,8 @@ return function(R, T)
           if best and not (R.WHATIF or {}).bellNoAttack then R.enemyAttack(en, best, "Hour III") end
         end
       end
+    elseif h == 4 and R.knows("the-hour-was-wrong") then
+      R.log("Hour IV's text does not resolve (The Hour Was Wrong)")
     elseif h == 4 then
       -- the lead chooses a revealed location with the fewest clues, other than
       -- the Square: impassable. Among the fewest, a careful lead spares the
@@ -216,7 +235,8 @@ return function(R, T)
     local G = R.G
     G.enteredThisTurn[L.id] = true
     if L.id == "sthr-loc-almanacsteps" then R.raise(1, "The Almanac Steps") end
-    if L.id == "sthr-loc-belfry" and not R.knows("the-thirteenth-toll") then R.raise(1, "The Belfry") end
+    if L.id == "sthr-loc-belfry" and not R.knows("the-thirteenth-toll") and not FX.registerCancels() then R.raise(1, "The Belfry") end
+    if L.id == "sthr-loc-well" then inv.wellRound = G.round end
     if L.id == "sthr-loc-well" and not R.knows("the-sheriff-is-already-dead") then horror(inv, 1, "The Well") end
     if L.id == "sthr-loc-nave" and not R.test(inv, "wil", 2, { kind = "location" }) then horror(inv, 1, "The Nave") end
     if L.id == "sthr-loc-lowbridge" and not R.test(inv, "agi", 2, { kind = "location" }) then
@@ -366,23 +386,29 @@ return function(R, T)
   -- act's clues (any investigator contributes when carry.any, else those at
   -- carry.take) to take control of a set-aside story asset; the act advances
   -- when its controller is at `at`. A defeated controller drops it.
-  ACTS["sthr-act-whythirteen"] = { at = "sthr-loc-belfry", fact = "the-thirteenth-toll", spend = true,
+  -- onAdvance = the carry is delivered only when the Hourglass advances (FX.afterAdvance)
+  ACTS["sthr-act-whythirteen"] = { at = "sthr-loc-belfry", fact = "the-thirteenth-toll", spend = true, onAdvance = true,
                                    carry = { asset = "sthr-item-register", take = "sthr-loc-vestry", any = true } }
-  ACTS["sthr-act-sheriffdead"] = { at = "sthr-loc-well", fact = "the-sheriff-is-already-dead", spend = true }
+  -- twoPlace = one investigator at each location at once (solo: at the second, having been at the first this round)
+  ACTS["sthr-act-sheriffdead"] = { at = "sthr-loc-townhallsteps", fact = "the-sheriff-is-already-dead", spend = true,
+                                   twoPlace = { "sthr-loc-well", "sthr-loc-townhallsteps" } }
   ACTS["sthr-act-almanachid"] = { at = "sthr-loc-press", fact = "what-the-almanac-hid", spend = true,
                                   carry = { asset = "sthr-item-almanac", take = "sthr-loc-readingroom", any = true } }
   ACTS["sthr-act-hourwaswrong"] = { at = "sthr-loc-vestry", contrib = true, fact = "the-hour-was-wrong", spend = true,
                                     carry = { asset = "sthr-item-drownedpage", take = "sthr-loc-floodedcrypt" } }
   ACTS["sthr-act-vote"] = { at = "sthr-loc-townhallsteps", contrib = true, fact = "the-vote-that-never-ends", spend = true,
                             carry = { asset = "sthr-item-ledger", take = "sthr-loc-recordsoffice" } }
-  ACTS["sthr-act-appointedname"] = { at = "sthr-loc-sealedstudy", contrib = true, fact = "the-appointeds-name", spend = true }
+  ACTS["sthr-act-appointedname"] = { at = "sthr-loc-sealedstudy", contrib = true, fact = "the-appointeds-name", spend = true,
+                                     minStage = 2 }
   ACTS["sthr-act-ninthdeath"] = { at = "sthr-loc-lanternroom", contrib = true, fact = "the-keepers-ninth-death", spend = true,
                                   needLamp = true, carry = { asset = "sthr-item-logbook", take = "sthr-loc-keepersquarters" } }
   ACTS["sthr-act-lamp"] = { at = "sthr-loc-lanternroom", contrib = true, fact = "the-lamp-was-never-lit", action = true,
                             test = { "wil", "com" }, diff = 3, failClues = true }
   ACTS["sthr-act-wheelturns"] = { at = "sthr-loc-wheel", contrib = true, fact = "the-wheel-still-turns", action = true,
-                                  test = { "agi" }, diff = 3, failClues = true }
-  ACTS["sthr-act-bargain"] = { at = "sthr-loc-ticketbooth", contrib = true, fact = "the-ticket-takers-bargain", action = true }
+                                  doomCost = 2 }
+  -- fare = paid in clues, Memory from own cards and resources (2 for 1)
+  ACTS["sthr-act-bargain"] = { at = "sthr-loc-ticketbooth", contrib = true, fact = "the-ticket-takers-bargain", action = true,
+                               fare = true }
   ACTS["sthr-act-walkbackward"] = { sequence = { "sthr-loc-turning", "sthr-loc-lowbridge", "sthr-loc-milestones" },
                                     fact = "the-road-remembers" }
   ACTS["sthr-act-walksbeside"] = { at = "sthr-loc-turning", standFirm = true, fact = "who-walks-beside-you" }
@@ -402,14 +428,36 @@ return function(R, T)
   end
 
   --- The story assets: who controls one gets its skill bonus (and penalty).
+  --- (each one's ability is encoded where it triggers; a constant modifier sits here)
   FX.STORY = {
-    ["sthr-item-logbook"] = { name = "The Keeper's Logbook", wil = 1 },
-    ["sthr-item-register"] = { name = "The Parish Register", int = 1 },
-    ["sthr-item-drownedpage"] = { name = "The Drowned Page", wil = 1 },
-    ["sthr-item-ledger"] = { name = "The Town Ledger", wil = 1 },
-    ["sthr-item-almanac"] = { name = "The Bound Almanac", int = 1, agi = -1 },
+    ["sthr-item-logbook"] = { name = "Keeper's Logbook" },        -- R.hurt: 1 less damage (exhaust)
+    ["sthr-item-register"] = { name = "Parish Register" },        -- the Verger hunts its holder; cancels a Belfry/Thirteen raise
+    ["sthr-item-drownedpage"] = { name = "Drowned Page" },        -- Lost Hour: 1 doom instead of the advance
+    ["sthr-item-ledger"] = { name = "Town Ledger" },              -- [action]: an Echo here sleeps this round
+    ["sthr-item-almanac"] = { name = "Bound Almanac", agi = -1 }, -- R.test: redraws a Static token
   }
+  --- The investigator who controls this story asset now, or nil.
+  function FX.storyHolder(assetId)
+    for _, inv in ipairs(R.aliveInvs()) do if inv.story and inv.story.id == assetId then return inv end end
+    return nil
+  end
+  --- Exhaust a held story asset for its reaction: true if it was ready.
+  function FX.useStory(assetId)
+    local h = FX.storyHolder(assetId)
+    if not h or h.storyExhausted then return nil end
+    h.storyExhausted = true
+    R.G.metrics.story_uses = R.G.metrics.story_uses or {}
+    R.G.metrics.story_uses[assetId] = (R.G.metrics.story_uses[assetId] or 0) + 1
+    return h
+  end
+  function FX.registerCancels()
+    if FX.useStory("sthr-item-register") then R.log("Parish Register cancels a Dissonance raise") return true end
+    return false
+  end
   for id in pairs(FX.STORY) do cov(id, "full; a defeated controller drops it at their location, where any investigator may take it with an [action]") end
+  cov("sthr-item-ledger", "full; the AI reads an Echo to sleep when it is engaged with one or one is ready at its location")
+  cov("sthr-act-bargain", "full; the fare is paid in resources (2 for 1) first, then clues, then Memory")
+  cov("sthr-act-sheriffdead", "full; the nearest investigator to each place goes there")
 
   --- A carry act's [action]: the investigator takes control of the story asset
   -- (paying the act's clues), or picks a dropped one up.
@@ -453,6 +501,21 @@ return function(R, T)
       return nil
     end
     if A.minHour and R.hour() < A.minHour then return nil end       -- "Hour VII or later" (The First Hour)
+    if A.minStage and R.stage() < A.minStage then return nil end    -- "while the Approach is Emerging or Arrived"
+    if A.twoPlace then
+      -- one investigator at each location at once; solo: at the second, having been at the first this round
+      local a, b = R.locById(A.twoPlace[1]), R.locById(A.twoPlace[2])
+      if not a or not b then return nil end
+      local atA, atB = R.investigatorsAt(a), R.investigatorsAt(b)
+      local ok = (#atA > 0 and #atB > 0)
+      if G.n == 1 and #atB > 0 and (atB[1].wellRound == G.round) then ok = true end
+      if not ok then return nil end
+      local have = 0
+      for _, inv in ipairs(R.aliveInvs()) do have = have + inv.clues end
+      if have >= clueNeed(act.id) then return R.aliveInvs() end
+      return nil
+    end
+    if A.onAdvance and A.carry then return nil end
     local L = R.locById(A.at)
     if not L or L.closed then return nil end
     local here = R.investigatorsAt(L)
@@ -530,9 +593,9 @@ return function(R, T)
         R.spawnEnemy(c, nil, nil, { want = "The Flooded Crypt", ok = false, note = "the Flooded Crypt is closed or not in play" })
       end
     elseif act.id == "sthr-act-vote" then
-      local ro = R.locById("sthr-loc-recordsoffice")
+      local steps = R.locById("sthr-loc-townhallsteps")
       local c = T.takeCard("sthr-wearssheriff")
-      if c and ro then R.spawnEnemy(c, ro, nil, { want = "The Records Office" }) end
+      if c and steps then R.spawnEnemy(c, steps, nil, { want = "The Town Hall Steps" }) end
     elseif act.id == "sthr-act-walksbeside" then
       G.walksBesideCurrent = true
       local turning = R.locById("sthr-loc-turning")
@@ -560,6 +623,11 @@ return function(R, T)
     local G = R.G
     if G.logFlags["You refused the ticket"] and not G.group.refusedTicket then
       G.group.refusedTicket = true
+      return "discard"
+    end
+    if FX.useStory("sthr-item-drownedpage") then
+      R.log("Drowned Page: the Lost Hour costs 1 doom instead")
+      R.placeDoom(1, "Lost Hour (Drowned Page)")
       return "discard"
     end
     local mode = (R.WHATIF or {}).lostHour                           -- what-if: "doom" / "old"
@@ -661,7 +729,8 @@ return function(R, T)
   ENC["sthr-samespeech"] = function(inv)
     if R.test(inv, "wil", 3, { kind = "treachery", peril = true }) then return "discard" end
     local loops = R.G.loopsCompleted or 0
-    horror(inv, 1 + math.min((R.WHATIF or {}).speechMax or 3, math.floor(loops / 3)), "The Same Speech")
+    local extra = R.knows("the-vote-that-never-ends") and 0 or math.min((R.WHATIF or {}).speechMax or 3, math.floor(loops / 3))
+    horror(inv, 1 + extra, "The Same Speech")
     return "discard"
   end
 
@@ -699,7 +768,7 @@ return function(R, T)
   cov("sthr-thirteen")
   ENC["sthr-thirteen"] = function(inv)
     R.placeDoom(1, "Thirteen")
-    if (R.locOf(inv) or {}).district == "Church" then R.raise(1, "Thirteen (Church)") end
+    if (R.locOf(inv) or {}).district == "Church" and not FX.registerCancels() then R.raise(1, "Thirteen (Church)") end
     return "discard"
   end
 
@@ -774,7 +843,7 @@ return function(R, T)
     ["sthr-bandonsteps"] = "sthr-loc-townhallsteps", ["sthr-somethingonstair"] = "sthr-loc-windingstair",
     ["sthr-drownedverger"] = "sthr-loc-vestry", ["sthr-milecounter"] = "sthr-loc-milestones",
     ["sthr-barker"] = "sthr-loc-ticketbooth", ["sthr-compositor"] = "sthr-loc-press",
-    ["sthr-bellringer"] = "sthr-loc-floodedcrypt", ["sthr-wearssheriff"] = "sthr-loc-recordsoffice",
+    ["sthr-bellringer"] = "sthr-loc-floodedcrypt", ["sthr-wearssheriff"] = "sthr-loc-townhallsteps",
     ["sthr-onewhorides"] = "sthr-loc-wheel",
   }
   FX.SPAWN = SPAWN
@@ -842,6 +911,8 @@ return function(R, T)
     if en.id == "sthr-familiarface" and inv then R.addMemory(inv, 1, "Familiar Face") end
     if en.id == "sthr-uninvited" then R.contest(1, "the Uninvited defeated") end
     if en.id == "sthr-milecounter" then en.res = 0 end
+    if en.id == "sthr-bellringer" then G.bellDefeated = true end      -- Hour III no longer resolves this loop
+    if en.id == "sthr-onewhorides" then G.riderDefeated = true end    -- the Wheel's Forced no longer resolves
   end
 
   --- After an enemy moves (the Mile-Counter keeps count).
@@ -898,7 +969,11 @@ return function(R, T)
       return
     end
     -- the Reading Room's [reaction] (always taken): the last clue places 1 Memory
-    if L.id == "sthr-loc-readingroom" and R.clues(L) == 0 then R.addMemory(inv, 1, "The Reading Room") return end
+    if L.id == "sthr-loc-readingroom" and R.clues(L) == 0 and not R.G.group.readingRoom then
+      R.G.group.readingRoom = true
+      R.addMemory(inv, 1, "The Reading Room")
+      return
+    end
     if L.id ~= "sthr-loc-vestry" then return end
     for _, en in ipairs(R.G.enemies) do
       if en.id == "sthr-drownedverger" and en.loc == L.guid and not en.exhausted and not en.engaged then

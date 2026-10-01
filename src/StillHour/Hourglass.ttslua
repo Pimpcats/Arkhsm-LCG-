@@ -7,7 +7,7 @@
 --
 -- Knowledge facts edit specific Hours. Two edits change the clock's STRUCTURE
 -- and are handled here:
---   * "The Hour Was Wrong"     -> Hour IV is removed entirely (skipped).
+--   * "The Hour Was Wrong"     -> Hour IV's "When reached" text no longer resolves.
 --   * "The Way the Night Breaks" -> reaching Hour IX may open the finale instead
 --     of forcing a reset.
 -- The remaining edits change what an Hour DOES; those are applied inside the
@@ -102,10 +102,9 @@ function Hourglass.undoHourSix(ctx)
 end
 
 --- Is this Hour structurally removed from the clock by a Knowledge fact?
+-- (No Hour is removed any more: "The Hour Was Wrong" stops Hour IV's text
+-- from resolving instead, so every loop keeps its full length.)
 function Hourglass.isHourRemoved(hour)
-  if hour == 4 and CampaignState.knows("the-hour-was-wrong") then
-    return true
-  end
   return false
 end
 
@@ -133,7 +132,9 @@ local HOUR_HANDLERS = {
   end,
 
   [4] = function(ctx)
-    -- Handled structurally by isHourRemoved(); if we get here the fact is unknown.
+    if CampaignState.knows("the-hour-was-wrong") then
+      return "Hour IV's When reached does not resolve (The Hour Was Wrong): the road holds."
+    end
     if ctx and ctx.roadGivesWay then
       ctx.roadGivesWay()
     end

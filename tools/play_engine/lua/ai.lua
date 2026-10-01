@@ -170,6 +170,8 @@ return function(R, T)
         if bd == nil or d < bd then bd, cands = d, { inv } elseif d == bd then cands[#cands + 1] = inv end
       end
     end
+    local only = R.onlyPrey(en)
+    if only then return G.locs[only.loc] end
     -- "Prey – Most ..." chooses among all investigators (the Appointed-like text), else the nearest
     local text = tostring(en.def.text or "")
     if text:find("Prey", 1, true) then
@@ -317,6 +319,35 @@ return function(R, T)
       if spots[1] then return spots[1].L, "clues" end
       local nxt = A.nextObjective(act)
       return loc, "go"
+    end
+    if spec.twoPlace then
+      -- one investigator to each place: the nearest to the first goes there,
+      -- the nearest other one to the second (solo: the first, then the second)
+      local first, second = R.locById(spec.twoPlace[1]), R.locById(spec.twoPlace[2])
+      if G.n == 1 then
+        if inv.wellRound == G.round then return second, "go" end
+        return first, "go"
+      end
+      local nearA, da
+      for _, x in ipairs(R.aliveInvs()) do
+        local d = travelCost(R.locOf(x), first)
+        if da == nil or d < da then nearA, da = x, d end
+      end
+      if nearA == inv then return first, "go" end
+      local nearB, db
+      for _, x in ipairs(R.aliveInvs()) do
+        if x ~= nearA then
+          local d = travelCost(R.locOf(x), second)
+          if db == nil or d < db then nearB, db = x, d end
+        end
+      end
+      if nearB == inv then return second, "go" end
+      local nxt = A.nextObjective(act)
+      if nxt and A.needAfter(act, nxt) > 0 then
+        local s = clueSpots(inv, nxt)
+        if s[1] then return s[1].L, "clues (next)" end
+      end
+      return second, "go"
     end
     -- enough clues: those who carry them (or one investigator) go
     if spec.contrib then
@@ -591,6 +622,22 @@ return function(R, T)
       end
     end
 
+    -- Town Ledger: [action] exhaust: an awake Echo here is Sleepwalking until the end of the round
+    if inv.story and inv.story.id == "sthr-item-ledger" and not inv.storyExhausted then
+      for _, en in ipairs(G.enemies) do
+        if en.loc == L.guid and not en.dead and R.hasTrait(en.def, "Echo") and not R.sleepwalking(en)
+           and (en.engaged == inv or not en.exhausted) then
+          add(en.engaged == inv and 42 or 22, "ability", function()
+            inv.storyExhausted = true
+            en.ledgerRound = G.round
+            if en.engaged then en.engaged = nil ; R.placeEnemy(en) end
+            R.log("Town Ledger: %s sleeps until the end of the round", en.name)
+          end)
+          break
+        end
+      end
+    end
+
     -- 2. the Appointed here: Hold Back
     local AL = R.appointedLoc()
     -- (camping at the Sealed Study for Hour IX, finale_h9, the party lets the Appointed come)
@@ -614,7 +661,10 @@ return function(R, T)
       if spec.action and target == L then
         local here = spec.contrib == false and R.aliveInvs() or R.investigatorsAt(L)
         local have = 0
-        for _, x in ipairs(here) do have = have + x.clues end
+        for _, x in ipairs(here) do
+          have = have + x.clues
+          if spec.fare then have = have + math.floor(x.resources / 2) + (x.memory or 0) end
+        end
         local need = FX.actNeed(act.id)
         if have >= need then
           add(60, "objective", function() R.objectiveAction(inv, act) end)
@@ -774,7 +824,8 @@ return function(R, T)
       end
       if a.name == "Old Book of Lore" and not a.exhausted and #inv.hand <= 3 then add(3, "ability", function() R.ACT.assetAbility(inv, a) end) end
       if a.name == "The Bell of Ambergrove" and not a.exhausted and a.uses > 0 and act and R.hour() >= 5
-         and R.dissonance() + 1 < R.consts().glitch - 1 and (inv.raisedCost or 0) < 2 then
+         and not inv.loopUsed.bell and not G.finale
+         and R.dissonance() + 2 < R.consts().glitch - 1 and (inv.raisedCost or 0) < 2 then
         add(12, "ability", function() R.ACT.assetAbility(inv, a) end)
       end
     end

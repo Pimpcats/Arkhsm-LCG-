@@ -165,7 +165,7 @@ function runStillHourTests()
   Hourglass.advance(4, ctx)
   local sawIV = false
   for _, h in ipairs(reached) do if h == 4 then sawIV = true end end
-  check("'The Hour Was Wrong' removes Hour IV from the clock", not sawIV)
+  check("'The Hour Was Wrong' keeps Hour IV in the clock (its text stops resolving)", sawIV)
 
   -- 8. Aging brackets + drift (P7).
   check("years 5 -> Weathered, 10 -> Elder, 15 -> Ancient",

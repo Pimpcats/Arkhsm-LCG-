@@ -147,7 +147,7 @@ check("Recollection debits its memoryCost (5)", CampaignState.purchaseRecollecti
 check("cannot overdraw the pool (need 4, have 2)", CampaignState.purchaseUpgrade(4) == false and CampaignState.getBankedMemory() == 2)
 check("both wrappers share one pool", CampaignState.spendMemory(2) == true and CampaignState.getBankedMemory() == 0)
 
-print("== P6: a big Skip resolves intervening Hours; 'The Hour Was Wrong' removes Hour IV ==")
+print("== P6: a big Skip resolves intervening Hours; 'The Hour Was Wrong' silences Hour IV ==")
 CampaignState.init(3)
 local reached = {}
 local ctx = { onHourReached = function(h) reached[#reached + 1] = h end }
@@ -156,13 +156,14 @@ check("advancing resolved Hours II,III,IV", reached[1] == 2 and reached[2] == 3 
 CampaignState.init(3)
 CampaignState.unlockFact("the-hour-was-wrong")
 reached = {}
-Hourglass.advance(4, ctx) -- should step over IV
+local gave = false
+Hourglass.advance(4, { onHourReached = function(h) reached[#reached + 1] = h end,
+                       roadGivesWay = function() gave = true end })
 local sawIV = false
 for _, h in ipairs(reached) do if h == 4 then sawIV = true end end
-check("Hour IV skipped when 'The Hour Was Wrong' known", sawIV == false)
--- With IV removed the clock is I,II,III,V,VI,...; 4 steps from I lands on VI
--- (II,III,V,VI) — a removed Hour is stepped over, it does not consume a step.
-check("landed on Hour VI (IV stepped over)", CampaignState.getHour() == 6)
+check("Hour IV stays in the clock when 'The Hour Was Wrong' is known", sawIV == true)
+check("...but the road does not give way", gave == false)
+check("4 steps from Hour I land on Hour V", CampaignState.getHour() == 5)
 
 print("== P7: Aging brackets + drift ==")
 check("years 4 -> Prime", Aging.bracketForYears(4) == "Prime")
@@ -620,7 +621,7 @@ check("a spend larger than the bank is refused (no change)", CampaignState.spend
   and CampaignState.getBankedMemory() == 0)
 CampaignState.deserialize(JSON.encode({ version = 1, investigators = 3, bankedMemory = -4 }))
 check("a save holding negative banked Memory loads as 0", CampaignState.getBankedMemory() == 0)
-check("Borrowed Time costs 3 Memory", Interlude.recollectionCost("sthr-borrowedtime") == 3)
+check("Stolen Minute costs 3 Memory", Interlude.recollectionCost("sthr-borrowedtime") == 3)
 
 print("== Reset Loop: the loop-ended flag (guards a second Reset Loop) ==")
 CampaignState.init(3)

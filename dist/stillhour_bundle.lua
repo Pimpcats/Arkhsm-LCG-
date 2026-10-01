@@ -932,7 +932,7 @@ __modules["StillHour/Hourglass"] = function()
 --
 -- Knowledge facts edit specific Hours. Two edits change the clock's STRUCTURE
 -- and are handled here:
---   * "The Hour Was Wrong"     -> Hour IV is removed entirely (skipped).
+--   * "The Hour Was Wrong"     -> Hour IV's "When reached" text no longer resolves.
 --   * "The Way the Night Breaks" -> reaching Hour IX may open the finale instead
 --     of forcing a reset.
 -- The remaining edits change what an Hour DOES; those are applied inside the
@@ -1027,10 +1027,9 @@ function Hourglass.undoHourSix(ctx)
 end
 
 --- Is this Hour structurally removed from the clock by a Knowledge fact?
+-- (No Hour is removed any more: "The Hour Was Wrong" stops Hour IV's text
+-- from resolving instead, so every loop keeps its full length.)
 function Hourglass.isHourRemoved(hour)
-  if hour == 4 and CampaignState.knows("the-hour-was-wrong") then
-    return true
-  end
   return false
 end
 
@@ -1058,7 +1057,9 @@ local HOUR_HANDLERS = {
   end,
 
   [4] = function(ctx)
-    -- Handled structurally by isHourRemoved(); if we get here the fact is unknown.
+    if CampaignState.knows("the-hour-was-wrong") then
+      return "Hour IV's When reached does not resolve (The Hour Was Wrong): the road holds."
+    end
     if ctx and ctx.roadGivesWay then
       ctx.roadGivesWay()
     end
@@ -2002,15 +2003,15 @@ local Interlude = {}
 -- In-engine the panel can instead read memoryCost off each card's GMNotes; this
 -- table keeps the logic layer self-contained and testable.
 Interlude.RECOLLECTION_COST = {
-  ["sthr-foreknowledge"]      = 3,
-  ["sthr-dejavu"]             = 4,
-  ["sthr-musclememory"]       = 3,
-  ["sthr-rehearsedescape"]    = 3,
+  ["sthr-foreknowledge"]      = 2,
+  ["sthr-dejavu"]             = 2,
+  ["sthr-musclememory"]       = 2,
+  ["sthr-rehearsedescape"]    = 2,
   ["sthr-longwayround"]       = 2,
   ["sthr-borrowedtime"]       = 3,
-  ["sthr-thistimeforsure"]    = 4,
-  ["sthr-anchorpoint"]        = 3,
-  ["sthr-cassandrasnotebook"] = 4,
+  ["sthr-thistimeforsure"]    = 2,
+  ["sthr-anchorpoint"]        = 4,
+  ["sthr-cassandrasnotebook"] = 3,
   ["sthr-hourlearnedname"]    = 5,
 }
 
@@ -3850,7 +3851,7 @@ local function bagChanges()
   if CampaignState.inPartTwo() then c.tablet = c.tablet + 1 end
   if CampaignState.anyAgedOut() then c.elder = c.elder + 1 end
   if CampaignState.knows("who-walks-beside-you") then c.cultist = c.cultist - 1 end
-  if CampaignState.knows("the-keepers-ninth-death") then c.tablet = c.tablet - 1 end
+  if CampaignState.knows("the-appointeds-name") then c.tablet = c.tablet - 1 end
   if CampaignState.knows("the-hour-was-wrong") then c.elder = c.elder - 1 end
   return c
 end
@@ -4966,7 +4967,8 @@ local function stillHourTestBody(T)
   Hourglass.advance(4, ctx)
   local sawIV = false
   for _, h in ipairs(reached) do if h == 4 then sawIV = true end end
-  P, F = check("'The Hour Was Wrong' removes Hour IV", not sawIV, P, F)
+  P, F = check("'The Hour Was Wrong' keeps Hour IV in the clock (its text stops resolving)", sawIV
+    and CampaignState.getHour() == 5, P, F)
 
   P, F = check("aging brackets 5/10/15 -> Weathered/Elder/Ancient",
     Aging.bracketForYears(5) == "Weathered" and Aging.bracketForYears(10) == "Elder"

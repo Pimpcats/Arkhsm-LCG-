@@ -14,7 +14,27 @@ return function(R, T)
     local L = R.locById(spec.at)
     local need = FX.actNeed(act.id)
     local here = spec.contrib == false and R.aliveInvs() or R.investigatorsAt(L)
+    if spec.fare then
+      -- the Ticket-Taker's fare: resources (2 for 1) first, then clues, then Memory on own cards
+      local owe = need
+      for _, x in ipairs(here) do
+        while owe > 0 and x.resources >= 2 and x.resources >= 4 do x.resources = x.resources - 2 ; owe = owe - 1 end
+      end
+      local cl = 0
+      for _, x in ipairs(here) do cl = cl + x.clues end
+      local pay = math.min(owe, cl)
+      if pay > 0 then R.spendClues(here, pay) ; owe = owe - pay end
+      for _, x in ipairs(here) do
+        while owe > 0 and (x.memory or 0) > 0 do R.addMemory(x, -1, "the Ticket-Taker's fare") ; owe = owe - 1 end
+      end
+      for _, x in ipairs(here) do
+        while owe > 0 and x.resources >= 2 do x.resources = x.resources - 2 ; owe = owe - 1 end
+      end
+      R.advanceAct(act, inv)
+      return
+    end
     R.spendClues(here, need)
+    if spec.doomCost then R.placeDoom(spec.doomCost, act.id .. " (cost)") end
     if spec.test then
       local skill, best = spec.test[1], -99
       for _, s in ipairs(spec.test) do
@@ -123,9 +143,8 @@ return function(R, T)
     -- begun at Hour IX: Hours IX to VI go back on the deck, Hour V is current,
     -- no Hour resolves (right-click Hour four times)
     if atNine then R.rewind(4, "the finale begins at Hour IX") end
-    -- a finale begun before Hour V skips to Hour V (each Hour resolves). The
-    -- Control steps over a removed Hour (The Hour Was Wrong removes Hour IV),
-    -- so advance until Hour V is current rather than a fixed number of clicks.
+    -- a finale begun before Hour V skips to Hour V (each Hour resolves):
+    -- advance until Hour V is current rather than a fixed number of clicks.
     local fromHour = (R.WHATIF or {}).finaleFrom or 5
     if not atNine then
       local guard = 0

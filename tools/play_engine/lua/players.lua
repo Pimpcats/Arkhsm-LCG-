@@ -63,6 +63,9 @@ return function(R, T)
     ["Lucky Compass"] = "used as a move that provokes no attacks of opportunity when engaged; its Knowledge-district jump is not used",
     ["Nobody Believes Her"] = "blocks commits from others and deals 1 horror if alone; other investigators' abilities still reach her (Elias's redirect)",
     ["Recollections"] = "not in the starting decks (bought between loops); only Foreknowledge, Muscle Memory and I've Done This Before are encoded",
+    ["The Bell of Ambergrove"] = "the rewind (once per loop, 2 Dissonance, never in the finale) is used; the [wil] evade is not",
+    ["The Lexicon of the Hour"] = "cancels a non-weakness treachery drawn at its owner's location for 2 secrets; +2 [int] for 1",
+    ["It Means 'Wait'"] = "cancels Ayako's own Lost Hour or The Crossing draw (1 horror), or Hour VI/VIII's text or an attack on her (1 Dissonance); cost 1",
     ["The walker's ring / The walkers keep their ring"] = "not in any representative campaign state, so not encoded",
     ["The Ambergrove Lamp"] = "+1 [agi] to evade at its location; its [action] (peek and move) is not used by the AI",
     ["Shotgun (4)"] = "+3 [com], +2 damage (damage by margin, 1-5, averaged)",
@@ -293,7 +296,7 @@ return function(R, T)
       if c and c[1] == skill and (c[3] == nil or c[3] == opts.kind) then b = b + c[2] end
       if a.name == "The Ambergrove Lamp" then end
     end
-    -- a story asset's bonus (or penalty) while its controller holds it
+    -- a story asset's constant modifier (Bound Almanac: -1 [agi])
     local st = inv.story and R.FX.STORY[inv.story.id]
     if st and st[skill] then b = b + st[skill] end
     if opts.kind == "evade" then
@@ -342,7 +345,7 @@ return function(R, T)
         local n = (c.icons and ((c.icons[skill] or 0) + (c.icons.wild or 0))) or 0
         if c.name == "I've Done This Before" and inv.failedTypes[skill] then n = 3 end
         if c.name == "Muscle Memory" and inv.testedTypes[skill] then n = 2 end
-        if c.name == "Foreknowledge" and (inv.memory or 0) > 0 then n = 3 end
+        if c.name == "Foreknowledge" then n = ((inv.memory or 0) > 0) and 4 or 2 end
         if c.name == "I've Done This Before" and opts.helper then n = 0 end
         if n > 0 then
           -- skill cards are the ones meant to be committed; others only when needed
@@ -401,7 +404,7 @@ return function(R, T)
         R.addMemory(inv, 1, "Ayako: [int] success")
       end
       local lex = P.findAsset(inv, "The Lexicon of the Hour")
-      if lex and skill == "int" and margin >= 2 and lex.uses < 5 then lex.uses = lex.uses + 1 end
+      if lex and skill == "int" and margin >= 2 and lex.uses < 4 then lex.uses = lex.uses + 1 end
     else
       inv.round.failed = true
       inv.failedTypes[skill] = true
@@ -454,7 +457,7 @@ return function(R, T)
     for _, c in ipairs(inv.hand) do
       if c.name == "Seen This Hand Before" and inv.resources >= 1 then
         P.discardFromHand(inv, c)
-        inv.resources = inv.resources - 1 + ((tonumber(tokenName) ~= nil) and 2 or 3)
+        inv.resources = inv.resources - 1 + ((tonumber(tokenName) ~= nil) and 1 or 2)
         R.log("%s cancels %s with Seen This Hand Before", inv.name, tokenName)
         return true
       end
@@ -488,34 +491,46 @@ return function(R, T)
 
   ------------------------------------------------------------ cancels --
 
-  --- It Means 'Wait' against an effect ("losthour", "slippage", "crossing",
-  -- "whisper", "appointed-attack", "approach-horror"); returns true if cancelled.
-  function P.itMeansWait(target, what)
-    local G = R.G
-    if (R.state().memory or 0) < 3 then return false end
-    local want = { losthour = true, crossing = true, ["appointed-attack"] = true }
-    if not want[what] then return false end
-    for _, inv in ipairs(R.aliveInvs()) do
-      if inv.id == "sthrayako" then
-        for _, c in ipairs(inv.hand) do
-          if c.name == "It Means 'Wait'" then
-            if what == "appointed-attack" and target ~= inv then return false end
-            P.discardFromHand(inv, c)
-            G.metrics.itmeanswait = G.metrics.itmeanswait + 1
-            R.log("It Means 'Wait' cancels %s", what)
-            return true
-          end
-        end
+  --- It Means 'Wait' (Ayako, cost 1): cancel a non-weakness treachery she
+  -- draws (then 1 horror), or, with 3+ banked Memory, an Hour's "When reached"
+  -- text or an attack by The Appointed on her (then raise Dissonance by 1).
+  -- what: "losthour" / "crossing" (her own draw), "hour", "appointed-attack".
+  local function playIMW(inv, why, horror)
+    for _, c in ipairs(inv.hand) do
+      if c.name == "It Means 'Wait'" and inv.resources >= 1 then
+        P.discardFromHand(inv, c)
+        inv.resources = inv.resources - 1
+        R.G.metrics.itmeanswait = R.G.metrics.itmeanswait + 1
+        R.log("It Means 'Wait' cancels %s", why)
+        if horror then R.hurt(inv, 0, 1, "It Means 'Wait'") else R.raise(1, "It Means 'Wait'") end
+        return true
       end
     end
     return false
   end
+  function P.itMeansWait(target, what)
+    local ayako
+    for _, inv in ipairs(R.aliveInvs()) do if inv.id == "sthrayako" then ayako = inv end end
+    if not ayako then return false end
+    if what == "losthour" or what == "crossing" then
+      if target ~= ayako or ayako.horror >= ayako.sanity - 1 then return false end
+      return playIMW(ayako, what, true)
+    end
+    if (R.state().memory or 0) < 3 or R.dissonance() + 1 >= R.consts().glitch then return false end
+    if what == "appointed-attack" then
+      if target ~= ayako then return false end
+      return playIMW(ayako, what, false)
+    end
+    if what == "hour" then return playIMW(ayako, "an Hour's text", false) end
+    return false
+  end
   function P.itMeansWaitHour(h)
     if h ~= 8 and h ~= 6 then return false end
-    return P.itMeansWait(nil, "losthour")
+    return P.itMeansWait(nil, "hour")
   end
 
-  --- Lexicon (Static treachery) and Ward of Protection (any treachery).
+  --- The Lexicon (any non-weakness treachery drawn at its owner's location, 2
+  -- secrets), It Means 'Wait' and Ward of Protection.
   function P.cancelTreachery(inv, id, def)
     local G = R.G
     local bad = { ["sthr-losthour"] = 3, ["sthr-crossing"] = 3, ["sthr-thirteen"] = 3, ["sthr-wheelsturn"] = 2,
@@ -523,17 +538,15 @@ return function(R, T)
                   ["sthr-deadair"] = 1, ["sthr-loopnotices"] = 2, ["sthr-slippage"] = 0 }
     local worth = bad[id] or 0
     if worth <= 0 then return false end
-    if R.hasTrait(def, "Static") then
-      for _, x in ipairs(R.aliveInvs()) do
-        local lex = P.findAsset(x, "The Lexicon of the Hour")
-        if lex and not lex.exhausted and lex.uses > 0 then
-          lex.exhausted = true ; lex.uses = lex.uses - 1
-          R.log("The Lexicon cancels %s", def.name or id)
-          return true
-        end
+    for _, x in ipairs(R.investigatorsAt(R.locOf(inv))) do
+      local lex = P.findAsset(x, "The Lexicon of the Hour")
+      if lex and not lex.exhausted and lex.uses >= 2 and worth >= 2 then
+        lex.exhausted = true ; lex.uses = lex.uses - 2
+        R.log("The Lexicon cancels %s", def.name or id)
+        return true
       end
     end
-    if id == "sthr-losthour" or id == "sthr-crossing" or id == "sthr-appointedwhisper" then
+    if id == "sthr-losthour" or id == "sthr-crossing" then
       if P.itMeansWait(inv, id == "sthr-losthour" and "losthour" or "crossing") then return true end
     end
     if worth >= 2 and inv.resources >= 1 and inv.horror < inv.sanity - 2 then

@@ -351,7 +351,7 @@ local function bagChanges()
   if CampaignState.inPartTwo() then c.tablet = c.tablet + 1 end
   if CampaignState.anyAgedOut() then c.elder = c.elder + 1 end
   if CampaignState.knows("who-walks-beside-you") then c.cultist = c.cultist - 1 end
-  if CampaignState.knows("the-keepers-ninth-death") then c.tablet = c.tablet - 1 end
+  if CampaignState.knows("the-appointeds-name") then c.tablet = c.tablet - 1 end
   if CampaignState.knows("the-hour-was-wrong") then c.elder = c.elder - 1 end
   return c
 end
@@ -1467,7 +1467,8 @@ local function stillHourTestBody(T)
   Hourglass.advance(4, ctx)
   local sawIV = false
   for _, h in ipairs(reached) do if h == 4 then sawIV = true end end
-  P, F = check("'The Hour Was Wrong' removes Hour IV", not sawIV, P, F)
+  P, F = check("'The Hour Was Wrong' keeps Hour IV in the clock (its text stops resolving)", sawIV
+    and CampaignState.getHour() == 5, P, F)
 
   P, F = check("aging brackets 5/10/15 -> Weathered/Elder/Ancient",
     Aging.bracketForYears(5) == "Weathered" and Aging.bracketForYears(10) == "Elder"

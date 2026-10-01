@@ -336,17 +336,6 @@ return function(H)
         ap.setRotation({ 0, 270, 0 })
       end
     end
-    -- the Hours: an Hour a Knowledge entry removed leaves the deck
-    if G.knowledge["the-hour-was-wrong"] then
-      local h4 = T.find(function(o) return o.type == "Deck" and T.dist(o.getPosition(), G.agendaPos) < 0.8 end)
-      if h4 then
-        for _, e in ipairs(h4.getObjects()) do
-          if tostring(e.name or ""):sub(1, 7) == "Hour IV" then
-            h4.takeObject({ guid = e.guid, position = { AWAY.x, AWAY.y, AWAY.z + 6 }, smooth = false })
-          end
-        end
-      end
-    end
     -- act decks
     for _, b in ipairs(boxes) do
       local id = T.gm(b).id

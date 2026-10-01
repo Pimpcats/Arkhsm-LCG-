@@ -157,9 +157,8 @@ def test_one_short_game_per_scenario(clean_tree):
 
 
 def test_finale_skip_stops_at_hour_five(clean_tree):
-    # a finale begun before Hour V skips to Hour V; with Hour IV removed the
-    # Control steps over it, so the Skip takes one click fewer (the engine once
-    # clicked a fixed count and began the finale at Hour VI)
+    # a finale begun before Hour V skips to Hour V (the engine once clicked a
+    # fixed count and began the finale at Hour VI)
     why = _real()
     if why:
         pytest.skip(why)

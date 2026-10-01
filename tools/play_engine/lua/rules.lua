@@ -456,6 +456,12 @@ return function(R, T)
     opts = opts or {}
     if inv.defeated or (dmg <= 0 and hor <= 0) then return end
     local G = R.G
+    if dmg > 0 and inv.story and inv.story.id == "sthr-item-logbook" and not inv.storyExhausted then
+      inv.storyExhausted = true
+      dmg = dmg - 1
+      R.log("Keeper's Logbook: %s takes 1 less damage", inv.name)
+      if dmg <= 0 and hor <= 0 then return end
+    end
     -- Elias: take damage for another investigator at his location
     if dmg > 0 and not opts.direct and inv.id ~= "sthrelias" then
       local elias = R.invById("sthrelias")
@@ -531,6 +537,7 @@ return function(R, T)
       R.pendingYear(inv, 1, "second wind")
       return
     end
+    if R.knows("the-keepers-ninth-death") then R.addMemory(inv, 1, "every death is written down") end
     inv.defeated = true
     G.metrics.defeats = G.metrics.defeats + 1
     G.metrics.defeated[inv.id] = true
@@ -617,6 +624,7 @@ return function(R, T)
   function R.sleepwalking(en)
     local G = R.G
     if not R.hasTrait(en.def, "Echo") then return false end
+    if en.ledgerRound == G.round then return true end              -- Town Ledger: its name read aloud
     if en.wakeLoop then return false end                          -- The Eighth Grave
     if G.crowdTurns then return false end                           -- The Crowd Turns
     if en.id == "sthr-lamplighterecho" and R.P.lampInPlay() then return false end
@@ -634,12 +642,24 @@ return function(R, T)
     return math.max(0, f)
   end
   function R.enemyEvade(en) return en.def.evade or 0 end
+  --- Enemies that hunt one story asset's holder only (What Wears the Sheriff:
+  -- Town Ledger; The Drowned Verger: Parish Register): that holder, or nil.
+  local ONLY = { ["sthr-wearssheriff"] = "sthr-item-ledger", ["sthr-drownedverger"] = "sthr-item-register" }
+  function R.onlyPrey(en)
+    local asset = ONLY[en.id]
+    return asset and R.FX.storyHolder(asset) or nil
+  end
   function R.isHunter(en)
+    if R.onlyPrey(en) then return true end
     if R.textHas(en.def, "Hunter.") then return true end
     if en.id == "sthr-waitingcongregation" and R.band() ~= "Calm" then return true end
     return false
   end
-  function R.isAloof(en) return R.textHas(en.def, "Aloof.") end
+  function R.isAloof(en)
+    if R.onlyPrey(en) then return false end
+    if en.id == "sthr-wearssheriff" then return true end         -- giving the speech: aloof, does not move
+    return R.textHas(en.def, "Aloof.")
+  end
   function R.hasRetaliate(en)
     if R.textHas(en.def, "Retaliate.") then return true end
     if en.id == "sthr-lamplighterecho" and R.P.lampInPlay() then return true end
@@ -688,7 +708,8 @@ return function(R, T)
       m.bad_spawns[#m.bad_spawns + 1] = { id = en.id, want = meta.want, used = L and L.id or "?", note = meta.note }
     end
     R.log("%s spawns at %s%s", en.name, L and L.name or "?", inv and (" (drawn by " .. inv.name .. ")") or "")
-    if inv and inv.loc == en.loc and not R.sleepwalking(en) and not R.isAloof(en) then
+    if inv and inv.loc == en.loc and not R.sleepwalking(en) and not R.isAloof(en)
+       and (not R.onlyPrey(en) or R.onlyPrey(en) == inv) then
       en.engaged = inv
     end
     R.placeEnemy(en)
@@ -705,9 +726,14 @@ return function(R, T)
     if (R.WHATIF or {}).wakeExhausted ~= false then R.FX.checkWakes() end     -- a waking Echo is exhausted first
     for _, en in ipairs(R.G.enemies) do
       if en.loc == L.guid and not en.engaged and not en.exhausted and not R.sleepwalking(en) and not R.isAloof(en) then
-        en.engaged = R.prey(en, here)
-        R.log("%s engages %s", en.name, en.engaged.name)
-        R.placeEnemy(en)
+        local only = R.onlyPrey(en)
+        if only and only.loc ~= L.guid then
+          -- it engages only its prey
+        else
+          en.engaged = only or R.prey(en, here)
+          R.log("%s engages %s", en.name, en.engaged.name)
+          R.placeEnemy(en)
+        end
       end
     end
     R.appointedEngageCheck()
@@ -801,8 +827,12 @@ return function(R, T)
     if not L then return end
     local here = R.investigatorsAt(L)
     if #here == 0 then return end
-    local best, bm
-    for _, inv in ipairs(here) do if bm == nil or (inv.memory or 0) > bm then best, bm = inv, inv.memory or 0 end end
+    -- "Prey – Most Memory on their cards only": it engages only its prey
+    local prey, pm
+    for _, inv in ipairs(R.aliveInvs()) do if pm == nil or (inv.memory or 0) > pm then prey, pm = inv, inv.memory or 0 end end
+    local best
+    for _, inv in ipairs(here) do if (inv.memory or 0) == pm then best = inv break end end
+    if not best then return end
     A.engaged = best
     A.loc = L.guid
     R.log("The Appointed engages %s", best.name)

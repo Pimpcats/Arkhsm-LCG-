@@ -52,6 +52,14 @@ return function(R, T)
       m.dissonance_sources["[static] token"] = (m.dissonance_sources["[static] token"] or 0) + 1
       m.diss_max = math.max(m.diss_max, R.dissonance())
     end
+    -- Bound Almanac: cancel a Static token and reveal another
+    if name == "Static" and inv.story and inv.story.id == "sthr-item-almanac" and not inv.storyExhausted then
+      inv.storyExhausted = true
+      R.lower(1, "Bound Almanac cancels [static] (the Control had raised it)")
+      R.log("Bound Almanac: %s reveals another token", inv.name)
+      name = T.drawToken(inv.color)
+      R.touch()
+    end
     local tokenName = name
     local mod = FX.tokenValue(name, inv)
     local cancelled = false
@@ -130,7 +138,7 @@ return function(R, T)
         local step = (inv.walk or 0) + 1
         -- clues per step (Walk It Backward); what-if walkSteps {a, b, c} or walkPer n
         local steps = (R.WHATIF or {}).walkSteps
-        local per = (steps and steps[step]) or (R.WHATIF or {}).walkPer or ({ 3, 3, 4 })[step]
+        local per = (steps and steps[step]) or (R.WHATIF or {}).walkPer or ({ 2, 1, 1 })[step]
         if seq[step] == L.id then inv.walkCount = (inv.walkCount or 0) + 1 end
         if seq[step] == L.id and inv.walkCount >= per then
           inv.walk = step
@@ -438,8 +446,14 @@ return function(R, T)
       local t = R.AI.bestEnemyHere(inv, function(en) return en.engaged == inv end)
       if t then A_.evade(inv, t, { skill = "wil", blinding = true }) end
     elseif n == "I Remember the Ending" then
-      local ok = R.test(inv, "wil", R.dissonance(), { kind = "ability", important = true })
-      if ok then G.rememberEnding = G.round + 1 end
+      -- Test [wil] (X = Dissonance, minimum 2); then, for 1 Dissonance, cancel
+      -- the next advance before the end of the next round (the encounter-deck
+      -- reorder is not modelled)
+      local ok = R.test(inv, "wil", math.max(2, R.dissonance()), { kind = "ability", important = true })
+      if ok and R.dissonance() + 1 < R.consts().glitch then
+        R.raise(1, "I Remember the Ending", inv)
+        G.rememberEnding = G.round + 1
+      end
       inv.loopUsed.rememberEnding = true
     end
     return true
@@ -460,9 +474,11 @@ return function(R, T)
       a.exhausted = true
       P.draw(inv, 1)
     elseif a.name == "The Bell of Ambergrove" then
+      -- once per loop, never in the finale, 2 Dissonance
       a.exhausted = true
       a.uses = a.uses - 1
-      R.raise(1, "The Bell of Ambergrove (cost)", inv)
+      inv.loopUsed.bell = true
+      R.raise(2, "The Bell of Ambergrove (cost)", inv)
       R.rewind(1, "The Bell of Ambergrove")
     elseif a.name == "Lucky Compass" then
       a.exhausted = true
@@ -605,6 +621,7 @@ return function(R, T)
     end
     G.appointed.exhausted = false
     for _, inv in ipairs(R.aliveInvs()) do
+      inv.storyExhausted = nil
       for _, a in ipairs(inv.assets) do a.exhausted = false end
       P.draw(inv, 1)
       inv.resources = inv.resources + 1
