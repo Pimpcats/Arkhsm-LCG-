@@ -420,11 +420,11 @@ return function(H)
     expectAt("the act sits on SCED's act spot", act, mythosSpot("act"))
     expectAt("the encounter deck sits on SCED's encounter deck spot", enc, mythosSpot("encounter"))
     expectAt("the scenario reference card sits in SCED's scenario card area", ref, mythosSpot("reference"), 1.0)
-    check("the encounter deck holds 22 cards", enc ~= nil and #enc.getObjects() == 22, enc and #enc.getObjects())
+    check("the encounter deck holds 21 cards", enc ~= nil and #enc.getObjects() == 21, enc and #enc.getObjects())
     check("the encounter deck is face down", enc ~= nil and enc.is_face_down)
     if enc then
       enc.shuffle()                         -- Setup: "Shuffle it"
-      check("the encounter deck still holds 22 after shuffling", #enc.getObjects() == 22)
+      check("the encounter deck still holds 21 after shuffling", #enc.getObjects() == 21)
     end
     local locs = locationsOf(prologueBox)
     check("three Prologue locations are laid out", #locs == 3, #locs)
@@ -549,7 +549,7 @@ return function(H)
     square = placeBox("district_square")
     if not square then return end
     local enc = encounterDeck()
-    check("the shared encounter deck holds 26 cards", enc ~= nil and #enc.getObjects() == 26, enc and #enc.getObjects())
+    check("the shared encounter deck holds 25 cards", enc ~= nil and #enc.getObjects() == 25, enc and #enc.getObjects())
     expectAt("the Hours sit on SCED's agenda spot", deckNamed("Agenda Deck", square), mythosSpot("agenda"))
     local act = deckNamed("Act Deck", square)
     check("the Square's act deck is in the district row (not on SCED's act spot)",
@@ -579,7 +579,7 @@ return function(H)
     E.run(1)
     enc = encounterDeck()
     if enc then enc.shuffle() end
-    check("the encounter deck holds 26 + the district sets (" .. (26 + added) .. ")", enc ~= nil and #enc.getObjects() == 26 + added,
+    check("the encounter deck holds 25 + the district sets (" .. (25 + added) .. ")", enc ~= nil and #enc.getObjects() == 25 + added,
       enc and #enc.getObjects())
     local all = {}
     for _, b in ipairs({ square, unpack(districts) }) do
@@ -762,7 +762,7 @@ return function(H)
     check("SCED's own table objects are untouched", #diff == 0, table.concat(diff, "; "))
     square = placeBox("district_square")
     local enc = encounterDeck()
-    check("a fresh encounter deck of 26 again", enc ~= nil and #enc.getObjects() == 26, enc and #enc.getObjects())
+    check("a fresh encounter deck of 25 again", enc ~= nil and #enc.getObjects() == 25, enc and #enc.getObjects())
     placeBox("district_road")
     local falls = newFalls()
     check("nothing laid out fell into a bag", #falls == 0, table.concat(falls, "; "))

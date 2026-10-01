@@ -28,7 +28,7 @@ __modules["StillHour/Constants"] = function()
 --   reset threshold R  = 8 x investigators   (Dissonance hits R -> loop resets)
 --   Appointed Arrived  = floor(2R / 3)       (Noticed band; the Appointed arrives)
 --   Memory soft cap    = 6 x investigators
---   contest target     = 7, 6 solo            (finale; was 4 x investigators, CO-001)
+--   contest target     = 6, 5 with one or two investigators (finale; was 4 x investigators, CO-001)
 --   scar cap           = 2 x investigators    (start-of-loop Dissonance ceiling; 4 solo)
 --   bands              = thirds of R: Calm / Glitch / Noticed
 --
@@ -63,7 +63,7 @@ Constants.HOLD_BACK_REWINDS_PER_LOOP = 3
 --- Compute the full constant set for a given investigator count.
 -- @param n integer number of investigators (>= 1)
 -- @return table of thresholds
-Constants.CONTEST_TARGET = 7          -- 6 with one investigator
+Constants.CONTEST_TARGET = 6          -- 5 with one or two investigators
 -- the solo rule (guide: Difficulty and Player Count): +3 maximum health and sanity
 -- (and a second wind once a loop, a table rule)
 Constants.SOLO_HEALTH_BONUS = 3
@@ -89,12 +89,14 @@ function Constants.forCount(n)
     resetThreshold = reset,
     appointedThreshold = appointed,
     memoryCap = 6 * n,
-    -- Finale contest target: 7, or 6 with one investigator (12-round loops) (tuning 2026-09,
-    -- docs/design/PLAYTEST_SIM.md). Its sources (deep entries, Hold Back
-    -- successes, the Uninvited) do not grow with the party, so the old
+    -- Finale contest target: 6; 5 with one or two investigators (tuning 2026-10: the finale
+    -- opens with the Name and the Vote, so a party brings two deep entries; owner curve: about
+    -- 40% won, docs/design/PLAYTEST_SIM.md). Its sources (deep entries, Hold Back
+    -- successes, the Uninvited) barely grow with the party, so the old
     -- 4 x investigators (CO-001) was out of reach at 3-4 investigators and
-    -- nearly automatic solo.
-    contestTarget = (n == 1) and 6 or 7,
+    -- nearly automatic solo. Engine finales won: 1p 52% (5), 2p 52% (5; 27% at 6),
+    -- 3p 35% (6), 4p 63% (6; 13% at 7, where four mostly run out of time).
+    contestTarget = (n <= 2) and 5 or 6,
     scarCap = scarCap,
     bandGlitchStart = math.floor(reset / 3),
     bandNoticedStart = math.floor(2 * reset / 3),
@@ -1667,19 +1669,12 @@ function Knowledge.actIIOpen()
   return CampaignState.inPartTwo() or Knowledge.partTwoDue()
 end
 
---- "The Way the Night Breaks" assembles when you know The Appointed's Name, The
--- Vote That Never Ends, and any ONE OTHER deep fact (guide §6.6).
+--- "The Way the Night Breaks" assembles when you know The Appointed's Name and The
+-- Vote That Never Ends (the Name's act needs the Vote, so recording the Name opens
+-- the finale). Was: and one other deep fact; with objectives won 80% to 50% by
+-- night that took a median of 10 nights, past the 6-8 the campaign is built for.
 function Knowledge.canAssembleFinale()
-  if not (CampaignState.knows("the-appointeds-name") and CampaignState.knows("the-vote-that-never-ends")) then
-    return false
-  end
-  for id, f in pairs(Knowledge.FACTS) do
-    if f.layer == "deep" and id ~= "the-appointeds-name" and id ~= "the-vote-that-never-ends"
-        and CampaignState.knows(id) then
-      return true
-    end
-  end
-  return false
+  return CampaignState.knows("the-appointeds-name") and CampaignState.knows("the-vote-that-never-ends")
 end
 
 --- Unlock the assembled finale fact if its inputs are present. Returns true if it
@@ -2326,7 +2321,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/87430324c772d6dd65c56445390c482f8f385a69/dist/cards/sthr-static-token.jpg?v=a556271511"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/aa0134bc9e5d7243bf3c6a8730a5c5e9e1669c81/dist/cards/sthr-static-token.jpg?v=a556271511"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -3607,10 +3602,19 @@ local function changeInvestigators(delta)
   end
 end
 
+-- guide: Echoes and Sleepwalking (an Echo that wakes is exhausted)
+local function announceWake(bandBefore)
+  if bandBefore == Constants.BAND_CALM and CampaignState.band() ~= Constants.BAND_CALM then
+    announce("Dissonance leaves Calm: every Echo wakes. Exhaust each Echo as it wakes (it readies in the upkeep phase).")
+  end
+end
+
 local function changeDissonance(delta)
   local before = Appointed.stage()
+  local bandBefore = CampaignState.band()
   if delta > 0 then
     local info = Dissonance.raise(delta, bag)
+    announceWake(bandBefore)
     if info.appointedStage > before then
       announce("The Appointed draws nearer: " .. Appointed.stageName() .. ".")
     end
@@ -3623,11 +3627,13 @@ end
 local function changeHour(delta)
   if delta > 0 then
     local before = CampaignState.getHour()
+    local bandBefore = CampaignState.band()
     Hourglass.advance(delta, playCtx())
     if CampaignState.getHour() > before and CampaignState.getHour() < 9 then
       -- guide: The Hourglass (the Hour turns); doom on the Hours is on the table
-      announce("The Hour turns: remove all doom in play; each investigator heals 1 horror.")
+      announce("The Hour turns: remove all doom in play; each investigator heals 1 damage and 1 horror.")
     end
+    announceWake(bandBefore)
   else
     Hourglass.rewind(-delta, playCtx())
   end
@@ -4416,7 +4422,9 @@ end
 function onObjectLeaveContainer(container, obj)
   guarded("reveal", function()
     if bag.onLeave(container, obj) then
+      local bandBefore = CampaignState.band()
       local info = Dissonance.onStaticRevealed(bag)
+      announceWake(bandBefore)
       announce(string.format("[static] revealed: Dissonance %d (%s).", info.value, info.band))
       if info.reachedReset then announceResetReached() end
       afterChange()
@@ -4608,7 +4616,9 @@ end
 
 function shRaiseDissonance()
   local before = Appointed.stage()
+  local bandBefore = CampaignState.band()
   local info = Dissonance.raise(1, bag)
+  announceWake(bandBefore)
   print("Dissonance -> " .. info.value .. " (" .. info.band .. ")" ..
     (info.appointedStage > before and ("  ** the Appointed advances to " .. Appointed.stageName() .. " **") or ""))
   if info.reachedReset then print("  Dissonance hit the reset threshold — the loop ends.") ; shReset() end
@@ -4752,8 +4762,8 @@ local function stillHourTestBody(T)
 
   local c3 = Constants.forCount(3)
   P, F = check("reset 24 / appointed 16 at 3p", c3.resetThreshold == 24 and c3.appointedThreshold == 16, P, F)
-  P, F = check("contest target 7 (6 solo)", c3.contestTarget == 7 and Constants.forCount(1).contestTarget == 6
-    and Constants.forCount(4).contestTarget == 7, P, F)
+  P, F = check("contest target 6 (5 with one or two)", c3.contestTarget == 6 and Constants.forCount(1).contestTarget == 5
+    and Constants.forCount(2).contestTarget == 5 and Constants.forCount(4).contestTarget == 6, P, F)
 
   local bag = { count = 0 }
   bag.setBaselineStatic = function(m) bag.count = m end
