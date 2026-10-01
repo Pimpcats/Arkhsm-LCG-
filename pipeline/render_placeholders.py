@@ -2115,7 +2115,8 @@ def s_location(c, pt, dest, art_path=None, placement=None):
                       max_size=int(dia * 0.52), fill=SHROUD_NUM, pos_key="shroud")
         if c.get("clues") not in (None, ""):
             base = se_reg("Location", "Clues")
-            per_inv = bool(c.get("clues_per_investigator"))
+            # a 0-clue location prints a plain 0 (no per-investigator mark)
+            per_inv = bool(c.get("clues_per_investigator")) and str(c["clues"]) != "0"
             cx = (base[0] + base[2]) // 2
             cy = (base[1] + base[3]) // 2
             dia = base[2] - base[0]

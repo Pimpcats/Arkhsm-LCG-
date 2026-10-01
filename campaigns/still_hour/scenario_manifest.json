@@ -664,7 +664,7 @@
             {
               "id": "sthr-loc-lanternroom",
               "name": "The Lantern Room",
-              "shroud": 3,
+              "shroud": 4,
               "clues": 1,
               "accepted": {
                 "shroud": 4,
@@ -679,12 +679,12 @@
               "id": "sthr-loc-windingstair",
               "name": "The Winding Stair",
               "shroud": 2,
-              "clues": 1
+              "clues": 0
             },
             {
               "id": "sthr-loc-keepersquarters",
               "name": "The Keeper's Quarters",
-              "shroud": 2,
+              "shroud": 3,
               "clues": 1
             }
           ]
@@ -815,7 +815,7 @@
               "id": "sthr-loc-nave",
               "name": "The Nave",
               "shroud": 2,
-              "clues": 1
+              "clues": 2
             },
             {
               "id": "sthr-loc-belfry",
@@ -1284,8 +1284,8 @@
             {
               "id": "sthr-loc-ticketbooth",
               "name": "The Ticket Booth",
-              "shroud": 2,
-              "clues": 1
+              "shroud": 3,
+              "clues": 2
             }
           ]
         },
@@ -1405,13 +1405,13 @@
               "id": "sthr-loc-readingroom",
               "name": "The Reading Room",
               "shroud": 2,
-              "clues": 1
+              "clues": 2
             },
             {
               "id": "sthr-loc-press",
               "name": "The Press",
               "shroud": 3,
-              "clues": 2
+              "clues": 1
             },
             {
               "id": "sthr-loc-sealedstudy",

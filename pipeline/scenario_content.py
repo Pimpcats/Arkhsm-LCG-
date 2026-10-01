@@ -200,7 +200,8 @@ def check_gmnotes(rep, sid, cid, c):
         front = m.get("locationFront") or {}
         if not front.get("icons") or not front.get("connections"):
             rep.err(sid, "{}: GMNotes locationFront lacks icons/connections".format(cid))
-        if not front.get("uses"):
+        if not front.get("uses") and int(c.get("clues") or 0) > 0:
+            # (a 0-clue location, like official transit locations, carries none)
             rep.err(sid, "{}: GMNotes locationFront lacks clue uses".format(cid))
         if "Location" not in obj["Tags"]:
             rep.err(sid, "{}: location is not tagged Location".format(cid))

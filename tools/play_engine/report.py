@@ -31,6 +31,18 @@ PRIMARY = {
 for _k in list(PRIMARY):                  # later-night variants (scenarios.lua: _n3, _p2_n5/_n6/_n7)
     for _v in (("_n5", "_n6", "_n7") if _k.endswith("_p2") else ("_n3",)):
         PRIMARY[_k + _v] = PRIMARY[_k]
+# The night's goal, as an official scenario's act deck: the district's act and
+# the Square's current act (both are on the board every loop). A night "wins"
+# when every one advanced. (Official scenarios run about 3 acts, usually one
+# of them asking for clues: docs/design/OFFICIAL_COMPARISON.md.)
+NIGHT = {}
+for _k, _a in PRIMARY.items():
+    if _k == "prologue" or _k.startswith("district_square") or _k.startswith("district_almanac_p2"):
+        NIGHT[_k] = [_a]
+    elif "_p2" in _k:
+        NIGHT[_k] = [_a, "sthr-act-vote"]
+    else:
+        NIGHT[_k] = [_a, "sthr-act-sheriffdead"]
 MULTI = {"loop_multi": ["sthr-act-whythirteen", "sthr-act-almanachid", "sthr-act-sheriffdead"]}
 TEMPO_KEY = {
     "district_square": ("square_surface", 0), "district_church": ("church_surface", 0),
@@ -128,7 +140,13 @@ def summarize(name, players, games):
     prim = PRIMARY.get(name)
     ms = [D(g.get("metrics")) for g in games]
     if prim:
-        done = [act_done(g, prim) for g in games]
+        # the district's own act alone (for reference)
+        s["district_completion"] = sum(1 for g in games if act_done(g, prim)) / n if n else 0
+        need = NIGHT.get(name, [prim])
+        done = []
+        for g in games:
+            ds = [act_done(g, a) for a in need]
+            done.append(max(ds, key=lambda d: d["round"]) if all(ds) else None)
         ok = [d for d in done if d]
         s["completion"] = len(ok) / n if n else 0
         s["completed_hour"] = mean([d["hour"] for d in ok])
