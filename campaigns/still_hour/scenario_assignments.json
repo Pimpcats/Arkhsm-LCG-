@@ -95,7 +95,10 @@
         1
       ]
     },
-    "_locked": true
+    "_locked": true,
+    "setup_aside": [
+      "sthr-item-logbook"
+    ]
   },
   "district_church": {
     "reference": [
@@ -138,7 +141,11 @@
         3
       ]
     },
-    "_locked": true
+    "_locked": true,
+    "setup_aside": [
+      "sthr-item-register",
+      "sthr-item-drownedpage"
+    ]
   },
   "district_road": {
     "reference": [
@@ -235,7 +242,8 @@
       "sthr-appointedwhisper",
       "sthr-appointedwhisper",
       "sthr-story-firstdark",
-      "sthr-story-actii"
+      "sthr-story-actii",
+      "sthr-item-ledger"
     ],
     "_map": {
       "sthr-loc-hubsquare": [
@@ -327,7 +335,10 @@
         4
       ]
     },
-    "_locked": true
+    "_locked": true,
+    "setup_aside": [
+      "sthr-item-almanac"
+    ]
   },
   "finale": {
     "reference": [

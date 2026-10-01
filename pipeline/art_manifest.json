@@ -305,6 +305,36 @@
     "reason": "campaign log: a fillable form"
   },
   {
+    "id": "sthr-item-logbook",
+    "art_type": "asset",
+    "scene": "a worn lighthouse logbook, closed, its spine cracked, a pencil tucked into the binding, on a sea-damp table",
+    "seed": 4133
+  },
+  {
+    "id": "sthr-item-register",
+    "art_type": "asset",
+    "scene": "a heavy parish register open under a candle, columns of tally marks in faded brown ink",
+    "seed": 4973
+  },
+  {
+    "id": "sthr-item-drownedpage",
+    "art_type": "asset",
+    "scene": "a single waterlogged almanac page held carefully in two hands, the ink still legible",
+    "seed": 7066
+  },
+  {
+    "id": "sthr-item-ledger",
+    "art_type": "asset",
+    "scene": "a thick town ledger bound in cracked leather, one page sealed with red wax",
+    "seed": 3279
+  },
+  {
+    "id": "sthr-item-almanac",
+    "art_type": "asset",
+    "scene": "a heavy volume of bound almanacs, dozens of copies stitched together, every one open to the same page",
+    "seed": 3909
+  },
+  {
     "id": "sthr-hour-1",
     "art_type": "agenda",
     "scene": "the town square at eleven o'clock, lamps lit, townsfolk looking up at a sky where the stars are sliding behind something without an edge",

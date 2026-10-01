@@ -247,6 +247,16 @@ class ScenarioContentTests(unittest.TestCase):
         rep = audit_with(cards=cards)
         self.assertTrue(any("repeats" in e for e in rep.errors["district_church"]))
 
+    def test_catches_a_broken_take_and_deliver_objective(self):
+        assign = copy.deepcopy(ASSIGN)
+        assign["district_church"]["setup_aside"].remove("sthr-item-register")
+        cards = copy.deepcopy(CARDS)
+        cards["sthr-act-hourwaswrong"]["text"] = cards["sthr-act-hourwaswrong"]["text"].replace("Drowned Page", "page")
+        rep = audit_with(cards=cards, assign=assign)
+        errs = rep.errors["district_church"]
+        self.assertTrue(any("not set aside" in e for e in errs), errs)
+        self.assertTrue(any("does not name its story asset" in e for e in errs), errs)
+
     def test_catches_bad_markup(self):
         cards = copy.deepcopy(CARDS)
         cards["sthr-act-lamp"]["text"] += " [combat]"

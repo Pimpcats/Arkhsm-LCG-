@@ -711,7 +711,6 @@
               "id": "sthr-act-ninthdeath",
               "name": "The Ninth Death",
               "act": "II",
-              "clues_at": "The Keeper's Quarters",
               "needs": {
                 "clues": "card",
                 "from": [
@@ -727,6 +726,12 @@
                   "The Well"
                 ],
                 "note": "clues are portable: the Square is always in play (and the Sunken Road, the way to the Lighthouse), so its clues count toward this act"
+              },
+              "at": "The Lantern Room",
+              "carry": {
+                "asset": "sthr-item-logbook",
+                "take_at": "The Keeper's Quarters",
+                "deliver_to": "The Lantern Room"
               }
             }
           ]
@@ -745,6 +750,15 @@
           "size": "2-4",
           "status": "authored",
           "note": "ships with the node objective"
+        },
+        "setup_aside": {
+          "cards": [
+            {
+              "id": "sthr-item-logbook",
+              "name": "The Keeper's Logbook",
+              "role": "story asset (The Ninth Death)"
+            }
+          ]
         }
       },
       "setup": {
@@ -832,7 +846,7 @@
               "id": "sthr-act-whythirteen",
               "name": "Why Thirteen?",
               "act": "I",
-              "at": "The Vestry",
+              "at": "The Belfry",
               "needs": {
                 "clues": "card",
                 "from": [
@@ -845,13 +859,17 @@
                   "The Well"
                 ],
                 "note": "the Flooded Crypt is sealed until this fact; clues are portable: the Square is always in play, so its clues count toward this act"
+              },
+              "carry": {
+                "asset": "sthr-item-register",
+                "take_at": "The Vestry",
+                "deliver_to": "The Belfry"
               }
             },
             {
               "id": "sthr-act-hourwaswrong",
               "name": "The Hour Was Wrong",
               "act": "II",
-              "clues_at": "The Flooded Crypt",
               "needs": {
                 "clues": "card",
                 "from": [
@@ -861,6 +879,12 @@
                   "The Vestry"
                 ],
                 "note": "clues are portable: the district's clues pay for its deep act (12-round loops)"
+              },
+              "at": "The Vestry",
+              "carry": {
+                "asset": "sthr-item-drownedpage",
+                "take_at": "The Flooded Crypt",
+                "deliver_to": "The Vestry"
               }
             }
           ]
@@ -885,6 +909,20 @@
             {
               "ref": "sthr-bellringer",
               "act": "II"
+            }
+          ]
+        },
+        "setup_aside": {
+          "cards": [
+            {
+              "id": "sthr-item-register",
+              "name": "The Parish Register",
+              "role": "story asset (Why Thirteen?)"
+            },
+            {
+              "id": "sthr-item-drownedpage",
+              "name": "The Drowned Page",
+              "role": "story asset (The Hour Was Wrong)"
             }
           ]
         }
@@ -1110,7 +1148,6 @@
               "id": "sthr-act-vote",
               "name": "The Vote That Never Ends",
               "act": "II",
-              "clues_at": "The Records Office",
               "needs": {
                 "clues": "card",
                 "from": [
@@ -1120,6 +1157,12 @@
                   "The Well"
                 ],
                 "note": "clues are portable: the district's clues pay for its deep act (12-round loops)"
+              },
+              "at": "The Town Hall Steps",
+              "carry": {
+                "asset": "sthr-item-ledger",
+                "take_at": "The Records Office",
+                "deliver_to": "The Town Hall Steps"
               }
             }
           ]
@@ -1158,6 +1201,11 @@
               "id": "sthr-story-actii",
               "name": "The Shape of the Hour",
               "role": "interlude beat entering Act II"
+            },
+            {
+              "id": "sthr-item-ledger",
+              "name": "The Town Ledger",
+              "role": "story asset (The Vote That Never Ends)"
             }
           ]
         }
@@ -1385,6 +1433,11 @@
                   "The Well"
                 ],
                 "note": "the Sealed Study is sealed until this fact; clues are portable: the Square is always in play, so its clues count toward this act"
+              },
+              "carry": {
+                "asset": "sthr-item-almanac",
+                "take_at": "The Reading Room",
+                "deliver_to": "The Press"
               }
             },
             {
@@ -1421,6 +1474,15 @@
           "id": "node_almanac",
           "size": "2-4",
           "status": "authored"
+        },
+        "setup_aside": {
+          "cards": [
+            {
+              "id": "sthr-item-almanac",
+              "name": "The Bound Almanac",
+              "role": "story asset (What the Almanac Hid)"
+            }
+          ]
         }
       },
       "setup": {

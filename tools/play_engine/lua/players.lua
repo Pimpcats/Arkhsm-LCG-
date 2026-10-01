@@ -293,6 +293,9 @@ return function(R, T)
       if c and c[1] == skill and (c[3] == nil or c[3] == opts.kind) then b = b + c[2] end
       if a.name == "The Ambergrove Lamp" then end
     end
+    -- a story asset's bonus (or penalty) while its controller holds it
+    local st = inv.story and R.FX.STORY[inv.story.id]
+    if st and st[skill] then b = b + st[skill] end
     if opts.kind == "evade" then
       for _, x in ipairs(R.investigatorsAt(R.locOf(inv))) do
         if P.findAsset(x, "The Ambergrove Lamp") then b = b + 1 break end

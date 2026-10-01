@@ -206,6 +206,12 @@ SCENES.update({
     "sthr-res-4": "a door sealed with iron bands and wax in the middle of the square, one chair empty beside it",
     "sthr-res-5": "eleven o'clock in the square again, but the sky has fewer stars missing than before",
     "sthr-res-6": "hooded figures walking the sunken road in fog, all in the same direction, never arriving",
+    # story assets: the object its act shows (the act's illustration is reused)
+    "sthr-item-logbook": "a worn lighthouse logbook, closed, its spine cracked, a pencil tucked into the binding, on a sea-damp table",
+    "sthr-item-register": "a heavy parish register open under a candle, columns of tally marks in faded brown ink",
+    "sthr-item-drownedpage": "a single waterlogged almanac page held carefully in two hands, the ink still legible",
+    "sthr-item-ledger": "a thick town ledger bound in cracked leather, one page sealed with red wax",
+    "sthr-item-almanac": "a heavy volume of bound almanacs, dozens of copies stitched together, every one open to the same page",
 })
 
 # faces with no illustration of their own: the chaos-token reference renders on

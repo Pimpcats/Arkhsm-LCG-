@@ -855,38 +855,53 @@
     "clues_per_investigator": true
   },
   "sthr-act-ninthdeath": {
-    "clues": 6,
-    "text": "Part II only.\nObjective – If the Lantern Room's lamp is lit, investigators at the Keeper's Quarters may, as a group, spend 6 [perinv] clues to advance.",
+    "clues": 5,
+    "text": "Part II only.\n[action] Spend 5 [perinv] clues: Take control of the set-aside Keeper's Logbook. Only an investigator at the Keeper's Quarters may use this ability; investigators at the Keeper's Quarters may contribute the clues.\nObjective – If the Lantern Room's lamp is lit and the investigator who controls the Keeper's Logbook is at the Lantern Room, advance.",
     "index": "2a",
     "number": "2/2",
     "flavor": "Elias kept the log for years. He does not remember writing most of it.",
     "back_flavor": "Eight deaths in Elias's own careful hand, each one dated tonight. The ninth line is ruled and waiting.",
-    "back_text": "Record in your Campaign Log: The Keeper's Ninth Death.\nRemove 1 [tablet] token from the chaos bag for the rest of the campaign.\nFrom now on, when Elias's [elder] heals damage, it also heals 1 horror.\nThe Lighthouse's objectives are complete. From now on, do not use this act deck when you Place this box.",
-    "clues_per_investigator": true
+    "back_text": "Record in your Campaign Log: The Keeper's Ninth Death.\nRemove 1 [tablet] token from the chaos bag for the rest of the campaign.\nRemove the Keeper's Logbook from the game.\nFrom now on, when Elias's [elder] heals damage, it also heals 1 horror.\nThe Lighthouse's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "clues_per_investigator": true,
+    "take": {
+      "asset": "sthr-item-logbook",
+      "at": "The Keeper's Quarters",
+      "deliver": "The Lantern Room"
+    }
   },
   "sthr-act-whythirteen": {
     "name": "Why Thirteen?",
-    "clues": 9,
-    "text": "Objective – If an investigator is at the Vestry, the investigators may, as a group, spend 9 [perinv] clues to advance.",
+    "clues": 8,
+    "text": "[action] Spend 8 [perinv] clues: Take control of the set-aside Parish Register. Only an investigator at the Vestry may use this ability; any investigator may contribute the clues.\nObjective – If the investigator who controls the Parish Register is at the Belfry, advance.",
     "flavor": "The bell tolled thirteen times at the first occultation. It should toll twelve.",
     "deck": 95104,
     "index": "1a",
     "number": "1/2",
     "back_flavor": "The register lists every service since the church was raised, and every entry ends at twelve. On the night of the first occultation, in a different ink, someone has added a thirteenth stroke, pressed so hard the nib tore the page.",
-    "back_text": "Record in your Campaign Log: The Thirteenth Toll.\nHour III no longer raises Dissonance by 2 at a Church location.\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game.",
-    "clues_per_investigator": true
+    "back_text": "Record in your Campaign Log: The Thirteenth Toll.\nHour III no longer raises Dissonance by 2 at a Church location.\nRemove the Parish Register from the game.\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game.",
+    "clues_per_investigator": true,
+    "take": {
+      "asset": "sthr-item-register",
+      "at": "The Vestry",
+      "deliver": "The Belfry"
+    }
   },
   "sthr-act-hourwaswrong": {
     "name": "The Hour Was Wrong",
-    "clues": 7,
-    "text": "Part II only.\nForced – When this act becomes the current act: The Flooded Crypt opens. Spawn the set-aside Bell-Ringer Beneath there.\nObjective – Investigators at the Flooded Crypt may, as a group, spend 7 [perinv] clues to advance.",
+    "clues": 6,
+    "text": "Part II only.\nForced – When this act becomes the current act: The Flooded Crypt opens. Spawn the set-aside Bell-Ringer Beneath there.\n[action] Spend 6 [perinv] clues: Take control of the set-aside Drowned Page. Only an investigator at the Flooded Crypt may use this ability; investigators at the Flooded Crypt may contribute the clues.\nObjective – If the investigator who controls the Drowned Page is at the Vestry, advance.",
     "deck": 95105,
     "index": "2a",
     "number": "2/2",
     "flavor": "Below the bell, below the water, the church keeps what it was told to keep.",
     "back_flavor": "The page is soft as wet cloth, but the ink held. The same almanac, the same night, and a different hour. Someone set the occultation an hour wrong, and the town has been standing in the gap ever since.",
-    "back_text": "Record in your Campaign Log: The Hour Was Wrong.\nRemove 1 [elderthing] token from the chaos bag for the rest of the campaign.\nRemove Hour IV from the game now unless it is the current Hour (if it is, remove it as soon as it stops being the current Hour), and during every later Loop Setup. The Hourglass steps over it in both directions.\nThe Drowned Church's objectives are complete. From now on, do not use this act deck when you Place this box.",
-    "clues_per_investigator": true
+    "back_text": "Record in your Campaign Log: The Hour Was Wrong.\nRemove 1 [elderthing] token from the chaos bag for the rest of the campaign.\nRemove the Drowned Page from the game.\nRemove Hour IV from the game now unless it is the current Hour (if it is, remove it as soon as it stops being the current Hour), and during every later Loop Setup. The Hourglass steps over it in both directions.\nThe Drowned Church's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "clues_per_investigator": true,
+    "take": {
+      "asset": "sthr-item-drownedpage",
+      "at": "The Flooded Crypt",
+      "deliver": "The Vestry"
+    }
   },
   "sthr-act-walkbackward": {
     "name": "Walk It Backward",
@@ -924,15 +939,20 @@
   },
   "sthr-act-vote": {
     "name": "The Vote That Never Ends",
-    "clues": 8,
-    "text": "Part II only.\nForced – When this act becomes the current act: Spawn the set-aside What Wears the Sheriff at the Records Office.\nObjective – Investigators at the Records Office may, as a group, spend 8 [perinv] clues to advance.",
+    "clues": 7,
+    "text": "Part II only.\nForced – When this act becomes the current act: Spawn the set-aside What Wears the Sheriff at the Records Office.\n[action] Spend 7 [perinv] clues: Take control of the set-aside Town Ledger. Only an investigator at the Records Office may use this ability; investigators at the Records Office may contribute the clues.\nObjective – If the investigator who controls the Town Ledger is at the Town Hall Steps, advance.",
     "flavor": "The Records Office keeps every decision the town ever made. It keeps this one in a locked drawer.",
     "deck": 95109,
     "index": "2a",
     "number": "2/2",
     "back_flavor": "The minutes are dated the night of the first occultation. A motion to open the door. Every name in Ambergrove, each in its own hand. Carried, unanimous. Under the tally a clerk has written: the cost to be settled at the appointed hour.",
-    "back_text": "Record in your Campaign Log: The Vote That Never Ends. If Seraphine Vale is at the Records Office, mark Seraphine's thread “suspected.”\nThe Square's objectives are complete. From now on, do not use this act deck when you Place this box.",
-    "clues_per_investigator": true
+    "back_text": "Record in your Campaign Log: The Vote That Never Ends. If Seraphine Vale is at the Town Hall Steps, mark Seraphine's thread “suspected.”\nRemove the Town Ledger from the game.\nThe Square's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "clues_per_investigator": true,
+    "take": {
+      "asset": "sthr-item-ledger",
+      "at": "The Records Office",
+      "deliver": "The Town Hall Steps"
+    }
   },
   "sthr-act-wheelturns": {
     "name": "The Wheel Still Turns",
@@ -960,15 +980,20 @@
   },
   "sthr-act-almanachid": {
     "name": "What the Almanac Hid",
-    "clues": 9,
-    "text": "Objective – If an investigator is at the Press, the investigators may, as a group, spend 9 [perinv] clues to advance.",
+    "clues": 8,
+    "text": "[action] Spend 8 [perinv] clues: Take control of the set-aside Bound Almanac. Only an investigator at the Reading Room may use this ability; any investigator may contribute the clues.\nObjective – If the investigator who controls the Bound Almanac is at the Press, advance.",
     "flavor": "Where the wrong almanac was printed.",
     "deck": 95112,
     "index": "1a",
     "number": "1/2",
     "clues_per_investigator": true,
     "back_flavor": "The press groans and runs. The pages come out warm, and wrong in a new way: the hour printed on them is the right one. For a moment the sky over the Almanac House looks almost ordinary.",
-    "back_text": "Record in your Campaign Log: What the Almanac Hid.\nAt Hour VI, the chaos bag holds 1 fewer Static token for the rest of the loop instead of 1 more.\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game."
+    "back_text": "Record in your Campaign Log: What the Almanac Hid.\nRemove the Bound Almanac from the game.\nAt Hour VI, the chaos bag holds 1 fewer Static token for the rest of the loop instead of 1 more.\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game.",
+    "take": {
+      "asset": "sthr-item-almanac",
+      "at": "The Reading Room",
+      "deliver": "The Press"
+    }
   },
   "sthr-act-appointedname": {
     "name": "The Appointed's Name",
@@ -1274,5 +1299,50 @@
     "fight": 4,
     "evade": 3,
     "health": 4
+  },
+  "sthr-item-logbook": {
+    "name": "The Keeper's Logbook",
+    "traits": "Item. Tome.",
+    "text": "You get +1 [wil].\nIf you are defeated, place the Keeper's Logbook at your location. As an [action], any investigator at that location may take control of it.",
+    "flavor": "The keeper's hand, page after page, steady as the tide tables.",
+    "deck": 95124,
+    "unique": true,
+    "cost": "–"
+  },
+  "sthr-item-register": {
+    "name": "The Parish Register",
+    "traits": "Item. Tome.",
+    "text": "You get +1 [int].\nIf you are defeated, place the Parish Register at your location. As an [action], any investigator at that location may take control of it.",
+    "flavor": "Every service since the church was raised, in faded brown ink.",
+    "deck": 95125,
+    "unique": true,
+    "cost": "–"
+  },
+  "sthr-item-drownedpage": {
+    "name": "The Drowned Page",
+    "traits": "Item.",
+    "text": "You get +1 [wil].\nIf you are defeated, place the Drowned Page at your location. As an [action], any investigator at that location may take control of it.",
+    "flavor": "Soft as wet cloth. Hold it carefully.",
+    "deck": 95126,
+    "unique": true,
+    "cost": "–"
+  },
+  "sthr-item-ledger": {
+    "name": "The Town Ledger",
+    "traits": "Item. Tome.",
+    "text": "You get +1 [wil].\nIf you are defeated, place the Town Ledger at your location. As an [action], any investigator at that location may take control of it.",
+    "flavor": "The minutes of every meeting the town has ever held. One page is sealed with wax.",
+    "deck": 95127,
+    "unique": true,
+    "cost": "–"
+  },
+  "sthr-item-almanac": {
+    "name": "The Bound Almanac",
+    "traits": "Item. Tome.",
+    "text": "You get +1 [int] and −1 [agi].\nIf you are defeated, place the Bound Almanac at your location. As an [action], any investigator at that location may take control of it.",
+    "flavor": "A hundred almanacs bound into one heavy volume, every copy open to the same page.",
+    "deck": 95128,
+    "unique": true,
+    "cost": "–"
   }
 }

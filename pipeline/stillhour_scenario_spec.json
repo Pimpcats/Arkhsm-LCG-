@@ -94,7 +94,7 @@
     "deck": 95046,
     "id": "sthr-appointed-approach",
     "type": "Story",
-    "name": "The Appointed\u2019s Approach",
+    "name": "The Appointed’s Approach",
     "class": "Mythos",
     "traits": "",
     "encounter": true,
@@ -106,5 +106,65 @@
     "name": "Campaign Log",
     "subtitle": "THE STILL HOUR",
     "campaign_name": "The Still Hour"
+  },
+  {
+    "id": "sthr-item-logbook",
+    "type": "Asset",
+    "name": "The Keeper's Logbook",
+    "class": "Neutral",
+    "traits": "Item. Tome.",
+    "encounter": true,
+    "unique": true,
+    "cost": "–",
+    "deck": 95124,
+    "quantity": 1
+  },
+  {
+    "id": "sthr-item-register",
+    "type": "Asset",
+    "name": "The Parish Register",
+    "class": "Neutral",
+    "traits": "Item. Tome.",
+    "encounter": true,
+    "unique": true,
+    "cost": "–",
+    "deck": 95125,
+    "quantity": 1
+  },
+  {
+    "id": "sthr-item-drownedpage",
+    "type": "Asset",
+    "name": "The Drowned Page",
+    "class": "Neutral",
+    "traits": "Item.",
+    "encounter": true,
+    "unique": true,
+    "cost": "–",
+    "deck": 95126,
+    "quantity": 1
+  },
+  {
+    "id": "sthr-item-ledger",
+    "type": "Asset",
+    "name": "The Town Ledger",
+    "class": "Neutral",
+    "traits": "Item. Tome.",
+    "encounter": true,
+    "unique": true,
+    "cost": "–",
+    "deck": 95127,
+    "quantity": 1
+  },
+  {
+    "id": "sthr-item-almanac",
+    "type": "Asset",
+    "name": "The Bound Almanac",
+    "class": "Neutral",
+    "traits": "Item. Tome.",
+    "encounter": true,
+    "unique": true,
+    "cost": "–",
+    "deck": 95128,
+    "quantity": 1
   }
 ]

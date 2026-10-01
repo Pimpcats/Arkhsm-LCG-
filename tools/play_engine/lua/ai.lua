@@ -73,6 +73,7 @@ return function(R, T)
   function A.wantsAdvance(act)
     local obj = A.objective()
     if not obj or obj == act then return true end
+    if FX.actNeed(act.id) == 0 then return true end          -- nothing to pay (a story asset delivered)
     local spec = FX.ACTS[obj.id] or {}
     if spec.sequence or spec.contest then return true end
     local objNeed = spec.standFirm and R.walksBesideCost() or FX.actNeed(obj.id)
@@ -86,6 +87,12 @@ return function(R, T)
     if spec.sequence then
       local step = (inv and inv.walk or 0) + 1
       return R.locById(spec.sequence[math.min(step, 3)])
+    end
+    if spec.carry then
+      -- take the story asset, pick a dropped one up, or deliver it
+      if act.holder then return R.locById(spec.at) end
+      if act.dropped then return R.G.locs[act.dropped] end
+      return R.locById(spec.carry.take)
     end
     if spec.needLamp and not G.lampLit then return R.locById("sthr-loc-lanternroom") end
     if spec.at then return R.locById(spec.at) end
@@ -283,6 +290,28 @@ return function(R, T)
     local loc = A.actLocation(act, inv)
     if spec.sequence then return loc, "walk" end
     if spec.standFirm then return loc, "stand firm" end
+    if spec.carry and (act.holder or act.dropped) then
+      -- the controller delivers; the others pick a dropped asset up (nearest),
+      -- or work ahead on the next objective, or go along
+      if act.holder == inv then return loc, "go" end
+      if act.dropped then
+        local nearest, nd
+        for _, x in ipairs(R.aliveInvs()) do
+          local d = travelCost(R.locOf(x), loc)
+          if nd == nil or d < nd then nearest, nd = x, d end
+        end
+        if nearest == inv then return loc, "go" end
+      end
+      local nxt = A.nextObjective(act)
+      if nxt then
+        if A.needAfter(act, nxt) > 0 then
+          local s = clueSpots(inv, nxt)
+          if s[1] then return s[1].L, "clues (next)" end
+        end
+        return A.actLocation(nxt, inv), "next"
+      end
+      return loc, "go"
+    end
     if A.need(act, inv) > 0 then
       local spots = clueSpots(inv, act)
       if spots[1] then return spots[1].L, "clues" end
@@ -589,6 +618,18 @@ return function(R, T)
         local need = FX.actNeed(act.id)
         if have >= need then
           add(60, "objective", function() R.objectiveAction(inv, act) end)
+        end
+      end
+      if spec.carry and not act.holder and target == L then
+        if act.dropped then
+          add(60, "objective", function() R.takeStory(inv, act) end)
+        else
+          local payers = spec.carry.any and R.aliveInvs() or R.investigatorsAt(L)
+          local have = 0
+          for _, x in ipairs(payers) do have = have + x.clues end
+          if have >= FX.actNeed(act.id) then
+            add(60, "objective", function() R.takeStory(inv, act) end)
+          end
         end
       end
       local sfNeed = spec.standFirm and R.walksBesideCost() or 0

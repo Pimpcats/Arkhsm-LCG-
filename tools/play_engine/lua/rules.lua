@@ -540,6 +540,7 @@ return function(R, T)
     R.log("%s is DEFEATED (%s)", inv.name, source or "?")
     -- clues go on the location; engaged enemies stay, unengaged
     local L = R.locOf(inv)
+    R.FX.dropStory(inv, L)
     if inv.clues > 0 and L then
       for _, tok in ipairs(inv.clueTokens) do if T.alive(tok) then tok.destruct() end end
       inv.clueTokens = {}

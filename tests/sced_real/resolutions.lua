@@ -644,7 +644,7 @@ return function(H)
     logSync(2)
     check("Sync leaves Seraphine's thread to the players (still 'unheard')", logVal("sera_unheard") == true
       and logVal("sera_suspected") ~= true)
-    logTick("sera_suspected")   -- the Vote's act, with Seraphine at the Records Office
+    logTick("sera_suspected")   -- the Vote's act, with Seraphine at the Town Hall Steps
     check("The Vote That Never Ends: Seraphine's thread 'suspected' on the log", logVal("sera_suspected") == true
       and logVal("sera_unheard") ~= true)
     check("no finale yet: The Way the Night Breaks needs The Appointed's Name",

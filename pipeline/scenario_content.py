@@ -441,6 +441,26 @@ def audit(campaign=None):
                 for req in a.get("requires", []):
                     if _norm(req) not in _norm(c.get("text")):
                         rep.err(sid, "act {} does not state its requirement '{}'".format(a["id"], req))
+                # a take-and-deliver objective: its story asset is set aside in
+                # this box, and the act names the asset and both locations
+                carry = a.get("carry")
+                if carry:
+                    asset = cards.get(carry.get("asset"))
+                    if not asset or asset.get("type") != "Asset":
+                        rep.err(sid, "act {}: story asset {} is missing or not an Asset".format(
+                            a["id"], carry.get("asset")))
+                    else:
+                        if carry["asset"] not in box.get("setup_aside", []):
+                            rep.err(sid, "act {}: story asset {} is not set aside in the box".format(
+                                a["id"], carry["asset"]))
+                        if _norm(re.sub(r"^The ", "", asset.get("name", ""))) not in _norm(c.get("text")):
+                            rep.err(sid, "act {} text does not name its story asset".format(a["id"]))
+                    for key in ("take_at", "deliver_to"):
+                        w = carry.get(key)
+                        if not w or not loc_named(w, pool):
+                            rep.err(sid, "act {}: {} '{}' does not resolve".format(a["id"], key, w))
+                        elif _norm(re.sub(r"^The ", "", w)) not in _norm(c.get("text")):
+                            rep.err(sid, "act {} text does not name '{}'".format(a["id"], w))
         elif box.get("act_deck"):
             rep.err(sid, "act deck on the board but none required")
 

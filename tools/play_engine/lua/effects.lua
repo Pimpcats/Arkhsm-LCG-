@@ -87,6 +87,7 @@ return function(R, T)
       for _, act in pairs(G.acts) do
         local spec = FX.ACTS[act.id] or {}
         if spec.at then need[spec.at] = true end
+        if spec.carry then need[spec.carry.take] = true end
         for _, id in ipairs(spec.sequence or {}) do need[id] = true end
         if spec.needLamp then need["sthr-loc-lanternroom"] = true end
       end
@@ -361,13 +362,22 @@ return function(R, T)
   local function clueNeed(id) local c = R.card(id) return (c.clues or 0) * (c.clues_per_investigator and R.G.n or 1) end
 
   ACTS["sthr-act-firsthour"] = { at = "sthr-loc-almanacsteps", contrib = true, fact = nil, spend = true, minHour = 7 }
-  ACTS["sthr-act-whythirteen"] = { at = "sthr-loc-vestry", fact = "the-thirteenth-toll", spend = true }
+  -- carry = a take-and-deliver objective: an [action] at carry.take spends the
+  -- act's clues (any investigator contributes when carry.any, else those at
+  -- carry.take) to take control of a set-aside story asset; the act advances
+  -- when its controller is at `at`. A defeated controller drops it.
+  ACTS["sthr-act-whythirteen"] = { at = "sthr-loc-belfry", fact = "the-thirteenth-toll", spend = true,
+                                   carry = { asset = "sthr-item-register", take = "sthr-loc-vestry", any = true } }
   ACTS["sthr-act-sheriffdead"] = { at = "sthr-loc-well", fact = "the-sheriff-is-already-dead", spend = true }
-  ACTS["sthr-act-almanachid"] = { at = "sthr-loc-press", fact = "what-the-almanac-hid", spend = true }
-  ACTS["sthr-act-hourwaswrong"] = { at = "sthr-loc-floodedcrypt", contrib = true, fact = "the-hour-was-wrong", spend = true }
-  ACTS["sthr-act-vote"] = { at = "sthr-loc-recordsoffice", contrib = true, fact = "the-vote-that-never-ends", spend = true }
+  ACTS["sthr-act-almanachid"] = { at = "sthr-loc-press", fact = "what-the-almanac-hid", spend = true,
+                                  carry = { asset = "sthr-item-almanac", take = "sthr-loc-readingroom", any = true } }
+  ACTS["sthr-act-hourwaswrong"] = { at = "sthr-loc-vestry", contrib = true, fact = "the-hour-was-wrong", spend = true,
+                                    carry = { asset = "sthr-item-drownedpage", take = "sthr-loc-floodedcrypt" } }
+  ACTS["sthr-act-vote"] = { at = "sthr-loc-townhallsteps", contrib = true, fact = "the-vote-that-never-ends", spend = true,
+                            carry = { asset = "sthr-item-ledger", take = "sthr-loc-recordsoffice" } }
   ACTS["sthr-act-appointedname"] = { at = "sthr-loc-sealedstudy", contrib = true, fact = "the-appointeds-name", spend = true }
-  ACTS["sthr-act-ninthdeath"] = { at = "sthr-loc-keepersquarters", contrib = true, fact = "the-keepers-ninth-death", spend = true, needLamp = true }
+  ACTS["sthr-act-ninthdeath"] = { at = "sthr-loc-lanternroom", contrib = true, fact = "the-keepers-ninth-death", spend = true,
+                                  needLamp = true, carry = { asset = "sthr-item-logbook", take = "sthr-loc-keepersquarters" } }
   ACTS["sthr-act-lamp"] = { at = "sthr-loc-lanternroom", contrib = true, fact = "the-lamp-was-never-lit", action = true,
                             test = { "wil", "com" }, diff = 3, failClues = true }
   ACTS["sthr-act-wheelturns"] = { at = "sthr-loc-wheel", contrib = true, fact = "the-wheel-still-turns", action = true,
@@ -380,7 +390,54 @@ return function(R, T)
   for id in pairs(ACTS) do cov(id) end
   cov("sthr-act-lasthour", "full; the [action] spends one recorded deep entry per action, in the order they were recorded")
 
-  function FX.actNeed(actId) return clueNeed(actId) end
+  --- The act's clue cost still to pay: a carry act's story asset already
+  -- taken (held or dropped) owes nothing more.
+  function FX.actNeed(actId)
+    if ACTS[actId] and ACTS[actId].carry then
+      for _, act in pairs(R.G.acts or {}) do
+        if act.id == actId and (act.holder or act.dropped) then return 0 end
+      end
+    end
+    return clueNeed(actId)
+  end
+
+  --- The story assets: who controls one gets its skill bonus (and penalty).
+  FX.STORY = {
+    ["sthr-item-logbook"] = { name = "The Keeper's Logbook", wil = 1 },
+    ["sthr-item-register"] = { name = "The Parish Register", int = 1 },
+    ["sthr-item-drownedpage"] = { name = "The Drowned Page", wil = 1 },
+    ["sthr-item-ledger"] = { name = "The Town Ledger", wil = 1 },
+    ["sthr-item-almanac"] = { name = "The Bound Almanac", int = 1, agi = -1 },
+  }
+  for id in pairs(FX.STORY) do cov(id, "full; a defeated controller drops it at their location, where any investigator may take it with an [action]") end
+
+  --- A carry act's [action]: the investigator takes control of the story asset
+  -- (paying the act's clues), or picks a dropped one up.
+  function R.takeStory(inv, act)
+    local G = R.G
+    local A = ACTS[act.id]
+    if act.dropped then
+      act.dropped = nil
+    else
+      local L = R.locById(A.carry.take)
+      R.spendClues(A.carry.any and R.aliveInvs() or R.investigatorsAt(L), clueNeed(act.id))
+      G.metrics.story_taken = G.metrics.story_taken or {}
+      G.metrics.story_taken[#G.metrics.story_taken + 1] = { id = A.carry.asset, round = G.round, hour = R.hour() }
+    end
+    act.holder = inv
+    inv.story = { id = A.carry.asset, act = act }
+    R.log("%s takes control of %s", inv.name, FX.STORY[A.carry.asset].name)
+  end
+
+  --- A defeated controller's story asset stays at their location.
+  function FX.dropStory(inv, L)
+    if not inv.story then return end
+    local act = inv.story.act
+    act.holder = nil
+    act.dropped = L and L.guid
+    inv.story = nil
+    R.log("%s drops %s", inv.name, FX.STORY[ACTS[act.id].carry.asset].name)
+  end
 
   --- Can the act's objective be met right now by the party (no action)?
   -- Returns the investigators whose clues pay, or nil.
@@ -389,6 +446,12 @@ return function(R, T)
     local A = ACTS[act.id]
     if not A or A.action or A.sequence or A.standFirm or A.contest then return nil end
     if A.needLamp and not G.lampLit then return nil end
+    if A.carry then
+      -- "If the investigator who controls X is at Y, advance."
+      local h = act.holder
+      if h and not h.defeated and R.locOf(h) == R.locById(A.at) then return {} end
+      return nil
+    end
     if A.minHour and R.hour() < A.minHour then return nil end       -- "Hour VII or later" (The First Hour)
     local L = R.locById(A.at)
     if not L or L.closed then return nil end
@@ -407,6 +470,7 @@ return function(R, T)
     local G = R.G
     local A = ACTS[act.id] or {}
     act.completed = true
+    if act.holder then act.holder.story = nil ; act.holder = nil end     -- the story asset leaves play
     G.metrics.acts_completed[#G.metrics.acts_completed + 1] = { id = act.id, round = G.round, hour = R.hour(),
                                                                  by = by and by.id }
     R.log("ACT ADVANCES: %s (Hour %d, round %d)", act.id, R.hour(), G.round)

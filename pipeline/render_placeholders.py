@@ -113,7 +113,8 @@ OV_COUNT_KEYS = ("quantity", "memoryCost", "wildIcons",
 # index is what prints ("Agenda 1"), number is the encounter number ("1/9") —
 # both are free text on real cards, so neither is forced to an int
 OV_PROP_KEYS = ("class", "deck", "difficulty", "encounter", "uses",
-                "elderSign", "signatures", "campaign_name", "index", "number")
+                "elderSign", "signatures", "campaign_name", "index", "number",
+                "take")
 
 # owner watermark, printed in the official footer text/format on every card
 WATERMARK = "Pimpcats ACE"
@@ -2182,7 +2183,15 @@ def s_act(c, pt, dest, art_path=None, placement=None):
     _box_text(d, hdr, se_reg("Act", "ScenarioIndex"), bold=True, max_size=15,
               fill=(74, 60, 46), align="left")
     _box_text(d, c["name"], se_reg("Act", "Name"), title=True, grow=1.15, key="name")
-    if c.get("clues") not in (None, ""):
+    if c.get("take"):
+        # a take-and-deliver objective has no clue threshold (its clue cost is
+        # on the act's [action]): the circle prints a dash, as official ones do
+        cb = se_reg("Act", "Clues")
+        cx, cy = (cb[0] + cb[2]) // 2, (cb[1] + cb[3]) // 2
+        half = max(6, (cb[2] - cb[0]) // 5)
+        d.line([(cx - half, cy), (cx + half, cy)], fill=(238, 232, 216),
+               width=max(3, half // 3))
+    elif c.get("clues") not in (None, ""):
         cb = se_reg("Act", "Clues")
         if c.get("clues_per_investigator") and cb:
             # a per-investigator threshold: numeral left of centre and the
