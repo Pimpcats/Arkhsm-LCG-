@@ -663,7 +663,7 @@ return function(R, T)
         local have = 0
         for _, x in ipairs(here) do
           have = have + x.clues
-          if spec.fare then have = have + math.floor(x.resources / 2) + (x.memory or 0) end
+          if spec.fare then have = have + math.floor(x.resources / ((R.WHATIF or {}).fareRate or FX.FARE_RATE or 2)) + (x.memory or 0) end
         end
         local need = FX.actNeed(act.id)
         if have >= need then

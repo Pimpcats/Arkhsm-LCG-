@@ -15,10 +15,11 @@ return function(R, T)
     local need = FX.actNeed(act.id)
     local here = spec.contrib == false and R.aliveInvs() or R.investigatorsAt(L)
     if spec.fare then
-      -- the Ticket-Taker's fare: resources (2 for 1) first, then clues, then Memory on own cards
+      -- the Ticket-Taker's fare: resources (FX.FARE_RATE for 1) first, then clues, then Memory on own cards
       local owe = need
+      local rate = (R.WHATIF or {}).fareRate or FX.FARE_RATE or 2     -- resources per fare point
       for _, x in ipairs(here) do
-        while owe > 0 and x.resources >= 2 and x.resources >= 4 do x.resources = x.resources - 2 ; owe = owe - 1 end
+        while owe > 0 and x.resources >= rate and x.resources >= 2 * rate do x.resources = x.resources - rate ; owe = owe - 1 end
       end
       local cl = 0
       for _, x in ipairs(here) do cl = cl + x.clues end
@@ -28,7 +29,7 @@ return function(R, T)
         while owe > 0 and (x.memory or 0) > 0 do R.addMemory(x, -1, "the Ticket-Taker's fare") ; owe = owe - 1 end
       end
       for _, x in ipairs(here) do
-        while owe > 0 and x.resources >= 2 do x.resources = x.resources - 2 ; owe = owe - 1 end
+        while owe > 0 and x.resources >= rate do x.resources = x.resources - rate ; owe = owe - 1 end
       end
       R.advanceAct(act, inv)
       return

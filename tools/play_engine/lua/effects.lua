@@ -406,7 +406,8 @@ return function(R, T)
                             test = { "wil", "com" }, diff = 3, failClues = true }
   ACTS["sthr-act-wheelturns"] = { at = "sthr-loc-wheel", contrib = true, fact = "the-wheel-still-turns", action = true,
                                   doomCost = 2 }
-  -- fare = paid in clues, Memory from own cards and resources (2 for 1)
+  -- fare = paid in clues, Memory from own cards and resources (FX.FARE_RATE for 1)
+  FX.FARE_RATE = 3
   ACTS["sthr-act-bargain"] = { at = "sthr-loc-ticketbooth", contrib = true, fact = "the-ticket-takers-bargain", action = true,
                                fare = true }
   ACTS["sthr-act-walkbackward"] = { sequence = { "sthr-loc-turning", "sthr-loc-lowbridge", "sthr-loc-milestones" },
@@ -456,7 +457,7 @@ return function(R, T)
   end
   for id in pairs(FX.STORY) do cov(id, "full; a defeated controller drops it at their location, where any investigator may take it with an [action]") end
   cov("sthr-item-ledger", "full; the AI reads an Echo to sleep when it is engaged with one or one is ready at its location")
-  cov("sthr-act-bargain", "full; the fare is paid in resources (2 for 1) first, then clues, then Memory")
+  cov("sthr-act-bargain", "full; the fare is paid in resources (3 for 1) first, then clues, then Memory")
   cov("sthr-act-sheriffdead", "full; the nearest investigator to each place goes there")
 
   --- A carry act's [action]: the investigator takes control of the story asset
