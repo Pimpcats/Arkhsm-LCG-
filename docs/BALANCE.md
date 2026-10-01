@@ -390,3 +390,12 @@ finale opens with The Appointed's Name and The Vote That Never Ends,
 the Uninvited 1 horror, the Minute Hand ×1, a waking Echo is exhausted and the
 Hour turning heals 1 damage and 1 horror. `simulate.py`: 0 failed assertions.
 Simulation only; not a playtest.
+
+## Official flow, final (2026-10-01)
+
+Enemies at official strength, about half the treacheries are skill tests,
+campaign chaos-bag changes, official XP (docs/design/OFFICIAL_COMPARISON.md).
+Engine, 3 investigators, target -> result: Prologue 80 -> 83%, night 1 80 ->
+76%, night 3 70 -> 76%, nights 4-5 60 -> 66%, nights 6-7 50 -> 45%, finale
+40 -> 38% (1p 42%, 2p 38%, 4p 27%). Details: docs/design/PLAYTEST_SIM.md.
+Simulation only; not a playtest.

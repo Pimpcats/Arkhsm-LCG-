@@ -360,6 +360,44 @@ the night-7 Lighthouse and Fairground 30%; one AI party and one upgrade path
 per investigator. Simulation only; not a playtest.
 
 
+
+## Official flow and final calibration (2026-10-01, late)
+
+**Supersedes the curve section above.** After the official comparison
+(docs/design/OFFICIAL_COMPARISON.md): enemies at official strength, 10
+treacheries rewritten as skill tests (Rising Water lingers), campaign
+chaos-bag changes, official XP (Victory per investigator, surface 1 / deep 3,
+cap 10 per investigator). Recalibrated on the engine with two cost settings
+per act (current and 2 lower), fitted per district and confirmed.
+
+Final costs ([perinv] unless noted): The First Hour 7 from **Hour VII**; The
+Sheriff Is Already Dead 9; The Thirteenth Toll **9**; What the Almanac Hid 9;
+Light the Lamp 4; The Wheel Still Turns **4**; Walk It Backward 3, 3, 4
+clues (4/4/4: 40% / 30%; 3/4/4: 43% / 57% on nights 1 / 3); The Vote 8; The
+Hour Was Wrong 7; The Keeper's Ninth Death 6; The Ticket-Taker's Bargain
+**7**; The Appointed's Name 7; Who Walks Beside You **8**. The Uninvited
+**2 fight, 3 health** (finale 30% -> 38%). Finale contest 6, 5 solo, 7 at four.
+
+Results (3 investigators, Standard, XP decks, 30 games a district, 60 for
+the finale):
+
+| night | target | won | Square / Church / Road / Lighthouse / Fairground / Almanac |
+|---|---|---|---|
+| Prologue | 80% | **83%** | – |
+| 1 | 80% | **76%** | 67 / 80 / 93 / 83 / 67 / 67 |
+| 3 | 70% | **76%** | 73 / 80 / 77 / 73 / 73 / 80 |
+| 4 | 60% | **71%** | 77 / 67 / 57 / 53 / 83 / 87 |
+| 5 | 60% | **61%** | 57 / 60 / 63 / 50 / 63 / 70 |
+| 6 | 50% | **48%** | 50 / 53 / 40 / 43 / 47 / 53 |
+| 7 | 50% | **42%** | 33 / 40 / 37 / 43 / 57 / 40 |
+| Finale | 40% | **38%** | 1p 42%, 2p 38%, 4p 27% (60 each) |
+
+Pairs: nights 4-5 66% (60), nights 6-7 45% (50). Over the 80% cap: Road
+night 1 (93%), Almanac II night 4 (87%), Fairground II night 4 (83%), the
+Prologue (83%); the steps either side were much further off. Memory: about
+5.6 per investigator on a Part II night (4.0 before the XP change).
+Simulation only; not a playtest.
+
 ## Assumptions and limits
 
 - One AI party, greedy but competent; real players differ (they talk and plan
