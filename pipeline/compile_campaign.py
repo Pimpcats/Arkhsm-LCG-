@@ -109,12 +109,13 @@ DISTRICT_ROW = {"district_fairground": 15.3, "district_lighthouse": 9.18,
 # OtherDoominPlay, MasterClueCounter); at -7.05 the Square's Named enemy lay
 # over the Master Clue Counter.
 DISTRICT_ACT_X, DISTRICT_SET_X = -13.8, -8.0
-# a district's set-aside stack (story assets), midway between the two
-DISTRICT_ASIDE_X = -10.9
-# the bottom row's midway spot is SCED's Phase Tracker (-11.3, -16, 3 x 3), so
-# the Church's set-aside stack sits just past it, in the same column and clear
-# of the Church's Named enemy (x -8.0, z -16.7)
-DISTRICT_ASIDE_Z = {"district_church": -19.3}
+# a district's set-aside stack (story assets), upright between the two: the
+# act deck reaches x -12.53 and the set row's cards x -9.75, and only an
+# upright card (2.53 across) fits the 2.78 between
+DISTRICT_ASIDE_X, DISTRICT_ASIDE_ROT = -11.14, 180
+# the bottom row's spot is SCED's Phase Tracker (-11.3, -16, 3 x 3), so the
+# Church's set-aside stack sits just past it, in the same column
+DISTRICT_ASIDE_Z = {"district_church": -19.6}
 # the finale shares the loop's board: its set-aside stack goes where the
 # official boxes put set-aside cards, beside the encounter discard, clear of
 # the Square's set-aside stack. Never the mat's other corner snap
@@ -146,7 +147,7 @@ def stack_anchor(sc, stack):
         if stack == "setup_aside" and sc.get("shared_from"):
             # a district's set-aside cards (its story assets): face down in
             # its own column, between its act deck and its encounter set
-            return {"pos": (DISTRICT_ASIDE_X, 1.62, DISTRICT_ASIDE_Z.get(sid, z)), "rot": 270,
+            return {"pos": (DISTRICT_ASIDE_X, 1.62, DISTRICT_ASIDE_Z.get(sid, z)), "rot": DISTRICT_ASIDE_ROT,
                     "face_down": True}
     if sid == "finale" and stack == "setup_aside":
         return FINALE_ASIDE
