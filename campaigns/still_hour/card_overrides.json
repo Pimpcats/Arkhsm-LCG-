@@ -842,8 +842,8 @@
     "clues_per_investigator": true
   },
   "sthr-act-ninthdeath": {
-    "clues": 7,
-    "text": "Part II only.\nObjective – If the Lantern Room's lamp is lit, investigators at the Keeper's Quarters may, as a group, spend 7 [perinv] clues to advance.",
+    "clues": 6,
+    "text": "Part II only.\nObjective – If the Lantern Room's lamp is lit, investigators at the Keeper's Quarters may, as a group, spend 6 [perinv] clues to advance.",
     "index": "2a",
     "number": "2/2",
     "flavor": "Elias kept the log for years. He does not remember writing most of it.",
@@ -887,14 +887,14 @@
   },
   "sthr-act-walksbeside": {
     "name": "Who Walks Beside You",
-    "text": "Part II only.\nForced – When this act becomes the current act: Search the encounter deck and discard pile for a Waiting Congregation, spawn it at the Turning and shuffle the encounter deck. While this act is the current act, each Echo at the Turning is not Sleepwalking.\nObjective – [action] Spend 8 [perinv] clues: Stand Firm. Only an investigator at the Turning may use this ability; investigators at the Turning may contribute the clues. Choose a ready Echo at the Turning and test [wil] (X) or [com] (X), where X is its fight value. If you succeed, exhaust it and advance. If you fail, place the spent clues on the Turning. Investigators at the Turning may also spend 8 [perinv] clues after one of them evades an Echo there, to advance.",
+    "text": "Part II only.\nForced – When this act becomes the current act: Search the encounter deck and discard pile for a Waiting Congregation, spawn it at the Turning and shuffle the encounter deck. While this act is the current act, each Echo at the Turning is not Sleepwalking.\nObjective – [action] Spend 7 [perinv] clues: Stand Firm. Only an investigator at the Turning may use this ability; investigators at the Turning may contribute the clues. Choose a ready Echo at the Turning and test [wil] (X) or [com] (X), where X is its fight value. If you succeed, exhaust it and advance. If you fail, place the spent clues on the Turning. Investigators at the Turning may also spend 7 [perinv] clues after one of them evades an Echo there, to advance.",
     "flavor": "Some of them turn to look at you now.",
     "deck": 95107,
     "index": "2a",
     "number": "2/2",
     "back_flavor": "The face under the hood is worn almost smooth, like a step a thousand feet have climbed. You know the coat. You know the ring on the hand that lifts to stop you. They were here before you, and they looped until there was nothing left to loop.",
     "back_text": "Record in your Campaign Log: Who Walks Beside You.\nWhile your Campaign Log records Who Walks Beside You, each Echo gets −1 fight.\nThe Sunken Road's objectives are complete. From now on, do not use this act deck when you Place this box.",
-    "clues": 8,
+    "clues": 7,
     "clues_per_investigator": true
   },
   "sthr-act-sheriffdead": {
@@ -959,8 +959,8 @@
   },
   "sthr-act-appointedname": {
     "name": "The Appointed's Name",
-    "clues": 8,
-    "text": "Part II only, once your Campaign Log records What the Almanac Hid and The Vote That Never Ends.\nForced – When this act becomes the current act: The Sealed Study opens.\nObjective – Investigators at the Sealed Study may, as a group, spend 8 [perinv] clues to advance.",
+    "clues": 7,
+    "text": "Part II only, once your Campaign Log records What the Almanac Hid and The Vote That Never Ends.\nForced – When this act becomes the current act: The Sealed Study opens.\nObjective – Investigators at the Sealed Study may, as a group, spend 7 [perinv] clues to advance.",
     "flavor": "Inside is the name the town spoke to call the thing through.",
     "deck": 95113,
     "index": "2a",
