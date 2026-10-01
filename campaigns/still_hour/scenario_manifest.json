@@ -85,7 +85,7 @@
           },
           {
             "id": "sthr-rewind",
-            "name": "REWIND",
+            "name": "STUTTER",
             "type": "Treachery",
             "keywords": [
               "Peril"
@@ -554,19 +554,19 @@
               "name": "The Square",
               "starting": true,
               "shroud": 1,
-              "clues": 2
+              "clues": 1
             },
             {
               "id": "sthr-loc-longpier",
               "name": "The Long Pier",
               "shroud": 2,
-              "clues": 2
+              "clues": 1
             },
             {
               "id": "sthr-loc-almanacsteps",
               "name": "The Almanac Steps",
               "shroud": 2,
-              "clues": 3
+              "clues": 2
             }
           ]
         },
@@ -665,7 +665,7 @@
               "id": "sthr-loc-lanternroom",
               "name": "The Lantern Room",
               "shroud": 3,
-              "clues": 2,
+              "clues": 1,
               "accepted": {
                 "shroud": 4,
                 "decision": "CONTENT_DECISIONS A1 (owner's own edit)"
@@ -685,7 +685,7 @@
               "id": "sthr-loc-keepersquarters",
               "name": "The Keeper's Quarters",
               "shroud": 2,
-              "clues": 2
+              "clues": 1
             }
           ]
         },
@@ -709,7 +709,7 @@
             },
             {
               "id": "sthr-act-ninthdeath",
-              "name": "The Ninth Death",
+              "name": "The Keeper's Ninth Death",
               "act": "II",
               "needs": {
                 "clues": "card",
@@ -755,7 +755,7 @@
           "cards": [
             {
               "id": "sthr-item-logbook",
-              "name": "The Keeper's Logbook",
+              "name": "Keeper's Logbook",
               "role": "story asset (The Ninth Death)"
             }
           ]
@@ -815,26 +815,26 @@
               "id": "sthr-loc-nave",
               "name": "The Nave",
               "shroud": 2,
-              "clues": 3
+              "clues": 1
             },
             {
               "id": "sthr-loc-belfry",
               "name": "The Belfry",
               "shroud": 3,
-              "clues": 2
+              "clues": 1
             },
             {
               "id": "sthr-loc-floodedcrypt",
               "name": "The Flooded Crypt",
               "shroud": 4,
-              "clues": 3,
+              "clues": 2,
               "sealed_until_fact": true
             },
             {
               "id": "sthr-loc-vestry",
               "name": "The Vestry",
               "shroud": 2,
-              "clues": 2
+              "clues": 1
             }
           ]
         },
@@ -916,12 +916,12 @@
           "cards": [
             {
               "id": "sthr-item-register",
-              "name": "The Parish Register",
+              "name": "Parish Register",
               "role": "story asset (Why Thirteen?)"
             },
             {
               "id": "sthr-item-drownedpage",
-              "name": "The Drowned Page",
+              "name": "Drowned Page",
               "role": "story asset (The Hour Was Wrong)"
             }
           ]
@@ -980,19 +980,19 @@
               "id": "sthr-loc-milestones",
               "name": "The Milestones",
               "shroud": 1,
-              "clues": 2
+              "clues": 1
             },
             {
               "id": "sthr-loc-lowbridge",
               "name": "The Low Bridge",
               "shroud": 3,
-              "clues": 2
+              "clues": 1
             },
             {
               "id": "sthr-loc-turning",
               "name": "The Turning",
               "shroud": 2,
-              "clues": 3
+              "clues": 2
             }
           ]
         },
@@ -1006,12 +1006,21 @@
               "act": "I",
               "at": "The Milestones",
               "needs": {
-                "each": 1,
-                "from": [
-                  "The Turning",
-                  "The Low Bridge",
-                  "The Milestones"
-                ]
+                "sequence": [
+                  [
+                    "The Turning",
+                    2
+                  ],
+                  [
+                    "The Low Bridge",
+                    1
+                  ],
+                  [
+                    "The Milestones",
+                    1
+                  ]
+                ],
+                "note": "one investigator discovers these in order"
               }
             },
             {
@@ -1094,13 +1103,13 @@
               "starting": true,
               "role": "loop hub",
               "shroud": 1,
-              "clues": 2
+              "clues": 1
             },
             {
               "id": "sthr-loc-townhallsteps",
               "name": "The Town Hall Steps",
               "shroud": 2,
-              "clues": 2,
+              "clues": 1,
               "back": {
                 "flip_fact": "The Sheriff Is Already Dead",
                 "shroud": 2
@@ -1110,13 +1119,13 @@
               "id": "sthr-loc-recordsoffice",
               "name": "The Records Office",
               "shroud": 3,
-              "clues": 3
+              "clues": 2
             },
             {
               "id": "sthr-loc-well",
               "name": "The Well",
               "shroud": 2,
-              "clues": 2
+              "clues": 1
             }
           ]
         },
@@ -1204,7 +1213,7 @@
             },
             {
               "id": "sthr-item-ledger",
-              "name": "The Town Ledger",
+              "name": "Town Ledger",
               "role": "story asset (The Vote That Never Ends)"
             }
           ]
@@ -1264,19 +1273,19 @@
               "id": "sthr-loc-wheel",
               "name": "The Wheel",
               "shroud": 3,
-              "clues": 2
+              "clues": 1
             },
             {
               "id": "sthr-loc-hallofmirrors",
               "name": "The Hall of Mirrors",
               "shroud": 2,
-              "clues": 3
+              "clues": 2
             },
             {
               "id": "sthr-loc-ticketbooth",
               "name": "The Ticket Booth",
               "shroud": 2,
-              "clues": 2
+              "clues": 1
             }
           ]
         },
@@ -1396,19 +1405,19 @@
               "id": "sthr-loc-readingroom",
               "name": "The Reading Room",
               "shroud": 2,
-              "clues": 2
+              "clues": 1
             },
             {
               "id": "sthr-loc-press",
               "name": "The Press",
               "shroud": 3,
-              "clues": 3
+              "clues": 2
             },
             {
               "id": "sthr-loc-sealedstudy",
               "name": "The Sealed Study",
               "shroud": 4,
-              "clues": 3,
+              "clues": 2,
               "opens_with_fact": true
             }
           ]
@@ -1479,7 +1488,7 @@
           "cards": [
             {
               "id": "sthr-item-almanac",
-              "name": "The Bound Almanac",
+              "name": "Bound Almanac",
               "role": "story asset (What the Almanac Hid)"
             }
           ]

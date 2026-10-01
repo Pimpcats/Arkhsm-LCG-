@@ -6,7 +6,7 @@
 ---
 
 ## LOOP COUNTER
-Completed loops: ______  →  **Scar next loop** (= loops; maximum 3 / 4 / 6 / 8 at 1 / 2 / 3 / 4 investigators): ______
+Completed loops: ______  →  **Scar next loop** (= loops; maximum 4 / 4 / 6 / 8 at 1 / 2 / 3 / 4 investigators): ______
 
 Current **Part**:  ☐ I — Learning the Rules   ☐ II — The Shape of the Hour   ☐ The Last Hour available
 
@@ -43,7 +43,7 @@ Current **Part**:  ☐ I — Learning the Rules   ☐ II — The Shape of the Ho
 ---
 
 ## BANKED MEMORY
-Banked Memory: **______**  (cap 6 × investigators: after spending, reduce to the cap; never below 0)
+Banked Memory: **______**  (cap 10 × investigators: after spending, reduce to the cap; never below 0)
 Spent this interlude: ______  on: _______________________________________
 
 ---
@@ -71,7 +71,7 @@ Spent this interlude: ______  on: _______________________________________
 ---
 
 ## VICTORY
-*Each banks its Victory X in total, once per campaign.*
+*Each pays its Victory X to each investigator, once per campaign.*
 
 - ☐ **Church — Named (Victory 2)** — ______________________ — banked: ☐
 - ☐ **Square — Named (Victory 3)** — ______________________ — banked: ☐

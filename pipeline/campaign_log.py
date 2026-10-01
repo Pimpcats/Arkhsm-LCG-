@@ -56,11 +56,11 @@ FACTS = [
     ("the-lamp-was-never-lit", "The Lamp Was Never Lit", "Lighthouse", "surface",
      "The Lantern Room enters play calm side up."),
     ("the-keepers-ninth-death", "The Keeper's Ninth Death", "Lighthouse", "deep",
-     "When Elias's [elder] heals damage, it also heals 1 horror."),
+     "A defeated investigator first places 1 Memory. Elias Warde's [elder] heals 1 horror too."),
     ("the-thirteenth-toll", "The Thirteenth Toll", "Church", "surface",
      "Hour III: no extra Dissonance at a Church location."),
     ("the-hour-was-wrong", "The Hour Was Wrong", "Church", "deep",
-     "Remove Hour IV from the Hours deck."),
+     "Hour IV's When reached does not resolve. −1 [elderthing]."),
     ("the-road-remembers", "The Road Remembers", "Sunken Road", "surface",
      "Group limit once per loop: Square–Milestones costs no Hour."),
     ("who-walks-beside-you", "Who Walks Beside You", "Sunken Road", "deep",
@@ -68,7 +68,7 @@ FACTS = [
     ("the-sheriff-is-already-dead", "The Sheriff Is Already Dead", "Square", "surface",
      "The Town Hall Steps enter play calm side up."),
     ("the-vote-that-never-ends", "The Vote That Never Ends", "Square", "deep",
-     "Seraphine's thread: suspected."),
+     "The Same Speech: no extra horror. Seraphine's thread: suspected (if she is playing)."),
     ("the-wheel-still-turns", "The Wheel Still Turns", "Fairground", "surface",
      "At The Wheel, group limit once per loop: reorder top 2 encounter cards."),
     ("the-ticket-takers-bargain", "The Ticket-Taker's Bargain", "Fairground", "deep",
@@ -76,7 +76,7 @@ FACTS = [
     ("what-the-almanac-hid", "What the Almanac Hid", "Almanac", "surface",
      "Hour VI: the bag holds 1 fewer Static token instead of 1 more."),
     ("the-appointeds-name", "The Appointed's Name", "Almanac", "deep",
-     "Hour VII: exhaust the Appointed. Seraphine's thread: known."),
+     "Hour VII: exhaust The Appointed. −1 [tablet]. Seraphine's thread: known (if she is playing)."),
     ("the-way-the-night-breaks", "The Way the Night Breaks", "assembled", "assembled",
      "The finale may be begun."),
 ]
@@ -196,7 +196,7 @@ def _pages():
     y = 348
     p1.text(90, y, "Completed loops", size=24, style="bold")
     p1.counter("loops", 320, y - 9, 0, 99)
-    p1.text(400, y, "Scar next loop (= loops; max 3/4/6/8 at 1–4 inv.):", size=20,
+    p1.text(400, y, "Scar next loop (= loops; max 4/4/6/8 at 1–4 inv.):", size=20,
             style="italic", fill=SOFT)
     p1.counter("scar", 895, y - 9, derived="scar")
     p1.text(960, y, "Investigators:", size=24, style="bold")

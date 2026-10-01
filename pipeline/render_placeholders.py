@@ -114,7 +114,7 @@ OV_COUNT_KEYS = ("quantity", "memoryCost", "wildIcons",
 # both are free text on real cards, so neither is forced to an int
 OV_PROP_KEYS = ("class", "deck", "difficulty", "encounter", "uses",
                 "elderSign", "signatures", "campaign_name", "index", "number",
-                "take")
+                "take", "no_threshold")
 
 # card id -> (encounter set id, "a/total") — filled in main() (encounter_sets.py)
 ENC_MARKS = {}
@@ -1676,13 +1676,19 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
     # Events: the box curves inward at its lower corners. Assets with a slot:
     # the slot icon sits in the lower right, so stop the rules above it.
     bottom_pad = -44 if kind == "Event" else (-6 if kind == "Asset" and c.get("slot") else 24)
+    if kind == "Asset" and c.get("encounter_set"):
+        # a story asset has no slot icon, but its frame's lower ornament sits
+        # where the slot would: stop the rules above it
+        bottom_pad = -34
     y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3] + bottom_pad),
                    start=BODY_PX, key="text")
     if pt.get("flavor") and y < b[3]:
         # the Event box curves inward at its lower corners
         fx = b[0] + (28 if kind == "Event" else 0)
-        _box_block(d, pt.get("flavor", ""), (fx, y + 8, b[2], b[3] + 40),
-                   fill=(84, 66, 50), italic=True, start=FLAVOR_PX, key="flavor")
+        fb = b[3] + (bottom_pad if kind == "Asset" and c.get("encounter_set") else 40)
+        if y + 30 < fb:
+            _box_block(d, pt.get("flavor", ""), (fx, y + 8, b[2], fb),
+                       fill=(84, 66, 50), italic=True, start=FLAVOR_PX, key="flavor")
     if c.get("victory"):
         _box_text(d, "Victory {}.".format(c["victory"]),
                   (b[0], b[3] + 24, b[2], b[3] + 52), bold=True, max_size=22, key="victory")
@@ -2223,9 +2229,10 @@ def s_act(c, pt, dest, art_path=None, placement=None):
     _box_text(d, hdr, se_reg("Act", "ScenarioIndex"), bold=True, max_size=15,
               fill=(74, 60, 46), align="left")
     _box_text(d, c["name"], se_reg("Act", "Name"), title=True, grow=1.15, key="name")
-    if c.get("take"):
-        # a take-and-deliver objective has no clue threshold (its clue cost is
-        # on the act's [action]): the circle prints a dash, as official ones do
+    if c.get("take") or c.get("no_threshold"):
+        # an objective with no clue threshold (a take-and-deliver act, or a
+        # clue cost paid on the act's [action]): the circle prints a dash, as
+        # official ones do
         cb = se_reg("Act", "Clues")
         cx, cy = (cb[0] + cb[2]) // 2, (cb[1] + cb[3]) // 2
         half = max(6, (cb[2] - cb[0]) // 5)

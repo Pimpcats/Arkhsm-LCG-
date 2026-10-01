@@ -268,6 +268,12 @@ def objective_feasibility(cards, assign, manifest, n):
                 if sum(got) < need["fixed"]:
                     out.append((sid, "{}: needs {} clues, only {} exist".format(
                         label, need["fixed"], sum(got))))
+            elif "sequence" in need:
+                # one investigator discovers k clues at each named location, in order
+                for name, k in need["sequence"]:
+                    have = clues_at(name)
+                    if have is None or have < k:
+                        out.append((sid, "{}: {} holds {} clue(s), the sequence needs {}".format(label, name, have, k)))
             elif "each" in need:
                 if min(got) < need["each"]:
                     out.append((sid, "{}: a location has fewer than {} clue(s)".format(label, need["each"])))
