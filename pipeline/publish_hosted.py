@@ -147,7 +147,8 @@ def publish(ref, render=True):
     if guide:
         urls["_campaign_guide"] = guide
 
-    with open(os.path.join(HERE, "art_urls.json"), "w", encoding="utf-8") as f:
+    os.makedirs(os.path.dirname(CFG.path("art_urls")), exist_ok=True)
+    with open(CFG.path("art_urls"), "w", encoding="utf-8") as f:
         json.dump(urls, f, indent=2)
 
     for script, *args in REBUILD:

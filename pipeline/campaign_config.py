@@ -89,6 +89,7 @@ def load(cid=None):
     c.setdefault("illustrations", "assets/illustrations/" + cid)
     c.setdefault("out_dir", "out/" + cid)
     c.setdefault("genre", "custom campaign")
+    c.setdefault("art_urls", "out/%s/art_urls.json" % cid)       # hosted image URLs (publish_hosted.py; gitignored)
     c.setdefault("art_setting", "1920s New England, cosmic horror, uncanny rather than gory")
     c.setdefault("art_scenes", "campaigns/%s/art_scenes.json" % cid)   # {scenes, characters, text_only}
     c.setdefault("art_pack_json", "campaigns/%s/art/chatgpt_art_pack.json" % cid)

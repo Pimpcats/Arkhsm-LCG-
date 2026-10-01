@@ -36,7 +36,7 @@ STATIC_TOKEN_FALLBACK = TOKEN.get("fallback_url", "https://placehold.co/512x512/
 
 
 def static_token_url(root):
-    path = os.path.join(root, "pipeline", "art_urls.json")
+    path = CFG.path("art_urls")
     if os.path.exists(path):
         v = json.load(open(path, encoding="utf-8")).get("_static_token")
         if isinstance(v, dict):

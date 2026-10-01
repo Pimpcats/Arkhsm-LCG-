@@ -384,7 +384,16 @@ def audit(campaign=None):
 
         # agenda (the Occultation clock)
         ag = stacks.get("agenda_deck")
-        if ag:
+        if ag and ag.get("cards"):
+            # a scenario's own agenda deck (the official shape)
+            want = [c.get("id") for c in ag["cards"]]
+            if box.get("agenda_deck", []) != want:
+                rep.err(sid, "agenda deck is not the scenario's agendas in order")
+            for c in ag["cards"]:
+                card = cards.get(c.get("id"))
+                if card and card.get("doom") in (None, "") and not c.get("final"):
+                    rep.err(sid, "{}: agenda has no doom threshold".format(c["id"]))
+        elif ag:
             clock = next((k for k in camp.get("clocks", []) if k["id"] == ag.get("ref")), None)
             if not clock:
                 rep.err(sid, "agenda ref {} is not a campaign clock".format(ag.get("ref")))

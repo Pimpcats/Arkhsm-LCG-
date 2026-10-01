@@ -77,8 +77,8 @@ def build_gmnotes(c):
     # SCED calls the chaos-token card a ScenarioReference (docs/art_reference/
     # sced_objects/campaign_box_memory_bag.json); our editor calls it Scenario.
     meta_type = "ScenarioReference" if t == "Scenario" else t
-    m = {"id": c["id"], "type": meta_type, "class": c["class"],
-         "traits": c["traits"], "cycle": CFG.name}
+    m = {"id": c["id"], "type": meta_type, "class": c.get("class", "Mythos"),
+         "traits": c.get("traits", ""), "cycle": CFG.name}
     if t in SCENARIO_SIDE_TYPES and not c.get("traits"):
         # real agendas/acts/references carry no traits key at all
         del m["traits"]
@@ -254,7 +254,7 @@ LOC_SYMBOL_META = {
 # pipeline/art_urls.json  {cardId: {"face": url, "back": url}} — URLs may be
 # hosted (https://...) or local (file:///...) for private TTS testing.
 def _load_art_urls():
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "art_urls.json")
+    path = CFG.path("art_urls")
     if os.path.exists(path):
         return json.load(open(path, encoding="utf-8"))
     return {}
