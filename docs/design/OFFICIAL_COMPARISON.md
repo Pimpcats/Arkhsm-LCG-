@@ -1,0 +1,50 @@
+# The Still Hour against the official campaigns
+
+Design document (spoilers). The owner's checklist for "the correct flow":
+agenda pacing (doom), act pacing (clues), locations (count, connections,
+clues against the act), enemy spawns including elites, encounter cards,
+chaos-bag changes over a campaign, and XP gain.
+
+Official figures: `tools/official_compare/compare.py` (downloads SCED's own
+TTS campaign files, arkhamdb-json-data and arkham-cards-data into
+`.cache/official/`; nothing vendored). 54 scenarios, Night of the Zealot to
+The Innsmouth Conspiracy; the newer campaigns are missing from
+arkhamdb-json-data, so their stats are left out. Medians, with the middle
+half of scenarios in brackets. The Still Hour: a night at three
+investigators (the Square plus one district unless noted), measured
+2026-10-01.
+
+| area | official | The Still Hour (before this pass) | verdict / change |
+|---|---|---|---|
+| Agenda: total doom | 18 (14-20) over 3 agendas (about 6 each) | 17 over 8 Hours (2 each); 10.5-13 rounds a night | matches in total and length; the Hourglass's small steps are the campaign's clock (kept) |
+| Act: clues asked | 2.5 per investigator per clue act, 3 per scenario (0-5) | 9-10 per investigator (Part I), 6-8 (Part II) | about 3x; recalibrated down with the changes below |
+| Location clues | 0.9 per investigator per location (0.7-1.2), 10 per scenario (7-15) | 2.3 per location, 16-21 a night | about 2.5x, but the act asks for about half the map's clues as official does (0.5, middle half 0.3-0.6); a scale choice from the 3-hour loops (kept) |
+| Locations | 11.5 (9-14) | 7-8 with one district, 11-14 with two or three | in range on a typical night |
+| Connections per location | 2.5 (1.6-3.5) | 1.7-1.9 (district leaves are dead ends) | low end of the official range (kept) |
+| Enemies | 30% of a 30-card deck (25-33); fight 2.9 / evade 2.6 / health 3.0 per enemy copy; 2 elites (1-3) | 29-37% of 25-33 cards; fight 1.9 / evade 2.0 / health 2.4; elites 1-2 a night (the Appointed, a Named enemy in Part II) | **stats raised** to 2.7-2.8 / 2.4-2.6 / 2.8-3.0 (CREATURES_AND_VICTORY.md) |
+| Encounter cards | 52% call for a skill test (40-60%); 37% stay in play | 1 of 23 distinct cards had a test (7% of copies); none stayed in play; mostly automatic horror | **10 rewritten** as "Test X (3). If you fail, ..."; Rising Water attaches until the Hourglass advances (about half of a night's treachery copies now test) |
+| Chaos bag | Standard about 16 tokens; over a campaign, story results add or remove a symbol token (add: Elder Thing 66, Tablet 64, Cultist 53, Skull 12, Auto-fail 1; remove: Tablet 73, Elder Thing 73, Cultist 65, Skull 4, Elder Sign 1, across 12 campaigns) | Standard 17 tokens; nothing changed over a campaign (only the temporary [static] tokens) | **added**: Part II +1 [tablet]; the first Torn loop +1 [cultist]; the first age-out +1 [elderthing]; The Hour Was Wrong -1 [elderthing], Who Walks Beside You -1 [cultist], The Keeper's Ninth Death -1 [tablet] |
+| XP | about 4-6 per scenario, 35-50 per campaign; Victory pays each investigator | engine: about 2.7 Memory per investigator a Part I night, 4 a Part II night, about 30 a campaign (part of it spent on Recollections); Victory paid the group once; surface entries 0, deep 2; cap 6 per investigator | **raised**: Victory pays each investigator, surface entries 1 and deep entries 3 per investigator, cap 10 per investigator; engine: about 5.6 a Part II night |
+
+## How the Still Hour side is measured
+
+- Encounter deck, enemy share and stats: `scenario_assignments.json`
+  encounter lists with the campaign card data (Square box plus the district
+  box; Part II adds the Appointed's Whispers).
+- Connections: the location GMNotes in `dist/saved_object_the_still_hour.json`
+  (same icon/connection format as SCED's official files), with the same
+  degree count as the tool.
+- Treachery tests and lingering effects: the same text patterns as the tool.
+- XP: play-engine games (`memory_bank_end - memory_bank_start` per
+  investigator), plus `pipeline/simulate_tempo.py --memory`.
+
+## Implementation
+
+- Chaos-bag changes: `src/tts/control.lua` (`bagChanges`, `bagFor`,
+  `refreshBag`) derives them from the campaign state (Part II, Knowledge, the
+  `torn` mark set by Reset Loop, Years at 18) and refills SCED's bag with the
+  chosen difficulty plus the changes; `tests/sced_real/playthrough.lua`
+  checks Part II (+[tablet]) and The Hour Was Wrong (-[elderthing]).
+- Treacheries: `tools/play_engine/lua/effects.lua` resolves the new tests.
+- XP: `Knowledge.MEMORY_PER_INVESTIGATOR`, `Constants.forCount().memoryCap`,
+  `shApiClaimVictory` (X per investigator).

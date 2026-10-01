@@ -141,6 +141,17 @@ Coverage checklist:
   state (scar, Years, banked Memory) **with upgraded XP decks**; measure every
   night of each pair, not one per pair, since the state can move a night by
   10–25 points. Report to the owner by night, not by scenario variant.
+- Compare the structure with the official campaigns before calibrating
+  (`tools/official_compare/compare.py`; Still Hour: docs/design/OFFICIAL_COMPARISON.md):
+  doom per scenario, act clues against location clues, locations and
+  connections, enemy share and stats (elites included), treacheries with a
+  skill test or a lingering effect, chaos-bag changes over the campaign
+  (mostly Cultist / Tablet / Elder Thing; Elder Sign and Auto-fail almost
+  never), XP per scenario and campaign. Report which gaps are missing and
+  which are deliberate, and fix the missing ones first.
+- Calibrate with several levers, not clue costs alone: tuning only the acts
+  left The Still Hour with official-strength flow but weak enemies,
+  automatic treacheries and acts three times the official size.
 - Check every player count where a target is an integer (the finale's
   contest goal): one step can move the win rate 25–50 points, so choose the
   goal closest to the target per count and report the residual.
