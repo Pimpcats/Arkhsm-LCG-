@@ -1,5 +1,13 @@
 # Current campaign audit — 2026-10-02
 
+> **Superseded in part (later playtest and balance passes).** The act-cost and
+> investigator tables below are out of date. The current values are in
+> `campaigns/still_hour/card_overrides.json` and
+> `docs/design/FINISHING_BALANCE.md`. For example, act costs are now The Hour
+> Was Wrong 2, What the Almanac Hid 3, Who Walks Beside You 3, the Ticket-Taker's
+> fare 3 and Why Thirteen? 3; Dr. Ayako Sōma has 6 health and "Birdie" Okonkwo 7.
+> The Winding Stair also now holds 1 clue per investigator.
+
 Designer reference; contains spoilers. Effective overrides and the current
 player guide govern the release. Older design documents are historical.
 

@@ -309,7 +309,7 @@
     "name": "The Winding Stair",
     "traits": "Lighthouse.",
     "shroud": 2,
-    "clues": 0,
+    "clues": 1,
     "clues_per_investigator": true,
     "icons": "cross",
     "color": "#5c246e",
@@ -905,7 +905,7 @@
   },
   "sthr-act-walkbackward": {
     "name": "Walk It Backward",
-    "text": "Objective – If one investigator has discovered 3 clues at The Turning, then 1 clue at The Low Bridge, then 1 clue at The Milestones, in that order, during this loop, advance. (With one investigator: 2, then 1, then 1.) (Keep a separate pile of resources from the token pool on this act for each investigator, 1 per clue that counts.)",
+    "text": "Objective – If one investigator has discovered 3 clues at The Turning, then 1 clue at The Low Bridge, then 1 clue at The Milestones, in that order, during this loop, advance. (With one investigator: 2, then 1, then 1.) Each investigator counts separately; discoveries elsewhere or out of order do not count and do not reset your count. (Keep a separate pile of resources from the token pool on this act for each investigator, 1 per clue that counts.)",
     "flavor": "The same figures walk it every loop, in the same direction, never arriving.",
     "deck": 95106,
     "index": "1a",
@@ -1220,7 +1220,7 @@
     "text": "Revelation – If Dissonance is in the Noticed band, advance The Appointed's Approach by 1 stage; if the Approach is already Arrived, take 2 horror instead. Otherwise, if Dissonance is in the Glitch band, take 2 horror. Otherwise, raise Dissonance by 1."
   },
   "sthr-foreknowledge": {
-    "text": "Max 1 committed per skill test.\nWhen you commit Foreknowledge to a skill test, you may remove 1 Memory from a card you control. If you do, Foreknowledge gains [wild][wild] for that test, and if that test succeeds, draw 1 card.",
+    "text": "Max 1 committed per skill test.\nWhen you commit Foreknowledge to a skill test, you may remove 1 Memory from a card you control. If you do, Foreknowledge gains [wild] for that test, and if that test succeeds, draw 1 card.",
     "memoryCost": 2,
     "wildIcons": 2
   },
@@ -1228,7 +1228,7 @@
     "text": "Commit only to a skill test you are performing. If you have already failed a test of the same skill during this loop, I've Done This Before gains [wild][wild]."
   },
   "sthr-musclememory": {
-    "text": "When you commit Muscle Memory to a skill test, if you have already performed a test of the same skill during this loop, Muscle Memory gains [wild] and you draw 1 card. If it is a [com] or [agi] test and you are Weathered or older, Muscle Memory gains another [wild].",
+    "text": "When you commit Muscle Memory to a skill test, if you have already performed a test of the same skill during this loop, Muscle Memory gains [wild] for that test, and if that test succeeds, draw 1 card. If it is a [com] or [agi] test and you are Weathered or older, Muscle Memory gains another [wild].",
     "memoryCost": 2,
     "flavor": "The body ages. The muscle remembers."
   },

@@ -64,6 +64,12 @@ local function hasLabel(prefix)
   return nil
 end
 
+-- Begin Next Loop asks once when the interlude is unfinished; a second click starts the night
+local function beginNext(e)
+  e.shBeginNextLoop()
+  if e.shApiState().mode ~= "play" then e.shBeginNextLoop() end
+end
+
 print("== driving the bundle as TTS would ==")
 env.onLoad(nil)
 print("  created " .. #buttons .. " buttons: " .. table.concat(labels(), ", "))
@@ -137,16 +143,16 @@ print("\n== interlude buy panel ==")
 env.shApiCounter({ name = "memory", delta = 9 })
 env.shOpenInterlude()
 print("  panel: " .. table.concat(labels(), ", "))
-expect("panel lists Recollections with prices", hasLabel("sthr-longwayround (2)") ~= nil)
+expect("panel lists Recollections with prices", hasLabel("The Long Way Round (2)") ~= nil)
 expect("panel has level-up buttons", hasLabel("Lvl 3 (3)") ~= nil and hasLabel("Lvl 5 (5)") ~= nil)
 local m0 = env.shApiState().memory
-local rb = hasLabel("sthr-longwayround (2)")
+local rb = hasLabel("The Long Way Round (2)")
 env[rb.click_function](nil, "White", false)
 expect("clicking a Recollection spends its memoryCost", env.shApiState().memory == m0 - 2)
 env.shBuyLvl3(nil, "White", false)
 expect("clicking Lvl 3 spends 3", env.shApiState().memory == m0 - 5)
 expect("unaffordable purchase is refused", env.shApiBuy({ level = 5 }).ok == (m0 - 5 >= 5))
-env.shBeginNextLoop()
+beginNext(env)
 expect("Begin Next Loop returns to the play panel", env.shApiState().mode == "play" and hasLabel("Run Tests") ~= nil)
 
 print("\n== play sequence (console helpers) ==")
@@ -239,10 +245,10 @@ expect("aging row per investigator", b ~= nil and hasLabel("Defeated: no") ~= ni
 -- "leaned on the loop" is derived from Birdie's own tallies (no toggle)
 expect("no Leaned toggle any more (derived label only)", hasLabel("Leaned: no") ~= nil
   and hasLabel("Leaned: no").click_function == "shNoop")
-expect("interlude rows show both tallies", hasLabel("Raised 0") ~= nil and hasLabel("Spent 0") ~= nil)
+expect("interlude rows show both tallies", hasLabel("Dissonance raised 0") ~= nil and hasLabel("Loop-power Memory 0") ~= nil)
 env.shCardRaised(birdie, "White", false) ; env.shCardRaised(birdie, "White", false)
 expect("the card's Dissonance-raised tally counts", cardLabel(birdie, "Dissonance raised 2") ~= nil)
-expect("the interlude row mirrors it", hasLabel("Raised 2") ~= nil)
+expect("the interlude row mirrors it", hasLabel("Dissonance raised 2") ~= nil)
 expect("two raises are not leaning", not env.shApiTally({ id = "sthrbirdie", kind = "spent", delta = 3 }).leaned)
 expect("the spend tally shows on the card", cardLabel(birdie, "Loop-power Memory 3") ~= nil)
 env.shCardSpent(birdie, "White", true)
@@ -258,7 +264,7 @@ expect("aging only once per interlude", env.shApiAge({ id = "sthrbirdie" }) == n
 env.shApiAge({ id = "sthrelias" })
 local r2 = env.shApiAge({ id = "sthrbirdie" })
 expect("Birdie's card shows her Years", cardLabel(birdie, "Years 4 · Prime") ~= nil)
-env.shBeginNextLoop()
+beginNext(env)
 expect("Begin Next Loop clears the tallies", cardLabel(birdie, "Dissonance raised 0") ~= nil
   and cardLabel(birdie, "Loop-power Memory 0") ~= nil)
 env.shApiAge({ id = "sthrbirdie", physical = "agility", mental = "willpower" })   -- 4 -> 5 Weathered
@@ -315,6 +321,15 @@ env3.onLoad(nil)
 local function label3(prefix)
   for _, b in ipairs(buttons3) do if b.label:sub(1, #prefix) == prefix then return b end end
 end
+-- the Prologue's reward in one click (2 banked Memory per investigator, once)
+expect("the Prologue shows a reward button (+2 each)", label3("Prologue reward +6") ~= nil)
+env3.shPrologueReward(nil, "White", false)
+expect("Prologue reward banks 2 per investigator", env3.shApiState().memory == 6 and last3:find("+6", 1, true) ~= nil)
+env3.shPrologueReward(nil, "White", false)
+expect("the Prologue reward is once only", env3.shApiState().memory == 6 and last3:find("already been banked", 1, true) ~= nil)
+env3.shPrologueReward(nil, "White", true)
+expect("right-click takes the Prologue reward back", env3.shApiState().memory == 0)
+env3.shPrologueReward(nil, "White", false)
 env3.shReset()
 env3.shReset()
 expect("a second Reset Loop after the Prologue counts nothing and says so",
@@ -324,7 +339,7 @@ expect("after the Prologue each Age button reads 'No Age'", label3("No Age") ~= 
 env3[label3("No Age").click_function](nil, "White", false)
 expect("clicking it gives no Years and says why", last3:find("do not gain Years", 1, true) ~= nil
   and env3.shApiInvestigators()[1].years == 0)
-env3.shBeginNextLoop()
+beginNext(env3)
 env3.shApiCounter({ name = "dissonance", delta = 16 })
 env3.shReset() ; env3.shReset()
 expect("a second Reset Loop after a loop counts one loop only", env3.shApiState().loops == 1)
@@ -332,6 +347,30 @@ env3.shOpenInterlude()
 expect("after a real loop the Age buttons are back", label3("Age") ~= nil and label3("No Age") == nil)
 expect("the interlude Memory button says it adjusts banked Memory",
   (label3("Memory ").tooltip or ""):find("Adjusts banked Memory", 1, true) ~= nil)
+
+-- Begin Next Loop asks first when the interlude is unfinished
+local who = env3.shApiInvestigators()[1].id
+env3.shApiOnCardMemory({ id = who, delta = 2 })
+last3 = ""
+env3.shBeginNextLoop()
+expect("Begin Next Loop first says what is outstanding and does not start the night",
+  env3.shApiState().mode == "interlude" and last3:find("Age has not been clicked", 1, true) ~= nil
+  and last3:find("still on investigators' cards", 1, true) ~= nil and last3:find("again", 1, true) ~= nil)
+
+-- the first Age click for an investigator who will cross into Weathered asks for the skill choice
+env3.shApiPendingYears({ id = who, delta = 4 })
+last3 = ""
+env3[label3("Age").click_function](nil, "White", false)
+expect("the first Age click toward Weathered asks for the choice and applies nothing",
+  last3:find("Choose which skill to lower and raise first", 1, true) ~= nil and env3.shApiInvestigators()[1].years == 0)
+env3[label3("Age").click_function](nil, "White", false)
+expect("the second Age click applies it and names the skills changed",
+  env3.shApiInvestigators()[1].years >= 5 and last3:find("Weathered", 1, true) ~= nil
+  and last3:find("-1 combat, +1 intellect", 1, true) ~= nil)
+env3.shBankOnCard()
+env3.shBeginNextLoop()
+expect("a click after the warning starts the night, and the chat says how much the cap removed", env3.shApiState().mode == "play"
+  and last3:find("capped at 30; 0 lost", 1, true) ~= nil)
 
 expect("no board-wiring errors on a vanilla table", #errors == 0)
 for _, e in ipairs(errors) do print("    " .. e) end

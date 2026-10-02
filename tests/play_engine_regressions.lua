@@ -79,9 +79,9 @@ local entry=P.commitables(ayako,"com",{})[1]
 check("Weathered repeated combat receives three icons",entry.icons==3)
 local committed={}
 P.commit(ayako,entry,"com",{},committed)
-check("Muscle Memory draws at commit time",#ayako.hand==1 and #ayako.deck==0)
+check("Muscle Memory does not draw at commit time",#ayako.hand==0 and #ayako.deck==1)
 P.afterTest(ayako,true,1,"com",{},committed)
-check("Muscle Memory does not draw twice",#ayako.hand==1)
+check("Muscle Memory draws once on success",#ayako.hand==1 and #ayako.deck==0)
 
 local fore={name="Foreknowledge",type="Skill",traits="Recollection.",icons={wild=2}}
 local helper=inv("helper")
@@ -90,7 +90,7 @@ helper.assets={{name="Notebook",memory=1}}
 helper.memory=1
 committed={}
 P.commit(helper,P.commitables(helper,"int",{helper=true})[1],"int",{},committed)
-check("helper pays own asset Memory",committed[1].memoryPaid and committed[1].icons==4 and helper.memory==0)
+check("helper pays own asset Memory",committed[1].memoryPaid and committed[1].icons==3 and helper.memory==0)
 ayako.hand={fore}
 check("Foreknowledge maximum applies across owners",P.commit(ayako,P.commitables(ayako,"int",{})[1],"int",{},committed)==nil and #ayako.hand==1)
 P.afterTest(helper,true,1,"int",{},committed)

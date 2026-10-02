@@ -6,7 +6,7 @@
 -- Rules encoded:
 --   reset threshold R  = 8 x investigators   (Dissonance hits R -> loop resets)
 --   Appointed Arrived  = floor(2R / 3)       (Noticed band; the Appointed arrives)
---   Memory soft cap    = 6 x investigators
+--   Memory cap         = 10 x investigators (applied after spending)
 --   contest target     = 6, 5 solo, 7 at four (finale; was 4 x investigators, CO-001)
 --   scar cap           = 2 x investigators    (start-of-loop Dissonance ceiling; 4 solo)
 --   bands              = thirds of R: Calm / Glitch / Noticed

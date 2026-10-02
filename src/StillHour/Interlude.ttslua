@@ -32,6 +32,20 @@ Interlude.RECOLLECTION_COST = {
   ["sthr-hourlearnedname"]    = 5,
 }
 
+-- Their card names, for the panel when the Player Cards bag is not on the table.
+Interlude.RECOLLECTION_NAME = {
+  ["sthr-foreknowledge"]      = "Foreknowledge",
+  ["sthr-dejavu"]             = "The Same Doorway Twice",
+  ["sthr-musclememory"]       = "Muscle Memory",
+  ["sthr-rehearsedescape"]    = "Rehearsed Escape",
+  ["sthr-longwayround"]       = "The Long Way Round",
+  ["sthr-borrowedtime"]       = "Stolen Minute",
+  ["sthr-thistimeforsure"]    = "This Time For Sure",
+  ["sthr-anchorpoint"]        = "Anchor Point",
+  ["sthr-cassandrasnotebook"] = "Cassandra's Notebook",
+  ["sthr-hourlearnedname"]    = "The Hour I Learned Your Name",
+}
+
 --------------------------------------------------------------------- aging --
 
 --- Age one investigator this interlude. `cond` = {defeated, endedInDanger,

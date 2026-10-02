@@ -66,7 +66,12 @@ return function(H)
     return find(function(o) return o.hasTag("StillHour") and tostring(o.getName()):find("Control", 1, true) ~= nil end)
   end
   local function st() return control().call("shApiState") end
-  local function ctl(fn, alt) local ok = click(control(), fn, alt) ; E.run(0.2) ; return ok end
+  local function ctl(fn, alt)
+    local ok = click(control(), fn, alt) ; E.run(0.2)
+    -- Begin Next Loop asks first when the interlude is unfinished: a second click starts the night
+    if ok and fn == "shBeginNextLoop" and st().mode ~= "play" then ok = click(control(), fn, alt) ; E.run(0.2) end
+    return ok
+  end
 
   -- the table's chat since a mark
   local function chatMark() return #E.log end
@@ -325,6 +330,8 @@ return function(H)
       if l:find("no", 1, true) then ctl("shAgeDef" .. i) end
     end
     ctl("shAge" .. i)
+    -- the first Age click toward Weathered asks for the skill choice and applies nothing: click again
+    if buttonLabel(control(), "shAge" .. i) == "Age" then ctl("shAge" .. i) end
   end
 
   step("setup: the campaign box, three investigators, a new campaign", function()
@@ -390,7 +397,12 @@ return function(H)
 
   local function prologueEnd(res, memoryEach, extra, choice)
     local m0 = st().memory
-    times(memoryEach * 3 + extra, function() ctl("shClickMemory") end)
+    ctl("shPrologueReward")
+    check(res .. ": the Prologue reward button banks 2 per investigator in one click", st().memory == m0 + memoryEach * 3,
+      m0 .. " -> " .. st().memory)
+    ctl("shPrologueReward")
+    check(res .. ": the Prologue reward is once only", st().memory == m0 + memoryEach * 3, m0 .. " -> " .. st().memory)
+    times(extra, function() ctl("shClickMemory") end)   -- the party's extra Memory (the first ending)
     check(res .. ": the banked Memory button banks " .. (memoryEach * 3 + extra), st().memory == m0 + memoryEach * 3 + extra,
       m0 .. " -> " .. st().memory)
     logTick("k:you-are-unstuck")

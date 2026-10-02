@@ -418,7 +418,7 @@ return function(R, T)
           n = inv.testedTypes[skill] and 2 or 1
           if (skill == "com" or skill == "agi") and ((inv.years or 0) >= 5 or inv.bracket == "Weathered" or inv.bracket == "Elder" or inv.bracket == "Ancient") then n = n + 1 end
         end
-        if c.name == "Foreknowledge" then n = ((inv.memory or 0) > 0) and 4 or 2 end
+        if c.name == "Foreknowledge" then n = ((inv.memory or 0) > 0) and 3 or 2 end
         if c.name == "I've Done This Before" and opts.helper then n = 0 end
         if c.name == "Opportunist" and opts.helper then n = 0 end
         if n > 0 then
@@ -449,9 +449,9 @@ return function(R, T)
       if R.syncMemory(inv) >= 1 then
         R.addMemory(inv, -1, "Foreknowledge", "any")
         T.api("shApiTally", { id = inv.id, kind = "spent", delta = 1 })
-        c.icons, c.memoryPaid = 4, true
+        c.icons, c.memoryPaid = 3, true
       end
-    elseif card.name == "Muscle Memory" and inv.testedTypes[skill] then P.draw(inv, 1, "Muscle Memory committed") end
+    elseif card.name == "Muscle Memory" and inv.testedTypes[skill] then c.drawOnSuccess = true end
     committed[#committed + 1] = c
     inv.lastCommitted = inv.lastCommitted or {}
     return c
@@ -505,6 +505,7 @@ return function(R, T)
       if ok and (n == "Guts" or n == "Perception" or n == "Overpower" or n == "Manual Dexterity") then P.draw(c.owner, 1) end
       if ok and n == "Fearless" then R.heal(c.owner, 0, (c.card.level or 0) >= 2 and margin >= 2 and 2 or 1) end
       if ok and n == "Foreknowledge" and c.memoryPaid then P.draw(c.owner, 1) end
+      if ok and n == "Muscle Memory" and c.drawOnSuccess then P.draw(c.owner, 1) end
       if ok and n == "Survival Instinct" and opts.kind == "evade" then
         for _, en in ipairs(G.enemies) do
           if en.engaged == inv and en ~= opts.enemy then

@@ -107,7 +107,7 @@ Official figures: 973 locations and 93 scenarios from 11 campaigns
 
 | part | official | The Still Hour before | now |
 |---|---|---|---|
-| Ordinary location clues (per investigator) | 0 (20%), 1 (50%), 2 (16%), 3+ (4%); mean 1.05 | 2-3 everywhere | 0-2, mean 1.2 (a thoroughfare at 0, most at 1, the richer rooms at 2) |
+| Ordinary location clues (per investigator) | 0 (20%), 1 (50%), 2 (16%), 3+ (4%); mean 1.05 | 2-3 everywhere | 1-2, mean 1.3 (most at 1, the richer rooms at 2; the Winding Stair, once a thoroughfare at 0, now holds 1 so the Lighthouse supplies 3 clues per investigator against its acts' demand of 4) |
 | Victory location clues | 1 (54%), 2 (38%), 3 (6%); mean 1.48 | 2-3 | 1-2, mean 1.8 |
 | Ordinary shroud | mostly 2-3, mean 2.65 | 2-4 | 1-4, mean 2.2 (the hub and roads at 1) |
 | Victory shroud | mostly 3-4, mean 3.1 | 3-4 | 3-4, mean 3.4 |

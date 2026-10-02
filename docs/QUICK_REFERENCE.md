@@ -62,9 +62,12 @@ matching Control or investigator button (*guide: The Control token*).
   The Appointed; The Control token, The Appointed.*
 - **Memory.** Your experience. Memory on your cards is banked into one shared
   pool at the reset and spent Between Loops on Recollections (their printed
-  cost) and upgrades (the new card's level; a new level 0 card costs 1). Banked
-  Memory above 30 is cut to 30 after spending. Whoever carries the most Memory
-  on their cards is the one hunted. *Guide: Campaign Rules, Memory.*
+  cost, no extra 1) and upgrades (the new card's
+  level, with no credit for the card replaced: level 0 to 2 to 4 costs 6, level
+  0 straight to 4 costs 4; any other new level 0 card costs 1). After spending,
+  banked Memory above 10 per investigator (30 at three) is cut to that number.
+  Whoever carries the most Memory on their cards is the one hunted (ties: the
+  nearest, then the lead investigator chooses). *Guide: Campaign Rules, Memory.*
 - **Knowledge.** Completing a district's act records a Knowledge entry; it is
   found, never bought, and changes the town from then on. The first record
   banks 1 Memory per investigator (surface entry) or 3 (deep entry). Tick it on

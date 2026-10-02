@@ -203,9 +203,11 @@ for _,skill in ipairs({"wil","com","agi"}) do
       local icons=1+(repeated and 1 or 0)+(skill~="wil" and 1 or 0)
       expect("Muscle correct icons "..skill.."/"..tostring(repeated),entry.icons==icons)
       local committed={};P.commit(i,entry,skill,{},committed)
-      expect("Muscle commit-time draw "..skill.."/"..tostring(repeated),#i.hand==(repeated and 1 or 0))
+      expect("Muscle no draw at commit "..skill.."/"..tostring(repeated),#i.hand==0)
+      P.afterTest(i,false,-1,skill,{},committed)
+      expect("Muscle no draw on a failed test "..skill.."/"..tostring(repeated),#i.hand==0)
       P.afterTest(i,true,1,skill,{},committed)
-      expect("Muscle no second draw "..skill.."/"..tostring(repeated),#i.hand==(repeated and 1 or 0))
+      expect("Muscle draws on success "..skill.."/"..tostring(repeated),#i.hand==(repeated and 1 or 0))
     end)
   end
 end
@@ -218,7 +220,7 @@ for _,source in ipairs({"none","investigator","asset"}) do
       if source=="investigator" then i.cardMemory=1 elseif source=="asset" then i.assets={{name="Notebook",memory=1}} end
       R.syncMemory(i)
       local committed={};P.commit(i,P.commitables(i,"int",{helper=true})[1],"int",{},committed)
-      expect("Foreknowledge cost/icons "..source.."/"..tostring(success),committed[1].icons==(source=="none" and 2 or 4) and i.memory==0)
+      expect("Foreknowledge cost/icons "..source.."/"..tostring(success),committed[1].icons==(source=="none" and 2 or 3) and i.memory==0)
       j.hand={card}
       expect("Foreknowledge max across owners "..source.."/"..tostring(success),P.commit(j,P.commitables(j,"int",{})[1],"int",{},committed)==nil and #j.hand==1)
       FX.afterFail=function() end;P.afterTest(j,success,success and 1 or -1,"int",{},committed)

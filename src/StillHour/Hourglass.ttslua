@@ -42,7 +42,7 @@ local Hourglass = {}
 Hourglass.HOUR_NAMES = {
   [1] = "First Dark",
   [2] = "Low Water",
-  [3] = "The Thirteenth Toll",
+  [3] = "The Bell Counts",
   [4] = "The Road Gives Way",
   [5] = "The Streets Empty",
   [6] = "The Wrong Sky",
@@ -128,7 +128,13 @@ local HOUR_HANDLERS = {
       amount = 2
     end
     raiseDissonance(ctx, amount)
-    return string.format("Raise Dissonance by %d.", amount)
+    local msg = string.format("Raised Dissonance by %d.", amount)
+    if not (ctx and ctx.anyoneAtChurch) then
+      -- the Control does not look at the table for these two: the players do
+      msg = msg .. " By hand: if an investigator is at a Church location and your Campaign Log does not"
+        .. " record The Thirteenth Toll, click Dissonance once more. Reveal The Belfry now if it is in play."
+    end
+    return msg
   end,
 
   [4] = function(ctx)
@@ -143,6 +149,9 @@ local HOUR_HANDLERS = {
 
   [5] = function(ctx)
     advanceAppointed(ctx, 1)  -- Hour V -> at least Sensed
+    if CampaignState.inPrologue() then
+      return "The streets empty. (There is no Appointed in the Prologue.)"
+    end
     if CampaignState.band() ~= Constants.BAND_CALM then
       if ctx and ctx.awakenSleepwalkingEchoes then
         ctx.awakenSleepwalkingEchoes()
@@ -170,6 +179,9 @@ local HOUR_HANDLERS = {
 
   [7] = function(ctx)
     advanceAppointed(ctx, 2)  -- Hour VII -> at least Emerging
+    if CampaignState.inPrologue() then
+      return "The guest approaches. (There is no Appointed in the Prologue.)"
+    end
     return "The guest approaches. The Appointed is Emerging"
       .. (CampaignState.knows("the-appointeds-name") and ". Exhaust the Appointed." or ".")
   end,
@@ -178,6 +190,9 @@ local HOUR_HANDLERS = {
     raiseDissonance(ctx, 2)
     advanceAppointed(ctx, 3)  -- Hour VIII -> Arrived
     if ctx and ctx.enemiesGetFightBonus then ctx.enemiesGetFightBonus(1) end
+    if CampaignState.inPrologue() then
+      return "Almost. Raised Dissonance by 2; each enemy gets +1 fight until the end of the Prologue. (There is no Appointed in the Prologue.)"
+    end
     return "Almost. Raise Dissonance by 2; each enemy gets +1 fight until the end of the loop; the Appointed has Arrived."
   end,
 

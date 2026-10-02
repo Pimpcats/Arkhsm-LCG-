@@ -9,7 +9,8 @@
 -- Years gained this loop, per investigator:
 --   +1 base (the night always takes something)
 --   +1 if defeated during the loop
---   +1 if the loop ended at the danger threshold or higher (Dissonance >= 4x inv)
+--   +1 if the loop ended in the Noticed band or higher (Dissonance >= two thirds of the
+--      reset: 16 at three investigators, Constants.forCount(n).appointedThreshold)
 --   +1 if they leaned on the loop (raised Dissonance 3+ times OR spent 4+ Memory)
 --
 -- Brackets (checked at each interlude; higher bracket REPLACES lower — no stacking):

@@ -9,6 +9,8 @@ The owner is playing it as a **first-time player**: keep story spoilers (card ef
 ## Play it
 Load `dist/saved_object_the_still_hour.json` as a Saved Object in SCED. Step by step: **`docs/LOADING.md`**. Card images load from GitHub, so the file works on any PC.
 
+Deck building: **`docs/STARTER_DECKS.md`** has an optional, legal 30-card starting deck for Elias Warde, Dr. Ayako Sōma and Cass Lindqvist (suggestions only).
+
 At the table: **`docs/QUICK_REFERENCE.md`** is a one-page play aid (round structure and the campaign's own terms, each pointing to the guide section). It explains how the campaign's systems work, so read it when you sit down to play, not before.
 
 ## Run the app (one click)
@@ -46,7 +48,7 @@ optional; their machine-specific settings live in `rig.local.json`.
 - Relay passes, computer-played games and offline checks are not playtest approval.
 
 ## File map
-**Owner docs:** `docs/LOADING.md` (load in TTS) · `docs/QUICK_REFERENCE.md` (play aid; read at the table) · `docs/TTS_RELAY.md` (automated in-game test) · `docs/CHECKLIST.md` (status) · `docs/HANDOFF.md` (next session).
+**Owner docs:** `docs/LOADING.md` (load in TTS) · `docs/QUICK_REFERENCE.md` (play aid; read at the table) · `docs/STARTER_DECKS.md` (optional ready-made 30-card starting decks for Elias, Ayako and Cass) · `docs/TTS_RELAY.md` (automated in-game test) · `docs/CHECKLIST.md` (status) · `docs/HANDOFF.md` (next session).
 **Assistant/designer docs (spoilers, do not read as a player):** `docs/ASSISTANT_WORKFLOW.md` (read first) · `docs/CAMPAIGN_PLAYBOOK.md` · `docs/BUILD_STATUS.md` · `docs/BALANCE.md` · `docs/ART_HANDOFF.md` · `docs/design/` (design, change orders, audits, the campaign guide source).
 **State:** `campaigns/still_hour/assistant/production.json` (current counts, validation, next actions).
 

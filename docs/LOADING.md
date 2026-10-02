@@ -23,9 +23,20 @@ GitHub, so the build works on any PC.
 3. Press **Place** on the campaign box. It lays out the scenario boxes, the
    campaign guide, the campaign log, the minicards, the player-card bag, the
    **Control** token and the `[static]` token.
-4. Open the **campaign guide** and follow it from *Campaign Setup*. The guide
+4. Put the investigators on the table. Each player takes their **investigator
+   card** from the **Player Cards** bag (step 3 laid it out), together with the
+   signature and other required cards listed on its back and the cards of their
+   deck, and puts the investigator card on a **playmat**. The Control token's
+   per-investigator rows (Memory, Age) and the buttons on each investigator card
+   appear only once the investigator cards are on the table, on their playmats.
+5. Open the **campaign guide** and follow it from *Campaign Setup*. The guide
    tells you when to press each button on the Control token and each box's
    **Place**.
+
+Every box has **Place** and **Recall**. **Place** is not idempotent: it lays
+the box out afresh each time, so pressing it twice lays out a second copy of a
+district (a duplicate). Press it once. To take a box back (a district placed by
+mistake, or a loop that is over), press **Recall** on that box.
 
 The Control token does the campaign's bookkeeping: Hour, Dissonance and the
 `[static]` tokens in the chaos bag, Memory, the loop count, aging and the

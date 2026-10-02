@@ -77,6 +77,12 @@ return function(H)
     return find(function(o) return o.hasTag("StillHour") and tostring(o.getName()):find("Control", 1, true) ~= nil end)
   end
   local function st() return control().call("shApiState") end
+  -- Begin Next Loop asks first when the interlude is unfinished: a second click starts the night
+  local function beginNextLoop()
+    click(control(), "Begin Next Loop")
+    E.run(0.2)
+    if st().mode ~= "play" then click(control(), "Begin Next Loop") end
+  end
 
   -- SCED's chaos bag through its own Global API (ChaosBagApi)
   local function chaosBag() return E.Global.call("findChaosBag") end
@@ -500,7 +506,7 @@ return function(H)
     check("a second Reset Loop is refused", st().loops == 0)
     click(control(), "Interlude")
     check("the Interlude panel opens", hasLabel(control(), "Begin Next Loop"), labels(control()))
-    click(control(), "Begin Next Loop")
+    beginNextLoop()
     E.run(2)
     s = st()
     check("Begin Next Loop starts Loop 1 (Hour I, Dissonance at the scar 0)", s.mode == "play" and s.hour == 1
@@ -752,7 +758,7 @@ return function(H)
     local m0 = st().memory
     if b then click(control(), b.click_function) end
     check("buying it spends 2 Memory", st().memory == m0 - 2, m0 .. " -> " .. st().memory)
-    click(control(), "Begin Next Loop")
+    beginNextLoop()
     E.run(2)
     check("Loop 2 begins at the scar (Dissonance 1)", st().dissonance == 1 and st().mode == "play", J.encode(st()))
   end)
@@ -780,7 +786,7 @@ return function(H)
     click(control(), "Reset Loop")
     E.run(1)
     click(control(), "Interlude")
-    click(control(), "Begin Next Loop")
+    beginNextLoop()
     E.run(2)
     check("Part II has begun", st().partTwo == true, J.encode(st()))
     E.run(3)
