@@ -12,7 +12,9 @@ cloud session ◀──reads── tts-results branch ◀──relay pushes─�
 
 ## Owner: start it (Windows, local PowerShell)
 
-1. Open Tabletop Simulator and load a game (the SCED Arkham mod).
+1. Open Tabletop Simulator and load the SCED Arkham mod on a **fresh table**,
+   not your campaign save. If your campaign's Control token is on the table,
+   the run stops without spawning or touching anything.
 2. In **local PowerShell** on the same PC, run:
 
    ```powershell
@@ -21,6 +23,12 @@ cloud session ◀──reads── tts-results branch ◀──relay pushes─�
 
    Or double-click `Start TTS Relay.bat` in the repo folder.
 3. Leave both open. Turn off PC sleep. Keep TTS visible for screenshots.
+
+A test run shows campaign pieces on your TTS screen (boxes, cards, the campaign
+log), so look away from TTS while it runs if you want to avoid spoilers. The
+relay window says when the run is finished; everything the test placed is
+removed again. It tests the exact file you load,
+`dist/saved_object_the_still_hour.json`, as well as the separate parts.
 
 Needs Git and Python 3.8+ (both already used by CardForge). The first results
 push may open a GitHub sign-in window once. Close Atom or the VS Code TTS
@@ -49,6 +57,25 @@ For each new commit on the watched branch:
    SCED table: other locations/minicards already on the table take part in
    "farthest" and "prey". It also moves the
    camera over each object so the relay can screenshot the TTS window.
+   Then it clears those component builds away and tests the Saved Object the
+   owner loads (`dist/saved_object_the_still_hour.json`, the job payload with
+   `"role": "saved_object"`) on its own: what the box holds (scenario boxes,
+   log, guide, minicards, player cards, Control, `[static]`), SCED metadata and
+   commit-pinned raw.githubusercontent image URLs on every card, the box's
+   Place (each piece on its remembered spot), the laid-out Control's in-engine
+   tests, one scenario box's Place (every card on the table, none in a bag, no
+   overlaps, nothing on the table's own tokens/counters/bags), Clear Board and
+   Place again, and the update path from `docs/LOADING.md`: progress made on
+   the Control is copied into the campaign log, survives the log's
+   save+reload, and a Control taken out of a fresh copy of the box adopts it.
+   Safety: the run stops at once if a Still Hour Control that the relay did
+   not spawn is on the table; a box's Place is skipped when the table already
+   holds pieces under its GUIDs (SCED's memory bag would move them); the
+   update path runs only with exactly one campaign log on the table; Clear
+   Board is replaced by the box's Recall when other campaign scenario cards
+   are on the table. At the end it reports objects that are new or gone
+   compared with the start of the run (SCED replaces its chaos bag when a
+   difficulty is set, so these are notes, not failures).
 4. Commits `runs/<time>_<commit>/{results.json,log.txt,screenshots/}` plus
    `latest.json` to the `tts-results` branch and pushes it.
 
@@ -59,8 +86,9 @@ no longer exists (merged and deleted), the relay and its launcher fall back to
 TTS, as long as that commit survives the merge: **never squash- or
 rebase-merge a publish commit**.
 
-Only objects tagged `StillHourRelay` (the ones the relay spawned) are ever
-removed. Only Lua from the watched commit is sent to TTS. The relay never runs
+Only objects the relay spawned (tagged `StillHourRelay`, laid out by its own
+scenario boxes, or `[static]` tokens its Controls left loose) are ever
+removed; nothing that was on the table when the run started. Only Lua from the watched commit is sent to TTS. The relay never runs
 repository code on the PC itself.
 
 ## Assistant: reading results

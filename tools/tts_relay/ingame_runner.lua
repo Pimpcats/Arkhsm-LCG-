@@ -4,8 +4,13 @@
 -- the External Editor API ("Execute Lua Code", messageID 3, guid -1). The relay
 -- prepends one table before this file:
 --
---   local RELAY = { run = "<run id>", payloads = { {name=, json=}, ... },
+--   local RELAY = { run = "<run id>", payloads = { {name=, json=, role=}, ... },
 --                   pause = <seconds between screenshots> }
+--
+-- Payloads without a role are the component builds: spawned together and
+-- tested first. The payload with role "saved_object" is the exact file the
+-- owner loads (dist/saved_object_the_still_hour.json); it is spawned on its
+-- own once the component builds are cleared away (see "the saved object").
 --
 -- Everything here is local to the chunk; nothing leaks into Global. Results go
 -- back to the relay with sendExternalMessage (messageID 4):
@@ -145,6 +150,21 @@ end
 local spawned = {}     -- name -> object
 local byNick = {}      -- nickname -> object
 
+local COMPONENTS, SAVED = {}, nil
+for _, pl in ipairs(RELAY.payloads) do
+  if pl.role == "saved_object" then SAVED = pl else COMPONENTS[#COMPONENTS + 1] = pl end
+end
+
+-- GUIDs already on the table when the run starts (after an earlier run's
+-- leftovers are removed): the owner's and SCED's objects, GUID -> name. The
+-- relay never tags or destroys one of them, and skips a campaign box's Place
+-- when it would move one (see "campaign box: Place").
+local OWNER = {}
+local function isOwners(o)
+  local ok, g = pcall(function() return o.getGUID() end)
+  return ok and OWNER[g] ~= nil
+end
+
 ------------------------------------------------------------------ the steps --
 
 step("environment", function(go)
@@ -154,6 +174,18 @@ step("environment", function(go)
   -- playmats carry no identifying tag, so this is the one reliable marker
   info(getObjectFromGUID("123456") ~= nil and "SCED detected (GUID reference handler)"
     or "SCED not detected: running on a non-SCED table")
+  -- the owner's own campaign on this table (its Control token): the relay's
+  -- Controls would write their test state into the owner's campaign log, and
+  -- Clear Board would take the owner's laid-out cards. Run nothing.
+  for _, o in ipairs(all) do
+    if alive(o) and not o.hasTag(TAG)
+       and (o.getLuaScript() or ""):find("function runStillHourTests", 1, true) then
+      check("the table holds no Still Hour campaign in progress", false,
+        "a Still Hour Control token is on the table: the relay needs a fresh SCED table, not a campaign save")
+      idx = #steps                    -- nothing else runs; the relay gets "done"
+      return go()
+    end
+  end
   go()
 end)
 
@@ -161,13 +193,18 @@ step("cleanup previous run", function(go)
   local old = getObjectsWithTag(TAG)
   for _, o in ipairs(old) do destroyObject(o) end
   info("removed " .. #old .. " object(s) left by an earlier relay run")
-  Wait.frames(go, 10)
+  Wait.frames(function()
+    for _, o in ipairs(getObjects()) do
+      if alive(o) then OWNER[o.getGUID()] = tostring(o.getName()) end
+    end
+    go()
+  end, 10)
 end)
 
 step("spawn payloads", function(go)
-  local pending = #RELAY.payloads
+  local pending = #COMPONENTS
   if pending == 0 then check("job has at least one payload", false) ; return go() end
-  for _, pl in ipairs(RELAY.payloads) do
+  for _, pl in ipairs(COMPONENTS) do
     local ok, err = pcall(spawnObjectJSON, {
       json = pl.json,
       callback_function = function(o)
@@ -184,42 +221,58 @@ step("spawn payloads", function(go)
   waitFor(function() return pending <= 0 end, 30, function(ok)
     local n = 0
     for _ in pairs(spawned) do n = n + 1 end
-    check("every payload finished spawning", ok and n == #RELAY.payloads,
-      n .. "/" .. #RELAY.payloads .. " spawned")
+    check("every payload finished spawning", ok and n == #COMPONENTS,
+      n .. "/" .. #COMPONENTS .. " spawned")
     Wait.frames(go, 30)       -- let onLoad scripts run
   end)
 end)
 
-step("card metadata", function(go)
-  local ids, cards, bad, local_urls = {}, 0, {}, 0
-  local function scan(data)
-    if data.Name == "Card" or data.Name == "CardCustom" then
-      cards = cards + 1
-      local md = decode(data.GMNotes)
-      if not md or type(md.id) ~= "string" then
-        bad[#bad + 1] = (data.Nickname or "?") .. ": GMNotes not SCED JSON"
-      elseif ids[md.id] and not deepEqual(ids[md.id], md) then
-        -- copies of one card legitimately share an id; they must agree
-        bad[#bad + 1] = md.id .. ": copies disagree on metadata"
-      else
-        ids[md.id] = md
-      end
-      for _, d in pairs(data.CustomDeck or {}) do
-        for _, u in ipairs({ d.FaceURL or "", d.BackURL or "" }) do
-          if u:find("^file:") then local_urls = local_urls + 1 end
+-- every card in an object's data (decks, bags, boxes inside boxes): its SCED
+-- metadata, and where its face and back images come from
+local function scanCards(data, acc)
+  acc = acc or { ids = {}, cards = 0, bad = {}, local_urls = 0, urls = 0, hosted = 0, unhosted = {} }
+  if data.Name == "Card" or data.Name == "CardCustom" then
+    acc.cards = acc.cards + 1
+    local md = decode(data.GMNotes)
+    if not md or type(md.id) ~= "string" then
+      acc.bad[#acc.bad + 1] = tostring(data.GUID or "?") .. ": GMNotes not SCED JSON"
+    elseif acc.ids[md.id] and not deepEqual(acc.ids[md.id], md) then
+      -- copies of one card legitimately share an id; they must agree
+      acc.bad[#acc.bad + 1] = md.id .. ": copies disagree on metadata"
+    else
+      acc.ids[md.id] = md
+    end
+    for _, d in pairs(data.CustomDeck or {}) do
+      for _, u in ipairs({ d.FaceURL or "", d.BackURL or "" }) do
+        acc.urls = acc.urls + 1
+        if u:find("^file:") then acc.local_urls = acc.local_urls + 1 end
+        -- published images are pinned to the commit that holds them
+        -- (pipeline/publish_hosted.py): raw.githubusercontent.com/<owner>/<repo>/<40-hex sha>/
+        local sha = u:match("^https://raw%.githubusercontent%.com/[^/]+/[^/]+/(%x+)/")
+        if sha and #sha == 40 then
+          acc.hosted = acc.hosted + 1
+        elseif #acc.unhosted < 5 then
+          acc.unhosted[#acc.unhosted + 1] = tostring(data.GUID or "?") .. " " .. u:sub(1, 48)
         end
       end
     end
-    for _, c in ipairs(data.ContainedObjects or {}) do scan(c) end
   end
+  for _, c in ipairs(data.ContainedObjects or {}) do scanCards(c, acc) end
+  for _, st in pairs(data.States or {}) do scanCards(st, acc) end
+  return acc
+end
+
+step("card metadata", function(go)
+  local acc = scanCards({})
   for name, o in pairs(spawned) do
-    if alive(o) then scan(o.getData()) else info("payload '" .. name .. "' is gone (absorbed into a container?)") end
+    if alive(o) then scanCards(o.getData(), acc) else info("payload '" .. name .. "' is gone (absorbed into a container?)") end
   end
-  check("spawned content contains cards", cards > 0, cards .. " card(s)")
+  local bad = acc.bad
+  check("spawned content contains cards", acc.cards > 0, acc.cards .. " card(s)")
   check("every card has consistent SCED metadata", #bad == 0,
     #bad == 0 and nil or table.concat(bad, "; ", 1, math.min(#bad, 8)))
-  check("no card image points at a local file:/// path", local_urls == 0,
-    local_urls .. " local URL(s)")
+  check("no card image points at a local file:/// path", acc.local_urls == 0,
+    acc.local_urls .. " local URL(s)")
   go()
 end)
 
@@ -985,6 +1038,17 @@ step("campaign box: Place", function(go)
   tp.ml = st.ml or {}
   for _ in pairs(tp.ml) do tp.n = tp.n + 1 end
   check("campaign box remembers where its contents go", tp.n >= 3, tp.n .. " object(s)")
+  -- SCED's memory bag MOVES an object already on the table under a remembered
+  -- GUID instead of taking its own copy out: never let it move (and this run
+  -- then tag and remove) the owner's own campaign pieces
+  local taken = 0
+  for g in pairs(tp.ml) do if getObjectFromGUID(g) ~= nil then taken = taken + 1 end end
+  if taken > 0 then
+    tp.box, tp.skipped = nil, true
+    info("the table already holds " .. taken .. " object(s) under the campaign box's GUIDs (a campaign laid out?): "
+      .. "its Place, minicard, guide, log and Recall checks are skipped so those pieces are left alone")
+    return go()
+  end
   waitFor(function() return hasButton(tp.box, "Place") and hasButton(tp.box, "Recall") end, 30, function(ok)
     check("campaign box shows Place and Recall", ok)
     local okc, err = pcall(function() tp.box.call("buttonClick_place") end)
@@ -1014,6 +1078,7 @@ step("investigator minicards", function(go)
   for _, o in ipairs(tp.placed) do
     if o.hasTag("Minicard") then deck = o end
   end
+  if tp.skipped then return go() end
   check("minicard deck placed", deck ~= nil)
   if not deck then return go() end
   local d = deck.getData()
@@ -1038,6 +1103,7 @@ end)
 step("campaign guide", function(go)
   local guide
   for _, o in ipairs(tp.placed) do if o.hasTag("CampaignGuide") then guide = o end end
+  if tp.skipped then return go() end
   check("campaign guide placed (Tag CampaignGuide)", guide ~= nil)
   if not guide then return go() end
   local d = guide.getData()
@@ -1053,6 +1119,7 @@ end)
 step("campaign log", function(go)
   for _, o in ipairs(tp.placed) do if o.hasTag("CampaignLog") then tp.log = o end end
   local log = tp.log
+  if tp.skipped then return go() end
   check("campaign log placed (Tag CampaignLog)", log ~= nil)
   if not log then return go() end
   check("log GMNotes type CampaignLog", gm(log).type == "CampaignLog")
@@ -1144,82 +1211,6 @@ step("campaign box: Recall", function(go)
   end)
 end)
 
--- A loop is set up again every night: a scenario box must Place a full,
--- fresh copy each time, and the control's Clear Board must take every card it
--- laid out (and any card drawn from it) back off the table.
-local function loopCount()
-  local n = 0
-  for _, o in ipairs(getObjects()) do
-    if alive(o) and o.hasTag("StillHourLoop") then
-      n = n + (o.type == "Deck" and #(o.getObjects() or {}) or 1)
-    end
-  end
-  return n
-end
-
-step("a loop: Place, play, Clear Board, Place again", function(go)
-  local ctl = findControl()
-  local book
-  for _, o in ipairs(getObjects()) do
-    if alive(o) and gm(o).type == "ScenarioBox" and gm(o).id == "district_church" then book = o end
-  end
-  if not book then
-    local camp = findSpawned(function(o)
-      if gm(o).type ~= "CampaignBox" then return false end
-      for _, e in ipairs(o.getObjects() or {}) do
-        if (decode(e.gm_notes) or {}).id == "district_church" then return true end
-      end
-      return false
-    end)
-    if camp then
-      for _, e in ipairs(camp.getObjects() or {}) do
-        if (decode(e.gm_notes) or {}).id == "district_church" then
-          book = camp.takeObject({ guid = e.guid, position = { 20, 3, 30 }, smooth = false })
-        end
-      end
-    end
-  end
-  check("a district's scenario box is available", book ~= nil)
-  if not book or not ctl then return go() end
-  book.addTag(TAG)
-  check("the box is replayable (loop box script)",
-    (book.getLuaScript() or ""):find("StillHourLoop", 1, true) ~= nil)
-  local inside = #(book.getObjects() or {})
-  Wait.frames(function()
-    local ok1, placed = pcall(function() return book.call("buttonClick_place") end)
-    check("Place lays out a copy of every object in the box", ok1 and placed == inside,
-      tostring(placed) .. "/" .. inside)
-    Wait.time(function()
-      local n1 = loopCount()
-      check("the placed cards carry the loop tag", n1 > 0, n1 .. " card(s)")
-      -- play: draw a card off a placed deck onto the table
-      for _, o in ipairs(getObjects()) do
-        if alive(o) and o.type == "Deck" and o.hasTag("StillHourLoop") then
-          local p = o.getPosition()
-          pcall(function() o.takeObject({ position = { p.x, p.y + 2, p.z + 3 } }) end)
-          break
-        end
-      end
-      Wait.time(function()
-        local okc, r = pcall(function() return ctl.call("shApiClearBoard") end)
-        check("Clear Board runs", okc, r)
-        Wait.time(function()
-          check("Clear Board takes every loop card off the table (drawn ones too)", loopCount() == 0,
-            loopCount() .. " left; " .. tostring(type(r) == "table" and r.tokens or "?") .. " token(s) removed")
-          check("the box never empties", #(book.getObjects() or {}) == inside)
-          local ok2, placed2 = pcall(function() return book.call("buttonClick_place") end)
-          Wait.time(function()
-            check("the next loop's Place lays out the same cards again", ok2 and placed2 == inside
-              and loopCount() == n1, loopCount() .. " vs " .. n1)
-            pcall(function() ctl.call("shApiClearBoard") end)
-            Wait.time(go, 2)
-          end, 3)
-        end, 2)
-      end, 2)
-    end, 3)
-  end, 10)
-end)
-
 step("screenshots", function(go)
   local p = hostPlayer()
   if not p then info("no seated player: screenshots skipped") ; return go() end
@@ -1243,19 +1234,534 @@ step("screenshots", function(go)
   shoot()
 end)
 
+------------------------------------------------------------------ cleanup --
+
+-- the relay's own scenario boxes: the cleanup also removes what they laid out
+local relayBoxTags = {}
+
 -- leave the owner's table as it was: the owner plays on this same table, so a
 -- run must not leave its test objects behind (they used to wait for the next
--- run's cleanup)
-step("clean up this run", function(go)
+-- run's cleanup). Objects that were on the table before the run never go.
+local function cleanUp(what)
   local n = 0
-  for _, o in pairs(spawned) do
-    if alive(o) then destroyObject(o) ; n = n + 1 end
+  local function drop(o)
+    if alive(o) and not isOwners(o) then destroyObject(o) ; n = n + 1 end
   end
-  for _, o in ipairs(getObjectsWithTag(TAG)) do
-    if alive(o) then destroyObject(o) ; n = n + 1 end
+  for _, o in pairs(spawned) do drop(o) end
+  for _, o in ipairs(getObjectsWithTag(TAG)) do drop(o) end
+  for tag in pairs(relayBoxTags) do
+    for _, o in ipairs(getObjectsWithTag(tag)) do drop(o) end
   end
-  info("removed " .. n .. " object(s) this run created")
+  -- [static] tokens a relay Control spawned that never reached the chaos bag
+  -- (its spawn callback dies with the Control); ones inside a bag are not
+  -- table objects and stay put
+  for _, o in ipairs(getObjectsWithTag("StillHourStatic")) do drop(o) end
+  info("removed " .. n .. " object(s) " .. what)
+end
+
+-- the saved object below shares GUIDs with the component builds: clear them
+-- away first so it spawns and lays out exactly as on the owner's table
+-- objects on the table that were not there before the run, and objects that
+-- were there and are gone. A report, not a check: SCED replaces some of its
+-- own objects (its chaos bag when a difficulty is set), so a changed GUID is
+-- not always a leftover or a loss.
+local function reportNewObjects(when)
+  local extra = {}
+  for _, o in ipairs(getObjects()) do
+    if alive(o) and not isOwners(o) then
+      extra[#extra + 1] = (o.type == "Card" or o.type == "Deck") and (o.type .. " " .. o.getGUID())
+        or (tostring(o.getName()) .. " (" .. tostring(o.type) .. ")")
+    end
+  end
+  info(#extra == 0 and ("the table holds only what was on it before the run (" .. when .. ")")
+    or (#extra .. " object(s) on the table that were not there before the run (" .. when .. "): "
+      .. table.concat(extra, ", ", 1, math.min(#extra, 12))))
+  local gone = {}
+  for g, name in pairs(OWNER) do
+    if getObjectFromGUID(g) == nil then gone[#gone + 1] = name .. " (" .. g .. ")" end
+  end
+  table.sort(gone)
+  info(#gone == 0 and ("every object that was on the table before the run is still there (" .. when .. ")")
+    or (#gone .. " object(s) that were on the table before the run are gone (" .. when .. "): "
+      .. table.concat(gone, ", ", 1, math.min(#gone, 12))))
+end
+
+step("clear the component builds away", function(go)
+  cleanUp("of the component builds")
+  for k in pairs(spawned) do spawned[k] = nil end
+  Wait.frames(function()
+    reportNewObjects("component builds cleared")
+    go()
+  end, 30)
+end)
+
+-------------------------------------------------------- the saved object --
+-- dist/saved_object_the_still_hour.json is the exact file the owner loads
+-- (docs/LOADING.md: Objects > Saved Objects > The Still Hour, then Place). It
+-- is tested on its own: what the box holds and where its card images come
+-- from, its Place, the Control token it lays out, one scenario box's Place /
+-- Clear Board / Place again, and moving a campaign in progress onto a fresh
+-- Control through the campaign log (the update path in docs/LOADING.md).
+-- Check names and details stay neutral (no scenario or card names): results
+-- are summarised in chat.
+
+local SB = { placed = {}, boxes = {} }
+
+local function pieceKind(md, tags, script, isBag)
+  if md.type == "ScenarioBox" then return "scenario box" end
+  if md.type == "CampaignLog" or tags.CampaignLog then return "campaign log" end
+  if md.type == "CampaignGuide" or tags.CampaignGuide then return "campaign guide" end
+  if tags.Minicard then return "minicard deck" end
+  if tags.StillHourStatic then return "[static] token" end
+  if (script or ""):find("function runStillHourTests", 1, true) then return "Control token" end
+  if isBag then return "player-card bag" end
+  return "other"
+end
+
+local function tagSet(list)
+  local t = {}
+  for _, v in ipairs(list or {}) do t[v] = true end
+  return t
+end
+
+local function kindOfData(e)
+  return pieceKind(decode(e.GMNotes) or {}, tagSet(e.Tags), e.LuaScript, e.Name == "Bag")
+end
+
+local function kindOfObject(o)
+  return pieceKind(gm(o), tagSet(o.getTags()), o.getLuaScript(), o.type == "Bag")
+end
+
+-- what the package holds (docs/LOADING.md, "Everything you need is one file")
+local SAVED_HOLDS = {
+  { "scenario box", 8, "8 scenario boxes" },
+  { "campaign log", 1, "the campaign log" },
+  { "campaign guide", 1, "the campaign guide" },
+  { "minicard deck", 1, "the investigator minicards" },
+  { "player-card bag", 1, "the player-card bag" },
+  { "Control token", 1, "the Control token" },
+  { "[static] token", 1, "the [static] token" },
+}
+
+-- the fields that make up "where the campaign is" (copied out at once: tables
+-- a Control returns belong to its script and die with it)
+local STATE_KEYS = { "memory", "dissonance", "hour", "stage", "investigators", "loops", "prologue", "finale", "partTwo" }
+local function stateOf(ctl)
+  local ok, s = pcall(function() return ctl.call("shApiState") end)
+  if not ok or type(s) ~= "table" then return nil end
+  local out = {}
+  for _, k in ipairs(STATE_KEYS) do out[k] = s[k] end
+  return out
+end
+local function describeState(s)
+  if not s then return "no state" end
+  return string.format("memory %s, dissonance %s, hour %s, loops %s, prologue %s", tostring(s.memory),
+    tostring(s.dissonance), tostring(s.hour), tostring(s.loops), tostring(s.prologue))
+end
+local function mirrorSeq(ctl)
+  local ok, m = pcall(function() return ctl.call("shApiLogMirror") end)
+  if ok and type(m) == "table" then return tonumber(m.seq), tonumber(m.bytes) end
+  return nil, nil
+end
+
+step("saved object: spawn the box the owner loads", function(go)
+  if not SAVED then
+    info("the job has no saved_object payload: the file the owner loads is not tested")
+    return go()
+  end
+  local ok, err = pcall(spawnObjectJSON, { json = SAVED.json, callback_function = function(o)
+    o.addTag(TAG)
+    SB.box = o
+  end })
+  if not ok then check("spawnObjectJSON accepts the saved object", false, err) ; return go() end
+  waitFor(function() return SB.box ~= nil end, 30, function(done)
+    check("the saved object spawns", done)
+    if not done then return go() end
+    local box = SB.box
+    check("it is SCED's campaign box (GMNotes type CampaignBox)", gm(box).type == "CampaignBox")
+    check("it carries SCED's memory-bag script",
+      (box.getLuaScript() or ""):find("function buttonClick_place", 1, true) ~= nil)
+    waitFor(function() return alive(box) and hasButton(box, "Place") and hasButton(box, "Recall") end, 30, function(okb)
+      check("the saved object's box shows Place and Recall", okb, labelsOf(box))
+      go()
+    end)
+  end)
+end)
+
+step("saved object: what the box holds", function(go)
+  local box = SB.box
+  if not alive(box) then return go() end
+  SB.data = box.getData()
+  local contents = SB.data.ContainedObjects or {}
+  local counts = {}
+  for _, e in ipairs(contents) do
+    local k = kindOfData(e)
+    counts[k] = (counts[k] or 0) + 1
+    if k == "Control token" then SB.ctlGuid = e.GUID end
+    if k == "scenario box" then SB.nBoxes = (SB.nBoxes or 0) + 1 end
+  end
+  local total = 0
+  for _, want in ipairs(SAVED_HOLDS) do
+    total = total + want[2]
+    check("the box holds " .. want[3], (counts[want[1]] or 0) == want[2], tostring(counts[want[1]] or 0))
+  end
+  check("the box holds nothing else (" .. total .. " pieces)", #contents == total and (counts.other or 0) == 0,
+    #contents .. " piece(s), " .. (counts.other or 0) .. " unrecognised")
+  check("TTS lists the same pieces inside the box", #(box.getObjects() or {}) == #contents,
+    #(box.getObjects() or {}) .. " vs " .. #contents)
+  local good, nb = 0, 0
+  for _, e in ipairs(contents) do
+    if kindOfData(e) == "scenario box" then
+      nb = nb + 1
+      local ml = (decode(e.LuaScriptState) or {}).ml
+      if (e.LuaScript or ""):find("StillHourLoop", 1, true) and type(ml) == "table" and next(ml) ~= nil
+         and #(e.ContainedObjects or {}) > 0 then
+        good = good + 1
+      end
+    end
+  end
+  check("every scenario box is replayable, remembers its layout and holds its cards", nb > 0 and good == nb,
+    good .. "/" .. nb)
+  local acc = scanCards(SB.data)
+  check("the box's cards are inside it", acc.cards > 0, acc.cards .. " card(s)")
+  check("every card in the box has consistent SCED metadata", #acc.bad == 0,
+    #acc.bad == 0 and nil or table.concat(acc.bad, "; ", 1, math.min(#acc.bad, 8)))
+  check("every card face and back is a hosted raw.githubusercontent URL pinned to a commit",
+    acc.urls > 0 and acc.hosted == acc.urls,
+    acc.hosted .. "/" .. acc.urls .. (#acc.unhosted > 0 and ("; e.g. " .. table.concat(acc.unhosted, ", ")) or ""))
+  local pdf
+  for _, e in ipairs(contents) do
+    if e.Name == "Custom_PDF" then pdf = (e.CustomPDF or {}).PDFUrl end
+  end
+  check("the guide PDF is hosted on raw.githubusercontent",
+    type(pdf) == "string" and pdf:find("^https://raw%.githubusercontent%.com/") ~= nil and pdf:find("%.pdf") ~= nil)
+  go()
+end)
+
+step("saved object: Place on the campaign box", function(go)
+  local box = SB.box
+  if not alive(box) then return go() end
+  local ml = (decode(box.script_state) or {}).ml or {}
+  local n, taken = 0, 0
+  for g in pairs(ml) do
+    n = n + 1
+    if getObjectFromGUID(g) ~= nil then taken = taken + 1 end
+  end
+  check("the box remembers a spot for every piece", n > 0 and n == #((SB.data or {}).ContainedObjects or {}),
+    n .. " spot(s)")
+  -- SCED's memory bag MOVES an object already on the table under a remembered
+  -- GUID: with the owner's own campaign laid out, Place would move their pieces
+  if taken > 0 then
+    SB.blocked = true
+    info("the table already holds " .. taken .. " object(s) under the saved object's GUIDs (a campaign laid out?): "
+      .. "its Place, scenario-box and update checks are skipped so those pieces are never moved. "
+      .. "Run the relay on a fresh SCED table to test them.")
+    return go()
+  end
+  local okc, err = pcall(function() box.call("buttonClick_place") end)
+  check("Place runs on the saved object's box", okc, err)
+  waitFor(function()
+    for g in pairs(ml) do if getObjectFromGUID(g) == nil then return false end end
+    return true
+  end, 20, function(all)
+    local at = 0
+    for g, e in pairs(ml) do
+      local o = getObjectFromGUID(g)
+      if o and not isOwners(o) then
+        o.addTag(TAG)
+        SB.placed[#SB.placed + 1] = o
+        if near(o.getPosition(), e.pos) then at = at + 1 end
+        local k = kindOfObject(o)
+        if k == "scenario box" then SB.boxes[#SB.boxes + 1] = o
+        elseif k == "Control token" then SB.ctl = o
+        elseif k == "campaign log" then SB.log = o end
+      end
+    end
+    check("Place lays out every piece", all and #SB.placed == n, #SB.placed .. "/" .. n)
+    check("each piece lands on its remembered spot", at == n, at .. "/" .. n)
+    check("the campaign box is empty afterwards", #(box.getObjects() or {}) == 0)
+    check("every scenario box is on the table", #SB.boxes > 0 and #SB.boxes == (SB.nBoxes or -1),
+      #SB.boxes .. "/" .. tostring(SB.nBoxes))
+    check("the campaign log is on the table", SB.log ~= nil)
+    waitFor(function() return alive(SB.ctl) and #(SB.ctl.getButtons() or {}) >= 7 end, 20, function(ready)
+      check("the Control token is on the table with its buttons", ready, SB.ctl and labelsOf(SB.ctl) or "no Control")
+      Wait.frames(go, 70)          -- its onLoad board sync runs 60 frames in
+    end)
+  end)
+end)
+
+step("saved object: the Control token's tests", function(go)
+  local ctl = SB.ctl
+  if SB.blocked or not alive(ctl) then return go() end
+  local s = stateOf(ctl)
+  check("the box's Control opens a new campaign in the Prologue", s ~= nil and s.prologue == true and s.loops == 0,
+    describeState(s))
+  local ok, res = pcall(function() return ctl.call("runStillHourTests") end)
+  local passed, failed = ok and type(res) == "table" and res.passed, ok and type(res) == "table" and res.failed
+  check("the box's Control runs its in-engine tests", ok and type(res) == "table", (not ok) and res or nil)
+  if ok and type(res) == "table" then
+    check("the box's Control's in-engine tests all pass", (failed or 1) == 0,
+      tostring(passed) .. " passed, " .. tostring(failed) .. " failed")
+  end
   Wait.frames(go, 10)
+end)
+
+-- what the Control's Clear Board takes: anything tagged StillHourLoop, or a
+-- campaign scenario card (src/tts/control.lua isLoopCard)
+local SCENARIO_TYPES = { Location = true, Act = true, Agenda = true, Enemy = true, Treachery = true,
+  Story = true, ScenarioReference = true, Scenario = true }
+local function isLoopEntry(tags, gmNotes)
+  for _, t in ipairs(tags or {}) do if t == "StillHourLoop" then return true end end
+  local md = decode(gmNotes) or {}
+  return tostring(md.id or ""):sub(1, 5) == "sthr-" and SCENARIO_TYPES[md.type] == true and not md.weakness
+end
+
+-- campaign scenario cards on the table that `tag` (one box's) did not lay out
+local function foreignLoopCards(tag)
+  local n = 0
+  for _, o in ipairs(getObjects()) do
+    if alive(o) and o.type == "Card" then
+      if not o.hasTag(tag) and isLoopEntry(o.getTags(), o.getGMNotes()) then n = n + 1 end
+    elseif alive(o) and o.type == "Deck" then
+      for _, e in ipairs(o.getObjects() or {}) do
+        if not tagSet(e.tags)[tag] and isLoopEntry(e.tags, e.gm_notes) then n = n + 1 end
+      end
+    end
+  end
+  return n
+end
+
+-- cards (and other objects) carrying `tag` on the table, counting decks' cards
+local function cardsTagged(tag)
+  local n, list = 0, {}
+  for _, o in ipairs(getObjectsWithTag(tag)) do
+    if alive(o) then
+      list[#list + 1] = o
+      n = n + (o.type == "Deck" and #(o.getObjects() or {}) or 1)
+    end
+  end
+  return n, list
+end
+
+-- what a box's Place lays out, counting the cards in its decks
+local function cardsIn(data)
+  local n = 0
+  for _, e in ipairs(data.ContainedObjects or {}) do
+    n = n + ((e.Name == "Deck") and #(e.ContainedObjects or {}) or 1)
+  end
+  return n
+end
+
+local function footprint(o)
+  local b = o.getBounds()
+  return { x1 = b.center.x - b.size.x / 2, x2 = b.center.x + b.size.x / 2,
+           z1 = b.center.z - b.size.z / 2, z2 = b.center.z + b.size.z / 2,
+           cx = b.center.x, cz = b.center.z, sx = b.size.x, sz = b.size.z }
+end
+
+-- every pair of laid-out objects whose footprints overlap
+local function overlapping(list)
+  local out, pad = {}, 0.15
+  for i = 1, #list do
+    for j = i + 1, #list do
+      local ok, hit = pcall(function()
+        local a, b = footprint(list[i]), footprint(list[j])
+        return a.x1 + pad < b.x2 and a.x2 - pad > b.x1 and a.z1 + pad < b.z2 and a.z2 - pad > b.z1
+      end)
+      if ok and hit then out[#out + 1] = list[i].type .. " " .. list[i].getGUID() .. " / " .. list[j].getGUID() end
+    end
+  end
+  return out
+end
+
+-- the table's own pieces (SCED's tokens, counters, bags: objects that were
+-- there before the run) that a laid-out object covers. Boards, zones and
+-- hidden objects are not in the way; cards are the owner's, not SCED's.
+local BOARDS = { ["9f334f"] = true, ["721ba2"] = true, ["4ee1f2"] = true, ["5ce0a1"] = true }
+local NOT_PIECES = { Scripting = true, Hand = true, Layout = true, Fog = true, Randomize = true, Zone = true,
+  Card = true, Deck = true }
+local function onTablePieces(list)
+  local out = {}
+  local pieces = {}
+  for _, s in ipairs(getObjects()) do
+    local ok, keep = pcall(function()
+      local g = s.getGUID()
+      return OWNER[g] ~= nil and not BOARDS[g] and not NOT_PIECES[s.type] and s.interactable ~= false
+        and not s.hasTag("NotInteractable")
+    end)
+    if ok and keep then pieces[#pieces + 1] = s end
+  end
+  for _, o in ipairs(list) do
+    for _, s in ipairs(pieces) do
+      local ok, covers = pcall(function()
+        local a, b = footprint(o), footprint(s)
+        if b.sx >= 30 or b.sz >= 30 then return false end
+        -- bounds are not exact: count it only when one covers the other's centre
+        return (b.cx > a.x1 and b.cx < a.x2 and b.cz > a.z1 and b.cz < a.z2)
+          or (a.cx > b.x1 and a.cx < b.x2 and a.cz > b.z1 and a.cz < b.z2)
+      end)
+      if ok and covers then
+        out[#out + 1] = o.type .. " " .. o.getGUID() .. " on " .. tostring(s.getName()) .. " (" .. s.getGUID() .. ")"
+      end
+    end
+  end
+  return out
+end
+
+-- A loop is set up again every night: a scenario box must Place a full,
+-- fresh copy each time, and the Control's Clear Board must take every card it
+-- laid out (and any card drawn from it) back off the table.
+step("saved object: a scenario box's Place, Clear Board, Place again", function(go)
+  if SB.blocked or not SAVED then return go() end
+  local ctl, book = SB.ctl, nil
+  for _, o in ipairs(SB.boxes) do if alive(o) and gm(o).id == "prologue" then book = o end end
+  book = book or SB.boxes[1]
+  check("a scenario box from the saved object and its Control are on the table", alive(book) and alive(ctl))
+  if not alive(book) or not alive(ctl) then return go() end
+  local tag = "StillHourBox:" .. book.getGUID()
+  relayBoxTags[tag] = true
+  local inside = #(book.getObjects() or {})
+  local expected = cardsIn(book.getData())
+  -- Clear Board takes every campaign scenario card on the table: with the
+  -- owner's own laid out, clear with this box's Recall (only what it placed)
+  local foreign = foreignLoopCards(tag)
+  if foreign > 0 then
+    info(foreign .. " campaign scenario card(s) already on the table: this check clears with the box's Recall, "
+      .. "not the Control's Clear Board")
+  end
+  local function clear()
+    if foreign > 0 then return pcall(function() return book.call("buttonClick_recall") end) end
+    return pcall(function() return ctl.call("shApiClearBoard") end)
+  end
+  local okp, placed = pcall(function() return book.call("buttonClick_place") end)
+  check("the scenario box's Place lays out a copy of every object in it", okp and placed == inside,
+    tostring(placed) .. "/" .. inside)
+  Wait.time(function()
+    local n1, list = cardsTagged(tag)
+    check("every card it laid out is on the table (none fell into a bag)", n1 == expected, n1 .. "/" .. expected)
+    local untagged = 0
+    for _, o in ipairs(list) do if not o.hasTag("StillHourLoop") then untagged = untagged + 1 end end
+    check("the laid-out cards carry the loop tag", n1 > 0 and untagged == 0, untagged .. " without it")
+    local ov = overlapping(list)
+    check("no two laid-out cards overlap", #ov == 0, #ov > 0 and table.concat(ov, "; ", 1, math.min(#ov, 6)) or nil)
+    local on = onTablePieces(list)
+    check("nothing laid out sits on the table's own pieces (tokens, counters, bags)", #on == 0,
+      #on > 0 and table.concat(on, "; ", 1, math.min(#on, 6)) or nil)
+    -- play: draw a card off a laid-out deck onto the table
+    for _, o in ipairs(list) do
+      if alive(o) and o.type == "Deck" then
+        local p = o.getPosition()
+        pcall(function() o.takeObject({ position = { p.x, p.y + 2, p.z + 3 }, smooth = false }) end)
+        break
+      end
+    end
+    Wait.time(function()
+      local okc, r = clear()
+      check(foreign > 0 and "the box's Recall runs" or "Clear Board runs", okc, (not okc) and r or nil)
+      Wait.time(function()
+        local left = cardsTagged(tag)
+        check("every card the box laid out leaves the table (drawn ones too)", left == 0, left .. " left")
+        check("the scenario box never empties", #(book.getObjects() or {}) == inside)
+        local ok2, placed2 = pcall(function() return book.call("buttonClick_place") end)
+        Wait.time(function()
+          local n2 = cardsTagged(tag)
+          check("the next loop's Place lays out the same cards again", ok2 and placed2 == inside and n2 == n1,
+            n2 .. " vs " .. n1)
+          clear()
+          Wait.time(go, 2)
+        end, 3)
+      end, 2)
+    end, 2)
+  end, 3)
+end)
+
+-- docs/LOADING.md "Moving a campaign in progress to a newer build": the
+-- Control copies its state into the campaign log's memo (TTS saves it with the
+-- log); the owner deletes the old Control and takes the new build's Control
+-- out of a freshly spawned box (no Place: that would lay out a second log);
+-- the fresh Control adopts the copy when it loads.
+step("saved object: a campaign in progress moves to a fresh Control (update path)", function(go)
+  if SB.blocked or not SAVED then return go() end
+  local old, log = SB.ctl, SB.log
+  if not alive(old) or not alive(log) or not SB.data or not SB.ctlGuid then
+    check("the saved object's Control and campaign log are on the table for the update path", false)
+    return go()
+  end
+  local logs = getObjectsWithTag("CampaignLog")
+  if #logs ~= 1 then
+    info(#logs .. " campaign logs on the table (the Control keeps its copy only in a single log): "
+      .. "update path not exercised")
+    return go()
+  end
+  -- 1. campaign progress, made the way the Control's buttons make it
+  old.call("shApiEndPrologue")
+  local sp = stateOf(old)
+  old.call("shApiCounter", { name = "memory", delta = 3 })
+  old.call("shApiCounter", { name = "hour", delta = 2 })
+  local s1 = stateOf(old)
+  check("campaign progress is recorded on the Control (Prologue over, Memory +3, Hour +2)",
+    sp ~= nil and s1 ~= nil and s1.prologue == false and s1.memory == sp.memory + 3 and s1.hour == sp.hour + 2,
+    describeState(s1))
+  local seq1, bytes1 = mirrorSeq(old)
+  check("the Control copies the campaign state into the campaign log", (seq1 or 0) > 0 and (bytes1 or 0) > 0,
+    "seq " .. tostring(seq1))
+  check("the campaign log's saved data carries the copy (what a TTS save writes)",
+    (log.getData().Memo or ""):find("stillHour", 1, true) ~= nil)
+  -- 2. the game is saved and loaded: the log comes back from its saved data
+  local fresh = log.reload()
+  Wait.frames(function()
+    if alive(fresh) then fresh.addTag(TAG) ; SB.log = fresh end
+    local memo = alive(fresh) and fresh.memo or nil
+    check("the copy survives a save+reload of the campaign log",
+      type(memo) == "string" and memo:find("stillHour", 1, true) ~= nil)
+    -- 3. delete the old Control; spawn the box again; take its Control out
+    local pos = old.getPosition()
+    destroyObject(old)
+    SB.ctl = nil
+    local data = SB.data
+    data.GUID = nil
+    data.Locked = true                     -- hangs where it spawns: nothing else is disturbed
+    data.Transform = data.Transform or {}
+    data.Transform.posY = (data.Transform.posY or 2) + 2
+    data.Transform.posZ = (data.Transform.posZ or 0) - 7
+    Wait.frames(function()
+      spawnObjectData({ data = data, callback_function = function(copy)
+        copy.addTag(TAG)
+        local newCtl
+        local okt, errt = pcall(function()
+          newCtl = copy.takeObject({ guid = SB.ctlGuid, position = { pos.x, pos.y + 1, pos.z }, smooth = false })
+        end)
+        check("a Control token comes out of a fresh copy of the saved object", okt and newCtl ~= nil,
+          (not okt) and errt or nil)
+        if not newCtl then return go() end
+        newCtl.addTag(TAG)
+        waitFor(function() return alive(newCtl) and #(newCtl.getButtons() or {}) >= 7 end, 20, function(ready)
+          check("the fresh Control loads with its buttons", ready)
+          if not ready then return go() end
+          SB.ctl = newCtl
+          local s2 = stateOf(newCtl)
+          local same = s2 ~= nil
+          for _, k in ipairs(STATE_KEYS) do if same and s2[k] ~= s1[k] then same = false end end
+          check("the fresh Control adopts the campaign state from the campaign log", same,
+            describeState(s2) .. " (was " .. describeState(s1) .. ")")
+          -- 4. play goes on: the fresh Control keeps its copy in the same log
+          newCtl.call("shApiCounter", { name = "memory", delta = 1 })
+          local seq2 = mirrorSeq(newCtl)
+          check("the fresh Control keeps saving into the same campaign log", (seq2 or 0) > (seq1 or 0),
+            "seq " .. tostring(seq1) .. " -> " .. tostring(seq2))
+          go()
+        end)
+      end })
+    end, 10)
+  end, 30)
+end)
+
+step("clean up this run", function(go)
+  cleanUp("this run created")
+  Wait.frames(function()
+    reportNewObjects("after the run")
+    go()
+  end, 30)
 end)
 
 nextStep()

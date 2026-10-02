@@ -33,14 +33,57 @@ between-loops purchases. Its difficulty buttons fill SCED's chaos bag for the
 difficulty you choose. Ticking a Knowledge fact on the campaign log tells the
 Control token too.
 
+## End of every session: save your game (Tabletop Simulator)
+
+Your progress lives in the **Control** token and the **campaign log** on your
+table, and TTS only writes them to disk when you save. Before you quit:
+top menu **Games → Save & Load**, then **Create**, type a name (for example
+`Still Hour`) and click **Save**, or hover over your existing save and choose
+**Overwrite**. Next time, load that save instead of starting from SCED.
+
 ## Updating to a newer build
 
-Before a campaign starts: copy the new `saved_object_the_still_hour.json` over
-the old one and spawn it on a fresh table.
+**Before a campaign starts:** copy the new `saved_object_the_still_hour.json`
+over the old one (step 2 of the one-time setup) and spawn it on a fresh table.
 
-In the middle of a campaign: your progress lives in the Control token and the
-campaign log on your table. Save your game, then ask the assistant which pieces
-to swap; it will tell you how to keep that state.
+**In the middle of a campaign** (moving a campaign in progress onto a newer
+build without losing progress). The Control token keeps a copy of the campaign
+state inside the campaign log, so a new Control token picks up where the old one
+stopped. Keep the campaign log you have; you only swap the other pieces.
+Between sessions or between loops is the easiest moment, but mid-loop works:
+cards already on the table stay as they are.
+
+1. **In Tabletop Simulator:** load your campaign save and save it once more
+   under a new name (for example `Still Hour before update`), as described
+   above. This is your way back if anything goes wrong.
+2. **On your PC, in Windows File Explorer:** copy the new
+   `saved_object_the_still_hour.json` into
+   `Documents\My Games\Tabletop Simulator\Saves\Saved Objects\`, and choose
+   **Replace** when Windows asks.
+3. **In Tabletop Simulator:** with your campaign table loaded, right-click the
+   old **Control** token and choose **Delete**. Leave the **campaign log** where
+   it is. It holds your progress. Do not delete or replace it.
+4. **In Tabletop Simulator:** **Objects → Saved Objects → The Still Hour.** A
+   new campaign box appears. **Do not press Place on it.** That would lay out a
+   second campaign log, and with two logs on the table the Control cannot tell
+   which one holds your progress.
+5. **In Tabletop Simulator:** right-click the new box and choose **Search**.
+   Drag the new **Control** token out onto the table. When it lands it reads
+   the campaign log and says *"Still Hour campaign state restored from the
+   campaign log."* Check that its Memory, Dissonance, Hour and loop count match
+   what you had.
+6. **In Tabletop Simulator:** delete the old scenario boxes and drag the new
+   ones out of the box the same way. Where you put them does not matter: each
+   box remembers where its cards go. Swap the campaign guide too (your progress
+   is not in it). If the update notes mention other pieces (for example a
+   changed player card), take those from the new box now.
+7. **In Tabletop Simulator:** delete the new campaign box with what is left in
+   it (including its spare campaign log), then save your game (as described
+   above).
+
+If step 5 shows a brand-new campaign (Prologue, Memory 0), there was more than
+one campaign log on the table, or the log was deleted. Load the save from step 1
+and start again.
 
 ---
 
@@ -50,7 +93,8 @@ to swap; it will tell you how to keep that state.
 |---|---|
 | `dist/saved_object_the_still_hour.json` | **The package the owner loads** (the campaign box as a Saved Object). |
 | `dist/downloads/the_still_hour.json`, `the_still_hour_box.json` | The same box as a single object plus a download-box stub, for SCED's download mechanism. **Optional and not a load path:** the stub only works once the release file is hosted where SCED's downloader looks, which this build does not do. Use the Saved Object. |
-| `dist/the_still_hour_mod.json`, `dist/the_still_hour_campaign.json`, `dist/the_still_hour_table.json` | Component builds the TTS relay spawns for automated in-game tests. Not for play. |
+| `dist/the_still_hour_mod.json`, `dist/the_still_hour_table.json` | Component builds the TTS relay spawns for automated in-game tests (it also spawns and tests the Saved Object itself). Not for play. |
+| `dist/the_still_hour_campaign.json` | The scenario boxes in one campaign box (a build step and CardForge's spawn button). Not for play. |
 
 Rebuild everything (cards, hosted images, guide PDF, boxes, package):
 
