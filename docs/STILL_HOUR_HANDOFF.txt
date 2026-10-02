@@ -15,32 +15,29 @@ Applied four supported clue-cost adjustments, rebuilt 200 card images and the 24
 Preserved alternate outcomes and the campaign’s branching structure.
 
 VERIFICATION
-Full suite (re-run 2026-10-02 after the release housekeeping): 115 passed, 2 skipped (the optional render test, and the other-campaign check that runs only when another campaign is selected), 155 subtests passed. It also passes with another campaign selected.
-The optional render test is supplemented by three actual Godot scenes on the real-SCED emulator.
-Lua 5.2 and 5.4: 309 live rules checks each and the bundle check (re-run 2026-10-02); seven model fixtures totaling 652 checks each.
-CardForge selftest: 20 passed (re-run 2026-10-02). Eight scenario readiness checks: no errors or warnings.
-Card art is complete: every illustration is in the published faces.
-Final model validation: 70 cells, 1,319 played slots, no engine/Lua/table-note/missing-draw failures.
-Three independent reviews completed within their recorded scopes.
-This build has not been tested on the owner’s actual TTS table.
+Full suite (2026-10-02, final build): 124 tests passed, 2 skipped (the optional render test, and the other-campaign check that runs only when another campaign is selected), 155 subtests passed.
+Lua 5.2 and 5.4: 309 live rules checks each, the bundle check and the Control token check, all passing on the published build.
+Every card face passes the print audit (no hidden, covered, colliding or clipped text). 20 dense player and enemy cards still print their rules between 20 and 24 px against the official 31; none is cut off.
+All 200 hosted images in the saved object resolve; they are pinned to an immutable commit.
+The in-game test (Start TTS Relay.bat) now loads the exact saved object you play and checks the update path for a campaign in progress; it passes in the emulator and has not run on the owner's PC.
+Card art is complete. Three independent reviews and eight further audits were completed within their recorded scopes (docs/design/review/, docs/design/CURRENT_CAMPAIGN_AUDIT.md).
+This build has not been tested on the owner's actual TTS table and has not been played by a person.
 
-DIFFICULTY BY PLAYED SCENARIO
-Standard difficulty. These are model results, not human win probabilities.
-Night rows average five routes equally. Finale is a conditional prepared state.
+DIFFICULTY (model results, not human win probabilities; Standard, 3 investigators)
+The first calibration tested each night from a fresh setup (table below). Played as whole campaigns, those nights had one goal after the Square was done and won 90-100%, so the whole-campaign runs now give every night two goals, as official scenarios have about three acts, and the guide tells players to plan on about two acts a night. Act costs were then set from those runs (docs/design/FINISHING_BALANCE.md, "Whole-campaign calibration"). Whole-campaign result, 20 campaigns: mean night win 59% against the 60% target mean; individual nights swing widely (20% to 90%) because each depends on which districts it draws. Finale on the final cards: 32% (13 of 40) against 40%. Experience per investigator over a campaign: 36 to 49 across four parties.
+Fresh-setup table (earlier build):
 Scenario       Target   Model   Approx. 95% interval
-Prologue        80%      83%     74%–89%
-Night 1         80%      71%     61%–79%
-Night 2         70%      82%     73%–88%
-Night 3         70%      69%     59%–77%
-Night 4         60%      60%     50%–69%
-Night 5         60%      62%     52%–71%
-Night 6         50%      56%     46%–65%
-Night 7         50%      50%     40%–60%
-Night 8         40%      42%     33%–52%
-Finale          40%      50%     40%–60%
-
-The 20 carried runs played 199 slots and made 7 unlocked finale attempts, with 4 contest wins, under a fixed route and ten-slot limit.
-The measured curve is not reliably progressive. Route, party and actual campaign earnings matter. Seeds preserve random inputs, but equal legal choices may vary with Lua table order.
+Prologue        80%      83%     74%-89%
+Night 1         80%      71%     61%-79%
+Night 2         70%      82%     73%-88%
+Night 3         70%      69%     59%-77%
+Night 4         60%      60%     50%-69%
+Night 5         60%      62%     52%-71%
+Night 6         50%      56%     46%-65%
+Night 7         50%      50%     40%-60%
+Night 8         40%      42%     33%-52%
+Finale          40%      50%     40%-60%
+The exact 80/80/70/70/60/60/50/50/40/40 percentages remain design targets; seeds preserve random inputs, but equal legal choices may vary with Lua table order.
 
 HOW TO LOAD
 1. Download dist/saved_object_the_still_hour.json from main.

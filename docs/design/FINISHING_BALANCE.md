@@ -113,7 +113,7 @@ Designer-facing; contains spoilers. Supersedes the preset-night table above for 
 
 **Player cards.** Stolen Minute, The Lexicon of the Hour, Anchor Point, The Long Way Round, Rehearsed Escape, the Bell, I Remember the Ending, the Ambergrove Lamp and both unusual weaknesses were trimmed or limited toward official strength; each investigator's Memory reaction is limited to once per round and three times per loop. Ayako and Birdie gained 1 health to reach the official 14 total. Experience per investigator over a full campaign, 6 carried campaigns each: Elias/Ayako/Cass 43 (41–45), Birdie/Cass/Seraphine 40 (38–41), Elias/Birdie/Seraphine 36 (30–42), Elias/Ayako 49 (40–56).
 
-**Still open.** n=20 per cell is a screen, not certification; the finale and the other player counts were not re-measured on the final cards except as noted in the release log; human playtests decide the rest.
+**Still open.** n=20 per cell is a screen, not certification. The finale on the final cards (40 games, prepared state): 32% (13 wins) against 40%, was 50% before the player-card trims. The other player counts were not re-measured on the final cards. Human playtests decide the rest.
 
 ## Remaining calibration
 
