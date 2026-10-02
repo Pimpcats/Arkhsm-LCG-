@@ -47,7 +47,7 @@ HOW TO LOAD
 3. Load SCED, then Objects > Saved Objects > The Still Hour, and press Place.
 4. Open the included guide and follow Campaign Setup.
 Detailed loading instructions: docs/LOADING.md.
-Before updating an existing campaign, save the table and preserve its campaign state; use the update instructions in that document.
+To move a campaign in progress onto a newer build without losing progress, follow "Updating to a newer build" in docs/LOADING.md (keep the campaign log, swap the Control token and scenario boxes). Save your game in TTS at the end of every session.
 
 NEXT HANDOFF TASKS
 Run the current build’s live TTS relay using Start TTS Relay.bat and docs/TTS_RELAY.md.
