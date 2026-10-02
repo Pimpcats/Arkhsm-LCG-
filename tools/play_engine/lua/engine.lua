@@ -565,13 +565,19 @@ return function(H)
     -- what-if districtsPerNight = 2: the party places the next two districts
     -- (in route order) that still have an act to play this Part, so a night's
     -- goal is two district acts plus the Square's current act
-    local perNight=(cfg.districtsPerNight or 1)
     local function pending(d)
       return not c.knowledge[S.SURF[d]] or (c.partTwo and not c.knowledge[S.DEEP[d]])
     end
+    local perNight=(cfg.districtsPerNight or 1)
+    -- what-if goalsPerNight = N: every night's goal is N acts (the Square's
+    -- while it still has one, the rest districts'), as an official scenario's
+    -- act deck is about 3 acts however the party gets there
+    if cfg.goalsPerNight then
+      perNight=math.max(1,cfg.goalsPerNight-(pending("Square") and 1 or 0))
+    end
     if perNight>1 then
       districts={}
-      local start=((slot-2)*perNight)%#ROUTE
+      local start=((slot-2)*(cfg.goalsPerNight and 1 or perNight))%#ROUTE
       for i=0,#ROUTE-1 do
         local d=ROUTE[((start+i)%#ROUTE)+1]
         if pending(d) and #districts<perNight then districts[#districts+1]=d end

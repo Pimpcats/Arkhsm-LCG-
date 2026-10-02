@@ -5,6 +5,13 @@
 > [current campaign audit](CURRENT_CAMPAIGN_AUDIT.md) and
 > [finishing measurements](FINISHING_BALANCE.md).
 
+**Official structure numbers:** the one authoritative table is
+[CAMPAIGN_DESIGN_LESSONS.md section 1](CAMPAIGN_DESIGN_LESSONS.md) (93
+scenarios, `library/stats/scenario_structure.csv`). Where a figure below
+differs (this page's first table used an earlier 54-scenario tool run), that
+table wins; this page keeps the tool-only figures (connections, enemy share
+and stats, treachery tests, chaos-bag changes) and the dated Still Hour record.
+
 Official-campaign measurements below remain a historical reference. The Still
 Hour columns and conclusions describe their dated sources and are not evidence
 that the current difficulty targets have been achieved. Physical encounter
@@ -86,6 +93,11 @@ defeat and delivering a story asset, and the assets' skill bonuses. The
 party never resigns (it cannot win a loop that way).
 
 ## Clue scale and the night's goal (third pass, 2026-10-01)
+
+> **Historical — superseded by [FINISHING_BALANCE.md](FINISHING_BALANCE.md).**
+> The "now" column and the measurements it points to record the 2026-10-01
+> state. The official column is restated authoritatively in
+> CAMPAIGN_DESIGN_LESSONS.md section 1.
 
 The owner's follow-up: act clue costs and location clues to official, and
 locations as a range like official (Victory locations richer and harder).

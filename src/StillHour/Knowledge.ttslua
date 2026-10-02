@@ -14,7 +14,7 @@ local Knowledge = {}
 -- id -> { name, district, layer = "prologue"|"surface"|"deep"|"assembled" }
 Knowledge.FACTS = {
   ["you-are-unstuck"]          = { name = "You Are Unstuck",           district = "Prologue",    layer = "prologue" },
-  ["the-lamp-was-never-lit"]   = { name = "The Lamp Was Never Lit",    district = "Lighthouse",  layer = "surface" },
+  ["the-lamp-was-never-lit"]   = { name = "The Lamp Remembers",        district = "Lighthouse",  layer = "surface" },
   ["the-keepers-ninth-death"]  = { name = "The Keeper's Ninth Death",  district = "Lighthouse",  layer = "deep" },
   ["the-thirteenth-toll"]      = { name = "The Thirteenth Toll",       district = "Church",      layer = "surface" },
   ["the-hour-was-wrong"]       = { name = "The Hour Was Wrong",        district = "Church",      layer = "deep" },

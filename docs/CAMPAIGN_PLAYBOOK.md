@@ -46,16 +46,26 @@ refactor was checked against all 214 outputs).
 
 **Scaffold:** `python3 tools/new_campaign.py <id> "<Name>" --prefix abcd` writes
 a starter campaign that already passes the content check, builds, and passes
-`pipeline/verify_control.lua`; `tests/test_new_campaign.py` keeps that true.
+`pipeline/verify_control.lua` on Lua 5.2 and 5.4; `tests/test_new_campaign.py`
+keeps that true. It refuses a prefix another campaign uses or overlaps (card
+ids, hosted image names and publish clean-up all go by prefix). Its EXAMPLE
+scenario has the official components (a clue act and a take-and-deliver act
+with a story asset, Resign, agenda flavor, act/agenda backs, unrevealed
+location sides, location rules text) in a neutral house style.
 The owner's view is `docs/NEW_CAMPAIGN.md`; the assistant's runbook is the
 `/new-campaign` skill (`.claude/skills/new-campaign/SKILL.md`).
 
 ## 2. Brief and pitch (owner: 5 minutes)
 
+0. In a fresh checkout, run `python3 tools/library/build_library.py` first. It
+   rebuilds the LCG rules/card library in `library/` (ignored by version
+   control: Rules Reference, FAQ, official campaigns, `library/stats/`) that
+   the design lessons and the structure table come from.
 1. Owner gives theme, tone, player count, length and any must/never items.
 2. Assistant reads docs/design/CAMPAIGN_DESIGN_LESSONS.md (what the top and
    mid-tier official campaigns do well, what the bottom tier does poorly, and
-   the official scenario shape), then proposes 2–3 **non-spoiler** pitches:
+   in its section 1 the one authoritative table of official structure
+   numbers), then proposes 2–3 **non-spoiler** pitches:
    premise, the core mechanic in one sentence, how scenarios connect, target
    length. Each pitch passes that doc's pre-brief checklist. Owner picks one.
 3. Record the brief in `campaigns/<id>/assistant/production.json`.
@@ -65,7 +75,7 @@ content, name files or maintain manifests.
 
 ## 3. Campaign skeleton (spoiler doc)
 
-Write `docs/design/<ID>_DESIGN.md`:
+Write `campaigns/<id>/design.md` (the scaffold creates its skeleton):
 - **Structure:** scenarios (or loops/districts), their order and how they link.
 - **Core mechanic and currencies.** Name each resource the campaign trades in
   (Still Hour: Hours, Dissonance, Memory, Years, Static) and what each costs
@@ -90,7 +100,8 @@ Use official campaigns as structure references, not as material to copy.
     additional cost to play X, …";
   - spend-clue objectives ("investigators at X may, as a group, spend N
     clues to advance");
-  - "When reached" text on agendas.
+  - an agenda's on-arrival effect as Forced templating ("Forced – When …:"),
+    never a home-made label such as "When reached:".
 - Every term the campaign invents is defined once in the guide's rules
   section, and cards use it the same way everywhere.
 - **Three wording passes**, each by an independent reviewer (a sub-agent):
@@ -114,8 +125,9 @@ For each card type:
    encounter deck already punishes, and quiet hubs.
 4. **Test it (section 6)** before it goes on a card.
 
-Coverage checklist (official rates in brackets, NotZ–TIC; see
-`docs/design/OFFICIAL_COMPARISON.md`):
+Coverage checklist (component rates in brackets, NotZ–TIC; see
+`docs/design/OFFICIAL_COMPARISON.md`; structure numbers such as clues, shroud,
+doom and deck size are in `docs/design/CAMPAIGN_DESIGN_LESSONS.md` section 1):
 - agendas: flavor and rules on the front (100%), story and rules on the back;
 - acts: fronts and backs (the back resolves or continues); vary the
   objectives — about a third ask for a clue threshold, the rest are
@@ -161,13 +173,15 @@ Coverage checklist (official rates in brackets, NotZ–TIC; see
   state (scar, Years, banked Memory) **with upgraded XP decks**; measure every
   night of each pair, not one per pair, since the state can move a night by
   10–25 points. Report to the owner by night, not by scenario variant.
-- Compare the structure with the official campaigns before calibrating
-  (`tools/official_compare/compare.py`; Still Hour: docs/design/OFFICIAL_COMPARISON.md):
-  doom per scenario, act clues against location clues, locations and
-  connections, enemy share and stats (elites included), treacheries with a
-  skill test or a lingering effect, chaos-bag changes over the campaign
-  (mostly Cultist / Tablet / Elder Thing; Elder Sign and Auto-fail almost
-  never), XP per scenario and campaign. Report which gaps are missing and
+- Compare the structure with the official campaigns before calibrating:
+  doom, acts and clue acts, location clues and shroud, locations and deck
+  size against the table in `docs/design/CAMPAIGN_DESIGN_LESSONS.md` section 1
+  (the only place those numbers are stated); connections, enemy share and
+  stats (elites included), treacheries with a skill test or a lingering
+  effect, chaos-bag changes over the campaign (mostly Cultist / Tablet /
+  Elder Thing; Elder Sign and Auto-fail almost never) and XP with
+  `tools/official_compare/compare.py` (Still Hour:
+  docs/design/OFFICIAL_COMPARISON.md). Report which gaps are missing and
   which are deliberate, and fix the missing ones first.
 - Calibrate with several levers, not clue costs alone: tuning only the acts
   left The Still Hour with official-strength flow but weak enemies,
@@ -208,11 +222,25 @@ Follow `docs/ASSISTANT_WORKFLOW.md`:
 export CAMPAIGN=<id>
 python3 pipeline/render_set_icons.py                    # the encounter-set symbols
 python3 pipeline/scenario_content.py --lock             # every scenario LOCKED, 0 errors
-CAMPAIGN=<id> PUBLISH_COMMIT_TRAILER="<attribution lines>" python3 pipeline/publish_hosted.py
-python3 -m pytest -q tests
+python3 pipeline/render_placeholders.py                 # card faces
+# local package for checking (private; never commit a --local build):
+python3 pipeline/build_cards.py --local && python3 pipeline/bundle_mod.py --local
+python3 pipeline/compile_campaign.py
+python3 pipeline/table_presence.py --local && python3 pipeline/package_download.py --local
 lua5.4 pipeline/verify_control.lua dist/<slug>_bundle.lua runCampaignTests
-# The Still Hour only: lua5.4 pipeline/lua_smoketest.lua && lua5.4 pipeline/verify_bundle.lua
+lua5.2 pipeline/verify_control.lua dist/<slug>_bundle.lua runCampaignTests
+python3 -m pytest -q tests                              # about 7 minutes
+# release (commits the hosted images, rebuilds dist/ with hosted URLs):
+PUBLISH_COMMIT_TRAILER="<attribution lines>" python3 pipeline/publish_hosted.py
+# The Still Hour only: lua5.4 pipeline/lua_smoketest.lua && lua5.4 pipeline/verify_bundle.lua (and lua5.2)
 ```
+
+The suite tests The Still Hour, whatever `CAMPAIGN` is exported:
+`tests/conftest.py` pins it. `tests/test_new_campaign.py` checks the kit in a
+throwaway copy, and `tests/test_selected_campaign.py` runs the exported
+campaign's scenario audit read-only. Publishing a campaign removes only its
+own earlier images from `dist/cards/` (by prefix), never another campaign's;
+`tests/test_publish_hosted.py` keeps that true.
 
 Then **look** at every changed card (contact sheets). The automatic overflow
 check misses text that runs under frame art. Known trouble spots:
@@ -300,6 +328,28 @@ check misses text that runs under frame art. Known trouble spots:
 - Objective feasibility checks must count every clue source really in play
   (the hub is always placed and clues are portable), or they flag costs the
   engine meets.
+- The play-engine AI must work the hub/opening objective first. Letting it
+  wander to the districts first moved measured win rates by 17–27 points.
+- Test every Lua path on both Lua 5.2 and 5.4 (rules suite, Control check,
+  engine fixtures). Table code that works on one can fail on the other.
+- Wait until a chaos token has resolved (cancellation and redraw choices
+  done) before applying an irreversible effect such as a campaign-state
+  change; a token that is later canceled must leave no trace.
+- Encounter assignment lists (`scenario_assignments.json`) are physical
+  copies: each id appears once per copy. Never multiply them by a quantity
+  again when counting a deck.
+- The engine uses the standard opening mulligan (redraw any cards once;
+  weaknesses set aside and replaced). Other policies skew early tempo.
+- Measure with uncertainty intervals: report each win rate with its
+  approximate 95% interval and the trial count, and treat differences inside
+  the interval as noise.
+- When a measurement is superseded, mark the old table historical at its
+  top (with a link to the current source) instead of leaving two sets of
+  numbers that look current.
+- Measure difficulty with carried full-campaign runs (each scenario played
+  from the state, decks and XP the earlier ones produced), not only with
+  single-scenario presets. Single-night presets hid that later nights had
+  only one objective each.
 
 ## Definition of done (per campaign)
 

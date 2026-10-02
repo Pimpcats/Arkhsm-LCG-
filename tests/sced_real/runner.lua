@@ -15,7 +15,8 @@ return function(H)
     local list = d.ObjectStates or { d }
     for i, o in ipairs(list) do
       local name = p.file:match("([^/]+)%.json$") .. (#list > 1 and ("#" .. i) or "")
-      parts[#parts + 1] = string.format("{ name = %q, json = %q },", name, J.encode(o))
+      parts[#parts + 1] = string.format("{ name = %q, json = %q%s },", name, J.encode(o),
+        p.role and string.format(", role = %q", p.role) or "")
     end
   end
   parts[#parts + 1] = "} }\n"

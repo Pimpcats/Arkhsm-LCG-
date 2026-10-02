@@ -5,8 +5,10 @@ Tabletop Simulator on the owner's PC cannot read file:/// paths from whatever
 machine produced the build, so a shareable build needs hosted image URLs. This:
 
   1. renders every card face (pipeline/render_placeholders.py) unless --no-render
-  2. converts the Still Hour faces/backs + deck backs (and the [static] chaos
-     token face, pipeline/render_token.py) to JPEG in dist/cards/
+  2. converts the campaign's faces/backs (<prefix>*) + the shared deck backs
+     (and its chaos token face, pipeline/render_token.py) to JPEG in
+     dist/cards/, removing only this campaign's images from earlier builds
+     (other campaigns' hosted images are never touched; stale_images())
   3. writes pipeline/art_urls.json in hosted mode, pointing at
        https://raw.githubusercontent.com/<repo>/<commit>/dist/cards/<id>.jpg?v=<hash>
      where <commit> holds exactly these files (committed first if changed), so a
@@ -100,10 +102,11 @@ def publish(ref, render=True):
     # phase 1: write every hosted file, remembering its content hash
     hashes = {}                      # image name -> content hash
     plan = {}                        # art_urls key -> image name or {face, back}
+    others = other_prefixes()
     for png in sorted(glob.glob(os.path.join(FACES, PREFIX + "*.png"))):
         name = os.path.splitext(os.path.basename(png))[0]
-        if name.endswith("-back"):
-            continue
+        if name.endswith("-back") or not owns_image(name, others):
+            continue        # a back goes with its face; "sth*" never takes "sthr*" faces
         hashes[name] = to_jpeg(png, name)
         plan[name] = {"face": name}
         back = os.path.join(FACES, name + "-back.png")
@@ -126,10 +129,10 @@ def publish(ref, render=True):
         plan["_static_token"] = STATIC_TOKEN
     written = set(hashes)
 
-    # drop images from earlier builds that no longer belong to any card
-    for old in glob.glob(os.path.join(OUT, "*.jpg")):
-        if os.path.splitext(os.path.basename(old))[0] not in written:
-            os.remove(old)
+    # drop this campaign's images from earlier builds that no longer belong to
+    # any of its cards; every other campaign's hosted images stay untouched
+    for old in stale_images(written):
+        os.remove(old)
     build_guide()
 
     # phase 2: pin to the commit holding exactly these files (see pin_ref)
@@ -169,6 +172,46 @@ def publish(ref, render=True):
         "campaign_note": None if compiled else
         "campaign box not rebuilt (scenarios not all locked); " + stale + " is stale",
         "local_urls_left": bad}
+
+
+def other_prefixes():
+    """Card-id prefixes of every other campaign with a campaigns/<id>/build.json."""
+    out = set()
+    for path in glob.glob(os.path.join(ROOT, "campaigns", "*", "build.json")):
+        cid = os.path.basename(os.path.dirname(path))
+        if cid == CFG.id:
+            continue
+        try:
+            p = json.load(open(path, encoding="utf-8")).get("prefix") or cid[:4]
+        except (OSError, ValueError):
+            continue
+        if p != PREFIX:
+            out.add(p)
+    return out
+
+
+def owns_image(name, others=None):
+    """True for a dist/cards image this campaign publishes: its <prefix>* card
+    faces and backs and its own chaos token. A name that also starts with a
+    longer prefix of another campaign (prefix "sth" vs "sthr") is not ours.
+    The shared deck backs (player_back, encounter_back) belong to no single
+    campaign and are never removed."""
+    if STATIC_TOKEN and name == STATIC_TOKEN:
+        return True
+    if not name.startswith(PREFIX):
+        return False
+    others = other_prefixes() if others is None else others
+    return not any(len(p) > len(PREFIX) and name.startswith(p) for p in others)
+
+
+def stale_images(written):
+    """dist/cards/*.jpg this campaign published earlier but did not write now."""
+    stale, others = [], other_prefixes()
+    for old in sorted(glob.glob(os.path.join(OUT, "*.jpg"))):
+        name = os.path.splitext(os.path.basename(old))[0]
+        if name not in written and owns_image(name, others):
+            stale.append(old)
+    return stale
 
 
 def build_guide():

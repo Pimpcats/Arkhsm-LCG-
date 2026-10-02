@@ -1,8 +1,12 @@
 # THE STILL HOUR — Art Handoff
-*Everything the art pass needs, current as of this repo state. Supersedes the
-inventory assumptions in `ART_PIPELINE_BRIEF` / `CARDFORGE_BRIEF` (both still
-define the tooling); reflects CO-001/CO-002 (the boss is **The Appointed**) and
-the Victory elites.*
+
+> **SPOILERS — designer-facing.** This file names cards and describes their
+> scenes. A first-time player should not read it. The art is complete; this
+> file is a historical record of the art pass.
+
+*Everything the art pass needed. Supersedes the inventory assumptions in
+`ART_PIPELINE_BRIEF` / `CARDFORGE_BRIEF` (both still define the tooling);
+reflects change orders CO-001/CO-002.*
 
 ## What exists right now
 

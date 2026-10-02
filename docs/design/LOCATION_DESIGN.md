@@ -72,11 +72,11 @@ Locations speak the campaign's currencies: **Hours** (time), **Dissonance**
 | Prologue | The Long Pier | [action]: Test [wil] (2). If you succeed, place 1 Memory on your investigator card. Group limit once per game. | teaches Memory |
 | Prologue | The Almanac Steps | Forced – After you enter the Almanac Steps: Raise Dissonance by 1. | teaches Dissonance |
 | Square (every loop) | The Square | Each loop begins here… (travel rule) | hub, rule reminder |
-| Square | The Town Hall Steps | side rule; calm side: cancel one named Hour's "When reached" (once per loop) | Knowledge payoff (audit pass 5) |
+| Square | The Town Hall Steps | side rule; calm side: cancel one named Hour's Forced ability (once per loop) | Knowledge payoff (audit pass 5) |
 | Square | The Well | Forced – After you enter the Well: If your Campaign Log does not record The Sheriff Is Already Dead, take 1 horror. | hazard, Knowledge quiets |
 | Square | The Records Office (V1) | [action] Spend 2 clues: An investigator at the Records Office who gained Years from a card effect during this loop loses 1 of those Years. Group limit once per loop. | lever (Years) |
 | Lighthouse | The Winding Stair | gate to the Lantern Room | unchanged |
-| Lighthouse | The Lantern Room | calm side with The Lamp Was Never Lit | unchanged |
+| Lighthouse | The Lantern Room | calm side with The Lamp Remembers | unchanged |
 | Lighthouse | The Keeper's Quarters (V1) | [action][action]: Heal 1 damage and 1 horror. | lever (rest) |
 | Drowned Church | The Nave | *(blank)* | hub |
 | Drowned Church | The Belfry | Forced – After you enter the Belfry: If your Campaign Log does not record The Thirteenth Toll, raise Dissonance by 1. | hazard, Knowledge quiets |

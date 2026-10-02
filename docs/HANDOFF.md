@@ -43,7 +43,8 @@ Run it: `python3 cardforge/studio.py` → http://127.0.0.1:8570
 | SCED object builder | `pipeline/build_cards.py` |
 | Scenario readiness audit | `pipeline/scenario_content.py` |
 | Setup / vendor installs | `cardforge/installer.py` |
-| Selftests (sandboxed) | `cardforge/selftest.py`, `cardforge/studio_selftest.py` |
+| Selftests (sandboxed) | `cardforge/selftest.py` (fast), `cardforge/studio_selftest.py` (20–45 min) |
+| Player quick reference (play aid) | `docs/QUICK_REFERENCE.md` |
 | By-hand rebuild proof | `tools/rebuild_by_hand.py` |
 | In-game test relay | `tools/tts_relay/` (`docs/TTS_RELAY.md`) |
 | Ground-truth SCED objects | `docs/art_reference/sced_objects/` |

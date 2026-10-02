@@ -297,7 +297,10 @@ def lua_quote(s):
 
 def load_payloads(repo, job):
     """Each job payload is a dist/ file: a TTS save (ObjectStates) or one
-    object. Every top-level object is tagged so the runner can clean it up."""
+    object. Every top-level object is tagged so the runner can clean it up.
+    A payload's optional "role" reaches the runner unchanged ("saved_object":
+    the file the owner loads, spawned and tested on its own after the
+    component builds are cleared away)."""
     out = []
     for p in job["payloads"]:
         data = json.load(open(os.path.join(repo, p["file"]), encoding="utf-8"))
@@ -309,7 +312,7 @@ def load_payloads(repo, job):
                 tags.append(TAG)
             o["Tags"] = tags
             name = "{}#{} {}".format(os.path.basename(p["file"]), i, o.get("Nickname") or o.get("Name"))
-            out.append({"name": name, "json": json.dumps(o, ensure_ascii=False)})
+            out.append({"name": name, "json": json.dumps(o, ensure_ascii=False), "role": p.get("role")})
     return out
 
 
@@ -319,7 +322,8 @@ def build_chunk(repo, job, run_id):
     parts = ["local RELAY = {{ run = {}, pause = {}, payloads = {{".format(
         lua_quote(run_id), float(job.get("screenshot_pause_s", 2)))]
     for p in payloads:
-        parts.append("  {{ name = {}, json = {} }},".format(lua_quote(p["name"]), lua_long_string(p["json"])))
+        role = ", role = {}".format(lua_quote(p["role"])) if p.get("role") else ""
+        parts.append("  {{ name = {}, json = {}{} }},".format(lua_quote(p["name"]), lua_long_string(p["json"]), role))
     parts.append("} }")
     return "\n".join(parts) + "\n" + runner, len(payloads)
 

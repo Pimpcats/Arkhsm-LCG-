@@ -346,7 +346,7 @@ class ContentGapTests(unittest.TestCase):
     def test_lantern_room_has_its_calm_side(self):
         c = CARDS["sthr-loc-lanternroom"]
         self.assertEqual(c["back_shroud"], 3)
-        self.assertIn("The Lamp Was Never Lit", c["back_text"])
+        self.assertIn("The Lamp Remembers", c["back_text"])
         lua = open(os.path.join(ROOT, "src", "StillHour", "Locations.ttslua"),
                    encoding="utf-8").read()
         self.assertIn('"lantern-room"', lua)

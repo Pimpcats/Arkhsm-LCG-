@@ -168,6 +168,39 @@ SCED_CHECKS = (
 )
 
 
+# the exact file the owner loads (dist/saved_object_the_still_hour.json),
+# spawned on its own after the component builds are cleared away
+SAVED_OBJECT_CHECKS = (
+    "the saved object spawns",
+    "the saved object's box shows Place and Recall",
+    "the box holds 8 scenario boxes",
+    "the box holds the Control token",
+    "the box holds nothing else (14 pieces)",
+    "every card face and back is a hosted raw.githubusercontent URL pinned to a commit",
+    "the guide PDF is hosted on raw.githubusercontent",
+    "Place lays out every piece",
+    "each piece lands on its remembered spot",
+    "the Control token is on the table with its buttons",
+    "the box's Control's in-engine tests all pass",
+    "the scenario box's Place lays out a copy of every object in it",
+    "every card it laid out is on the table (none fell into a bag)",
+    "no two laid-out cards overlap",
+    "nothing laid out sits on the table's own pieces (tokens, counters, bags)",
+    "every card the box laid out leaves the table (drawn ones too)",
+    "the next loop's Place lays out the same cards again",
+)
+
+# moving a campaign in progress onto a fresh Control (docs/LOADING.md);
+# needs exactly one campaign log on the table
+UPDATE_PATH_CHECKS = (
+    "the Control copies the campaign state into the campaign log",
+    "the copy survives a save+reload of the campaign log",
+    "a Control token comes out of a fresh copy of the saved object",
+    "the fresh Control adopts the campaign state from the campaign log",
+    "the fresh Control keeps saving into the same campaign log",
+)
+
+
 def _assert_clean_pass(latest):
     failed = [c for c in latest["checks"] if not c["ok"]]
     assert latest["lua_errors"] == [], latest["lua_errors"]
@@ -183,16 +216,46 @@ def test_board_wiring_on_a_vanilla_table(tmp_path, remote):
                                     "vanilla table: a difficulty preset asks for the bag to be built by hand"):
         assert expected in names, expected
     assert not any(n in names for n in SCED_CHECKS)
+    for expected in SAVED_OBJECT_CHECKS + UPDATE_PATH_CHECKS:
+        assert expected in names, expected
+    assert any("the table holds only what was on it before the run (after the run)" in n
+               for n in latest["notes"]), latest["notes"]
 
 
 def test_board_wiring_on_an_sced_table(tmp_path, remote):
     rc, latest, _ = run_relay(tmp_path, remote, preexisting=sced_table())
     names = _assert_clean_pass(latest)
-    for expected in BOARD_CHECKS + SCED_CHECKS:
+    for expected in BOARD_CHECKS + SCED_CHECKS + SAVED_OBJECT_CHECKS:
         assert expected in names, expected
     assert any("control sees SCED" in n for n in latest["notes"])
     assert any("SCED detected" in n for n in latest["notes"])
+    # the stand-in table brings a campaign log of its own: with two on the
+    # table the update path is left alone (the owner's log is never touched)
+    assert not any(n in names for n in UPDATE_PATH_CHECKS)
+    assert any("update path not exercised" in n for n in latest["notes"]), latest["notes"]
     assert rc == 0
+
+
+def test_saved_object_leaves_the_owners_campaign_alone(tmp_path, remote):
+    """With the owner's own campaign laid out (pieces under the saved object's
+    GUIDs), the relay never presses Place on its copy: SCED's memory bag would
+    move the owner's pieces, and the run would then remove them."""
+    saved = json.load(open(os.path.join(ROOT, "dist", "saved_object_the_still_hour.json"),
+                           encoding="utf-8"))["ObjectStates"][0]
+    log = next(o for o in saved["ContainedObjects"] if "CampaignLog" in (o.get("Tags") or []))
+    owners_log = {"Name": "Custom_Token", "Nickname": "owner's campaign log", "GUID": log["GUID"],
+                  "Tags": ["CampaignLog"], "Memo": "owner's progress",
+                  "Transform": {"posX": -1.35, "posY": 1.6, "posZ": -26.6}}
+    rc, latest, _ = run_relay(tmp_path, remote, preexisting=[owners_log])
+    names = {c["name"] for c in latest["checks"]}
+    assert latest["verdict"] == "pass", [c for c in latest["checks"] if not c["ok"]]
+    assert "the box holds 8 scenario boxes" in names
+    assert "Place runs on the saved object's box" not in names
+    assert "Place runs" not in names           # the table build's box shares the log's GUID
+    assert any("saved object's GUIDs" in n for n in latest["notes"]), latest["notes"]
+    assert any("campaign box's GUIDs" in n for n in latest["notes"]), latest["notes"]
+    assert any("every object that was on the table before the run is still there (after the run)" in n
+               for n in latest["notes"]), latest["notes"]
 
 
 def test_relay_only_removes_its_own_objects(tmp_path, remote):
@@ -206,6 +269,20 @@ def test_relay_only_removes_its_own_objects(tmp_path, remote):
     assert latest["verdict"] == "pass"
     assert any("removed 1 object" in n for n in latest["notes"])
     assert any("SCED detected" in n for n in latest["notes"])
+
+
+def test_a_campaign_in_progress_on_the_table_stops_the_run(tmp_path, remote):
+    """The owner's own campaign (its Control token) on the table: the relay's
+    Controls would write test state into the owner's campaign log, so nothing
+    is spawned and the run reports why."""
+    saved = json.load(open(os.path.join(ROOT, "dist", "saved_object_the_still_hour.json"),
+                           encoding="utf-8"))["ObjectStates"][0]
+    ctl = dict(next(o for o in saved["ContainedObjects"] if o.get("Nickname", "").endswith("Control")))
+    ctl["Transform"] = {"posX": 25, "posY": 1.6, "posZ": 9}
+    rc, latest, _ = run_relay(tmp_path, remote, preexisting=[ctl])
+    assert latest["verdict"] == "fail" and rc == 1
+    assert [c["name"] for c in latest["checks"]] == ["the table holds no Still Hour campaign in progress"]
+    assert latest["lua_errors"] == []
 
 
 def test_lua_error_in_runner_is_reported_not_hung(tmp_path, remote):

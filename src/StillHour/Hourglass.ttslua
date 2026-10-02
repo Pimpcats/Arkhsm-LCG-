@@ -2,12 +2,12 @@
 --
 -- The Occultation is a FIXED, ordered stack of nine Hour cards (encounter v0.4
 -- §1). The Hourglass advances by time and by Skip effects; each newly reached
--- Hour resolves its "when reached" effect IN ORDER — so a big Skip that jumps
+-- Hour resolves its Forced ability IN ORDER — so a big Skip that jumps
 -- several Hours must resolve every intervening Hour, not just the destination.
 --
 -- Knowledge facts edit specific Hours. Two edits change the clock's STRUCTURE
 -- and are handled here:
---   * "The Hour Was Wrong"     -> Hour IV's "When reached" text no longer resolves.
+--   * "The Hour Was Wrong"     -> Hour IV's Forced ability no longer resolves.
 --   * "The Way the Night Breaks" -> reaching Hour IX may open the finale instead
 --     of forcing a reset.
 -- The remaining edits change what an Hour DOES; those are applied inside the
@@ -69,7 +69,7 @@ local function advanceAppointed(ctx, stage)
 end
 
 -- Once-per-loop flags (cleared by the reset): Hour VI has resolved, and what
--- it applied (so a cancelled Hour VI can be undone).
+-- it applied (so a canceled Hour VI can be undone).
 Hourglass.HOUR_SIX_FLAG = "hour-vi-resolved"
 Hourglass.HOUR_SIX_STATIC_FLAG = "hour-vi-static"
 Hourglass.HOUR_SIX_ALMANAC_FLAG = "hour-vi-almanac"
@@ -79,7 +79,7 @@ function Hourglass.hourSixResolved()
   return CampaignState.isFlagSet(Hourglass.HOUR_SIX_FLAG)
 end
 
---- Hour VI's "When reached" was cancelled (e.g. It Means 'Wait'): reverse what
+--- Hour VI's Forced ability was canceled (e.g. It Means 'Wait'): reverse what
 -- it applied — its temporary Static token, or, with What the Almanac Hid, the
 -- bag's "1 fewer" — and clear its once-per-loop flag so reaching Hour VI again
 -- this loop resolves it. Returns "static" | "almanac" | nil (nothing to undo).
@@ -108,7 +108,7 @@ function Hourglass.isHourRemoved(hour)
   return false
 end
 
--- Per-Hour "when reached" handlers. Return a short descriptor string for logging.
+-- Per-Hour Forced-ability handlers ("When the Hourglass advances to this Hour"). Return a short descriptor string for logging.
 local HOUR_HANDLERS = {
   [1] = function(_) return "The night begins." end,
 
@@ -133,7 +133,7 @@ local HOUR_HANDLERS = {
 
   [4] = function(ctx)
     if CampaignState.knows("the-hour-was-wrong") then
-      return "Hour IV's When reached does not resolve (The Hour Was Wrong): the road holds."
+      return "Hour IV's Forced ability does not resolve (The Hour Was Wrong): the road holds."
     end
     if ctx and ctx.roadGivesWay then
       ctx.roadGivesWay()
@@ -195,7 +195,7 @@ local HOUR_HANDLERS = {
   end,
 }
 
---- Resolve a single Hour's "when reached" effect (unless removed).
+--- Resolve a single Hour's Forced ability (unless removed).
 local function resolveHour(hour, ctx)
   if Hourglass.isHourRemoved(hour) then
     return

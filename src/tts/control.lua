@@ -5,7 +5,7 @@
 --
 -- It is the campaign's one state host (docs/INTEGRATION.md §2) and the board
 -- wiring: touchable Memory / Dissonance / Hour counters, the [static] chaos-bag
--- adapter, the Appointed's card buttons, location flips/seals and the interlude
+-- adapter, the Appointed's card buttons, location flips/CLOSED labels and the interlude
 -- buy panel. Rules live in src/StillHour/*; this file only routes clicks and
 -- table events into them. Every entry point is guarded so a vanilla (non-SCED)
 -- table, or a missing object, never raises a script error.
@@ -682,7 +682,7 @@ local function drawPlay()
   button("shClickHour", string.format("Hour %d · %s", h, Hourglass.HOUR_NAMES[h] or "?"), -PAIR_X, -0.5, 1000,
     "Left-click advance (resolves the Hour) · Right-click rewind")
   button("shClickAppointed", "Appointed: " .. Appointed.stageName(), PAIR_X, -0.5, 1000,
-    "Left-click: a card advances its Approach one stage (min Sensed). Hold Back is on its card.")
+    "Left-click: a card advances its Approach by 1 stage (min Sensed). Hold Back is on its card.")
   investigatorList = guarded("investigators", Board.investigators) or {}
   for i, inv in ipairs(investigatorList) do
     if i > 4 then break end
@@ -693,7 +693,7 @@ local function drawPlay()
   -- two rows of three, spaced so no button overlaps another
   button("runStillHourTests", "Run Tests", -ROW3_X, 1.4)
   button("shStatus", "Status", 0.0, 1.4)
-  button("shSyncBoard", "Sync Board", ROW3_X, 1.4, 620, "Re-apply location faces/seals, the Appointed and the chaos bag.")
+  button("shSyncBoard", "Sync Board", ROW3_X, 1.4, 620, "Re-apply location faces and CLOSED labels, the Appointed and the chaos bag.")
   button("shReset", "Reset Loop", -ROW3_X, 2.0)
   button("shOpenInterlude", "Interlude", 0.0, 2.0, 620, "Spend Memory: Recollections and level-ups.")
   button("shKnowledgeStatus", "Knowledge", ROW3_X, 2.0)
@@ -710,8 +710,8 @@ local function drawPlay()
     "Loop Setup: remove every card the scenario boxes laid out, and the tokens on them.")
   if Hourglass.hourSixResolved() then
     button("shUndoHourSix", "Undo Hour VI", ROW3_X, 2.6, 620,
-      "Hour VI's When reached effect was cancelled: take back its Static token (or, with What the Almanac Hid, "
-        .. "its 1 fewer), and Hour VI resolves again if it is reached again this loop.")
+      "Hour VI's Forced ability was canceled: take back its Static token (or, with What the Almanac Hid, "
+        .. "its 1 fewer), and Hour VI resolves again if the Hourglass advances to it again this loop.")
   end
   for i, d in ipairs(DIFFICULTY) do
     button("shDifficulty" .. i, d.label, -1.8 + (i - 1) * 1.2, 3.2, 520,
@@ -974,7 +974,7 @@ function shBeginFinale()
   afterChange()
 end
 
---- Hour VI's "When reached" was cancelled: undo what it applied.
+--- Hour VI's Forced ability was canceled: undo what it applied.
 local function undoHourSix()
   local what = Hourglass.undoHourSix(playCtx())
   if what == "almanac" then
@@ -1357,7 +1357,7 @@ function shReset()
 end
 
 --- Console: unlock a Knowledge fact by id when a card or the guide says so,
--- then re-apply location faces/seals. e.g. shUnlock("fact-id")
+-- then re-apply location faces/CLOSED labels. e.g. shUnlock("fact-id")
 function shUnlock(id)
   local r = unlockFact(id)
   if r then note("Fact recorded. Locations re-synced.") end
@@ -1601,7 +1601,7 @@ local function stillHourTestBody(T)
   P, F = check("Hour VI adds 1 Static token", CampaignState.getHour() == 6 and six.extra == 1, P, F)
   Hourglass.rewind(1, sixCtx); Hourglass.advance(1, sixCtx)
   P, F = check("Hour VI once per loop: reaching it again adds nothing", six.extra == 1, P, F)
-  P, F = check("undoing a cancelled Hour VI takes its token back",
+  P, F = check("undoing a canceled Hour VI takes its token back",
     Hourglass.undoHourSix(sixCtx) == "static" and six.extra == 0 and not Hourglass.hourSixResolved(), P, F)
   CampaignState.reset(); Hourglass.advance(5, sixCtx)
   P, F = check("Hour VI resolves again in the next loop", six.extra == 1, P, F)
