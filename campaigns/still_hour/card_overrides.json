@@ -1175,14 +1175,14 @@
     "memoryCost": 2
   },
   "sthr-markeddeck": {
-    "text": "Cass Lindqvist deck only.\n[free] Exhaust Marked Deck: Reveal a random chaos token without resolving it and seal it on Marked Deck. The next time you would reveal a chaos token during a skill test this round, resolve the sealed token instead, as if just revealed. Release it after that test, or at the end of the round.\n[free] Exhaust Marked Deck, raise Dissonance by 1 and remove 1 Memory from a card you control: As above, but choose a number token in the chaos bag to seal. (Limit once per loop.)",
+    "text": "Cass Lindqvist deck only.\n[free] Exhaust Marked Deck: Reveal a random chaos token without resolving it and seal it on Marked Deck. The next time you would reveal a chaos token this round, resolve the sealed token instead. Release it after that test, or at the end of the round.\n[free] Exhaust Marked Deck, raise Dissonance by 1 and remove 1 Memory from a card you control: As above, but choose a number token in the chaos bag to seal. (Limit once per loop.)",
     "unique": true,
     "flavor": "",
     "intIcons": 1,
     "agiIcons": 1
   },
   "sthr-compass": {
-    "text": "“Birdie” Okonkwo deck only.\n[action] Exhaust Lucky Compass: Disengage from each non-Elite enemy engaged with you, then move to a connecting location. This action does not provoke attacks of opportunity.\n[action] Exhaust Lucky Compass and remove 1 Memory from it: Move to any revealed location in a district whose Knowledge entry your Campaign Log records. This action does not provoke attacks of opportunity.",
+    "text": "“Birdie” Okonkwo deck only.\n[action] Exhaust Lucky Compass: Disengage from each non-Elite enemy engaged with you, then move to a connecting location. This does not provoke attacks of opportunity.\n[action] Exhaust Lucky Compass and remove 1 Memory from it: Move to any revealed location in a district whose Knowledge entry your Campaign Log records. This action does not provoke attacks of opportunity.",
     "unique": true,
     "wilIcons": 1,
     "agiIcons": 1
@@ -1247,7 +1247,7 @@
     "back_text": "Deck Size: 30.\nDeckbuilding Options: Guardian cards level 0–5, Neutral cards level 0–5, up to 5 Survivor cards level 0–2, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): The Ambergrove Lamp, I've Done This Before, The Eighth Grave, 1 random basic weakness."
   },
   "sthr-lexicon": {
-    "text": "Dr. Ayako Sōma deck only.\nUses (0 secrets).\n[reaction] After you succeed at an [int] test by 2 or more: Place 1 secret on The Lexicon of the Hour (maximum 4).\n[free] Exhaust The Lexicon of the Hour and spend 1 secret: You get +2 [int] for this skill test.\n[reaction] When a non-weakness treachery card is drawn at your location, exhaust The Lexicon of the Hour and spend 2 secrets: Cancel its revelation effect. (Limit once per loop.)",
+    "text": "Dr. Ayako Sōma deck only.\nUses (0 secrets).\n[reaction] After you succeed at an [int] test by 2 or more: Place 1 secret on The Lexicon of the Hour (maximum 4).\n[free] Exhaust The Lexicon of the Hour and spend 1 secret: You get +2 [int] for this skill test.\n[reaction] When a non-weakness treachery is drawn at your location, exhaust The Lexicon of the Hour and spend 2 secrets: Cancel its revelation effect. (Limit once per loop.)",
     "unique": true,
     "intIcons": 1,
     "wilIcons": 1
@@ -1255,7 +1255,7 @@
   "sthr-bell": {
     "unique": true,
     "wilIcons": 2,
-    "text": "Seraphine Vale deck only.\nUses (3 charges).\n[action] Exhaust The Bell of Ambergrove and spend 1 charge: Evade. This evasion attempt uses [wil] instead of [agi]. If you succeed, each investigator at your location heals 1 horror.\n[action] Exhaust The Bell of Ambergrove, spend 1 charge and raise Dissonance by 2: Advance or rewind the Hourglass by 1 Hour. This ability cannot be triggered during the finale. (Limit once per loop.)"
+    "text": "Seraphine Vale deck only.\nUses (3 charges).\n[action] Exhaust The Bell of Ambergrove and spend 1 charge: Evade, using [wil] instead of [agi]. If you succeed, each investigator at your location heals 1 horror.\n[action] Exhaust The Bell of Ambergrove, spend 1 charge and raise Dissonance by 2: Advance or rewind the Hourglass by 1 Hour. This ability cannot be triggered during the finale. (Limit once per loop.)"
   },
   "sthr-borrowedtime": {
     "text": "Limit 1 per investigator.\nUses (2 charges). These charges are not Memory.\n[free] During your turn, exhaust Stolen Minute and spend 1 charge: Gain 1 additional action this turn.\n[reaction] After the Hourglass advances: Place 1 charge on Stolen Minute (maximum 2). (Limit once per loop.)",
@@ -1287,7 +1287,7 @@
     "wilIcons": 1,
     "agiIcons": 1,
     "flavor": "",
-    "text": "Elias Warde deck only.\nEach investigator at your location gets +1 [agi] while evading.\n[action] Exhaust The Ambergrove Lamp: Look at the top card of the encounter deck. You may take 1 horror to place it on the bottom of the encounter deck. Then, you may move to a connecting location. This action does not provoke attacks of opportunity.\nWhen you trigger this ability, you may also raise Dissonance by 1 (limit once per loop). If you do, that move does not place doom on the current Hour."
+    "text": "Elias Warde deck only.\nEach investigator at your location gets +1 [agi] while evading.\n[action] Exhaust The Ambergrove Lamp: Look at the top card of the encounter deck. You may take 1 horror to put it on the bottom. Then, you may move to a connecting location. This action does not provoke attacks of opportunity.\nYou may also raise Dissonance by 1 (limit once per loop). If you do, that move does not place doom on the current Hour."
   },
   "sthr-rehearsedescape": {
     "wildIcons": 1,
