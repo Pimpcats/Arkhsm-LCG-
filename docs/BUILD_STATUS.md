@@ -1,12 +1,13 @@
 # THE STILL HOUR — SCED build status
 
-*Designer-facing (spoilers). Updated 2026-09-27.* Tracks the
+*Designer-facing (spoilers). Updated 2026-10-02.* Tracks the
 `SCED_BUILD_BRIEF.md` priorities. P0–P8, the board wiring, the chaos-bag
 integration, every scenario and the table presence are built and pass their
 offline checks. Current counts and test results:
 `campaigns/still_hour/assistant/production.json`. Remaining before release:
-a real TTS relay run on the current head, six illustrations (the ChatGPT art
-pack's "remaining" request) and the first playtest.
+a real TTS relay run on the current head and the first playtest; the
+difficulty curve is measured but not yet certified
+(`docs/design/FINISHING_BALANCE.md`). Art is complete.
 
 ## Priority ladder
 
@@ -169,16 +170,14 @@ actual play session:
    `publish_hosted.py`); one loose token ships in the mod save. SCED's
    `getChaosBagState()` / campaign export skip it (and print "not
    recognized"); the count is rebuilt from Dissonance on load.
-5. **Art** — 🟡 the illustrations are approved (generated in ChatGPT via
-   `docs/CHATGPT_ART_PACK.md`) and composited into every face, except six
-   cards still waiting on the art pack's "remaining" request
-   (`pipeline/chatgpt_art_pack.json`). Box art: campaign and scenario boxes
-   share one texture.
+5. **Art** — ✅ complete: every illustration is approved (generated in
+   ChatGPT via `docs/CHATGPT_ART_PACK.md`) and composited into every face.
+   Optional: campaign and scenario boxes share one texture.
 6. **P8 download box** — optional. The Saved Object is the load path; the
    download box would need the release file hosted where SCED's downloader
    looks, plus a check of `placeholderDownload` in the fork.
 
-Next: the relay run (1), the six illustrations (5), then the first playtest.
+Next: the relay run (1), then the first playtest.
 
 ## CardForge (art batch tool)
 
@@ -206,10 +205,8 @@ run in a temporary copy of the repository.
 ## Next steps
 
 1. Owner: run the TTS relay on the current head (`docs/TTS_RELAY.md`).
-2. Generate and import the six remaining illustrations (ChatGPT art pack
-   "remaining" request), re-render, `publish_hosted.py`, review with neutral
-   labels.
-3. Owner: first playtest (Prologue and Loop 1); record errata.
+2. Owner: first playtest (Prologue and Loop 1); record errata.
+3. Calibration follow-up from real play (`docs/design/FINISHING_BALANCE.md`).
 4. Open designer items: `docs/design/AUDIT_PASS5.md` and
    `docs/design/CONTENT_DECISIONS.md`.
 

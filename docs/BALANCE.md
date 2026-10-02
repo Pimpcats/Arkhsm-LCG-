@@ -1,5 +1,11 @@
 # THE STILL HOUR — balance findings (audited)
 
+> **SPOILERS — designer-facing.** This file names the campaign's rules, cards
+> and numbers. A first-time player should not read it.
+>
+> **Historical — superseded by [docs/design/FINISHING_BALANCE.md](design/FINISHING_BALANCE.md).**
+> Its tables and success rates describe earlier builds and models.
+
 > Current source: 2026-10-02 finishing corrections. See
 > [correction ledger](design/FINISHING_CORRECTIONS.md) and
 > [current campaign audit](design/CURRENT_CAMPAIGN_AUDIT.md) and

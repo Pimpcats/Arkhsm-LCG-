@@ -19,11 +19,11 @@
     "scenario_readiness_warnings": 0,
     "campaign_box_compiles_without_force": true,
     "objectives_feasible_1_to_4_investigators": true,
-    "lua_rules_tests": "309/309 each on Lua 5.2 and 5.4",
+    "lua_rules_tests": "309/309 each on Lua 5.2 and 5.4 (re-run 2026-10-02)",
     "play_engine_regressions": "7 fixtures, 652 checks each on Lua 5.2 and 5.4",
-    "pytest": "111 passed, 1 optional render test skipped, 155 subtests passed",
-    "verify_bundle": "OK on Lua 5.2 and 5.4; current built bundle",
-    "cardforge_selftest": "20 passed, 0 failed, sandboxed; owner-only golden prompts unavailable",
+    "pytest": "115 passed, 2 skipped (optional render test; other-campaign audit when Still Hour is selected), 155 subtests passed; also passes with CAMPAIGN set to a scaffolded campaign",
+    "verify_bundle": "OK on Lua 5.2 and 5.4 (re-run 2026-10-02); current built bundle",
+    "cardforge_selftest": "20 passed, 0 failed, sandboxed (re-run 2026-10-02); owner-only golden prompts unavailable",
     "independent_review": "3 independent reviewers; no remaining blocker in their recorded scopes",
     "scenario_audit": "8/8 locked, 0 errors, 0 warnings",
     "godot": "4.7.2: three real-SCED emulator scenes rendered, exit0, no scene/script errors",
@@ -72,7 +72,9 @@
     "carried_income_per_investigator_mean": 47.43,
     "carried_income_scope": "At most ten slots, fixed route, first age-out stops the policy; no replacement investigators or finale epilogue simulated.",
     "tts_relay_latest": "Historical 89/89 on 5bb290d; current build has not run on the owner PC",
-    "tests_leave_checkout_clean": true
+    "tests_leave_checkout_clean": true,
+    "art_complete": true,
+    "campaign_log_hidden_names": "implemented: unearned names stay hidden on the log until ticked"
   },
   "evidence": [
     "python3 pipeline/scenario_content.py: 8/8 scenarios, 0 errors (notes: one inherited stat deviation, five cross-district symbol repeats in distinct colours)",
@@ -88,7 +90,8 @@
     "2026-09-28: headless SCED harness (tests/sced_real) boots the real SCED table and plays Prologue, loops, Part II, finale and save/reload through the owner's buttons; found and fixed 5 integration bugs (finale set-aside on SCED's chaos bag, Clear Board removing SCED pieces, Square set-aside over the clue counter, [static] token into a respawned bag, relay stale bag reference). Not real TTS: no rendering, approximate physics.",
     "2026-09-29: owner decision: assets/plugins/ArkhamHorrorLCG.seext stays in the repo (sharing allowed; public, non-commercial use).",
     "2026-09-29: the 7 remaining monster illustrations imported (owner-generated), framed with committed art placements (campaigns/still_hour/art_placements.json).",
-    "2026-10-02: reviewed finishing corrections applied; 133 effective cards, 200 framed images, 24-page guide. 111 pytest tests and 155 subtests; both Lua versions, real-SCED harness, CardForge and three Godot renders pass. 70 final measurement cells / 1319 slots; 400 scoped proposal trials separately archived. See docs/design/FINISHING_CORRECTIONS.md and FINISHING_BALANCE.md. Exact target curve and human playtest approval remain open."
+    "2026-10-02: reviewed finishing corrections applied; 133 effective cards, 200 framed images, 24-page guide. 111 pytest tests and 155 subtests; both Lua versions, real-SCED harness, CardForge and three Godot renders pass. 70 final measurement cells / 1319 slots; 400 scoped proposal trials separately archived. See docs/design/FINISHING_CORRECTIONS.md and FINISHING_BALANCE.md. Exact target curve and human playtest approval remain open.",
+    "2026-10-02: release housekeeping. publish_hosted.py removes only the published campaign's own earlier images (prefix-scoped; Still Hour URLs unchanged; tests/test_publish_hosted.py). Full suite passes with CAMPAIGN set to a scaffolded campaign (tests/conftest.py pins still_hour): 116 passed, 1 skipped there; 115 passed, 2 skipped, 155 subtests in the checkout. CardForge selftest 20/20, Lua rules 309/309 and bundle check OK on Lua 5.2 and 5.4. Art complete; log hidden-name decision already implemented. Owner docs refreshed; player quick reference docs/QUICK_REFERENCE.md added (play aid)."
   ],
   "next_actions": [
     "Owner: run current main through the live TTS relay (Start TTS Relay.bat; docs/TTS_RELAY.md).",

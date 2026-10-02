@@ -1,5 +1,5 @@
 # THE STILL HOUR — Master Checklist
-*Updated 2026-09-27. Spoiler-free. ✅ done · 🔶 partly done / needs your action · ⬜ not started.*
+*Updated 2026-10-02. Spoiler-free. ✅ done · 🔶 partly done / needs your action · ⬜ not started.*
 
 Current counts and test results: `campaigns/still_hour/assistant/production.json`.
 
@@ -12,7 +12,9 @@ Current counts and test results: `campaigns/still_hour/assistant/production.json
   campaign box compiles with all scenario boxes
 - ✅ Rules-wording passes against the Rules Reference applied to the guide
   and every card
-- ✅ Balance and pacing modelled (docs/BALANCE.md, designer-facing)
+- ✅ Balance and pacing modelled and measured with computer-played games
+  (designer-facing, spoilers: docs/design/FINISHING_BALANCE.md; docs/BALANCE.md
+  is historical). The results do not yet meet every difficulty target
 - ✅ Campaign guide typeset as a PDF on the plugin's guide pages; interactive
   campaign log; investigator minicards; campaign and scenario boxes with
   Place / Recall
@@ -23,13 +25,13 @@ Current counts and test results: `campaigns/still_hour/assistant/production.json
 - 🔶 Real-TTS relay run on the current build — needs you (local PowerShell,
   docs/TTS_RELAY.md). The last real run passed on an older build
 - ⬜ First playtest (Prologue and Loop 1)
+- ✅ One-page play aid for the table: docs/QUICK_REFERENCE.md (read it when
+  you sit down to play; it explains the campaign's systems)
 
 ## Art
 
-- ✅ Illustrations approved and composited into the card faces
-- 🔶 Six illustrations still to generate: the "remaining" request of the
-  ChatGPT art pack (docs/CHATGPT_ART_PACK.md). Their cards show a blank art
-  window until then
+- ✅ Art complete: every illustration approved and composited into the card
+  faces
 - 🔶 Box art: the campaign box and scenario boxes share one texture (not urgent)
 
 ## CardForge Studio (the app)
@@ -43,18 +45,16 @@ Current counts and test results: `campaigns/still_hour/assistant/production.json
 - ✅ Deck backs on every export
 - ✅ Cloud art is the default path; local backends (A1111 / ComfyUI) optional,
   settings in `rig.local.json` (never committed)
-- ✅ Selftests: `cardforge/selftest.py` and `cardforge/studio_selftest.py` all
-  green; both run in a temporary copy, so they never touch your files
+- ✅ Selftests: `cardforge/selftest.py` passes (re-run 2026-10-02);
+  `cardforge/studio_selftest.py` passed when last run. Both run in a temporary
+  copy, so they never touch your files
 - 🔶 Strange Eons path (pixel-perfect benchmark): optional, one-time setup
 
 ## Your to-dos (nobody else can)
 
 - 🔶 Start the TTS relay on your PC and let it test the current build
-- 🔶 Generate the six remaining illustrations in ChatGPT (the assistant
-  prepares the request and imports the results)
 - ⬜ Load the campaign in TTS and play the Prologue and Loop 1
-- ⬜ Decide: hide Knowledge entry names on the campaign log until earned, or
-  keep the visible checklist
+- ✅ Campaign log names stay hidden until earned (decided and built)
 
 ## Parked
 

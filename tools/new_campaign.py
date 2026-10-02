@@ -8,17 +8,24 @@ card specs with a small EXAMPLE scenario, overrides, scenario manifest and
 assignments, art scenes, log layout, guide and design skeletons, production
 tracker) and src/tts/<id>_control.lua (a working Control token: difficulty
 presets, campaign chaos-bag changes, investigator count, save/load, tests).
+The example scenario follows the official shape (a clue act and a
+take-and-deliver act with a story asset, Resign, agenda flavor, act and agenda
+backs, unrevealed location sides, location rules text) in a neutral style.
+The prefix must not be used by (or overlap) another campaign's.
 
 Every file the example writes is marked EXAMPLE: the assistant replaces the
 example scenario with the real campaign, following docs/CAMPAIGN_PLAYBOOK.md.
 Then build with the campaign selected, e.g.:
 
-    CAMPAIGN=<id> python3 pipeline/render_placeholders.py
-    CAMPAIGN=<id> python3 pipeline/scenario_content.py
-    CAMPAIGN=<id> python3 pipeline/build_cards.py --local
-    CAMPAIGN=<id> python3 pipeline/bundle_mod.py --local
-    CAMPAIGN=<id> python3 pipeline/compile_campaign.py
+    export CAMPAIGN=<id>
+    python3 pipeline/render_set_icons.py
+    python3 pipeline/scenario_content.py
+    python3 pipeline/render_placeholders.py
+    python3 pipeline/build_cards.py --local
+    python3 pipeline/bundle_mod.py --local
+    python3 pipeline/compile_campaign.py
     lua5.4 pipeline/verify_control.lua dist/<slug>_bundle.lua runCampaignTests
+    lua5.2 pipeline/verify_control.lua dist/<slug>_bundle.lua runCampaignTests
 """
 import argparse
 import json
@@ -39,8 +46,13 @@ def dump(path, data):
 
 
 def example_cards(p, name):
-    """A tiny but complete scenario (one investigator, two agendas, two acts,
-    three locations, enemies incl. an elite, treacheries in the official mix)."""
+    """A tiny scenario in the official shape (docs/design/CAMPAIGN_DESIGN_LESSONS.md
+    section 1): one investigator; two agendas with flavor and story backs; two
+    acts, one clue act and one take-and-deliver act with a set-aside story
+    asset, both with backs; four locations with rules text (a Resign on the
+    starting location, a thoroughfare at 0 clues, a Victory room at shroud 4)
+    whose unrevealed sides carry flavor (one also rules); enemies incl. an
+    elite; treacheries in the official mix (most test, one lingers)."""
     inv = p + "inv1"
     player = [
         {"id": inv, "type": "Investigator", "name": "Example Investigator", "subtitle": "EXAMPLE — replace",
@@ -52,25 +64,37 @@ def example_cards(p, name):
         {"id": p + "-weak1", "type": "Treachery", "name": "Example Weakness", "subtitle": "", "class": "Neutral",
          "traits": "Flaw.", "weakness": True},
     ]
+    col = "#2d5b58"
+
+    def link(*symbols):
+        return [{"symbol": s, "color": col} for s in symbols]
+
     enc = [
         {"id": p + "-scn", "type": "Scenario", "name": name, "tokens": [
             {"token": "skull", "text": "-X. X is the number of enemies at your location."},
             {"token": "cultist", "text": "-2. If you fail, place 1 doom on the current agenda."},
             {"token": "tablet", "text": "-2. If there is an enemy at your location, take 1 horror."},
             {"token": "elderthing", "text": "-3. If you fail, discard 1 card at random."}]},
-        {"id": p + "-agenda-1", "type": "Agenda", "name": "The Night Begins", "index": 1, "number": 1, "doom": 6},
-        {"id": p + "-agenda-2", "type": "Agenda", "name": "The Night Closes In", "index": 2, "number": 2, "doom": 8},
+        {"id": p + "-agenda-1", "type": "Agenda", "name": "The Night Begins", "index": 1, "number": 1, "doom": 7},
+        {"id": p + "-agenda-2", "type": "Agenda", "name": "The Night Closes In", "index": 2, "number": 2, "doom": 9},
         {"id": p + "-act-1", "type": "Act", "name": "Follow the Trail", "index": 1, "number": "1",
          "clues": 2, "clues_per_investigator": True},
-        {"id": p + "-act-2", "type": "Act", "name": "Into the Dark", "index": 2, "number": "2",
-         "clues": 3, "clues_per_investigator": True},
+        {"id": p + "-act-2", "type": "Act", "name": "Carry the Map", "index": 2, "number": "2",
+         "clues": 1, "clues_per_investigator": True,
+         "take": {"asset": p + "-story-1", "at": "The Old Mill", "deliver": "The Chapel"}},
         {"id": p + "-loc-a", "type": "Location", "name": "The Station", "traits": "Town.", "shroud": 2, "clues": 1,
-         "clues_per_investigator": True, "icons": "circle", "color": "#2d5b58", "connections": [{"symbol": "square", "color": "#2d5b58"}, {"symbol": "triangle", "color": "#2d5b58"}]},
+         "clues_per_investigator": True, "icons": "circle", "color": col, "connections": link("diamond")},
+        {"id": p + "-loc-x", "type": "Location", "name": "The Crossroads", "traits": "Town.", "shroud": 1, "clues": 0,
+         "clues_per_investigator": True, "icons": "diamond", "color": col, "unrevealed": True,
+         "connections": link("circle", "square", "triangle")},
         {"id": p + "-loc-b", "type": "Location", "name": "The Old Mill", "traits": "Town.", "shroud": 3, "clues": 1,
-         "clues_per_investigator": True, "icons": "square", "color": "#2d5b58", "connections": [{"symbol": "circle", "color": "#2d5b58"}, {"symbol": "triangle", "color": "#2d5b58"}]},
-        {"id": p + "-loc-c", "type": "Location", "name": "The Chapel", "traits": "Town.", "shroud": 3, "clues": 2,
-         "clues_per_investigator": True, "icons": "triangle", "color": "#2d5b58", "connections": [{"symbol": "circle", "color": "#2d5b58"}, {"symbol": "square", "color": "#2d5b58"}],
-         "victory": 1},
+         "clues_per_investigator": True, "icons": "square", "color": col, "unrevealed": True,
+         "connections": link("diamond", "triangle")},
+        {"id": p + "-loc-c", "type": "Location", "name": "The Chapel", "traits": "Town. Sanctum.", "shroud": 4,
+         "clues": 2, "clues_per_investigator": True, "icons": "triangle", "color": col, "unrevealed": True,
+         "connections": link("diamond", "square"), "victory": 1},
+        {"id": p + "-story-1", "type": "Asset", "name": "Old Survey Map", "class": "Neutral", "traits": "Item.",
+         "encounter": True, "unique": True, "cost": "–", "quantity": 1},
         {"id": p + "-enemy-1", "type": "Enemy", "name": "Example Lurker", "class": "Mythos", "traits": "Monster.",
          "encounter": True, "quantity": 2},
         {"id": p + "-elite-1", "type": "Enemy", "name": "Example Horror", "class": "Mythos",
@@ -87,13 +111,41 @@ def example_cards(p, name):
               "flavor": "EXAMPLE investigator — replace."},
         p + "-sig1": {"text": "Uses (3 charges).\n[action] Spend 1 charge: Fight. You get +2 [com] for this attack."},
         p + "-weak1": {"text": "Revelation – Take 1 horror. Shuffle Example Weakness into your deck."},
-        p + "-agenda-1": {"text": "Forced – When this agenda becomes the current agenda: Each investigator takes 1 horror."},
-        p + "-agenda-2": {"text": "Forced – When this agenda becomes the current agenda: The night is over. (→R2)"},
-        p + "-act-1": {"text": "Objective – Investigators at The Old Mill may, as a group, spend 2 [perinv] clues to advance."},
-        p + "-act-2": {"text": "Objective – Investigators at The Chapel may, as a group, spend 3 [perinv] clues to advance. (→R1)"},
-        p + "-loc-a": {"text": "", "flavor": "EXAMPLE location."},
-        p + "-loc-b": {"text": "", "flavor": "EXAMPLE location."},
-        p + "-loc-c": {"text": "", "flavor": "EXAMPLE location."},
+        p + "-agenda-1": {"text": "Example Lurker gets +1 fight.",
+                          "flavor": "EXAMPLE agenda flavor: the streetlamps go out one by one.",
+                          "back_flavor": "EXAMPLE story: a bell rings somewhere in the dark.",
+                          "back_text": "Each investigator takes 1 horror. Advance to agenda 2."},
+        p + "-agenda-2": {"text": "Example Horror gets +1 fight and +1 evade.",
+                          "flavor": "EXAMPLE agenda flavor: the night is nearly over.",
+                          "back_flavor": "EXAMPLE story: the dark closes over the town.",
+                          "back_text": "(→R2)"},
+        p + "-act-1": {"text": "Objective – Investigators at The Old Mill may, as a group, spend 2 [perinv] clues "
+                               "to advance.",
+                       "flavor": "EXAMPLE act flavor: the trail leads out of town.",
+                       "back_flavor": "EXAMPLE story: inside the mill, an old map is pinned to the wall.",
+                       "back_text": "Put the set-aside Example Horror into play at The Chapel."},
+        p + "-act-2": {"text": "[action] Investigators at The Old Mill spend 1 [perinv] clue, as a group: Take control "
+                               "of the set-aside Old Survey Map. Only an investigator at The Old Mill may trigger "
+                               "this ability.\nObjective – If the investigator who controls Old Survey Map is at "
+                               "The Chapel, advance.",
+                       "flavor": "EXAMPLE act flavor: the map marks the chapel.",
+                       "back_flavor": "EXAMPLE story: the map matches the chapel floor.",
+                       "back_text": "Remove Old Survey Map from the game. (→R1)"},
+        p + "-loc-a": {"text": "[action]: Resign. You leave on the last train.",
+                       "flavor": "EXAMPLE location."},
+        p + "-loc-x": {"text": "Forced – After an enemy moves into The Crossroads: It exhausts.",
+                       "flavor": "EXAMPLE thoroughfare.", "unrevealed_flavor": "EXAMPLE unrevealed side."},
+        p + "-loc-b": {"text": "Forced – After you fail a skill test while investigating The Old Mill: Take 1 damage.",
+                       "flavor": "EXAMPLE location.", "unrevealed_flavor": "EXAMPLE unrevealed side."},
+        p + "-loc-c": {"text": "[action] Spend 1 clue: Heal 1 horror. Limit once per round.",
+                       "flavor": "EXAMPLE Victory location.", "unrevealed_flavor": "EXAMPLE unrevealed side.",
+                       "unrevealed_text": "Investigators cannot move into The Chapel while there are clues on "
+                                          "The Old Mill."},
+        p + "-story-1": {"text": "[fast] Exhaust Old Survey Map: You get +1 [int] for this skill test.\n"
+                                 "Forced – When you are eliminated: Place Old Survey Map at your location.\n"
+                                 "[action]: Take control of Old Survey Map while it is at your location with no "
+                                 "controller.",
+                         "flavor": "EXAMPLE story asset."},
         p + "-enemy-1": {"fight": 3, "health": 3, "evade": 2, "damage": 1, "horror": 1, "text": "Hunter."},
         p + "-elite-1": {"fight": 4, "health": 5, "evade": 3, "damage": 2, "horror": 1,
                          "text": "Retaliate.\nSpawn – The Chapel."},
@@ -104,10 +156,18 @@ def example_cards(p, name):
     return player, enc, text, inv
 
 
+LOCS = (("-loc-a", "The Station", 2, 1), ("-loc-x", "The Crossroads", 1, 0),
+        ("-loc-b", "The Old Mill", 3, 1), ("-loc-c", "The Chapel", 4, 2))
+
+
 def manifest(cid, name, p, inv):
+    where = [n for _, n, _, _ in LOCS]
+    locs = [{"id": p + s, "name": n, "shroud": sh, "clues": cl} for s, n, sh, cl in LOCS]
+    locs[0]["starting"] = True
     return {
         "_note": "EXAMPLE scenario written by tools/new_campaign.py; replace with the real campaign "
-                 "(docs/design/SCENARIO_SCHEMA.md, docs/CAMPAIGN_PLAYBOOK.md).",
+                 "(docs/design/SCENARIO_SCHEMA.md, docs/CAMPAIGN_PLAYBOOK.md). Tiny on purpose: an official "
+                 "scenario has about 12 locations and a 25-33 card encounter deck.",
         "campaign": {"id": cid, "name": name, "box_id": "CB-" + p.upper(), "investigators": [inv],
                      "encounter_sets": {"example_set": {"name": "Example Set", "cards": [
                          {"id": p + "-enemy-1", "name": "Example Lurker", "type": "Enemy", "qty": 2},
@@ -119,20 +179,20 @@ def manifest(cid, name, p, inv):
             "id": "example", "name": "Example Scenario", "order": 0,
             "reference": {"id": p + "-scn", "status": "authored"},
             "stacks": {
-                "locations": {"template": "Location", "status": "authored", "cards": [
-                    {"id": p + "-loc-a", "name": "The Station", "starting": True, "shroud": 2, "clues": 1},
-                    {"id": p + "-loc-b", "name": "The Old Mill", "shroud": 3, "clues": 1},
-                    {"id": p + "-loc-c", "name": "The Chapel", "shroud": 3, "clues": 2}]},
+                "locations": {"template": "Location", "status": "authored", "cards": locs},
                 "agenda_deck": {"template": "Agenda", "status": "authored", "cards": [
-                    {"id": p + "-agenda-1", "name": "The Night Begins", "doom": 6},
-                    {"id": p + "-agenda-2", "name": "The Night Closes In", "doom": 8}]},
+                    {"id": p + "-agenda-1", "name": "The Night Begins", "doom": 7},
+                    {"id": p + "-agenda-2", "name": "The Night Closes In", "doom": 9}]},
                 "act_deck": {"template": "Act", "status": "authored", "cards": [
                     {"id": p + "-act-1", "name": "Follow the Trail", "at": "The Old Mill",
-                     "needs": {"clues": "card", "from": ["The Station", "The Old Mill", "The Chapel"]}},
-                    {"id": p + "-act-2", "name": "Into the Dark", "at": "The Chapel",
-                     "needs": {"clues": "card", "from": ["The Station", "The Old Mill", "The Chapel"]}}]},
+                     "needs": {"clues": "card", "from": where}},
+                    {"id": p + "-act-2", "name": "Carry the Map", "at": "The Chapel",
+                     "needs": {"clues": "card", "from": where},
+                     "carry": {"asset": p + "-story-1", "take_at": "The Old Mill", "deliver_to": "The Chapel"}}]},
                 "encounter": {"sets": ["example_set"], "aside": []},
-                "setup_aside": {"cards": [{"id": p + "-elite-1", "name": "Example Horror", "role": "elite"}]},
+                "setup_aside": {"cards": [{"id": p + "-elite-1", "name": "Example Horror", "role": "elite"},
+                                          {"id": p + "-story-1", "name": "Old Survey Map",
+                                           "role": "story asset (Carry the Map)"}]},
             },
             "setup": {"starting_location": "The Station"},
             "resolutions": [
@@ -148,12 +208,80 @@ def assignments(p):
         "reference": [p + "-scn"],
         "agenda_deck": [p + "-agenda-1", p + "-agenda-2"],
         "act_deck": [p + "-act-1", p + "-act-2"],
-        "locations": [p + "-loc-a", p + "-loc-b", p + "-loc-c"],
+        "locations": [p + s for s, _, _, _ in LOCS],
         "encounter": [p + "-enemy-1", p + "-enemy-1", p + "-tr-1", p + "-tr-1", p + "-tr-2", p + "-tr-2",
                       p + "-tr-3", p + "-tr-3"],
-        "setup_aside": [p + "-elite-1"],
-        "_map": {p + "-loc-a": [1, 1], p + "-loc-b": [2, 1], p + "-loc-c": [3, 1]},
+        "setup_aside": [p + "-elite-1", p + "-story-1"],
+        "_map": {p + "-loc-a": [1, 1], p + "-loc-x": [2, 1], p + "-loc-b": [3, 0], p + "-loc-c": [3, 2]},
     }}
+
+
+# The house art style for a new campaign: the Arkham LCG painterly language the
+# reference campaign settled on (1930s pulp oil), without that campaign's own
+# motifs. The backend, checkpoint and negative prompt come from
+# campaigns/still_hour/campaign.json; art_scenes.json adds the subjects.
+HOUSE_STYLE_POSITIVE = (
+    "1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a "
+    "1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value "
+    "masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and "
+    "occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial "
+    "illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible "
+    "brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, "
+    "drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages "
+    "and unfinished peripheral areas, not from texture on every surface")
+HOUSE_DETAIL_HIERARCHY = (
+    "Concentrate detail around the face, hands, and important prop. Keep clothing, architecture, landscape "
+    "and sky simplified into large value masses. Background forms should dissolve quickly and should never "
+    "compete with the focal subject.")
+
+
+def house_style(cid):
+    """campaigns/still_hour/campaign.json's backend settings with the neutral house style."""
+    path = os.path.join(ROOT, "campaigns", "still_hour", "campaign.json")
+    house = {k: v for k, v in json.load(open(path, encoding="utf-8")).items()
+             if k != "_checkpoint_note"}
+    house["output_dir"] = "out/" + cid
+    house["style_positive"] = HOUSE_STYLE_POSITIVE
+    guidance = dict(house.get("style_guidance") or {})
+    guidance["DETAIL HIERARCHY"] = HOUSE_DETAIL_HIERARCHY
+    house["style_guidance"] = guidance
+    house["_style_note"] = ("House style for a new campaign (tools/new_campaign.py): the Arkham LCG painterly "
+                            "language without any one campaign's motifs. Put this campaign's own subjects in "
+                            "art_scenes.json.")
+    return house
+
+
+def prefixes_in_use(skip=None):
+    """{prefix: campaign id} for every campaign folder (build.json "prefix",
+    else campaign_config's default: the first four characters of the id)."""
+    used = {}
+    base = os.path.join(ROOT, "campaigns")
+    for cid in sorted(os.listdir(base)) if os.path.isdir(base) else []:
+        if cid == skip or cid.startswith((".", "_")) or not os.path.isdir(os.path.join(base, cid)):
+            continue
+        p = cid[:4]
+        build = os.path.join(base, cid, "build.json")
+        if os.path.exists(build):
+            try:
+                p = json.load(open(build, encoding="utf-8")).get("prefix") or p
+            except ValueError:
+                pass
+        used[p] = cid
+    return used
+
+
+def check_prefix(p, cid):
+    """Card ids, hosted image names and table GUIDs all start with the prefix:
+    refuse one another campaign uses, or one that starts or is started by
+    another campaign's (publish and render steps select files by prefix)."""
+    if not re.match(r"^[a-z][a-z0-9]{2,7}$", p):
+        raise SystemExit("prefix: 3-8 lower-case letters or digits, starting with a letter (e.g. drbl)")
+    for other, owner in prefixes_in_use(skip=cid).items():
+        if p == other:
+            raise SystemExit("prefix '%s' is already used by campaigns/%s; choose another --prefix" % (p, owner))
+        if p.startswith(other) or other.startswith(p):
+            raise SystemExit("prefix '%s' overlaps '%s' (campaigns/%s); choose a prefix that neither starts "
+                             "with nor begins another campaign's" % (p, other, owner))
 
 
 LOG_LAYOUT = '''"""Campaign log layout for %(name)s (pipeline/campaign_log.py draws it and
@@ -225,7 +353,9 @@ behind "Do not read until" lines; resolutions in ```resolution fences.
 
 > Intro text.
 
-**Setup.** Put The Station into play. Gather the Example Set.
+**Setup.** Gather the Example Set. Put The Station into play revealed and the other locations
+unrevealed. Set Example Horror and the Old Survey Map story asset aside. Each investigator begins at
+The Station.
 
 **Do not read until the end of the scenario.**
 
@@ -418,10 +548,10 @@ def scaffold(cid, name, prefix, force=False):
     if os.path.exists(cdir) and not force:
         raise SystemExit("campaigns/%s already exists (use --force to overwrite the scaffold files)" % cid)
     p = prefix or re.sub(r"[^a-z]", "", cid)[:4]
+    check_prefix(p, cid)
     slug = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
     tag = "".join(w.capitalize() for w in cid.split("_"))
-    house = json.load(open(os.path.join(ROOT, "campaigns", "still_hour", "campaign.json"), encoding="utf-8"))
-    house["output_dir"] = "out/" + cid
+    house = house_style(cid)
     build = {
         "_doc": "Build names for this campaign (pipeline/campaign_config.py). Select it with CAMPAIGN=%s." % cid,
         "name": name, "upper_name": name.upper(), "box_name": name, "slug": slug, "prefix": p, "tag": tag,

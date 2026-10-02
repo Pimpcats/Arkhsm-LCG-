@@ -1,5 +1,9 @@
 # The Still Hour — play engine (simulated playtests)
 
+> **Historical — superseded by [FINISHING_BALANCE.md](FINISHING_BALANCE.md)** for every
+> measured win rate and calibration table below. The description of how the
+> play engine works still applies.
+
 > Current source: 2026-10-02 finishing corrections. See
 > [correction ledger](FINISHING_CORRECTIONS.md) and
 > [current campaign audit](CURRENT_CAMPAIGN_AUDIT.md) and

@@ -79,7 +79,7 @@ python3 pipeline/simulate_tempo.py         # pacing model
   committed.
 - **Never squash- or rebase-merge a publish commit.** The hosted image URLs
   name that exact commit; rewriting it blanks every card face in TTS.
-- **Selftests are sandboxed.** Both CardForge selftests copy the repository to
+- **Selftests are sandboxed.** The CardForge selftests copy the repository to
   a temporary folder, run there, and delete the copy, so they never change
   tracked files or your generated art. The pytest suite does not write to
   tracked files either.
@@ -88,15 +88,16 @@ python3 pipeline/simulate_tempo.py         # pacing model
 
 ## Status
 
-The campaign is content-complete and passes its offline checks (pytest, both
-CardForge selftests, the Lua rules suite, the bundle check and the scenario
-audit). Current counts live in `campaigns/still_hour/assistant/production.json`.
-Still to do before it is released to the group:
+The campaign is content-complete and its art is complete. It passes its
+offline checks (pytest suite, CardForge selftest, the Lua rules suite on Lua
+5.2 and 5.4, the bundle check and the scenario audit). Current counts and
+results live in `campaigns/still_hour/assistant/production.json` and the
+[campaign handoff](docs/STILL_HOUR_HANDOFF.txt). Still to do before it is
+released to the group:
 
 - a real TTS relay run on the current build (`docs/TTS_RELAY.md`);
-- six remaining illustrations, generated in ChatGPT from the art pack (the
-  `remaining` request in `pipeline/chatgpt_art_pack.json`; see
-  `docs/CHATGPT_ART_PACK.md`);
-- the first playtest.
+- the first playtest, and finishing the difficulty curve from real play.
 
-Offline checks and relay passes are not playtest approval.
+Offline checks, computer-played games and relay passes are not playtest
+approval. A one-page play aid for the table: `docs/QUICK_REFERENCE.md` (it
+explains the campaign's systems; read it when you sit down to play).
