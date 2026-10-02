@@ -111,6 +111,14 @@ return function(R, T)
     if controlStats then
       inv.stats = { wil = controlStats.wil, int = controlStats.int, com = controlStats.com, agi = controlStats.agi }
       inv.health, inv.sanity = controlStats.health, controlStats.sanity
+      -- The Control reads the printed card on the table (its GMNotes) and adds
+      -- aging. If the campaign's card data has changed the printed maximum
+      -- health or sanity since that card was packaged, play the current card.
+      local md = cardObj and cardObj.getGMNotes and T.decode(cardObj.getGMNotes()) or nil
+      if type(md) == "table" then
+        if tonumber(md.health) and c.health then inv.health = inv.health + (c.health - md.health) end
+        if tonumber(md.sanity) and c.sanity then inv.sanity = inv.sanity + (c.sanity - md.sanity) end
+      end
       if (R.WHATIF or {}).soloBonus and R.G.n == 1 then
         inv.health, inv.sanity = inv.health + R.WHATIF.soloBonus, inv.sanity + R.WHATIF.soloBonus
       end
@@ -255,7 +263,9 @@ return function(R, T)
     inv.discard[#inv.discard + 1] = card
     if card.id == "sthr-eighthgrave" then
       if R.investigatorMemory(inv) > 0 then
-        R.hurt(inv, 0, math.min(4, R.investigatorMemory(inv)), "The Eighth Grave")
+        -- 1 horror per Memory on Elias (maximum 2), then remove 1 Memory from him
+        R.hurt(inv, 0, math.min(2, R.investigatorMemory(inv)), "The Eighth Grave")
+        R.addMemory(inv, -1, "The Eighth Grave")
       else
         local c = T.searchEncounter(function(md) return R.hasTrait(R.card(md.id), "Echo") and R.card(md.id).type == "Enemy" end)
         if c then
@@ -284,8 +294,9 @@ return function(R, T)
       end
     elseif card.id == "sthr-nobodybelieves" then
       inv.round.nobodyBelieves = true
+      -- 1 horror, 1 more if no other investigator is at her location
       local alone = #R.investigatorsAt(R.locOf(inv)) <= 1
-      if alone then R.hurt(inv, 0, 1, "Nobody Believes Her") end
+      R.hurt(inv, 0, alone and 2 or 1, "Nobody Believes Her")
     elseif card.id == "sthr-housewins" then
       table.remove(inv.discard)
       local def = R.card("sthr-housewins")
@@ -385,7 +396,8 @@ return function(R, T)
     inv.round.sera = (inv.round.sera or 0) + 1
     R.raise(1, "Seraphine's ability (cost)", inv)
     inv.lastTurn.paidDiss = true
-    if inv.round.sera == 2 then R.addMemory(inv, 1, "Seraphine: second use in a round") end
+    -- after you resolve the [free] ability: 1 Memory (once per round, 3 per loop)
+    P.memoryReaction(inv, "Seraphine: resolved her ability")
     if choice == "action" then inv.actionsLeft = inv.actionsLeft + 1
     elseif choice == "ready" and asset then asset.exhausted = false end
     if not repeating then
@@ -512,20 +524,15 @@ return function(R, T)
       if c.card.traits and tostring(c.card.traits):find("Recollection", 1, true) then c.owner.lastTurn.recollection = true end
     end
     if ok then
-      -- Ayako: after you succeed at an [int] test: 1 Memory (limit once per round)
-      if inv.id == "sthrayako" and skill == "int" and not inv.round.ayako then
-        inv.round.ayako = true
-        R.addMemory(inv, 1, "Ayako: [int] success")
-      end
+      -- Ayako: after you succeed at an [int] test: 1 Memory (once per round, 3 per loop)
+      if inv.id == "sthrayako" and skill == "int" then P.memoryReaction(inv, "Ayako: [int] success") end
       local lex = P.findAsset(inv, "The Lexicon of the Hour")
       if lex and skill == "int" and margin >= 2 and lex.uses < 4 then lex.uses = lex.uses + 1 end
     else
       inv.round.failed = true
       inv.failedTypes[skill] = true
-      if inv.id == "sthrbirdie" and margin <= -2 and not inv.round.birdie then
-        inv.round.birdie = true
-        R.addMemory(inv, 1, "Birdie: failed by 2 or more")
-      end
+      -- Birdie: after you fail by 2 or more: 1 Memory (once per round, 3 per loop)
+      if inv.id == "sthrbirdie" and margin <= -2 then P.memoryReaction(inv, "Birdie: failed by 2 or more") end
       local foot = P.findAsset(inv, "Rabbit's Foot")
       if foot and not foot.exhausted then foot.exhausted = true ; P.draw(inv, 1) end
       R.FX.afterFail(inv)
@@ -646,7 +653,7 @@ return function(R, T)
   end
 
   --- The Lexicon (any non-weakness treachery drawn at its owner's location, 2
-  -- secrets), It Means 'Wait' and Ward of Protection.
+  -- secrets, limit once per loop), It Means 'Wait' and Ward of Protection.
   function P.cancelTreachery(inv, id, def)
     local G = R.G
     local bad = { ["sthr-losthour"] = 3, ["sthr-crossing"] = 3, ["sthr-thirteen"] = 3, ["sthr-wheelsturn"] = 2,
@@ -656,8 +663,9 @@ return function(R, T)
     if worth <= 0 then return false end
     for _, x in ipairs(R.investigatorsAt(R.locOf(inv))) do
       local lex = P.findAsset(x, "The Lexicon of the Hour")
-      if lex and not lex.exhausted and lex.uses >= 2 and worth >= 2 then
+      if lex and not lex.exhausted and lex.uses >= 2 and worth >= 2 and not x.loopUsed.lexicon then
         lex.exhausted = true ; lex.uses = lex.uses - 2
+        x.loopUsed.lexicon = true
         R.log("The Lexicon cancels %s", def.name or id)
         return true
       end
@@ -727,9 +735,34 @@ return function(R, T)
 
   function P.onHourReachedPlayers(h)
     for _, inv in ipairs(R.aliveInvs()) do
+      -- Stolen Minute: after the Hourglass advances, 1 charge (maximum 2), limit
+      -- once per loop (taken when it can add a charge)
       local a = P.findAsset(inv, "Stolen Minute")
-      if a then a.uses = math.min(3, a.uses + 1) end
+      if a and a.uses < 2 and not inv.loopUsed.stolenMinute then
+        inv.loopUsed.stolenMinute = true
+        a.uses = a.uses + 1
+      end
     end
+  end
+
+  --- An investigator's own Memory reaction (each of the five has one):
+  -- "Place 1 Memory on <investigator>. (Limit once per round, and 3 times
+  -- per loop.)" Returns true if the Memory was placed.
+  P.MEMORY_REACTION_PER_LOOP = 3
+  function P.memoryReaction(inv, why)
+    if inv.round.memoryReaction or (inv.loopUsed.memoryReaction or 0) >= P.MEMORY_REACTION_PER_LOOP then return false end
+    inv.round.memoryReaction = true
+    inv.loopUsed.memoryReaction = (inv.loopUsed.memoryReaction or 0) + 1
+    R.addMemory(inv, 1, why)
+    return true
+  end
+
+  --- Rehearsed Escape can choose this enemy: non-Elite, or Elite for 1
+  -- Dissonance (limit once per loop).
+  function P.rehearsedLegal(inv, en)
+    if en.dead or R.cannotEvade(en) then return false end
+    if not R.hasTrait(en.def, "Elite") then return true end
+    return not inv.loopUsed.rehearsedElite and R.dissonance() + 1 < R.consts().reset
   end
 
   function P.playCost(inv, card)

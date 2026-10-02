@@ -523,8 +523,9 @@ return function(R, T)
          and (elias.health - elias.damage) > dmg + 1 then
         elias.round.redirect = true
         R.log("Elias takes %d damage for %s", dmg, inv.name)
-        R.hurt(elias, dmg, 0, (source or "damage") .. " (redirected)", { enemy = opts.enemy, fromWeakness = opts.fromWeakness })
-        R.addMemory(elias, 1, "Elias: took damage for another")
+        local took = R.hurt(elias, dmg, 0, (source or "damage") .. " (redirected)", { enemy = opts.enemy, fromWeakness = opts.fromWeakness })
+        -- his Memory reaction: damage this ability dealt to him (once per round, 3 per loop)
+        if (took.damage or 0) > 0 then R.P.memoryReaction(elias, "Elias: dealt damage") end
         dmg = 0
         if hor <= 0 then return dealt end
       end

@@ -813,7 +813,9 @@ return function(R, T)
         if n == "Sneak Attack" and A.bestEnemyHere(inv, function(en) return en.exhausted end) then add(15, "play", function() R.ACT.play(inv, c) end) end
         if n == "Elusive" and #eng > 0 and inv.resources >= 2 then add(28, "play", function() R.ACT.play(inv, c) end, { actions = 0, provokes = false }) end
         if n == "Blinding Light" and #eng > 0 then add(24, "play", function() R.ACT.play(inv, c) end, { provokes = false }) end
-        if n == "Rehearsed Escape" and #eng > 0 then add(44,"play",function() R.ACT.play(inv,c) end,{provokes=false}) end
+        if n == "Rehearsed Escape" and A.bestEnemyHere(inv, function(en) return en.engaged == inv and P.rehearsedLegal(inv, en) end) then
+          add(44,"play",function() R.ACT.play(inv,c) end,{provokes=false})
+        end
         if n == "The Hour I Learned Your Name" and not inv.loopUsed.hourName then
           if R.appointedLoc() == L and not G.appointed.exhausted and G.appointed.holdBackRound ~= G.round and R.stage() >= 1 then
             add(70,"play",function() R.ACT.play(inv,c) end,{provokes=false})

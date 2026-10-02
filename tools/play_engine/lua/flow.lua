@@ -82,8 +82,9 @@ return function(R, T)
       local cancelled = false
       if inv.namedToken and inv.namedToken == name then
         inv.namedToken, cancelled = nil, true
-        R.addMemory(inv, 1, "Cass: named token cancelled")
       end
+      -- Cass: after you reveal a symbol token: 1 Memory (once per round, 3 per loop)
+      if inv.id == "sthrcass" and name and tonumber(name) == nil then P.memoryReaction(inv, "Cass: revealed a symbol token") end
       if not cancelled and total >= diff and (mod == nil or total + mod < diff)
          and P.cancelToken(inv, name, mod and total + mod - diff or -1, total - diff, opts) then cancelled = true end
       tokenName = cancelled and "Canceled" or name
@@ -301,11 +302,8 @@ return function(R, T)
     G.metrics.attacks = G.metrics.attacks + 1
     R.log("%s attacks %s (%s)", en.name, inv.name, why or "")
     local dealt = R.hurt(inv, en.def.damage or 0, en.def.horror or 0, en.name, { enemy = en })
-    -- Elias: after an enemy attack deals damage to him while he is alone
-    if inv.id == "sthrelias" and dealt.damage > 0 and #R.investigatorsAt(R.locOf(inv) or {}) <= 1 and not inv.round.eliasAlone then
-      inv.round.eliasAlone = true
-      R.addMemory(inv, 1, "Elias: attacked while alone")
-    end
+    -- Elias: after an enemy attack deals damage to him: 1 Memory (once per round, 3 per loop)
+    if inv.id == "sthrelias" and (dealt.damage or 0) > 0 then P.memoryReaction(inv, "Elias: dealt damage") end
     FX.afterAttack(en, inv)
     if en.id == "weakness:Silver Twilight Acolyte" or en.name == "Silver Twilight Acolyte" then R.placeDoom(1, "Silver Twilight Acolyte (doom)") end
   end
@@ -334,10 +332,7 @@ return function(R, T)
     G.metrics.appointed_attacks = G.metrics.appointed_attacks + 1
     R.log("The Appointed attacks %s (%s)", inv.name, why)
     local dealt = R.hurt(inv, def.damage or 2, def.horror or 2, "The Appointed", {enemy={id="sthr-appointed",def=def}})
-    if inv.id == "sthrelias" and dealt.damage > 0 and #R.investigatorsAt(R.locOf(inv) or {}) <= 1 and not inv.round.eliasAlone then
-      inv.round.eliasAlone = true
-      R.addMemory(inv, 1, "Elias: attacked while alone")
-    end
+    if inv.id == "sthrelias" and (dealt.damage or 0) > 0 then P.memoryReaction(inv, "Elias: dealt damage") end
     R.raise(1, "The Appointed (Arrived) attacks")
   end
 
@@ -506,23 +501,25 @@ return function(R, T)
       local t = R.AI.bestEnemyHere(inv, function(en) return en.engaged == inv end)
       if t then A_.evade(inv, t, { skill = "wil", blinding = (card.level or 0) >= 2 and 2 or 1 }) end
     elseif n == "Rehearsed Escape" then
-      local t = R.AI.bestEnemyHere(inv, function(en) return en.engaged == inv end)
-      if t and not R.cannotEvade(t) and (not R.hasTrait(t.def, "Elite") or R.dissonance() + 1 < R.consts().reset) then
-        if R.hasTrait(t.def, "Elite") then R.raise(1, "Rehearsed Escape (cost)", inv) end
+      -- the Elite choice (raise Dissonance by 1) is limited once per loop
+      local t = R.AI.bestEnemyHere(inv, function(en) return en.engaged == inv and P.rehearsedLegal(inv, en) end)
+      if t then
+        if R.hasTrait(t.def, "Elite") then inv.loopUsed.rehearsedElite = true ; R.raise(1, "Rehearsed Escape (cost)", inv) end
         t.exhausted, t.engaged = true, nil
         R.placeEnemy(t)
         G.metrics.evades = G.metrics.evades + 1
         FX.onEvade(inv, t)
       end
     elseif n == "The Long Way Round" then
-      local waived = false
+      -- its doom-free first crossing is limited once per loop
+      local waived = inv.loopUsed.longWay == true
       for _ = 1, 2 do
         local here = R.locOf(inv)
         local target = R.AI.targetFor(inv)
         local step = target and R.route(here, target)
         if step and R.canEnter(here, step) then
           local free = not waived and R.isCrossing(here, step)
-          if free then waived = true end
+          if free then waived = true ; inv.loopUsed.longWay = true end
           R.moveInv(inv, step, { noHour = free })
         else break end
       end
@@ -541,17 +538,30 @@ return function(R, T)
         end
       end
     elseif n == "I Remember the Ending" then
-      -- Test [wil] (X = Dissonance, minimum 2); then, for 1 Dissonance, cancel
-      -- the next advance before the end of the next round.
+      -- Test [wil] (X = Dissonance, minimum 2): look at the top 3; for 1
+      -- Dissonance, put the worst of them on the bottom; the rest on top, the
+      -- worst last.
       local ok = R.test(inv, "wil", math.max(2, R.dissonance()), { kind = "ability", important = true })
       if ok then
-        T.reorderEncounterTop(3,function(md)
+        local function threat(md)
           local def=R.card(md.id)
           return (def.type=="Enemy" and 3 or 0)+(R.hasTrait(def,"Time") and 2 or 0)
-        end)
-        if R.dissonance() + 1 < R.consts().glitch then
+        end
+        local worst = 0
+        local deck = T.encounterDeck()
+        if deck and deck.type == "Deck" then
+          for i, e in ipairs(deck.getObjects()) do
+            if i > 3 then break end
+            worst = math.max(worst, threat(T.decode(e.gm_notes) or {}))
+          end
+        end
+        if worst >= 3 and R.dissonance() + 1 < R.consts().glitch then
           R.raise(1, "I Remember the Ending", inv)
-          G.rememberEnding = G.round + 1
+          T.reorderEncounterTop(3, function(md) return -threat(md) end)
+          T.moveTopEncounterBottom()
+          T.reorderEncounterTop(2, threat)
+        else
+          T.reorderEncounterTop(3, threat)
         end
       end
       inv.loopUsed.rememberEnding = true
@@ -625,7 +635,10 @@ return function(R, T)
         if top then
           local md = T.decode(top.gm_notes) or {}
           local def = R.card(md.id)
-          if def.type == "Enemy" or (def.type == "Treachery" and R.hasTrait(def, "Time")) then
+          -- take 1 horror to place it on the bottom
+          if (def.type == "Enemy" or (def.type == "Treachery" and R.hasTrait(def, "Time")))
+             and inv.sanity - inv.horror > 2 then
+            R.hurt(inv, 0, 1, "The Ambergrove Lamp")
             T.moveTopEncounterBottom()
           end
         end
