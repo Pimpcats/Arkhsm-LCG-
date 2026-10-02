@@ -930,12 +930,12 @@ __modules["StillHour/Hourglass"] = function()
 --
 -- The Occultation is a FIXED, ordered stack of nine Hour cards (encounter v0.4
 -- §1). The Hourglass advances by time and by Skip effects; each newly reached
--- Hour resolves its "when reached" effect IN ORDER — so a big Skip that jumps
+-- Hour resolves its Forced ability IN ORDER — so a big Skip that jumps
 -- several Hours must resolve every intervening Hour, not just the destination.
 --
 -- Knowledge facts edit specific Hours. Two edits change the clock's STRUCTURE
 -- and are handled here:
---   * "The Hour Was Wrong"     -> Hour IV's "When reached" text no longer resolves.
+--   * "The Hour Was Wrong"     -> Hour IV's Forced ability no longer resolves.
 --   * "The Way the Night Breaks" -> reaching Hour IX may open the finale instead
 --     of forcing a reset.
 -- The remaining edits change what an Hour DOES; those are applied inside the
@@ -997,7 +997,7 @@ local function advanceAppointed(ctx, stage)
 end
 
 -- Once-per-loop flags (cleared by the reset): Hour VI has resolved, and what
--- it applied (so a cancelled Hour VI can be undone).
+-- it applied (so a canceled Hour VI can be undone).
 Hourglass.HOUR_SIX_FLAG = "hour-vi-resolved"
 Hourglass.HOUR_SIX_STATIC_FLAG = "hour-vi-static"
 Hourglass.HOUR_SIX_ALMANAC_FLAG = "hour-vi-almanac"
@@ -1007,7 +1007,7 @@ function Hourglass.hourSixResolved()
   return CampaignState.isFlagSet(Hourglass.HOUR_SIX_FLAG)
 end
 
---- Hour VI's "When reached" was cancelled (e.g. It Means 'Wait'): reverse what
+--- Hour VI's Forced ability was canceled (e.g. It Means 'Wait'): reverse what
 -- it applied — its temporary Static token, or, with What the Almanac Hid, the
 -- bag's "1 fewer" — and clear its once-per-loop flag so reaching Hour VI again
 -- this loop resolves it. Returns "static" | "almanac" | nil (nothing to undo).
@@ -1036,7 +1036,7 @@ function Hourglass.isHourRemoved(hour)
   return false
 end
 
--- Per-Hour "when reached" handlers. Return a short descriptor string for logging.
+-- Per-Hour Forced-ability handlers ("When the Hourglass advances to this Hour"). Return a short descriptor string for logging.
 local HOUR_HANDLERS = {
   [1] = function(_) return "The night begins." end,
 
@@ -1061,7 +1061,7 @@ local HOUR_HANDLERS = {
 
   [4] = function(ctx)
     if CampaignState.knows("the-hour-was-wrong") then
-      return "Hour IV's When reached does not resolve (The Hour Was Wrong): the road holds."
+      return "Hour IV's Forced ability does not resolve (The Hour Was Wrong): the road holds."
     end
     if ctx and ctx.roadGivesWay then
       ctx.roadGivesWay()
@@ -1123,7 +1123,7 @@ local HOUR_HANDLERS = {
   end,
 }
 
---- Resolve a single Hour's "when reached" effect (unless removed).
+--- Resolve a single Hour's Forced ability (unless removed).
 local function resolveHour(hour, ctx)
   if Hourglass.isHourRemoved(hour) then
     return
@@ -1610,7 +1610,7 @@ local Knowledge = {}
 -- id -> { name, district, layer = "prologue"|"surface"|"deep"|"assembled" }
 Knowledge.FACTS = {
   ["you-are-unstuck"]          = { name = "You Are Unstuck",           district = "Prologue",    layer = "prologue" },
-  ["the-lamp-was-never-lit"]   = { name = "The Lamp Was Never Lit",    district = "Lighthouse",  layer = "surface" },
+  ["the-lamp-was-never-lit"]   = { name = "The Lamp Remembers",        district = "Lighthouse",  layer = "surface" },
   ["the-keepers-ninth-death"]  = { name = "The Keeper's Ninth Death",  district = "Lighthouse",  layer = "deep" },
   ["the-thirteenth-toll"]      = { name = "The Thirteenth Toll",       district = "Church",      layer = "surface" },
   ["the-hour-was-wrong"]       = { name = "The Hour Was Wrong",        district = "Church",      layer = "deep" },
@@ -2365,7 +2365,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/edb319dc44156898bd22b8f11382d4e94e8fd485/dist/cards/sthr-static-token.jpg?v=a556271511"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/13d87b8e62b7501eef77592afbffff1b20e7299c/dist/cards/sthr-static-token.jpg?v=a556271511"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -3275,7 +3275,7 @@ local STAGE_BUTTONS = {
   { fn = "shAppointedInfo", label = function() return "The Appointed: " .. Appointed.stageName() end,
     z = 1.75, w = 1100, fs = 120, tip = "Approach stage (CO-002)" },
   { fn = "shHoldBack", label = function() return "Hold Back (success)" end, z = 2.2, w = 1100, fs = 120,
-    tip = "Click after a SUCCESSFUL [willpower] or [combat] (4) test: back one stage, rewind one Hour (3 rewinds a loop)." },
+    tip = "Click after a SUCCESSFUL [willpower] or [combat] (4) test: push its Approach back 1 stage, rewind 1 Hour (3 rewinds a loop)." },
 }
 
 --- Put the Hold Back / Hunt buttons on the Appointed card (idempotent).
@@ -3444,7 +3444,7 @@ local function restoreNow()
   local pos = st.appointed.lastPos or setAsidePos()
   local rot = st.appointed.lastRot
   if bringAppointed(pos, rot, function(card) Board.refreshAppointedButtons(card) end) then
-    say("The Appointed cannot be defeated. It does not leave play.")
+    say("The Appointed cannot be defeated. It leaves play only when its Approach is pushed back to Unseen.")
   elseif restoreData then
     local data = restoreData
     safe(function()
@@ -3454,7 +3454,7 @@ local function restoreNow()
           Board.refreshAppointedButtons(o)
         end })
     end)
-    say("The Appointed cannot be defeated. It does not leave play.")
+    say("The Appointed cannot be defeated. It leaves play only when its Approach is pushed back to Unseen.")
   end
   restoreData = nil
 end
@@ -3554,7 +3554,7 @@ end
 --
 -- It is the campaign's one state host (docs/INTEGRATION.md §2) and the board
 -- wiring: touchable Memory / Dissonance / Hour counters, the [static] chaos-bag
--- adapter, the Appointed's card buttons, location flips/seals and the interlude
+-- adapter, the Appointed's card buttons, location flips/CLOSED labels and the interlude
 -- buy panel. Rules live in src/StillHour/*; this file only routes clicks and
 -- table events into them. Every entry point is guarded so a vanilla (non-SCED)
 -- table, or a missing object, never raises a script error.
@@ -4231,7 +4231,7 @@ local function drawPlay()
   button("shClickHour", string.format("Hour %d · %s", h, Hourglass.HOUR_NAMES[h] or "?"), -PAIR_X, -0.5, 1000,
     "Left-click advance (resolves the Hour) · Right-click rewind")
   button("shClickAppointed", "Appointed: " .. Appointed.stageName(), PAIR_X, -0.5, 1000,
-    "Left-click: a card advances its Approach one stage (min Sensed). Hold Back is on its card.")
+    "Left-click: a card advances its Approach by 1 stage (min Sensed). Hold Back is on its card.")
   investigatorList = guarded("investigators", Board.investigators) or {}
   for i, inv in ipairs(investigatorList) do
     if i > 4 then break end
@@ -4242,7 +4242,7 @@ local function drawPlay()
   -- two rows of three, spaced so no button overlaps another
   button("runStillHourTests", "Run Tests", -ROW3_X, 1.4)
   button("shStatus", "Status", 0.0, 1.4)
-  button("shSyncBoard", "Sync Board", ROW3_X, 1.4, 620, "Re-apply location faces/seals, the Appointed and the chaos bag.")
+  button("shSyncBoard", "Sync Board", ROW3_X, 1.4, 620, "Re-apply location faces and CLOSED labels, the Appointed and the chaos bag.")
   button("shReset", "Reset Loop", -ROW3_X, 2.0)
   button("shOpenInterlude", "Interlude", 0.0, 2.0, 620, "Spend Memory: Recollections and level-ups.")
   button("shKnowledgeStatus", "Knowledge", ROW3_X, 2.0)
@@ -4259,8 +4259,8 @@ local function drawPlay()
     "Loop Setup: remove every card the scenario boxes laid out, and the tokens on them.")
   if Hourglass.hourSixResolved() then
     button("shUndoHourSix", "Undo Hour VI", ROW3_X, 2.6, 620,
-      "Hour VI's When reached effect was cancelled: take back its Static token (or, with What the Almanac Hid, "
-        .. "its 1 fewer), and Hour VI resolves again if it is reached again this loop.")
+      "Hour VI's Forced ability was canceled: take back its Static token (or, with What the Almanac Hid, "
+        .. "its 1 fewer), and Hour VI resolves again if the Hourglass advances to it again this loop.")
   end
   for i, d in ipairs(DIFFICULTY) do
     button("shDifficulty" .. i, d.label, -1.8 + (i - 1) * 1.2, 3.2, 520,
@@ -4523,7 +4523,7 @@ function shBeginFinale()
   afterChange()
 end
 
---- Hour VI's "When reached" was cancelled: undo what it applied.
+--- Hour VI's Forced ability was canceled: undo what it applied.
 local function undoHourSix()
   local what = Hourglass.undoHourSix(playCtx())
   if what == "almanac" then
@@ -4906,7 +4906,7 @@ function shReset()
 end
 
 --- Console: unlock a Knowledge fact by id when a card or the guide says so,
--- then re-apply location faces/seals. e.g. shUnlock("fact-id")
+-- then re-apply location faces/CLOSED labels. e.g. shUnlock("fact-id")
 function shUnlock(id)
   local r = unlockFact(id)
   if r then note("Fact recorded. Locations re-synced.") end
@@ -5150,7 +5150,7 @@ local function stillHourTestBody(T)
   P, F = check("Hour VI adds 1 Static token", CampaignState.getHour() == 6 and six.extra == 1, P, F)
   Hourglass.rewind(1, sixCtx); Hourglass.advance(1, sixCtx)
   P, F = check("Hour VI once per loop: reaching it again adds nothing", six.extra == 1, P, F)
-  P, F = check("undoing a cancelled Hour VI takes its token back",
+  P, F = check("undoing a canceled Hour VI takes its token back",
     Hourglass.undoHourSix(sixCtx) == "static" and six.extra == 0 and not Hourglass.hourSixResolved(), P, F)
   CampaignState.reset(); Hourglass.advance(5, sixCtx)
   P, F = check("Hour VI resolves again in the next loop", six.extra == 1, P, F)

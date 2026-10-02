@@ -61,52 +61,53 @@ local function fixture(n,id)
   return R,FX,AI,st,act,R.G.inv[1],function() return tests,returned end
 end
 for _,id in ipairs({'sthr-act-whythirteen','sthr-act-hourwaswrong','sthr-act-walksbeside'}) do
-  local expected=id=='sthr-act-walksbeside' and 4 or 3
+  local expected=id=='sthr-act-walksbeside' and 3 or (id=='sthr-act-hourwaswrong' and 2 or 3)
   expect(id..' effective metadata has intended per-investigator cost',OV[id].clues==expected and OV[id].clues_per_investigator)
   local count=0;for _ in OV[id].text:gmatch(expected..' %[%s*perinv%s*%] clues') do count=count+1 end
   expect(id..' printed payment routes match metadata',count==(id=='sthr-act-walksbeside' and 2 or 1))
 end
 for n=1,4 do
  for _,id in ipairs({'sthr-act-whythirteen','sthr-act-hourwaswrong'}) do
+  local C=(id=='sthr-act-hourwaswrong') and 2 or 3
   case(id..' full cost '..n,function()
     local R,FX,AI,st,act,i=fixture(n,id)
-    expect(id..' scaled cost '..n,FX.actNeed(id)==3*n)
-    for _,x in ipairs(R.G.inv) do x.clues=3 end
+    expect(id..' scaled cost '..n,FX.actNeed(id)==C*n)
+    for _,x in ipairs(R.G.inv) do x.clues=C end
     local choice=AI.choose(i)
     expect(id..' AI selects one action only when fully paid '..n,choice and choice.kind=='objective' and choice.actions==1)
-    expect(id..' direct payment succeeds '..n,R.takeStory(i,act)==true and R.G.metrics.clues_spent==3*n and act.holder==i and i.story~=nil)
+    expect(id..' direct payment succeeds '..n,R.takeStory(i,act)==true and R.G.metrics.clues_spent==C*n and act.holder==i and i.story~=nil)
     expect(id..' story already held owes no more '..n,FX.actNeed(id)==0)
   end)
   case(id..' insufficient cost '..n,function()
     local R,FX,AI,st,act,i=fixture(n,id)
-    for _,x in ipairs(R.G.inv) do x.clues=3 end;i.clues=2
+    for _,x in ipairs(R.G.inv) do x.clues=C end;i.clues=C-1
     local choice=AI.choose(i)
     expect(id..' AI bars one-short payment '..n,not choice or choice.kind~='objective')
-    expect(id..' direct one-short rejects without mutation '..n,R.takeStory(i,act)==false and i.clues==2 and R.G.metrics.clues_spent==0 and not i.story and not act.holder and not R.G.metrics.story_taken)
+    expect(id..' direct one-short rejects without mutation '..n,R.takeStory(i,act)==false and i.clues==C-1 and R.G.metrics.clues_spent==0 and not i.story and not act.holder and not R.G.metrics.story_taken)
   end)
   case(id..' affordability race '..n,function()
     local R,FX,AI,st,act,i=fixture(n,id)
-    for _,x in ipairs(R.G.inv) do x.clues=3 end
+    for _,x in ipairs(R.G.inv) do x.clues=C end
     local choice=AI.choose(i);i.clues=i.clues-1
     if choice then choice.run() end
-    expect(id..' AI-selected execution rechecks full cost '..n,choice and choice.kind=='objective' and not i.story and R.G.metrics.clues_spent==0 and i.clues==2)
+    expect(id..' AI-selected execution rechecks full cost '..n,choice and choice.kind=='objective' and not i.story and R.G.metrics.clues_spent==0 and i.clues==C-1)
   end)
  end
  for _,route in ipairs({'action','reaction'}) do
   for _,full in ipairs({false,true}) do
    case('Road '..route..' '..n..' full='..tostring(full),function()
     local R,FX,AI,st,act,i,counts=fixture(n,'sthr-act-walksbeside');R.G.walksBesideCurrent=true
-    for _,x in ipairs(R.G.inv) do x.clues=4 end;if not full then i.clues=3 end
+    for _,x in ipairs(R.G.inv) do x.clues=3 end;if not full then i.clues=2 end
     local en={id='fixture_echo',name='echo',loc='turning',engaged=nil,exhausted=false,damage=0,def={traits='Echo.',fight=3,evade=3,health=3}};R.G.enemies={en}
-    expect('Road action/reaction cost '..route..n..tostring(full),R.walksBesideCost()==4*n)
+    expect('Road action/reaction cost '..route..n..tostring(full),R.walksBesideCost()==3*n)
     if route=='action' then
       local choice=AI.choose(i)
       expect('Road AI full threshold '..n..tostring(full),full and choice and choice.kind=='objective' or not full and (not choice or choice.kind~='objective'))
       R.standFirm(i,en)
     else en.engaged=i;R.ACT.evade(i,en) end
     local tests=counts()
-    expect('Road '..route..' exact affordability '..n..tostring(full),act.completed==full and R.G.metrics.clues_spent==(full and 4*n or 0))
-    expect('Road '..route..' no partial clue loss '..n..tostring(full),i.clues==(full and 0 or 3))
+    expect('Road '..route..' exact affordability '..n..tostring(full),act.completed==full and R.G.metrics.clues_spent==(full and 3*n or 0))
+    expect('Road '..route..' no partial clue loss '..n..tostring(full),i.clues==(full and 0 or 2))
     if route=='action' then expect('Road no unpaid test '..n..tostring(full),tests==(full and 1 or 0)) end
    end)
   end
@@ -146,16 +147,16 @@ case('unchanged timed delivery',function()
  R.checkObjectives();expect('deep still delivers immediately on arrival',act.completed and i.story==nil)
 end)
 case('Road failure returns exact new cost and reaction conditions',function()
- local R,FX,AI,st,act,i,counts=fixture(2,'sthr-act-walksbeside');i.clues=4;R.G.inv[2].clues=4
+ local R,FX,AI,st,act,i,counts=fixture(2,'sthr-act-walksbeside');i.clues=3;R.G.inv[2].clues=3
  local en={id='echo',loc='turning',exhausted=false,damage=0,def={traits='Echo.',fight=3}};R.G.enemies={en}
  R.test=function() return false,-1,'-2' end;R.standFirm(i,en)
  local _,returned=counts()
- expect('failed Stand Firm returns exactly eight to Turning',returned==8 and R.G.metrics.clues_spent==8 and not act.completed and not en.exhausted)
- R,FX,AI,st,act,i=fixture(1,'sthr-act-walksbeside');i.clues=4;R.G.walksBesideCurrent=true
+ expect('failed Stand Firm returns exactly six to Turning',returned==6 and R.G.metrics.clues_spent==6 and not act.completed and not en.exhausted)
+ R,FX,AI,st,act,i=fixture(1,'sthr-act-walksbeside');i.clues=3;R.G.walksBesideCurrent=true
  FX.onEvade(i,{loc='turning',def={traits='Humanoid.'}})
- expect('Road reaction still requires Echo',not act.completed and i.clues==4)
+ expect('Road reaction still requires Echo',not act.completed and i.clues==3)
  FX.onEvade(i,{loc='hub',def={traits='Echo.'}})
- expect('Road reaction still requires Turning',not act.completed and i.clues==4)
+ expect('Road reaction still requires Turning',not act.completed and i.clues==3)
 end)
 case('final carry-policy and missing-drop hardening',function()
  local R,FX,AI,st,act,i=fixture(1,'sthr-act-whythirteen');i.clues=3;i.story={id='sthr-item-drownedpage'}

@@ -329,13 +329,13 @@ end)
 case('printed paid evade reaction retains timing',function()
   for _,full in ipairs({false,true}) do
     local R,P,FX,T,st,C=fixture(1,5);local inv=R.G.inv[1]
-    C.addLocation('turning','sthr-loc-turning');inv.loc='turning';inv.clues=full and 4 or 3
+    C.addLocation('turning','sthr-loc-turning');inv.loc='turning';inv.clues=full and 3 or 2
     local act={id='sthr-act-walksbeside',district='Road'}
     R.G.prologue=false;R.G.actOrder={'Road'};R.G.acts={Road=act};R.G.walksBesideCurrent=true
     local en={id='fixture_echo',loc='turning',engaged=inv,damage=0,def={traits='Echo.',evade=1,fight=3,health=3}}
     R.G.enemies={en};R.ACT.evade(inv,en)
     expect('evade resolves before reaction full='..tostring(full),en.exhausted and en.engaged==nil and C.tokens==1)
-    expect('reaction charges only full printed cost full='..tostring(full),(not not act.completed)==full and R.G.metrics.clues_spent==(full and 4 or 0))
+    expect('reaction charges only full printed cost full='..tostring(full),(not not act.completed)==full and R.G.metrics.clues_spent==(full and 3 or 0))
     expect('reaction invents no post-test free window full='..tostring(full),count(C.events,'window:')==2)
     if full then expect('paid reaction follows resolved test',before(C.events,'returned token','advance:sthr-act-walksbeside')) end
   end
