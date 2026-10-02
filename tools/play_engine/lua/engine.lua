@@ -561,15 +561,42 @@ return function(H)
     for fact,v in pairs(c.knowledge) do if v then sc.knowledge[#sc.knowledge+1]=fact end end
     table.sort(sc.knowledge)
     local district=ROUTE[((slot-2)%#ROUTE)+1]
+    local districts={district}
+    -- what-if districtsPerNight = 2: the party places the next two districts
+    -- (in route order) that still have an act to play this Part, so a night's
+    -- goal is two district acts plus the Square's current act
+    local perNight=(cfg.districtsPerNight or 1)
+    local function pending(d)
+      return not c.knowledge[S.SURF[d]] or (c.partTwo and not c.knowledge[S.DEEP[d]])
+    end
+    if perNight>1 then
+      districts={}
+      local start=((slot-2)*perNight)%#ROUTE
+      for i=0,#ROUTE-1 do
+        local d=ROUTE[((start+i)%#ROUTE)+1]
+        if pending(d) and #districts<perNight then districts[#districts+1]=d end
+      end
+      for i=0,#ROUTE-1 do
+        local d=ROUTE[((start+i)%#ROUTE)+1]
+        local dup=false
+        for _,x in ipairs(districts) do if x==d then dup=true end end
+        if #districts<perNight and not dup then districts[#districts+1]=d end
+      end
+    end
     if slot==10 and c.knowledge["the-way-the-night-breaks"] then
-      district="Almanac" ; sc.finaleGoal=true
+      districts={"Almanac"} ; sc.finaleGoal=true
     end
+    local placed={}
     local function add(d)
-      sc.boxes[#sc.boxes+1]=BOX[d]
+      if not placed[d] then placed[d]=true ; sc.boxes[#sc.boxes+1]=BOX[d] end
     end
-    if district=="Lighthouse" then add("Road") end
-    add(district)
-    for _,d in ipairs({"Square",district}) do
+    for _,d in ipairs(districts) do
+      if d=="Lighthouse" then add("Road") end
+      add(d)
+    end
+    local goalsFor={"Square"}
+    for _,d in ipairs(districts) do goalsFor[#goalsFor+1]=d end
+    for _,d in ipairs(goalsFor) do
       if not c.knowledge[S.SURF[d]] then sc.objectives[#sc.objectives+1]=SURFACE_ACT[d]
       elseif c.partTwo and not c.knowledge[S.DEEP[d]] then sc.objectives[#sc.objectives+1]=DEEP_ACT[d] end
     end
