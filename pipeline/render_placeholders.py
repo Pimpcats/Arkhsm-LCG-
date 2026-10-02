@@ -2098,7 +2098,7 @@ LAYOUT_LIGHT = 150          # parchment for layout is at least this light (the
 BODY_LEADING = 1.15         # official cards set rules tight (~1.15)
 BODY_PARA_GAP = 0.33        # gap between abilities, as a share of a line
 FLAVOR_INK = (84, 66, 50)
-FLAVOR_KEEP_PX = 24         # below this, a dense card drops its flavour text
+FLAVOR_KEEP_PX = 27         # below this, a dense card drops its flavour text
 FLAVOR_DROPPED = []         # card ids whose flavour did not fit
 BODY_SIZES = {}             # card id -> [rules px of each body block drawn]
 
