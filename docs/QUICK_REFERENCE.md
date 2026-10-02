@@ -28,9 +28,10 @@ matching Control or investigator button (*guide: The Control token*).
   The Loop; Between Loops.*
 - **Hourglass / Hours.** The agenda deck: nine Hours, I to IX. Hour I needs 3
   doom, Hours II–VIII need 2. Each time an Hour passes, each investigator heals
-  1 damage and 1 horror. "When reached" text resolves as each Hour arrives. A
-  **Skip** advances Hours at once; a **rewind** goes back without resolving
-  "When reached" again. *Guide: Campaign Rules, The Hourglass.*
+  1 damage and 1 horror. Hours II–IX each have a "Forced – When the Hourglass advances to
+  this Hour" ability that resolves as it arrives. A **Skip** advances Hours at once,
+  resolving each in order; a **rewind** goes back without resolving any Forced
+  ability. *Guide: Campaign Rules, The Hourglass.*
 - **Crossing doom.** Each round, the first move (by anyone, either way, by
   any means) along each connection between two districts places 1 doom on the
   current Hour; later moves along it that round are free. Enemy moves never
@@ -56,7 +57,7 @@ matching Control or investigator button (*guide: The Control token*).
   back. It cannot be defeated. *Guide: Campaign Rules, The Appointed.*
 - **Hold Back.** An [action] on the Appointed's card, for an investigator at
   its location while it is ready. A success exhausts it, pushes the Approach
-  back one stage and rewinds the Hourglass 1 Hour (at most 3 rewinds a loop;
+  back 1 stage and rewinds the Hourglass 1 Hour (at most 3 rewinds a loop;
   click **Hold Back** on its card, which also rewinds the Hour counter). *Guide:
   The Appointed; The Control token, The Appointed.*
 - **Memory.** Your experience. Memory on your cards is banked into one shared
