@@ -16,20 +16,36 @@ scenarios from 11 campaigns) and the owner's ranking:
 
 ## 1. The shape every official scenario shares
 
-Figures are medians over the 93 scenarios, with the middle half in brackets.
-They are the "it still feels like Arkham" envelope. Go outside it only on
-purpose, and only in one direction at a time.
+**This table is the one authoritative statement of the official structure
+numbers.** The new-campaign skill, `docs/CAMPAIGN_PLAYBOOK.md` and
+`docs/design/OFFICIAL_COMPARISON.md` point here instead of restating them.
+Source: `library/stats/scenario_structure.csv` (93 scenarios from 11
+campaigns; 973 locations), rebuilt by `python3 tools/library/build_library.py`
+(the library is git-ignored, so run that first in a fresh checkout). Figures
+are medians with the middle half of scenarios in brackets unless a mean is
+named. They are the "it still feels like Arkham" envelope. Go outside it only
+on purpose, and only in one direction at a time.
 
 | Part | Official | Note |
 |---|---|---|
-| Agendas | 2 (2–3) | total doom 17 (13–20) |
-| Acts | 3 (2–4) | most acts advance by story or objective, not by clues |
-| Clue acts per scenario | 0 or 1 | when an act costs clues: 2–3 per investigator, never more than 5 |
-| Locations | 12 (9–15) | |
+| Agendas | 2 (2–3) per scenario | total doom: median 17–18, typical range 14–20 (middle half 13–20) |
+| Acts | about 3 (2–4) per scenario | most acts advance by story or objective, not by clues |
+| Clue acts | 0 or 1 per scenario | when an act costs clues: 2–3 per investigator, never more than 5 |
+| Locations | median 12, typical 9–15 | |
 | Victory locations | 3 (0–5) | |
-| Clues on a location | 1.25 per investigator (0.95–1.45) | ordinary: 0 (20%), 1 (50%), 2 (16%), 3+ (4%); Victory: 1 (54%), 2 (38%), 3 (6%) |
-| Shroud | 2.9 (2.6–3.1) | ordinary mostly 2–3; Victory mostly 3–4 |
-| Encounter deck | 30 cards (25–33) | |
+| Clues on an ordinary location | 0 (20%), 1 (50%), 2 (16%), 3+ (4%) per investigator; mean 1.05 | thoroughfares 0–1 at shroud 1–2 |
+| Clues on a Victory location | 1–3 per investigator: 1 (54%), 2 (38%), 3 (6%); mean 1.48 | the richer, harder rooms |
+| Clues on a location, all | 1.25 per investigator (0.95–1.45) | |
+| Shroud | ordinary mostly 2–3 (mean 2.65); Victory mostly 3–4 (mean 3.1) | all locations 2.9 (2.6–3.1) |
+| Encounter deck | 30 cards, typical 25–33 | |
+
+Measurements made earlier with `tools/official_compare/compare.py` (54
+scenarios, Night of the Zealot to The Innsmouth Conspiracy) differ slightly
+(for example doom 18, locations 11.5, 0.9 clues per investigator per
+location); they are kept in OFFICIAL_COMPARISON.md as a historical record.
+Connections (2.5 per location), enemy share and stats, treachery tests and
+chaos-bag changes come only from that tool, so use OFFICIAL_COMPARISON.md for
+those.
 
 Rules of thumb that follow from it:
 

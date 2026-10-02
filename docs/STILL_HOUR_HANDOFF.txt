@@ -15,10 +15,11 @@ Applied four supported clue-cost adjustments, rebuilt 200 card images and the 24
 Preserved alternate outcomes and the campaign’s branching structure.
 
 VERIFICATION
-Full suite: 111 passed, 1 optional render test skipped, 155 subtests passed.
+Full suite (re-run 2026-10-02 after the release housekeeping): 115 passed, 2 skipped (the optional render test, and the other-campaign check that runs only when another campaign is selected), 155 subtests passed. It also passes with another campaign selected.
 The optional render test is supplemented by three actual Godot scenes on the real-SCED emulator.
-Lua 5.2 and 5.4: 309 live rules checks each; seven model fixtures totaling 652 checks each; rebuilt bundle checks passed.
-CardForge selftest: 20 passed. Eight scenario readiness checks: no errors or warnings.
+Lua 5.2 and 5.4: 309 live rules checks each and the bundle check (re-run 2026-10-02); seven model fixtures totaling 652 checks each.
+CardForge selftest: 20 passed (re-run 2026-10-02). Eight scenario readiness checks: no errors or warnings.
+Card art is complete: every illustration is in the published faces.
 Final model validation: 70 cells, 1,319 played slots, no engine/Lua/table-note/missing-draw failures.
 Three independent reviews completed within their recorded scopes.
 This build has not been tested on the owner’s actual TTS table.

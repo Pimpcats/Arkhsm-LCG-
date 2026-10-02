@@ -9,6 +9,8 @@ The owner is playing it as a **first-time player**: keep story spoilers (card ef
 ## Play it
 Load `dist/saved_object_the_still_hour.json` as a Saved Object in SCED. Step by step: **`docs/LOADING.md`**. Card images load from GitHub, so the file works on any PC.
 
+At the table: **`docs/QUICK_REFERENCE.md`** is a one-page play aid (round structure and the campaign's own terms, each pointing to the guide section). It explains how the campaign's systems work, so read it when you sit down to play, not before.
+
 ## Run the app (one click)
 
 Double-click in the repo folder:
@@ -33,19 +35,20 @@ optional; their machine-specific settings live in `rig.local.json`.
 - **Knowledge** — facts you earn that change later nights.
 - **Aging** — living the same night again has a cost.
 
-## Status (2026-09-27)
-- ✅ Campaign content, rules wording passes, balance models, guide PDF and campaign log built; offline checks green (pytest, CardForge selftests, Lua rules suite, bundle check, scenario audit). Counts: `campaigns/still_hour/assistant/production.json`.
-- ✅ Card art: the illustrations are approved and composited into the faces in `dist/`, except six still to generate (below).
+## Status (2026-10-02)
+- ✅ Campaign content, rules wording passes, guide PDF and campaign log built; offline checks pass (pytest suite, CardForge selftest, Lua rules suite on Lua 5.2 and 5.4, bundle check, scenario audit). Current counts and results: `campaigns/still_hour/assistant/production.json`; summary: `docs/STILL_HOUR_HANDOFF.txt`.
+- ✅ Card art: complete. Every illustration is approved and composited into the faces in `dist/`.
+- ✅ Campaign log: names you have not earned yet stay hidden until you tick them (already built in).
 - ⏳ **Pending:**
-  1. a real **TTS relay run on the current head** (owner, local PowerShell; `docs/TTS_RELAY.md`);
-  2. **six illustrations** via the ChatGPT art pack's "remaining" request (`docs/CHATGPT_ART_PACK.md`, `pipeline/chatgpt_art_pack.json`);
-  3. the owner's **first playtest**.
-- Relay passes and offline checks are not playtest approval.
+  1. a real **TTS relay run on the current build** (owner, local PowerShell; `docs/TTS_RELAY.md`);
+  2. the owner's **first playtest**;
+  3. finishing the difficulty curve from real play (the computer-played results do not yet match every target).
+- Relay passes, computer-played games and offline checks are not playtest approval.
 
 ## File map
-**Owner docs:** `docs/LOADING.md` (load in TTS) · `docs/TTS_RELAY.md` (automated in-game test) · `docs/CHECKLIST.md` (status) · `docs/HANDOFF.md` (next session).
-**Assistant/designer docs (spoilers):** `docs/ASSISTANT_WORKFLOW.md` (read first) · `docs/CAMPAIGN_PLAYBOOK.md` · `docs/BUILD_STATUS.md` · `docs/design/` (design, change orders, audits).
+**Owner docs:** `docs/LOADING.md` (load in TTS) · `docs/QUICK_REFERENCE.md` (play aid; read at the table) · `docs/TTS_RELAY.md` (automated in-game test) · `docs/CHECKLIST.md` (status) · `docs/HANDOFF.md` (next session).
+**Assistant/designer docs (spoilers, do not read as a player):** `docs/ASSISTANT_WORKFLOW.md` (read first) · `docs/CAMPAIGN_PLAYBOOK.md` · `docs/BUILD_STATUS.md` · `docs/BALANCE.md` · `docs/ART_HANDOFF.md` · `docs/design/` (design, change orders, audits, the campaign guide source).
 **State:** `campaigns/still_hour/assistant/production.json` (current counts, validation, next actions).
 
 ## How to continue
-Hand the next task to **Claude Code** against `Pimpcats/Arkhsm-LCG-` @ `main`; it reads `AGENTS.md` and `docs/ASSISTANT_WORKFLOW.md` first. Next up: the relay run on the current head, the six remaining illustrations, then the first playtest.
+Hand the next task to **Claude Code** against `Pimpcats/Arkhsm-LCG-` @ `main`; it reads `AGENTS.md` and `docs/ASSISTANT_WORKFLOW.md` first. Next up: the relay run on the current build, then the first playtest.
