@@ -101,6 +101,20 @@ The carried policy rotates Church/Fairground/Almanac/Road/Lighthouse, stops afte
 
 These are only five trials per party/scenario: useful coverage probes, too small to approve investigator parity. Every investigator’s abilities, signatures, weaknesses and all Recollections also have source-level rules checks; legal card coverage is separate from the AI choosing every useful ability.
 
+## Whole-campaign calibration (2026-10-02, evening)
+
+Designer-facing; contains spoilers. Supersedes the preset-night table above for tuning decisions.
+
+**What changed in the method.** The single-night presets always had two goals (the Square's act plus a district's act), but a carried campaign finishes the Square's acts by about the fifth night, after which a night had one goal and won 90–100%. Official scenarios have about three acts however a party gets there, so the carried runs now give every night two goals: the Square's current act while it has one, then two districts' acts (`goalsPerNight` what-if in `tools/play_engine/lua/engine.lua`). The guide tells players to plan on about two acts a night.
+
+**Values chosen** (all official range, 2–3 per investigator; walk 3, 1, 1): The Hour Was Wrong 2, What the Almanac Hid 3, Who Walks Beside You 3, the Ticket-Taker's fare 3, Why Thirteen? 3; The Appointed's Name while the Approach is Emerging or Arrived (the Arrived-only window left it near 40%).
+
+**Result** (20 carried campaigns, Elias/Ayako/Cass, 3 players, same seeds as the earlier arms; win = every goal of the night done): Prologue 90, Night 1 75, Night 2 75, Night 3 25, Night 4 55, Night 5 20, Night 6 90, Night 7 40, Night 8 81. Against 80/80/70/70/60/60/50/50/40 the mean is 59% against 60%. Single slots swing ±25 points at n=20 and depend on which districts the fixed route draws, so treat the per-night shape as noise and the mean and the Part I / Part II levels (58% / 58% against 73% / 52%) as the signal. Nights 8+ and the last slots often have fewer than two acts left. Earlier arms on the same seeds: one district a night, 90–100% on Nights 2–7 (too easy); two districts plus the Square, 0% (too hard); two goals with the previous costs, mean 38% (too hard).
+
+**Player cards.** Stolen Minute, The Lexicon of the Hour, Anchor Point, The Long Way Round, Rehearsed Escape, the Bell, I Remember the Ending, the Ambergrove Lamp and both unusual weaknesses were trimmed or limited toward official strength; each investigator's Memory reaction is limited to once per round and three times per loop. Ayako and Birdie gained 1 health to reach the official 14 total. Experience per investigator over a full campaign, 6 carried campaigns each: Elias/Ayako/Cass 43 (41–45), Birdie/Cass/Seraphine 40 (38–41), Elias/Birdie/Seraphine 36 (30–42), Elias/Ayako 49 (40–56).
+
+**Still open.** n=20 per cell is a screen, not certification; the finale and the other player counts were not re-measured on the final cards except as noted in the release log; human playtests decide the rest.
+
 ## Remaining calibration
 
 The candidate can proceed to live relay and human playtesting. The target curve remains open: repeat route outliers with actual carried decks, test the transition between early nights and upgraded decks, and test endings with real group choices. Choose further encounter/tempo adjustments from that evidence rather than forcing an integer finale threshold that overshoots. Do not mark human playtest approval or exact target percentages complete.
