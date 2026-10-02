@@ -498,7 +498,7 @@
     "type": "Act",
     "name": "Light the Lamp",
     "clues": 4,
-    "text": "Objective — Once 4 clues have been discovered in the Lighthouse district, an investigator at the Lantern Room may test [com] or [wil] (3) to light the lamp. If they succeed, record \"The Lamp Was Never Lit.\"\nWhile the lamp is lit this loop, Echoes at connected districts stay Sleepwalking one band longer. For all future loops, the Lantern Room flips to its calmer side.",
+    "text": "Objective — Once 4 clues have been discovered in the Lighthouse district, an investigator at the Lantern Room may test [com] or [wil] (3) to light the lamp. If they succeed, record \"The Lamp Remembers.\"\nWhile the lamp is lit this loop, Echoes at connected districts stay Sleepwalking one band longer. For all future loops, the Lantern Room flips to its calmer side.",
     "flavor": "The lamp is dark. It has never, in any loop, been lit.",
     "deck": 95103,
     "index": "1a",

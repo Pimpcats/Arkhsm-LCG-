@@ -21,9 +21,9 @@ Read this section aloud before the Prologue. It explains what is new in The Stil
 
 **One night, played again and again.** Each play of the night is a **loop**. When a loop ends, the board is cleared and the night starts over at eleven o'clock in the Square. Three things always carry over: your **Campaign Log**, your shared **banked Memory** and each investigator's **Years**.
 
-**The Hourglass is the clock.** The agenda deck is nine **Hours**, Hour I to Hour IX. Hour I has a doom threshold of 3 and Hours II to VIII of 2. From the second round on, each Mythos phase places 1 doom on the current Hour, so an Hour passes about every second round and a loop runs about twelve rounds. (Nine Hours fit between eleven o'clock and midnight. That is part of what is wrong.) Each time an Hour passes, each investigator heals 1 damage and 1 horror. Many Hours do something the moment they arrive ("When reached"). When the Hourglass reaches **Hour IX**, the loop ends. A few effects skip Hours forward, and a few rewind them.
+**The Hourglass is the clock.** The agenda deck is nine **Hours**, Hour I to Hour IX. Hour I has a doom threshold of 3 and Hours II to VIII of 2. From the second round on, each Mythos phase places 1 doom on the current Hour, so an Hour passes about every second round and a loop runs about twelve rounds. (Nine Hours fit between eleven o'clock and midnight. That is part of what is wrong.) Each time an Hour passes, each investigator heals 1 damage and 1 horror. Most Hours have a **Forced** ability that resolves the moment the Hourglass advances to them. When the Hourglass reaches **Hour IX**, the loop ends. A few effects skip Hours forward, and a few rewind them.
 
-**The town is split into districts.** Ambergrove has six **districts**, each a small cluster of locations with its own box, act deck and encounter cards. The Square is always in play. At the start of each loop, you choose which other districts to visit and lay them out. **Travel costs time:** each round, the first crossing along each connection between two districts places 1 doom on the current Hour, half an Hour (the Lighthouse, at the end of the Sunken Road, is reached without one). In one loop you will usually finish work in two or three districts, so choosing where to go is your biggest decision.
+**The town is split into districts.** Ambergrove has six **districts**, each a small cluster of locations with its own box, act deck and encounter cards. The Square is always in play. At the start of each loop, you choose which other districts to visit and lay them out. **Travel costs time:** each round, the first crossing along each connection between two districts places 1 doom on the current Hour, about half an Hour of the night. The Lighthouse, at the end of the Sunken Road, is reached without a crossing. In one loop you will usually finish work in two or three districts, so choosing where to go is your biggest decision.
 
 **Each district has its own act deck.** Its first act (a surface objective) can be completed from the start. Its second act (a deep objective) opens in **Part II** of the campaign. Several act decks can be in play at once, one per district.
 
@@ -40,7 +40,7 @@ Each loop starts Dissonance at the **scar**: the number of loops you have comple
 
 **The Static token** ([static]) is a new chaos token: **−3, and raise Dissonance by 1** when it is revealed. The band decides how many are in the bag, so rising Dissonance makes more of them likely.
 
-**The Appointed** is something that climbs toward you through four stages: Unseen, Sensed, Emerging, Arrived. Rising Dissonance and certain Hours push it up. It cannot be defeated. An investigator at its location can **Hold Back** it while it is ready: a successful Hold Back pushes it down one stage, exhausts it and rewinds the Hourglass by 1 Hour (the rewind happens at most 3 times each loop and never in the finale; the Control token counts). It hunts whoever carries the most Memory on their cards.
+**The Appointed** is something that climbs toward you through four stages: Unseen, Sensed, Emerging, Arrived. Rising Dissonance and certain Hours advance it. It cannot be defeated. An investigator at its location can **Hold Back** it while it is ready: a successful Hold Back pushes its Approach back 1 stage, exhausts it and rewinds the Hourglass by 1 Hour (the rewind happens at most 3 times each loop and never in the finale; the Control token counts). It hunts whoever carries the most Memory on their cards.
 
 **Memory is your experience.** During a loop you gain **Memory** tokens on your cards. Some investigators' abilities use them, but they also make you the one being hunted. At the reset, all Memory on cards goes into one shared pool, **banked Memory**, which you spend between loops like experience: on **Recollections** (cards that remember the loop) and on upgrades. Learning pays too: see Knowledge, below.
 
@@ -83,11 +83,11 @@ These rules add to the Arkham Horror: The Card Game Rules Reference. Where they 
 - **Place X doom on the current Hour** (district crossings and small costs of time) puts doom tokens on the current Hour; its threshold is checked only in the Mythos phase, as in the Rules Reference. When the Hourglass advances or rewinds for any reason, remove all doom in play.
 - **The Hour turns.** Each time the Hourglass advances to a new Hour (by doom or by a Skip, not when an advance is canceled), each investigator heals 1 damage and 1 horror.
 - **Advance the Hourglass by X Hours** (a **Skip**) advances the agenda at once, one Hour at a time: remove all doom in play, turn the current Hour over and read its back, then make the next Hour the current agenda. Set each advanced Hour aside, in order, beside the Hours deck instead of removing it from the game. The Hourglass never advances past Hour IX. Any effect that advances the Hourglass is a Skip.
-- **When reached.** Each time an Hour becomes the current agenda by advancing (by doom or by a Skip), resolve its "When reached" text. A Skip of several Hours resolves each Hour in order. If the Hourglass reaches an Hour again after a rewind, its text resolves again.
-- **Rewind the Hourglass by X Hours:** X times, put the current Hour back on top of the Hours deck and make the last Hour you set aside the current agenda again, with no doom on it. Rewinding never resolves "When reached" text and does not end effects an Hour already created. The Hourglass never rewinds before Hour I.
+- **An Hour's Forced ability.** Hours II–IX each have "Forced – When the Hourglass advances to this Hour:". It resolves each time that Hour becomes the current agenda by advancing (by doom or by a Skip). A Skip of several Hours resolves each Hour's ability in order. If the Hourglass advances to an Hour again after a rewind, its ability resolves again.
+- **Rewind the Hourglass by X Hours:** X times, put the current Hour back on top of the Hours deck and make the last Hour you set aside the current agenda again, with no doom on it. Rewinding never resolves an Hour's Forced ability and does not end effects an Hour already created. The Hourglass never rewinds before Hour I.
 - **Cancel an advance:** cancel all of it, however many Hours it would advance. The current Hour stays current; remove all doom from it.
 
-**Districts and travel.** Ambergrove has six **districts**; each is a cluster of locations laid out from its own box, and every location belongs to one district. **The Square** is the hub. The district connections are The Square–The Nave, The Square–The Milestones, The Square–The Ticket Booth and The Square–The Reading Room. The first time in a round that any investigator moves along a given district connection (in either direction, by any means), place 1 doom on the current Hour after that move. Other investigators may move along that same connection later in the round without placing more. A move that is not along a connection, or that says it does not place doom, costs no time, and it does not count as the first move along that connection this round. Enemy moves never cost time. You will reach only two or three districts before time runs out. Connection symbols match by shape **and** colour: some shapes repeat in other districts in a different colour, and a location connects only to locations whose symbol matches both. The district connections listed here, and The Turning–The Winding Stair, are the only connections between districts. The Turning–The Winding Stair is not a district connection: the Lighthouse stands at the end of the Sunken Road, and moving between them never places doom.
+**Districts and travel.** Ambergrove has six **districts**; each is a cluster of locations laid out from its own box, and every location belongs to one district. **The Square** is the hub. The district connections are The Square–The Nave, The Square–The Milestones, The Square–The Ticket Booth and The Square–The Reading Room. The first time in a round that any investigator moves along a given district connection (in either direction, by any means), place 1 doom on the current Hour after that move. Other investigators may move along that same connection later in the round without placing more. A move that is not along a connection, or that says it does not place doom, costs no time, and it does not count as the first move along that connection this round. Enemy moves never cost time. You will reach only two or three districts before time runs out. Connection symbols match by shape **and** color: some shapes repeat in other districts in a different color, and a location connects only to locations whose symbol matches both. The district connections listed here, and The Turning–The Winding Stair, are the only connections between districts. The Turning–The Winding Stair is not a district connection: the Lighthouse stands at the end of the Sunken Road, and moving between them never places doom.
 
 **Dissonance.** A shared value from 0 to the reset value (24). Apart from Loop Setup, where it is set to the scar, it changes only when an effect says to **raise** or **lower** it. Dissonance sets the band:
 
@@ -100,13 +100,13 @@ These rules add to the Arkham Horror: The Card Game Rules Reference. Where they 
 
 A band change takes effect at once. [static] tokens added by cards are in addition to the band's. Lowering Dissonance never pushes the Approach back. Setting Dissonance at Loop Setup does not count as entering a band.
 
-**[static].** A chaos token and a symbol token (cards call it the Static token): **−3. Raise Dissonance by 1.** Like the other symbol effects, this resolves when the token is revealed during a skill test; the token returns to the bag afterwards. A canceled [static] token has no modifier and no effect. A sealed [static] token still counts toward its band's number.
+**[static].** A chaos token and a symbol token (cards call it the Static token): **−3. Raise Dissonance by 1.** Like the other symbol effects, this resolves when the token is revealed during a skill test; the token returns to the bag afterward. A canceled [static] token has no modifier and no effect. A sealed [static] token still counts toward its band's number.
 
 **Number and symbol tokens.** A number token is a chaos token that shows only a modifier (+1, 0, −1 and so on). Every other chaos token ([skull], [cultist], [tablet], [elderthing], [static], [elder], [autofail]) is a symbol token.
 
 **Echoes and Sleepwalking.** An Echo is an enemy with the Echo trait. **Sleepwalking** is a keyword: while an enemy is Sleepwalking, it cannot engage or be engaged, attack, or move, and it cannot be attacked, evaded, dealt damage or chosen as the target of a card ability. It is still an enemy in play at its location. A Sleepwalking enemy that would spawn engaged with an investigator spawns unengaged at that investigator's location instead; an engaged enemy that becomes Sleepwalking disengages and stays where it is. Every Echo has the Sleepwalking keyword printed on it; that keyword applies only while Dissonance is in the Calm band, unless a card says otherwise. It **wakes** when it stops being Sleepwalking, and it can fall asleep again. An Echo that wakes is **exhausted** (it readies in the upkeep phase as usual), so it engages no one until then.
 
-**The Appointed.** Something called the Appointed climbs an **Approach**: Unseen, Sensed, Emerging, Arrived. To **advance** the Approach (to a stage) means to raise it, never lower it; to **push it back** means to lower it by one stage, never below Unseen. When the Approach becomes Sensed or later while the Appointed is set aside, it **manifests**: put it into play at the revealed location farthest from all investigators that is not closed (the lead investigator breaks ties). When it is pushed back to Unseen, set it aside. It cannot be defeated. **Hold Back** is an [action] on its card that only an investigator at its location can take, and only while the Appointed is ready; a success exhausts it, so the Appointed can be held back at most once per round. A "Hold Back success" means succeeding at its test, or resolving it without a test when a card allows. Its behaviour at each stage is on **The Appointed's Approach**, which is in play beside the Hours deck during every loop and the finale.
+**The Appointed.** Something called the Appointed climbs an **Approach**: Unseen, Sensed, Emerging, Arrived. To **advance** the Approach (to a stage) means to raise it, never lower it; to **push it back** means to lower it by 1 stage, never below Unseen. When the Approach becomes Sensed or later while the Appointed is set aside, it **manifests**: put it into play at the revealed location farthest from all investigators that is not closed (the lead investigator breaks ties). When the Approach is pushed back to Unseen, set the Appointed aside. It cannot be defeated. **Hold Back** is an [action] on its card that only an investigator at its location can take, and only while the Appointed is ready; a success exhausts it, so the Appointed can be held back at most once per round. A "Hold Back success" means succeeding at its test, or resolving it without a test when a card allows. Its behavior at each stage is on **The Appointed's Approach**, which is in play beside the Hours deck during every loop and the finale.
 
 **Memory.**
 - **Memory on cards** is Memory tokens on investigator and asset cards you control. "Most Memory" in a prey or spawn instruction means Memory on cards. Charges on Stolen Minute are not Memory.
@@ -142,19 +142,19 @@ For finale conditions and the epilogue, an investigator's bracket is set by all 
 
 **The Control token.** The Control token keeps the campaign's books. Use it like this, and do not also apply by hand what it applies for you:
 - **Hour.** Put doom tokens on the current Hour as the Mythos phase and cards place them (the Control token does not count doom). Each time the Hourglass advances or rewinds, remove all doom in play, move the Hours deck to match and click **Hour** once per Hour (left-click advance, right-click rewind). On an advance it applies Hour III's base +1 Dissonance, the Approach at Hours V, VII and VIII, Hour VI's [static] token and Hour VIII's +2 Dissonance. Resolve the rest yourself: the 1 damage and 1 horror each investigator heals when an Hour passes, Hour II's encounter draws, Hour III's extra +1 at a Church location (click Dissonance), Hour IV, Hour VII's exhaust, Hour VIII's +1 fight and Hour IX. (Exception: **Hold Back** on the Appointed's card rewinds the Hour counter itself; move the Hours deck, but do not also right-click **Hour**.)
-- **Canceled effects.** If an effect the Control token already applied is canceled (for example an Hour's "When reached" text canceled by It Means 'Wait'), undo it with the matching button: right-click **Dissonance** for Dissonance it added, right-click **[static]** for a Static token, and click **Appointed** back if the Approach moved. If Hour VI is canceled, click **Undo Hour VI** instead (it appears once Hour VI has resolved this loop): it takes back Hour VI's change to the chaos bag, and Hour VI resolves again if it is reached again this loop.
+- **Canceled effects.** If an effect the Control token already applied is canceled (for example an Hour's Forced ability canceled by It Means 'Wait'), undo it with the matching button: right-click **Dissonance** for Dissonance it added, right-click **[static]** for a Static token, and click **Appointed** back if the Approach moved. If Hour VI is canceled, click **Undo Hour VI** instead (it appears once Hour VI has resolved this loop): it takes back Hour VI's change to the chaos bag, and Hour VI resolves again if it is reached again this loop.
 - **Dissonance.** Each time a card or ability raises or lowers Dissonance, click **Dissonance** (left-click +1, right-click −1). It adds and removes the band's [static] tokens and advances the Approach when a band is entered. A [static] token drawn from the chaos bag waits for your decision: after cancellation choices, if it resolves in a skill test, left-click **Resolve** on that token before continuing the test (or **Static waiting** on the Control when only one token is pending); the Control token applies its +1 Dissonance and consequences. Do not also click **Dissonance**. For a canceled token or an outside-test preview (for example Marked Deck), return it to the bag or right-click **Resolve** on that token; neither changes campaign state. With multiple pending tokens, use their individual buttons; the Control button refuses an ambiguous choice. When a sealed [static] token is later treated as the revealed token (Marked Deck), left-click **Dissonance** yourself only if it resolves.
 - **Temporary Static tokens.** When a card adds a Static token for a limited time, left-click **[static]**; when that time ends, or the Press removes it, right-click it. (Hour VI's change is applied by **Hour**; see **Canceled effects** to undo it.)
 - **Leaning on the loop.** Each time an investigator pays "raise Dissonance" as a cost or additional cost, click **Dissonance raised** on their investigator card (as well as **Dissonance**). Each time they remove Memory from their own cards, as a cost or by their own choice, for one of their own cards or abilities (for example Foreknowledge), click **Loop-power Memory** once per Memory. The Interlude's **Age** button reads these. Click **Dissonance raised** once per payment, however much it raises (The Turning is one click here and two on **Dissonance**).
 - **Years pending.** When a card or resolution gives an investigator Years, click **Years pending** on their investigator card; **Age** adds them. When the Records Office takes one back, right-click it.
 - **Memory on cards.** Click an investigator's **Memory** row when Memory is placed on or removed from their cards (left-click +1, right-click −1).
-- **The Appointed.** When The Crossing, The Debt of Hours or the finale advances the Approach, click **Appointed** once per stage. After a Hold Back success (including the walker's ring and The Hour I Learned Your Name), click **Hold Back** on its card once: it pushes the Approach back one stage and rewinds the Hour counter by 1 for you. Disengage and exhaust the card yourself. When an effect pushes it back further (The Hour I Learned Your Name's extra stage), right-click **Appointed** once per extra stage. While it hunts, click **Hunt** once in each enemy phase while it is ready and unengaged. On a farthest-location tie, the Control token names the tied destinations and makes a default placement; the lead investigator chooses and moves it to another tied destination before continuing if needed. If the Control token places it on a closed or unrevealed location, move it to the location the rules require.
+- **The Appointed.** When The Crossing, The Debt of Hours or the finale advances the Approach, click **Appointed** once per stage. After a Hold Back success (including the walker's ring and The Hour I Learned Your Name), click **Hold Back** on its card once: it pushes the Approach back 1 stage and rewinds the Hour counter by 1 for you. Disengage and exhaust the card yourself. When an effect pushes the Approach back further (The Hour I Learned Your Name's additional stage), right-click **Appointed** once per extra stage. While it hunts, click **Hunt** once in each enemy phase while it is ready and unengaged. On a farthest-location tie, the Control token names the tied destinations and makes a default placement; the lead investigator chooses and moves it to another tied destination before continuing if needed. If the Control token places it on a closed or unrevealed location, move it to the location the rules require.
 - **Knowledge and Victory.** When you record a Knowledge entry or a Victory, tick it on the Campaign Log token. The Control token records it too: it turns the locations a Knowledge entry changes, banks the Memory a new Knowledge entry pays, and banks a Victory's Memory, each the first time only. If you tick a Knowledge box by mistake, untick it: the entry is removed and the Memory it paid is taken back, as far as banked Memory allows (ticking it again pays back only what was taken).
 - **Contest.** In the finale, the Control token shows a **Contest** counter (left-click +1, right-click −1). No contest progress is automatic: click **Contest** for every source listed under **Contest progress**, including each Hold Back success and the Uninvited's defeat.
 - **Aging.** After the Prologue there is no aging: the buttons read **No Age**. After a loop, in the Interlude panel, set each investigator's **Defeated** toggle, and the first time they reach Weathered, their −skill and +skill buttons, before clicking **Age**.
 - **Memory.** **Begin Next Loop** adds the 1 Memory an Elder or Ancient investigator begins with to their count; put the token on their investigator card at Loop Setup step 7, and do not click their Memory row for it. Click the banked **Memory** button when banked Memory changes outside the Interlude panel (the Prologue's rewards, The House Always Wins, Resolution 1b). It never goes below 0.
 - **Between loops.** Use **Reset Loop**, **Interlude**, **Begin Next Loop** and **Clear Board** as **Between Loops** and **Loop Setup** direct. **Reset Loop** counts once per loop: a second click before **Begin Next Loop** does nothing.
-- **Other buttons.** **Status** prints the current Hour, Dissonance, band, scar, Memory and Part to the chat. **Knowledge** lists the entries recorded so far. **Sync Board** re-applies the board from the campaign state (location sides and CLOSED labels, the Appointed's position and the chaos bag's Static tokens); use it if the table and the Control token disagree. **Run Tests** checks the Control token's own rules and restores your campaign afterwards; you never need it in play.
+- **Other buttons.** **Status** prints the current Hour, Dissonance, band, scar, Memory and Part to the chat. **Knowledge** lists the entries recorded so far. **Sync Board** re-applies the board from the campaign state (location sides and CLOSED labels, the Appointed's position and the chaos bag's Static tokens); use it if the table and the Control token disagree. **Run Tests** checks the Control token's own rules and restores your campaign afterward; you never need it in play.
 
 ---
 
@@ -199,7 +199,7 @@ A small town at the end of a shore road, under a starless, snagged sky. **The Sq
 
 ## PROLOGUE — THE FIRST HOUR
 
-> You are in Ambergrove for your own reasons: a letter, a debt, a promise, a rumour. Soon, you will not remember them.
+> You are in Ambergrove for your own reasons: a letter, a debt, a promise, a rumor. Soon, you will not remember them.
 >
 > Ambergrove is a town on no one's way to anywhere: a church, a road out to the shore, a lighthouse no ship has needed in years, a printing house that sells almanacs to three counties. Tonight it is full. The almanac has promised an occultation, a star swallowed by the dark of something passing in front of it, once in a hundred years, and visible from here and nowhere else.
 >
@@ -250,7 +250,7 @@ There is no Appointed in the Prologue, and no Years are gained in it: ignore any
 
 ### What You Saw
 
-> Salt on your tongue. The same lanterns, the same band, the same children on the same shoulders. You look at one another across the Square and see it in each other's faces: you all remember. No one else does. A woman in a green shawl asks if you are feeling well.
+> Salt on your tongue. The same lanterns, the same band, the same children on the same shoulders. You look at one another across the Square and see it in each other's faces: you all remember. No one else does. It does not feel like the first time this night has happened, only the first time you noticed. A woman in a green shawl asks if you are feeling well.
 
 **The investigators must decide** (choose one):
 - **Tell the town.** Stand on the Town Hall steps and tell them what is coming, though they will not believe a word. Record in your Campaign Log: *The town was warned.* (on the log token: this row's **1st** box.)
@@ -267,7 +267,7 @@ Play every loop from here on the same way: set it up, play the night across the 
 **Loop Setup**
 1. If a loop or the Prologue just ended, click **Clear Board** on the Control token. Every card the boxes laid out, and every token on those cards, leaves the table. Each investigator heals all damage and horror, removes all clues, resources and Memory (it was banked Between Loops) from their cards and discards all resources, shuffles every card they own back into their deck except permanent cards and cards their own rules set aside or put into play at the start of a game (such as bonded cards), sets those up as at the start of a game, takes 5 resources and draws an opening hand of 5 cards (mulligan as normal; weaknesses drawn now are set aside and replaced). Then the investigators choose a lead investigator for this loop.
 2. Press **Place** on **The Square (Town Hall)** box. It lays out the Square's locations, the **Hours** (agenda deck, Hour I on top), the scenario reference card, the shared encounter deck, the Square's act deck (in the district row between the mythos area and the map) and, set aside, the Appointed's cards (the Appointed, The Appointed's Approach, its Whispers, and two story cards whose text this guide gives) and the story asset **Town Ledger**.
-3. Note every Knowledge entry on your Campaign Log that changes an Hour (for example, Hour IV's text no longer resolving). The Hours deck itself never changes.
+3. Note every Knowledge entry on your Campaign Log that changes an Hour (for example, Hour IV's Forced ability no longer resolving). The Hours deck itself never changes.
 4. The Control token now shows **Hour I** and Dissonance at the **scar**: the number of loops completed so far, maximum **6** at three investigators (Reset Loop set both).
 5. **Choose the districts** you mean to visit this loop. For each one, press **Place** on its box: its locations join the map unrevealed (except any its entry says are revealed), its act deck takes its own spot in the district row, and its encounter set and any Named enemy go face down just below the mythos area. Shuffle each district's encounter set into the encounter deck. Leave each Named enemy set aside unless its district's entry says otherwise. Set up each district's act deck as **The Districts** describes. You may also Place another district's box later in the loop, immediately before an investigator moves into it; no investigator can move into a district whose box is not placed.
 6. **Part II onward:** shuffle the Appointed's Whispers into the encounter deck.
@@ -333,10 +333,10 @@ Run this after every reset, and once after the Prologue. First, if you have not 
 **Age stories.** The first time any investigator reaches a new age bracket, read its story aloud as well.
 - **Weathered** (5 Years): *In a darkened shopfront there is a line beside your mouth that was not there when you came. The reflection notices it before you do.*
 - **Elder** (10 Years): *The Town Hall steps seem higher than they used to. They are not. You count them each night, and each night it takes you longer to reach the top.*
-- **Ancient** (15 Years): *A child in the Square takes your hand to help you down the Town Hall steps. You have known this child for a hundred nights. To them you are a kind old stranger, and always will be.*
+- **Ancient** (15 Years): *A child in the Square takes your hand to help you down the Town Hall steps. You have known this child for every night you can remember. To them you are a kind old stranger, and always will be.*
 - If an investigator **ages out** (18 Years): *They do not wake at First Dark. You find them on the Sunken Road, walking in the same direction as the others, hood up. They do not turn when you call their name.*
 
-> **Before the finale** (once your log records The Way the Night Breaks; if you begin the finale in the loop you first record it, read this first). You know the shape of the night now. You know what it costs to end it. The only question left is who pays. You may attempt **The Last Hour** during any loop from now on, or keep looping to prepare, knowing each loop costs years.
+> **Before the finale** (once your log records The Way the Night Breaks; if you begin the finale in the loop you first record it, read this first). You know the shape of the night now. You know what it costs to end it. Something has held this night in place all along, the way an anchor holds against the tide. The only question left is who pays. You may attempt **The Last Hour** during any loop from now on, or keep looping to prepare, knowing each loop costs years.
 
 ---
 
@@ -357,9 +357,9 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 ### The Lighthouse
 
-> The lamp at the end of the Sunken Road is dark. It has never, in any loop, been lit, and the keeper cannot remember why he didn't light it. The stair winds up into the smell of old oil and older salt.
+> The lamp at the end of the Sunken Road is dark. It has never, in any loop, been lit, and its keeper cannot say why it was left dark. The stair winds up into the smell of old oil and older salt.
 
-*If your Campaign Log already records The Lamp Was Never Lit, read this instead:*
+*If your Campaign Log already records The Lamp Remembers, read this instead:*
 
 > The beam you lit last time is gone, as if it had never been. The wick is dry again, the glass is cold, and the stair has forgotten your footsteps. But your hands have not forgotten the way up.
 
@@ -421,7 +421,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 **Do not read until the loop ends.**
 
 ```resolution Resolution 1 — The Page Beneath the Water (you completed The Hour Was Wrong this loop)
-> You come up out of the crypt with the page held flat against your chest, water running out of your sleeves. One hour. The whole night hangs on one misprinted hour. When the loop folds, you feel it fold differently, as though a fold at the edge of the night has been smoothed flat, and the road will hold.
+> You come up out of the crypt with the page held flat against your chest, water running out of your sleeves. One hour. The whole night hangs on one misprinted hour. When the loop folds, you feel it close differently, as though a crease at the edge of the night has been smoothed flat, and the road will hold.
 - If you defeated **The Bell-Ringer Beneath** this loop, add: *Below the flooded steps the rope hangs slack. For the rest of the night, and only for the rest of the night, the bell did not ring at all.*
 - If **Seraphine Vale** is one of your investigators, add: *Seraphine stood in the nave with her palm against the cold stone until the water rose. "I heard it," she says afterward. "The first night, here, and all my life before that, very far off. I heard it strike thirteen, and I reached for it."*
 - **The investigators must decide** (choose one):
@@ -459,12 +459,20 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > The walkers part around you. One reaches for your hand, finds the ring, and lets go.
 
+*If your Campaign Log records You hold the ticket, add:*
+
+> At the Turning the walkers glance at your pocket, where the ticket is, and step aside as if for a paying passenger.
+
+*If your Campaign Log records You refused the ticket, add:*
+
+> One of the walkers holds out a hand as you pass, palm up, like a conductor waiting for a fare. Then the hand drops.
+
 **When you Place this box:** The Milestones, The Low Bridge and The Turning join the map. Shuffle its encounter set ([set:node_road] The Waiting Congregation, The Mile-Counter, The Bridge Remembers) into the encounter deck. Its act deck: **Walk It Backward** (1a) and **Who Walks Beside You** (2a).
 
 **Do not read until the loop ends.**
 
 ```resolution Resolution 1 — Worn Smooth (you completed Who Walks Beside You this loop)
-> You cannot stop seeing the face beneath the hood, worn smooth as a step, and the ring on the hand that rose to stop you. When the night folds you look for them in the crowd at the Square, and do not find them. They are on the road. They are always on the road. You wonder, for the first time, how many loops it takes to wear a face away.
+> You cannot stop seeing the face beneath the hood, worn smooth as a step, and the ring on the hand that rose to stop you. When the night folds you look for them in the crowd at the Square, and do not find them. They are on the road. They are always on the road. You wonder, for the first time, how many loops it takes to wear a face away, and what a night like this needs to hold it in place.
 - If **"Birdie" Okonkwo** is one of your investigators, add: *Birdie's compass swung toward the walker and held there, steady as north, until the night ended. She has not put it away since.*
 - **The investigators must decide** (choose one):
   - **Take the ring.** The walker opens their hand and lets it go, as if it had been waiting a long time to be carried somewhere else. Record in your Campaign Log: *You carry the walker's ring.* (on the log token: this row's **1st** box.)
@@ -542,6 +550,14 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 *If your Campaign Log records You kept the night to yourselves, add:*
 
 > The ticket-taker catches your eye across the crowd and touches one finger to the side of his nose. A man who keeps a secret knows another who does.
+
+*If your Campaign Log records The vote was torn out, add:*
+
+> Here and there in the crowd someone stops cheering mid-breath and looks around, as if they have forgotten what they came to celebrate.
+
+*If your Campaign Log records The vote still stands, add:*
+
+> The crowd at the fair cheers on the same beat as the crowd in the Square, though neither can hear the other.
 
 *If your Campaign Log records You hold the ticket, add:*
 
@@ -625,7 +641,7 @@ Before the finale begins: if you completed a district's act 2a this loop, read t
 
 > You have lived this night more times than you can hold. You know the ledger, the wrong sky, the name. You know what the town agreed to: an appointment made in ink and never kept.
 >
-> You feel the loops in your body now. In the joints of your hands, in the grey at your temples, in the way the Town Hall steps seem steeper each night. The town has not aged a single night. You have aged all of them.
+> You feel the loops in your body now. In the joints of your hands, in the gray at your temples, in the way the Town Hall steps seem steeper each night. The town has not aged a single night. You have aged all of them.
 >
 > Out on the hill, the guest has stopped being polite. All that is left is to keep the appointment, and to decide what you are willing to spend.
 
@@ -652,7 +668,7 @@ Before the finale begins: if you completed a district's act 2a this loop, read t
 When contest progress reaches **6** (**5** with one investigator, **7** with four), advance Contest the Crossing: the contest is reached. Every deep entry you carry into the finale is one step of it; the rest must be taken from the Appointed. During the finale, a Hold Back success does not rewind the Hourglass (the Control token knows this). The finale also ends, with the contest **not** reached, when Hour IX is reached, when every investigator has been defeated, or when Dissonance reaches the reset value.
 
 During the finale, if your log records:
-- *You carry the walker's ring:* once during the finale, when an investigator takes the Hold Back action, they may resolve it without a skill test: push the Appointed back one stage, disengage and exhaust it. This counts as succeeding at Hold Back.
+- *You carry the walker's ring:* once during the finale, when an investigator takes the Hold Back action, they may resolve it without a skill test: push the Appointed's Approach back 1 stage, disengage and exhaust the Appointed. This counts as succeeding at Hold Back.
 - *The name is kept unspoken:* once during the finale, when the Hourglass would advance for any reason, the investigators may speak the name to cancel that entire advance (remove all doom from the current Hour).
 
 > **Halfway.** The first time your contest progress reaches half its target, rounded up, read aloud: *Every clock in Ambergrove stops, then starts again, ticking backward. For one breath you are all the ages you have ever been at once: young and tired and old, standing on every step of every stair you ever climbed in this town. Then the moment passes, and the thing on the hill is closer, and so is the dawn.*
@@ -681,7 +697,7 @@ Then read **Epilogue — What the Years Took.**
 - Ambergrove wakes to a morning with one more guest in it. The campaign is over.
 ```
 
-```resolution Resolution 2 — Close the Door (contest reached, your log records The Vote That Never Ends, The Appointed's Name and The vote still stands)
+```resolution Resolution 2 — Close the Door (contest reached, and your log records The vote still stands)
 > You pay the price the town agreed to and never paid. It is paid in years, as every price here is. You feel them go, all at once, like stepping off a stair that is not there. When you look up the sky has an edge again, and the edge is the dawn.
 - Each present investigator gains **3 Years** at once, and the door closes. If your log records *The town was warned*, Ambergrove remembers just enough to share the cost: **2 Years** each instead.
 - The debt is paid, and the door stays shut. The campaign is over.
@@ -713,7 +729,7 @@ Then read **Epilogue — What the Years Took.**
 
 **Epilogue — What the Years Took.** Unless you read Resolution 5 or 6, read one line for each investigator who is present at the end, was not kept as anchor and did not age out, matching their age bracket after the resolution's Years.
 - **Prime:** *You leave Ambergrove as young as you came, and no one on the train believes how tired you are.*
-- **Weathered:** *There is grey in your hair that was not there the night you arrived. You keep it. It is the only proof.*
+- **Weathered:** *There is gray in your hair that was not there the night you arrived. You keep it. It is the only proof.*
 - **Elder:** *Your hands shake a little now in the mornings. You spent years on one night, and you would spend them again.*
 - **Ancient:** *The station master helps you down from the carriage and asks if you have family meeting you. You had family, once, a hundred years ago tonight.*
 - An investigator **kept as anchor** has no epilogue. On clear nights in Ambergrove, the lamp at the end of the Sunken Road is lit.
@@ -749,7 +765,7 @@ You never need this with the boxes: **Place** builds every deck. Use it to build
 | [set:weight_of_years] The Weight of Years | A Year in a Night (2), What You've Forgotten (2), Old Bones (1) | Prologue, every loop |
 | [set:node_square] The Square | The Crossing (1), The Band on the Steps (1), The Same Speech (1), The Crowd Turns (1) | every loop |
 | [set:appointed] The Appointed | The Appointed's Whisper (2) | every loop from Part II; The Appointed and The Appointed's Approach are set aside |
-| District sets | as each district's **When you Place this box** lists (the Drowned Church's adds a third Drowned Choir) | when that district is placed |
+| District sets | as each district's **When you Place this box** lists (the Drowned Church's adds a third copy of The Drowned Choir, and the Sunken Road's a third copy of The Waiting Congregation) | when that district is placed |
 
 Every scenario card prints its set's symbol. A district's locations, acts and story assets print its district's symbol ([set:node_square] The Square, [set:node_lighthouse] The Lighthouse, [set:node_church] The Drowned Church, [set:node_road] The Sunken Road, [set:node_fairground] The Fairground, [set:node_almanac] The Almanac House); the Hours, the Prologue's cards and the story cards print [set:occultation_skips]; the Named print [set:named]; The Last Hour's cards print [set:appointed].
 

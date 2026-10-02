@@ -187,9 +187,9 @@
     }
    ],
    "back_shroud": 3,
-   "back_text": "Calm side: use it from setup once the log shows \"The Lamp Was Never Lit.\"\n[action] Light the lamp (no test). While it is lit this loop, Echoes at connected districts stay Sleepwalking one band longer, and The Dark That Waits treats investigators here as not at the Lantern Room.",
+   "back_text": "Calm side: use it from setup once the log shows \"The Lamp Remembers.\"\n[action] Light the lamp (no test). While it is lit this loop, Echoes at connected districts stay Sleepwalking one band longer, and The Dark That Waits treats investigators here as not at the Lantern Room.",
    "back_flavor": "You know how to light it now. Some part of you always did.",
-   "text": "Objective — With 4+ clues discovered in this district, test [com] or [wil] (3) here to light the lamp. Success: record \"The Lamp Was Never Lit.\"\nWhen the log shows \"The Lamp Was Never Lit,\" place this location calm side up."
+   "text": "Objective — With 4+ clues discovered in this district, test [com] or [wil] (3) here to light the lamp. Success: record \"The Lamp Remembers.\"\nWhen the log shows \"The Lamp Remembers,\" place this location calm side up."
   },
   {
    "id": "sthr-loc-windingstair",
@@ -290,7 +290,7 @@
    "index": "1a",
    "number": "1/2",
    "clues": 4,
-   "text": "Objective — Once 4 clues have been discovered in the Lighthouse district, an investigator at the Lantern Room may test [com] or [wil] (3) to light the lamp. If they succeed, record \"The Lamp Was Never Lit.\"\nWhile the lamp is lit this loop, Echoes at connected districts stay Sleepwalking one band longer. In every later loop, place the Lantern Room calm side up.",
+   "text": "Objective — Once 4 clues have been discovered in the Lighthouse district, an investigator at the Lantern Room may test [com] or [wil] (3) to light the lamp. If they succeed, record \"The Lamp Remembers.\"\nWhile the lamp is lit this loop, Echoes at connected districts stay Sleepwalking one band longer. In every later loop, place the Lantern Room calm side up.",
    "flavor": "The lamp is dark. It has never, in any loop, been lit."
   },
   {
@@ -298,7 +298,7 @@
    "index": "2a",
    "number": "2/2",
    "clues": 2,
-   "text": "Act II only, once the log shows \"The Lamp Was Never Lit.\"\nObjective — With the lamp lit this loop, search the Keeper's Quarters (2 clues there) for the keeper's logbook. Record \"The Keeper's Ninth Death.\"\nElias's elder-sign heal also removes 1 horror."
+   "text": "Act II only, once the log shows \"The Lamp Remembers.\"\nObjective — With the lamp lit this loop, search the Keeper's Quarters (2 clues there) for the keeper's logbook. Record \"The Keeper's Ninth Death.\"\nElias's elder-sign heal also removes 1 horror."
   },
   {
    "id": "sthr-act-whythirteen",

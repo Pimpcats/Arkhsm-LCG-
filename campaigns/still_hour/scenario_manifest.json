@@ -671,7 +671,7 @@
                 "decision": "CONTENT_DECISIONS A1 (owner's own edit)"
               },
               "back": {
-                "flip_fact": "The Lamp Was Never Lit",
+                "flip_fact": "The Lamp Remembers",
                 "shroud": 3
               }
             },
@@ -766,7 +766,7 @@
         "note": "reached from the Square by way of the Sunken Road"
       },
       "grants": [
-        "The Lamp Was Never Lit",
+        "The Lamp Remembers",
         "The Keeper's Ninth Death"
       ],
       "resolutions": [
@@ -1631,7 +1631,7 @@
         {
           "id": "R2",
           "name": "Close the Door",
-          "condition": "contest reached, your log records The Vote That Never Ends, The Appointed's Name and The vote still stands",
+          "condition": "contest reached, and your log records The vote still stands",
           "source": "player guide"
         },
         {

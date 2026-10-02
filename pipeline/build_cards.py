@@ -229,11 +229,12 @@ def scenario_tokens(tokens):
         if not key:
             continue
         text = str(t.get("text", "")).strip()
-        mod = re.match(r"\s*([+-]?)\s*(\d+|X)\b", text)
+        # printed values use the minus sign (U+2212); an ASCII hyphen still reads
+        mod = re.match(r"\s*([+\u2212-]?)\s*(\d+|X)\b", text)
         if mod and mod.group(2) == "X":
             modifier = -999
         elif mod:
-            modifier = int(mod.group(2)) * (-1 if mod.group(1) == "-" else 1)
+            modifier = int(mod.group(2)) * (-1 if mod.group(1) in ("-", "\u2212") else 1)
         else:
             modifier = 0
         out[key] = {"description": text, "modifier": modifier}

@@ -700,7 +700,7 @@ return function(H)
       list(st()))
     local markIV = chatMark()
     ctl("shClickHour")
-    check("The Hour Was Wrong: Hour IV is reached, but its When reached does not resolve",
+    check("The Hour Was Wrong: Hour IV is reached, but its Forced ability does not resolve",
       st().hour == 4 and chatHas(markIV, "does not resolve"), list(st()))
     ctl("shClickHour")
     check("...Hour V follows; the Appointed Sensed", st().hour == 5 and st().stage >= 1, list(st()))
@@ -726,7 +726,7 @@ return function(H)
     end
     E.run(2)
     local function card(id) return find(function(o) return o.type == "Card" and gm(o).id == id end) end
-    check("The Lamp Was Never Lit: the Lantern Room enters play calm side up (turned)",
+    check("The Lamp Remembers: the Lantern Room enters play calm side up (turned)",
       card("sthr-loc-lanternroom") ~= nil and card("sthr-loc-lanternroom").is_face_down == true)
     check("Part II with The Thirteenth Toll: the Flooded Crypt is open (act 2a current at Place)",
       card("sthr-loc-floodedcrypt") ~= nil and not hasLabel(card("sthr-loc-floodedcrypt"), "CLOSED"),

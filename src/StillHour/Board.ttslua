@@ -600,7 +600,7 @@ local STAGE_BUTTONS = {
   { fn = "shAppointedInfo", label = function() return "The Appointed: " .. Appointed.stageName() end,
     z = 1.75, w = 1100, fs = 120, tip = "Approach stage (CO-002)" },
   { fn = "shHoldBack", label = function() return "Hold Back (success)" end, z = 2.2, w = 1100, fs = 120,
-    tip = "Click after a SUCCESSFUL [willpower] or [combat] (4) test: back one stage, rewind one Hour (3 rewinds a loop)." },
+    tip = "Click after a SUCCESSFUL [willpower] or [combat] (4) test: push its Approach back 1 stage, rewind 1 Hour (3 rewinds a loop)." },
 }
 
 --- Put the Hold Back / Hunt buttons on the Appointed card (idempotent).
@@ -769,7 +769,7 @@ local function restoreNow()
   local pos = st.appointed.lastPos or setAsidePos()
   local rot = st.appointed.lastRot
   if bringAppointed(pos, rot, function(card) Board.refreshAppointedButtons(card) end) then
-    say("The Appointed cannot be defeated. It does not leave play.")
+    say("The Appointed cannot be defeated. It leaves play only when its Approach is pushed back to Unseen.")
   elseif restoreData then
     local data = restoreData
     safe(function()
@@ -779,7 +779,7 @@ local function restoreNow()
           Board.refreshAppointedButtons(o)
         end })
     end)
-    say("The Appointed cannot be defeated. It does not leave play.")
+    say("The Appointed cannot be defeated. It leaves play only when its Approach is pushed back to Unseen.")
   end
   restoreData = nil
 end

@@ -90,7 +90,8 @@ Use official campaigns as structure references, not as material to copy.
     additional cost to play X, …";
   - spend-clue objectives ("investigators at X may, as a group, spend N
     clues to advance");
-  - "When reached" text on agendas.
+  - an agenda's on-arrival effect as Forced templating ("Forced – When …:"),
+    never a home-made label such as "When reached:".
 - Every term the campaign invents is defined once in the guide's rules
   section, and cards use it the same way everywhere.
 - **Three wording passes**, each by an independent reviewer (a sub-agent):
