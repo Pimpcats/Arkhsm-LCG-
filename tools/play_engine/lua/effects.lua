@@ -399,7 +399,7 @@ return function(R, T)
   ACTS["sthr-act-vote"] = { at = "sthr-loc-townhallsteps", contrib = true, fact = "the-vote-that-never-ends", spend = true,
                             carry = { asset = "sthr-item-ledger", take = "sthr-loc-recordsoffice" } }
   ACTS["sthr-act-appointedname"] = { at = "sthr-loc-sealedstudy", contrib = true, fact = "the-appointeds-name", spend = true,
-                                     minStage = 3 }
+                                     minStage = 2 }
   ACTS["sthr-act-ninthdeath"] = { at = "sthr-loc-lanternroom", contrib = true, fact = "the-keepers-ninth-death", spend = true,
                                   needLamp = true, carry = { asset = "sthr-item-logbook", take = "sthr-loc-keepersquarters" } }
   ACTS["sthr-act-lamp"] = { at = "sthr-loc-lanternroom", contrib = true, fact = "the-lamp-was-never-lit", action = true,
@@ -511,7 +511,7 @@ return function(R, T)
       return nil
     end
     if A.minHour and R.hour() < A.minHour then return nil end       -- "Hour VIII or later" (The First Hour)
-    if A.minStage and R.stage() < A.minStage then return nil end    -- "while the Approach is Arrived"
+    if A.minStage and R.stage() < A.minStage then return nil end    -- "while the Approach is Emerging or Arrived"
     if A.twoPlace then
       -- one investigator at each location at once; solo: at the second, having been at the first this round
       local a, b = R.locById(A.twoPlace[1]), R.locById(A.twoPlace[2])
