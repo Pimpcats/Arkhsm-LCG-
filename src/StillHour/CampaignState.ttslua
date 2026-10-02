@@ -515,6 +515,9 @@ function CampaignState.reset()
     state.hourglass = Constants.HOUR_FIRST
     state.oncePerLoopFlags = {}
     state.holdBackRewinds = 0
+    -- The Prologue awards no Years, including pending awards from cards.
+    -- Age is skipped at this handoff, so it cannot consume these for us.
+    state.pendingYears = {}
     state.testTypesLastLoop = state.testTypesThisLoop
     state.testTypesThisLoop = {}
     state.appointedStage = 0

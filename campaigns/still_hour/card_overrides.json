@@ -214,7 +214,7 @@
         "color": "#1a605e"
       }
     ],
-    "flavor": "You came to Ambergrove for your own reasons. You will not remember why, soon.",
+    "flavor": "You are in Ambergrove for your own reasons. Soon, you will not remember why.",
     "unrevealed": true,
     "unrevealed_flavor": "Planks run out over black water. At the far end, someone is waiting for a boat that is not coming.",
     "text": "[action]: Test [wil] (2). If you succeed, place 1 Memory on your investigator card. (Group limit once per game.)"
@@ -829,8 +829,8 @@
   },
   "sthr-act-firsthour": {
     "name": "The First Hour",
-    "clues": 1,
-    "text": "Objective – If the current Hour is Hour VIII or later, investigators at The Almanac Steps may, as a group, spend 1 [perinv] clue to advance.\nIf Hour IX is reached first, (→R2).",
+    "clues": 2,
+    "text": "Objective – If the current Hour is Hour VIII or later, investigators at The Almanac Steps may, as a group, spend 2 [perinv] clues to advance.\nIf Hour IX is reached first, (→R2).",
     "flavor": "The almanac promised the occultation at midnight. It is eleven, and the sky is already wrong.",
     "deck": 95101,
     "index": "1a",
@@ -873,8 +873,8 @@
   },
   "sthr-act-whythirteen": {
     "name": "Why Thirteen?",
-    "clues": 4,
-    "text": "[action] Investigators spend 4 [perinv] clues, as a group: Take control of the set-aside Parish Register asset. Only an investigator at The Vestry may trigger this ability.\nObjective – After the Hourglass advances, if the investigator who controls Parish Register is at The Belfry, advance.",
+    "clues": 3,
+    "text": "[action] Investigators spend 3 [perinv] clues, as a group: Take control of the set-aside Parish Register asset. Only an investigator at The Vestry may trigger this ability.\nObjective – After the Hourglass advances, if the investigator who controls Parish Register is at The Belfry, advance.",
     "flavor": "The bell tolled thirteen times at the first occultation. It should toll twelve. Take the register up to the bell and count the strokes against it.",
     "deck": 95104,
     "index": "1a",
@@ -889,8 +889,8 @@
   },
   "sthr-act-hourwaswrong": {
     "name": "The Hour Was Wrong",
-    "clues": 2,
-    "text": "Part II only.\nForced – When this act becomes the current act: The Flooded Crypt opens. Spawn the set-aside The Bell-Ringer Beneath at The Flooded Crypt.\n[action] Investigators at The Flooded Crypt spend 2 [perinv] clues, as a group: Take control of the set-aside Drowned Page asset. Only an investigator at The Flooded Crypt may trigger this ability.\nObjective – If the investigator who controls Drowned Page is at The Vestry, advance.",
+    "clues": 3,
+    "text": "Part II only.\nForced – When this act becomes the current act: The Flooded Crypt opens. Spawn the set-aside The Bell-Ringer Beneath at The Flooded Crypt.\n[action] Investigators at The Flooded Crypt spend 3 [perinv] clues, as a group: Take control of the set-aside Drowned Page asset. Only an investigator at The Flooded Crypt may trigger this ability.\nObjective – If the investigator who controls Drowned Page is at The Vestry, advance.",
     "deck": 95105,
     "index": "2a",
     "flavor": "Below the bell, below the water, the church keeps what it was told to keep. Bring it up to the Vestry and read it against the register before the water takes the ink.",
@@ -915,13 +915,13 @@
   },
   "sthr-act-walksbeside": {
     "name": "Who Walks Beside You",
-    "text": "Part II only.\nForced – When this act becomes the current act: Search the encounter deck and discard pile for a Waiting Congregation, spawn it at The Turning and shuffle the encounter deck.\nEach Echo at The Turning is not Sleepwalking.\nObjective – [action] Investigators at The Turning spend 3 [perinv] clues, as a group: Stand Firm. Choose a ready Echo at The Turning and test [wil] or [com] (X), where X is its fight value. If you succeed, exhaust it and advance. If you fail, place the spent clues on The Turning.\n[reaction] After an investigator at The Turning evades an Echo there, investigators at The Turning spend 3 [perinv] clues, as a group: Advance.",
+    "text": "Part II only.\nForced – When this act becomes the current act: Search the encounter deck and discard pile for a Waiting Congregation, spawn it at The Turning and shuffle the encounter deck.\nEach Echo at The Turning is not Sleepwalking.\nObjective – [action] Investigators at The Turning spend 4 [perinv] clues, as a group: Stand Firm. Choose a ready Echo at The Turning and test [wil] or [com] (X), where X is its fight value. If you succeed, exhaust it and advance. If you fail, place the spent clues on The Turning.\n[reaction] After an investigator at The Turning evades an Echo there, investigators at The Turning spend 4 [perinv] clues, as a group: Advance.",
     "flavor": "Some of them turn to look at you now.",
     "deck": 95107,
     "index": "2a",
     "back_flavor": "The face under the hood is worn almost smooth, like a step a thousand feet have climbed. You know the coat. You know the ring on the hand that lifts to stop you, worn thin on the inside, as if it had been turned and turned through a thousand nights of holding something at the door. They were here before you, and they looped until there was nothing left to loop.",
     "back_text": "Record in your Campaign Log: Who Walks Beside You.\nRemove 1 [cultist] token from the chaos bag for the rest of the campaign.\nWhile your Campaign Log records Who Walks Beside You, each Echo gets −1 fight.\nThe Sunken Road's objectives are complete. From now on, do not use this act deck when you Place this box.",
-    "clues": 3,
+    "clues": 4,
     "clues_per_investigator": true,
     "no_threshold": true
   },
@@ -966,7 +966,7 @@
   },
   "sthr-act-bargain": {
     "name": "The Ticket-Taker's Bargain",
-    "text": "Part II only.\nObjective – [action] Parley. Only an investigator at The Ticket Booth may trigger this ability. The investigators at The Ticket Booth pay a fare of 5 [perinv], as a group, in any mix of clues (1 each), Memory removed from their own cards (1 each) and resources (3 count as 1). Advance.",
+    "text": "Part II only.\nObjective – [action] Parley. Investigators at The Ticket Booth pay a fare of 5 [perinv], as a group, in any mix of clues (1 each), Memory removed from their own cards (1 each) and resources (3 count as 1): Advance. Only an investigator at The Ticket Booth may trigger this ability.",
     "flavor": "He smiles at you like he's been expecting you for a very long time.",
     "deck": 95111,
     "index": "2a",

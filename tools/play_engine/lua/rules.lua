@@ -81,6 +81,8 @@ return function(R, T)
       m.dissonance_sources[why or "?"] = (m.dissonance_sources[why or "?"] or 0) + (after - before)
     end
     if costInv then
+      costInv.lastTurn = costInv.lastTurn or {}
+      if R.G.phase == "investigation" and R.G.turnOf == costInv then costInv.lastTurn.paidDiss = true end
       T.api("shApiTally", { id = costInv.id, kind = "raises", delta = 1 })
       costInv.raisedCost = (costInv.raisedCost or 0) + 1
     end
@@ -98,15 +100,57 @@ return function(R, T)
     end
   end
 
-  function R.addMemory(inv, n, why)
-    if n == 0 then return end
-    T.api("shApiOnCardMemory", { id = inv.id, delta = n })
-    inv.memory = math.max(0, (inv.memory or 0) + n)
-    local m = R.G.metrics
-    if n > 0 then
-      m.memory_on_cards[why or "?"] = (m.memory_on_cards[why or "?"] or 0) + n
+  -- `memory` is the total used by prey and banking. Investigator-only costs
+  -- use cardMemory; asset tokens never subsidize those costs.
+  function R.investigatorMemory(inv)
+    if inv.cardMemory == nil then
+      local assets = 0
+      for _, a in ipairs(inv.assets or {}) do assets = assets + (a.memory or 0) end
+      inv.cardMemory = math.max(0, (inv.memory or 0) - assets)
     end
-    R.log("%s Memory %+d (%s) -> %d", inv.name, n, why or "?", inv.memory)
+    return inv.cardMemory
+  end
+  function R.syncMemory(inv)
+    local total = R.investigatorMemory(inv)
+    local hasMarked = false
+    for _, a in ipairs(inv.assets or {}) do total = total + (a.memory or 0) end
+    for _, a in ipairs(inv.assets or {}) do if a.name == "Marked Deck" then hasMarked = true end end
+    if inv.sealedToken and not hasMarked then
+      T.chaosBag().putObject(inv.sealedToken)
+      inv.sealedToken = nil
+      E.run(0.1)
+      R.touch()
+    end
+    local delta = total - (inv.memory or 0)
+    inv.memory = total
+    if delta ~= 0 then T.api("shApiOnCardMemory", { id = inv.id, delta = delta }) end
+    return total
+  end
+  function R.addMemory(inv, n, why, source)
+    if n == 0 then return 0 end
+    R.investigatorMemory(inv)
+    local before = inv.memory or 0
+    if source == "any" and n < 0 then
+      local owe = -n
+      local take = math.min(owe, inv.cardMemory)
+      inv.cardMemory, owe = inv.cardMemory - take, owe - take
+      for _, a in ipairs(inv.assets or {}) do
+        take = math.min(owe, a.memory or 0)
+        a.memory, owe = (a.memory or 0) - take, owe - take
+      end
+    elseif type(source) == "table" then
+      source.memory = math.max(0, (source.memory or 0) + n)
+    else
+      inv.cardMemory = math.max(0, inv.cardMemory + n)
+    end
+    R.syncMemory(inv)
+    local delta = inv.memory - before
+    local m = R.G.metrics
+    if delta > 0 then
+      m.memory_on_cards[why or "?"] = (m.memory_on_cards[why or "?"] or 0) + delta
+    end
+    R.log("%s Memory %+d (%s) -> %d", inv.name, delta, why or "?", inv.memory)
+    return delta
   end
 
   function R.pendingYear(inv, n, why)
@@ -147,14 +191,19 @@ return function(R, T)
 
   function R.advance(n, why)
     local G = R.G
+    if n <= 0 or G.ended then return end
+    -- A cancellation applies to this entire advance, including a multi-Hour
+    -- skip. It must not be offered independently for each increment.
+    if R.cancelAdvance(why) then
+      G.doom = 0            -- guide: Cancel an advance removes current-Hour doom
+      R.log("Hourglass advance (%s) cancelled", why)
+      return
+    end
     local turned = false
     for _ = 1, n do
       if G.ended then return end
-      G.doom = 0            -- an advance removes all doom in play (cancelled or not)
-      -- cancel effects: I Remember the Ending, the name kept unspoken, It Means 'Wait'
-      if R.cancelAdvance(why) then
-        R.log("Hourglass advance (%s) cancelled", why)
-      else
+      G.doom = 0            -- a completed advance removes all doom in play
+      do
         local before = R.hour()
         if before >= 9 then return end
         local fx = R.hourPrevent and R.hourPrevent(before + 1)
@@ -212,6 +261,10 @@ return function(R, T)
       end
     end
     if turned and not G.ended and R.FX.afterAdvance then R.FX.afterAdvance() end
+    -- Mandatory no-cost objectives can resolve now. Optional clue payments
+    -- wait for a legal player window; a doom advance supplies none before
+    -- Mythos encounter draws (RR 1.3 -> 1.4).
+    if turned and not G.ended and R.checkObjectives then R.checkObjectives() end
   end
 
   function R.rewind(n, why, alreadyCounted)
@@ -454,25 +507,26 @@ return function(R, T)
   -- (the AI assigns), then defeat.
   function R.hurt(inv, dmg, hor, source, opts)
     opts = opts or {}
-    if inv.defeated or (dmg <= 0 and hor <= 0) then return end
+    local dealt = { damage = 0, horror = 0, assetDamage = 0, assetHorror = 0 }
+    if inv.defeated or (dmg <= 0 and hor <= 0) then return dealt end
     local G = R.G
     if dmg > 0 and inv.story and inv.story.id == "sthr-item-logbook" and not inv.storyExhausted then
       inv.storyExhausted = true
       dmg = dmg - 1
       R.log("Keeper's Logbook: %s takes 1 less damage", inv.name)
-      if dmg <= 0 and hor <= 0 then return end
+      if dmg <= 0 and hor <= 0 then return dealt end
     end
     -- Elias: take damage for another investigator at his location
-    if dmg > 0 and not opts.direct and inv.id ~= "sthrelias" then
+    if dmg > 0 and not opts.direct and not inv.round.nobodyBelieves and inv.id ~= "sthrelias" then
       local elias = R.invById("sthrelias")
       if elias and not elias.defeated and elias.loc == inv.loc and not elias.round.redirect
          and (elias.health - elias.damage) > dmg + 1 then
         elias.round.redirect = true
         R.log("Elias takes %d damage for %s", dmg, inv.name)
-        R.hurt(elias, dmg, 0, source .. " (redirected)", { direct = true })
+        R.hurt(elias, dmg, 0, (source or "damage") .. " (redirected)", { enemy = opts.enemy, fromWeakness = opts.fromWeakness })
         R.addMemory(elias, 1, "Elias: took damage for another")
         dmg = 0
-        if hor <= 0 then return end
+        if hor <= 0 then return dealt end
       end
     end
     if not opts.direct then
@@ -480,11 +534,13 @@ return function(R, T)
         if dmg > 0 and (a.hp or 0) > (a.dmg or 0) then
           local take = math.min(dmg, a.hp - a.dmg)
           a.dmg = a.dmg + take ; dmg = dmg - take
+          dealt.assetDamage = dealt.assetDamage + take
           if a.name == "Guard Dog" and opts.enemy and take > 0 then R.damageEnemy(opts.enemy, 1, inv, "Guard Dog") end
         end
         if hor > 0 and (a.sp or 0) > (a.hor or 0) then
           local take = math.min(hor, a.sp - a.hor)
           a.hor = a.hor + take ; hor = hor - take
+          dealt.assetHorror = dealt.assetHorror + take
         end
       end
       -- discard defeated assets
@@ -496,7 +552,9 @@ return function(R, T)
           R.log("%s's %s is defeated", inv.name, a.name)
         end
       end
+      R.syncMemory(inv)       -- tokens on discarded assets leave play too
     end
+    dealt.damage, dealt.horror = dmg + dealt.assetDamage, hor + dealt.assetHorror
     inv.damage = inv.damage + dmg
     inv.horror = inv.horror + hor
     G.metrics.damage = G.metrics.damage + dmg
@@ -510,6 +568,7 @@ return function(R, T)
     if hor > 0 and inv.threat["Psychosis"] and not opts.fromWeakness then R.hurt(inv, 1, 0, "Psychosis", { direct = true, fromWeakness = true }) end
     if dmg > 0 and inv.threat["Hypochondria"] and not opts.fromWeakness then R.hurt(inv, 0, 1, "Hypochondria", { direct = true, fromWeakness = true }) end
     if inv.damage >= inv.health or inv.horror >= inv.sanity then R.defeat(inv, source, opts) end
+    return dealt
   end
 
   function R.heal(inv, dmg, hor)
@@ -539,6 +598,12 @@ return function(R, T)
     end
     if R.knows("the-keepers-ninth-death") then R.addMemory(inv, 1, "every death is written down") end
     inv.defeated = true
+    if inv.sealedToken then
+      T.chaosBag().putObject(inv.sealedToken)
+      inv.sealedToken = nil
+      E.run(0.1)
+      R.touch()
+    end
     G.metrics.defeats = G.metrics.defeats + 1
     G.metrics.defeated[inv.id] = true
     local src = tostring(source or "?"):gsub(" %(.*%)$", "")
@@ -592,10 +657,8 @@ return function(R, T)
     R.FX.onEnter(inv, b)
     R.engageAt(b)
     if G.ended then return true end
-    -- district travel costs time (guide: Districts and travel): after the
-    -- first move each round along a district connection, the Hourglass
-    -- advances; a move not along a connection, or one that says it does not
-    -- advance it, costs nothing and does not count as that first move
+    -- The first move along a district connection each round places doom;
+    -- free crossings do not consume that connection's first-move allowance.
     if a and not opts.teleport and R.isCrossing(a, b) then
       local key = R.crossKey(a, b)
       G.metrics.crossings = G.metrics.crossings + 1
@@ -756,7 +819,7 @@ return function(R, T)
 
   function R.damageEnemy(en, n, inv, why)
     local G = R.G
-    if n <= 0 or en.dead then return end
+    if n <= 0 or en.dead or en.id == "sthr-appointed" then return end
     if en.id == "sthr-onewhorides" and not en.exhausted then
       R.log("%s is ready: it cannot be dealt damage", en.name)
       return

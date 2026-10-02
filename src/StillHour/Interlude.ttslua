@@ -130,7 +130,7 @@ end
 
 --------------------------------------------------------------- loop handoff --
 
---- Begin the next loop's play: enforce the Memory soft cap (6 x investigators).
+--- Begin the next loop's play: enforce the Memory soft cap (10 x investigators).
 -- Call at the end of the interlude, before loop setup. `inPlay` (optional set
 -- id -> true): investigators still in the campaign; a departed investigator
 -- (aged out, or not in play) gets no start-of-loop Memory.

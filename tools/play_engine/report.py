@@ -29,7 +29,7 @@ PRIMARY = {
     "district_almanac_p2": "sthr-act-appointedname",
 }
 for _k in list(PRIMARY):                  # later-night variants (scenarios.lua: _n3, _p2_n5/_n6/_n7)
-    for _v in (("_n5", "_n6", "_n7") if _k.endswith("_p2") else ("_n3",)):
+    for _v in (("_n5", "_n6", "_n7", "_n8") if _k.endswith("_p2") else ("_n2", "_n3")):
         PRIMARY[_k + _v] = PRIMARY[_k]
 # The night's goal, as an official scenario's act deck: the district's act and
 # the Square's current act (both are on the board every loop). A night "wins"
@@ -55,6 +55,7 @@ TEMPO_KEY = {
 ORDER = ["prologue", "district_square", "district_church", "district_road", "district_lighthouse",
          "district_fairground", "district_almanac", "district_square_p2", "district_church_p2", "district_road_p2",
          "district_lighthouse_p2", "district_fairground_p2", "district_almanac_p2", "loop_multi", "finale", "finale_h9"]
+ORDER += [k for k in PRIMARY if k not in ORDER]
 
 
 def L(x):
@@ -142,9 +143,9 @@ def summarize(name, players, games):
     if prim:
         # the district's own act alone (for reference)
         s["district_completion"] = sum(1 for g in games if act_done(g, prim)) / n if n else 0
-        need = NIGHT.get(name, [prim])
         done = []
         for g in games:
+            need = L(g.get("goals")) or NIGHT.get(name, [prim])
             ds = [act_done(g, a) for a in need]
             done.append(max(ds, key=lambda d: d["round"]) if all(ds) else None)
         ok = [d for d in done if d]

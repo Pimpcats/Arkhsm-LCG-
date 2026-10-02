@@ -1,4 +1,15 @@
-# THE STILL HOUR — Content decisions (scenario content pass)
+# THE STILL HOUR — content decisions (historical record)
+
+> Current source: 2026-10-02 finishing corrections. See
+> [correction ledger](FINISHING_CORRECTIONS.md) and
+> [current campaign audit](CURRENT_CAMPAIGN_AUDIT.md) and
+> [finishing measurements](FINISHING_BALANCE.md).
+
+Everything below the dated update is a historical design or measurement record.
+Old clue costs, doom thresholds, economy caps, deck budgets and success rates
+are superseded wherever they disagree with effective card overrides, the current
+guide and the corrected engine. Do not use an old headline as release approval.
+
 
 *CONTAINS SPOILERS. Assistant/designer reference only — not an owner handout.*
 

@@ -150,6 +150,8 @@ return function(H)
     return blob
   end
 
+  local carried, campaignDecks, campaignWeaknesses, campaignFlags, upgradeAt, recollectionAt
+
   ------------------------------------------------------------ setup --
 
   local AWAY = { x = -60, y = 2, z = 0 }
@@ -250,7 +252,9 @@ return function(H)
     local errMark = #E.errors
 
     cleanTable()
-    T.api("shApiRestore", { blob = J.encode(campaignFor(sc)) })
+    local restored = carried and T.decode(J.encode(carried)) or campaignFor(sc)
+    if carried then restored.campaign.onCardMemory = {} end -- re-created on actual card sources below
+    T.api("shApiRestore", { blob = J.encode(restored) })
     E.run(0.5)
     -- the campaign log shows the same entries
     local vals = T.logValues()
@@ -353,12 +357,13 @@ return function(H)
     local invStats = {}
     for _, x in ipairs(T.api("shApiInvestigators") or {}) do invStats[x.id] = x.stats end
     for i, s in ipairs(seats) do
-      local w = R.pick(decks.weaknesses)
+      local w = campaignWeaknesses and campaignWeaknesses[s.id] or R.pick(decks.weaknesses)
       local mini = T.minicard(s.id)
       -- later nights play the XP deck of that night (decks.py TIERS: n2, n3, n4, n6, fin)
-      local deck = (sc.xp and decks.tiers and decks.tiers[sc.xp] and decks.tiers[sc.xp][s.id]) or decks.decks[s.id]
+      local deck = campaignDecks and campaignDecks[s.id] or (sc.xp and decks.tiers and decks.tiers[sc.xp] and decks.tiers[sc.xp][s.id]) or decks.decks[s.id]
       local inv = R.P.newInvestigator(i, s.id, s.color, s.card, mini, invStats[s.id], deck, w)
-      inv.bracket = (sc.years or 0) >= 15 and "Ancient" or (sc.years or 0) >= 10 and "Elder" or (sc.years or 0) >= 5 and "Weathered" or "Prime"
+      inv.years = (restored.campaign.years or {})[s.id] or sc.years or 0
+      inv.bracket = inv.years >= 15 and "Ancient" or inv.years >= 10 and "Elder" or inv.years >= 5 and "Weathered" or "Prime"
       inv.loc = start.guid
       if mini then T.moveMini(mini, start.obj, i) end
       G.inv[i] = inv
@@ -369,6 +374,7 @@ return function(H)
     -- Elder and Ancient investigators begin each loop with 1 Memory
     for _, inv in ipairs(G.inv) do
       if inv.bracket == "Elder" or inv.bracket == "Ancient" then R.addMemory(inv, 1, "Elder: begins the loop with 1 Memory") end
+      if R.P.findAsset(inv, "Anchor Point") then R.addMemory(inv, 1, "Anchor Point: begins the loop with 1 Memory") end
     end
     G.metrics.start = { dissonance = R.dissonance(), hour = R.hour(), memory = R.state().memory }
     -- Part II acts that are current from the start resolve "When this act becomes the current act"
@@ -406,6 +412,7 @@ return function(H)
       if e.reason == "act" then res = "R1" elseif e.reason == "defeat" then res = "NR" else res = "R2" end
       local mem = 2 * n + (res == "R1" and 1 or 0)
       for _ = 1, mem do T.ctl("Memory") end
+      T.tickLog("k:you-are-unstuck", true) -- every Prologue resolution records it
     elseif G.finale then
       res = R.finaleResolution()
     else
@@ -417,30 +424,38 @@ return function(H)
       local d = S.BOX_DISTRICT[id]
       if d and d ~= "Prologue" and not districts[d] then districts[d] = districtResolution(G, d) end
     end
-    -- Reset Loop, then the Interlude: Age (who was defeated) and bank on-card Memory
+    -- Ordinary loops use the interlude. The finale's outcome is classified
+    -- above; its ending/epilogue must be read from the guide. It must not
+    -- silently receive an ordinary loop's reset, aging or Memory banking.
     local st0 = T.st()
     local onCard = 0
     for _, inv in ipairs(G.inv) do onCard = onCard + (inv.memory or 0) end
-    T.ctl("Reset Loop")
-    E.run(0.5)
     local years = {}
-    if not G.prologue then
-      T.api("shApiInterlude", { open = true })
-      for _, inv in ipairs(G.inv) do
-        local r = T.api("shApiAge", { id = inv.id, defeated = m.defeated[inv.id] == true })
-        years[inv.id] = r and r.gained or 0
+    local banked = 0
+    if not G.finale then
+      T.ctl("Reset Loop")
+      E.run(0.5)
+      if not G.prologue then
+        T.api("shApiInterlude", { open = true })
+        for _, inv in ipairs(G.inv) do
+          local r = T.api("shApiAge", { id = inv.id, defeated = m.defeated[inv.id] == true })
+          years[inv.id] = r and r.gained or 0
+        end
       end
+      banked = T.api("shApiBankOnCard") or 0
+      T.api("shApiInterlude", { open = false })
     end
-    local banked = T.api("shApiBankOnCard") or 0
-    T.api("shApiInterlude", { open = false })
     local st1 = T.st()
     local out = {
       scenario = G.name, seed = G.seed, players = n, party = party,
       ended = e.reason, resolution = res, districts = districts, round = e.round, hour = e.hour,
+      finale_aftermath = G.finale and "not simulated; resolve the ending and epilogue in the guide" or nil,
       dissonance_end = e.dissonance, band_end = st0.band, stage_max = m.stage_max,
       acts = m.acts_completed, knowledge = m.knowledge, contest = G.contest,
+      goals = G.cfg.goals or G.cfg.objectives,
       memory_on_cards = onCard, memory_banked_on_cards = banked, memory_bank_start = m.start.memory,
       memory_bank_end = st1.memory, years = years, card_years = m.card_years,
+      campaign_state = cfg.campaign and T.decode(T.api("shApiSnapshot")) or nil,
       metrics = m, trace = G.trace, table_notes = T.errors,
       lua_errors = {},
     }
@@ -483,14 +498,124 @@ return function(H)
   end
 
   local total = 0
+  -- A campaign keeps the actual log, paid Knowledge/Victory, scar, Years,
+  -- remaining bank, purchased deck and original basic weakness. Its route
+  -- rotates districts; it never injects unearned finale requirements.
+  local SURFACE_ACT={Square="sthr-act-sheriffdead",Church="sthr-act-whythirteen",Road="sthr-act-walkbackward",
+    Lighthouse="sthr-act-lamp",Fairground="sthr-act-wheelturns",Almanac="sthr-act-almanachid"}
+  local DEEP_ACT={Square="sthr-act-vote",Church="sthr-act-hourwaswrong",Road="sthr-act-walksbeside",
+    Lighthouse="sthr-act-ninthdeath",Fairground="sthr-act-bargain",Almanac="sthr-act-appointedname"}
+  local ROUTE={"Church","Fairground","Almanac","Road","Lighthouse"}
+  local BOX={Church="district_church",Fairground="district_fairground",Almanac="district_almanac",Road="district_road",Lighthouse="district_lighthouse"}
+  local function purchaseAfter(out)
+    local spent, purchases = 0, {}
+    T.api("shApiInterlude",{open=true})
+    for _,id in ipairs(party) do
+      local dk=campaignDecks[id]
+      local ri=recollectionAt[id]
+      local rid=(decks.recollection_picks[id] or {})[ri]
+      local rc=rid and decks.recollections[rid]
+      if rc and T.st().memory >= rc.memoryCost then
+        local result=T.api("shApiBuy",{recollection=rid})
+        if result and result.ok then
+          if not rc.permanent then
+            local replace
+            for j,c in ipairs(dk.cards) do if c.name=="Unexpected Courage" or c.name=="Knife" or c.name=="Emergency Cache" then replace=j break end end
+            table.remove(dk.cards,replace or 1)
+          end
+          dk.cards[#dk.cards+1]=T.decode(J.encode(rc))
+          recollectionAt[id]=ri+1
+          spent=spent+rc.memoryCost
+          purchases[#purchases+1]={investigator=id,id=rid,cost=rc.memoryCost}
+        end
+      end
+      local ui=upgradeAt[id]
+      local up=(decks.upgrade_steps[id] or {})[ui]
+      if up and T.st().memory >= up.cost then
+        local replaced={}
+        for j,c in ipairs(dk.cards) do if c.name==up.from or c.full==up.from then replaced[#replaced+1]=j end end
+        if up.card.permanent or #replaced >= up.copies then
+          for j=1,up.copies do
+            local result=T.api("shApiBuy",{level=up.level})
+            if not result or not result.ok then error("upgrade preflight/payment disagreement") end
+            if up.card.permanent then dk.cards[#dk.cards+1]=T.decode(J.encode(up.card))
+            else dk.cards[replaced[j]]=T.decode(J.encode(up.card)) end
+          end
+          upgradeAt[id]=ui+1
+          spent=spent+up.cost
+          purchases[#purchases+1]={investigator=id,id=up.card.full or up.card.name,cost=up.cost}
+        end
+      end
+    end
+    out.spent, out.purchases=spent,purchases
+    local before=T.st().memory
+    T.api("shApiBeginNextLoop")
+    out.carry_lost=before-T.st().memory
+    carried=T.decode(T.api("shApiSnapshot"))
+    out.memory_after_spending=T.st().memory
+  end
+  local function campaignScenario(slot)
+    local c=carried.campaign
+    local sc={part=c.partTwo and 2 or 1,loops=c.loopsCompleted,knowledge={},logFlags=campaignFlags,
+      objectives={},boxes={"district_square"}}
+    for fact,v in pairs(c.knowledge) do if v then sc.knowledge[#sc.knowledge+1]=fact end end
+    table.sort(sc.knowledge)
+    local district=ROUTE[((slot-2)%#ROUTE)+1]
+    if slot==10 and c.knowledge["the-way-the-night-breaks"] then
+      district="Almanac" ; sc.finaleGoal=true
+    end
+    local function add(d)
+      sc.boxes[#sc.boxes+1]=BOX[d]
+    end
+    if district=="Lighthouse" then add("Road") end
+    add(district)
+    for _,d in ipairs({"Square",district}) do
+      if not c.knowledge[S.SURF[d]] then sc.objectives[#sc.objectives+1]=SURFACE_ACT[d]
+      elseif c.partTwo and not c.knowledge[S.DEEP[d]] then sc.objectives[#sc.objectives+1]=DEEP_ACT[d] end
+    end
+    if slot==10 and not sc.finaleGoal then sc.finaleUnavailable=true end
+    return sc
+  end
   for _, job in ipairs(cfg.jobs) do
     for r = 1, job.runs do
       local seed = job.seed + r - 1
       local t0 = os.clock()
-      local out = play(job.scenario, seed)
-      out.cpu = os.clock() - t0
-      total = total + 1
-      emit("GAME", out)
+      if cfg.campaign then
+        carried=nil
+        campaignDecks, campaignWeaknesses, campaignFlags, upgradeAt, recollectionAt={},{},{},{},{}
+        E.seed(seed)
+        for _,id in ipairs(party) do
+          campaignDecks[id]=T.decode(J.encode(decks.decks[id]))
+          campaignWeaknesses[id]=R.pick(decks.weaknesses)
+          upgradeAt[id],recollectionAt[id]=1,1
+        end
+        for slot=1,10 do
+          local name=slot==1 and "prologue" or "campaign_slot_"..slot
+          if slot>1 then S[name]=campaignScenario(slot) end
+          local out=play(name,seed*100+slot)
+          out.campaign_seed,out.slot=seed,slot
+          out.cpu=os.clock()-t0
+          for d,res in pairs(out.districts or {}) do
+            if res=="R1" then
+              if d=="Square" then campaignFlags["The vote still stands"]=true
+              elseif d=="Church" then campaignFlags["The drowned heard the true hour"]=true
+              elseif d=="Road" then campaignFlags["The walkers keep their ring"]=true
+              elseif d=="Almanac" then campaignFlags["The name is kept unspoken"]=true end
+            end
+          end
+          local agedOut=false
+          for _,id in ipairs(party) do if (out.campaign_state.campaign.years[id] or 0)>=18 then agedOut=true end end
+          if slot<10 and not out.engine_error and not agedOut then purchaseAfter(out) end
+          total=total+1 ; emit("GAME",out)
+          if out.engine_error or agedOut or out.ended=="contest" then break end
+        end
+        carried,campaignDecks,campaignWeaknesses,campaignFlags=nil,nil,nil,nil
+      else
+        local out = play(job.scenario, seed)
+        out.cpu = os.clock() - t0
+        total = total + 1
+        emit("GAME", out)
+      end
       if H.args.snapshots and cfg.snapshotGame then H.snapshot("end of " .. job.scenario) end
     end
   end

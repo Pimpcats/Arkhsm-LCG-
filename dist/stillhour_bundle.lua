@@ -639,6 +639,9 @@ function CampaignState.reset()
     state.hourglass = Constants.HOUR_FIRST
     state.oncePerLoopFlags = {}
     state.holdBackRewinds = 0
+    -- The Prologue awards no Years, including pending awards from cards.
+    -- Age is skipped at this handoff, so it cannot consume these for us.
+    state.pendingYears = {}
     state.testTypesLastLoop = state.testTypesThisLoop
     state.testTypesThisLoop = {}
     state.appointedStage = 0
@@ -1942,23 +1945,30 @@ end
 -- from the sources are ignored while any reachable one exists. Ties go to
 -- `tiebreak(a, b)` (true when a should win) or else to the smaller key.
 -- With no sources, every node counts as distance 0 (tiebreak decides).
-function Locations.farthest(graph, sources, tiebreak)
+-- `candidates`, when supplied, restricts destinations, not transit nodes.
+-- Also returns all destinations tied at the greatest legal distance.
+function Locations.farthest(graph, sources, tiebreak, candidates)
   local dist = Locations.distances(graph, sources)
   local anyReachable = next(dist) ~= nil
-  local best, bestD
+  local best, bestD, tied = nil, nil, {}
   local keys = {}
   for k in pairs(graph) do keys[#keys + 1] = k end
   table.sort(keys, function(a, b) return tostring(a) < tostring(b) end)
   for _, k in ipairs(keys) do
     local d = dist[k]
     if d == nil and not anyReachable then d = 0 end
-    if d ~= nil then
-      if best == nil or d > bestD or (d == bestD and tiebreak and tiebreak(k, best)) then
-        best, bestD = k, d
+    if d ~= nil and (candidates == nil or candidates[k]) then
+      if best == nil or d > bestD then
+        best, bestD, tied = k, d, { k }
+      elseif d == bestD then
+        tied[#tied + 1] = k
+        if tiebreak and tiebreak(k, best) then
+          best, bestD = k, d
+        end
       end
     end
   end
-  return best, bestD
+  return best, bestD, tied
 end
 
 --- One step from `from` along a shortest path toward `to`; returns `from`
@@ -2113,7 +2123,7 @@ end
 
 --------------------------------------------------------------- loop handoff --
 
---- Begin the next loop's play: enforce the Memory soft cap (6 x investigators).
+--- Begin the next loop's play: enforce the Memory soft cap (10 x investigators).
 -- Call at the end of the interlude, before loop setup. `inPlay` (optional set
 -- id -> true): investigators still in the campaign; a departed investigator
 -- (aged out, or not in play) gets no start-of-loop Memory.
@@ -2355,7 +2365,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d76b31f78acfc05a6a1ad5cc50074bdb677a47fe/dist/cards/sthr-static-token.jpg?v=a556271511"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/edb319dc44156898bd22b8f11382d4e94e8fd485/dist/cards/sthr-static-token.jpg?v=a556271511"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -2430,6 +2440,7 @@ function ChaosBag.new(opts)
     pendingRemove = 0,
     removing = {},     -- guid -> true while we take a token out to destroy it
     out = {},          -- guid -> true: our tokens drawn out of the bag
+    pendingStatic = {}, -- guid -> true: reveal not yet committed (may be a preview/cancel)
     retryScheduled = false,
     lastMode = "virtual",
   }
@@ -2460,7 +2471,7 @@ function ChaosBag.new(opts)
     local n = 0
     for guid in pairs(a.out) do
       local o = safe(function() return getObjectFromGUID(guid) end)
-      if o ~= nil then n = n + 1 else a.out[guid] = nil end
+      if o ~= nil then n = n + 1 else a.out[guid] = nil ; a.pendingStatic[guid] = nil end
     end
     return n
   end
@@ -2578,6 +2589,7 @@ function ChaosBag.new(opts)
   function a.clearTemporary()
     a.extra = 0
     a.almanac = false
+    a.pendingStatic = {}
     return a.reconcile()
   end
 
@@ -2591,7 +2603,8 @@ function ChaosBag.new(opts)
     end
     local guid = safe(function() return obj.getGUID() end) or obj.guid
     if guid and a.removing[guid] then return false end
-    if guid then a.out[guid] = true end
+    if guid and a.out[guid] then return false end
+    if guid then a.out[guid] = true ; a.pendingStatic[guid] = true end
     return true
   end
 
@@ -2599,22 +2612,43 @@ function ChaosBag.new(opts)
   function a.onEnter(container, obj)
     if ChaosBag.isStaticToken(obj) and ChaosBag.isChaosBag(container) then
       local guid = safe(function() return obj.getGUID() end) or obj.guid
-      if guid then a.out[guid] = nil end
+      if guid then a.out[guid] = nil ; a.pendingStatic[guid] = nil end
+      return true
     end
+    return false
+  end
+
+  --- Commit/discard one pending reveal. Returning a preview to the bag also
+  -- discards it. Committing is explicit because extraction alone cannot tell
+  -- a resolved skill-test token from a canceled token or an outside-test peek.
+  function a.takePendingStatic(guid)
+    if guid ~= nil and not a.pendingStatic[guid] then return nil end
+    if guid == nil then
+      local keys = {}
+      for g in pairs(a.pendingStatic) do keys[#keys + 1] = g end
+      table.sort(keys)
+      guid = keys[1]
+    end
+    if guid then a.pendingStatic[guid] = nil end
+    return guid
   end
 
   --- Cheap summary for labels (no bag lookup); pass true to also count the
   -- physical tokens (looks the bag up).
   function a.describe(withPhysical)
     local phys = withPhysical and a.physicalCount() or nil
+    local pending = 0
+    for _ in pairs(a.pendingStatic) do pending = pending + 1 end
     return { mode = a.lastMode, target = a.target(), baseline = a.baseline,
-             extra = a.extra, almanac = a.almanac, physical = phys }
+             extra = a.extra, almanac = a.almanac, physical = phys, pending = pending }
   end
 
   function a.save()
-    local out = {}
+    local out, pending = {}, {}
     for g in pairs(a.out) do out[#out + 1] = g end
-    return { baseline = a.baseline, extra = a.extra, almanac = a.almanac, out = out }
+    for g in pairs(a.pendingStatic) do pending[#pending + 1] = g end
+    table.sort(out) ; table.sort(pending)
+    return { baseline = a.baseline, extra = a.extra, almanac = a.almanac, out = out, pendingStatic = pending }
   end
 
   function a.load(t)
@@ -2624,6 +2658,10 @@ function ChaosBag.new(opts)
     a.almanac = t.almanac == true or (tonumber(t.extra) or 0) < 0
     a.out = {}
     for _, g in ipairs(t.out or {}) do a.out[g] = true end
+    a.pendingStatic = {}
+    for _, g in ipairs(t.pendingStatic or {}) do
+      if a.out[g] then a.pendingStatic[g] = true end
+    end
     a.count = a.target()
   end
 
@@ -3287,25 +3325,25 @@ function Board.appointedCtx(extra)
       end
       return false
     end
-    local graph = Board.graph(locs)
-    local occ = Board.occupied(locs)
-    local byGuid = {}
-    for _, l in ipairs(locs) do byGuid[l.guid] = l end
-    local minis = Board.minicards()
-    -- tie-break: farther (straight-line) from the nearest investigator wins
-    local function spread(g)
-      local p, best = byGuid[g].pos, nil
-      for _, m in ipairs(minis) do
-        if m.pos then
-          local d = dist2d(p, m.pos)
-          if best == nil or d < best then best = d end
-        end
-      end
-      return best or 0
+    -- Reveal status restricts the destination, not the legal movement path.
+    local movement = Board.movableLocations()
+    local graph = Board.graph(movement)
+    local occ = Board.occupied(movement)
+    local byGuid, eligible = {}, {}
+    for _, l in ipairs(locs) do
+      byGuid[l.guid], eligible[l.guid] = l, true
     end
-    local target = Locations.farthest(graph, occ, function(a, b) return spread(a) > spread(b) end)
+    local target, _, tied = Locations.farthest(graph, occ, nil, eligible)
     local l = byGuid[target]
     if not l then return false end
+    if #tied > 1 then
+      local names = {}
+      for _, g in ipairs(tied) do
+        names[#names + 1] = safe(function() return byGuid[g].obj.getName() end) or g
+      end
+      say("Farthest-location tie: " .. table.concat(names, "; ") .. ". The lead investigator chooses. "
+        .. "The automatic placement is a default: move it to another tied location before continuing if chosen.")
+    end
     local ok = bringAppointed(placePosFor(l), rotFor(l), function(card)
       Board.refreshAppointedButtons(card)
     end)
@@ -4228,6 +4266,11 @@ local function drawPlay()
     button("shDifficulty" .. i, d.label, -1.8 + (i - 1) * 1.2, 3.2, 520,
       "Campaign Setup: fill SCED's chaos bag for " .. d.label .. " (the guide's list).", 90)
   end
+  if d.pending > 0 then
+    button("shResolveStatic", string.format("Static waiting %d: resolve / cancel", d.pending), 0, 3.8, 1800,
+      "One pending token: left resolves, right cancels. Multiple tokens: use Resolve on the actual token. "
+        .. "Returning an unresolved token to the bag also discards that token's pending reveal.", 85)
+  end
 end
 
 local function drawInterlude()
@@ -4312,6 +4355,17 @@ end
 refreshControl = function()
   pcall(function() self.clearButtons() end)
   if mode == "interlude" then drawInterlude() else drawPlay() end
+  -- Token UI is transient in TTS. Reattach by saved GUID on reload/restore;
+  -- clearing first makes repeated restoration idempotent.
+  for _, guid in ipairs(bag.save().pendingStatic or {}) do
+    local obj = getObjectFromGUID(guid)
+    if obj and obj.createButton then
+      if obj.clearButtons then pcall(obj.clearButtons) end
+      obj.createButton({ click_function = "shResolveStaticToken", function_owner = self, label = "Resolve",
+        position = {0,0.3,0}, rotation = {0,0,0}, width = 900, height = 260, font_size = 140,
+        tooltip = "Left: this Static resolves. Right: cancel this token's effect. Returning a preview also cancels it." })
+    end
+  end
   persist()
 end
 
@@ -4321,6 +4375,27 @@ function shNoop() end
 function shClickMemory(_, _, alt) guarded("memory", changeMemory, alt and -1 or 1) ; refreshControl() end
 function shClickInvestigators(_, _, alt) guarded("investigators", changeInvestigators, alt and -1 or 1) ; afterChange() end
 function shClickDissonance(_, _, alt) guarded("dissonance", changeDissonance, alt and -1 or 1) ; afterChange() end
+function shApiResolveStatic(p)
+  if not (p and p.guid) and bag.describe().pending > 1 then
+    announce("More than one [static] is waiting. Use Resolve on the actual token, "
+      .. "or return a preview/canceled token to the bag before resolving the remaining one.")
+    return false
+  end
+  local guid = bag.takePendingStatic(p and p.guid)
+  if not guid then return false end
+  local obj = getObjectFromGUID(guid)
+  if obj and obj.clearButtons then pcall(obj.clearButtons) end
+  if not (p and p.cancel) then
+    guarded("static resolution", changeDissonance, 1)
+    announce(string.format("[static] resolves: Dissonance %d (%s).", CampaignState.getDissonance(), CampaignState.band()))
+  end
+  afterChange()
+  return true
+end
+function shResolveStatic(_, _, alt) return shApiResolveStatic({ cancel = alt == true }) end
+function shResolveStaticToken(obj, _, alt)
+  return shApiResolveStatic({ guid = obj and obj.getGUID(), cancel = alt == true })
+end
 function shClickHour(_, _, alt) guarded("hour", changeHour, alt and -1 or 1) ; afterChange() end
 -- left-click: a card adds a temporary Static token; right-click: its time is
 -- up (or Hour VI with What the Almanac Hid). Either way the bag is re-synced.
@@ -4562,12 +4637,11 @@ end
 function onObjectLeaveContainer(container, obj)
   guarded("reveal", function()
     if bag.onLeave(container, obj) then
-      local bandBefore = CampaignState.band()
-      local info = Dissonance.onStaticRevealed(bag)
-      announceWake(bandBefore)
-      announce(string.format("[static] revealed: Dissonance %d (%s).", info.value, info.band))
-      if info.reachedReset then announceResetReached() end
-      afterChange()
+      -- Extraction may be a preview or a canceled draw. Commit only when the
+      -- player resolves it; no meter, Approach, wake or reset side effect yet.
+      announce("[static] drawn: if it resolves, click Resolve on that token (or Static waiting for a single draw). "
+        .. "For a preview or cancellation, return it or right-click Resolve on that token.")
+      refreshControl()
     end
     Board.onLeaveContainer(container, obj)
   end)
@@ -4575,7 +4649,10 @@ end
 
 function onObjectEnterContainer(container, obj)
   guarded("container", function()
-    bag.onEnter(container, obj)
+    if bag.onEnter(container, obj) then
+      if obj.clearButtons then pcall(obj.clearButtons) end
+      refreshControl()
+    end
     Board.onEnterContainer(container, obj)
   end)
 end

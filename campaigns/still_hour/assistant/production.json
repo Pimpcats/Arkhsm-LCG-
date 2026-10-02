@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "campaign": "still_hour",
-  "stage": "audit_pass_5_applied_awaiting_relay_art_and_playtest",
+  "stage": "offline_validated_awaiting_live_playtest_and_curve_calibration",
   "owner_preferences": {
     "minimal_manual_work": true,
     "first_time_player": true,
@@ -10,6 +10,99 @@
     "visual_direction": "Closely match Arkham LCG painterly cosmic-horror art direction, adapted to the established campaign."
   },
   "validation": {
+    "current_effective_cards": 133,
+    "built_card_records": 143,
+    "hosted_card_images": 200,
+    "guide_pages": 24,
+    "scenarios_locked": 8,
+    "scenario_readiness_errors": 0,
+    "scenario_readiness_warnings": 0,
+    "campaign_box_compiles_without_force": true,
+    "objectives_feasible_1_to_4_investigators": true,
+    "lua_rules_tests": "309/309 each on Lua 5.2 and 5.4",
+    "play_engine_regressions": "7 fixtures, 652 checks each on Lua 5.2 and 5.4",
+    "pytest": "111 passed, 1 optional render test skipped, 155 subtests passed",
+    "verify_bundle": "OK on Lua 5.2 and 5.4; current built bundle",
+    "cardforge_selftest": "20 passed, 0 failed, sandboxed; owner-only golden prompts unavailable",
+    "independent_review": "3 independent reviewers; no remaining blocker in their recorded scopes",
+    "scenario_audit": "8/8 locked, 0 errors, 0 warnings",
+    "godot": "4.7.2: three real-SCED emulator scenes rendered, exit0, no scene/script errors",
+    "godot_limits": "Two-round scenes; one nonvisual SCED sound/effect bundle has no mesh renderer. Campaign raw assets seeded from hash-verified local bytes matching the immutable GitHub commit.",
+    "hosted_asset_commit": "edb319dc44156898bd22b8f11382d4e94e8fd485",
+    "immutable_remote_assets_verified": true,
+    "full_renderer_run": true,
+    "art_missing": 0,
+    "final_measurement_cells": 70,
+    "final_measurement_played_slots": 1319,
+    "final_measurement_invalid_trials": 0,
+    "final_input_digest": "7816c967868172384a7dcc008ea7b2cf6c5ad1fb1f8f472e427c1ad622f36b9d",
+    "difficulty_targets": [
+      80,
+      80,
+      70,
+      70,
+      60,
+      60,
+      50,
+      50,
+      40,
+      40
+    ],
+    "difficulty_model_percent": [
+      83,
+      71,
+      82,
+      69,
+      60,
+      62,
+      56,
+      50,
+      42,
+      50
+    ],
+    "difficulty_targets_achieved": false,
+    "human_playtest_approved": false,
+    "tts_playtested": false,
+    "prepared_finale_is_conditional": true,
+    "seed_limit": "Equal legal tie choices can vary with Lua table order; same seeds do not guarantee identical paired draws.",
+    "carried_campaigns": 20,
+    "carried_played_slots": 199,
+    "carried_finale_attempts": 7,
+    "carried_contest_wins": 4,
+    "carried_income_per_investigator_mean": 47.43,
+    "carried_income_scope": "At most ten slots, fixed route, first age-out stops the policy; no replacement investigators or finale epilogue simulated.",
+    "tts_relay_latest": "Historical 89/89 on 5bb290d; current build has not run on the owner PC",
+    "tests_leave_checkout_clean": true
+  },
+  "evidence": [
+    "python3 pipeline/scenario_content.py: 8/8 scenarios, 0 errors (notes: one inherited stat deviation, five cross-district symbol repeats in distinct colours)",
+    "python3 -m pytest -q tests: 21 passed",
+    "python3 pipeline/compile_campaign.py: ok, 8 scenario boxes, 143 cards",
+    "Design decisions and open flags: docs/design/CONTENT_DECISIONS.md (spoilers)",
+    "2026-09-24: Prologue R1/R2 and loop resolutions (R2 Seam Tears / NR Night Keeps You / R1 Appointed Hour) written into the guide, log sheet and scenario_manifest.json; guide PDF rebuilt.",
+    "2026-09-24: first complete real-TTS relay run (ab136f1, owner's PC, SCED table): 82 passed, 1 failed (prey step, fixed in f0be782).",
+    "2026-09-25: resolutions for every scenario (Prologue 3, loop 3, districts 4 each, finale 7 + age epilogue); 7 recorded choices tied to other districts and the finale.",
+    "2026-09-25: replayable scenario boxes (loop_box.lua) + Control Clear Board; Prologue mode; difficulty buttons (SCED setChaosBagState); Knowledge/Victory ticks on the log reach the Control; unrevealed location sides; Hard/Expert reference side.",
+    "2026-09-25: rules-wording pass against the Rules Reference applied to the guide and every card; renderer reports text overflow; every card checked visually.",
+    "2026-09-28: audit pass 5 applied (balance: Knowledge pays Memory, tighter districts, deck trim + The Minute Hand; cards; guide; Control guards, Undo Hour VI, Begin Finale, Knowledge Memory), dist rebuilt on hosted images 21aecea. Findings: docs/design/AUDIT_PASS5.md.",
+    "2026-09-28: headless SCED harness (tests/sced_real) boots the real SCED table and plays Prologue, loops, Part II, finale and save/reload through the owner's buttons; found and fixed 5 integration bugs (finale set-aside on SCED's chaos bag, Clear Board removing SCED pieces, Square set-aside over the clue counter, [static] token into a respawned bag, relay stale bag reference). Not real TTS: no rendering, approximate physics.",
+    "2026-09-29: owner decision: assets/plugins/ArkhamHorrorLCG.seext stays in the repo (sharing allowed; public, non-commercial use).",
+    "2026-09-29: the 7 remaining monster illustrations imported (owner-generated), framed with committed art placements (campaigns/still_hour/art_placements.json).",
+    "2026-10-02: reviewed finishing corrections applied; 133 effective cards, 200 framed images, 24-page guide. 111 pytest tests and 155 subtests; both Lua versions, real-SCED harness, CardForge and three Godot renders pass. 70 final measurement cells / 1319 slots; 400 scoped proposal trials separately archived. See docs/design/FINISHING_CORRECTIONS.md and FINISHING_BALANCE.md. Exact target curve and human playtest approval remain open."
+  ],
+  "next_actions": [
+    "Owner: run current main through the live TTS relay (Start TTS Relay.bat; docs/TTS_RELAY.md).",
+    "Human playtest: opening, first night and complete campaigns at intended difficulty/player count; record objective success, defeats, earned XP and purchases by played slot.",
+    "Calibration: investigate the first-to-second-night reversal, route outliers and finale residual with actual carried decks; do not approve the exact target curve from the current model.",
+    "Optional: vary campaign/scenario box art, which currently shares a texture."
+  ],
+  "connection": "GitHub handoff; no live connection to the owner's desktop or TTS.",
+  "tts_relay": {
+    "doc": "docs/TTS_RELAY.md",
+    "results_branch": "tts-results",
+    "note": "Offline relay tests use a fake TTS; real in-TTS results arrive on tts-results once the owner starts the relay."
+  },
+  "historical_validation": {
     "bridge_tests_passed": 4,
     "scenario_content_tests_passed": 27,
     "current_effective_cards": 140,
@@ -42,30 +135,5 @@
     "independent_review": "post-fix verification: 0 blockers, 0 majors; 9 minors applied",
     "sced_headless_harness": "real SCED 0e12534 table (211 objects): playthrough 168/168, relay suite 129/129 (Lua 5.2 and 5.4); tests/test_sced_real.py"
   },
-  "evidence": [
-    "python3 pipeline/scenario_content.py: 8/8 scenarios, 0 errors (notes: one inherited stat deviation, five cross-district symbol repeats in distinct colours)",
-    "python3 -m pytest -q tests: 21 passed",
-    "python3 pipeline/compile_campaign.py: ok, 8 scenario boxes, 143 cards",
-    "Design decisions and open flags: docs/design/CONTENT_DECISIONS.md (spoilers)",
-    "2026-09-24: Prologue R1/R2 and loop resolutions (R2 Seam Tears / NR Night Keeps You / R1 Appointed Hour) written into the guide, log sheet and scenario_manifest.json; guide PDF rebuilt.",
-    "2026-09-24: first complete real-TTS relay run (ab136f1, owner's PC, SCED table): 82 passed, 1 failed (prey step, fixed in f0be782).",
-    "2026-09-25: resolutions for every scenario (Prologue 3, loop 3, districts 4 each, finale 7 + age epilogue); 7 recorded choices tied to other districts and the finale.",
-    "2026-09-25: replayable scenario boxes (loop_box.lua) + Control Clear Board; Prologue mode; difficulty buttons (SCED setChaosBagState); Knowledge/Victory ticks on the log reach the Control; unrevealed location sides; Hard/Expert reference side.",
-    "2026-09-25: rules-wording pass against the Rules Reference applied to the guide and every card; renderer reports text overflow; every card checked visually.",
-    "2026-09-28: audit pass 5 applied (balance: Knowledge pays Memory, tighter districts, deck trim + The Minute Hand; cards; guide; Control guards, Undo Hour VI, Begin Finale, Knowledge Memory), dist rebuilt on hosted images 21aecea. Findings: docs/design/AUDIT_PASS5.md.",
-    "2026-09-28: headless SCED harness (tests/sced_real) boots the real SCED table and plays Prologue, loops, Part II, finale and save/reload through the owner's buttons; found and fixed 5 integration bugs (finale set-aside on SCED's chaos bag, Clear Board removing SCED pieces, Square set-aside over the clue counter, [static] token into a respawned bag, relay stale bag reference). Not real TTS: no rendering, approximate physics.",
-    "2026-09-29: owner decision: assets/plugins/ArkhamHorrorLCG.seext stays in the repo (sharing allowed; public, non-commercial use).",
-    "2026-09-29: the 7 remaining monster illustrations imported (owner-generated), framed with committed art placements (campaigns/still_hour/art_placements.json)."
-  ],
-  "next_actions": [
-    "Owner: run the TTS relay on main from local PowerShell (Start TTS Relay.bat).",
-    "Owner: first playtest of the Prologue and Loop 1 (relay passes are not playtest approval).",
-    "Box art (not urgent): campaign box and scenario boxes still share one texture."
-  ],
-  "connection": "GitHub handoff; no live connection to the owner's desktop or TTS.",
-  "tts_relay": {
-    "doc": "docs/TTS_RELAY.md",
-    "results_branch": "tts-results",
-    "note": "Offline relay tests use a fake TTS; real in-TTS results arrive on tts-results once the owner starts the relay."
-  }
+  "handoff": "docs/STILL_HOUR_HANDOFF.txt"
 }

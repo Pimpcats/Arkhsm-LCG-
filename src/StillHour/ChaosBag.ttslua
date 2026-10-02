@@ -108,6 +108,7 @@ function ChaosBag.new(opts)
     pendingRemove = 0,
     removing = {},     -- guid -> true while we take a token out to destroy it
     out = {},          -- guid -> true: our tokens drawn out of the bag
+    pendingStatic = {}, -- guid -> true: reveal not yet committed (may be a preview/cancel)
     retryScheduled = false,
     lastMode = "virtual",
   }
@@ -138,7 +139,7 @@ function ChaosBag.new(opts)
     local n = 0
     for guid in pairs(a.out) do
       local o = safe(function() return getObjectFromGUID(guid) end)
-      if o ~= nil then n = n + 1 else a.out[guid] = nil end
+      if o ~= nil then n = n + 1 else a.out[guid] = nil ; a.pendingStatic[guid] = nil end
     end
     return n
   end
@@ -256,6 +257,7 @@ function ChaosBag.new(opts)
   function a.clearTemporary()
     a.extra = 0
     a.almanac = false
+    a.pendingStatic = {}
     return a.reconcile()
   end
 
@@ -269,7 +271,8 @@ function ChaosBag.new(opts)
     end
     local guid = safe(function() return obj.getGUID() end) or obj.guid
     if guid and a.removing[guid] then return false end
-    if guid then a.out[guid] = true end
+    if guid and a.out[guid] then return false end
+    if guid then a.out[guid] = true ; a.pendingStatic[guid] = true end
     return true
   end
 
@@ -277,22 +280,43 @@ function ChaosBag.new(opts)
   function a.onEnter(container, obj)
     if ChaosBag.isStaticToken(obj) and ChaosBag.isChaosBag(container) then
       local guid = safe(function() return obj.getGUID() end) or obj.guid
-      if guid then a.out[guid] = nil end
+      if guid then a.out[guid] = nil ; a.pendingStatic[guid] = nil end
+      return true
     end
+    return false
+  end
+
+  --- Commit/discard one pending reveal. Returning a preview to the bag also
+  -- discards it. Committing is explicit because extraction alone cannot tell
+  -- a resolved skill-test token from a canceled token or an outside-test peek.
+  function a.takePendingStatic(guid)
+    if guid ~= nil and not a.pendingStatic[guid] then return nil end
+    if guid == nil then
+      local keys = {}
+      for g in pairs(a.pendingStatic) do keys[#keys + 1] = g end
+      table.sort(keys)
+      guid = keys[1]
+    end
+    if guid then a.pendingStatic[guid] = nil end
+    return guid
   end
 
   --- Cheap summary for labels (no bag lookup); pass true to also count the
   -- physical tokens (looks the bag up).
   function a.describe(withPhysical)
     local phys = withPhysical and a.physicalCount() or nil
+    local pending = 0
+    for _ in pairs(a.pendingStatic) do pending = pending + 1 end
     return { mode = a.lastMode, target = a.target(), baseline = a.baseline,
-             extra = a.extra, almanac = a.almanac, physical = phys }
+             extra = a.extra, almanac = a.almanac, physical = phys, pending = pending }
   end
 
   function a.save()
-    local out = {}
+    local out, pending = {}, {}
     for g in pairs(a.out) do out[#out + 1] = g end
-    return { baseline = a.baseline, extra = a.extra, almanac = a.almanac, out = out }
+    for g in pairs(a.pendingStatic) do pending[#pending + 1] = g end
+    table.sort(out) ; table.sort(pending)
+    return { baseline = a.baseline, extra = a.extra, almanac = a.almanac, out = out, pendingStatic = pending }
   end
 
   function a.load(t)
@@ -302,6 +326,10 @@ function ChaosBag.new(opts)
     a.almanac = t.almanac == true or (tonumber(t.extra) or 0) < 0
     a.out = {}
     for _, g in ipairs(t.out or {}) do a.out[g] = true end
+    a.pendingStatic = {}
+    for _, g in ipairs(t.pendingStatic or {}) do
+      if a.out[g] then a.pendingStatic[g] = true end
+    end
     a.count = a.target()
   end
 

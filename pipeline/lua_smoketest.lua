@@ -817,7 +817,9 @@ do
   CampaignState.init(3)
   C.onLoad(nil)
   check("a new campaign opens in the Prologue", C.shApiState().prologue == true)
+  C.shApiPendingYears({ id = "sthrelias", delta = 2 })
   C.shApiReset()
+  check("Prologue handoff discards pending Years", CampaignState.getPendingYears("sthrelias") == 0)
   check("the Prologue's Reset Loop starts Between Loops", C.shApiState().loopEnded == true and C.shApiState().loops == 0)
   C.shApiReset()
   check("a second Reset Loop after the Prologue does nothing but say so", C.shApiState().loops == 0
@@ -926,5 +928,49 @@ CampaignState.init(3)
 CampaignState.addPendingYears("sthrelias", 2)
 check("Interlude.age adds a card's pending Years (1 + 2)",
   Interlude.age("sthrelias", { extraYears = CampaignState.getPendingYears("sthrelias") }).yearsGained == 3)
+print("== Static: pending resolution, preview, cancel and duplicate callbacks ==")
+do
+  local originalLookup = getObjectFromGUID
+  local tok = { getGUID = function() return "static-fixture" end,
+    hasTag = function(tag) return tag == ChaosBag.TOKEN_TAG end }
+  local bagObj = { getName = function() return "Chaos Bag" end }
+  getObjectFromGUID = function(guid) if guid == "static-fixture" then return tok end return nil end
+  local C = loadControl()
+  CampaignState.init(3)
+  C.onLoad(nil)
+  C.shApiReset()
+  C.shApiBeginNextLoop()
+  C.shApiCounter({ name = "dissonance", delta = 7 })
+  C.onObjectLeaveContainer(bagObj, tok)
+  check("preview at a band boundary does not advance state", C.shApiState().dissonance == 7 and C.shApiState().stage == 0)
+  check("Static draw is offered for resolution", C.shApiState().static.pending == 1 and C.label("Static waiting") ~= nil)
+  C.onObjectLeaveContainer(bagObj, tok)
+  check("duplicate leave callbacks do not duplicate pending draws", C.shApiState().static.pending == 1)
+  C.onObjectEnterContainer(bagObj, tok)
+  check("returning a preview drops its pending effect", C.shApiState().static.pending == 0 and C.shApiState().dissonance == 7)
+  C.onObjectLeaveContainer(bagObj, tok)
+  C.shApiResolveStatic({ cancel = true })
+  check("canceling a draw preserves the band and Approach", C.shApiState().dissonance == 7 and C.shApiState().stage == 0)
+  C.onObjectEnterContainer(bagObj, tok)
+  C.onObjectLeaveContainer(bagObj, tok)
+  C.shApiResolveStatic({})
+  check("resolving Static applies its effect exactly once", C.shApiState().dissonance == 8 and C.shApiState().stage == 1)
+  C.shApiResolveStatic({})
+  check("a repeated resolve call does nothing", C.shApiState().dissonance == 8)
+  C.onObjectEnterContainer(bagObj, tok)
+  C.shApiCounter({ name = "dissonance", delta = 15 })
+  C.onObjectLeaveContainer(bagObj, tok)
+  C.shApiResolveStatic({ cancel = true })
+  check("canceled Static cannot reset a loop at the reset boundary", C.shApiState().dissonance == 23 and not C.shApiState().loopEnded)
+  getObjectFromGUID = originalLookup
+end
+do
+  local graph = { a={"b","near"}, b={"a","c"}, c={"b","far"}, far={"c"}, near={"a"} }
+  local chosen,d,ties = Locations.farthest(graph,{"a"},nil,{far=true,near=true})
+  check("unrevealed transit remains in farthest-distance calculation", chosen=="far" and d==3 and #ties==1)
+  graph.other={"c"} ; graph.c[#graph.c+1]="other"
+  chosen,d,ties = Locations.farthest(graph,{"a"},nil,{far=true,other=true})
+  check("all equal-distance eligible destinations are reported",d==3 and #ties==2)
+end
 print(string.format("RESULT: %d passed, %d failed", passed, failed))
 os.exit(failed == 0 and 0 or 1)

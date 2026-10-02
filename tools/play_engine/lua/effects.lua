@@ -33,6 +33,7 @@ return function(R, T)
   --- The Wheel: "Forced – After the Hourglass advances: Each investigator at the Wheel takes 1 horror."
   function FX.afterAdvance()
     local G = R.G
+    R.P.onHourReachedPlayers(R.hour())  -- recharge once per complete advance
     local wheel = R.locById("sthr-loc-wheel")
     if wheel and not G.riderDefeated then
       for _, inv in ipairs(R.investigatorsAt(wheel)) do horror(inv, 1, "The Wheel") end
@@ -157,7 +158,6 @@ return function(R, T)
   end
   R.onHourReached = function(h, fx)
     R.scanLocationsLight()
-    R.P.onHourReachedPlayers(h)
     FX.onHourReached(h, fx)
     R.syncAppointedArrival()
   end
@@ -464,18 +464,27 @@ return function(R, T)
   -- (paying the act's clues), or picks a dropped one up.
   function R.takeStory(inv, act)
     local G = R.G
-    local A = ACTS[act.id]
+    local A = act and ACTS[act.id]
+    if not inv or inv.defeated or not A or not A.carry or act.completed or act.holder or inv.story then return false end
+    local L
+    if act.dropped then L = G.locs and G.locs[act.dropped] else L = R.locById(A.carry.take) end
+    local here = R.locOf(inv)
+    if not L or L.closed or not here or here.guid ~= L.guid then return false end
     if act.dropped then
       act.dropped = nil
     else
-      local L = R.locById(A.carry.take)
-      R.spendClues(A.carry.any and R.aliveInvs() or R.investigatorsAt(L), clueNeed(act.id))
+      local payers = A.carry.any and R.aliveInvs() or R.investigatorsAt(L)
+      local need, have = clueNeed(act.id), 0
+      for _, payer in ipairs(payers) do have = have + (payer.clues or 0) end
+      if have < need then return false end
+      if R.spendClues(payers, need) ~= need then error("story asset preflight/payment disagreement") end
       G.metrics.story_taken = G.metrics.story_taken or {}
       G.metrics.story_taken[#G.metrics.story_taken + 1] = { id = A.carry.asset, round = G.round, hour = R.hour() }
     end
     act.holder = inv
     inv.story = { id = A.carry.asset, act = act }
     R.log("%s takes control of %s", inv.name, FX.STORY[A.carry.asset].name)
+    return true
   end
 
   --- A defeated controller's story asset stays at their location.
@@ -493,7 +502,7 @@ return function(R, T)
   function FX.canAdvance(act)
     local G = R.G
     local A = ACTS[act.id]
-    if not A or A.action or A.sequence or A.standFirm or A.contest then return nil end
+    if not A or A.action or A.sequence or A.standFirm or A.contest or A.onAdvance then return nil end
     if A.needLamp and not G.lampLit then return nil end
     if A.carry then
       -- "If the investigator who controls X is at Y, advance."
@@ -516,7 +525,6 @@ return function(R, T)
       if have >= clueNeed(act.id) then return R.aliveInvs() end
       return nil
     end
-    if A.onAdvance and A.carry then return nil end
     local L = R.locById(A.at)
     if not L or L.closed then return nil end
     local here = R.investigatorsAt(L)
@@ -702,7 +710,7 @@ return function(R, T)
     local have = inv.memory or 0
     local want = (R.WHATIF or {}).oldForgotten and 2 or 1
     local take = math.min(want, have)
-    if take > 0 then R.addMemory(inv, -take, "What You've Forgotten") end
+    if take > 0 then R.addMemory(inv, -take, "What You've Forgotten", "any") end
     if take < want then horror(inv, want - take, "What You've Forgotten") end
     return "discard"
   end

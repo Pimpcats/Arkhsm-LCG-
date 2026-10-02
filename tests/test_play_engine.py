@@ -35,6 +35,19 @@ def _engine_run():
 LUA = shutil.which("lua5.2")
 
 
+@pytest.mark.parametrize("script", ["play_engine_regressions.lua", "play_engine_independent.lua", "play_engine_upgrades.lua",
+                                    "play_engine_final_independent.lua", "play_engine_objective_windows.lua",
+                                    "play_engine_balance_costs.lua", "play_engine_encounter_draws.lua"])
+@pytest.mark.parametrize("lua", ["lua5.2", "lua5.4"])
+def test_campaign_rules_interactions(script, lua):
+    exe = shutil.which(lua)
+    if not exe:
+        pytest.skip("no " + lua + " installed")
+    out = subprocess.run([exe, os.path.join(ROOT, "tests", script)],
+                         cwd=ROOT, capture_output=True, text=True, timeout=60)
+    assert out.returncode == 0, out.stdout + out.stderr
+
+
 def _porcelain():
     return subprocess.run(["git", "status", "--porcelain"], cwd=ROOT, capture_output=True, text=True).stdout
 
@@ -134,6 +147,9 @@ def test_decks_are_legal():
     for inv, deck in d["decks"].items():
         assert len(deck["cards"]) == 30, inv
         assert deck["offclass"] <= deck["limit"], inv
+    for tier, party in d["tiers"].items():
+        for inv, deck in party.items():
+            assert sum(not c.get("permanent") for c in deck["cards"]) == 30, (tier, inv)
 
 
 def test_one_short_game_per_scenario(clean_tree):

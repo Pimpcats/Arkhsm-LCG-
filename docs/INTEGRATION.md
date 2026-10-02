@@ -75,8 +75,9 @@ otherwise keeps a virtual count, so it never errors on a vanilla table. SCED's
 the adapter mirrors what they do for a custom `Custom_Tile` token tagged
 `StillHourStatic` (spawn + `putObject`; `takeObject({guid})` + destruct),
 honouring `canTouchChaosTokens()`. The host forwards
-`onObjectLeaveContainer`/`onObjectEnterContainer` so a drawn `[static]` raises
-Dissonance. `src/StillHour/SCED.ttslua` is the fail-safe wrapper over the SCED
+`onObjectLeaveContainer`/`onObjectEnterContainer` to track pending `[static]`
+tokens. Extraction alone has no Dissonance effect: it may be a preview or a
+canceled draw. `src/StillHour/SCED.ttslua` is the fail-safe wrapper over the SCED
 calls (all mirrored from SCED's `*Api.ttslua` wrappers).
 
 The contract any adapter implements:
@@ -95,10 +96,14 @@ Then call `Dissonance.raise(n, bag)` / `Dissonance.reduce(n, bag)` /
 `Dissonance.syncBag(bag)` at loop setup. Band → baseline count is
 Calm 0 / Glitch 1 / Noticed 2 (`Constants.STATIC_BY_BAND`).
 
-The `[static]` token itself: modifier **−3**, and on reveal call
-`Dissonance.onStaticRevealed(bag)` (raises Dissonance by 1, which may itself
-cross a band and reconcile the bag, or advance the Appointed / trigger a reset —
-the return table reports `appointedStage` / `reachedReset`).
+The `[static]` token itself: modifier **−3**. When it actually resolves after
+cancellation windows, call `shApiResolveStatic({guid=tokenGuid})` on the Control.
+To cancel it, pass `cancel=true` with that GUID, or return it to the bag. The
+Control supplies a Resolve button on each pending physical token; left resolves,
+right cancels. The generic Control button works only with a single pending
+token. More than one requires the token-specific button so a cancellation cannot
+discard a different draw. A direct `Dissonance.onStaticRevealed(bag)` is only
+appropriate after an adapter has established a real, uncanceled resolution.
 
 ## 4. Cards → manager (P4/P6/P7)
 

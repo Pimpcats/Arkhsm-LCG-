@@ -61,8 +61,8 @@
           ],
           "CustomDeck": {
             "95010": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d76b31f78acfc05a6a1ad5cc50074bdb677a47fe/dist/cards/sthrelias.jpg?v=acbd66b5c2",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d76b31f78acfc05a6a1ad5cc50074bdb677a47fe/dist/cards/sthrelias-back.jpg?v=816f690110",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/edb319dc44156898bd22b8f11382d4e94e8fd485/dist/cards/sthrelias.jpg?v=acbd66b5c2",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/edb319dc44156898bd22b8f11382d4e94e8fd485/dist/cards/sthrelias-back.jpg?v=816f690110",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -112,8 +112,8 @@
           ],
           "CustomDeck": {
             "95011": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d76b31f78acfc05a6a1ad5cc50074bdb677a47fe/dist/cards/sthr-lamp.jpg?v=3beb028804",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d76b31f78acfc05a6a1ad5cc50074bdb677a47fe/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/edb319dc44156898bd22b8f11382d4e94e8fd485/dist/cards/sthr-lamp.jpg?v=3beb028804",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/edb319dc44156898bd22b8f11382d4e94e8fd485/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -162,8 +162,8 @@
           ],
           "CustomDeck": {
             "95012": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d76b31f78acfc05a6a1ad5cc50074bdb677a47fe/dist/cards/sthr-donebefore.jpg?v=d21b5e8f6f",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d76b31f78acfc05a6a1ad5cc50074bdb677a47fe/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/edb319dc44156898bd22b8f11382d4e94e8fd485/dist/cards/sthr-donebefore.jpg?v=d21b5e8f6f",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/edb319dc44156898bd22b8f11382d4e94e8fd485/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
@@ -212,8 +212,8 @@
           ],
           "CustomDeck": {
             "95013": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d76b31f78acfc05a6a1ad5cc50074bdb677a47fe/dist/cards/sthr-eighthgrave.jpg?v=f22674b61b",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d76b31f78acfc05a6a1ad5cc50074bdb677a47fe/dist/cards/player_back.jpg?v=66196e40c9",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/edb319dc44156898bd22b8f11382d4e94e8fd485/dist/cards/sthr-eighthgrave.jpg?v=f22674b61b",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/edb319dc44156898bd22b8f11382d4e94e8fd485/dist/cards/player_back.jpg?v=66196e40c9",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,

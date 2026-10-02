@@ -12,12 +12,16 @@ return function(R, T)
     local G = R.G
     local spec = FX.ACTS[act.id]
     local L = R.locById(spec.at)
+    if R.locOf(inv) ~= L then return false end
     local need = FX.actNeed(act.id)
     local here = spec.contrib == false and R.aliveInvs() or R.investigatorsAt(L)
     if spec.fare then
       -- the Ticket-Taker's fare: resources (FX.FARE_RATE for 1) first, then clues, then Memory on own cards
       local owe = need
       local rate = (R.WHATIF or {}).fareRate or FX.FARE_RATE or 2     -- resources per fare point
+      local available = 0
+      for _, x in ipairs(here) do available = available + x.clues + math.floor(x.resources / rate) + R.syncMemory(x) end
+      if available < need then return false end
       for _, x in ipairs(here) do
         while owe > 0 and x.resources >= rate and x.resources >= 2 * rate do x.resources = x.resources - rate ; owe = owe - 1 end
       end
@@ -26,13 +30,14 @@ return function(R, T)
       local pay = math.min(owe, cl)
       if pay > 0 then R.spendClues(here, pay) ; owe = owe - pay end
       for _, x in ipairs(here) do
-        while owe > 0 and (x.memory or 0) > 0 do R.addMemory(x, -1, "the Ticket-Taker's fare") ; owe = owe - 1 end
+        while owe > 0 and (x.memory or 0) > 0 do R.addMemory(x, -1, "the Ticket-Taker's fare", "any") ; owe = owe - 1 end
       end
       for _, x in ipairs(here) do
         while owe > 0 and x.resources >= rate do x.resources = x.resources - rate ; owe = owe - 1 end
       end
+      if owe ~= 0 then error("fare preflight/payment disagreement") end
       R.advanceAct(act, inv)
-      return
+      return true
     end
     R.spendClues(here, need)
     if spec.doomCost then R.placeDoom(spec.doomCost, act.id .. " (cost)") end
@@ -120,6 +125,10 @@ return function(R, T)
     local G = R.G
     if G.finale then return end
     G.finale = true
+    -- Participation is fixed when the finale starts. Later defeat does not
+    -- remove an investigator from its resolution (player guide, The Last Hour).
+    G.finaleParticipants = {}
+    for _, x in ipairs(R.aliveInvs()) do G.finaleParticipants[x.id] = true end
     G.metrics.finale_began = { round = G.round, hour = R.hour(), dissonance = R.dissonance(), atNine = atNine and true or false }
     R.log("THE FINALE BEGINS (Hour %d, Dissonance %d)", R.hour(), R.dissonance())
     -- 1. Place The Last Hour; district act decks are set aside
@@ -224,13 +233,24 @@ return function(R, T)
       return banked >= 4 * n and "R5" or "R6"
     end
     local present = {}
-    for _, inv in ipairs(G.inv) do if not inv.defeated then present[#present + 1] = inv end end
+    for _, inv in ipairs(G.inv) do
+      if G.finaleParticipants and G.finaleParticipants[inv.id]
+         or not G.finaleParticipants and not inv.defeated then
+        present[#present + 1] = inv
+      end
+    end
     local lf = G.logFlags
     if R.knows("the-keepers-ninth-death") then return "R3" end
     if R.knows("the-ticket-takers-bargain") and lf["You hold the ticket"]
        and banked >= (lf["You kept the night to yourselves"] and 3 or 4) * n then return "R1b" end
     if R.knows("the-vote-that-never-ends") and R.knows("the-appointeds-name") and lf["The vote still stands"] then return "R2" end
-    for _, inv in ipairs(present) do if inv.bracket == "Ancient" then return "R1" end end
+    for _, inv in ipairs(present) do
+      -- Pending Years count for ending eligibility without changing the aged
+      -- stat line during play. Every real investigator has recorded years;
+      -- retain the bracket fallback only for older isolated fixtures.
+      if (inv.years or 0) + (inv.pendingYears or 0) >= 15
+         or inv.years == nil and inv.bracket == "Ancient" then return "R1" end
+    end
     return "R4"
   end
 end

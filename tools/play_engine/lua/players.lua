@@ -15,17 +15,17 @@ return function(R, T)
                  ["Holy Rosary"] = { 0, 2 },
                  -- XP cards (decks.py UPGRADES)
                  ["Elder Sign Amulet (3)"] = { 0, 4 }, ["Bulletproof Vest (3)"] = { 4, 0 }, ["Hired Muscle (1)"] = { 3, 1 },
-                 ["Peter Sylvestre (2)"] = { 1, 2 } }
+                 ["Peter Sylvestre (2)"] = { 1, 3 } }
   -- uses when played
   local USES = { [".45 Automatic"] = 4, ["Flashlight"] = 3, ["First Aid"] = 3, ["Shrivelling"] = 4,
-                 ["The Bell of Ambergrove"] = 3, ["The Lexicon of the Hour"] = 0,
+                 ["The Bell of Ambergrove"] = 3, ["The Lexicon of the Hour"] = 0, ["Stolen Minute"] = 2,
                  ["Shotgun (4)"] = 2, ["Lightning Gun (5)"] = 3, [".41 Derringer (2)"] = 3, ["Chicago Typewriter (4)"] = 4,
                  ["Shrivelling (3)"] = 4, ["Shrivelling (5)"] = 4 }
   -- constant +skill while in play: name -> {skill, amount, when}
   local CONST = {
     ["Holy Rosary"] = { "wil", 1 }, ["Beat Cop"] = { "com", 1 }, ["Dr. Milan Christopher"] = { "int", 1 },
     ["Magnifying Glass"] = { "int", 1, "investigate" },
-    ["Hired Muscle (1)"] = { "com", 1 }, ["Peter Sylvestre (2)"] = { "agi", 1 }, ["Encyclopedia (2)"] = { "int", 1 },
+    ["Hired Muscle (1)"] = { "com", 1 }, ["Peter Sylvestre (2)"] = { "agi", 1 },
   }
   -- resource-for-skill talents: name -> skills they boost (1 resource: +1)
   local TALENT = { ["Physical Training"] = { wil = true, com = true }, ["Hard Knocks"] = { com = true, agi = true },
@@ -35,10 +35,10 @@ return function(R, T)
                    ["Streetwise (3)"] = { int = true, agi = true } }
   -- weapons: name -> {skill bonus, extra damage, uses?, skill used}
   local WEAPON = { ["Machete"] = { 1, 1 }, [".45 Automatic"] = { 1, 1, true }, ["Knife"] = { 1, 0 },
-                   ["Switchblade"] = { 0, 0 }, ["Baseball Bat"] = { 2, 1 }, ["Shrivelling"] = { 2, 1, true, "wil" },
+                   ["Switchblade"] = { 0, 0 }, ["Baseball Bat"] = { 2, 1 }, ["Shrivelling"] = { 0, 1, true, "wil" },
                    ["Shotgun (4)"] = { 3, 2, true }, ["Lightning Gun (5)"] = { 5, 2, true }, [".41 Derringer (2)"] = { 2, 1, true },
                    ["Chicago Typewriter (4)"] = { 2, 2, true }, ["Switchblade (2)"] = { 2, 1 },
-                   ["Shrivelling (3)"] = { 2, 1, true, "wil" }, ["Shrivelling (5)"] = { 3, 1, true, "wil" } }
+                   ["Shrivelling (3)"] = { 2, 1, true, "wil" }, ["Shrivelling (5)"] = { 3, 2, true, "wil" } }
   P.WEAPON = WEAPON
   P.CODED = {}
   for _, t in ipairs({ SOAK, USES, CONST, TALENT, WEAPON }) do for k in pairs(t) do P.CODED[k] = true end end
@@ -53,29 +53,19 @@ return function(R, T)
   end
   -- approximations (reported)
   P.APPROX = {
+    ["Finale aftermath"] = "contest and eligible ending are measured; ending choices and epilogues are not simulated, and no ordinary interlude is applied after a finale",
+    ["Story assets"] = "sequential-objective policy carries at most one story asset per investigator",
     ["Old Book of Lore"] = "draws 1 card (the search of the top 3 is not modelled)",
     ["Stubborn Detective"] = "Hunter enemy (fight 3, evade 2, health 2, 1 damage); its text-box blanking is not modelled",
-    ["Silver Twilight Acolyte"] = "Hunter enemy; after it attacks, 1 doom on the current Hour, which advances it (threshold 1)",
+    ["Silver Twilight Acolyte"] = "Hunter enemy; its doom is represented on the current Hour",
     ["Leo De Luca"] = "1 additional action each turn",
-    ["Opportunist"] = "returns to hand when the test succeeds by 3 or more",
+    ["Opportunist"] = "own tests only; returns on success by 3 (level 0) or 1 (level 2)",
     ["Medical Texts"] = "heals 1 damage on a successful [int] (2) test, else 1 damage",
-    ["Marked Deck"] = "played as an asset; neither ability is used by the AI",
-    ["Lucky Compass"] = "used as a move that provokes no attacks of opportunity when engaged; its Knowledge-district jump is not used",
-    ["Nobody Believes Her"] = "blocks commits from others and deals 1 horror if alone; other investigators' abilities still reach her (Elias's redirect)",
-    ["Recollections"] = "not in the starting decks (bought between loops); only Foreknowledge, Muscle Memory and I've Done This Before are encoded",
-    ["The Bell of Ambergrove"] = "the rewind (once per loop, 2 Dissonance, never in the finale) is used; the [wil] evade is not",
-    ["The Lexicon of the Hour"] = "cancels a non-weakness treachery drawn at its owner's location for 2 secrets; +2 [int] for 1",
-    ["It Means 'Wait'"] = "cancels Ayako's own Lost Hour or The Crossing draw (1 horror), or Hour VI/VIII's text or an attack on her (1 Dissonance); cost 1",
-    ["The walker's ring / The walkers keep their ring"] = "not in any representative campaign state, so not encoded",
-    ["The Ambergrove Lamp"] = "+1 [agi] to evade at its location; its [action] (peek and move) is not used by the AI",
-    ["Shotgun (4)"] = "+3 [com], +2 damage (damage by margin, 1-5, averaged)",
-    [".41 Derringer (2)"] = "+2 [com], +1 damage (the +1 only on a margin of 2 is averaged)",
+    ["It Means 'Wait'"] = "policy cancels threatening own treacheries, Hour VI/VIII text or an attack on her; other legal Hours are not selected",
     ["Chicago Typewriter (4)"] = "+2 [com], +2 damage (extra actions spent for more not modelled)",
-    ["Switchblade (2)"] = "+2 [com], +1 damage (the +1 only on a margin of 2 is averaged)",
-    ["Encyclopedia (2)"] = "+1 [int] while in play (the exhaust-for-+2 to anyone is averaged)",
-    ["Higher Education (3)"] = "resource for +1 [wil]/[int] (its 5-cards-in-hand condition is not checked)",
-    ["Streetwise (3)"] = "resource for +1 [int]/[agi] (2 resources for +3 averaged)",
-    ["Beat Cop (2) / Vicious Blow (2) / other same-title upgrades"] = "play as the level-0 card with the upgraded icons and uses",
+    ["Survival Instinct"] = "disengages other enemies on an evade success; the optional move is not selected",
+    ["Survival Instinct (2)"] = "automatically evades other legal enemies on an evade success; the optional move is not selected",
+    ["Magnifying Glass (1)"] = "fast play and +1 intellect; the optional return to hand is not selected",
   }
 
   local BASIC_ENEMY = {
@@ -83,6 +73,27 @@ return function(R, T)
     ["Silver Twilight Acolyte"] = { fight = 2, evade = 3, health = 3, damage = 0, horror = 1, text = "Hunter." },
     ["Stubborn Detective"] = { fight = 3, evade = 2, health = 2, damage = 1, horror = 0, text = "Hunter." },
   }
+
+  -- A reproducible, role-based mulligan policy. These are choices, not extra
+  -- cards or free setup: rejected cards stay aside until replacements are drawn.
+  function P.keepOpening(inv, card, kept)
+    local n=card.name
+    if kept[n] then return false end
+    local useful = n == "Emergency Cache" or n == "Leather Coat" or n == "Holy Rosary"
+      or n == "Flashlight" or n == "Magnifying Glass" or n == "The Ambergrove Lamp"
+      or n == "The Lexicon of the Hour" or n == "Cassandra's Notebook" or n == "Stolen Minute"
+      or n == "Leo De Luca" or n == "Marked Deck" or n == "Rabbit's Foot" or n == "Lucky Compass"
+    if WEAPON[n] and (inv.id == "sthrelias" or inv.id == "sthrseraphine" or inv.id == "sthrbirdie") then
+      if kept.weapon then return false end
+      kept.weapon=true ; useful=true
+    end
+    if card.slot == "Ally" and n ~= "Stray Cat" then
+      if kept.ally then return false end
+      kept.ally=true ; useful=true
+    end
+    if useful then kept[n]=true end
+    return useful
+  end
 
   ------------------------------------------------------------ setup --
 
@@ -94,8 +105,8 @@ return function(R, T)
       idx = idx, id = id, name = c.name or id, color = color, card = cardObj, mini = mini,
       stats = { wil = c.wil, int = c.int, com = c.com, agi = c.agi },
       health = c.health, sanity = c.sanity, damage = 0, horror = 0, resources = 5, clues = 0, clueTokens = {},
-      hand = {}, deck = {}, discard = {}, assets = {}, threat = {}, memory = 0, round = {}, loopUsed = {},
-      failedTypes = {}, testedTypes = {}, pendingYears = 0, compassMemory = 0, actionsTaken = 0,
+      hand = {}, deck = {}, discard = {}, assets = {}, threat = {}, memory = 0, cardMemory = 0, round = {}, loopUsed = {},
+      failedTypes = {}, testedTypes = {}, pendingYears = 0, compassMemory = 0, actionsTaken = 0, lastTurn = {},
     }
     if controlStats then
       inv.stats = { wil = controlStats.wil, int = controlStats.int, com = controlStats.com, agi = controlStats.agi }
@@ -107,15 +118,32 @@ return function(R, T)
         inv.health, inv.sanity = inv.health + R.WHATIF.duoBonus, inv.sanity + R.WHATIF.duoBonus
       end
     end
-    for _, card in ipairs(deckData.cards) do inv.deck[#inv.deck + 1] = card end
+    for _, card in ipairs(deckData.cards) do
+      if card.permanent or card.name == "Anchor Point" then
+        inv.assets[#inv.assets + 1] = { name = card.name, rec = card, exhausted = false, uses = 0 }
+        if card.name == "Anchor Point" then inv.sanity = inv.sanity + 1 end
+      else inv.deck[#inv.deck + 1] = card end
+    end
     for _, s in ipairs(deckData.signatures) do inv.deck[#inv.deck + 1] = s end
-    if weakness then inv.deck[#inv.deck + 1] = weakness end
+    if weakness then
+      if weakness.permanent then inv.threat[weakness.name]=weakness
+      else inv.deck[#inv.deck + 1] = weakness end
+    end
     R.shuffle(inv.deck)
     -- opening hand: weaknesses drawn are set aside and replaced, then shuffled back
     local aside = {}
     while #inv.hand < 5 and #inv.deck > 0 do
       local card = table.remove(inv.deck)
       if card.weakness then aside[#aside + 1] = card else inv.hand[#inv.hand + 1] = card end
+    end
+    local keep, kept = {}, {}
+    for _, card in ipairs(inv.hand) do
+      if P.keepOpening(inv,card,kept) then keep[#keep+1]=card else aside[#aside+1]=card end
+    end
+    inv.hand=keep
+    while #inv.hand < 5 and #inv.deck > 0 do
+      local card=table.remove(inv.deck)
+      if card.weakness then aside[#aside+1]=card else inv.hand[#inv.hand+1]=card end
     end
     for _, w in ipairs(aside) do inv.deck[#inv.deck + 1] = w end
     R.shuffle(inv.deck)
@@ -126,6 +154,7 @@ return function(R, T)
   ------------------------------------------------------------ cards --
 
   function P.draw(inv, n, why)
+    local drawn = {}
     for _ = 1, n or 1 do
       if inv.defeated then return end
       if #inv.deck == 0 then
@@ -141,8 +170,10 @@ return function(R, T)
         P.weakness(inv, card)
       else
         inv.hand[#inv.hand + 1] = card
+        drawn[#drawn + 1] = card
       end
     end
+    return drawn
   end
 
   function P.discardFromHand(inv, card)
@@ -172,33 +203,43 @@ return function(R, T)
   function P.playAsset(inv, card)
     P.discardFromHand(inv, card)
     table.remove(inv.discard)          -- it goes into play, not the discard
-    inv.resources = inv.resources - (card.cost or 0)
+    inv.resources = inv.resources - P.playCost(inv, card)
+    if inv.round.recollectionDiscount then inv.round.recollectionDiscount[card] = nil end
     local a = { rec = card, name = card.name, uses = USES[card.name] or (card.uses and card.uses[1] and card.uses[1].count) or 0,
                 exhausted = false, dmg = 0, hor = 0 }
     local s = SOAK[card.name]
     if s then a.hp, a.sp = s[1], s[2] end
-    -- one ally slot, two hand slots (Baseball Bat takes both), one arcane, one accessory, one body
+    if card.name == "Beat Cop" and (card.level or 0) >= 2 then a.hp = 3 end
+    -- Two hand and two arcane slots; one ally, accessory and body. A two-slot
+    -- asset replaces as many assets as necessary, not just the oldest one.
     if card.slot then
-      local want, cap = card.slot, 1
-      if card.slot == "Hand" then cap = 2 end
+      local function slot(s)
+        if not s then return nil,0 end
+        return s:gsub(" x2$",""), s:find(" x2$",1) and 2 or 1
+      end
+      local want, required = slot(card.slot)
+      local cap = (want == "Hand" or want == "Arcane") and 2 or 1
       local used = 0
       for _, x in ipairs(inv.assets) do
-        local s2 = x.rec.slot
-        if s2 == want or (want == "Hand" and s2 == "Hand x2") then used = used + ((s2 == "Hand x2") and 2 or 1) end
+        local s2,n2 = slot(x.rec.slot)
+        if s2 == want then used = used + n2 end
       end
-      if want == "Hand x2" then want, cap = "Hand", 2 ; used = used + 1 end
-      if used >= cap then
-        -- replace the oldest in that slot
+      while used + required > cap do
+        local removed = false
         for i, x in ipairs(inv.assets) do
-          if x.rec.slot == card.slot or (card.slot:find("Hand") and tostring(x.rec.slot):find("Hand")) then
+          local s2,n2 = slot(x.rec.slot)
+          if s2 == want then
             table.remove(inv.assets, i)
             inv.discard[#inv.discard + 1] = x.rec
+            used,removed = used-n2,true
             break
           end
         end
+        if not removed then break end
       end
     end
     inv.assets[#inv.assets + 1] = a
+    R.syncMemory(inv)
     R.G.metrics.cards_played = R.G.metrics.cards_played + 1
     R.log("%s plays %s", inv.name, card.name)
     return a
@@ -213,8 +254,8 @@ return function(R, T)
     R.log("%s draws weakness %s", inv.name, n)
     inv.discard[#inv.discard + 1] = card
     if card.id == "sthr-eighthgrave" then
-      if (inv.memory or 0) > 0 then
-        R.hurt(inv, 0, math.min(4, inv.memory), "The Eighth Grave")
+      if R.investigatorMemory(inv) > 0 then
+        R.hurt(inv, 0, math.min(4, R.investigatorMemory(inv)), "The Eighth Grave")
       else
         local c = T.searchEncounter(function(md) return R.hasTrait(R.card(md.id), "Echo") and R.card(md.id).type == "Enemy" end)
         if c then
@@ -291,9 +332,11 @@ return function(R, T)
   --- Constant bonuses from assets in play for this test.
   function P.staticBonus(inv, skill, opts)
     local b = 0
+    if R.G.phase == "investigation" and inv.round.encyclopedia and inv.round.encyclopedia.skill == skill then b = b + 2 end
     for _, a in ipairs(inv.assets) do
       local c = CONST[a.name]
       if c and c[1] == skill and (c[3] == nil or c[3] == opts.kind) then b = b + c[2] end
+      if a.name == "Peter Sylvestre (2)" and skill == "wil" then b = b + 1 end
       if a.name == "The Ambergrove Lamp" then end
     end
     -- a story asset's constant modifier (Bound Almanac: -1 [agi])
@@ -301,7 +344,7 @@ return function(R, T)
     if st and st[skill] then b = b + st[skill] end
     if opts.kind == "evade" then
       for _, x in ipairs(R.investigatorsAt(R.locOf(inv))) do
-        if P.findAsset(x, "The Ambergrove Lamp") then b = b + 1 break end
+        if (x == inv or not inv.round.nobodyBelieves) and P.findAsset(x, "The Ambergrove Lamp") then b = b + 1 break end
       end
     end
     if opts.weapon then
@@ -316,25 +359,40 @@ return function(R, T)
     local out = {}
     for _, a in ipairs(inv.assets) do
       local t = TALENT[a.name]
-      if t and t[skill] and inv.resources > 0 then
-        out[#out + 1] = { gain = 1, cost = "resource", repeatable = true, asset = a, pay = function() inv.resources = inv.resources - 1 end }
+      local price, gain = a.name == "Streetwise (3)" and 2 or 1, a.name == "Streetwise (3)" and 3 or 1
+      if a.name == "Higher Education (3)" then gain = 2 end
+      if t and t[skill] and inv.resources >= price and (a.name ~= "Higher Education (3)" or #inv.hand >= 5) then
+        out[#out + 1] = { gain = gain, price = price, cost = "resource", repeatable = true, asset = a,
+          pay = function() inv.resources = inv.resources - price end }
       end
       if a.name == "The Lexicon of the Hour" and skill == "int" and not a.exhausted and a.uses > 0 then
-        out[#out + 1] = { gain = 2, cost = "secret", pay = function() a.exhausted = true ; a.uses = a.uses - 1 end }
+        out[#out + 1] = { gain = 2, cost = "secret", pay = function()
+          a.exhausted = true ; a.uses = a.uses - 1
+          local repeated = P.afterOwnAbility(inv, { canRepeat=function() return a.uses > 0 end,
+            resolve=function() a.uses=a.uses-1 end })
+          return repeated and 2 or 0
+        end }
       end
     end
     -- Seraphine: raise Dissonance by 1: +2 (limit twice per round)
     if inv.id == "sthrseraphine" and (inv.round.sera or 0) < 2 and R.G.phase == "investigation" and R.G.turnOf == inv then
-      out[#out + 1] = { gain = 2, cost = "dissonance", pay = function() P.seraphine(inv) end }
+      out[#out + 1] = { gain = 2, cost = "dissonance", pay = function() return P.seraphine(inv) end }
     end
     return out
   end
 
-  function P.seraphine(inv)
+  function P.seraphine(inv, choice, asset, repeating)
     inv.round.sera = (inv.round.sera or 0) + 1
     R.raise(1, "Seraphine's ability (cost)", inv)
     inv.lastTurn.paidDiss = true
     if inv.round.sera == 2 then R.addMemory(inv, 1, "Seraphine: second use in a round") end
+    if choice == "action" then inv.actionsLeft = inv.actionsLeft + 1
+    elseif choice == "ready" and asset then asset.exhausted = false end
+    if not repeating then
+      local repeated = P.afterOwnAbility(inv,{canRepeat=function() return inv.round.sera < 2 end,
+        resolve=function() P.seraphine(inv,choice,asset,true) end})
+      return not choice and repeated and 2 or 0
+    end
   end
 
   --- Cards in hand that could commit to this skill: {card, icons}.
@@ -344,9 +402,13 @@ return function(R, T)
       if c.type == "Skill" or (c.icons and ((c.icons[skill] or 0) + (c.icons.wild or 0)) > 0) then
         local n = (c.icons and ((c.icons[skill] or 0) + (c.icons.wild or 0))) or 0
         if c.name == "I've Done This Before" and inv.failedTypes[skill] then n = 3 end
-        if c.name == "Muscle Memory" and inv.testedTypes[skill] then n = 2 end
+        if c.name == "Muscle Memory" then
+          n = inv.testedTypes[skill] and 2 or 1
+          if (skill == "com" or skill == "agi") and ((inv.years or 0) >= 5 or inv.bracket == "Weathered" or inv.bracket == "Elder" or inv.bracket == "Ancient") then n = n + 1 end
+        end
         if c.name == "Foreknowledge" then n = ((inv.memory or 0) > 0) and 4 or 2 end
         if c.name == "I've Done This Before" and opts.helper then n = 0 end
+        if c.name == "Opportunist" and opts.helper then n = 0 end
         if n > 0 then
           -- skill cards are the ones meant to be committed; others only when needed
           local value = (c.type == "Skill") and 1 or 3
@@ -359,25 +421,66 @@ return function(R, T)
     return out
   end
 
+  -- One commit path for the test taker and helpers. Costs and "when committed"
+  -- draws happen here, before the reveal, and a shared maximum applies to all.
+  function P.commit(inv, entry, skill, opts, committed)
+    local card = entry.card
+    if card.name == "Foreknowledge" or card.name == "Guts" or card.name == "Perception"
+       or card.name == "Overpower" or card.name == "Manual Dexterity" or card.name == "Unexpected Courage" then
+      for _, c in ipairs(committed) do if c.card.name == card.name then return nil end end
+    end
+    P.discardFromHand(inv, card)
+    table.remove(inv.discard)
+    local c = { card = card, icons = entry.icons, owner = inv }
+    if card.name == "Foreknowledge" then
+      c.icons = 2
+      if R.syncMemory(inv) >= 1 then
+        R.addMemory(inv, -1, "Foreknowledge", "any")
+        T.api("shApiTally", { id = inv.id, kind = "spent", delta = 1 })
+        c.icons, c.memoryPaid = 4, true
+      end
+    elseif card.name == "Muscle Memory" and inv.testedTypes[skill] then P.draw(inv, 1, "Muscle Memory committed") end
+    committed[#committed + 1] = c
+    inv.lastCommitted = inv.lastCommitted or {}
+    return c
+  end
+
+  -- These skills change the test taker's result, including when a helper
+  -- committed them. Keep every copy and its printing rather than a boolean.
+  function P.resultBonus(inv, name, margin)
+    local n = 0
+    for _, c in ipairs(inv.lastCommitted and inv.lastCommitted[name] or {}) do
+      n = n + (((c.level or 0) >= 2 and margin >= 2) and 2 or 1)
+    end
+    return n
+  end
+
   --- The investigator's elder sign: its modifier (effects are applied after).
   function P.elderSign(inv)
     local G = R.G
-    if inv.id == "sthrelias" then return (inv.memory or 0) >= 3 and 3 or 1 end
+    if inv.id == "sthrelias" then return R.investigatorMemory(inv) >= 3 and 3 or 1 end
     if inv.id == "sthrayako" then return 2 end
     if inv.id == "sthrcass" then return 1 end
     if inv.id == "sthrseraphine" then return math.min(5, R.dissonance()) end
     if inv.id == "sthrbirdie" then return inv.round.failed and 3 or 1 end
     return 1
   end
-  function P.elderSignAfter(inv)
-    if inv.id == "sthrelias" and (inv.memory or 0) >= 3 then
-      R.heal(inv, 1, R.knows("the-keepers-ninth-death") and 1 or 0)
+  function P.elderSignAfter(inv, modifier)
+    if inv.id == "sthrelias" and R.investigatorMemory(inv) >= 3 then
+      local healed = inv.damage > 0
+      R.heal(inv, 1, healed and R.knows("the-keepers-ninth-death") and 1 or 0)
     elseif inv.id == "sthrayako" then
-      P.draw(inv, 1)
+      local cards = P.draw(inv, 1) or {}
+      for _, c in ipairs(cards) do
+        if tostring(c.traits or ""):find("Recollection", 1, true) then
+          inv.round.recollectionDiscount = inv.round.recollectionDiscount or {}
+          inv.round.recollectionDiscount[c] = 2
+        end
+      end
     elseif inv.id == "sthrcass" then
-      inv.resources = inv.resources + math.min(3, inv.memory or 0)
+      inv.resources = inv.resources + math.min(3, R.investigatorMemory(inv))
     elseif inv.id == "sthrseraphine" then
-      local x = math.min(5, R.dissonance())
+      local x = modifier or math.min(5, R.dissonance())
       if x > 0 then R.lower(x, "Seraphine's elder sign") end
     end
   end
@@ -388,9 +491,20 @@ return function(R, T)
     for _, c in ipairs(committed) do
       local n = c.card.name
       if ok and (n == "Guts" or n == "Perception" or n == "Overpower" or n == "Manual Dexterity") then P.draw(c.owner, 1) end
-      if ok and n == "Fearless" then R.heal(c.owner, 0, 1) end
-      if n == "Muscle Memory" and c.owner.testedTypes[skill] then P.draw(c.owner, 1) end
-      if n == "Opportunist" and ok and margin >= 3 then
+      if ok and n == "Fearless" then R.heal(c.owner, 0, (c.card.level or 0) >= 2 and margin >= 2 and 2 or 1) end
+      if ok and n == "Foreknowledge" and c.memoryPaid then P.draw(c.owner, 1) end
+      if ok and n == "Survival Instinct" and opts.kind == "evade" then
+        for _, en in ipairs(G.enemies) do
+          if en.engaged == inv and en ~= opts.enemy then
+            if (c.card.level or 0) < 2 then en.engaged = nil ; R.placeEnemy(en)
+            elseif not R.cannotEvade(en) then
+              en.exhausted,en.engaged = true,nil ; R.placeEnemy(en)
+              G.metrics.evades = G.metrics.evades + 1 ; R.FX.onEvade(inv,en)
+            end
+          end
+        end
+      end
+      if n == "Opportunist" and ok and margin >= ((c.card.level or 0) >= 2 and 1 or 3) then
         c.owner.hand[#c.owner.hand + 1] = c.card
       else
         c.owner.discard[#c.owner.discard + 1] = c.card
@@ -422,7 +536,7 @@ return function(R, T)
   --- "When you would fail": Lucky!, then Birdie's once-per-loop save. Returns the new margin or nil.
   function P.wouldFail(inv, margin, tokenName, opts)
     if tokenName == "Auto-fail" then
-      if inv.id == "sthrbirdie" and not inv.loopUsed.birdieSave and (inv.memory or 0) >= 3 and opts.important then
+      if inv.id == "sthrbirdie" and not inv.loopUsed.birdieSave and R.investigatorMemory(inv) >= 3 and opts.important then
         inv.loopUsed.birdieSave = true
         R.addMemory(inv, -3, "Birdie: succeed instead")
         T.api("shApiTally", { id = inv.id, kind = "spent", delta = 3 })
@@ -436,11 +550,12 @@ return function(R, T)
           P.discardFromHand(inv, c)
           inv.resources = inv.resources - 1
           R.log("%s plays Lucky!", inv.name)
+          if (c.level or 0) >= 2 then P.draw(inv, 1) end
           return margin + 2
         end
       end
     end
-    if inv.id == "sthrbirdie" and not inv.loopUsed.birdieSave and (inv.memory or 0) >= 3 and opts.important then
+    if inv.id == "sthrbirdie" and not inv.loopUsed.birdieSave and R.investigatorMemory(inv) >= 3 and opts.important then
       inv.loopUsed.birdieSave = true
       R.addMemory(inv, -3, "Birdie: succeed instead")
       T.api("shApiTally", { id = inv.id, kind = "spent", delta = 3 })
@@ -473,15 +588,16 @@ return function(R, T)
       if c.name == "\"I Get Out\"" or c.name == "I Get Out" then
         inv.loopUsed.igetout = true
         P.discardFromHand(inv, c)
-        inv.damage = inv.health - 1
-        inv.horror = inv.sanity - 1
+        inv.damage = math.min(inv.damage, inv.health - 1)
+        inv.horror = math.min(inv.horror, inv.sanity - 1)
         for _, en in ipairs(R.G.enemies) do if en.engaged == inv then en.engaged = nil ; R.placeEnemy(en) end end
         if R.G.appointed.engaged == inv then R.G.appointed.engaged = nil end
         local here = R.locOf(inv)
         local to = R.AI.chooseMove(inv, here, true)
         if to then R.moveInv(inv, to, { noAoO = true }) end
         local compass = P.findAsset(inv, "Lucky Compass")
-        if compass then compass.memory = (compass.memory or 0) + 1 ; R.addMemory(inv, 1, "I Get Out (Lucky Compass)") end
+        if compass then R.addMemory(inv, 1, "I Get Out (Lucky Compass)", compass) end
+        if R.G.phase == "investigation" and R.G.turnOf == inv then inv.actionsLeft = 0 end
         R.log("Birdie: I Get Out")
         return true
       end
@@ -512,7 +628,7 @@ return function(R, T)
     local ayako
     for _, inv in ipairs(R.aliveInvs()) do if inv.id == "sthrayako" then ayako = inv end end
     if not ayako then return false end
-    if what == "losthour" or what == "crossing" then
+    if what == "treachery" or what == "losthour" or what == "crossing" then
       if target ~= ayako or ayako.horror >= ayako.sanity - 1 then return false end
       return playIMW(ayako, what, true)
     end
@@ -546,8 +662,8 @@ return function(R, T)
         return true
       end
     end
-    if id == "sthr-losthour" or id == "sthr-crossing" then
-      if P.itMeansWait(inv, id == "sthr-losthour" and "losthour" or "crossing") then return true end
+    if worth >= 2 and not def.weakness and not (id == "sthr-yearinanight" and G.prologue) then
+      if P.itMeansWait(inv, "treachery") then return true end
     end
     if worth >= 2 and inv.resources >= 1 and inv.horror < inv.sanity - 2 then
       for _, c in ipairs(inv.hand) do
@@ -595,13 +711,105 @@ return function(R, T)
   end
 
   function P.onKnowledge(fact)
-    -- Cassandra's Notebook is not in the starting decks
+    for _, inv in ipairs(R.aliveInvs()) do
+      local a = P.findAsset(inv, "Cassandra's Notebook")
+      if a then
+        local function reward()
+          P.draw(inv, 2, "Cassandra's Notebook")
+          inv.resources = inv.resources + 2
+          R.addMemory(inv, 1, "Cassandra's Notebook", a)
+        end
+        reward()
+        P.afterOwnAbility(inv,{canRepeat=function() return true end,resolve=reward})
+      end
+    end
   end
 
-  function P.onHourReachedPlayers(h) end
+  function P.onHourReachedPlayers(h)
+    for _, inv in ipairs(R.aliveInvs()) do
+      local a = P.findAsset(inv, "Stolen Minute")
+      if a then a.uses = math.min(3, a.uses + 1) end
+    end
+  end
+
+  function P.playCost(inv, card)
+    return math.max(0, (card.cost or 0) - ((inv.round.recollectionDiscount or {})[card] or 0))
+  end
+
+  function P.retryTest(inv, opts)
+    if not opts.important then return false end
+    for _, c in ipairs(inv.hand) do
+      if c.name == "This Time, For Sure" or c.name == "This Time For Sure" then
+        local knowsDistrict = false
+        local district = R.locOf(inv).district
+        for fact in pairs(R.G.knowledge) do
+          if R.G.knowledge[fact] and R.SCEN.FACT_DISTRICT and R.SCEN.FACT_DISTRICT[fact] == district then knowsDistrict = true end
+        end
+        if P.playCost(inv, c) <= inv.resources and (knowsDistrict or R.dissonance() + 1 < R.consts().reset) then
+          P.discardFromHand(inv, c)
+          inv.resources = inv.resources - P.playCost(inv, c)
+          if not knowsDistrict then R.raise(1, "This Time, For Sure (cost)", inv) end
+          inv.lastTurn.recollection = true
+          return true
+        end
+      end
+    end
+    return false
+  end
+
+  -- Doorway repeats an ability after it resolves. The descriptor supplies
+  -- current legality, remaining costs and limits; action/exhaust costs alone
+  -- are waived. It cannot repeat itself or bypass a reached limit.
+  function P.afterOwnAbility(inv, ability)
+    if R.G.ended or inv.defeated or R.G.turnOf ~= inv or ability.repeating or not ability.canRepeat() then return end
+    for _, c in ipairs(inv.hand) do
+      if c.name == "The Same Doorway Twice" then
+        if P.playCost(inv, c) <= inv.resources and R.dissonance() + 1 < R.consts().glitch then
+          P.discardFromHand(inv, c)
+          inv.resources = inv.resources - P.playCost(inv, c)
+          R.raise(1, "Déjà Vu at the Doorway (cost)", inv)
+          inv.lastTurn.recollection = true
+          ability.repeating = true
+          ability.resolve(true)
+          return true
+        end
+      end
+    end
+  end
+
+  function P.markedDeck(inv, a, mode)
+    if inv.sealedToken then return false end
+    local entries = T.chaosBag().getObjects()
+    if #entries == 0 then return false end
+    local entry = R.pick(entries)
+    if mode == "number" then
+      if inv.loopUsed.marked or R.syncMemory(inv) < 1 then return false end
+      local best
+      for _, e in ipairs(entries) do
+        local n = tonumber(e.name or e.nickname)
+        if n and (not best or n > best) then entry, best = e, n end
+      end
+      if not best then return false end
+      R.raise(1, "Marked Deck (cost)", inv)
+      R.addMemory(inv, -1, "Marked Deck", "any")
+      T.api("shApiTally", { id = inv.id, kind = "spent", delta = 1 })
+      inv.loopUsed.marked = true
+    end
+    local pos = inv.card.getPosition()
+    local token = T.chaosBag().takeObject({ guid = entry.guid, position = {pos.x, pos.y + 1, pos.z}, smooth = false })
+    E.run(0.1)
+    if not token then return false end
+    if token.getName() == "Static" then T.api("shApiResolveStatic", { guid = token.getGUID(), cancel = true }) end
+    inv.sealedToken, a.exhausted = token, true
+    R.touch()
+    return true
+  end
 
   --- End of an investigator's turn: Internal Injury / Chronophobia.
   function P.endTurn(inv)
+    for _, a in ipairs(inv.assets) do
+      if a.name == "Peter Sylvestre (2)" then a.hor = math.max(0,(a.hor or 0)-1) end
+    end
     if inv.threat["Internal Injury"] then R.hurt(inv, 1, 0, "Internal Injury", { direct = true }) end
     if inv.threat["Chronophobia"] then R.hurt(inv, 0, 1, "Chronophobia", { direct = true }) end
   end

@@ -38,68 +38,101 @@ return function(R, T)
   function R.test(inv, skill, diff, opts)
     opts = opts or {}
     local G = R.G
+    -- RR ST.1 -> ST.2: a player window before cards are committed.
+    R.playerWindow("skill test before commits")
     G.metrics.tests = G.metrics.tests + 1
     local base = R.skillBase(inv, skill) + P.staticBonus(inv, skill, opts) + (opts.bonus or 0)
     -- the AI commits cards and pays for boosts up to its target odds
     local committed, boost = R.AI.prepareTest(inv, skill, diff, base, opts)
+    inv.lastCommitted = {}
+    for _, c in ipairs(committed) do
+      local name = c.card.name
+      if name == "Deduction" or name == "Vicious Blow" then
+        inv.lastCommitted[name] = inv.lastCommitted[name] or {}
+        inv.lastCommitted[name][#inv.lastCommitted[name]+1] = c.card
+      end
+    end
     local total = base + boost
     for _, c in ipairs(committed) do total = total + c.icons end
-    -- reveal a chaos token through SCED
-    local name = T.drawToken(inv.color)
-    R.touch()
-    if name == "Static" then
-      local m = G.metrics
-      m.dissonance_sources["[static] token"] = (m.dissonance_sources["[static] token"] or 0) + 1
-      m.diss_max = math.max(m.diss_max, R.dissonance())
-    end
-    -- Bound Almanac: cancel a Static token and reveal another
-    if name == "Static" and inv.story and inv.story.id == "sthr-item-almanac" and not inv.storyExhausted then
-      inv.storyExhausted = true
-      R.lower(1, "Bound Almanac cancels [static] (the Control had raised it)")
-      R.log("Bound Almanac: %s reveals another token", inv.name)
-      name = T.drawToken(inv.color)
+    -- RR ST.2 -> ST.3: the second player window precedes token reveal.
+    -- A test inside an encounter therefore can offer a paid objective even
+    -- though Mythos has not yet reached its general post-draw player window.
+    R.playerWindow("skill test after commits")
+    local name, tokenName, ok, margin
+    repeat
+      local token, sealed, sealedReturned
+      if inv.sealedToken then
+        token, sealed = inv.sealedToken, true
+        inv.sealedToken = nil
+        name = token.getName()
+      else name, token = T.drawToken(inv.color) end
       R.touch()
-    end
-    local tokenName = name
-    local mod = FX.tokenValue(name, inv)
-    local cancelled = false
-    -- Cass: the named symbol is cancelled (and she places 1 Memory)
-    if inv.namedToken and inv.namedToken == name then
-      inv.namedToken = nil
-      cancelled = true
-      R.addMemory(inv, 1, "Cass: named token cancelled")
-      if name == "Static" then R.lower(1, "cancelled [static] (the Control had raised it)") end
-    end
-    if not cancelled and mod ~= nil and total + mod < diff and total >= diff and P.cancelToken(inv, name, total + mod - diff, total - diff, opts) then
-      cancelled = true
-      if name == "Static" then R.lower(1, "cancelled [static] (the Control had raised it)") end
-    elseif not cancelled and mod == nil and total >= diff and P.cancelToken(inv, name, -1, total - diff, opts) then
-      cancelled = true
-    end
-    if cancelled then mod = 0 end
-    local ok, margin
-    if mod == nil then
-      -- auto-fail: the total skill value is 0, so the test fails by its difficulty
-      ok, margin = false, -math.max(diff, 1)
-    else
-      margin = total + mod - diff
-      ok = margin >= 0
-    end
-    if not ok then
-      local saved = P.wouldFail(inv, margin, name, opts)
-      if saved and saved >= 0 then ok, margin = true, saved end
-    end
-    G.metrics.tokens[name] = (G.metrics.tokens[name] or 0) + 1
-    R.log("%s tests %s (%d) vs %d%s: token %s -> %s (margin %d)", inv.name, skill, total, diff,
-      #committed > 0 and (" +" .. #committed .. " card(s)") or "", tostring(name), ok and "success" or "FAIL", margin)
-    -- the tokens go back before the results resolve (an Elder Thing's advance
-    -- can reach Hour II, whose encounter draws hold tests of their own)
-    T.returnTokens()
-    R.touch()
-    if not cancelled then
-      if name == "Elder Sign" then P.elderSignAfter(inv) end
-      FX.tokenAfter(name, inv, ok, opts, margin)
-    end
+      -- A canceled or previewed Static must never apply irreversible band
+      -- transitions. Resolve pending tokens only after all cancellation windows.
+      if name == "Static" and inv.story and inv.story.id == "sthr-item-almanac" and not inv.storyExhausted then
+        inv.storyExhausted = true
+        T.api("shApiResolveStatic", { guid = token and token.getGUID(), cancel = true })
+        if sealed then T.chaosBag().putObject(token) end
+        name, token = T.drawToken(inv.color)
+        sealed = false
+        R.touch()
+      end
+      tokenName = name
+      local mod = FX.tokenValue(name, inv)
+      local cancelled = false
+      if inv.namedToken and inv.namedToken == name then
+        inv.namedToken, cancelled = nil, true
+        R.addMemory(inv, 1, "Cass: named token cancelled")
+      end
+      if not cancelled and total >= diff and (mod == nil or total + mod < diff)
+         and P.cancelToken(inv, name, mod and total + mod - diff or -1, total - diff, opts) then cancelled = true end
+      tokenName = cancelled and "Canceled" or name
+      if name == "Static" then
+        if sealed then
+          if not cancelled then
+            -- R.raise can end the loop immediately: put the revealed seal
+            -- back first so that early exit cannot strand a chaos token.
+            T.chaosBag().putObject(token) ; E.run(0.1) ; sealedReturned = true
+            R.raise(1, "[static] token")
+          end
+        else
+          T.api("shApiResolveStatic", { guid = token and token.getGUID(), cancel = cancelled })
+          R.touch()
+          if not cancelled then
+            local m = G.metrics
+            m.dissonance_sources["[static] token"] = (m.dissonance_sources["[static] token"] or 0) + 1
+            m.diss_max = math.max(m.diss_max, R.dissonance())
+          end
+        end
+        if not cancelled and R.dissonance() >= R.consts().reset then
+          T.returnTokens()
+          if sealed and not sealedReturned then T.chaosBag().putObject(token) ; E.run(0.1) end
+          R.touch()
+          R.checkReset()
+          if G.ended then return false, -math.max(diff,1), name end
+        end
+      end
+      if cancelled then mod = 0 end
+      margin = mod and total + mod - diff or -math.max(diff, 1)
+      ok = margin >= 0 and mod ~= nil
+      if not ok then
+        local saved = P.wouldFail(inv, margin, name, opts)
+        if saved and saved >= 0 then ok, margin = true, saved end
+      end
+      G.metrics.tokens[name] = (G.metrics.tokens[name] or 0) + 1
+      R.log("%s tests %s (%d) vs %d: token %s -> %s (margin %d)", inv.name, skill, total, diff,
+        tostring(name), ok and "success" or "FAIL", margin)
+      T.returnTokens()
+      if sealed and not sealedReturned then T.chaosBag().putObject(token) ; E.run(0.1) end
+      R.touch()
+      if not cancelled then
+        if name == "Elder Sign" then P.elderSignAfter(inv, mod) end
+        FX.tokenAfter(name, inv, ok, opts, margin)
+      end
+      -- Repeat only the reveal step: no new commits or boosts; previously
+      -- resolved token effects remain. Committed cards resolve once at the end.
+      if not ok and P.retryTest(inv, opts) then total = total + 2 else break end
+    until G.ended or inv.defeated
     R.syncAppointedArrival()
     R.checkReset()
     P.afterTest(inv, ok, margin, skill, opts, committed)
@@ -175,21 +208,28 @@ return function(R, T)
 
   ------------------------------------------------------------ objectives --
 
-  --- Group-spend objectives resolve as soon as they can (no action).
-  function R.checkObjectives()
+  --- Mandatory delivery objectives resolve at their condition. Ordinary
+  -- group clue payments are free triggered abilities, offered only in a
+  -- legal player window (RR pp.3, 23-26). A nested consequence must never
+  -- inherit permission to pay from its enclosing player window.
+  function R.checkObjectives(allowPaid)
     local G = R.G
     if G.ended then return end
-    for _, district in ipairs(G.actOrder) do
+    for _, district in ipairs(G.actOrder or {}) do
       local act = G.acts[district]
       if act and not act.completed and not G.finale then
         local payers = FX.canAdvance(act)
-        if payers and R.AI.wantsAdvance(act) then
+        if payers and (#payers == 0 or (allowPaid and R.AI.wantsAdvance(act))) then
           R.spendClues(payers, FX.actNeed(act.id))
           R.advanceAct(act, payers[1])
           if G.ended then return end
         end
       end
     end
+  end
+
+  function R.playerWindow(why)
+    R.checkObjectives(true)
   end
 
   function R.contest(n, why)
@@ -260,10 +300,9 @@ return function(R, T)
     if P.dodge(inv, en) then return end
     G.metrics.attacks = G.metrics.attacks + 1
     R.log("%s attacks %s (%s)", en.name, inv.name, why or "")
-    local dmgBefore = inv.damage
-    R.hurt(inv, en.def.damage or 0, en.def.horror or 0, en.name, { enemy = en })
+    local dealt = R.hurt(inv, en.def.damage or 0, en.def.horror or 0, en.name, { enemy = en })
     -- Elias: after an enemy attack deals damage to him while he is alone
-    if inv.id == "sthrelias" and inv.damage > dmgBefore and #R.investigatorsAt(R.locOf(inv) or {}) <= 1 and not inv.round.eliasAlone then
+    if inv.id == "sthrelias" and dealt.damage > 0 and #R.investigatorsAt(R.locOf(inv) or {}) <= 1 and not inv.round.eliasAlone then
       inv.round.eliasAlone = true
       R.addMemory(inv, 1, "Elias: attacked while alone")
     end
@@ -294,7 +333,11 @@ return function(R, T)
     local def = R.card("sthr-appointed")
     G.metrics.appointed_attacks = G.metrics.appointed_attacks + 1
     R.log("The Appointed attacks %s (%s)", inv.name, why)
-    R.hurt(inv, def.damage or 2, def.horror or 2, "The Appointed")
+    local dealt = R.hurt(inv, def.damage or 2, def.horror or 2, "The Appointed", {enemy={id="sthr-appointed",def=def}})
+    if inv.id == "sthrelias" and dealt.damage > 0 and #R.investigatorsAt(R.locOf(inv) or {}) <= 1 and not inv.round.eliasAlone then
+      inv.round.eliasAlone = true
+      R.addMemory(inv, 1, "Elias: attacked while alone")
+    end
     R.raise(1, "The Appointed (Arrived) attacks")
   end
 
@@ -314,8 +357,7 @@ return function(R, T)
     end
     local ok, margin = R.test(inv, "int", shroud, { kind = "investigate", important = opts.important, target = opts.target })
     if ok then
-      local n = 1
-      if inv.lastCommitted and inv.lastCommitted.deduction then n = 2 end
+      local n = 1 + P.resultBonus(inv, "Deduction", margin)
       R.discover(inv, L, n)
       if P.findAsset(inv, "Dr. Milan Christopher") then inv.resources = inv.resources + 1 end
     end
@@ -333,21 +375,31 @@ return function(R, T)
     if w and w[4] then skill = w[4] end
     if weapon and w and w[3] then weapon.uses = weapon.uses - 1 end
     local ok, margin, token = R.test(inv, skill, R.enemyFight(en), { kind = "fight", weapon = weapon, enemy = en, important = true })
-    if weapon and weapon.name == "Shrivelling" and (token == "Skull" or token == "Cultist" or token == "Tablet"
-        or token == "Elder Thing" or token == "Auto-fail") then R.hurt(inv, 0, 1, "Shrivelling") end
+    if weapon and weapon.name:find("Shrivelling",1,true) and (token == "Skull" or token == "Cultist" or token == "Tablet"
+        or token == "Elder Thing" or token == "Auto-fail") then
+      R.hurt(inv, 0, weapon.name == "Shrivelling (5)" and 2 or 1, "Shrivelling")
+    end
     if weapon and weapon.name == "Baseball Bat" and (token == "Skull" or token == "Auto-fail") then
       for i, a in ipairs(inv.assets) do if a == weapon then table.remove(inv.assets, i) inv.discard[#inv.discard + 1] = a.rec break end end
     end
     if ok then
       local dmg = 1 + ((w and w[2]) or 0)
+      if weapon and weapon.name == "Shotgun (4)" then dmg = math.max(1, math.min(5, margin)) end
+      if weapon and weapon.name == ".41 Derringer (2)" and margin < 1 then dmg = dmg - 1 end
+      if weapon and weapon.name == "Switchblade (2)" and margin < 2 then dmg = dmg - 1 end
       if weapon and weapon.name == "Machete" then
         local engaged = 0
         for _, x in ipairs(G.enemies) do if x.engaged == inv then engaged = engaged + 1 end end
         if engaged > 1 then dmg = dmg - 1 end
       end
       if weapon and weapon.name == "Switchblade" and margin >= 2 then dmg = dmg + 1 end
-      if inv.lastCommitted and inv.lastCommitted.vicious then dmg = dmg + 1 end
+      dmg = dmg + P.resultBonus(inv, "Vicious Blow", margin)
       R.damageEnemy(en, dmg, inv, weapon and weapon.name or "fight")
+      if weapon and weapon.name == ".41 Derringer (2)" and margin >= 3
+         and (weapon.actionRound ~= G.round or weapon.actionTurn ~= G.turnOf) then
+        weapon.actionRound,weapon.actionTurn = G.round,G.turnOf
+        inv.actionsLeft = (inv.actionsLeft or 0) + 1
+      end
     elseif R.hasRetaliate(en) and not en.exhausted and not en.dead then
       R.enemyAttack(en, inv, "retaliate")
     end
@@ -365,14 +417,18 @@ return function(R, T)
   function A_.evade(inv, en, opts)
     opts = opts or {}
     if R.cannotEvade(en) then return false end
-    local ok = R.test(inv, opts.skill or "agi", R.enemyEvade(en), { kind = "evade", enemy = en, important = true })
+    local ok, _, token = R.test(inv, opts.skill or "agi", R.enemyEvade(en), { kind = "evade", enemy = en, important = true })
+    if opts.blinding and (token == "Skull" or token == "Cultist" or token == "Tablet" or token == "Elder Thing" or token == "Auto-fail") then
+      inv.actionsLeft = math.max(0,(inv.actionsLeft or 0)-1)
+      if opts.blinding >= 2 then R.hurt(inv,0,1,"Blinding Light") end
+    end
     if ok then
       en.exhausted = true
       if en.engaged then en.engaged = nil end
       R.placeEnemy(en)
       local pp = P.findAsset(inv, "Pickpocketing")
       if pp and not pp.exhausted then pp.exhausted = true ; P.draw(inv, 1) end
-      if opts.blinding then R.damageEnemy(en, 1, inv, "Blinding Light") end
+      if opts.blinding then R.damageEnemy(en, opts.blinding, inv, "Blinding Light") end
       R.G.metrics.evades = R.G.metrics.evades + 1
       FX.onEvade(inv, en)
     end
@@ -389,11 +445,13 @@ return function(R, T)
     return (R.G.finale and (R.WHATIF or {}).finaleHoldBackDiff) or 4
   end
 
-  function A_.holdBack(inv)
+  function A_.holdBack(inv, automatic)
     local G = R.G
+    if G.appointed.exhausted or G.appointed.holdBackRound == G.round or R.appointedLoc() ~= R.locOf(inv) or R.stage() < 1 then return false end
     local skill = (R.skillBase(inv, "wil") + P.staticBonus(inv, "wil", {}) >= R.skillBase(inv, "com") + P.staticBonus(inv, "com", {})) and "wil" or "com"
     G.metrics.holdback_attempts = G.metrics.holdback_attempts + 1
-    local ok = R.test(inv, skill, R.holdBackDiff(), { kind = "holdback", important = true })
+    if G.finale and G.logFlags["You carry the walker's ring"] and not G.ringUsed then G.ringUsed,automatic=true,true end
+    local ok = automatic or R.test(inv, skill, R.holdBackDiff(), { kind = "holdback", important = true })
     if ok then
       G.metrics.holdbacks = G.metrics.holdbacks + 1
       local card = R.appointedCard()
@@ -404,6 +462,7 @@ return function(R, T)
       R.touch()
       if R.hour() < before then R.rewind(0) ; R.returnHourCard(R.hour(), before) ; G.metrics.rewinds = G.metrics.rewinds + 1 end
       G.appointed.exhausted = true
+      G.appointed.holdBackRound = G.round
       G.appointed.engaged = nil
       R.contest((R.WHATIF or {}).holdBackValue or 1, "Hold Back")
     end
@@ -421,7 +480,8 @@ return function(R, T)
     end
     -- events
     P.discardFromHand(inv, card)
-    inv.resources = inv.resources - (card.cost or 0)
+    inv.resources = inv.resources - P.playCost(inv, card)
+    if tostring(card.traits or ""):find("Recollection",1,true) then inv.lastTurn.recollection = true end
     G.metrics.cards_played = G.metrics.cards_played + 1
     R.log("%s plays %s", inv.name, n)
     if n == "Emergency Cache" then inv.resources = inv.resources + 3
@@ -444,15 +504,55 @@ return function(R, T)
       inv.mindOverMatter = true
     elseif n == "Blinding Light" then
       local t = R.AI.bestEnemyHere(inv, function(en) return en.engaged == inv end)
-      if t then A_.evade(inv, t, { skill = "wil", blinding = true }) end
+      if t then A_.evade(inv, t, { skill = "wil", blinding = (card.level or 0) >= 2 and 2 or 1 }) end
+    elseif n == "Rehearsed Escape" then
+      local t = R.AI.bestEnemyHere(inv, function(en) return en.engaged == inv end)
+      if t and not R.cannotEvade(t) and (not R.hasTrait(t.def, "Elite") or R.dissonance() + 1 < R.consts().reset) then
+        if R.hasTrait(t.def, "Elite") then R.raise(1, "Rehearsed Escape (cost)", inv) end
+        t.exhausted, t.engaged = true, nil
+        R.placeEnemy(t)
+        G.metrics.evades = G.metrics.evades + 1
+        FX.onEvade(inv, t)
+      end
+    elseif n == "The Long Way Round" then
+      local waived = false
+      for _ = 1, 2 do
+        local here = R.locOf(inv)
+        local target = R.AI.targetFor(inv)
+        local step = target and R.route(here, target)
+        if step and R.canEnter(here, step) then
+          local free = not waived and R.isCrossing(here, step)
+          if free then waived = true end
+          R.moveInv(inv, step, { noHour = free })
+        else break end
+      end
+    elseif n == "The Hour I Learned Your Name" then
+      inv.loopUsed.hourName = true
+      if R.appointedLoc() == R.locOf(inv) and not G.appointed.exhausted and G.appointed.holdBackRound ~= G.round then
+        if A_.holdBack(inv, true) and R.knows("the-appointeds-name") then
+          T.ctl("Appointed", true) ; R.touch()
+        end
+      else
+        local t = R.AI.bestEnemyHere(inv, function(en) return not en.dead end)
+        if t and R.test(inv, "wil", 3, { kind = "ability", important = true }) then
+          t.engaged, t.exhausted = nil, true
+          if not R.hasTrait(t.def, "Elite") then t.skipReady = true end
+          R.placeEnemy(t)
+        end
+      end
     elseif n == "I Remember the Ending" then
       -- Test [wil] (X = Dissonance, minimum 2); then, for 1 Dissonance, cancel
-      -- the next advance before the end of the next round (the encounter-deck
-      -- reorder is not modelled)
+      -- the next advance before the end of the next round.
       local ok = R.test(inv, "wil", math.max(2, R.dissonance()), { kind = "ability", important = true })
-      if ok and R.dissonance() + 1 < R.consts().glitch then
-        R.raise(1, "I Remember the Ending", inv)
-        G.rememberEnding = G.round + 1
+      if ok then
+        T.reorderEncounterTop(3,function(md)
+          local def=R.card(md.id)
+          return (def.type=="Enemy" and 3 or 0)+(R.hasTrait(def,"Time") and 2 or 0)
+        end)
+        if R.dissonance() + 1 < R.consts().glitch then
+          R.raise(1, "I Remember the Ending", inv)
+          G.rememberEnding = G.round + 1
+        end
       end
       inv.loopUsed.rememberEnding = true
     end
@@ -460,9 +560,20 @@ return function(R, T)
   end
 
   --- An [action] ability of an asset in play.
-  function A_.assetAbility(inv, a)
+  function A_.assetAbility(inv, a, mode, target, repeating)
     local G = R.G
-    if a.name == "First Aid" then
+    if a.name == "Encyclopedia (2)" then
+      a.exhausted = true
+      target = target or inv
+      if target == inv or not target.round.nobodyBelieves then target.round.encyclopedia = {skill=mode or "int"} end
+    elseif a.name == "Beat Cop" then
+      if not target or target.loc ~= inv.loc or target.dead or a.exhausted or a.dmg >= a.hp then return false end
+      a.exhausted = true ; a.dmg = a.dmg + 1
+      if a.dmg >= a.hp then
+        for i, x in ipairs(inv.assets) do if x == a then table.remove(inv.assets,i) ; inv.discard[#inv.discard+1] = a.rec break end end
+      end
+      R.damageEnemy(target,1,inv,"Beat Cop")
+    elseif a.name == "First Aid" then
       a.uses = a.uses - 1
       local t = R.AI.mostHurtHere(inv)
       if t then if t.damage >= t.horror then R.heal(t, 1, 0) else R.heal(t, 0, 1) end end
@@ -474,14 +585,88 @@ return function(R, T)
       a.exhausted = true
       P.draw(inv, 1)
     elseif a.name == "The Bell of Ambergrove" then
-      -- once per loop, never in the finale, 2 Dissonance
       a.exhausted = true
       a.uses = a.uses - 1
-      inv.loopUsed.bell = true
-      R.raise(2, "The Bell of Ambergrove (cost)", inv)
-      R.rewind(1, "The Bell of Ambergrove")
+      if mode == "evade" and target then
+        if A_.evade(inv, target, { skill = "wil" }) then
+          for _, x in ipairs(R.investigatorsAt(R.locOf(inv))) do
+            if x == inv or not x.round.nobodyBelieves then R.heal(x, 0, 1) end
+          end
+        end
+      else
+        inv.loopUsed.bell = true
+        R.raise(2, "The Bell of Ambergrove (cost)", inv)
+        if mode == "advance" then R.advance(1, "The Bell of Ambergrove") else R.rewind(1, "The Bell of Ambergrove") end
+      end
     elseif a.name == "Lucky Compass" then
       a.exhausted = true
+      if mode == "jump" then
+        R.addMemory(inv, -1, "Lucky Compass", a)
+        T.api("shApiTally", { id = inv.id, kind = "spent", delta = 1 })
+      else
+        for _, en in ipairs(G.enemies) do
+          if en.engaged == inv and not R.hasTrait(en.def, "Elite") then en.engaged = nil ; R.placeEnemy(en) end
+        end
+      end
+      if target then R.moveInv(inv, target, { teleport = mode == "jump" }) end
+    elseif a.name == "Cassandra's Notebook" then
+      a.exhausted = true
+      local ok, margin = R.test(inv, "int", R.shroud(R.locOf(inv)), { kind = "investigate", important = true, bonus = 1 })
+      if ok then R.discover(inv, R.locOf(inv), 1 + P.resultBonus(inv,"Deduction",margin)) ; P.draw(inv, 1) end
+    elseif a.name == "Stolen Minute" then
+      a.exhausted, a.uses = true, a.uses - 1
+      inv.actionsLeft = inv.actionsLeft + 1
+    elseif a.name == "The Ambergrove Lamp" then
+      a.exhausted = true
+      local deck = T.encounterDeck()
+      if deck and deck.type == "Deck" then
+        local entries = deck.getObjects()
+        local top = entries[1]
+        if top then
+          local md = T.decode(top.gm_notes) or {}
+          local def = R.card(md.id)
+          if def.type == "Enemy" or (def.type == "Treachery" and R.hasTrait(def, "Time")) then
+            T.moveTopEncounterBottom()
+          end
+        end
+      end
+      if target then
+        local free = not inv.loopUsed.lamp and R.isCrossing(R.locOf(inv), target) and R.dissonance() + 1 < R.consts().glitch
+        if free then inv.loopUsed.lamp = true ; R.raise(1, "The Ambergrove Lamp (cost)", inv) end
+        R.moveInv(inv, target, { noHour = free })
+      end
+    elseif a.name == "Marked Deck" then
+      P.markedDeck(inv, a, mode)
+    end
+    if not repeating then
+      local can = function()
+        if a.name == "The Bell of Ambergrove" then
+          return mode == "evade" and a.uses > 0 and target and not target.dead and target.engaged == inv and not R.cannotEvade(target)
+        end
+        if a.name == "Stolen Minute" then return a.uses > 0 end
+        if a.name == "Cassandra's Notebook" then return R.clues(R.locOf(inv)) > 0 end
+        if a.name == "First Aid" then return a.uses > 0 and R.AI.mostHurtHere(inv) ~= nil end
+        if a.name == "Medical Texts" then return R.AI.mostHurtHere(inv,true) ~= nil end
+        if a.name == "Old Book of Lore" then return true end
+        if a.name == "The Ambergrove Lamp" then return true end
+        if a.name == "Lucky Compass" then
+          if mode == "jump" and (a.memory or 0) < 1 then return false end
+          local here = R.locOf(inv)
+          local goal = R.AI.targetFor(inv)
+          local nextLocation = goal and R.route(here, goal)
+          if not nextLocation or nextLocation == here or not R.canEnter(here,nextLocation) then return false end
+          if mode == "jump" then
+            if not nextLocation.revealed then return false end
+            local known = false
+            for fact,v in pairs(G.knowledge) do if v and R.SCEN.FACT_DISTRICT[fact] == nextLocation.district then known = true end end
+            if not known then return false end
+          end
+          target = nextLocation
+          return true
+        end
+        return false
+      end
+      P.afterOwnAbility(inv, { canRepeat = can, resolve = function() A_.assetAbility(inv, a, mode, target, true) end })
     end
   end
 
@@ -498,6 +683,7 @@ return function(R, T)
       R.drawEncounter(inv)
     end
     FX.checkWakes()
+    R.playerWindow("Mythos encounter draws complete")
   end
 
   function R.investigation()
@@ -526,7 +712,7 @@ return function(R, T)
     while inv.actionsLeft > 0 and not inv.defeated and not G.ended do
       guard = guard + 1
       if guard > 20 then break end
-      R.checkObjectives()
+      R.playerWindow("before action")
       FX.checkWakes()
       local choice = R.AI.choose(inv)
       if not choice then break end
@@ -535,11 +721,12 @@ return function(R, T)
       G.metrics.actions[choice.kind] = (G.metrics.actions[choice.kind] or 0) + cost
       if choice.provokes ~= false then R.attacksOfOpportunity(inv, choice.provokes == "notAppointed") end
       if not inv.defeated and not G.ended then choice.run() end
-      R.checkObjectives()
+      R.playerWindow("after action")
       -- free abilities that open up after the action (the Town Hall Steps' calm side)
       local here = R.locOf(inv)
       if here and not G.ended then FX.townHallFree(inv, here) end
     end
+    R.playerWindow("turn ends")
     -- Dead Air ends at the end of that investigator's next turn
     if G.deadAir and G.deadAir.inv == inv then
       if G.deadAir.armed then
@@ -599,30 +786,40 @@ return function(R, T)
         R.appointedEngageCheck()
       end
     end
-    -- engaged enemies attack
-    for _, en in ipairs(copyList(G.enemies)) do
-      if not en.dead and en.engaged and not en.exhausted and not R.sleepwalking(en) then
-        R.enemyAttack(en, en.engaged, "enemy phase")
-        en.exhausted = true
-        if G.ended then return end
+    R.playerWindow("hunters complete")
+    -- RR 3.3: each investigator resolves their complete batch of attacks,
+    -- with a player window between investigators rather than between enemies.
+    for _, inv in ipairs(R.aliveInvs()) do
+      for _, en in ipairs(copyList(G.enemies)) do
+        if not en.dead and en.engaged == inv and not en.exhausted and not R.sleepwalking(en) then
+          R.enemyAttack(en, inv, "enemy phase")
+          en.exhausted = true
+          if G.ended then return end
+        end
       end
-    end
-    if A.engaged and not A.exhausted and R.stage() >= 3 then
-      R.appointedAttack(A.engaged, "enemy phase")
-      A.exhausted = true
+      if A.engaged == inv and not A.exhausted and R.stage() >= 3 then
+        R.appointedAttack(inv, "enemy phase")
+        A.exhausted = true
+      end
+      R.playerWindow("investigator attacks complete")
     end
   end
 
   function R.upkeep()
     local G = R.G
     G.phase = "upkeep"
+    R.playerWindow("Upkeep begins")
     for _, en in ipairs(G.enemies) do
-      en.exhausted = false
+      if en.skipReady then en.skipReady = nil else en.exhausted = false end
     end
     G.appointed.exhausted = false
     for _, inv in ipairs(R.aliveInvs()) do
+      if inv.sealedToken then T.chaosBag().putObject(inv.sealedToken) ; inv.sealedToken = nil ; E.run(0.1) ; R.touch() end
       inv.storyExhausted = nil
-      for _, a in ipairs(inv.assets) do a.exhausted = false end
+      inv.round.encyclopedia = nil -- its bonus lasts only this phase
+      for _, a in ipairs(inv.assets) do
+        a.exhausted = false
+      end
       P.draw(inv, 1)
       inv.resources = inv.resources + 1
       while #inv.hand > 8 do inv.discard[#inv.discard + 1] = table.remove(inv.hand, 1) end
@@ -651,6 +848,7 @@ return function(R, T)
     R.touch()
     FX.checkWakes()
     for _, L2 in ipairs(G.locList) do R.engageAt(L2) end
+    R.playerWindow("round ends")
   end
 
   function R.scanLocationsLight()

@@ -49,6 +49,20 @@ def all_errors(rep):
 
 
 class ScenarioContentTests(unittest.TestCase):
+    def test_deep_road_audit_rejects_unpayable_clue_cost(self):
+        cards = copy.deepcopy(CARDS)
+        cards["sthr-act-walksbeside"]["clues"] = 400
+        for n in range(1, 5):
+            problems = SC.objective_feasibility(cards, ASSIGN, MANIFEST, n)
+            self.assertTrue(any(sid == "district_road" and "sthr-act-walksbeside" in text
+                                and "only" in text for sid, text in problems), problems)
+
+    def test_superseded_feed_cannot_overwrite_current_cards(self):
+        before = open(os.path.join(ROOT, "campaigns", "still_hour", "card_overrides.json"), "rb").read()
+        with self.assertRaisesRegex(ValueError, "superseded"):
+            SC.apply_feed("still_hour")
+        self.assertEqual(before, open(os.path.join(ROOT, "campaigns", "still_hour", "card_overrides.json"), "rb").read())
+
     @classmethod
     def setUpClass(cls):
         cls.rep = SC.audit("still_hour")[0]

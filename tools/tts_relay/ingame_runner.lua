@@ -390,8 +390,11 @@ step("board: [static] in the chaos bag", function(go)
       local before = ctl.call("shApiState").dissonance
       local pos = bag.getPosition()
       local token = bag.takeObject({ guid = guid, smooth = false, position = { pos.x, pos.y + 3, pos.z + 3 } })
+      waitFor(function() return ctl.call("shApiState").static.pending == 1 end, 10, function(okPending)
+      check("drawing a [static] waits for an explicit resolution", okPending and ctl.call("shApiState").dissonance == before)
+      ctl.call("shApiResolveStatic", {guid=guid})
       waitFor(function() return ctl.call("shApiState").dissonance == before + 1 end, 10, function(ok3)
-        check("drawing a [static] from the bag raises Dissonance by 1", ok3,
+        check("resolving a [static] from the bag raises Dissonance by 1", ok3,
           before .. " -> " .. ctl.call("shApiState").dissonance)
         if token then bag.putObject(token) end
         ctl.call("shApiRestore", { blob = snapshot })
@@ -399,6 +402,7 @@ step("board: [static] in the chaos bag", function(go)
           check("back to Calm removes the [static] tokens again", ok4, "in bag: " .. staticInBag(bag))
           go()
         end)
+      end)
       end)
     end)
   end)

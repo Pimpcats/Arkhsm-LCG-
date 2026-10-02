@@ -650,25 +650,25 @@ function Board.appointedCtx(extra)
       end
       return false
     end
-    local graph = Board.graph(locs)
-    local occ = Board.occupied(locs)
-    local byGuid = {}
-    for _, l in ipairs(locs) do byGuid[l.guid] = l end
-    local minis = Board.minicards()
-    -- tie-break: farther (straight-line) from the nearest investigator wins
-    local function spread(g)
-      local p, best = byGuid[g].pos, nil
-      for _, m in ipairs(minis) do
-        if m.pos then
-          local d = dist2d(p, m.pos)
-          if best == nil or d < best then best = d end
-        end
-      end
-      return best or 0
+    -- Reveal status restricts the destination, not the legal movement path.
+    local movement = Board.movableLocations()
+    local graph = Board.graph(movement)
+    local occ = Board.occupied(movement)
+    local byGuid, eligible = {}, {}
+    for _, l in ipairs(locs) do
+      byGuid[l.guid], eligible[l.guid] = l, true
     end
-    local target = Locations.farthest(graph, occ, function(a, b) return spread(a) > spread(b) end)
+    local target, _, tied = Locations.farthest(graph, occ, nil, eligible)
     local l = byGuid[target]
     if not l then return false end
+    if #tied > 1 then
+      local names = {}
+      for _, g in ipairs(tied) do
+        names[#names + 1] = safe(function() return byGuid[g].obj.getName() end) or g
+      end
+      say("Farthest-location tie: " .. table.concat(names, "; ") .. ". The lead investigator chooses. "
+        .. "The automatic placement is a default: move it to another tied location before continuing if chosen.")
+    end
     local ok = bringAppointed(placePosFor(l), rotFor(l), function(card)
       Board.refreshAppointedButtons(card)
     end)

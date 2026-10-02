@@ -1,0 +1,21 @@
+lua5.2 pipeline/lua_smoketest.lua: RESULT: 309 passed, 0 failed
+lua5.2 tests/play_engine_regressions.lua: ENGINE REGRESSIONS: 21 passed
+lua5.2 tests/play_engine_independent.lua: INDEPENDENT FIX PASS 3: 128 passed, 0 failed
+lua5.2 tests/play_engine_upgrades.lua: UPGRADE AND ORDER REGRESSIONS: 27 passed
+lua5.2 tests/play_engine_final_independent.lua: FINAL THIRD PASS: 206 passed, 0 failed
+lua5.2 tests/play_engine_objective_windows.lua: INDEPENDENT OBJECTIVE WINDOWS RR: 93 passed, 0 failed
+lua5.2 tests/play_engine_balance_costs.lua: INDEPENDENT BALANCE COSTS: 146 passed, 0 failed
+lua5.2 tests/play_engine_encounter_draws.lua: INDEPENDENT ENCOUNTER DRAWS: 31 passed, 0 failed
+lua5.2 pipeline/verify_bundle.lua: verify_bundle: OK
+lua5.4 pipeline/lua_smoketest.lua: RESULT: 309 passed, 0 failed
+lua5.4 tests/play_engine_regressions.lua: ENGINE REGRESSIONS: 21 passed
+lua5.4 tests/play_engine_independent.lua: INDEPENDENT FIX PASS 3: 128 passed, 0 failed
+lua5.4 tests/play_engine_upgrades.lua: UPGRADE AND ORDER REGRESSIONS: 27 passed
+lua5.4 tests/play_engine_final_independent.lua: FINAL THIRD PASS: 206 passed, 0 failed
+lua5.4 tests/play_engine_objective_windows.lua: INDEPENDENT OBJECTIVE WINDOWS RR: 93 passed, 0 failed
+lua5.4 tests/play_engine_balance_costs.lua: INDEPENDENT BALANCE COSTS: 146 passed, 0 failed
+lua5.4 tests/play_engine_encounter_draws.lua: INDEPENDENT ENCOUNTER DRAWS: 31 passed, 0 failed
+lua5.4 pipeline/verify_bundle.lua: verify_bundle: OK
+Full current suite: 111 passed, 1 skipped, 155 subtests passed in 466.74s (0:07:46)
+CardForge: CARDFORGE SELFTEST: 20 passed, 0 failed
+Optional pytest Godot test skipped; three separate real-SCED Godot renders completed with zero scene/script errors.

@@ -12,6 +12,9 @@ in `docs/design/` and contain spoilers.
 **To play:** load `dist/saved_object_the_still_hour.json` as a Saved Object in
 SCED. See **`docs/LOADING.md`**. New here? Start with **`START_HERE.md`**.
 
+The current finishing status and scenario difficulty results are in the
+spoiler-free **[campaign handoff](docs/STILL_HOUR_HANDOFF.txt)**.
+
 ## Make a new campaign
 
 Type `/new-campaign` with your idea in a Claude Code session on this repo; see

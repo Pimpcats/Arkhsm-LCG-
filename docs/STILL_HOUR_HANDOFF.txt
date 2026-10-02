@@ -1,0 +1,65 @@
+THE STILL HOUR — HANDOFF
+Updated 2026-10-02. Spoiler-free.
+
+Repository: https://github.com/Pimpcats/Arkhsm-LCG-
+Working branch: main.
+
+STATUS
+The finishing corrections are applied and the campaign package is rebuilt.
+It is an offline validated candidate for live playtesting. The requested difficulty curve is not yet certified; human playtest approval remains open.
+
+WHAT WAS COMPLETED
+Reviewed all 133 effective cards, both faces where applicable, the complete guide, all eight boxes, five investigators, signatures/weaknesses and purchasable campaign cards.
+Corrected story continuity and wording, objective costs/timing, campaign bookkeeping, investigator/card interactions, simulated enemy/encounter handling and XP/deck progression.
+Applied four supported clue-cost adjustments, rebuilt 200 card images and the 24-page guide, and pinned package assets to an immutable GitHub commit.
+Preserved alternate outcomes and the campaign’s branching structure.
+
+VERIFICATION
+Full suite: 111 passed, 1 optional render test skipped, 155 subtests passed.
+The optional render test is supplemented by three actual Godot scenes on the real-SCED emulator.
+Lua 5.2 and 5.4: 309 live rules checks each; seven model fixtures totaling 652 checks each; rebuilt bundle checks passed.
+CardForge selftest: 20 passed. Eight scenario readiness checks: no errors or warnings.
+Final model validation: 70 cells, 1,319 played slots, no engine/Lua/table-note/missing-draw failures.
+Three independent reviews completed within their recorded scopes.
+This build has not been tested on the owner’s actual TTS table.
+
+DIFFICULTY BY PLAYED SCENARIO
+Standard difficulty. These are model results, not human win probabilities.
+Night rows average five routes equally. Finale is a conditional prepared state.
+Scenario       Target   Model   Approx. 95% interval
+Prologue        80%      83%     74%–89%
+Night 1         80%      71%     61%–79%
+Night 2         70%      82%     73%–88%
+Night 3         70%      69%     59%–77%
+Night 4         60%      60%     50%–69%
+Night 5         60%      62%     52%–71%
+Night 6         50%      56%     46%–65%
+Night 7         50%      50%     40%–60%
+Night 8         40%      42%     33%–52%
+Finale          40%      50%     40%–60%
+
+The 20 carried runs played 199 slots and made 7 unlocked finale attempts, with 4 contest wins, under a fixed route and ten-slot limit.
+The measured curve is not reliably progressive. Route, party and actual campaign earnings matter. Seeds preserve random inputs, but equal legal choices may vary with Lua table order.
+
+HOW TO LOAD
+1. Download dist/saved_object_the_still_hour.json from main.
+2. Copy it into Documents\My Games\Tabletop Simulator\Saves\Saved Objects\.
+3. Load SCED, then Objects > Saved Objects > The Still Hour, and press Place.
+4. Open the included guide and follow Campaign Setup.
+Detailed loading instructions: docs/LOADING.md.
+Before updating an existing campaign, save the table and preserve its campaign state; use the update instructions in that document.
+
+NEXT HANDOFF TASKS
+Run the current build’s live TTS relay using Start TTS Relay.bat and docs/TTS_RELAY.md.
+Play the opening and first night, then complete campaign sessions at the intended difficulty and player count.
+Record objective success, defeats, time pressure, earned XP, purchases and unclear wording by played scenario. Include different routes and all five investigators.
+Use those results to finish the curve; the exact 80/80/70/70/60/60/50/50/40/40 percentages remain design targets.
+
+FOR A DEVELOPER OR NEXT ASSISTANT
+Read AGENTS.md and docs/ASSISTANT_WORKFLOW.md; keep owner-facing discussion spoiler-free.
+Current status: campaigns/still_hour/assistant/production.json.
+Designer-only files contain spoilers: docs/design/CURRENT_CAMPAIGN_AUDIT.md, FINISHING_CORRECTIONS.md and FINISHING_BALANCE.md.
+Raw measurements, archived inputs and reproducibility limits: docs/design/verification/2026-10-02/.
+Godot procedure: docs/GODOT_TABLE.md. It renders emulator snapshots; it is not the native TTS game.
+Earlier balance reports are historical. Preliminary invalid simulation measurements have been withdrawn.
+Keep the immutable image commits in history; do not squash or rebase them.

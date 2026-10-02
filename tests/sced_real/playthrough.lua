@@ -694,7 +694,11 @@ return function(H)
     E.run(2)
     check("SCED's chaos-token draw takes the [static] out", okDraw and tok ~= nil and tostring(tok.getName()) == "Static",
       okDraw and tostring(tok) or tok)
-    check("drawing a [static] raises Dissonance by 1", st().dissonance == before + 1, before .. " -> " .. st().dissonance)
+    check("drawing a [static] waits for resolution", st().dissonance == before and st().static.pending == 1)
+    click(control(), "Static waiting")
+    E.run(1)
+    check("resolving a [static] raises Dissonance by 1", st().dissonance == before + 1 and st().static.pending == 0,
+      before .. " -> " .. st().dissonance)
     local okRet, errRet = pcall(E.Global.call, "returnChaosTokens")
     E.run(2)
     check("SCED returns the drawn [static] to the bag", okRet and staticInBag() == 2, okRet and staticInBag() or errRet)

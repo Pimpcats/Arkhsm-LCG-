@@ -152,7 +152,7 @@ return function(R, T)
     local best, bv
     for _, x in ipairs(R.investigatorsAt(R.locOf(inv))) do
       local v = x.damage + (damageOnly and 0 or x.horror)
-      if v > 0 and (bv == nil or v > bv) then best, bv = x, v end
+      if (x == inv or not x.round.nobodyBelieves) and v > 0 and (bv == nil or v > bv) then best, bv = x, v end
     end
     return best
   end
@@ -424,15 +424,7 @@ return function(R, T)
     for _, c in ipairs(mine) do
       if cur >= target then break end
       if c.card.type == "Skill" or (opts.important and cur < 0.5) then
-        P.discardFromHand(inv, c.card)
-        table.remove(inv.discard)
-        committed[#committed + 1] = { card = c.card, icons = c.icons, owner = inv }
-        if c.card.name == "Deduction" and opts.kind == "investigate" then inv.lastCommitted.deduction = true end
-        if c.card.name == "Vicious Blow" and opts.kind == "fight" then inv.lastCommitted.vicious = true end
-        if c.card.name == "Foreknowledge" and (inv.memory or 0) > 0 then
-          R.addMemory(inv, -1, "Foreknowledge")
-          T.api("shApiTally", { id = inv.id, kind = "spent", delta = 1 })
-        end
+        P.commit(inv, c, skill, opts, committed)
         cur = p()
       end
     end
@@ -442,25 +434,21 @@ return function(R, T)
       if cur >= target then break end
       if b.cost == "resource" then
         local n = 0
-        while cur < target and inv.resources > 1 and n < 3 do
+        while cur < target and inv.resources >= (b.price or 1) + 1 and n < 3 do
           b.pay() ; boost = boost + b.gain ; n = n + 1
           cur = p()
         end
       elseif b.cost == "secret" then
-        b.pay() ; boost = boost + b.gain ; cur = p()
+        local extra = b.pay() or 0 ; boost = boost + b.gain + extra ; cur = p()
       end
     end
     -- other investigators at the location commit one card each
     if not opts.peril and not inv.round.nobodyBelieves and cur < target then
       for _, x in ipairs(R.investigatorsAt(R.locOf(inv))) do
-        if x ~= inv and cur < target and not x.round.nobodyBelieves then
+        if x ~= inv and cur < target then
           local theirs = P.commitables(x, skill, { helper = true })
-          local c = theirs[1]
-          if c and c.card.type == "Skill" then
-            P.discardFromHand(x, c.card)
-            table.remove(x.discard)
-            committed[#committed + 1] = { card = c.card, icons = c.icons, owner = x }
-            cur = p()
+          for _, c in ipairs(theirs) do
+            if c.card.type == "Skill" and P.commit(x, c, skill, opts, committed) then cur = p() ; break end
           end
         end
       end
@@ -472,7 +460,7 @@ return function(R, T)
       for _, b in ipairs(boosts) do
         if b.cost == "dissonance" and cur < target and R.dissonance() + 1 < R.consts().glitch - 1
            and (inv.raisedCost or 0) < 2 then
-          b.pay() ; boost = boost + b.gain ; cur = p()
+          local extra = b.pay() or 0 ; boost = boost + b.gain + extra ; cur = p()
         end
       end
     end
@@ -547,6 +535,7 @@ return function(R, T)
     ["Pickpocketing"] = { nil, 2 }, ["Leo De Luca"] = { nil, 6 }, ["First Aid"] = { nil, 2 }, ["Medical Texts"] = { nil, 1 },
     ["Old Book of Lore"] = { nil, 1 }, ["The Lexicon of the Hour"] = { nil, 5 }, ["Marked Deck"] = { nil, 1 },
     ["The Bell of Ambergrove"] = { nil, 4 }, ["Lucky Compass"] = { nil, 2 }, ["The Ambergrove Lamp"] = { nil, 3 },
+    ["Stolen Minute"] = { nil, 7 }, ["Cassandra's Notebook"] = { nil, 7 },
     -- XP cards
     ["Shotgun (4)"] = { "sthrelias", 9 }, ["Lightning Gun (5)"] = { "sthrelias", 10 }, ["Elder Sign Amulet (3)"] = { nil, 6 },
     ["Bulletproof Vest (3)"] = { nil, 6 }, ["Higher Education (3)"] = { nil, 5 }, ["Encyclopedia (2)"] = { nil, 5 },
@@ -581,6 +570,10 @@ return function(R, T)
     -- 1. engaged enemies: fight or evade any of them (the most dangerous or the
     -- easiest to remove scores best), not only the first to engage
     local eng = engagedWith(inv)
+    if inv.id == "sthrseraphine" and (inv.round.sera or 0) < 2 and R.dissonance()+1 < R.consts().glitch
+       and inv.actionsLeft <= 1 and act and (inv.raisedCost or 0) < 2 then
+      add(80,"ability",function() P.seraphine(inv,"action") end,{actions=0,provokes=false})
+    end
     local worst, worstThreat = nil, -1
     for _, en in ipairs(eng) do
       local threat = (en.def.damage or 0) + (en.def.horror or 0)
@@ -614,7 +607,7 @@ return function(R, T)
         end
       end
       local cat = P.findAsset(inv, "Stray Cat")
-      if cat and not R.hasTrait(en.def, "Elite") then
+      if cat and not R.hasTrait(en.def, "Elite") and not R.cannotEvade(en) then
         add(45, "ability", function()
           for i, a in ipairs(inv.assets) do if a == cat then table.remove(inv.assets, i) inv.discard[#inv.discard + 1] = a.rec break end end
           en.exhausted = true ; en.engaged = nil ; R.placeEnemy(en)
@@ -667,10 +660,10 @@ return function(R, T)
         end
         local need = FX.actNeed(act.id)
         if have >= need then
-          add(60, "objective", function() R.objectiveAction(inv, act) end)
+          add(60, "objective", function() R.objectiveAction(inv, act) end, { provokes = not spec.fare })
         end
       end
-      if spec.carry and not act.holder and target == L then
+      if spec.carry and not act.holder and not inv.story and target == L then
         if act.dropped then
           add(60, "objective", function() R.takeStory(inv, act) end)
         else
@@ -766,7 +759,19 @@ return function(R, T)
           end
           local compass = P.findAsset(inv, "Lucky Compass")
           if compass and not compass.exhausted and #eng > 0 then
-            add(s + 3, "move", function() R.ACT.assetAbility(inv, compass) ; R.moveInv(inv, step) end, { provokes = false })
+            add(s + 3, "move", function() R.ACT.assetAbility(inv, compass, "move", step) end, { provokes = false })
+          end
+          local lamp = P.findAsset(inv, "The Ambergrove Lamp")
+          if lamp and not lamp.exhausted then add(s + 2,"move",function() R.ACT.assetAbility(inv,lamp,"move",step) end,{provokes=false}) end
+          if compass and not compass.exhausted and (compass.memory or 0) >= 1 and target.revealed and not target.closed then
+            local known = false
+            for fact,v in pairs(G.knowledge) do if v and R.SCEN.FACT_DISTRICT[fact] == target.district then known = true end end
+            if known then add(s+4,"move",function() R.ACT.assetAbility(inv,compass,"jump",target) end,{provokes=false}) end
+          end
+          for _,c in ipairs(inv.hand) do
+            if c.name == "The Long Way Round" and P.playCost(inv,c) <= inv.resources then
+              add(s+4,"move",function() R.ACT.play(inv,c) end,{provokes=false})
+            end
           end
           add(s, "move", function() R.moveInv(inv, step) end, { provokes = true })
         elseif L.id == "sthr-loc-windingstair" then
@@ -795,10 +800,10 @@ return function(R, T)
 
     -- 7. cards
     for _, c in ipairs(inv.hand) do
-      if c.type == "Asset" and (c.cost or 0) <= inv.resources then
+      if c.type == "Asset" and P.playCost(inv,c) <= inv.resources then
         local s = assetScore(inv, c)
         if s > 0 then add(s, "play", function() R.ACT.play(inv, c) end) end
-      elseif c.type == "Event" and (c.cost or 0) <= inv.resources then
+      elseif c.type == "Event" and P.playCost(inv,c) <= inv.resources then
         local n = c.name
         if n == "Emergency Cache" and inv.resources <= 3 then add(7, "play", function() R.ACT.play(inv, c) end) end
         if n == "Working a Hunch" and clues > 0 and need > 0 then add(40, "play", function() R.ACT.play(inv, c) end, { actions = 0, provokes = false }) end
@@ -808,6 +813,12 @@ return function(R, T)
         if n == "Sneak Attack" and A.bestEnemyHere(inv, function(en) return en.exhausted end) then add(15, "play", function() R.ACT.play(inv, c) end) end
         if n == "Elusive" and #eng > 0 and inv.resources >= 2 then add(28, "play", function() R.ACT.play(inv, c) end, { actions = 0, provokes = false }) end
         if n == "Blinding Light" and #eng > 0 then add(24, "play", function() R.ACT.play(inv, c) end, { provokes = false }) end
+        if n == "Rehearsed Escape" and #eng > 0 then add(44,"play",function() R.ACT.play(inv,c) end,{provokes=false}) end
+        if n == "The Hour I Learned Your Name" and not inv.loopUsed.hourName then
+          if R.appointedLoc() == L and not G.appointed.exhausted and G.appointed.holdBackRound ~= G.round and R.stage() >= 1 then
+            add(70,"play",function() R.ACT.play(inv,c) end,{provokes=false})
+          elseif #eng > 0 then add(26,"play",function() R.ACT.play(inv,c) end,{provokes=false}) end
+        end
         if n == "Mind over Matter" and not inv.mindOverMatter and #eng > 0 and inv.stats.int > inv.stats.agi then
           add(20, "play", function() R.ACT.play(inv, c) end, { actions = 0, provokes = false })
         end
@@ -817,12 +828,34 @@ return function(R, T)
       end
     end
     for _, a in ipairs(inv.assets) do
+      if a.name == "Stolen Minute" and not a.exhausted and a.uses > 0 then
+        add(85,"ability",function() R.ACT.assetAbility(inv,a) end,{actions=0,provokes=false})
+      end
+      if a.name == "Cassandra's Notebook" and not a.exhausted and clues > 0 and need > 0 then
+        add(25,"investigate",function() R.ACT.assetAbility(inv,a) end)
+      end
+      if a.name == "Marked Deck" and not a.exhausted and not inv.sealedToken then
+        if not inv.loopUsed.marked and R.syncMemory(inv) >= 1 and R.dissonance()+1 < R.consts().glitch then
+          add(45,"ability",function() R.ACT.assetAbility(inv,a,"number") end,{actions=0,provokes=false})
+        else add(5,"ability",function() R.ACT.assetAbility(inv,a,"random") end,{actions=0,provokes=false}) end
+      end
+      if a.name == "The Bell of Ambergrove" and not a.exhausted and a.uses > 0 and worst then
+        add(30,"evade",function() R.ACT.assetAbility(inv,a,"evade",worst) end,{provokes=false})
+      end
       if a.name == "First Aid" and a.uses > 0 then
         local t = A.mostHurtHere(inv)
         if t and A.frail(t) then add(32, "ability", function() R.ACT.assetAbility(inv, a) end)
         elseif t and (t.damage + t.horror) >= 3 then add(8, "ability", function() R.ACT.assetAbility(inv, a) end) end
       end
       if a.name == "Old Book of Lore" and not a.exhausted and #inv.hand <= 3 then add(3, "ability", function() R.ACT.assetAbility(inv, a) end) end
+      if a.name == "Encyclopedia (2)" and not a.exhausted and clues > 1 and need > 0 and inv.actionsLeft >= 2
+         and not inv.round.encyclopedia then
+        add(36, "ability", function() R.ACT.assetAbility(inv, a, "int", inv) end)
+      end
+      if a.name == "Beat Cop" and (a.rec.level or 0) >= 2 and not a.exhausted and a.dmg < a.hp then
+        local enemy = A.bestEnemyHere(inv, function(en) return en.id ~= "sthr-appointed" and not en.dead end)
+        if enemy then add(70, "ability", function() R.ACT.assetAbility(inv, a, "damage", enemy) end, {actions=0,provokes=false}) end
+      end
       if a.name == "The Bell of Ambergrove" and not a.exhausted and a.uses > 0 and act and R.hour() >= 5
          and not inv.loopUsed.bell and not G.finale
          and R.dissonance() + 2 < R.consts().glitch - 1 and (inv.raisedCost or 0) < 2 then

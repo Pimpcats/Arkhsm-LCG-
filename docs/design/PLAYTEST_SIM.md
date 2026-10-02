@@ -1,5 +1,16 @@
 # The Still Hour — play engine (simulated playtests)
 
+> Current source: 2026-10-02 finishing corrections. See
+> [correction ledger](FINISHING_CORRECTIONS.md) and
+> [current campaign audit](CURRENT_CAMPAIGN_AUDIT.md) and
+> [finishing measurements](FINISHING_BALANCE.md).
+
+Everything below the dated update is a historical design or measurement record.
+Old clue costs, doom thresholds, economy caps, deck budgets and success rates
+are superseded wherever they disagree with effective card overrides, the current
+guide and the corrected engine. Do not use an old headline as release approval.
+
+
 Designer-facing; spoilers throughout. This is simulation on an emulated table,
 not a playtest: it measures what the cards and rules do when a competent AI
 party plays them, and says nothing about fun, clarity or pacing at a real

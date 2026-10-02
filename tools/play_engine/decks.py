@@ -48,7 +48,7 @@ LISTS = {
 
 # XP upgrades in the order a careful player buys them: (xp, level-0 card it
 # replaces, upgraded card's SCED name, copies). Same-title upgrades keep the
-# base name (the engine's effects apply; icons and uses come from the upgraded
+# base name (the engine uses the level too; icons and uses come from the upgraded
 # printing); cards the engine encodes under their full name keep it (FULL).
 UPGRADES = {
     "sthrelias": [(4, "Vicious Blow", "Vicious Blow (2)", 2), (4, "Beat Cop", "Beat Cop (2)", 2),
@@ -63,7 +63,7 @@ UPGRADES = {
                  (1, "Pickpocketing", "Hired Muscle (1)", 1), (4, "Knife", "Chicago Typewriter (4)", 1),
                  (3, "Pickpocketing", "Streetwise (3)", 1), (3, "Lucky!", "Elder Sign Amulet (3)", 1)],
     "sthrseraphine": [(6, "Shrivelling", "Shrivelling (3)", 2), (4, "Fearless", "Fearless (2)", 2),
-                      (4, "Blinding Light", "Blinding Light (2)", 2), (2, "Shrivelling (3)", "Shrivelling (5)", 1),
+                      (4, "Blinding Light", "Blinding Light (2)", 2), (5, "Shrivelling (3)", "Shrivelling (5)", 1),
                       (3, "Drawn to the Flame", "Elder Sign Amulet (3)", 1),
                       (3, "Drawn to the Flame", "Bulletproof Vest (3)", 1)],
     "sthrbirdie": [(4, "Lucky!", "Lucky! (2)", 2), (4, "Survival Instinct", "Survival Instinct (2)", 2),
@@ -73,9 +73,24 @@ UPGRADES = {
 FULL = {"Shotgun (4)", "Lightning Gun (5)", "Elder Sign Amulet (3)", "Bulletproof Vest (3)", "Higher Education (3)",
         "Encyclopedia (2)", "Switchblade (2)", ".41 Derringer (2)", "Hired Muscle (1)", "Chicago Typewriter (4)",
         "Streetwise (3)", "Shrivelling (3)", "Shrivelling (5)", "Peter Sylvestre (2)", "Scrapper (3)"}
-# XP each investigator has spent on cards by that night (about two-thirds of the
-# Memory they earn; the rest buys Recollections): nights 2 to 7 and the finale
-TIERS = {"n2": 4, "n3": 8, "n4": 12, "n5": 16, "n6": 20, "n7": 24, "fin": 26}
+# Representative XP budgets, separate from genuinely paid carried campaigns.
+TIERS = {"n1": 2, "n2": 4, "n3": 8, "n4": 12, "n5": 16, "n6": 20, "n7": 24, "n8": 28, "fin": 28}
+RECOLLECTION_PICKS = {
+    "sthrelias": ["sthr-foreknowledge", "sthr-borrowedtime", "sthr-dejavu", "sthr-hourlearnedname"],
+    "sthrayako": ["sthr-cassandrasnotebook", "sthr-foreknowledge", "sthr-thistimeforsure", "sthr-anchorpoint"],
+    "sthrcass": ["sthr-longwayround", "sthr-borrowedtime", "sthr-thistimeforsure", "sthr-hourlearnedname"],
+    "sthrseraphine": ["sthr-dejavu", "sthr-borrowedtime", "sthr-foreknowledge", "sthr-anchorpoint"],
+    "sthrbirdie": ["sthr-musclememory", "sthr-rehearsedescape", "sthr-longwayround", "sthr-anchorpoint"],
+}
+
+
+def campaign_player_card(sc):
+    return {"name": sc["name"], "id": sc["id"], "type": sc["type"], "class": sc.get("class"),
+            "cost": sc.get("cost"), "traits": sc.get("traits", ""), "slot": sc.get("slot"),
+            "uses": sc.get("uses"), "memoryCost": sc.get("memoryCost"),
+            "permanent": "Permanent." in sc.get("text", ""), "weakness": sc.get("weakness", False),
+            "icons": {"wil": sc.get("wilIcons", 0), "int": sc.get("intIcons", 0),
+                      "com": sc.get("comIcons", 0), "agi": sc.get("agiIcons", 0), "wild": sc.get("wildIcons", 0)}}
 
 # basic weaknesses the engine encodes (one is drawn per investigator per game)
 WEAKNESSES = ["Paranoia", "Amnesia", "Haunted", "Psychosis", "Hypochondria", "Mob Enforcer",
@@ -131,6 +146,8 @@ def build(save, cards_json=None):
     p = pool(save)
     up = pool(save, upgraded=True)
     out = {"decks": {}, "weaknesses": [], "problems": []}
+    out["recollections"] = {c["id"]: campaign_player_card(c) for c in campaign.values() if "memoryCost" in c}
+    out["recollection_picks"] = RECOLLECTION_PICKS
     for inv, picks in LISTS.items():
         c = campaign[inv]
         klass = c["class"]
@@ -173,12 +190,14 @@ def build(save, cards_json=None):
         for tier, budget in TIERS.items():
             cur, spent = [dict(c) for c in deck], 0
             for xp, old, new, n in UPGRADES.get(inv, []):
-                if spent + xp > budget:
-                    break
                 md = up.get(new)
                 if not md:
                     out["problems"].append("%s: %s not in SCED's player cards" % (inv, new))
                     break
+                n = min(n, (budget - spent) // md["level"])
+                if n == 0:
+                    continue
+                xp = n * md["level"]  # every copy pays its full printed level
                 k = md.get("class")
                 if k not in (klass, "Neutral") and (k not in opt["classes"] or md.get("level", 0) > opt["level"]):
                     out["problems"].append("%s: %s (%s) is not allowed" % (inv, new, k))
@@ -189,19 +208,36 @@ def build(save, cards_json=None):
                         out["problems"].append("%s: no %s to replace with %s" % (inv, old, new))
                         break
                     base = re.sub(r" \(\d\)$", "", new)
-                    cur[i] = {"name": new if new in FULL else base, "full": new, "level": md.get("level"),
+                    replacement = {"name": new if new in FULL else base, "full": new, "level": md.get("level"),
                               "sced": md.get("id"), "type": md.get("type"), "class": k, "cost": md.get("cost"),
+                              "permanent": bool(md.get("permanent")),
                               "traits": md.get("traits", ""), "slot": md.get("slot"), "uses": md.get("uses"),
                               "icons": {"wil": md.get("willpowerIcons", 0), "int": md.get("intellectIcons", 0),
                                         "com": md.get("combatIcons", 0), "agi": md.get("agilityIcons", 0),
                                         "wild": md.get("wildIcons", 0)}}
+                    if replacement["permanent"]:
+                        cur.append(replacement)  # outside deck size; the old card stays
+                    else:
+                        cur[i] = replacement
                 spent += xp
-            out.setdefault("tiers", {}).setdefault(tier, {})[inv] = {"cards": cur, "signatures": sigs, "xp": spent}
+                if tier == "fin":
+                    out.setdefault("upgrade_steps", {}).setdefault(inv, []).append(
+                        {"cost": xp, "from": old, "copies": n, "level": md.get("level"), "card": dict(replacement)})
+            recollections = RECOLLECTION_PICKS[inv][:min(4, max(1, int(tier[1:]) // 2)) if tier != "fin" else 4]
+            for rid in recollections:
+                rc = out["recollections"][rid]
+                if not rc["permanent"]:
+                    replace = next((j for j, c in enumerate(cur) if c["name"] in ("Unexpected Courage", "Guts", "Knife", "Emergency Cache")), 0)
+                    cur.pop(replace)
+                cur.append(dict(rc))
+            out.setdefault("tiers", {}).setdefault(tier, {})[inv] = {"cards": cur, "signatures": sigs, "xp": spent,
+                "recollection_spent": sum(out["recollections"][r]["memoryCost"] for r in recollections)}
     for name in WEAKNESSES:
         md = p.get(name)
         if md and md.get("weakness"):
             out["weaknesses"].append({"name": name, "sced": md.get("id"), "type": md.get("type"),
-                                      "traits": md.get("traits", ""), "weakness": True, "icons": {}})
+                                      "traits": md.get("traits", ""), "weakness": True,
+                                      "permanent": bool(md.get("permanent")), "icons": {}})
         else:
             out["problems"].append("basic weakness %s not found" % name)
     return out

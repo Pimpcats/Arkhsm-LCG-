@@ -330,6 +330,43 @@ function T.deckCount(o)
   return 1
 end
 
+-- Preserve card identities, metadata and images while changing only encounter
+-- order. This is designer tooling using the same object-data API as setup.
+local function replaceEncounterOrder(deck, data)
+  data.DeckIDs = {}
+  for _, c in ipairs(data.ContainedObjects or {}) do data.DeckIDs[#data.DeckIDs+1] = c.CardID end
+  deck.destruct()
+  E.run(0.1)
+  local obj = E.spawnData(data, {}, "campaign")
+  E.run(0.1)
+  return obj
+end
+function T.reorderEncounterTop(n, score)
+  local deck=T.encounterDeck()
+  if not deck or deck.type~="Deck" then return false end
+  local data=deck.getData()
+  local top={}
+  for i=1,math.min(n,#data.ContainedObjects) do top[#top+1]={card=data.ContainedObjects[i],index=i} end
+  table.sort(top,function(a,b)
+    local sa,sb=score(T.decode(a.card.GMNotes) or {}),score(T.decode(b.card.GMNotes) or {})
+    if sa==sb then return a.index<b.index end
+    return sa<sb
+  end)
+  for i,c in ipairs(top) do data.ContainedObjects[i]=c.card end
+  replaceEncounterOrder(deck,data)
+  return true
+end
+function T.moveTopEncounterBottom()
+  local deck=T.encounterDeck()
+  if not deck or deck.type~="Deck" then return false end
+  local data=deck.getData()
+  local card=table.remove(data.ContainedObjects,1)
+  if not card then return false end
+  data.ContainedObjects[#data.ContainedObjects+1]=card
+  replaceEncounterOrder(deck,data)
+  return true
+end
+
 --- Draw an encounter card through the playmat's own button (SCED
 -- MythosArea.drawEncounterCard, which reshuffles the discard pile when the
 -- deck is empty). Returns the card object and whether a reshuffle happened.
@@ -338,20 +375,39 @@ function T.drawEncounter(color)
   local reshuffled = deckBefore == 0
   local mat = T.mat(color)
   local pos = mat.positionToWorld({ 1.365, 0.5, -0.625 })
+  -- SCED stacks left-click draws at one spot. A weakness already there can
+  -- turn the arriving encounter into a Deck, and the final encounter card
+  -- can be an existing object moved from the source rather than a new one.
+  -- Remember identities already at the destination, including pile contents.
   local before = {}
-  for _, o in ipairs(T.objects()) do before[o] = true end
+  for _, o in ipairs(T.objects()) do
+    if (o.type == "Card" or o.type == "Deck") and T.dist(o.getPosition(), pos) < 1.2 then
+      before[o.getGUID()] = true
+      if o.type == "Deck" then
+        for _, entry in ipairs(o.getObjects()) do before[entry.guid] = true end
+      end
+    end
+  end
   T.click(mat, "drawEncounterCard", false, color)
   local card
-  E.runUntil(function()
+  local function findDrawn()
     for _, o in ipairs(T.objects()) do
-      if o.type == "Card" and not before[o] and T.dist(o.getPosition(), pos) < 1.2 then card = o return true end
+      if T.dist(o.getPosition(), pos) < 1.2 then
+        if o.type == "Card" and not before[o.getGUID()] then card = o return true end
+        if o.type == "Deck" then
+          for _, entry in ipairs(o.getObjects()) do
+            if not before[entry.guid] then
+              card = o.takeObject({ guid = entry.guid,
+                position = { pos.x, pos.y + 2, pos.z }, smooth = false })
+              if card then return true end
+            end
+          end
+        end
+      end
     end
     return false
-  end, 3)
-  if not card then
-    -- the card may have landed on a card left there
-    card = T.find(function(o) return o.type == "Card" and T.dist(o.getPosition(), pos) < 1.2 and T.gm(o).id end)
   end
+  E.runUntil(findDrawn, 3)
   E.run(0.1)
   return card, reshuffled
 end

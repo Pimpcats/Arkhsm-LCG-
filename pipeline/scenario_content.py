@@ -660,9 +660,12 @@ def apply_feed(campaign=None):
     card editor edits)."""
     campaign = campaign or CC.campaign_config.campaign_id()
     sys.path.insert(0, ROOT)
-    from cardforge import studio
     feed = json.load(open(os.path.join(ROOT, "campaigns", campaign,
                                        "scenario_content_feed.json"), encoding="utf-8"))
+    if str(feed.get("_note", "")).lstrip().upper().startswith("SUPERSEDED"):
+        raise ValueError("This feed is superseded; importing it would overwrite current card corrections. "
+                         "Use the effective card specs and overrides instead.")
+    from cardforge import studio
     return studio.act_campaign_import({"campaign": campaign, "data": feed})
 
 

@@ -45,6 +45,7 @@ local env = setmetatable({
     print(s)
   end,
   broadcastToAll = function(msg) print("  (broadcast) " .. msg) end,
+  getObjectFromGUID = function() return nil end, -- vanilla table has no physical objects
   self = selfObj,
 }, { __index = _G })
 
@@ -109,7 +110,7 @@ env.shHoldBack()
 expect("Hold Back drops a stage (no card on a vanilla table: no error)", env.shApiState().stage == 1)
 env.shHunt() ; env.shSyncBoard() ; env.shClickStatic()
 env.shClickInvestigators(nil, "White", false)
-expect("Investigators +1 -> 4 (Memory cap 24)", env.shApiState().investigators == 4)
+expect("Investigators +1 -> 4", env.shApiState().investigators == 4)
 env.shClickInvestigators(nil, "White", true)
 
 print("\n== [static] reveal from a chaos bag (table event) ==")
@@ -117,9 +118,17 @@ local fakeBag = { getName = function() return "Chaos Bag" end, getDescription = 
 local token = { hasTag = function(t) return t == "StillHourStatic" end, getGUID = function() return "abc123" end }
 local d0 = env.shApiState().dissonance
 env.onObjectLeaveContainer(fakeBag, token)
-expect("revealing [static] raises Dissonance by 1", env.shApiState().dissonance == d0 + 1)
+expect("extracting [static] defers Dissonance until resolution", env.shApiState().dissonance == d0)
 env.onObjectLeaveContainer({ getName = function() return "Deck" end }, token)
-expect("leaving another container is not a reveal", env.shApiState().dissonance == d0 + 1)
+expect("leaving another container is not a reveal", env.shApiState().dissonance == d0)
+env.onObjectEnterContainer(fakeBag, token)
+expect("returning a preview cancels it without Dissonance", env.shApiState().dissonance == d0
+  and not env.shApiResolveStatic({ guid = "abc123" }))
+env.onObjectLeaveContainer(fakeBag, token)
+expect("resolving the actual token raises Dissonance once", env.shApiResolveStatic({ guid = "abc123" })
+  and env.shApiState().dissonance == d0 + 1)
+expect("duplicate resolution is inert", not env.shApiResolveStatic({ guid = "abc123" })
+  and env.shApiState().dissonance == d0 + 1)
 env.onObjectEnterContainer(fakeBag, token)
 env.onObjectDestroy({ type = "Card", getGMNotes = function() return "" end })
 env.onObjectDrop("White", token)

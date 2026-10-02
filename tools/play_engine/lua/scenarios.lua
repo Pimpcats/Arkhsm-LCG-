@@ -9,6 +9,10 @@ return function(R, T)
 
   local SURFACE = { church = "the-thirteenth-toll", road = "the-road-remembers", lighthouse = "the-lamp-was-never-lit",
                     square = "the-sheriff-is-already-dead", fairground = "the-wheel-still-turns", almanac = "what-the-almanac-hid" }
+  S.FACT_DISTRICT = { [SURFACE.church] = "Church", [SURFACE.road] = "Road", [SURFACE.lighthouse] = "Lighthouse",
+    [SURFACE.square] = "Square", [SURFACE.fairground] = "Fairground", [SURFACE.almanac] = "Almanac",
+    ["the-hour-was-wrong"] = "Church", ["who-walks-beside-you"] = "Road", ["the-keepers-ninth-death"] = "Lighthouse",
+    ["the-vote-that-never-ends"] = "Square", ["the-ticket-takers-bargain"] = "Fairground", ["the-appointeds-name"] = "Almanac" }
 
   local function partOne(boxes, objectives, extra)
     -- banked Memory after the interlude's spending (the Prologue paid 7 at 3p; Recollections bought)
@@ -38,6 +42,7 @@ return function(R, T)
   S.district_road = partOne({ "district_square", "district_road" }, { "sthr-act-sheriffdead", "sthr-act-walkbackward" })
   S.district_lighthouse = partOne({ "district_square", "district_road", "district_lighthouse" },
     { "sthr-act-sheriffdead", "sthr-act-lamp", "sthr-act-walkbackward" })
+  S.district_lighthouse.goals = {"sthr-act-sheriffdead", "sthr-act-lamp"}
   S.district_fairground = partOne({ "district_square", "district_fairground" }, { "sthr-act-sheriffdead", "sthr-act-wheelturns" })
   S.district_almanac = partOne({ "district_square", "district_almanac" }, { "sthr-act-sheriffdead", "sthr-act-almanachid" })
 
@@ -49,6 +54,7 @@ return function(R, T)
     { "sthr-act-vote", "sthr-act-walksbeside" })
   S.district_lighthouse_p2 = partTwo({ "district_square", "district_road", "district_lighthouse" },
     { SURFACE.lighthouse, SURFACE.road, SURFACE.square }, { "sthr-act-vote", "sthr-act-ninthdeath", "sthr-act-walksbeside" })
+  S.district_lighthouse_p2.goals = {"sthr-act-vote", "sthr-act-ninthdeath"}
   S.district_fairground_p2 = partTwo({ "district_square", "district_fairground" }, { SURFACE.fairground, SURFACE.square, SURFACE.church },
     { "sthr-act-vote", "sthr-act-bargain" })
   -- the Almanac House's deep act also needs The Vote That Never Ends
@@ -65,6 +71,9 @@ return function(R, T)
     return c
   end
   for _, d in ipairs({ "square", "church", "road", "lighthouse", "fairground", "almanac" }) do
+    S["district_" .. d].xp = "n1"  -- post-Prologue purchases, not a fresh starter deck
+    S["district_" .. d .. "_n2"] = later(S["district_" .. d], 1, 1, 3)
+    S["district_" .. d .. "_n2"].xp = "n2"
     S["district_" .. d .. "_n3"] = later(S["district_" .. d], 2, 3, 4)
     S["district_" .. d .. "_n3"].xp = "n3"
     S["district_" .. d .. "_p2"].xp = "n4"
@@ -74,6 +83,8 @@ return function(R, T)
     S["district_" .. d .. "_p2_n6"].xp = "n6"
     S["district_" .. d .. "_p2_n7"] = later(S["district_" .. d .. "_p2"], 6, 10, 11)
     S["district_" .. d .. "_p2_n7"].xp = "n7"
+    S["district_" .. d .. "_p2_n8"] = later(S["district_" .. d .. "_p2"], 7, 12, 13)
+    S["district_" .. d .. "_p2_n8"].xp = "n8"
   end
 
   -- a typical Part I loop: the Square and two districts (loop 2, scar 1)

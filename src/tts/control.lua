@@ -717,6 +717,11 @@ local function drawPlay()
     button("shDifficulty" .. i, d.label, -1.8 + (i - 1) * 1.2, 3.2, 520,
       "Campaign Setup: fill SCED's chaos bag for " .. d.label .. " (the guide's list).", 90)
   end
+  if d.pending > 0 then
+    button("shResolveStatic", string.format("Static waiting %d: resolve / cancel", d.pending), 0, 3.8, 1800,
+      "One pending token: left resolves, right cancels. Multiple tokens: use Resolve on the actual token. "
+        .. "Returning an unresolved token to the bag also discards that token's pending reveal.", 85)
+  end
 end
 
 local function drawInterlude()
@@ -801,6 +806,17 @@ end
 refreshControl = function()
   pcall(function() self.clearButtons() end)
   if mode == "interlude" then drawInterlude() else drawPlay() end
+  -- Token UI is transient in TTS. Reattach by saved GUID on reload/restore;
+  -- clearing first makes repeated restoration idempotent.
+  for _, guid in ipairs(bag.save().pendingStatic or {}) do
+    local obj = getObjectFromGUID(guid)
+    if obj and obj.createButton then
+      if obj.clearButtons then pcall(obj.clearButtons) end
+      obj.createButton({ click_function = "shResolveStaticToken", function_owner = self, label = "Resolve",
+        position = {0,0.3,0}, rotation = {0,0,0}, width = 900, height = 260, font_size = 140,
+        tooltip = "Left: this Static resolves. Right: cancel this token's effect. Returning a preview also cancels it." })
+    end
+  end
   persist()
 end
 
@@ -810,6 +826,27 @@ function shNoop() end
 function shClickMemory(_, _, alt) guarded("memory", changeMemory, alt and -1 or 1) ; refreshControl() end
 function shClickInvestigators(_, _, alt) guarded("investigators", changeInvestigators, alt and -1 or 1) ; afterChange() end
 function shClickDissonance(_, _, alt) guarded("dissonance", changeDissonance, alt and -1 or 1) ; afterChange() end
+function shApiResolveStatic(p)
+  if not (p and p.guid) and bag.describe().pending > 1 then
+    announce("More than one [static] is waiting. Use Resolve on the actual token, "
+      .. "or return a preview/canceled token to the bag before resolving the remaining one.")
+    return false
+  end
+  local guid = bag.takePendingStatic(p and p.guid)
+  if not guid then return false end
+  local obj = getObjectFromGUID(guid)
+  if obj and obj.clearButtons then pcall(obj.clearButtons) end
+  if not (p and p.cancel) then
+    guarded("static resolution", changeDissonance, 1)
+    announce(string.format("[static] resolves: Dissonance %d (%s).", CampaignState.getDissonance(), CampaignState.band()))
+  end
+  afterChange()
+  return true
+end
+function shResolveStatic(_, _, alt) return shApiResolveStatic({ cancel = alt == true }) end
+function shResolveStaticToken(obj, _, alt)
+  return shApiResolveStatic({ guid = obj and obj.getGUID(), cancel = alt == true })
+end
 function shClickHour(_, _, alt) guarded("hour", changeHour, alt and -1 or 1) ; afterChange() end
 -- left-click: a card adds a temporary Static token; right-click: its time is
 -- up (or Hour VI with What the Almanac Hid). Either way the bag is re-synced.
@@ -1051,12 +1088,11 @@ end
 function onObjectLeaveContainer(container, obj)
   guarded("reveal", function()
     if bag.onLeave(container, obj) then
-      local bandBefore = CampaignState.band()
-      local info = Dissonance.onStaticRevealed(bag)
-      announceWake(bandBefore)
-      announce(string.format("[static] revealed: Dissonance %d (%s).", info.value, info.band))
-      if info.reachedReset then announceResetReached() end
-      afterChange()
+      -- Extraction may be a preview or a canceled draw. Commit only when the
+      -- player resolves it; no meter, Approach, wake or reset side effect yet.
+      announce("[static] drawn: if it resolves, click Resolve on that token (or Static waiting for a single draw). "
+        .. "For a preview or cancellation, return it or right-click Resolve on that token.")
+      refreshControl()
     end
     Board.onLeaveContainer(container, obj)
   end)
@@ -1064,7 +1100,10 @@ end
 
 function onObjectEnterContainer(container, obj)
   guarded("container", function()
-    bag.onEnter(container, obj)
+    if bag.onEnter(container, obj) then
+      if obj.clearButtons then pcall(obj.clearButtons) end
+      refreshControl()
+    end
     Board.onEnterContainer(container, obj)
   end)
 end

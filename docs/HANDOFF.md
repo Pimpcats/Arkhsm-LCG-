@@ -1,6 +1,11 @@
 # Hand-off — CardForge Studio / THE STILL HOUR
 
-*Updated 2026-09-27. Spoiler-free.*
+*Updated 2026-10-02. Spoiler-free.*
+
+The current campaign handoff is [STILL_HOUR_HANDOFF.txt](STILL_HOUR_HANDOFF.txt).
+It records the finishing fixes, current verification, difficulty results and
+remaining human playtest work. The historical design reports are not current
+balance approval.
 
 Working branch: **`main`** (owner decision, 2026-09-22). Build from `main`;
 inspect the current branch heads and recent commits before resuming. Current
@@ -51,11 +56,12 @@ Campaign folders: `campaigns/still_hour` (the campaign), `hollow`, `demo`.
 
 1. **Real TTS relay run on the current head** — owner, local PowerShell
    (`docs/TTS_RELAY.md`). The last real run passed on an older build.
-2. **Six remaining illustrations** — the ChatGPT art pack's "remaining"
-   request (`pipeline/chatgpt_art_pack.json`, `docs/CHATGPT_ART_PACK.md`).
-   Import, render, publish, then review with neutral labels.
-3. **First playtest** — Prologue and Loop 1. Relay passes are not playtest
-   approval.
+2. **First playtest** — Prologue and Loop 1, then the complete campaign.
+   Relay passes and model trials are not playtest approval. Record difficulty
+   and campaign earnings against the current handoff.
+3. **Calibration follow-up** — use the handoff's measured residuals and human
+   results before approving the requested success curve. All campaign card
+   illustrations are present; optional box-art variation can follow later.
 
 ## Release rules
 

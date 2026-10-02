@@ -1,5 +1,16 @@
 # The Still Hour against the official campaigns
 
+> Current source: 2026-10-02 finishing corrections. See
+> [correction ledger](FINISHING_CORRECTIONS.md) and
+> [current campaign audit](CURRENT_CAMPAIGN_AUDIT.md) and
+> [finishing measurements](FINISHING_BALANCE.md).
+
+Official-campaign measurements below remain a historical reference. The Still
+Hour columns and conclusions describe their dated sources and are not evidence
+that the current difficulty targets have been achieved. Physical encounter
+assignment lists already contain copies; do not multiply them by quantity again.
+
+
 Design document (spoilers). The owner's checklist for "the correct flow":
 agenda pacing (doom), act pacing (clues), locations (count, connections,
 clues against the act), enemy spawns including elites, encounter cards,

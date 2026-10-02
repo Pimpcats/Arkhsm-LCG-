@@ -210,23 +210,30 @@ end
 -- from the sources are ignored while any reachable one exists. Ties go to
 -- `tiebreak(a, b)` (true when a should win) or else to the smaller key.
 -- With no sources, every node counts as distance 0 (tiebreak decides).
-function Locations.farthest(graph, sources, tiebreak)
+-- `candidates`, when supplied, restricts destinations, not transit nodes.
+-- Also returns all destinations tied at the greatest legal distance.
+function Locations.farthest(graph, sources, tiebreak, candidates)
   local dist = Locations.distances(graph, sources)
   local anyReachable = next(dist) ~= nil
-  local best, bestD
+  local best, bestD, tied = nil, nil, {}
   local keys = {}
   for k in pairs(graph) do keys[#keys + 1] = k end
   table.sort(keys, function(a, b) return tostring(a) < tostring(b) end)
   for _, k in ipairs(keys) do
     local d = dist[k]
     if d == nil and not anyReachable then d = 0 end
-    if d ~= nil then
-      if best == nil or d > bestD or (d == bestD and tiebreak and tiebreak(k, best)) then
-        best, bestD = k, d
+    if d ~= nil and (candidates == nil or candidates[k]) then
+      if best == nil or d > bestD then
+        best, bestD, tied = k, d, { k }
+      elseif d == bestD then
+        tied[#tied + 1] = k
+        if tiebreak and tiebreak(k, best) then
+          best, bestD = k, d
+        end
       end
     end
   end
-  return best, bestD
+  return best, bestD, tied
 end
 
 --- One step from `from` along a shortest path toward `to`; returns `from`

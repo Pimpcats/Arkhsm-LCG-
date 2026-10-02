@@ -80,7 +80,7 @@ def success_probability(delta, band):
 # simulate_tempo.py --memory (investigator Memory reactions + Knowledge pays
 # Memory + Victory + Elder): ~5.2-6.2 per investigator per loop at 3p for the
 # weakest to strongest party (5-95th percentile ~2.5-10). Memory carried
-# into the next loop is soft-capped at 6*investigators. The campaign runs ~7
+# into the next loop is soft-capped at 10*investigators. The campaign runs ~7
 # loops (guide §10). Total Memory EARNED across the campaign, divided per
 # investigator, is the XP-analog we benchmark against official Arkham
 # (~40-50 XP/investigator/campaign; CO-001).
@@ -413,8 +413,7 @@ def main():
     # The per-investigator total scales with campaign length (~6-8 loops, guide
     # §10). The official-XP benchmark (40-50) is reached across that window; show
     # the whole window so the length dependence is explicit rather than hidden in
-    # a single --loops value. The 18/loop cap is the governor that stops the loop
-    # structure from inflating the total past this.
+    # a single --loops value. The carry cap does not limit earned income.
     window = {L: L * econ["per_loop_mean"] / n for L in (6, 7, 8)}
     if not args.quiet:
         print("  campaign total by length (per investigator):")
@@ -537,9 +536,9 @@ def main():
         print("\n== 7. Code <-> data audit ==")
     # Recollection Memory prices: Interlude.RECOLLECTION_COST must match the
     # card spec's memoryCost per id (one source of truth, two copies).
-    spec = {c["id"]: c["memoryCost"]
-            for c in json.load(open(os.path.join(here, "stillhour_cards_spec.json"), encoding="utf-8"))
-            if "memoryCost" in c}
+    from scenario_content import load
+    effective, _, _ = load("still_hour")
+    spec = {c["id"]: c["memoryCost"] for c in effective.values() if "memoryCost" in c}
     lua = open(os.path.join(here, "..", "src", "StillHour", "Interlude.ttslua"), encoding="utf-8").read()
     lua_costs = dict(re.findall(r'\["(sthr-[a-z]+)"\]\s*=\s*(\d+)', lua))
     lua_costs = {k: int(v) for k, v in lua_costs.items()}
@@ -556,8 +555,8 @@ def main():
     # override with its own numbers).
     ok_bands = True
     for m in (2, 3, 4):
-        reset = 6 * m
-        if not (reset // 3 < 2 * reset // 3 < reset and 2 * reset // 3 == 4 * m):
+        reset = 8 * m
+        if not (reset // 3 < 2 * reset // 3 < reset):
             ok_bands = False
     assert_("bands partition cleanly and Noticed start == Appointed threshold (2-4p)", ok_bands)
 

@@ -1,0 +1,19 @@
+{
+  "guide_sha256": "cb12be9d609269fdaa1bf2e5f3128ad0988bc8ea9d81dcc2b3edb7d6a910778c",
+  "guide_pages": 24,
+  "all_pages_rendered": true,
+  "visual_contact_review": "pass; no clipped text or overlapping columns",
+  "changed_card_faces": [
+    "sthr-act-bargain",
+    "sthr-act-hourwaswrong",
+    "sthr-act-walksbeside",
+    "sthr-act-whythirteen",
+    "sthr-loc-longpier",
+    "sthr-act-firsthour"
+  ],
+  "changed_card_face_visual_review": "pass; fronts and applicable backs fit frames",
+  "warning": "Render proof is not human playtest approval.",
+  "hosted_asset_commit": "edb319dc44156898bd22b8f11382d4e94e8fd485",
+  "guide_render": "Poppler: 24 complete JPEG pages, independently loaded; all-page contact inspection",
+  "opening_update": "Final 2-per-investigator cost rendered and visually checked; matching reverse retained"
+}
