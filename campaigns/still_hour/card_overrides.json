@@ -798,7 +798,7 @@
     "traits": "Ambergrove. Central.",
     "shroud": 1,
     "clues": 1,
-    "text": "Each loop begins here.\nForced – After an investigator moves along a connection between The Square and a location in another district, if no investigator has moved along that connection yet this round: Place 1 doom on the current Hour.\n[action]: Resign. You cannot resign during the finale.",
+    "text": "Each loop begins here.\nForced – After an investigator moves along a connection between The Square and a location in another district, if it is the first time an investigator has moved along that connection this round: Place 1 doom on the current Hour.\n[action]: Resign. You cannot resign during the finale.",
     "flavor": "Everyone is out for the occultation. None of them will look at you twice — not this time, not ever.",
     "icons": "star",
     "color": "#1a605e",
@@ -1282,7 +1282,7 @@
     "wilIcons": 1,
     "agiIcons": 1,
     "flavor": "",
-    "text": "Elias Warde deck only.\nEach investigator at your location gets +1 [agi] while evading.\n[action] Exhaust The Ambergrove Lamp: Look at the top card of the encounter deck. You may place it on the bottom of the encounter deck. Then, you may move to a connecting location. This action does not provoke attacks of opportunity.\nWhen you trigger this ability, you may raise Dissonance by 1. If you do, that move does not place doom on the current Hour. (Limit once per loop.)"
+    "text": "Elias Warde deck only.\nEach investigator at your location gets +1 [agi] while evading.\n[action] Exhaust The Ambergrove Lamp: Look at the top card of the encounter deck. You may place it on the bottom of the encounter deck. Then, you may move to a connecting location. This action does not provoke attacks of opportunity.\nWhen you trigger this ability, you may also raise Dissonance by 1 (limit once per loop). If you do, that move does not place doom on the current Hour."
   },
   "sthr-rehearsedescape": {
     "wildIcons": 1,
