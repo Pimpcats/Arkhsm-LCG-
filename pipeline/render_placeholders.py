@@ -15,6 +15,12 @@ target so the mod reads like the game while art is pending.
 
 Run: python3 pipeline/render_placeholders.py   (from repo root)
 Out: art/faces/{id}.png  (flows through Frame coverage -> Apply)
+
+Rules text is laid out inside each frame's visible parchment (_flow_body), and
+every face is print-audited as it is saved (_finish): text the frame hides,
+text pasted over, text blocks touching and text off the card are reported.
+`--check` renders into a temporary folder and exits 1 on any finding
+(tests/test_render_print_audit.py).
 """
 import argparse
 import re
@@ -23,7 +29,7 @@ import json
 import os
 import sys
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont, ImageStat
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -579,8 +585,31 @@ def _wrapped_height(text, size, nlines, leading):
     return nlines * lh + max(0, _abilities(text).count("\n")) * pgap
 
 
+class _audit_role:
+    """Mark the text drawn inside as `role` for the print audit ("body" text
+    must sit on visible parchment clear of the frame)."""
+
+    def __init__(self, role):
+        self.role = role
+
+    def __enter__(self):
+        self.prev = AUDIT.get("role")
+        AUDIT["role"] = self.role
+
+    def __exit__(self, *exc):
+        AUDIT["role"] = self.prev
+
+
 def draw_wrapped(draw, text, x, y, size, max_width, fill, italic=False,
                  leading=1.25, bold=False, font_file=None, narrow=None):
+    with _audit_role("body"):
+        return _draw_wrapped(draw, text, x, y, size, max_width, fill,
+                             italic=italic, leading=leading, bold=bold,
+                             font_file=font_file, narrow=narrow)
+
+
+def _draw_wrapped(draw, text, x, y, size, max_width, fill, italic=False,
+                  leading=1.25, bold=False, font_file=None, narrow=None):
     tfont = _font(size, italic=italic, bold=bold, font_file=font_file)
     kfont = _font(size, italic=italic, bold=True, font_file=font_file)
     gfont = _font(size, glyph=True)
@@ -1070,6 +1099,20 @@ def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
     bold/italic)."""
     if not text:
         return
+    if key in ("victory", "traits"):
+        # these print inside the rules box: the audit holds them to the
+        # visible parchment like the rules themselves
+        with _audit_role("body"):
+            return _box_text_at(d, text, box, fill, title, bold, italic, grow,
+                                min_size, max_w_factor, max_size, align, stat,
+                                key, pos_key)
+    return _box_text_at(d, text, box, fill, title, bold, italic, grow,
+                        min_size, max_w_factor, max_size, align, stat, key,
+                        pos_key)
+
+
+def _box_text_at(d, text, box, fill, title, bold, italic, grow, min_size,
+                 max_w_factor, max_size, align, stat, key, pos_key):
     if stat and key is None:
         key = "stats"
     st = _field_style(key)
@@ -1131,6 +1174,213 @@ def _box_text(d, text, box, fill=PSD_INK, title=False, bold=False, italic=False,
 # text that did not fit its box even at the smallest size: (card id, area, size)
 OVERFLOWS = []
 CURRENT_CARD = [None]
+
+
+# ------------------------------------------------------------ print audit --
+# Every piece of text drawn on a card face is recorded with its exact ink mask
+# and the colours under it, so the finished face can be checked for text the
+# frame or later furniture hides — the defects a "did it fit its box" check
+# can't see, because the boxes themselves (plugin regions) run under ornament:
+#   contrast  ink sitting on frame ornament / border / dark art of its own tone
+#   covered   an icon, chit or set symbol pasted over the text afterwards
+#   collision two separate pieces of text touching (rules into the credit line)
+#   clipped   ink running off the card edge
+# Problems land in PRINT_ISSUES as (card id, problem, text, box); main() prints
+# them and `--check` exits non-zero (tests/test_render_print_audit.py).
+PRINT_ISSUES = []
+AUDIT = {"on": True}
+AUDIT_CONTRAST = 72        # min |luma(ink) - luma(ground)| for a legible pixel
+AUDIT_BAD_FRAC = 0.22      # share of a piece's ink that may fail before it counts
+AUDIT_COLLIDE_PX = 10      # ink pixels shared by two pieces = a collision
+AUDIT_GAP = 4              # px of air kept between different text blocks
+_AUDIT_RECS = {}           # id(canvas) -> [record]
+_CANVAS_FRAMES = {}        # id(canvas) -> (template name, frame at face size)
+_SAFE_MASKS = {}           # (template, size, margin, light) -> (opaque, safe)
+AUDIT_MARGIN = 5           # dark ink keeps this many px off any frame ornament
+AUDIT_LIGHT = 140          # ...on frame pixels at least this light (parchment)
+AUDIT_EDGE_PX = 6          # ink pixels past that margin = text on the frame
+
+
+def _ink_luma(color):
+    if color is None:
+        return 0.0
+    if isinstance(color, int):
+        return float(color)
+    r, g, b = color[:3]
+    return 0.299 * r + 0.587 * g + 0.114 * b
+
+
+class _AuditDraw(ImageDraw.ImageDraw):
+    """ImageDraw that records each text draw on an RGB card canvas for the
+    print audit (no effect on what is drawn)."""
+
+    def text(self, xy, text, *args, **kwargs):
+        rec = None
+        if AUDIT["on"] and CURRENT_CARD[0] and isinstance(text, str) \
+                and text.strip():
+            try:
+                rec = _audit_record(self, xy, text, args, kwargs)
+            except Exception:  # noqa: BLE001 - the audit never breaks a render
+                rec = None
+        out = super().text(xy, text, *args, **kwargs)
+        if rec is not None:
+            # what the ink looks like as drawn: anything pasted over it later
+            # shows up as a change at the save
+            W, H = self._image.size
+            x0, y0, x1, y1 = rec["box"]
+            rec["clip"] = (max(0, x0), max(0, y0), min(W, x1), min(H, y1))
+            if rec["clip"][2] > rec["clip"][0] and rec["clip"][3] > rec["clip"][1]:
+                rec["snap"] = self._image.crop(rec["clip"])
+        return out
+
+
+def _Draw(img):
+    return _AuditDraw(img)
+
+
+def _audit_record(d, xy, text, args, kwargs):
+    img = getattr(d, "_image", None)
+    if img is None or img.mode != "RGB":
+        return
+    fill = kwargs.get("fill", args[0] if args else None)
+    font = kwargs.get("font", args[1] if len(args) > 1 else None)
+    anchor = kwargs.get("anchor", args[2] if len(args) > 2 else None)
+    if font is None:
+        return
+    bb = d.textbbox(xy, text, font=font, anchor=anchor)
+    x0, y0 = int(bb[0]) - 1, int(bb[1]) - 1
+    x1, y1 = int(bb[2]) + 2, int(bb[3]) + 2
+    if x1 <= x0 or y1 <= y0:
+        return
+    m = Image.new("L", (x1 - x0, y1 - y0), 0)
+    ImageDraw.ImageDraw(m).text((xy[0] - x0, xy[1] - y0), text, fill=255,
+                                font=font, anchor=anchor)
+    core = m.point(lambda v: 255 if v > 235 else 0)
+    if not core.getbbox():
+        return
+    W, H = img.size
+    clipped = x0 + 1 < 0 or y0 + 1 < 0 or x1 - 2 > W or y1 - 2 > H
+    cx0, cy0, cx1, cy1 = max(0, x0), max(0, y0), min(W, x1), min(H, y1)
+    n = sum(core.histogram()[255:])
+    low = 0
+    if cx1 > cx0 and cy1 > cy0:
+        ground = img.crop((cx0, cy0, cx1, cy1)).convert("L")
+        sub = core.crop((cx0 - x0, cy0 - y0, cx1 - x0, cy1 - y0))
+        fl = _ink_luma(fill)
+        bad = ground.point(lambda v: 255 if abs(v - fl) < AUDIT_CONTRAST else 0)
+        low = sum(Image.composite(bad, Image.new("L", bad.size, 0),
+                                  sub).histogram()[255:])
+    role = AUDIT.get("role") or "field"
+    rec = {"text": text, "box": (x0, y0, x1, y1), "core": core, "n": n,
+           "fill": fill, "low": low, "clipped": clipped, "role": role}
+    recs = _AUDIT_RECS.setdefault(id(img), [])
+    for o in recs:
+        # rules against a different block (credit line, Victory, a label)
+        # must also keep a few px of air, not just avoid touching
+        g = AUDIT_GAP if o["role"] != role else 0
+        ix0, iy0 = max(x0, o["box"][0] - g), max(y0, o["box"][1] - g)
+        ix1, iy1 = min(x1, o["box"][2] + g), min(y1, o["box"][3] + g)
+        if ix1 <= ix0 or iy1 <= iy0:
+            continue
+        a = core.crop((ix0 - x0, iy0 - y0, ix1 - x0, iy1 - y0))
+        b = o["core"].crop((ix0 - o["box"][0], iy0 - o["box"][1],
+                            ix1 - o["box"][0], iy1 - o["box"][1]))
+        if g:
+            b = b.filter(ImageFilter.MaxFilter(2 * g + 1))
+        shared = sum(Image.composite(a, Image.new("L", a.size, 0),
+                                     b).histogram()[255:])
+        if shared > AUDIT_COLLIDE_PX:
+            PRINT_ISSUES.append((CURRENT_CARD[0], "collision",
+                                 "{!r} / {!r}".format(text.strip(),
+                                                      o["text"].strip()),
+                                 (ix0, iy0, ix1, iy1)))
+    recs.append(rec)
+    return rec
+
+
+def _register_frame(img, name, frame):
+    """Remember which frame (RGBA, at face size) the canvas `img` was built
+    on: body text is laid out in that frame's visible parchment, and the
+    print audit checks against it. Where pasted art covers an opaque frame,
+    pass the frame with that window cleared."""
+    _CANVAS_FRAMES[id(img)] = (name, frame)
+
+
+def _safe_mask(name, frame, margin=None, light_min=120):
+    """(opaque, safe) masks of a frame at face size. `safe` is the visible
+    parchment — light, opaque frame pixels, specks closed — shrunk by
+    `margin` (default AUDIT_MARGIN), so dark text outside it sits on (or
+    touches) a border, arch, ornament, icon well or banner edge."""
+    margin = AUDIT_MARGIN if margin is None else margin
+    key = (name, frame.size, margin, light_min)
+    if key not in _SAFE_MASKS:
+        a = frame.getchannel("A").point(lambda v: 255 if v > 200 else 0)
+        light = frame.convert("L").point(lambda v: 255 if v > light_min else 0)
+        m = ImageChops.multiply(light, a)
+        m = m.filter(ImageFilter.MaxFilter(3)).filter(ImageFilter.MinFilter(3))
+        safe = m.filter(ImageFilter.MinFilter(2 * margin + 1)) if margin else m
+        _SAFE_MASKS[key] = (a, safe)
+    return _SAFE_MASKS[key]
+
+
+def _finish(img, dest):
+    """Save a card face, auditing the text drawn on it first."""
+    recs = _AUDIT_RECS.pop(id(img), [])
+    frame = _CANVAS_FRAMES.pop(id(img), None)
+    masks = (_safe_mask(frame[0], frame[1], AUDIT_MARGIN, AUDIT_LIGHT)
+             if frame and frame[1].size == img.size else None)
+    if AUDIT["on"] and img.mode == "RGB":
+        W, H = img.size
+        for r in recs:
+            snippet = r["text"].strip()
+            if r["clipped"]:
+                PRINT_ISSUES.append((CURRENT_CARD[0], "clipped", snippet, r["box"]))
+            if r["n"] and r["low"] > AUDIT_BAD_FRAC * r["n"]:
+                PRINT_ISSUES.append((CURRENT_CARD[0], "contrast", snippet, r["box"]))
+                continue
+            if masks and r["role"] == "body" and _ink_luma(r["fill"]) < 110:
+                # dark ink must sit on visible parchment, clear of the frame
+                x0, y0, x1, y1 = r["box"]
+                cx0, cy0 = max(0, x0), max(0, y0)
+                cx1, cy1 = min(W, x1), min(H, y1)
+                if cx1 > cx0 and cy1 > cy0:
+                    sub = r["core"].crop((cx0 - x0, cy0 - y0, cx1 - x0, cy1 - y0))
+                    opaque = masks[0].crop((cx0, cy0, cx1, cy1))
+                    unsafe = masks[1].crop((cx0, cy0, cx1, cy1)).point(
+                        lambda v: 0 if v else 255)
+                    hit = ImageChops.multiply(ImageChops.multiply(sub, opaque),
+                                              unsafe)
+                    if sum(hit.histogram()[255:]) > AUDIT_EDGE_PX:
+                        PRINT_ISSUES.append((CURRENT_CARD[0], "frame", snippet,
+                                             r["box"]))
+                        continue
+            # covered: something pasted over the ink after it was drawn
+            snap = r.get("snap")
+            if snap is None or not r["n"]:
+                continue
+            cx0, cy0, cx1, cy1 = r["clip"]
+            x0, y0 = r["box"][:2]
+            diff = ImageChops.difference(img.crop(r["clip"]), snap).convert("L")
+            off = diff.point(lambda v: 255 if v > 24 else 0)
+            sub = r["core"].crop((cx0 - x0, cy0 - y0, cx1 - x0, cy1 - y0))
+            moved = sum(ImageChops.multiply(off, sub).histogram()[255:])
+            # (a dark icon over dark ink changes the ground around it instead)
+            area = off.size[0] * off.size[1]
+            if moved > AUDIT_BAD_FRAC * r["n"] or \
+                    sum(off.histogram()[255:]) > 0.35 * area:
+                PRINT_ISSUES.append((CURRENT_CARD[0], "covered", snippet, r["box"]))
+    img.save(dest)
+
+
+def audit_report(issues=None):
+    """Human-readable lines, one per card, for the print-audit findings."""
+    by = {}
+    for cid, kind, text, box in (PRINT_ISSUES if issues is None else issues):
+        by.setdefault(cid, []).append("{} {!r}@{},{}".format(
+            kind, text[:28], box[0], box[1]))
+    return ["{}: {}".format(cid, "; ".join(v[:6]) + (" (+{})".format(len(v) - 6)
+                                                    if len(v) > 6 else ""))
+            for cid, v in sorted(by.items())]
 
 
 def _box_block(d, text, box, fill=PSD_INK, start=30, min_size=15,
@@ -1234,6 +1484,12 @@ def _flow_around(d, text, box, obstacle, start=22, min_size=13, fill=PSD_INK,
     tasc, _ = _font(size, italic=italic).getmetrics()
     gmid = int(tasc * 0.60)
     gpad = int(size * GLYPH_PAD_FRAC)
+    with _audit_role("body"):
+        _draw_placed(d, placed, gmid, gpad, fill)
+    return endy
+
+
+def _draw_placed(d, placed, gmid, gpad, fill):
     for ly, lx, line in placed:
         cx = lx
         for is_g, piece, font in line:
@@ -1243,7 +1499,6 @@ def _flow_around(d, text, box, obstacle, start=22, min_size=13, fill=PSD_INK,
             else:
                 d.text((cx, ly), piece, font=font, fill=fill)
                 cx += d.textlength(piece, font=font)
-    return endy
 
 
 def p_investigator_front(c, pt, dest, art_path=None, placement=None):
@@ -1650,7 +1905,8 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
         if art_path:
             paste_cover(img, art_path, clip, placement)
         img.paste(frame2, (0, 0), frame2)
-    d = ImageDraw.Draw(img)
+    d = _Draw(img)
+    _register_frame(img, "{}-{}".format(kind, letter), frame2)
 
     # commit-icon column (skill boxes + stat icons)
     icons = []
@@ -1699,26 +1955,28 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
         _box_text(d, c["traits"], (b[0], y, b[2], y + 30),
                   bold=True, italic=True, max_size=24, key="traits")
         y += 36
-    # the Event box curves inward at its lower corners: stop the rules higher
-    # Events: the box curves inward at its lower corners. Assets with a slot:
-    # the slot icon sits in the lower right, so stop the rules above it.
-    bottom_pad = -44 if kind == "Event" else (-6 if kind == "Asset" and c.get("slot") else 24)
-    if kind == "Asset" and c.get("encounter_set"):
-        # a story asset has no slot icon, but its frame's lower ornament sits
-        # where the slot would: stop the rules above it
-        bottom_pad = -34
-    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3] + bottom_pad),
-                   start=BODY_PX, key="text")
-    if pt.get("flavor") and y < b[3]:
-        # the Event box curves inward at its lower corners
-        fx = b[0] + (28 if kind == "Event" else 0)
-        fb = b[3] + (bottom_pad if kind == "Asset" and c.get("encounter_set") else 40)
-        if y + 30 < fb:
-            _box_block(d, pt.get("flavor", ""), (fx, y + 8, b[2], fb),
-                       fill=(84, 66, 50), italic=True, start=FLAVOR_PX, key="flavor")
+    # rules + flavour flow through the frame's visible parchment, which ends
+    # at the frame's lower ornament (an Event's box curves in at its corners);
+    # they step around the slot icon and soak chits pasted below
+    obstacles = []
+    if kind == "Asset" and c.get("slot") in SLOT_OVERLAY:
+        obstacles.append(_grow(se_reg(kind, "Slot"), 6))
+    if kind == "Asset":
+        for region, fld, val in (("Stamina", "health", c.get("health")),
+                                 ("Sanity", "sanity", c.get("sanity"))):
+            if _soak_val(val):
+                reg = _nudge(se_reg(kind, region), _field_style(fld))
+                cx, cy = (reg[0] + reg[2]) // 2, (reg[1] + reg[3]) // 2
+                obstacles.append((cx - 52, cy - 54, cx + 52, cy + 54))
+    foot = se_reg(kind, "Artist") or (0, H - 30, 0, H)
+    # (a Skill's parchment runs further right than its plugin region; the
+    # layout keeps the margin to the frame either way)
+    bx1 = b[2] + 40 if kind == "Skill" else b[2]
+    y = _flow_body(d, (b[0], y, bx1, foot[1] - 10), pt.get("text", ""),
+                   pt.get("flavor", ""), obstacles=obstacles)
     if c.get("victory"):
         _box_text(d, "Victory {}.".format(c["victory"]),
-                  (b[0], b[3] + 24, b[2], b[3] + 52), bold=True, max_size=22, key="victory")
+                  (b[0], y + 2, b[2], y + 30), bold=True, max_size=22, key="victory")
 
     if kind == "Asset" and c.get("slot") in SLOT_OVERLAY:
         _paste_region(img, _se_img("overlays", "AHLCG-" + SLOT_OVERLAY[c["slot"]]),
@@ -1744,17 +2002,12 @@ def s_player_card(kind, c, pt, dest, art_path=None, placement=None):
                 _box_text(d, str(int(val)), reg, fill=(250, 244, 238),
                           stat=True, grow=0.9, pos_key=fld)
 
-    _box_text(d, _wm(art_path), se_reg(kind, "Artist"),
-              fill=(225, 218, 202), grow=1.0)
-    _box_text(d, CFG.upper_name, se_reg(kind, "Copyright"),
-              fill=(225, 218, 202), grow=1.0)
     if kind == "Asset" and c.get("encounter_set"):
-        # a story asset: its scenario's set symbol (top right) and number
-        _encounter_mark(img, d, "AssetStory", c, number=False)
-        en = se_reg("Asset", "EncounterNumber")
-        if c.get("number") and en:
-            _box_text(d, str(c["number"]), en, fill=(225, 218, 202), max_size=13, align="right")
-    img.save(dest)
+        # a story asset: its scenario's set symbol (top right); its set
+        # number prints in the footer
+        _encounter_mark(img, d, "AssetStory", c)
+    _card_footer(img, d, kind, c, art_path)
+    _finish(img, dest)
 
 
 def _has_art_window(frame, clip):
@@ -1781,6 +2034,17 @@ def _se_frame_compose(tpl_name, kind, clip_key, art_path, placement,
     frame2 = frame.resize((W, H), Image.LANCZOS)
     clip = se_reg(kind, clip_key)
     windowed = _has_art_window(frame2, clip)
+    # the frame as text layout / the print audit see it: on an opaque frame
+    # the art is pasted OVER the clip rect, so that window is not frame
+    if windowed or not clip:
+        lay_name, lay_frame = tpl_name, frame2
+    else:
+        lay_name, lay_frame = tpl_name + "#" + clip_key, frame2.copy()
+        lay_frame.paste((0, 0, 0, 0), tuple(int(v) for v in clip))
+
+    def done(img):
+        _register_frame(img, lay_name, lay_frame)
+        return img, _Draw(img)
     if BLANK:
         # the card with no art: keep the background the frame provides so the
         # editor can show the class colour behind the live art
@@ -1791,7 +2055,7 @@ def _se_frame_compose(tpl_name, kind, clip_key, art_path, placement,
             img = frame2.convert("RGB")
             if underlay and clip:
                 ImageDraw.Draw(img).rectangle(list(clip), fill=underlay)
-        return img, ImageDraw.Draw(img)
+        return done(img)
     if FURNITURE:
         # The frame (plus the text/discs the caller draws next) on a TRANSPARENT
         # art window, so the live editor can lay real art behind it. A windowed
@@ -1803,7 +2067,7 @@ def _se_frame_compose(tpl_name, kind, clip_key, art_path, placement,
         if not windowed and clip:
             img.paste(Image.new("RGBA", (clip[2] - clip[0], clip[3] - clip[1]),
                                 (0, 0, 0, 0)), (clip[0], clip[1]))
-        return img, ImageDraw.Draw(img)
+        return done(img)
     if windowed:
         img = Image.new("RGB", (W, H), underlay or frame_underlay(frame))
         if art_path:
@@ -1818,18 +2082,265 @@ def _se_frame_compose(tpl_name, kind, clip_key, art_path, placement,
             # the same (else e.g. the Guardian's dark-blue backdrop looks like a
             # grey filler box next to the warmer classes)
             ImageDraw.Draw(img).rectangle(list(clip), fill=underlay)
-    return img, ImageDraw.Draw(img)
+    return done(img)
+
+
+# ------------------------------------------------- shaped body layout --
+# Rules text is laid out line by line inside the frame's VISIBLE parchment:
+# each line gets the clear run of parchment (through the box's middle) across the rows it
+# occupies (minus LAYOUT_MARGIN), so text follows an enemy's arched text
+# circle, stops above an asset's bottom ornament, and steps around an act's
+# clue circle, a slot icon or a Victory line — the frame itself is the
+# measure, not a rectangle that runs under the ornament.
+LAYOUT_MARGIN = 10          # px of clear parchment kept between ink and frame
+LAYOUT_LIGHT = 150          # parchment for layout is at least this light (the
+                            # audit tolerates down to 120: shaded edges)
+BODY_LEADING = 1.15         # official cards set rules tight (~1.15)
+BODY_PARA_GAP = 0.33        # gap between abilities, as a share of a line
+FLAVOR_INK = (84, 66, 50)
+FLAVOR_KEEP_PX = 24         # below this, a dense card drops its flavour text
+FLAVOR_DROPPED = []         # card ids whose flavour did not fit
+BODY_SIZES = {}             # card id -> [rules px of each body block drawn]
+
+
+def _canvas_frame(d):
+    img = getattr(d, "_image", None)
+    return _CANVAS_FRAMES.get(id(img)) if img is not None else None
+
+
+def _span_fn(d, box, obstacles=()):
+    """span(y, h) -> (x_left, x_right) of the clear run of visible parchment
+    through the middle of `box`, over rows y..y+h, or None."""
+    fr = _canvas_frame(d)
+    mask = _safe_mask(fr[0], fr[1], LAYOUT_MARGIN, LAYOUT_LIGHT)[1] if fr else None
+    x0, x1 = int(box[0]), int(box[2])
+    cache = {}
+
+    def span(y, h):
+        key = (int(y), int(h))
+        if key in cache:
+            return cache[key]
+        y, h = key
+        w = x1 - x0
+        if mask is not None and h > 0 and w > 0:
+            band = mask.crop((x0, y, x1, y + h))
+            ok = [v == 255 for v in band.resize((w, 1), Image.BOX).tobytes()]
+        else:
+            ok = [True] * max(0, w)
+        for ob in obstacles:
+            if ob[1] < y + h and ob[3] > y:
+                for x in range(max(x0, int(ob[0])), min(x1, int(ob[2]))):
+                    ok[x - x0] = False
+        # the clear run through the box's centre: text never jumps to a
+        # far side of the box because an ornament rises in its middle
+        mid = w // 2
+        res = None
+        if 0 <= mid < len(ok) and ok[mid]:
+            a = mid
+            while a > 0 and ok[a - 1]:
+                a -= 1
+            e = mid
+            while e < len(ok) and ok[e]:
+                e += 1
+            res = (x0 + a, x0 + e)
+        cache[key] = res
+        return res
+    return span
+
+
+def _words(paragraph):
+    """[(kind, word, glued)] for one paragraph: kind False = body face, None =
+    bold trigger lead, True = glyph, ARROW = fallback face for the arrow;
+    `glued` = no space before it (a glyph's "." or "+1" before a glyph), so a
+    line never breaks there and strands the punctuation."""
+    paragraph, nkey = _trigger_lead(paragraph)
+    words = []
+    prev_tail_space = True
+    for is_glyph, chunk in glyphify(paragraph):
+        if is_glyph:
+            words.append((True, chunk, bool(words) and not prev_tail_space))
+            prev_tail_space = False
+        else:
+            parts = chunk.split(" ")
+            for i, w in enumerate(parts):
+                if w != "":
+                    words.append((False, w, i == 0 and bool(words)
+                                  and not prev_tail_space))
+            prev_tail_space = chunk.endswith(" ") or not chunk
+    for i in range(min(nkey, len(words))):
+        if words[i][0] is False:
+            words[i] = (None,) + words[i][1:]
+    return [(ARROW,) + t[1:] if t[0] is False and ARROW in t[1] else t
+            for t in words]
+
+
+def _fonts(size, italic=False, bold=False, font_file=None):
+    return {False: _font(size, italic=italic, bold=bold, font_file=font_file),
+            None: _font(size, italic=italic, bold=True, font_file=font_file),
+            True: _font(size, glyph=True), ARROW: _arrow_font(size)}
+
+
+def _shape(d, text, size, top, bottom, span, italic=False, bold=False,
+           font_file=None, leading=BODY_LEADING, min_w=0):
+    """Lay `text` out from y=top, every line in span(); -> (lines, next_y,
+    fits) with lines = [(y, x, runs)]."""
+    fonts = _fonts(size, italic, bold, font_file)
+    lh = int(size * leading)
+    pgap = int(lh * BODY_PARA_GAP)
+    gpad = int(size * GLYPH_PAD_FRAC)
+    asc, desc = fonts[False].getmetrics()
+    ink_top = int(size * 0.18)                  # cap height starts about here
+    ink_h = max(1, int(asc + desc * 0.7) - ink_top)
+    state = {"y": top, "fits": True, "x": None}
+
+    def place():
+        y = state["y"]
+        s = span(y + ink_top, ink_h)
+        if s is None or s[1] - s[0] < min_w or y + ink_top + ink_h > bottom:
+            state["fits"] = False
+            return s if s and s[1] > s[0] else (span(top, 1) or (0, 1))
+        # keep the left edge aligned: where the parchment only widens by a few
+        # px (texture at a torn edge) stay on the previous line's edge rather
+        # than wobble; a real step in the frame (the enemy arch) still shows
+        px = state["x"]
+        if px is None:
+            # first line: look a few lines ahead and start on the edge they
+            # will need if it is only a few px in
+            for k in (1, 2, 3):
+                nxt = span(y + k * lh + ink_top, ink_h)
+                if nxt and s[0] < nxt[0] <= s[0] + 12 and s[1] - nxt[0] >= min_w:
+                    px = max(px or 0, nxt[0])
+        if px is not None and s[0] < px <= s[0] + 12 and s[1] - px >= min_w:
+            s = (px, s[1])
+        state["x"] = s[0]
+        return s
+    out = []
+    for pn, paragraph in enumerate(_abilities(text).split("\n")):
+        if pn:
+            state["y"] += pgap
+        s = place()
+        line, width = [], 0.0
+        toks = _words(paragraph)
+        lens = []
+        for kind, w, _g in toks:
+            glyph = kind is True
+            piece = w if glyph else w + " "
+            lens.append((piece, d.textlength(piece, font=fonts[kind])
+                         + (gpad if glyph else 0)))
+        for i, (kind, w, glued) in enumerate(toks):
+            piece, plen = lens[i]
+            if not glued:
+                # break before a word only together with what is glued to it
+                group = plen
+                j = i + 1
+                while j < len(toks) and toks[j][2]:
+                    group += lens[j][1]
+                    j += 1
+                if line and width + group > s[1] - s[0]:
+                    out.append((state["y"], s[0], line))
+                    state["y"] += lh
+                    s = place()
+                    line, width = [], 0.0
+            line.append((kind, piece))
+            width += plen
+        out.append((state["y"], s[0], line or [(False, "")]))
+        state["y"] += lh
+    return out, state["y"], state["fits"]
+
+
+def _draw_line(d, x, y, runs, size, fill, italic=False, bold=False,
+               font_file=None):
+    fonts = _fonts(size, italic, bold, font_file)
+    tasc, _ = fonts[False].getmetrics()
+    gmid = int(tasc * 0.60)
+    gpad = int(size * GLYPH_PAD_FRAC)
+    cx = x
+    for kind, piece in runs:
+        f = fonts[kind]
+        if kind == ARROW:
+            d.text((cx, y + tasc), piece, font=f, fill=fill, anchor="ls")
+            cx += d.textlength(piece, font=f)
+        elif kind is True:
+            d.text((cx, y + gmid), piece, font=f, fill=fill, anchor="lm")
+            cx += d.textlength(piece, font=f) + gpad
+        else:
+            d.text((cx, y), piece, font=f, fill=fill)
+            cx += d.textlength(piece, font=f)
+
+
+def _flow_body(d, box, text, flavor="", start=BODY_PX, min_size=14,
+               obstacles=(), story_first=False, drop_flavor=True, key="text",
+               fill=PSD_INK, min_w_frac=0.42):
+    """Rules (+ flavour) in the visible parchment of `box`, at the largest
+    size where everything fits. Official cards drop the flavour of a dense
+    card rather than shrink its rules, so below FLAVOR_KEEP_PX the flavour
+    goes. `story_first`: agenda/act fronts, story in italics above the rules
+    at one shared size (never dropped). Returns the y below the last line."""
+    text, flavor = text or "", flavor or ""
+    if not (text or flavor):
+        return box[1]
+    st = _field_style(key)
+    box = _nudge(box, st)
+    font_file = (st or {}).get("font") or None
+    if st and st.get("size"):
+        start = max(min_size, int(round(start * float(st["size"]))))
+    span = _span_fn(d, box, obstacles)
+    min_w = int((box[2] - box[0]) * min_w_frac)
+
+    def attempt(size, with_flavor):
+        fs = size if story_first else min(size, FLAVOR_PX)
+        seq = [(flavor, True), (text, False)] if story_first \
+            else [(text, False), (flavor, True)]
+        y, ok, parts = box[1], True, []
+        for t, it in seq:
+            if not t or (it and not with_flavor):
+                continue
+            if parts:
+                y += int(size * (0.30 if story_first else 0.42))
+            sz = fs if it else size
+            lines, y, f = _shape(d, t, sz, y, box[3], span, italic=it,
+                                 font_file=font_file, min_w=min_w)
+            ok = ok and f
+            parts.append((lines, sz, it))
+        return ok, parts, y
+
+    def best(with_flavor):
+        for size in range(start, min_size - 1, -1):
+            ok, parts, y = attempt(size, with_flavor)
+            if ok:
+                return size, parts, y
+        return None, None, None
+    size, parts, y = best(True)
+    if flavor and text and drop_flavor and not story_first \
+            and (size is None or size < FLAVOR_KEEP_PX):
+        s2, p2, y2 = best(False)
+        if s2 is not None and (size is None or s2 > size):
+            FLAVOR_DROPPED.append(CURRENT_CARD[0])
+            size, parts, y = s2, p2, y2
+    if size is None:
+        OVERFLOWS.append((CURRENT_CARD[0], key, min_size))
+        size = min_size
+        _, parts, y = attempt(size, True)
+    BODY_SIZES.setdefault(CURRENT_CARD[0], []).append(size)
+    with _audit_role("body"):
+        for lines, sz, it in parts:
+            for ly, lx, runs in lines:
+                _draw_line(d, lx, ly, runs, sz, FLAVOR_INK if it else fill,
+                           italic=it, font_file=font_file)
+    return y
+
+
+def _grow(box, px):
+    return (box[0] - px, box[1] - px, box[2] + px, box[3] + px)
 
 
 def _se_body(d, c, pt, kind, letter="", extra_bottom=26, text_start=BODY_PX,
-             victory=True, box=None):
-    """Traits + rules + flavor (+ Victory) stacked in the Body region. Pass
+             victory=True, box=None, obstacles=()):
+    """Traits + rules + flavor (+ Victory) in the Body region, the rules and
+    flavour flowed through the frame's visible parchment (_flow_body). Pass
     victory=False when the card places its Victory line at a fixed spot (enemies
     print it centred just above the damage/horror row, not after the text)."""
     b = box or se_reg(kind, "Body", letter)
-    if kind == "Enemy":
-        # the enemy text circle narrows toward its lower edge: keep lines clear
-        b = (b[0] + 18, b[1], b[2] - 18, b[3])
     y = b[1]
     if c.get("traits"):
         traits = c["traits"] + ("  Elite." if c.get("elite")
@@ -1837,16 +2348,12 @@ def _se_body(d, c, pt, kind, letter="", extra_bottom=26, text_start=BODY_PX,
         _box_text(d, traits, (b[0], y, b[2], y + 36),
                   bold=True, italic=True, max_size=BODY_PX, key="traits")
         y += 40
-    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3] + extra_bottom),
-                   start=text_start, key="text")
-    if pt.get("flavor") and y + 34 < b[3] + extra_bottom:
-        y = _box_block(d, pt.get("flavor", ""),
-                       (b[0], y + 6, b[2], b[3] + extra_bottom + 16),
-                       fill=(84, 66, 50), italic=True, start=FLAVOR_PX, key="flavor")
+    y = _flow_body(d, (b[0], y, b[2], b[3] + extra_bottom), pt.get("text", ""),
+                   pt.get("flavor", ""), start=text_start, obstacles=obstacles)
     if victory and c.get("victory"):
         _box_text(d, "Victory {}.".format(c["victory"]),
-                  (b[0], min(y + 6, b[3]), b[2], min(y + 34, b[3] + 30)),
-                  bold=True, max_size=22, key="victory")
+                  (b[0], y + 2, b[2], y + 30), bold=True, max_size=22,
+                  key="victory")
     return y
 
 
@@ -1876,7 +2383,7 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
     st_ = se_reg("Investigator", "Stamina")
     chit_top = (st_[1] + st_[3]) // 2 - VITAL_RISE - 62
     _se_body(d, c, pt, "Investigator", extra_bottom=0,
-             box=(b[0] + 4, b[1], b[2] - 22, min(b[3], chit_top - 10)))
+             box=(b[0], b[1], b[2], min(b[3], chit_top - 8)))
     # health (red heart) + sanity (blue brain) chits from the official stat kit
     # — the plugin's own SanityBase is corrupt, so these are the clean source.
     # Push them apart (health left, sanity right) so the two big chits get a
@@ -1896,11 +2403,8 @@ def s_investigator_front(c, pt, dest, art_path=None, placement=None):
         else:
             # only reachable if a chit file is missing from the kit
             _box_text(d, str(val), box, fill=(240, 240, 240), stat=True, grow=0.9)
-    _box_text(d, ("Illus. " + WATERMARK) if art_path else "", se_reg("Investigator", "Artist"),
-              fill=(238, 234, 226), bold=True, max_size=18, align="left")
-    _box_text(d, CFG.upper_name, se_reg("Investigator", "Copyright"),
-              fill=(238, 234, 226), bold=True, max_size=18, align="right")
-    img.save(dest)
+    _card_footer(img, d, "Investigator", c, art_path)
+    _finish(img, dest)
 
 
 def s_investigator_back(c, pt, dest, art_path=None):
@@ -1921,8 +2425,10 @@ def s_investigator_back(c, pt, dest, art_path=None):
     paras = [(line, "label") for line in pt.get("back_text", "").split("\n") if line.strip()]
     if pt.get("back_flavor"):
         paras.append((pt["back_flavor"], "story"))
-    _flow_rich(d, paras, (b[0], b[1], b[2], b[3] - 8), ob, start=BODY_PX)
-    img.save(dest)
+    # inset from the parchment's torn right edge and darkened lower-left
+    # corner, which the plugin's Body region runs onto
+    _flow_rich(d, paras, (b[0] + 8, b[1], b[2] - 22, b[3] - 30), ob, start=BODY_PX)
+    _finish(img, dest)
 
 
 def _flow_rich(d, paras, box, obstacle, start=22, min_size=13, leading=1.24, gap=18):
@@ -1982,18 +2488,156 @@ def _flow_rich(d, paras, box, obstacle, start=22, min_size=13, leading=1.24, gap
             break
     if not fits:
         OVERFLOWS.append((CURRENT_CARD[0], "back_text", size))
-    for ly, lx, line, kind in placed:
-        cx = lx
-        fill = (84, 66, 50) if kind == "story" else PSD_INK
-        for piece, font in line:
-            d.text((cx, ly), piece, font=font, fill=fill)
-            cx += d.textlength(piece, font=font)
+    with _audit_role("body"):
+        for ly, lx, line, kind in placed:
+            cx = lx
+            fill = (84, 66, 50) if kind == "story" else PSD_INK
+            for piece, font in line:
+                d.text((cx, ly), piece, font=font, fill=fill)
+                cx += d.textlength(piece, font=font)
+
+
+# ------------------------------------------------------------ footers --
+# One credit line for every card type, laid out as official cards print it:
+# "Illus. <artist>" at the left, "© <publisher>" in the copyright slot, then
+# at the right the encounter-set number ("4/18", scenario cards only), the
+# collection symbol and the card's collector number. Bold, in light type on a
+# dark strip or over art (dark type where the frame's footer is parchment,
+# as on story cards), sized together so nothing collides.
+FOOT_LIGHT = (238, 234, 226)
+FOOT_DARK = (52, 40, 30)
+FOOT_STROKE = (22, 18, 14)
+FOOT_PX = 18
+COLLECTION_NUMBERS = {}     # card id -> collector number (main(): campaign order)
+
+
+def collection_symbol():
+    """The campaign's collection symbol (build.json "collection_symbol", else
+    its default encounter symbol): printed beside every collector number."""
+    syms = CFG.get("encounter_symbols") or {}
+    return CFG.get("collection_symbol") or syms.get("_default")
+
+
+def collection_numbers(cards):
+    """{card id: n}: investigators, then player cards, then the scenario
+    cards set by set in encounter-number order, as an official box is
+    numbered. Only the campaign's own specs are numbered."""
+    own, order = set(), {}
+    for sp in (CFG.path("specs") or []):
+        try:
+            for c in json.load(open(sp, encoding="utf-8")):
+                if c.get("id") and c["id"] not in order:
+                    order[c["id"]] = len(order)
+                    own.add(c["id"])
+        except (ValueError, OSError):
+            continue
+    set_rank = {}
+    for cid, (sid, _num) in ENC_MARKS.items():
+        set_rank.setdefault(sid, len(set_rank))
+
+    def first(num):
+        try:
+            return int(str(num).split("/")[0].replace("–", "-").split("-")[0])
+        except ValueError:
+            return 0
+
+    def key(c):
+        cid = c["id"]
+        if c.get("type") == "Investigator":
+            return (0, 0, 0, order[cid])
+        if cid in ENC_MARKS:
+            sid, num = ENC_MARKS[cid]
+            return (2, set_rank[sid], first(num), order[cid])
+        if c.get("type") in ("Asset", "Event", "Skill") \
+                and not c.get("encounter_set"):
+            return (1, 0, 0, order[cid])
+        return (3, 0, 0, order[cid])
+    mine = sorted((c for c in cards if c.get("id") in own), key=key)
+    return {c["id"]: i + 1 for i, c in enumerate(mine)}
+
+
+def _foot_box_text(img, d, text, x, band, size, align="left"):
+    """Draw one footer item at x (left edge, or right edge for align right)
+    in the band; the colour follows what is under it. -> (x0, x1)."""
+    f = _font(size, bold=True)
+    w = d.textlength(text, font=f)
+    x0 = x - w if align == "right" else x
+    probe = img.crop((int(x0), int(band[1]), int(x0 + w) + 1, int(band[3])))
+    lum = ImageStat.Stat(probe.convert("L")).mean[0] if probe.size[0] else 0
+    light = lum < 140
+    bb = f.getbbox(text)
+    y = (band[1] + band[3]) / 2 - (bb[1] + bb[3]) / 2
+    if light:
+        d.text((x0, y), text, font=f, fill=FOOT_LIGHT, stroke_width=1,
+               stroke_fill=FOOT_STROKE)
+    else:
+        d.text((x0, y), text, font=f, fill=FOOT_DARK)
+    return x0, x0 + w
+
+
+def _card_footer(img, d, kind, c, art_path=None, numbers=True):
+    """The official credit line for one face (see the section note)."""
+    cp = se_reg(kind, "Copyright")
+    art = se_reg(kind, "Artist")
+    en = se_reg(kind, "EncounterNumber")
+    cn = se_reg(kind, "CollectionNumber")
+    if not cp:
+        return
+    band = (0, cp[1] - 4, 0, cp[3] + 4)
+    left = art[0] if art and abs(art[1] - cp[1]) <= 8 else cp[0]
+    right = cn[2] if cn else (en[2] if en else cp[2])
+    illus = ("Illus. " + WATERMARK) if art_path else ""
+    copy = ("© " + WATERMARK) if art_path else ""
+    enc = str(c.get("number") or "") if numbers and c.get("encounter_set") else ""
+    coll = str(COLLECTION_NUMBERS.get(c.get("id"), "")) if numbers else ""
+    icon = None
+    if coll and collection_symbol():
+        import encounter_sets
+        path = encounter_sets.icon_path(collection_symbol())
+        if path:
+            icon = Image.open(path).convert("RGBA")
+    ih = band[3] - band[1] + 2
+    for size in range(FOOT_PX, 11, -1):
+        f = _font(size, bold=True)
+        tl = lambda t: d.textlength(t, font=f) if t else 0   # noqa: E731
+        x = right - tl(coll)
+        icon_x = x - (ih + 6) if icon is not None else x
+        enc_x1 = icon_x - (16 if (coll or icon is not None) else 0)
+        enc_x0 = enc_x1 - tl(enc)
+        ill_x1 = left + tl(illus)
+        # © centred on its own slot, kept clear of its neighbours
+        cw = tl(copy)
+        cx0 = (cp[0] + cp[2]) / 2 - cw / 2
+        lo = ill_x1 + (18 if illus else 0)
+        hi = (enc_x0 if enc else icon_x if (coll or icon is not None) else right) - 18
+        cx0 = max(lo, min(cx0, hi - cw))
+        if cx0 >= lo - 0.5 and cx0 + cw <= hi + 0.5 and enc_x0 >= ill_x1 + 12:
+            break
+    if illus:
+        _foot_box_text(img, d, illus, left, band, size)
+    if copy:
+        _foot_box_text(img, d, copy, cx0, band, size)
+    if enc:
+        _foot_box_text(img, d, enc, enc_x1, band, size, align="right")
+    color = None
+    if coll:
+        _foot_box_text(img, d, coll, right, band, size, align="right")
+        probe = img.crop((int(icon_x), int(band[1]), int(icon_x + ih), int(band[3])))
+        color = FOOT_LIGHT if ImageStat.Stat(probe.convert("L")).mean[0] < 140 \
+            else FOOT_DARK
+    if icon is not None and color is not None:
+        tint = Image.new("RGBA", icon.size, color + (255,))
+        tint.putalpha(icon.getchannel("A"))
+        cy = (band[1] + band[3]) // 2
+        _paste_icon_fit(img, tint, (int(icon_x), cy - ih // 2,
+                                    int(icon_x) + ih, cy + ih // 2))
 
 
 def _encounter_mark(img, d, kind, c, number=True):
-    """The encounter-set symbol in the frame's set slot and the encounter
-    number ("4/18") in its footer, as official scenario cards print them
-    (pipeline/encounter_sets.py decides both; no drawing, no symbol)."""
+    """The encounter-set symbol in the frame's set slot, as official scenario
+    cards print it (pipeline/encounter_sets.py decides it; no drawing, no
+    symbol). The encounter number ("4/18") prints in the footer
+    (_card_footer); `number` is kept for callers."""
     sid = c.get("encounter_set")
     if sid:
         import encounter_sets
@@ -2011,10 +2655,6 @@ def _encounter_mark(img, d, kind, c, number=True):
                           fill=(236, 226, 204), outline=(74, 60, 46), width=max(2, g // 2))
                 pad = int(min(w, h) * 0.16)
             _paste_icon_fit(img, icon, (box[0] + pad, box[1] + pad, box[2] - pad, box[3] - pad))
-    if number and c.get("number") and kind not in ("Agenda", "Act"):
-        en = se_reg(kind, "EncounterNumber")
-        if en:
-            _box_text(d, str(c["number"]), en, fill=(110, 92, 72), max_size=13, align="right")
 
 
 def s_enemy(c, pt, dest, art_path=None, placement=None):
@@ -2039,24 +2679,28 @@ def s_enemy(c, pt, dest, art_path=None, placement=None):
                   fill=(238, 232, 216), pos_key=fld)
     _box_text(d, "ENEMY", se_reg("Enemy", "Label"), bold=True, max_size=15,
               fill=(74, 60, 46))
-    _se_body(d, c, pt, "Enemy", extra_bottom=0, victory=False)
-    # Victory centred just above the damage/horror row (above the centre chevron)
+    # the text circle ends at the encounter-set ring at its foot; Victory
+    # prints centred on the last line above that ring, as on official enemies
+    b = se_reg("Enemy", "Body")
+    ring = se_reg("Enemy", "ReturnEncounter-portrait-clip") or (0, b[3], 0, b[3])
+    vic = None
+    bottom = ring[1] - 4
     if c.get("victory"):
-        dmg = se_reg("Enemy", "Damage1")
-        hor = se_reg("Enemy", "Horror1")
-        if dmg and hor:
-            _box_text(d, "Victory {}.".format(c["victory"]),
-                      (dmg[0] - 66, dmg[1] - 42, hor[2] + 66, dmg[1] - 6),
-                      bold=True, max_size=21, key="victory")
+        vic = (b[0] + 150, ring[1] - 34, b[2] - 150, ring[1] - 6)
+        bottom = vic[1] - 2
+    _se_body(d, c, pt, "Enemy", extra_bottom=0, victory=False,
+             box=(b[0], b[1], b[2], bottom))
+    if vic:
+        _box_text(d, "Victory {}.".format(c["victory"]), vic,
+                  bold=True, max_size=22, key="victory")
     for kind_key, count, ov in (("Damage", pt.get("damage"), "AHLCG-Damage"),
                                 ("Horror", pt.get("horror"), "AHLCG-Horror")):
         for i in range(pip_count(count)):
             _paste_region(img, _se_img("overlays", ov),
                           se_reg("Enemy", "{}{}".format(kind_key, i + 1)))
-    _box_text(d, _wm(art_path), se_reg("Enemy", "Artist"),
-              fill=(225, 218, 202), grow=1.0)
     _encounter_mark(img, d, "Enemy", c)
-    img.save(dest)
+    _card_footer(img, d, "Enemy", c, art_path)
+    _finish(img, dest)
 
 
 def s_treachery(c, pt, dest, art_path=None, placement=None):
@@ -2072,70 +2716,36 @@ def s_treachery(c, pt, dest, art_path=None, placement=None):
                   max_size=20)
     _box_text(d, "TREACHERY", se_reg(kind, "Label") or se_reg("Treachery", "Label"),
               bold=True, max_size=15, fill=(74, 60, 46))
-    _se_body(d, c, pt, kind if se_reg(kind, "Body") else "Treachery")
-    _box_text(d, _wm(art_path),
-              se_reg(kind, "Artist") or se_reg("Treachery", "Artist"),
-              fill=(225, 218, 202), grow=1.0)
+    bk = kind if se_reg(kind, "Body") else "Treachery"
+    b = se_reg(bk, "Body")
+    foot = se_reg(kind, "Artist")
+    # the parchment ends at the frame's lower ornament (the layout finds it);
+    # never below the credit line
+    _se_body(d, c, pt, bk, extra_bottom=0,
+             box=(b[0], b[1], b[2], foot[1] - 12))
     _encounter_mark(img, d, kind, c)
-    img.save(dest)
+    _card_footer(img, d, kind, c, art_path)
+    _finish(img, dest)
 
 
-def _scenario_body(d, kind, c, pt, traits=False, top=None):
-    """Rules/flavor block for a scenario-side card, inside its Body region."""
+def _scenario_body(d, kind, c, pt, traits=False, top=None, obstacles=()):
+    """Rules/flavor block for a scenario-side card, flowed through the visible
+    parchment of its Body region (_flow_body): an act's clue circle and the
+    frame's torn edges shape the lines. Agenda/act fronts print the story in
+    italics first and the rules below it, both at one size."""
     b = se_reg(kind, "Body")
     if not b:
         return
     y = top if top is not None else b[1]
-    b = (b[0], y, b[2], b[3])
     if traits and c.get("traits"):
         _box_text(d, c["traits"], (b[0], y, b[2], y + 36),
                   bold=True, italic=True, max_size=BODY_PX, key="traits")
         y += 40
-    both = None
-    if kind in ("Agenda", "Act") and pt.get("flavor") and pt.get("text"):
-        both = "{}\n{}".format(pt["flavor"], pt["text"])
-
-    # the act's clue circle sits in the body's lower-right corner: official
-    # acts run the text full width above it and wrap the lines beside it short
-    clues = se_reg(kind, "Clues") if kind == "Act" else None
-    narrow = (clues[1] - 6, clues[0] - 8 - b[0]) if clues else None
-    bw = b[2] - b[0]
-
-    def end_y(txt, size, y0, italic=False):
-        n_lines, n_paras = 0, 0
-        for para in _para_lines(d, txt, size, bw, italic=italic, y0=y0,
-                                narrow=narrow, leading=1.24):
-            n_paras += 1
-            n_lines += len(para)
-        lh = int(size * 1.24)
-        return y0 + n_lines * lh + max(0, n_paras - 1) * int(lh * PARA_GAP_FRAC)
-
-    def fits(size):
-        if both:
-            yy = end_y(pt["flavor"], size, y, italic=True)
-            return end_y(pt["text"], size, yy + 10) <= b[3]
-        return end_y(pt.get("text", ""), size, y) <= b[3]
-
-    if both or (narrow and pt.get("text") and not pt.get("flavor")):
-        # official agenda/act fronts: the story in italics first, rules below
-        # it; both share one size so neither crowds the other out
-        size = 15
-        for size in range(BODY_PX, 14, -1):
-            if fits(size):
-                break
-        else:
-            OVERFLOWS.append((CURRENT_CARD[0], "text", size))
-        if both:
-            y = draw_wrapped(d, pt["flavor"], b[0], y, size, bw,
-                             (84, 66, 50), italic=True, leading=1.24, narrow=narrow)
-            y += 10
-        draw_wrapped(d, pt.get("text", ""), b[0], y, size, bw,
-                     PSD_INK, leading=1.24, narrow=narrow)
-        return
-    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3]), start=BODY_PX, key="text")
-    if pt.get("flavor") and y + 30 < b[3]:
-        _box_block(d, pt.get("flavor", ""), (b[0], y + 6, b[2], b[3]),
-                   fill=(84, 66, 50), italic=True, start=FLAVOR_PX, key="flavor")
+    story_first = kind in ("Agenda", "Act")
+    return _flow_body(d, (b[0], y, b[2], b[3]), pt.get("text", ""),
+                      pt.get("flavor", ""), story_first=story_first,
+                      drop_flavor=not story_first, obstacles=obstacles,
+                      min_w_frac=0.30 if kind == "Act" else 0.42)
 
 
 def s_location(c, pt, dest, art_path=None, placement=None):
@@ -2148,12 +2758,19 @@ def s_location(c, pt, dest, art_path=None, placement=None):
     # the plugin names the unrevealed side's art window BackPortrait
     clip = "BackPortrait-portrait-clip" if back else "Portrait-portrait-clip"
     img, d = _se_frame_compose("AHLCG-" + kind, kind, clip, art_path, placement)
-    _box_text(d, c["name"], se_reg(kind, "Name"), title=True, grow=1.15, key="name")
-    # a location may have a subtitle banner under the title (e.g. "Feeding
-    # Grounds") — distinct from its trait line
+    nb = se_reg(kind, "Name")
     if c.get("subtitle"):
-        _box_text(d, c["subtitle"], se_reg(kind, "SubtitleText"),
-                  italic=True, max_size=22, key="subtitle")
+        # a location may carry a subtitle (distinct from its trait line). The
+        # frame kit has no subtitle ribbon — its SubtitleText region falls on
+        # the banner's tip and the art — so, as on official unique enemies,
+        # name and subtitle share the light title banner
+        # (the banner's light field ends at the double rule, ~y 60)
+        _box_text(d, c["name"], (nb[0], nb[1] - 8, nb[2], nb[1] + 32),
+                  title=True, grow=1.0, key="name")
+        _box_text(d, c["subtitle"], (nb[0] + 40, nb[1] + 32, nb[2] - 40, nb[1] + 51),
+                  italic=True, max_size=19, max_w_factor=1.0, key="subtitle")
+    else:
+        _box_text(d, c["name"], nb, title=True, grow=1.15, key="name")
     # the "LOCATION" type label in the centre of the stat band
     _box_text(d, "LOCATION", se_reg(kind, "Label"), bold=True, max_size=17,
               fill=(74, 60, 46))
@@ -2227,18 +2844,19 @@ def s_location(c, pt, dest, art_path=None, placement=None):
         _box_text(d, c["traits"], (b[0], y, b[2], y + 36),
                   bold=True, italic=True, max_size=BODY_PX, key="traits")
         y += 40
-    y = _box_block(d, pt.get("text", ""), (b[0], y, b[2], b[3]), start=BODY_PX, key="text")
-    if pt.get("flavor") and y + 24 < b[3]:
-        _box_block(d, pt.get("flavor", ""), (b[0], y + 4, b[2], b[3]),
-                   fill=(84, 66, 50), italic=True, start=FLAVOR_PX, key="flavor")
-    _box_text(d, _wm(art_path), se_reg(kind, "Copyright"),
-              fill=(120, 100, 80), max_size=14)
+    obstacles = []
+    if not back and c.get("victory"):
+        # the rules step around the Victory line in the box's lower right
+        vr = se_reg("Location", "Victory")
+        vw = d.textlength("Victory {}.".format(c["victory"]), font=_font(20, bold=True))
+        vcx, vcy = (vr[0] + vr[2]) / 2, (vr[1] + vr[3]) / 2
+        obstacles.append((vcx - vw / 2 - 14, vcy - 22, vcx + vw / 2 + 14, vcy + 22))
+    _flow_body(d, (b[0], y, b[2], b[3] + 30), pt.get("text", ""),
+               pt.get("flavor", ""), obstacles=obstacles)
     _encounter_mark(img, d, kind, c)
-    img.save(dest)
+    _card_footer(img, d, kind, c, art_path, numbers=not back)
+    _finish(img, dest)
 
-
-
-FOOTER_IMG = [None]       # the image the footer's set symbol is pasted on (set per card)
 
 
 def _a_index(c):
@@ -2259,50 +2877,11 @@ def _hdr_box(kind):
     return (cx - half, r[1] - 6, cx + half, r[3] + 10)
 
 
-def _scenario_footer(d, kind, c, art_path=None):
-    """Illustrator (left) / (c) (centre) / card number (right), in the frame's
-    tiny footer band - the official credit line."""
-    # official: bold white type on the dark footer band, "Illus. <artist>",
-    # "© <year> FFG", the encounter number, then the set symbol and the
-    # card's own index (e.g. "4-5a")
-    FOOT = (238, 234, 226)
-    a = se_reg(kind, "Artist")
-    if a and art_path:
-        _box_text(d, "Illus. " + WATERMARK, (a[0], a[1] - 4, a[2] + 60, a[3] + 4), fill=FOOT, bold=True,
-                  max_size=19, align="left")
-    cp = se_reg(kind, "Copyright")
-    if cp:
-        _box_text(d, ("\u00a9 " + WATERMARK) if art_path else "", (cp[0], cp[1] - 4, cp[2], cp[3] + 4),
-                  fill=FOOT, bold=True, max_size=19)
-    num = c.get("number")
-    en = se_reg(kind, "EncounterNumber")
-    if num and en:
-        _box_text(d, str(num), (en[0], en[1] - 4, en[2], en[3] + 4), fill=FOOT, bold=True, max_size=19,
-                  align="right")
-    if en and c.get("encounter_set") and FOOTER_IMG[0] is not None:
-        import encounter_sets
-        path = encounter_sets.icon_path(c["encounter_set"])
-        h = en[3] - en[1] + 14
-        x0 = en[2] + 14
-        if path:
-            icon = Image.open(path).convert("RGBA")
-            white = Image.new("RGBA", icon.size, FOOT + (255,))
-            white.putalpha(icon.getchannel("A"))
-            _paste_icon_fit(FOOTER_IMG[0], white, (x0, en[1] - 7, x0 + h, en[3] + 7))
-        idx = str(c.get("index", "")).strip()
-        if idx and idx[-1:] not in ("a", "b"):
-            idx += "a"
-        if idx:
-            _box_text(d, idx, (x0 + h + 6, en[1] - 4, x0 + h + 90, en[3] + 4), fill=FOOT, bold=True,
-                      max_size=19, align="left")
-
-
 def s_agenda(c, pt, dest, art_path=None, placement=None):
     """Agenda (the doom clock) - landscape, art LEFT + text RIGHT, "Agenda N"
     header top-right, doom on the frame, credit footer."""
     img, d = _se_frame_compose("AHLCG-Agenda", "Agenda", "Portrait-portrait-clip",
                                art_path, placement, landscape=True)
-    FOOTER_IMG[0] = img
     hdr = ("Agenda " + _a_index(c)).strip()
     _box_text(d, hdr, _hdr_box("Agenda"), bold=True, max_size=28, fill=(58, 44, 32))
     _box_text(d, c["name"], se_reg("Agenda", "Name"), title=True, grow=1.0, max_size=46, key="name")
@@ -2313,9 +2892,9 @@ def s_agenda(c, pt, dest, art_path=None, placement=None):
                   max_size=int((db[3] - db[1]) * 0.60),
                   fill=(238, 232, 216), pos_key="doom")
     _scenario_body(d, "Agenda", c, pt)
-    _scenario_footer(d, "Agenda", c, art_path)
+    _card_footer(img, d, "Agenda", c, art_path)
     _encounter_mark(img, d, "Agenda", c)
-    img.save(dest)
+    _finish(img, dest)
 
 
 def s_act(c, pt, dest, art_path=None, placement=None):
@@ -2323,7 +2902,6 @@ def s_act(c, pt, dest, art_path=None, placement=None):
     header top-left, clue threshold on the frame, credit footer."""
     img, d = _se_frame_compose("AHLCG-Act", "Act", "Portrait-portrait-clip",
                                art_path, placement, landscape=True)
-    FOOTER_IMG[0] = img
     hdr = ("Act " + _a_index(c)).strip()
     _box_text(d, hdr, _hdr_box("Act"), bold=True, max_size=28, fill=(58, 44, 32))
     _box_text(d, c["name"], se_reg("Act", "Name"), title=True, grow=1.0, max_size=46, key="name")
@@ -2355,9 +2933,9 @@ def s_act(c, pt, dest, art_path=None, placement=None):
                       max_size=int((cb[3] - cb[1]) * 0.56),
                       fill=(238, 232, 216), pos_key="clues")
     _scenario_body(d, "Act", c, pt)
-    _scenario_footer(d, "Act", c, art_path)
+    _card_footer(img, d, "Act", c, art_path)
     _encounter_mark(img, d, "Act", c)
-    img.save(dest)
+    _finish(img, dest)
 
 
 def _b_index(kind, c):
@@ -2374,8 +2952,10 @@ def s_scenario_back(kind, c, pt, dest):
     indented italics and the rules below it, one fitted size for both."""
     frame = _se_img("templates", "AHLCG-{}Back".format(kind))
     W, H = 525 * SE_SCALE, 375 * SE_SCALE
-    img = frame.resize((W, H), Image.LANCZOS).convert("RGB")
-    d = ImageDraw.Draw(img)
+    frame2 = frame.resize((W, H), Image.LANCZOS)
+    img = frame2.convert("RGB")
+    d = _Draw(img)
+    _register_frame(img, kind + "Back", frame2)
     bi = se_reg(kind + "Back", "BackScenarioIndex")
     _box_text(d, _b_index(kind, c), (bi[0] - 10, bi[1] - 4, bi[2] + 10, bi[3] + 6),
               bold=True, max_size=24, fill=(58, 44, 32))
@@ -2412,7 +2992,7 @@ def s_scenario_back(kind, c, pt, dest):
         draw_wrapped(d, rules, bb[0], y, size, bb[2] - bb[0], PSD_INK,
                      leading=1.24)
     _encounter_mark(img, d, kind + "Back", c, number=False)
-    img.save(dest)
+    _finish(img, dest)
 
 
 # real chaos-bag token symbols (SE plugin overlays) for the reference card
@@ -2482,7 +3062,8 @@ def s_scenario_ref(c, pt, dest, art_path=None, placement=None):
         _box_block(d, pt.get("text", ""), (body[0], y, body[2], body[3]),
                    start=BODY_PX, key="text")
     _encounter_mark(img, d, "Chaos", c)
-    img.save(dest)
+    _card_footer(img, d, "Chaos", c, art_path)
+    _finish(img, dest)
 
 
 def s_story(c, pt, dest, art_path=None, placement=None):
@@ -2492,7 +3073,8 @@ def s_story(c, pt, dest, art_path=None, placement=None):
     _box_text(d, c["name"], se_reg("Story", "Name"), title=True, grow=1.15, key="name")
     _scenario_body(d, "Story", c, pt, traits=True)
     _encounter_mark(img, d, "Story", c)
-    img.save(dest)
+    _card_footer(img, d, "Story", c, art_path)
+    _finish(img, dest)
 
 
 
@@ -2561,7 +3143,7 @@ def s_campaign_log(c, pt, dest, art_path=None, placement=None):
             y += 34
     _box_text(d, _wm(art_path), se_reg("Chaos", "Copyright"),
               fill=(120, 100, 80), max_size=14)
-    img.save(dest)
+    _finish(img, dest)
 
 
 
@@ -2591,12 +3173,12 @@ def s_minicard(c, dest, back_dest, art_path=None, placement=None):
         if art_path and paste_cover(img, art_path, reg, placement):
             if grey:
                 img = img.convert("L").convert("RGB")
-            d = ImageDraw.Draw(img)
+            d = _Draw(img)
             if artist and not grey:
                 _box_text(d, _wm(art_path), artist, fill=(230, 226, 214),
                           max_size=16, min_size=10)
         else:
-            d = ImageDraw.Draw(img)
+            d = _Draw(img)
             name = c.get("name", "")
             _box_text(d, name, (18, H - 150, W - 18, H - 90), title=True,
                       fill=(150, 150, 150) if grey else (236, 230, 212),
@@ -2604,7 +3186,7 @@ def s_minicard(c, dest, back_dest, art_path=None, placement=None):
             if c.get("class") and not grey:
                 _box_text(d, c["class"], (18, H - 84, W - 18, H - 52),
                           italic=True, fill=(196, 188, 170), max_size=26)
-        img.save(out)
+        _finish(img, out)
     return True
 
 
@@ -2702,8 +3284,15 @@ def main():
     ap.add_argument("--blank", action="store_true",
                     help="render the card with NO art (<id>-blank.png): the "
                          "editor backdrop showing the class background")
+    ap.add_argument("--check", action="store_true",
+                    help="print audit only: render the faces into a temporary "
+                         "folder (art/faces untouched) and exit 1 if any text "
+                         "is hidden by the frame, covered, colliding or clipped")
     args = ap.parse_args()
-    global FURNITURE, BLANK
+    global FURNITURE, BLANK, FACES_DIR
+    if args.check:
+        import tempfile
+        FACES_DIR = tempfile.mkdtemp(prefix="print_audit_")
     FURNITURE = bool(args.furniture)
     BLANK = bool(args.blank)
     use_tpl = (not args.no_template) and T.has_template("investigator_front")
@@ -2722,6 +3311,7 @@ def main():
                     cards.append(c)
         except (ValueError, OSError):
             continue
+    all_cards = list(cards)
     if args.only:
         cards = [c for c in cards if c["id"] in set(args.only)]
     print_text = {k: v for k, v in
@@ -2742,10 +3332,17 @@ def main():
     except Exception as e:  # noqa: BLE001 - a campaign without sets prints none
         print("encounter symbols skipped: {}".format(e))
         ENC_MARKS = {}
+    # collector numbers come from the whole campaign, even for an --only run
+    COLLECTION_NUMBERS.clear()
+    COLLECTION_NUMBERS.update(collection_numbers(
+        [dict(c, encounter_set=ENC_MARKS[c["id"]][0]) if c["id"] in ENC_MARKS
+         else c for c in all_cards]))
     font_default = font_overrides.get("_default", {})
     fields_default = font_default.get("fields", {})
     for c in cards:
         CURRENT_CARD[0] = c.get("id")
+        _AUDIT_RECS.clear()
+        _CANVAS_FRAMES.clear()
         FONT_OVERRIDE = dict(font_default, **font_overrides.get(c["id"], {}))
         # per-area typography: card field styles layered over the global default
         fields_card = font_overrides.get(c["id"], {}).get("fields", {})
@@ -2830,7 +3427,8 @@ def main():
                                                placement=place)
         else:
             render_player_card(c, pt, dest, art_path=art, placement=place)
-    if not (FURNITURE or BLANK or args.only):
+    CURRENT_CARD[0] = None
+    if not (FURNITURE or BLANK or args.only or args.check):
         # table presence: the campaign-log pages and the box texture
         import campaign_log
         import table_presence
@@ -2845,6 +3443,26 @@ def main():
     if OVERFLOWS:
         print("TEXT OVERFLOW (did not fit at the smallest size): " + ", ".join(
             "{} [{}@{}px]".format(*o) for o in OVERFLOWS))
+    if FLAVOR_DROPPED:
+        print("flavour left off (rules too dense to keep it at {}px+): {}".format(
+            FLAVOR_KEEP_PX, ", ".join(sorted(set(FLAVOR_DROPPED)))))
+    small = sorted((v[0], k) for k, v in BODY_SIZES.items() if v and v[0] < 25)
+    if small:
+        print("rules set below 25px (official 31): " + ", ".join(
+            "{} {}px".format(k, v) for v, k in small))
+    if PRINT_ISSUES:
+        lines = audit_report()
+        print("PRINT AUDIT: text hidden by the frame / covered / colliding / "
+              "clipped on {} face(s):".format(len(lines)))
+        for line in lines:
+            print("  " + line)
+    else:
+        print("print audit: no hidden, covered, colliding or clipped text")
+    if args.check:
+        import shutil
+        shutil.rmtree(FACES_DIR, ignore_errors=True)
+        if PRINT_ISSUES or OVERFLOWS:
+            sys.exit(1)
 
 
 if __name__ == "__main__":
