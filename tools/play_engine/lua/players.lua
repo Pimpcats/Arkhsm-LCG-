@@ -396,8 +396,6 @@ return function(R, T)
     inv.round.sera = (inv.round.sera or 0) + 1
     R.raise(1, "Seraphine's ability (cost)", inv)
     inv.lastTurn.paidDiss = true
-    -- after you resolve the [free] ability: 1 Memory (once per round, 3 per loop)
-    P.memoryReaction(inv, "Seraphine: resolved her ability")
     if choice == "action" then inv.actionsLeft = inv.actionsLeft + 1
     elseif choice == "ready" and asset then asset.exhausted = false end
     if not repeating then
@@ -473,7 +471,7 @@ return function(R, T)
     if inv.id == "sthrelias" then return R.investigatorMemory(inv) >= 3 and 3 or 1 end
     if inv.id == "sthrayako" then return 2 end
     if inv.id == "sthrcass" then return 1 end
-    if inv.id == "sthrseraphine" then return math.min(5, R.dissonance()) end
+    if inv.id == "sthrseraphine" then return math.min(3, R.dissonance()) end
     if inv.id == "sthrbirdie" then return inv.round.failed and 3 or 1 end
     return 1
   end
@@ -492,7 +490,7 @@ return function(R, T)
     elseif inv.id == "sthrcass" then
       inv.resources = inv.resources + math.min(3, R.investigatorMemory(inv))
     elseif inv.id == "sthrseraphine" then
-      local x = modifier or math.min(5, R.dissonance())
+      local x = modifier or math.min(3, R.dissonance())
       if x > 0 then R.lower(x, "Seraphine's elder sign") end
     end
   end
@@ -747,12 +745,14 @@ return function(R, T)
   end
 
   --- An investigator's own Memory reaction (each of the five has one):
-  -- "Place 1 Memory on <investigator>. (Limit once per round, and 3 times
-  -- per loop.)" Returns true if the Memory was placed.
+  -- "Place 1 Memory on <investigator>. (Limit three times per loop.)"
+  -- (twice per loop for Ayako and Cass, whose triggers come up most often).
+  -- Returns true if the Memory was placed.
   P.MEMORY_REACTION_PER_LOOP = 3
+  P.MEMORY_REACTION_LOOP_CAP = { sthrcass = 2, sthrayako = 2 }
   function P.memoryReaction(inv, why)
-    if inv.round.memoryReaction or (inv.loopUsed.memoryReaction or 0) >= P.MEMORY_REACTION_PER_LOOP then return false end
-    inv.round.memoryReaction = true
+    local cap = P.MEMORY_REACTION_LOOP_CAP[inv.id] or P.MEMORY_REACTION_PER_LOOP
+    if (inv.loopUsed.memoryReaction or 0) >= cap then return false end
     inv.loopUsed.memoryReaction = (inv.loopUsed.memoryReaction or 0) + 1
     R.addMemory(inv, 1, why)
     return true

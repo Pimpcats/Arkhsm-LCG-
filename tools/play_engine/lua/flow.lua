@@ -302,8 +302,6 @@ return function(R, T)
     G.metrics.attacks = G.metrics.attacks + 1
     R.log("%s attacks %s (%s)", en.name, inv.name, why or "")
     local dealt = R.hurt(inv, en.def.damage or 0, en.def.horror or 0, en.name, { enemy = en })
-    -- Elias: after an enemy attack deals damage to him: 1 Memory (once per round, 3 per loop)
-    if inv.id == "sthrelias" and (dealt.damage or 0) > 0 then P.memoryReaction(inv, "Elias: dealt damage") end
     FX.afterAttack(en, inv)
     if en.id == "weakness:Silver Twilight Acolyte" or en.name == "Silver Twilight Acolyte" then R.placeDoom(1, "Silver Twilight Acolyte (doom)") end
   end
@@ -332,7 +330,6 @@ return function(R, T)
     G.metrics.appointed_attacks = G.metrics.appointed_attacks + 1
     R.log("The Appointed attacks %s (%s)", inv.name, why)
     local dealt = R.hurt(inv, def.damage or 2, def.horror or 2, "The Appointed", {enemy={id="sthr-appointed",def=def}})
-    if inv.id == "sthrelias" and (dealt.damage or 0) > 0 then P.memoryReaction(inv, "Elias: dealt damage") end
     R.raise(1, "The Appointed (Arrived) attacks")
   end
 

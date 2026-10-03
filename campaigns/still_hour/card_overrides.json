@@ -1188,12 +1188,12 @@
     "agiIcons": 1
   },
   "sthrcass": {
-    "text": "[free] Spend 2 resources: Name a symbol token other than [autofail]. The next time you reveal a token with that symbol during a skill test this round, cancel it (it has no modifier and no symbol effect). (Limit once per round.)\n[reaction] After you reveal a symbol token during a skill test: Place 1 Memory on Cass Lindqvist. (Limit once per round, and 3 times per loop.)\n[elder] effect: +1. Gain 1 resource for each Memory on Cass Lindqvist (maximum 3).",
-    "elderSign": "+1. Gain 1 resource for each Memory on Cass Lindqvist (maximum 3).",
+    "text": "[free] Spend 2 resources: Name a symbol token other than [autofail]. The next time you reveal that symbol during a skill test this round, cancel it (it has no modifier and no symbol effect). (Limit once per round.)\n[reaction] After you reveal a symbol token during a skill test: Place 1 Memory on Cass. (Limit twice per loop.)\n[elder] effect: +1. Gain 1 resource for each Memory on Cass (maximum 3).",
+    "elderSign": "+1. Gain 1 resource for each Memory on Cass (maximum 3).",
     "back_text": "Deck Size: 30.\nDeckbuilding Options: Rogue cards level 0–5, Neutral cards level 0–5, up to 5 cards of any other class at level 0, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): Marked Deck, Seen This Hand Before, The House Always Wins, 1 random basic weakness."
   },
   "sthrayako": {
-    "text": "[reaction] After you succeed at an [int] test: Place 1 Memory on Dr. Ayako Sōma. (Limit once per round, and 3 times per loop.)\n[elder] effect: +2. Draw 1 card. If it is a Recollection, it costs 2 fewer resources to play until the end of the round.",
+    "text": "[reaction] After you succeed at an [int] test: Place 1 Memory on Dr. Ayako Sōma. (Limit twice per loop.)\n[elder] effect: +2. Draw 1 card. If it is a Recollection, it costs 2 fewer resources to play until the end of the round.",
     "elderSign": "+2. Draw 1 card. If it is a Recollection, it costs 2 fewer resources to play until the end of the round.",
     "back_text": "Deck Size: 30.\nDeckbuilding Options: Seeker cards level 0–5, Neutral cards level 0–5, up to 5 Mystic cards level 0–2, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): The Lexicon of the Hour, It Means 'Wait', Untranslatable, 1 random basic weakness.",
     "health": 6
@@ -1208,9 +1208,9 @@
     "memoryCost": 2
   },
   "sthrbirdie": {
-    "text": "[reaction] After you fail a skill test by 2 or more: Place 1 Memory on “Birdie” Okonkwo. (Limit once per round, and 3 times per loop.)\n[reaction] When you would fail a skill test (even because of [autofail]), remove 3 Memory from “Birdie” Okonkwo: You succeed at that test by 0 instead. (Limit once per loop.)\n[elder] effect: +1. If you have already failed a skill test this round, this token is +3 instead.",
+    "text": "[reaction] After you fail a skill test by 2 or more: Place 1 Memory on Birdie. (Limit three times per loop.)\n[reaction] When you would fail a skill test (even because of [autofail]), remove 3 Memory from Birdie: You succeed by 0 instead. (Limit once per loop.)\n[elder] effect: +1. If you have failed a skill test this round, this token is +3 instead.",
     "back_text": "Deck Size: 30.\nDeckbuilding Options: Survivor cards level 0–5, Neutral cards level 0–5, up to 5 other Guardian, Mystic, Rogue and/or Seeker cards level 0–1, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): Lucky Compass, I Get Out, Nobody Believes Her, 1 random basic weakness.",
-    "elderSign": "+1. If you have already failed a skill test this round, this token is +3 instead.",
+    "elderSign": "+1. If you have failed a skill test this round, this token is +3 instead.",
     "health": 7
   },
   "sthr-nobodybelieves": {
@@ -1242,8 +1242,8 @@
     "agiIcons": 1
   },
   "sthrelias": {
-    "text": "[reaction] When another investigator at your location would be dealt damage that is not direct damage: That damage is dealt to Elias Warde instead. (Limit once per round.)\n[reaction] After an enemy attack or Elias Warde's [reaction] ability deals damage to him: Place 1 Memory on Elias Warde. (Limit once per round, and 3 times per loop.)\n[elder] effect: +1. If there are 3 or more Memory on Elias Warde, this token is +3 instead, and heal 1 damage from Elias Warde.",
-    "elderSign": "+1. If there are 3 or more Memory on Elias Warde, this token is +3 instead, and heal 1 damage from Elias Warde.",
+    "text": "[reaction] When another investigator at your location would be dealt damage that is not direct damage: That damage is dealt to you instead. (Limit once per round.)\n[reaction] After you are dealt damage: Place 1 Memory on Elias Warde. (Limit three times per loop.)\n[elder] effect: +1. If there are 3 or more Memory on Elias Warde, this token is +3 instead, and heal 1 damage from you.",
+    "elderSign": "+1. If there are 3 or more Memory on Elias Warde, this token is +3 instead, and heal 1 damage from you.",
     "back_text": "Deck Size: 30.\nDeckbuilding Options: Guardian cards level 0–5, Neutral cards level 0–5, up to 5 Survivor cards level 0–2, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): The Ambergrove Lamp, I've Done This Before, The Eighth Grave, 1 random basic weakness."
   },
   "sthr-lexicon": {
@@ -1279,8 +1279,8 @@
     "agiIcons": 1
   },
   "sthrseraphine": {
-    "text": "[free] During your turn, raise Dissonance by 1: Choose one – You get +2 skill value for this skill test; or gain 1 additional action this turn; or ready a Spell asset you control. (Limit twice per round.)\n[reaction] After you resolve Seraphine Vale's [free] ability: Place 1 Memory on Seraphine Vale. (Limit once per round, and 3 times per loop.)\n[elder] effect: +X, where X is Dissonance (maximum +5). After this skill test ends, lower Dissonance by the amount this token added.",
-    "elderSign": "+X, where X is Dissonance (maximum +5). After this skill test ends, lower Dissonance by the amount this token added.",
+    "text": "[free] During your turn, raise Dissonance by 1: Choose one – +2 skill value for this test; gain 1 additional action; or ready a Spell asset you control. (Limit twice per round.)\n[reaction] After Dissonance is raised in the investigation phase: Place 1 Memory on Seraphine. (Limit three times per loop.)\n[elder] effect: +X, where X is Dissonance (maximum +3). After this test, lower Dissonance by that amount.",
+    "elderSign": "+X, where X is Dissonance (maximum +3). After this test, lower Dissonance by that amount.",
     "back_text": "Deck Size: 30.\nDeckbuilding Options: Mystic cards level 0–5, Neutral cards level 0–5, up to 5 Seeker cards level 0–2, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): The Bell of Ambergrove, I Remember the Ending, The Debt of Hours, 1 random basic weakness."
   },
   "sthr-lamp": {
