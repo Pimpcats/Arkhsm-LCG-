@@ -281,16 +281,14 @@ return function(R, T)
       end
     elseif card.id == "sthr-untranslatable" then
       local banked = R.state().memory or 0
-      local n2 = math.min((R.WHATIF or {}).untransMax or 5, math.max(1, math.ceil(banked / 2)))
+      local n2 = math.min((R.WHATIF or {}).untransMax or 5, 2 + math.floor(banked / 4))
       R.hurt(inv, 0, n2, "Untranslatable")
     elseif card.id == "sthr-debtofhours" then
       local band = R.band()
+      R.hurt(inv, 0, 2, "The Debt of Hours")
       if band == "Noticed" then
-        if R.stage() >= 3 then R.hurt(inv, 0, 2, "The Debt of Hours") else T.ctl("Appointed") ; R.touch() end
-      elseif band == "Glitch" then
-        R.hurt(inv, 0, 2, "The Debt of Hours")
-      else
-        R.hurt(inv, 0, 1, "The Debt of Hours")
+        if R.stage() < 3 then T.ctl("Appointed") ; R.touch() end
+      elseif band == "Calm" then
         R.raise(1, "The Debt of Hours")
       end
     elseif card.id == "sthr-nobodybelieves" then
