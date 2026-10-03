@@ -87,11 +87,6 @@ return function(R, T)
       costInv.raisedCost = (costInv.raisedCost or 0) + 1
     end
     m.diss_max = math.max(m.diss_max, after)
-    -- Seraphine: after Dissonance is raised during the investigation phase: 1 Memory
-    if n > 0 and R.G.phase == "investigation" then
-      local sera = R.invById("sthrseraphine")
-      if sera and not sera.defeated then R.P.memoryReaction(sera, "Seraphine: Dissonance raised in the investigation phase") end
-    end
     R.syncAppointedArrival()
     R.checkReset()
   end
@@ -568,8 +563,9 @@ return function(R, T)
     if hor > 0 then G.metrics.horror_by[src] = (G.metrics.horror_by[src] or 0) + hor end
     R.log("%s takes %d damage, %d horror (%s): %d/%d, %d/%d", inv.name, dmg, hor, source or "?",
       inv.damage, inv.health, inv.horror, inv.sanity)
-    -- Elias: after you are dealt damage: 1 Memory
+    -- Elias: after you are dealt damage: 1 Memory. Seraphine: after you are dealt horror: 1 Memory
     if inv.id == "sthrelias" and dealt.damage > 0 then R.P.memoryReaction(inv, "Elias: dealt damage") end
+    if inv.id == "sthrseraphine" and dealt.horror > 0 then R.P.memoryReaction(inv, "Seraphine: dealt horror") end
     -- Psychosis / Hypochondria
     if hor > 0 and inv.threat["Psychosis"] and not opts.fromWeakness then R.hurt(inv, 1, 0, "Psychosis", { direct = true, fromWeakness = true }) end
     if dmg > 0 and inv.threat["Hypochondria"] and not opts.fromWeakness then R.hurt(inv, 0, 1, "Hypochondria", { direct = true, fromWeakness = true }) end

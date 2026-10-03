@@ -346,10 +346,10 @@ for _,bank in ipairs({0,1,3,12}) do
   case("banked-memory weakness "..bank,function()
     local R,P,FX,AI,T,st,new=fixture();local i=new("sthrayako");st.memory=bank
     P.weakness(i,{id="sthr-untranslatable",name="Untranslatable"})
-    expect("banked-memory weakness ceiling/cap "..bank,i.horror==math.min(5,math.ceil(bank/2)))
+    expect("banked-memory weakness ceiling/cap "..bank,i.horror==math.min(5,math.max(1,math.ceil(bank/2))))
   end)
 end
-for _,spec in ipairs({{"Calm",0,1,0},{"Glitch",1,0,2},{"Noticed",2,0,0},{"Noticed",3,0,2}}) do
+for _,spec in ipairs({{"Calm",0,1,1},{"Glitch",1,0,2},{"Noticed",2,0,0},{"Noticed",3,0,2}}) do
   case("band weakness "..spec[1].."/"..spec[2],function()
     local R,P,FX,AI,T,st,new=fixture();local i=new("sthrseraphine");st.band=spec[1];st.stage=spec[2]
     P.weakness(i,{id="sthr-debtofhours",name="The Debt of Hours"})
@@ -391,7 +391,7 @@ case("investigator boost repeat through policy",function()
   R.G.turnOf=i;i.hand={{name="The Same Doorway Twice",type="Event",cost=1,traits="Recollection."}}
   local committed,boost=AI.prepareTest(i,"wil",8,3,{important=true})
   expect("Seraphine repeated skill ability supplies both +2 bonuses",boost==4)
-  expect("Seraphine repeated ability pays both costs and awards Memory for each of the three raises (limit 3 per loop)",st.dissonance==3 and i.round.sera==2 and i.cardMemory==3 and tally("raises",i.id)==3)
+  expect("Seraphine repeated ability takes 1 horror each time and awards Memory for each horror dealt",i.horror==2 and i.round.sera==2 and i.cardMemory==2 and st.dissonance==1)
 end)
 case("secret boost repeat through policy",function()
   local R,P,FX,AI,T,st,new=fixture();local i=new("sthrayako")

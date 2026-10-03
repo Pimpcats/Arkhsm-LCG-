@@ -24,7 +24,7 @@
     "subtitle": "The Translator", "class": "Seeker", "traits": "Scholar. Chronicler.",
     "wil": 3, "int": 5, "com": 1, "agi": 3, "health": 6, "sanity": 8,
     "signatures": [{ "sthr-lexicon": 1, "sthr-itmeanswait": 1, "sthr-untranslatable": 1 }],
-    "elderSign": "+2. Draw 1 card. If it is a Recollection, it costs 2 fewer resources to play until the end of the round."
+    "elderSign": "+2 (+3 if there are 2 or more Memory on Dr. Ayako Sōma). Draw 1 card. If it is a Recollection, it costs 2 fewer resources to play until the end of the round."
   },
   {
     "deck": 95015, "id": "sthr-lexicon", "type": "Asset", "name": "The Lexicon of the Hour",
@@ -65,7 +65,7 @@
     "subtitle": "The Medium", "class": "Mystic", "traits": "Sorcerer. Cursed.",
     "wil": 5, "int": 3, "com": 2, "agi": 2, "health": 6, "sanity": 8,
     "signatures": [{ "sthr-bell": 1, "sthr-rememberending": 1, "sthr-debtofhours": 1 }],
-    "elderSign": "+X, where X is Dissonance (maximum +3). After this test, lower Dissonance by that amount."
+    "elderSign": "+X, where X is the number of Memory on Seraphine (maximum +3)."
   },
   {
     "deck": 95023, "id": "sthr-bell", "type": "Asset", "name": "The Bell of Ambergrove",

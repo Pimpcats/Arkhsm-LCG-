@@ -146,6 +146,11 @@ doom and deck size are in `docs/design/CAMPAIGN_DESIGN_LESSONS.md` section 1):
 - player cards, signature weaknesses;
 - investigators: front, back with deckbuilding and a spoiler-free background
   story, and minicards.
+- **portable investigators** (docs/design/CAMPAIGN_DESIGN_LESSONS.md, guideline
+  13): strike every reference to the campaign's own trackers from each
+  investigator front and signature card; each ability and elder sign must
+  still do something and each weakness must still hurt. Record the result in
+  the audit.
 
 ## 6. Balance (simulate before the table)
 

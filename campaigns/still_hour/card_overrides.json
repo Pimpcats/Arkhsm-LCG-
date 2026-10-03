@@ -1193,8 +1193,8 @@
     "back_text": "Deck Size: 30.\nDeckbuilding Options: Rogue cards level 0–5, Neutral cards level 0–5, up to 5 cards of any other class at level 0, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): Marked Deck, Seen This Hand Before, The House Always Wins, 1 random basic weakness."
   },
   "sthrayako": {
-    "text": "[reaction] After you succeed at an [int] test: Place 1 Memory on Dr. Ayako Sōma. (Limit twice per loop.)\n[elder] effect: +2. Draw 1 card. If it is a Recollection, it costs 2 fewer resources to play until the end of the round.",
-    "elderSign": "+2. Draw 1 card. If it is a Recollection, it costs 2 fewer resources to play until the end of the round.",
+    "text": "[reaction] After you succeed at an [int] test: Place 1 Memory on Dr. Ayako Sōma. (Limit twice per loop.)\n[elder] effect: +2 (+3 if there are 2 or more Memory on Dr. Ayako Sōma). Draw 1 card. If it is a Recollection, it costs 2 fewer resources to play until the end of the round.",
+    "elderSign": "+2 (+3 if there are 2 or more Memory on Dr. Ayako Sōma). Draw 1 card. If it is a Recollection, it costs 2 fewer resources to play until the end of the round.",
     "back_text": "Deck Size: 30.\nDeckbuilding Options: Seeker cards level 0–5, Neutral cards level 0–5, up to 5 Mystic cards level 0–2, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): The Lexicon of the Hour, It Means 'Wait', Untranslatable, 1 random basic weakness.",
     "health": 6
   },
@@ -1217,7 +1217,7 @@
     "text": "Revelation – Take 1 horror. Until the end of the round, other investigators' card abilities cannot choose or affect you or cards you control, and other investigators cannot commit cards to your skill tests. If no other investigator is at your location, take 1 additional horror."
   },
   "sthr-debtofhours": {
-    "text": "Revelation – If Dissonance is in the Noticed band, advance The Appointed's Approach by 1 stage; if the Approach is already Arrived, take 2 horror instead. Otherwise, if Dissonance is in the Glitch band, take 2 horror. Otherwise, raise Dissonance by 1."
+    "text": "Revelation – If Dissonance is in the Noticed band, advance The Appointed's Approach by 1 stage; if the Approach is already Arrived, take 2 horror instead. Otherwise, if Dissonance is in the Glitch band, take 2 horror. Otherwise, take 1 horror and raise Dissonance by 1."
   },
   "sthr-foreknowledge": {
     "text": "Max 1 committed per skill test.\nWhen you commit Foreknowledge to a skill test, you may remove 1 Memory from a card you control. If you do, Foreknowledge gains [wild] for that test, and if that test succeeds, draw 1 card.",
@@ -1279,8 +1279,8 @@
     "agiIcons": 1
   },
   "sthrseraphine": {
-    "text": "[free] During your turn, raise Dissonance by 1: Choose one – +2 skill value for this test; gain 1 additional action; or ready a Spell asset you control. (Limit twice per round.)\n[reaction] After Dissonance is raised in the investigation phase: Place 1 Memory on Seraphine. (Limit three times per loop.)\n[elder] effect: +X, where X is Dissonance (maximum +3). After this test, lower Dissonance by that amount.",
-    "elderSign": "+X, where X is Dissonance (maximum +3). After this test, lower Dissonance by that amount.",
+    "text": "[free] During your turn, take 1 horror: Choose one – +2 skill value for this test; gain 1 additional action; or ready a Spell asset you control. (Limit twice per round.)\n[reaction] After you are dealt horror: Place 1 Memory on Seraphine. (Limit twice per loop.)\n[elder] effect: +X, where X is the number of Memory on Seraphine (maximum +3).",
+    "elderSign": "+X, where X is the number of Memory on Seraphine (maximum +3).",
     "back_text": "Deck Size: 30.\nDeckbuilding Options: Mystic cards level 0–5, Neutral cards level 0–5, up to 5 Seeker cards level 0–2, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): The Bell of Ambergrove, I Remember the Ending, The Debt of Hours, 1 random basic weakness."
   },
   "sthr-lamp": {
@@ -1383,7 +1383,7 @@
     "cost": "–"
   },
   "sthr-untranslatable": {
-    "text": "Revelation – Take horror equal to half the banked Memory, rounded up (maximum 5)."
+    "text": "Revelation – Take horror equal to half the banked Memory, rounded up (minimum 1, maximum 5)."
   },
   "sthr-anchorpoint": {
     "memoryCost": 4,

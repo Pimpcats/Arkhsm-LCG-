@@ -453,13 +453,11 @@ return function(R, T)
         end
       end
     end
-    -- Seraphine pays Dissonance only for a test that matters and would likely
-    -- fail, well below the next band, and never enough to lean on the loop
-    -- (3 payments in a loop cost a Year)
+    -- Seraphine takes horror only for a test that matters and would likely
+    -- fail, and never down to her last few points of sanity
     if cur < 0.5 and opts.important then
       for _, b in ipairs(boosts) do
-        if b.cost == "dissonance" and cur < target and R.dissonance() + 1 < R.consts().glitch - 1
-           and (inv.raisedCost or 0) < 2 then
+        if b.cost == "horror" and cur < target and inv.sanity - inv.horror >= 4 then
           local extra = b.pay() or 0 ; boost = boost + b.gain + extra ; cur = p()
         end
       end
@@ -570,8 +568,8 @@ return function(R, T)
     -- 1. engaged enemies: fight or evade any of them (the most dangerous or the
     -- easiest to remove scores best), not only the first to engage
     local eng = engagedWith(inv)
-    if inv.id == "sthrseraphine" and (inv.round.sera or 0) < 2 and R.dissonance()+1 < R.consts().glitch
-       and inv.actionsLeft <= 1 and act and (inv.raisedCost or 0) < 2 then
+    if inv.id == "sthrseraphine" and (inv.round.sera or 0) < 2 and inv.sanity - inv.horror >= 4
+       and inv.actionsLeft <= 1 and act then
       add(80,"ability",function() P.seraphine(inv,"action") end,{actions=0,provokes=false})
     end
     local worst, worstThreat = nil, -1

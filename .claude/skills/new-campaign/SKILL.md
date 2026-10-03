@@ -67,7 +67,9 @@ carry on from the recorded stage. Report the stage in one line, then work.
    changes (story results add/remove [cultist]/[tablet]/[elderthing]; Elder Sign
    and Auto-fail almost never), XP plan (Victory per investigator + resolution
    bonuses, 35–50 per investigator per campaign), difficulty and player-count
-   scaling. Confirm the win-rate curve with the owner (default: early scenarios
+   scaling. Investigators must be portable (lessons, guideline 13): their abilities,
+   elder signs and signature cards work in any campaign, with the campaign's own
+   trackers only as harmless bonus clauses. Confirm the win-rate curve with the owner (default: early scenarios
    80%, then 70 / 60 / 50, finale 40% at 3 players; never above 80%).
 5. **Content.** Cards in `campaigns/<id>/specs/` (cards_spec, encounter_spec,
    print_text), scenarios in `scenario_manifest.json` + `scenario_assignments.json`

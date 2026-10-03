@@ -197,6 +197,22 @@ Rules of thumb that follow from it:
     (Carcosa).
 12. **Optional mastery goals** (Drowned City achievements, Victory
     locations): reward thorough play without punishing a first play.
+13. **Investigators must work outside the campaign** (every official
+    campaign). New investigators fit the campaign's theme, but their
+    abilities, elder signs and signature cards use only core-game concepts
+    and tokens on their own cards, so they are playable in any campaign. A
+    campaign's own tracker (Dissonance, an hourglass, banked Memory, the
+    Campaign Log) may appear only as a bonus clause that fails harmlessly
+    ("if", "while") or as a cost that has a core-game fallback on the same
+    card, never as the only way the kit works. Campaign-flavoured player
+    cards (Recollections here) may lean on the tracker, but each still has a
+    usable base effect. Test: strike every reference to the campaign's
+    trackers from the investigator front and every signature card. Each
+    ability and elder sign must still do something useful and each weakness
+    must still hurt. Fix any that do not. The Still Hour's audit (2026-10-03)
+    found two investigators that failed (Seraphine's cost and elder sign ran
+    on Dissonance; Ayako's Memory had no use of its own) and two weaknesses
+    that went dead (Untranslatable, The Debt of Hours).
 
 ## 6. Pre-brief checklist
 
@@ -208,3 +224,4 @@ Rules of thumb that follow from it:
 - [ ] Encounter sets themed per scenario, 25–33 cards, about half skill tests
 - [ ] A difficulty ramp with the first scenario as the tutorial
 - [ ] Every new term checked against the Rules Reference in `library/rules/`
+- [ ] Portability test passed for every investigator and signature card (guideline 13)
