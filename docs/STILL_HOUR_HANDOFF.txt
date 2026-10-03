@@ -15,9 +15,9 @@ Applied four supported clue-cost adjustments, rebuilt 200 card images and the 24
 Preserved alternate outcomes and the campaign’s branching structure.
 
 VERIFICATION
-Full suite (2026-10-02, final build): 124 tests passed, 2 skipped (the optional render test, and the other-campaign check that runs only when another campaign is selected), 155 subtests passed.
+Full suite (2026-10-03, final build): 124 tests passed, 2 skipped (the optional render test, and the other-campaign check that runs only when another campaign is selected), 155 subtests passed.
 Lua 5.2 and 5.4: 309 live rules checks each, the bundle check and the Control token check, all passing on the published build.
-Every card face passes the print audit (no hidden, covered, colliding or clipped text). 20 dense player and enemy cards still print their rules between 20 and 24 px against the official 31; none is cut off.
+Every card face passes the print audit (no hidden, covered, colliding or clipped text). Two dense cards (Who Walks Beside You, Parish Register) print their rules at 24 px against the official 31; none is cut off, and every investigator front prints at 25 px or more.
 All 200 hosted images in the saved object resolve; they are pinned to an immutable commit.
 The in-game test (Start TTS Relay.bat) now loads the exact saved object you play and checks the update path for a campaign in progress; it passes in the emulator and has not run on the owner's PC.
 Card art is complete. Three independent reviews and eight further audits were completed within their recorded scopes (docs/design/review/, docs/design/CURRENT_CAMPAIGN_AUDIT.md).
@@ -61,3 +61,5 @@ Raw measurements, archived inputs and reproducibility limits: docs/design/verifi
 Godot procedure: docs/GODOT_TABLE.md. It renders emulator snapshots; it is not the native TTS game.
 Earlier balance reports are historical. Preliminary invalid simulation measurements have been withdrawn.
 Keep the immutable image commits in history; do not squash or rebase them.
+
+Experience by party (2026-10-03, 20 whole campaigns each, three investigators): 38.8 to 42.6 Memory banked per investigator across five parties (official campaigns give 35-45 XP); the lowest party was 36 before each investigator's Memory trigger was made to reach its cap equally often.

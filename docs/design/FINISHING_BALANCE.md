@@ -122,3 +122,7 @@ The candidate can proceed to live relay and human playtesting. The target curve 
 ## Evidence
 
 The correction ledger links the three independent reviews. `verification/2026-10-02/` contains `balance-summary.json`, 70 full-cell raw results and seeds in `release-results.tar.gz`, the exact owned inputs in `release-inputs.tar.gz`, and 400 proposal trials plus matching earlier inputs in `proposal-results.tar.gz` / `paired-inputs.tar.gz`. The README records reproduction and exclusions. Godot renders and card/PDF proofs establish packaging/rendering, not TTS physics or human balance.
+
+## Experience by party (2026-10-03)
+
+Whole carried campaigns, three investigators, 20 campaigns per party, Memory banked per investigator (mean, range): Elias/Ayako/Cass 39.0 (32.7–44.3); Birdie/Cass/Seraphine 40.1 (34.0–46.3); Elias/Birdie/Seraphine 38.8 (32.0–50.7); Ayako/Elias/Seraphine 42.6 (35.7–47.0); Ayako/Birdie/Cass 40.1 (33.0–48.7). The spread between parties is 3.8, inside the official 35–45 band. Before the change the Elias/Birdie/Seraphine party earned 36. Each investigator's own Memory reaction now has no per-round limit and a per-loop cap (twice for Ayako and Cass, three times for the others); Elias gains Memory whenever he is dealt damage, Seraphine whenever Dissonance is raised in the investigation phase, and her elder sign is capped at +3.
