@@ -27,7 +27,7 @@ __modules["StillHour/Constants"] = function()
 -- Rules encoded:
 --   reset threshold R  = 8 x investigators   (Dissonance hits R -> loop resets)
 --   Appointed Arrived  = floor(2R / 3)       (Noticed band; the Appointed arrives)
---   Memory soft cap    = 6 x investigators
+--   Memory cap         = 10 x investigators (applied after spending)
 --   contest target     = 6, 5 solo, 7 at four (finale; was 4 x investigators, CO-001)
 --   scar cap           = 2 x investigators    (start-of-loop Dissonance ceiling; 4 solo)
 --   bands              = thirds of R: Calm / Glitch / Noticed
@@ -970,7 +970,7 @@ local Hourglass = {}
 Hourglass.HOUR_NAMES = {
   [1] = "First Dark",
   [2] = "Low Water",
-  [3] = "The Thirteenth Toll",
+  [3] = "The Bell Counts",
   [4] = "The Road Gives Way",
   [5] = "The Streets Empty",
   [6] = "The Wrong Sky",
@@ -1056,7 +1056,13 @@ local HOUR_HANDLERS = {
       amount = 2
     end
     raiseDissonance(ctx, amount)
-    return string.format("Raise Dissonance by %d.", amount)
+    local msg = string.format("Raised Dissonance by %d.", amount)
+    if not (ctx and ctx.anyoneAtChurch) then
+      -- the Control does not look at the table for these two: the players do
+      msg = msg .. " By hand: if an investigator is at a Church location and your Campaign Log does not"
+        .. " record The Thirteenth Toll, click Dissonance once more. Reveal The Belfry now if it is in play."
+    end
+    return msg
   end,
 
   [4] = function(ctx)
@@ -1071,6 +1077,9 @@ local HOUR_HANDLERS = {
 
   [5] = function(ctx)
     advanceAppointed(ctx, 1)  -- Hour V -> at least Sensed
+    if CampaignState.inPrologue() then
+      return "The streets empty. (There is no Appointed in the Prologue.)"
+    end
     if CampaignState.band() ~= Constants.BAND_CALM then
       if ctx and ctx.awakenSleepwalkingEchoes then
         ctx.awakenSleepwalkingEchoes()
@@ -1098,6 +1107,9 @@ local HOUR_HANDLERS = {
 
   [7] = function(ctx)
     advanceAppointed(ctx, 2)  -- Hour VII -> at least Emerging
+    if CampaignState.inPrologue() then
+      return "The guest approaches. (There is no Appointed in the Prologue.)"
+    end
     return "The guest approaches. The Appointed is Emerging"
       .. (CampaignState.knows("the-appointeds-name") and ". Exhaust the Appointed." or ".")
   end,
@@ -1106,6 +1118,9 @@ local HOUR_HANDLERS = {
     raiseDissonance(ctx, 2)
     advanceAppointed(ctx, 3)  -- Hour VIII -> Arrived
     if ctx and ctx.enemiesGetFightBonus then ctx.enemiesGetFightBonus(1) end
+    if CampaignState.inPrologue() then
+      return "Almost. Raised Dissonance by 2; each enemy gets +1 fight until the end of the Prologue. (There is no Appointed in the Prologue.)"
+    end
     return "Almost. Raise Dissonance by 2; each enemy gets +1 fight until the end of the loop; the Appointed has Arrived."
   end,
 
@@ -1197,7 +1212,8 @@ __modules["StillHour/Aging"] = function()
 -- Years gained this loop, per investigator:
 --   +1 base (the night always takes something)
 --   +1 if defeated during the loop
---   +1 if the loop ended at the danger threshold or higher (Dissonance >= 4x inv)
+--   +1 if the loop ended in the Noticed band or higher (Dissonance >= two thirds of the
+--      reset: 16 at three investigators, Constants.forCount(n).appointedThreshold)
 --   +1 if they leaned on the loop (raised Dissonance 3+ times OR spent 4+ Memory)
 --
 -- Brackets (checked at each interlude; higher bracket REPLACES lower — no stacking):
@@ -2025,6 +2041,20 @@ Interlude.RECOLLECTION_COST = {
   ["sthr-hourlearnedname"]    = 5,
 }
 
+-- Their card names, for the panel when the Player Cards bag is not on the table.
+Interlude.RECOLLECTION_NAME = {
+  ["sthr-foreknowledge"]      = "Foreknowledge",
+  ["sthr-dejavu"]             = "The Same Doorway Twice",
+  ["sthr-musclememory"]       = "Muscle Memory",
+  ["sthr-rehearsedescape"]    = "Rehearsed Escape",
+  ["sthr-longwayround"]       = "The Long Way Round",
+  ["sthr-borrowedtime"]       = "Stolen Minute",
+  ["sthr-thistimeforsure"]    = "This Time For Sure",
+  ["sthr-anchorpoint"]        = "Anchor Point",
+  ["sthr-cassandrasnotebook"] = "Cassandra's Notebook",
+  ["sthr-hourlearnedname"]    = "The Hour I Learned Your Name",
+}
+
 --------------------------------------------------------------------- aging --
 
 --- Age one investigator this interlude. `cond` = {defeated, endedInDanger,
@@ -2365,7 +2395,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/13d87b8e62b7501eef77592afbffff1b20e7299c/dist/cards/sthr-static-token.jpg?v=a556271511"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/sthr-static-token.jpg?v=a556271511"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -3602,6 +3632,7 @@ local recollectionList = nil    -- cached {id, name, cost} for the buy panel
 local investigatorList = {}     -- cached Board.investigators() for the row buttons
 local aging = {}                -- investigatorId -> interlude aging inputs {defeated, physical, mental, aged}
 local saveSeq = 0               -- bumps on every change; newest copy wins (control vs campaign log)
+local beginWarned = false       -- Begin Next Loop already told the table what is outstanding
 
 -------------------------------------------------------------- board contexts --
 
@@ -3706,6 +3737,9 @@ local function changeDissonance(delta)
     if info.reachedReset then announceResetReached() end
   else
     Dissonance.reduce(-delta, bag)
+    if bandBefore ~= Constants.BAND_CALM and CampaignState.band() == Constants.BAND_CALM then
+      announce("Dissonance returns to Calm: Echoes fall asleep again (Sleepwalking).")
+    end
   end
 end
 
@@ -4081,7 +4115,7 @@ local function readRecollections()
   local ids = {}
   for id in pairs(Interlude.RECOLLECTION_COST) do ids[#ids + 1] = id end
   table.sort(ids)
-  for _, id in ipairs(ids) do consider(id, id, nil) end
+  for _, id in ipairs(ids) do consider(id, Interlude.RECOLLECTION_NAME[id] or id, nil) end
   table.sort(list, function(a, b) return a.name < b.name end)
   return list
 end
@@ -4089,12 +4123,15 @@ end
 local function buyRecollection(id)
   local ok = Interlude.buyRecollection(id)
   local cost = Interlude.recollectionCost(id)
-  local name = id
+  local name = Interlude.RECOLLECTION_NAME[id] or id
   for _, r in ipairs(recollectionList or {}) do if r.id == id then name = r.name end end
   if ok then
     announce(string.format("Bought %s for %d Memory (%d banked).", name, cost, CampaignState.getBankedMemory()))
+  elseif cost == nil then
+    announce("Cannot buy " .. tostring(name) .. ": it is not a Recollection.")
   else
-    note("Cannot buy " .. tostring(id) .. " (unknown, or not enough Memory).")
+    announce(string.format("Cannot buy %s: not enough Memory (%d needed, %d banked).", name, cost,
+      CampaignState.getBankedMemory()))
   end
   return ok
 end
@@ -4110,9 +4147,48 @@ local function buyLevel(level)
   return ok
 end
 
-local function beginNextLoop()
+--- What the interlude has not done yet (empty list: nothing outstanding).
+local function outstandingInterlude()
+  local out = {}
+  local listed = guarded("investigators", Board.investigators) or {}
+  if CampaignState.getLoopsCompleted() > 0 then
+    local names = {}
+    for _, inv in ipairs(listed) do
+      local a = aging[inv.id]
+      if not (a and a.aged) and CampaignState.getYears(inv.id) < Constants.AGE_OUT_YEARS then
+        local p = CampaignState.getPendingYears(inv.id)
+        names[#names + 1] = inv.name .. (p > 0 and string.format(" (%d Year(s) pending)", p) or "")
+      end
+    end
+    if #names > 0 then
+      out[#out + 1] = "Age has not been clicked for " .. table.concat(names, ", ") .. ", so the Years are not applied."
+    end
+  end
+  local onCard = 0
+  for _, n in pairs(CampaignState.onCardMemoryMap()) do onCard = onCard + n end
+  if onCard > 0 then
+    out[#out + 1] = string.format("%d Memory is still on investigators' cards: click Bank on-card Memory first,"
+      .. " or it will be banked again next loop.", onCard)
+  end
+  return out
+end
+
+--- force: start the night without the check (the runner API).
+local function beginNextLoop(force)
+  if mode == "interlude" and not force and not beginWarned then
+    local out = outstandingInterlude()
+    if #out > 0 then
+      beginWarned = true
+      announce("Not everything in the interlude is done. " .. table.concat(out, " ")
+        .. " Click Begin Next Loop again to start the night anyway.", { 1, 0.7, 0.4 })
+      return false
+    end
+  end
+  beginWarned = false
   checkPartTwo()
+  local before = CampaignState.getBankedMemory()
   Interlude.beginNextLoop(inPlaySet())
+  local lost = math.max(0, before - CampaignState.getBankedMemory())
   -- Part II with both Almanac entries: act 2a is current from the Almanac
   -- House's Place this loop (the Sealed Study opens)
   Locations.markAlmanacActTwoCurrent()
@@ -4121,7 +4197,9 @@ local function beginNextLoop()
   aging = {}
   mode = "play"
   guarded("aging", Board.refreshInvestigators, true)
-  announce("A new night begins. Memory capped at " .. CampaignState.constants().memoryCap .. ".")
+  announce(string.format("A new night begins. Memory capped at %d; %d lost.",
+    CampaignState.constants().memoryCap, lost))
+  return true
 end
 
 ----------------------------------------------------- investigators / Aging --
@@ -4165,16 +4243,39 @@ local function ageInvestigator(id)
   end
   local a = agingFor(id)
   if a.aged then return nil end
+  local name = id
+  for _, inv in ipairs(investigatorList) do if inv.id == id then name = inv.name end end
+  -- the first time an investigator enters Weathered or later, a skill choice
+  -- is locked in: ask for it before applying anything
+  local gain = Aging.computeYearsGained({ defeated = a.defeated, endedInDanger = Interlude.loopEndedInDanger(),
+    leanedOnLoop = Interlude.leanedOnLoop(id) }) + CampaignState.getPendingYears(id)
+  local nextBracket = Aging.bracketForYears(CampaignState.getYears(id) + gain)
+  if nextBracket ~= Aging.PRIME and Aging.needsChoice and not (CampaignState.getBracket(id) or {}).physical
+      and not a.confirmed then
+    a.confirmed = true
+    announce(string.format("%s will reach %s. Choose which skill to lower and raise first (the -%s and +%s buttons"
+      .. " on their row; they lock once applied), then press Age again.", name, nextBracket, a.physical, a.mental))
+    return nil
+  end
   local r = Interlude.age(id, { defeated = a.defeated, endedInDanger = Interlude.loopEndedInDanger(),
     extraYears = CampaignState.getPendingYears(id) },
     { physical = a.physical, mental = a.mental })
   CampaignState.clearPendingYears(id)
   a.aged = r.yearsGained
+  a.confirmed = nil
   guarded("aging", Board.refreshInvestigators, true)
-  local name = id
-  for _, inv in ipairs(investigatorList) do if inv.id == id then name = inv.name end end
-  announce(string.format("%s ages %d year(s): %d (%s)%s", name, r.yearsGained, r.years, r.bracket,
-    r.agedOut and " — aged out of the campaign" or ""))
+  local detail = ""
+  if r.bracketChanged and r.drift then
+    local d, parts = r.drift, {}
+    if d.physicalSkill then parts[#parts + 1] = string.format("%d %s", d.skillDeltas.physical, d.physicalSkill) end
+    if d.mentalSkill then parts[#parts + 1] = string.format("+%d %s", d.skillDeltas.mental, d.mentalSkill) end
+    if d.maxHealthDelta ~= 0 then parts[#parts + 1] = string.format("%d maximum health", d.maxHealthDelta) end
+    if d.maxSanityDelta ~= 0 then parts[#parts + 1] = string.format("%d maximum sanity", d.maxSanityDelta) end
+    if d.startLoopMemory > 0 then parts[#parts + 1] = "begins each loop with 1 Memory" end
+    if #parts > 0 then detail = " Now: " .. table.concat(parts, ", ") .. "." end
+  end
+  announce(string.format("%s ages %d year(s): %d (%s)%s%s", name, r.yearsGained, r.years, r.bracket,
+    r.agedOut and " — aged out of the campaign" or "", detail))
   return r
 end
 
@@ -4225,8 +4326,8 @@ local function drawPlay()
   button("shClickDissonance", string.format("Dissonance %d / %d · %s", CampaignState.getDissonance(),
     c.resetThreshold, CampaignState.band()), -PAIR_X, -1.1, 1000, "Left-click raise · Right-click reduce")
   local d = bag.describe()
-  button("shClickStatic", string.format("[static] %d (%s)", d.target, d.mode), PAIR_X, -1.1, 1000,
-    "Static tokens the bag holds (band + temporary). Left-click: a card adds one for a time. Right-click: remove a temporary one.")
+  button("shClickStatic", string.format("[static] %d", d.target), PAIR_X, -1.1, 1000,
+    "Static tokens the bag holds (band + temporary; bag mode: " .. tostring(d.mode) .. "). Left-click: a card adds one for a time. Right-click: remove a temporary one.")
   local h = CampaignState.getHour()
   button("shClickHour", string.format("Hour %d · %s", h, Hourglass.HOUR_NAMES[h] or "?"), -PAIR_X, -0.5, 1000,
     "Left-click advance (resolves the Hour) · Right-click rewind")
@@ -4246,6 +4347,13 @@ local function drawPlay()
   button("shReset", "Reset Loop", -ROW3_X, 2.0)
   button("shOpenInterlude", "Interlude", 0.0, 2.0, 620, "Spend Memory: Recollections and level-ups.")
   button("shKnowledgeStatus", "Knowledge", ROW3_X, 2.0)
+  if CampaignState.inPrologue() then
+    local n = c.investigators
+    button("shPrologueReward", string.format("Prologue reward +%d", 2 * n), 0.0, 2.6, 620,
+      string.format("Every Prologue ending: each investigator gains 2 banked Memory (%d at %d investigators). Click once. "
+        .. "For the ending where you advanced The First Hour, also click Memory once for the party's extra 1. "
+        .. "Right-click takes the reward back.", 2 * n, n), 85)
+  end
   if CampaignState.inFinale() then
     button("shClickContest", string.format("Contest %d / %d", CampaignState.getContest(), c.contestTarget),
       0.0, 2.6, 620, "The Last Hour: contest progress. " .. PLUS_MINUS
@@ -4313,9 +4421,9 @@ local function drawInterlude()
     button("shNoop", string.format("%s · Years %d · %s", inv.name, yrs, Aging.bracketForYears(yrs)),
       X - 0.75, zi, 1000, "", 80)
     local t = CampaignState.getTallies(inv.id)
-    button("shTalRaised" .. i, "Raised " .. t.raises, X + 0.85, zi, 380,
+    button("shTalRaised" .. i, "Dissonance raised " .. t.raises, X + 1.45, zi, 560,
       "Times this investigator paid 'raise Dissonance' as a cost this loop (3+ = leaned). " .. PLUS_MINUS, 70)
-    button("shTalSpent" .. i, "Spent " .. t.spent, X + 1.75, zi, 380,
+    button("shTalSpent" .. i, "Loop-power Memory " .. t.spent, X + 2.75, zi, 560,
       "Memory this investigator removed from their own cards for their own cards or abilities this loop (4+ = leaned). " .. PLUS_MINUS, 70)
     local locked = (CampaignState.getBracket(inv.id) or {}).physical ~= nil
     button("shAgeDef" .. i, "Defeated: " .. (a.defeated and "yes" or "no"), X - 1.45, zi + 0.42, 330, "", 70)
@@ -4373,6 +4481,29 @@ end
 function shNoop() end
 
 function shClickMemory(_, _, alt) guarded("memory", changeMemory, alt and -1 or 1) ; refreshControl() end
+-- the Prologue's reward in one click: 2 banked Memory per investigator, once
+local PROLOGUE_REWARD_FLAG = "prologue-reward"
+function shPrologueReward(_, _, alt)
+  guarded("prologue reward", function()
+    if not CampaignState.inPrologue() then return end
+    local n = CampaignState.constants().investigators
+    local flags = CampaignState.raw().oncePerLoopFlags
+    if alt then
+      if flags[PROLOGUE_REWARD_FLAG] then
+        flags[PROLOGUE_REWARD_FLAG] = nil
+        CampaignState.bankMemory(-2 * n)
+        announce(string.format("Prologue reward taken back (%d banked).", CampaignState.getBankedMemory()))
+      end
+    elseif CampaignState.setFlag(PROLOGUE_REWARD_FLAG) then
+      CampaignState.bankMemory(2 * n)
+      announce(string.format("Prologue reward: +%d banked Memory (%d banked). If you advanced The First Hour, "
+        .. "also click Memory once for the party's extra 1.", 2 * n, CampaignState.getBankedMemory()))
+    else
+      announce("The Prologue's reward has already been banked (right-click to take it back).")
+    end
+  end)
+  refreshControl()
+end
 function shClickInvestigators(_, _, alt) guarded("investigators", changeInvestigators, alt and -1 or 1) ; afterChange() end
 function shClickDissonance(_, _, alt) guarded("dissonance", changeDissonance, alt and -1 or 1) ; afterChange() end
 function shApiResolveStatic(p)
@@ -4537,9 +4668,9 @@ local function undoHourSix()
 end
 function shUndoHourSix() guarded("hour VI", undoHourSix) ; afterChange() end
 
-function shOpenInterlude() mode = "interlude" ; refreshControl() end
+function shOpenInterlude() mode = "interlude" ; beginWarned = false ; refreshControl() end
 function shCloseInterlude() mode = "play" ; refreshControl() end
-function shBeginNextLoop() guarded("next loop", beginNextLoop) ; afterChange() end
+function shBeginNextLoop() guarded("next loop", beginNextLoop, false) ; afterChange() end
 
 local function buyRecAt(i)
   local r = recollectionList and recollectionList[i]
@@ -4753,6 +4884,7 @@ function shApiAge(p)
   a.defeated = p.defeated and true or nil
   if p.physical then a.physical = p.physical end
   if p.mental then a.mental = p.mental end
+  if p.physical or p.mental then a.confirmed = true end   -- the caller chose the skills
   local r = guarded("age", ageInvestigator, p.id)
   afterChange()
   return r and { years = r.years, bracket = r.bracket, gained = r.yearsGained } or nil
@@ -4808,7 +4940,8 @@ function shApiBuy(p)
   refreshControl()
   return { ok = ok == true, memory = CampaignState.getBankedMemory() }
 end
-function shApiBeginNextLoop() guarded("next loop", beginNextLoop) ; afterChange() ; return shApiState() end
+-- p = {guard = true}: ask first, like the button (the default starts the night)
+function shApiBeginNextLoop(p) guarded("next loop", beginNextLoop, not (p and p.guard)) ; afterChange() ; return shApiState() end
 
 ------------------------------------------------------------------ console --
 
