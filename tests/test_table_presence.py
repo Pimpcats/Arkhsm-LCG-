@@ -575,24 +575,29 @@ end
 Wait.frames(function()
   local inside = #box.getObjects()
   out.placed1 = box.call("buttonClick_place")
-  out.onTable1 = count("StillHourLoop")
-  -- play: draw a card off the placed deck and leave it on the table
-  for _, o in ipairs(getObjects()) do
-    if o.type == "Deck" and o.hasTag("StillHourLoop") then
-      local c = o.takeObject({ index = 0, position = { 5, 2, 5 } })
-      out.drawnTagged = c.hasTag("StillHourLoop")
-      break
-    end
-  end
-  out.recalled = box.call("buttonClick_recall")
-  -- TTS removes destroyed objects at the end of the frame: look next frame
+  -- the box lays its objects out one at a time over the next frames
   Wait.frames(function()
-    out.onTable2 = count("StillHourLoop")
-    out.boxKept = #box.getObjects() == inside
-    out.placed2 = box.call("buttonClick_place")
-    out.onTable3 = count("StillHourLoop")
-    print("@@OUT " .. JSON.encode(out))
-  end, 1)
+    out.onTable1 = count("StillHourLoop")
+    -- play: draw a card off the placed deck and leave it on the table
+    for _, o in ipairs(getObjects()) do
+      if o.type == "Deck" and o.hasTag("StillHourLoop") then
+        local c = o.takeObject({ index = 0, position = { 5, 2, 5 } })
+        out.drawnTagged = c.hasTag("StillHourLoop")
+        break
+      end
+    end
+    out.recalled = box.call("buttonClick_recall")
+    -- TTS removes destroyed objects at the end of the frame: look next frame
+    Wait.frames(function()
+      out.onTable2 = count("StillHourLoop")
+      out.boxKept = #box.getObjects() == inside
+      out.placed2 = box.call("buttonClick_place")
+      Wait.frames(function()
+        out.onTable3 = count("StillHourLoop")
+        print("@@OUT " .. JSON.encode(out))
+      end, 400)
+    end, 1)
+  end, 400)
 end, 10)
 """
 

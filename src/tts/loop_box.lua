@@ -80,34 +80,73 @@ local function prepare(data, tags)
   return data
 end
 
+--- Written to the Lua log (Player.log) before the step it names runs, so a
+-- crash in Tabletop Simulator leaves the failing step behind.
+local function trace(msg)
+  log("StillHour box '" .. tostring(self.getName()) .. "': " .. msg)
+end
+
+local placing = false
+
+--- Lay the box out: ONE object every few frames, each announced in the log
+-- before it is spawned, then the board sync (the Control token's own staged
+-- steps). Returns how many objects will be placed; they land over the next
+-- second or so.
 function buttonClick_place()
-  local placed = 0
+  if placing then
+    broadcastToAll(self.getName() .. ": still placing, wait a moment.", { 0.95, 0.85, 0.6 })
+    return 0
+  end
   local tags = { LOOP_TAG, boxTag() }
+  trace("Place pressed")
+  local list = {}
   for _, od in ipairs(self.getData().ContainedObjects or {}) do
+    if memoryList[od.GUID] then list[#list + 1] = od end
+  end
+  trace("read " .. #list .. " object(s) to place")
+  if #list == 0 then
+    broadcastToAll(self.getName() .. ": nothing to place.", { 0.95, 0.85, 0.6 })
+    return 0
+  end
+  placing = true
+  local placed = 0
+  local function finish()
+    placing = false
+    trace("spawned " .. placed)
+    broadcastToAll(self.getName() .. ": " .. placed .. " object(s) placed.", { 0.95, 0.85, 0.6 })
+    -- once the cards have landed, let the control token apply the log's
+    -- Knowledge to them (location sides, sealed locations, the Appointed),
+    -- one announced step at a time
+    Wait.time(function()
+      local ok, objs = pcall(getObjectsWithTag, "StillHour")
+      for _, o in ipairs(ok and objs or {}) do
+        if tostring(o.getName()):find("Control", 1, true) then
+          trace("starting the board sync")
+          pcall(function()
+            if not o.call("shApiSyncBoardStaged") then o.call("shApiSyncBoard") end
+          end)
+        end
+      end
+    end, 2)
+  end
+  local function spawnOne(i)
+    local od = list[i]
+    if not od then return finish() end
     local entry = memoryList[od.GUID]
-    if entry then
+    local name = tostring(od.Nickname or od.Name)
+    trace(string.format("spawning %d/%d %s", i, #list, name))
+    broadcastToAll(string.format("Placing %d/%d: %s", i, #list, name), { 0.7, 0.7, 0.7 })
+    local ok, err = pcall(function()
       local data = prepare(JSON.decode(JSON.encode(od)), tags)
       data.Locked = entry.lock and true or false
       local obj = spawnObjectData({ data = data, position = entry.pos, rotation = entry.rot })
       if obj then placed = placed + 1 end
-    end
+    end)
+    if not ok then trace("spawn failed: " .. tostring(err)) end
+    Wait.frames(function() spawnOne(i + 1) end, 8)
   end
-  if placed > 0 then
-    broadcastToAll(self.getName() .. ": " .. placed .. " object(s) placed.", { 0.95, 0.85, 0.6 })
-    -- once the cards have landed, let the control token apply the log's
-    -- Knowledge to them (location sides, sealed locations, the Appointed)
-    Wait.time(function()
-      local ok, list = pcall(getObjectsWithTag, "StillHour")
-      for _, o in ipairs(ok and list or {}) do
-        if tostring(o.getName()):find("Control", 1, true) then
-          pcall(function() o.call("shApiSyncBoard") end)
-        end
-      end
-    end, 2)
-  else
-    broadcastToAll(self.getName() .. ": nothing to place.", { 0.95, 0.85, 0.6 })
-  end
-  return placed
+  Wait.frames(function() spawnOne(1) end, 5)
+  return #list
 end
 
 function buttonClick_recall()

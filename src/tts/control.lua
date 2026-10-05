@@ -1316,6 +1316,34 @@ function shApiHoldBack() local s = guarded("hold back", holdBack) ; afterChange(
 function shApiHunt() local m = guarded("hunt", hunt) ; afterChange() ; return m end
 function shApiReset() guarded("reset", resetLoop) ; afterChange() ; return shApiState() end
 function shApiSyncBoard() return shSyncBoard() end
+--- The board sync that follows a box's Place, one step per few frames, each
+-- step announced in the chat and the log BEFORE it runs, so a crash in real
+-- Tabletop Simulator leaves the failing step on screen and in Player.log.
+function shApiSyncBoardStaged()
+  local steps = {
+    { "locations", function() Board.syncLocations() end },
+    { "the Appointed", function() Board.syncAppointed({ log = hourLog, applyStats = true }) end },
+    { "investigators", function() Board.refreshInvestigators(true) end },
+    { "chaos bag", function() Dissonance.syncBag(bag) end },
+    { "control panel", function() refreshControl() end },
+  }
+  local function run(i)
+    local step = steps[i]
+    if not step then
+      note("Board synced.")
+      return
+    end
+    local msg = string.format("Board sync %d/%d: %s", i, #steps, step[1])
+    log(msg)
+    broadcastToAll(msg, { 0.7, 0.7, 0.7 })
+    Wait.frames(function()
+      guarded(step[1], step[2])
+      Wait.frames(function() run(i + 1) end, 20)
+    end, 10)
+  end
+  run(1)
+  return true
+end
 function shApiUnlockFact(p) local r = unlockFact(p and p.id) ; guarded("chaos bag", refreshBag) ; refreshControl() ; return r end
 --- A Campaign Log Knowledge box un-ticked: p = {id}
 function shApiForgetFact(p) local r = forgetFact(p and p.id) ; guarded("chaos bag", refreshBag) ; refreshControl() ; return r end
