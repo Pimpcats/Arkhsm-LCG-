@@ -73,3 +73,5 @@ Open defect: the owner's game crashed in TTS on pressing Place on the first scen
 Not run since the investigator changes: the whole-campaign difficulty recheck (30 campaigns Elias/Ayako/Cass, 20 Birdie/Cass/Seraphine; script scratchpad/fin/carried2.py) and the experience-by-party re-measure (scratchpad/fin/xp2.sh). Last measured on the published build: experience per investigator 38.8-42.6 across five parties; mean win rate 59% against a 60% target.
 Still owner-side: run Start TTS Relay.bat, play the Prologue and Night 1. Nothing has been played by a person yet.
 Housekeeping done: all agent worktrees and their branches removed.
+
+UPDATE 2026-10-05 (later): full fronts for Elias, Ayako, Birdie and Seraphine are drafted in docs/design/PORTABLE_INVESTIGATORS.md (Revision 2) and checked against the official investigators; Seraphine's elder sign was changed because the first one matched Agnes Baker's. Awaiting owner approval; nothing is in the cards or engine, and the branch is still unpublished.

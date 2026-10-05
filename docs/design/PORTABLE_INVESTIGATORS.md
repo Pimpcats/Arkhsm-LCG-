@@ -9,7 +9,40 @@ Hours, loops, Recollections or Campaign Log. They then work in any campaign.
 The campaign flavour moves to one **personal quest card** per investigator,
 unlocked in this campaign only.
 
-## Investigator fronts
+## Revision 2 (2026-10-05): proposed fronts, awaiting owner approval
+
+Owner direction applied: keep Cass; Seraphine once per round; no once-per-game
+abilities; every ability and elder sign unique against the official
+investigators (checked against library/cards/player/*/investigators.md) and
+independent of card level (deckbuilding stays level 0–5). Elias, Ayako and
+Birdie are new designs; the first-proposal fronts below are superseded.
+Tokens are named on the investigator's own card, so nothing needs the campaign.
+
+- **Elias Warde (Guardian).** [reaction] When damage would be dealt to you or another investigator at your location: Discard up to 3 cards from the top of your deck. Prevent 1 of that damage for each card discarded. (Limit once per round.) Elder: +1. You may discard the top 2 cards of your deck. If you do, this token is +3 instead and heal 1 damage from an investigator at your location.
+- **Dr. Ayako Sōma (Seeker).** [reaction] After you succeed at a skill test by 2 or more while an enemy is at your location: Place 1 translation token on an enemy at your location. (Limit once per round.) While attacking or evading an enemy that has 1 or more translation tokens, you may use your [intellect] in place of your [combat] or [agility]. Elder: +2. Place 1 translation token on an enemy at your location; if there is none, draw 1 card.
+- **Cass Lindqvist (Rogue), unchanged from the first proposal.** [free] Spend 2 resources: name a symbol token (not auto-fail); the next time you reveal it this round, cancel it (once per round). [reaction] After you reveal a symbol token: gain 1 resource (once per round). Elder: +1, gain 2 resources.
+- **"Birdie" Okonkwo (Survivor).** [reaction] After you fail a skill test: Place 1 resolve on Birdie. (Limit twice per round.) [free] During your turn, remove 2 resolve from Birdie: Return an event from your discard pile to your hand. (Limit once per round.) Elder: +1. If you have failed a skill test this round, this token is +3 instead.
+- **Seraphine Vale (Mystic).** [free] During your turn, take 1 horror: choose one – +2 skill value for this test; gain 1 additional action; or ready a Spell asset you control. (Limit once per round.) Elder: +2. You may take 1 horror. If you do, ready a Spell asset you control. (The first proposal's "+X, X = horror on you" is dropped: it is Agnes Baker's official elder sign.)
+
+Official overlap check, by ability:
+
+| Ability | Closest official | Why it is distinct |
+|---|---|---|
+| Elias, deck discarded to prevent damage | Survivors who may be assigned damage meant for allies or others | No official investigator spends deck cards to prevent damage; his ability prevents, theirs reassigns |
+| Ayako, translation tokens and [intellect] for attack/evade | Survivor that seals bless/curse on an evaded enemy; Mind over Matter (a card) | Her own tokens, placed by successes, and a stat swap no investigator has |
+| Birdie, resolve from failures to return events | Seeker/Mystic play of Spell/Insight from discard; Survivor skill recursion for horror | Failure currency; any event; returned to hand, not played |
+| Birdie elder, +3 after a failure this round | none found | unique |
+| Seraphine, horror for one of three effects | Agnes Baker (horror triggers); Rogues that spend resources for an extra action | Horror is the price, the buyer picks the effect |
+| Seraphine elder, take 1 horror to ready a Spell | none found | unique |
+
+Signature cards and weaknesses follow from these fronts (the table below is
+the first proposal and is being updated: no once-per-game clauses, nothing
+that needs the campaign, each tied to its investigator's new tokens where
+that helps). The five personal quests tally the new verbs: Elias prevents 8
+damage; Ayako places 8 translation tokens; Cass cancels 8 symbol tokens;
+Birdie spends 10 resolve; Seraphine uses her ability 10 times.
+
+## Investigator fronts (first proposal, superseded above)
 
 - **Elias Warde (Guardian).** [reaction] When another investigator at your location would be dealt non-direct damage: it is dealt to you instead (once per round). [reaction] After an enemy attack deals you damage: draw 1 card (once per round). Elder: +1; with 3 or more damage on you, +3 instead and heal 1 damage.
 - **Dr. Ayako Sōma (Seeker).** [reaction] After you succeed at an [int] test by 2 or more: draw 1 card or gain 2 resources (once per round). Elder: +2, draw 1 card.
