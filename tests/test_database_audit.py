@@ -108,7 +108,8 @@ def test_dist_audit_covers_every_shipped_file(dist_audit):
 def test_dist_images_and_pin_verified(dist_audit):
     """Every hosted image exists, parses as a JPEG and is byte-identical in the pinned commit."""
     report, _aud, _t = dist_audit
-    assert report.stats.get("hosted_urls", 0) >= 190
+    # sprite sheets: about a hundred distinct images now carry the whole campaign (one per card before)
+    assert report.stats.get("hosted_urls", 0) >= 90
     bad = [f for f in report.findings if f.code.startswith(("C01", "C02")) and f.severity == A.ERROR]
     assert not bad, bad[0].message
     pinned = [f for f in report.findings if f.code == "C04.pinned-ok"]
@@ -549,7 +550,7 @@ def test_real_dist_images_parse():
     path = os.path.join(ROOT, "dist", "cards")
     if not os.path.isdir(path):
         pytest.skip("dist/cards absent")
-    names = sorted(os.listdir(path))[:6]
+    names = [n for n in sorted(os.listdir(path)) if n.endswith(".jpg")][:6]
     for n in names:
         info = A.image_info(n, open(os.path.join(path, n), "rb").read())
         assert info["ok"] and info["width"] > 0 and info["eoi"], n

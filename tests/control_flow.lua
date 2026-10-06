@@ -126,6 +126,8 @@ local function newControl(W, opts)
     getPosition = function() return { x = 3, y = 1, z = 0 } end,
     getName = function() return "THE STILL HOUR \xE2\x80\x94 Control" end,
     hasTag = function(_, t) return t == "StillHour" end,
+    -- the Guide menu (src/StillHour/Guide.ttslua) adds its entries when the build carries page numbers
+    addContextMenuItem = function(label, fn) T.menu = T.menu or {} ; T.menu[#T.menu + 1] = label end,
   }
   T.self = selfObj
   local env = setmetatable({

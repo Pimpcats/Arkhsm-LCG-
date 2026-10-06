@@ -81,7 +81,7 @@ def test_guide_object_follows_sced_campaign_guide():
     truth = gt("campaign_guide_pdf.json")
     g = T.build_guide()
     assert missing_keys(truth, g) == []
-    assert g["Name"] == "Custom_PDF" and g["Tags"] == ["CampaignGuide"]
+    assert g["Name"] == "Custom_PDF" and g["Tags"] == ["CampaignGuide", "CleanUpHelper_ignore"]
     assert json.loads(g["GMNotes"])["type"] == "CampaignGuide"
     assert set(g["CustomPDF"]) == set(truth["CustomPDF"])
     assert g["Transform"]["scaleX"] == truth["Transform"]["scaleX"]
@@ -153,7 +153,7 @@ def test_log_token_follows_sced_campaign_log():
     truth = gt("campaign_log_token.json")
     log = T.build_log()
     assert missing_keys(truth, log) == []
-    assert log["Name"] == "Custom_Token" and log["Tags"] == ["CampaignLog"]
+    assert log["Name"] == "Custom_Token" and log["Tags"] == ["CampaignLog", "CameraZoom_ignore", "CleanUpHelper_ignore"]
     assert set(log["CustomImage"]) == set(truth["CustomImage"])
     assert log["Transform"]["scaleX"] == truth["Transform"]["scaleX"]
     pages = [log] + [log["States"][k] for k in sorted(log["States"])]

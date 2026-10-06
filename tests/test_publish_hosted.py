@@ -60,6 +60,9 @@ def table(tmp_path, monkeypatch):
     monkeypatch.setattr(ph, "ROOT", str(root))
     monkeypatch.setattr(ph, "FACES", str(faces))
     monkeypatch.setattr(ph, "OUT", str(cards))
+    # SHEETS_OUT is computed from OUT when the module loads: without this the stale-sheet cleanup
+    # of a publish run here deletes the repository's real dist/cards/sheets
+    monkeypatch.setattr(ph, "SHEETS_OUT", str(cards / "sheets"))
     monkeypatch.setattr(ph, "GUIDE", str(root / "dist" / "guide" / "none.pdf"))
     monkeypatch.setattr(ph, "build_guide", lambda: None)
     monkeypatch.setattr(ph, "render_static_token", lambda path: png(path, (90, 20, 20)))
