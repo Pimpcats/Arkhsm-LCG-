@@ -105,7 +105,7 @@ is believed to match TTS. Passing here is not playtest approval and not art appr
 | TXT-17 | The last Hour printed an empty doom disc | Fixed: a dash |
 | TXT-19, 20 | Stale developer text; button labels wider than their buttons | Fixed |
 | TXT-21 | Manifest missing the loop's fourth ending; one name drifted | Fixed |
-| TXT-22 | Four copies of each Recollection for up to eight wanted | Fixed: eight |
+| TXT-22 | Four copies of each Recollection for up to eight wanted | Changed: two (a deck's limit); the bag listed 110 cards with eight copies of each, which read as a mistake. A third copy is a TTS copy, as the guide says |
 
 ## Scripting parity (capability gaps)
 

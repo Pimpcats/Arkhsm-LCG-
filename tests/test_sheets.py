@@ -35,7 +35,9 @@ def test_plan_packs_by_box_and_card_shape():
     assert set(by) == {"b1-p", "b1-l", "b2-p"}
     assert by["b1-p"]["cells"] == ["p1", "p2"] and by["b1-l"]["cells"] == ["land1", "land2"]
     assert (by["b1-p"]["cols"], by["b1-p"]["rows"]) == (2, 1)       # only as big as its cards need
-    assert by["b1-l"]["cell"] == [819, 585] and by["b1-p"]["cell"] == [585, 819]
+    # every cell is portrait: TTS shapes a card by its cell, and sideways cards are stored with their art turned
+    assert by["b1-l"]["cell"] == [585, 819] and by["b1-p"]["cell"] == [585, 819]
+    assert by["b1-l"]["sideways"] is True and by["b1-p"]["sideways"] is False
     assert by["b2-p"]["cells"] == ["p3"]
     assert P.textures_per_box(specs) == {"b1": 4, "b2": 2}
     # one deck id per sheet, assigned in key order from the reserved block
@@ -51,7 +53,7 @@ def test_a_box_over_one_sheets_capacity_gets_a_second_sheet():
     assert (specs[0]["cols"], specs[0]["rows"]) == (7, 5)
     assert specs[0]["cols"] * specs[0]["cell"][0] <= 4095 and specs[0]["rows"] * specs[0]["cell"][1] <= 4095
     landscape = P.plan({"big": ["land%d" % i for i in range(36)]}, sideways)
-    assert (landscape[0]["cols"], landscape[0]["rows"]) == (5, 7)
+    assert (landscape[0]["cols"], landscape[0]["rows"]) == (7, 5)
     assert landscape[0]["cols"] * landscape[0]["cell"][0] <= 4095 and landscape[0]["rows"] * landscape[0]["cell"][1] <= 4095
 
 
@@ -89,6 +91,27 @@ def test_every_cell_holds_its_card_and_its_back(tmp_path):
     assert len(h) == 10
     jpeg = Image.open(path)
     assert jpeg.format == "JPEG" and "progressive" not in jpeg.info and "progression" not in jpeg.info
+
+
+def test_a_sideways_card_is_stored_portrait_with_its_art_turned(tmp_path):
+    """A landscape agenda/act/investigator image goes into a portrait cell: the face turned a quarter clockwise
+    (its top edge becomes the right edge, its left edge the top), the back a quarter counter-clockwise."""
+    from PIL import Image
+    spec = P.plan({"box": ["land1"]}, sideways)[0]
+    assert spec["sideways"] is True and spec["cell"] == [585, 819]
+    src = Image.new("RGB", (1050, 750), (200, 0, 0))                       # left half red, right half blue
+    src.paste(Image.new("RGB", (525, 750), (0, 0, 200)), (525, 0))
+    path = str(tmp_path / "land.png")
+    src.save(path)
+    face, back = P.render(spec, lambda cid: path, lambda box, cid: path)
+    assert face.size == (585, 819) == back.size
+    near = lambda a, b: max(abs(x - y) for x, y in zip(a, b)) <= 12        # noqa: E731
+    assert near(face.getpixel((300, 100)), (200, 0, 0)) and near(face.getpixel((300, 700)), (0, 0, 200))
+    assert near(back.getpixel((300, 100)), (0, 0, 200)) and near(back.getpixel((300, 700)), (200, 0, 0))
+    # a portrait image on a sideways sheet (or the reverse) is still refused
+    portrait = _solid(str(tmp_path / "p.png"), (750, 1050), (1, 2, 3))
+    with pytest.raises(ValueError):
+        P.render(spec, lambda cid: portrait, lambda box, cid: portrait)
 
 
 def test_a_face_of_the_wrong_shape_is_refused(tmp_path):

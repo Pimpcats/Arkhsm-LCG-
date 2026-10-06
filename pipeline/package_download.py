@@ -108,10 +108,11 @@ def local_urls(obj):
 
 
 # Recollections are bought from a shared pool, by any investigator, up to the
-# usual 2 copies of a title per deck: ship 8 of each so that four investigators
-# can each take a full playset without copying cards in TTS. (The copies share
-# their card sheet, so they add no textures.)
-RECOLLECTION_COPIES = 8
+# usual 2 copies of a title per deck: ship that playset of 2 (the bag then holds
+# about fifty cards, not a hundred and ten). A third copy, for another
+# investigator, is a copy in Tabletop Simulator (hover, Ctrl+C, Ctrl+V); the
+# guide says so. (The copies share their card sheet, so they add no textures.)
+RECOLLECTION_COPIES = 2
 
 
 def add_recollection_copies(bag):

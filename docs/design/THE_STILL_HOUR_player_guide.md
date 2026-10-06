@@ -17,7 +17,19 @@ Along the way the guide will ask you to **make choices**. Record each one in you
 
 ## NEW RULES
 
-Read this section aloud before the Prologue. It explains what is new in The Still Hour in plain terms. **Campaign Rules**, after it, gives the exact wording to check during play. Everything else works as in the Arkham Horror: The Card Game Rules Reference. Numbers here are for three investigators; **Difficulty and Player Count** gives the others, and the Control token applies them.
+Read this section aloud before the Prologue. It explains what is new in The Still Hour in plain terms. **Campaign Rules**, after it, is a reference: the exact wording to check when a question comes up, not something to read through first. Everything else works as in the Arkham Horror: The Card Game Rules Reference. Numbers here are for three investigators; **Difficulty and Player Count** gives the others, and the Control token applies them.
+
+**The whole campaign in ten lines.**
+1. You play one night over and over. Each play-through is a **loop**. The Prologue comes first and is not a loop.
+2. The agenda deck is a clock of nine **Hours**. An Hour passes about every second round. When the ninth Hour arrives, the loop ends.
+3. The town is the Square plus the **districts** you choose to visit each loop. Crossing between districts costs time.
+4. **Dissonance** (0 to 24) is how much the night has noticed you. The higher it is, the more Static tokens are in the chaos bag and the closer the Appointed comes. At 24 the loop ends.
+5. The **Appointed** cannot be defeated. It can be held back.
+6. You gain **Memory** on your cards. At the reset it is banked, and you spend it between loops on Recollections and upgrades.
+7. Each loop costs every investigator **Years**. At 18 an investigator ages out.
+8. Finishing a district's act records **Knowledge**. Knowledge changes the town and pays Memory. Enough of it begins Part II, and the right entries open the finale.
+9. The **Control token** keeps the numbers; click it when this guide says to. Your **Campaign Log** keeps the choices you make.
+10. If anything is unclear, this guide wins. Everything it does not mention works as in the Rules Reference.
 
 **One night, played again and again.** Each play of the night is a **loop**. When a loop ends, the board is cleared and the night starts over at eleven o'clock in the Square. Three things always carry over: your **Campaign Log**, your shared **banked Memory** and each investigator's **Years**.
 
@@ -60,7 +72,7 @@ Each loop starts Dissonance at the **scar**: the number of loops you have comple
 
 ## CAMPAIGN RULES
 
-These rules add to the Arkham Horror: The Card Game Rules Reference. Where they disagree with it, these rules win. Numbers are for **three investigators**; **Difficulty and Player Count** gives the other values, and the Control token applies them for you.
+**This section is a reference.** Look a rule up when a question comes up; you do not need to read it through before playing (the ten lines and the plain explanation under **New Rules** are enough to start). These rules add to the Arkham Horror: The Card Game Rules Reference. Where they disagree with it, these rules win. Numbers are for **three investigators**; **Difficulty and Player Count** gives the other values, and the Control token applies them for you.
 
 **Loops.** A loop is one play of the night, from Loop Setup until the loop ends. A loop ends at once when the Hourglass reaches **Hour IX** (unless you begin the finale instead; see **The Last Hour**), when every investigator has been defeated or has resigned, or when Dissonance reaches the **reset value** (24). For card text, "scenario" and "game" mean the current loop, and "interlude" means **Between Loops**. The Prologue is not a loop, but during the Prologue, "loop" on a card means the Prologue.
 
@@ -119,7 +131,7 @@ A band change takes effect at once. Static tokens added by cards are in addition
   - Decks keep their deck size. An upgrade replaces its base copy. Any other card you buy (a Recollection or a new level 0 card) takes the place of a different card, which you remove from the deck. Permanent cards, such as Anchor Point, do not count toward deck size, so buying one removes nothing.
   - Banked Memory is one shared pool. How it is divided between the investigators' purchases is the table's choice.
   - After spending, if banked Memory is above **10 per investigator** (30 at three), reduce it to that number.
-- A starting deck holds level 0 cards only, and no Recollections: they are bought between loops. (Signature Recollections are the exception.) The Recollection cards are in the **Player Cards** bag that the campaign box's **Place** laid out; take each copy you buy from it. The ten, with their Memory costs:
+- A starting deck holds level 0 cards only, and no Recollections: they are bought between loops. (Signature Recollections are the exception.) The Recollection cards are in the **Player Cards** bag that the campaign box's **Place** laid out, two copies of each (the most one deck may hold); take each copy you buy from it. If another investigator needs a copy, copy one in Tabletop Simulator: hover over the card, press **Ctrl+C**, then **Ctrl+V**. The ten, with their Memory costs:
 
 | Recollection | Card type | Memory |
 |---|---|---|

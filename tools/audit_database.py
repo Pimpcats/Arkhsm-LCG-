@@ -2533,7 +2533,10 @@ class Auditor(object):
 
     # -- C (continued): card image orientation and aspect --------------------------------
     def c_orientation(self):
-        """Card faces/backs on 1x1 sheets must be landscape iff the card is sideways."""
+        """Card faces/backs on 1x1 decks must be portrait, sideways cards included. Tabletop Simulator shapes a
+        card by its image, so a landscape image makes a landscape card, and at the official sideways rotation
+        (rotY 180; SCED's slots, playmats and snap points assume it) that card lies across the table. The
+        official sideways decks hold portrait cells with the art turned, as pack_sheets.py stores them."""
         seen = set()
         aspects = collections.Counter()
         for doc in self.docs:
@@ -2559,10 +2562,11 @@ class Auditor(object):
                             continue
                         w, h = info["width"], info["height"]
                         landscape = w > h
-                        if landscape != side:
+                        if landscape:
                             self.grp(WARN, "C07.orientation",
-                                     "image orientation does not match SidewaysCard (TTS stretches it onto the card mesh)",
-                                     "Render sideways cards landscape and upright cards portrait.").hit(
+                                     "a landscape card image makes a landscape card mesh (TTS shapes a card by its image): at "
+                                     "the sideways rotation SCED places it, it lies across the slot",
+                                     "Store sideways cards as portrait cells with the art turned a quarter (pack_sheets.py).").hit(
                                 doc.where(node), "%s %dx%d, SidewaysCard %s" % (key, w, h, side))
                             continue
                         ratio = min(w, h) / float(max(w, h))

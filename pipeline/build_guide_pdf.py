@@ -76,7 +76,7 @@ INK = "#000000"
 ICONS = {"[wil]": "A", "[int]": "B", "[com]": "C", "[agi]": "D",
          "[action]": "E", "[free]": "F", "[fast]": "F", "[reaction]": "G",
          "[skull]": "M", "[cultist]": "N", "[tablet]": "R", "[elder]": "Q",
-         "[autofail]": "O", "[elderthing]": "H", "[unique]": "S",
+         "[autofail]": "P", "[elderthing]": "O", "[unique]": "S",
          "[perinv]": "T", "[wild]": "U"}
 
 

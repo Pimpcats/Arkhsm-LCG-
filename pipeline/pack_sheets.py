@@ -12,12 +12,17 @@ sheet for its portrait cards, the same for its landscape ones).
 
 Layout, per box (a scenario box's id, or "player" / "investigators" for the
 player-card bag):
-  * portrait cards (everything but agendas, acts and investigators) go on
-    portrait sheets, landscape ones (SidewaysCard) on landscape sheets, because
-    one CustomDeck has one cell shape;
-  * at most 7 x 5 portrait cells of 585 x 819 (4095 x 4095 px) or 5 x 7
-    landscape cells of 819 x 585 (4095 x 4095 px) on a sheet; a sheet is only as
-    big as its cards need (a box with 3 cards gets a 3 x 1 sheet);
+  * portrait cards go on portrait sheets, sideways ones (SidewaysCard: agendas,
+    acts, investigators) on their own sheets;
+  * EVERY cell is portrait, 585 x 819 (at most 7 x 5 cells, 4095 x 4095 px; a
+    sheet is only as big as its cards need). Tabletop Simulator shapes a card by
+    its cell, so a landscape cell makes a landscape card, and a card at the
+    official sideways rotation (rotY 180, which SCED's mythos area, playmats and
+    snap points assume) then lies across the table. As in the official decks,
+    a sideways card is stored as a portrait cell with its art turned a quarter
+    (the face clockwise, the back counter-clockwise, since a flip turns the card
+    over its long edge): the card is portrait and the object's rotation turns it
+    upright;
   * the back sheet has the same grid; a card's cell holds its own back (a
     location's other side, an investigator's deckbuilding back) or the shared
     player / encounter back (UniqueBack true on every sheet);
@@ -38,7 +43,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 
 PORTRAIT = {"cols": 7, "rows": 5, "cell": (585, 819), "sideways": False, "tag": "p"}
-LANDSCAPE = {"cols": 5, "rows": 7, "cell": (819, 585), "sideways": True, "tag": "l"}
+LANDSCAPE = {"cols": 7, "rows": 5, "cell": (585, 819), "sideways": True, "tag": "l"}   # a portrait cell, art turned
 DECK_BASE = 99100            # sheet deck ids: DECK_BASE .. (below the 99999 block's end)
 JPEG_QUALITY = 88
 ASPECT_TOLERANCE = 0.02      # a face whose shape is further than this from its cell's is an error
@@ -105,6 +110,14 @@ def _fit(img, cell, what):
     return img if img.size == tuple(cell) else img.resize(tuple(cell), Image.LANCZOS)
 
 
+def turn_for_cell(img, side):
+    """A sideways card's landscape image as the portrait cell holds it: the face a quarter turn clockwise (the
+    card's top becomes the cell's right edge, so the object's rotation turns it upright), the back a quarter
+    turn counter-clockwise (a flip over the long edge mirrors which end of the card is which)."""
+    from PIL import Image
+    return img.transpose(Image.ROTATE_270 if side == "face" else Image.ROTATE_90)
+
+
 def render(spec, face_path, back_path):
     """(face sheet, back sheet) PIL images for one planned sheet. face_path(card
     id) and back_path(box, card id) give the full-size source image of each cell."""
@@ -114,12 +127,16 @@ def render(spec, face_path, back_path):
     face = Image.new("RGB", size, (0, 0, 0))
     back = Image.new("RGB", size, (0, 0, 0))
     cache = {}
+    sideways = bool(spec["sideways"])
+    shape = (ch, cw) if sideways else (cw, ch)      # the source images of a sideways card are landscape
     for n, cid in enumerate(spec["cells"]):
         x, y = (n % spec["cols"]) * cw, (n // spec["cols"]) * ch
-        face.paste(_fit(_open(face_path(cid)), spec["cell"], "face of " + cid), (x, y))
+        img = _fit(_open(face_path(cid)), shape, "face of " + cid)
+        face.paste(turn_for_cell(img, "face") if sideways else img, (x, y))
         bp = back_path(spec["box"], cid)
         if bp not in cache:
-            cache[bp] = _fit(_open(bp), spec["cell"], "back of " + cid)
+            img = _fit(_open(bp), shape, "back of " + cid)
+            cache[bp] = turn_for_cell(img, "back") if sideways else img
         back.paste(cache[bp], (x, y))
     return face, back
 

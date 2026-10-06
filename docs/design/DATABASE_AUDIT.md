@@ -78,7 +78,7 @@ remains is "unlike every official box" (below).
 | C17 | Flavour text left off 23 faces and rules at 22-24 px on four (official body 31) | Accepted as a design choice; the print audit pins the list and a 22 px floor, so a new drop fails until it is added on purpose |
 | C18 | The last Hour printed an empty doom disc | Fixed: a dash, as an act's circle prints |
 | C19 | Scenario manifest lacked the loop's fourth ending and spelled one entry differently from the guide | Fixed |
-| C20 | Four copies of each Recollection for up to eight wanted (four investigators, two copies each) | Fixed: eight |
+| C20 | Four copies of each Recollection for up to eight wanted (four investigators, two copies each) | Changed: two copies (a deck's limit); eight made the Player Cards bag list 110 cards. A third copy is a TTS copy (guide) |
 
 ## Verified clean (counts)
 

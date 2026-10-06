@@ -276,8 +276,9 @@ function buildUi()
         position = { x, Y, z }, rotation = { 0, 0, 0 },
         scale = { UI_SCALE, UI_SCALE, UI_SCALE },
         width = units(w), height = fs * rows + 23, font_size = fs,
-        color = { 1, 1, 1, 0 }, font_color = INK,
-        value = values[f.k] or "", tooltip = "",
+        -- a pale fill so the write-in places can be seen (an official log's fields are white boxes)
+        color = { 1, 1, 1, 0.5 }, font_color = INK,
+        value = values[f.k] or "", tooltip = "Click to write",
       })
       inputIndex[f.k] = ni
       ni = ni + 1
