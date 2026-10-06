@@ -20,8 +20,9 @@ card entries, 3,851 distinct ids; the Download menu's 199 items are cached in
    shipped face.
 
 Status values (as in DECKBUILDING_REVIEW.md): **Fixed**, **Accepted**, **Watch**,
-**Rejected**. "Fixed (build)" means the code that makes `dist/` is fixed and the
-next `dist/` rebuild carries it.
+**Rejected**. Everything marked Fixed is in the rebuilt `dist/` that ships with this
+audit (`tests/test_dist_fresh.py` fails whenever `dist/` falls behind the specs or the
+rules code).
 
 ## Structure
 
@@ -33,19 +34,19 @@ remains is "unlike every official box" (below).
 
 | # | Finding | Status |
 |---|---|---|
-| S1 | `CustomUIAssets` font bundle on 203 of 208 cards (official: 4 of 11,483, helpers with XML UI; nothing of ours uses it) | Fixed (build) |
-| S2 | The shipped scenario-box script and Control are older than `src/` (one-frame `spawnObjectData` Place; no quest cards in the Control) | Fixed (build): `dist/` rebuilt; `tests/test_dist_fresh.py` now fails when `dist/` is behind the specs or the rules code |
-| S3 | Texture budget per Place: The First Hour 43 textures / 29 deck ids, The Square 57 / 41 (official median 9 / 7, max 27 / 21); every card its own 1x1 sheet | Fixed (build): sprite sheets, 4 textures per box (SPRITE_SHEETS.md) |
-| S4 | All 199 JPEGs progressive | Fixed (build): baseline |
-| S5 | `BackIsHidden` false on 127 of 137 deck entries (official exports: true everywhere) | Fixed (build) |
-| S6 | Card scale 1.15 on 221 of 227 cards and decks (official: 1.0; investigators 1.15) | Fixed (build): 1.0, investigators 1.15 |
-| S7 | Five story assets with `cost` as the string "–" (official: always an integer; SCED's AttachmentHelper compares it to a number) | Fixed (build) |
+| S1 | `CustomUIAssets` font bundle on 203 of 208 cards (official: 4 of 11,483, helpers with XML UI; nothing of ours uses it) | Fixed |
+| S2 | The shipped scenario-box script and Control are older than `src/` (one-frame `spawnObjectData` Place; no quest cards in the Control) | Fixed: `dist/` rebuilt; `tests/test_dist_fresh.py` now fails when `dist/` is behind the specs or the rules code |
+| S3 | Texture budget per Place: The First Hour 43 textures / 29 deck ids, The Square 57 / 41 (official median 9 / 7, max 27 / 21); every card its own 1x1 sheet | Fixed: sprite sheets, 4 textures per box (SPRITE_SHEETS.md) |
+| S4 | All 199 JPEGs progressive | Fixed: baseline |
+| S5 | `BackIsHidden` false on 127 of 137 deck entries (official exports: true everywhere) | Fixed |
+| S6 | Card scale 1.15 on 221 of 227 cards and decks (official: 1.0; investigators 1.15) | Fixed: 1.0, investigators 1.15 |
+| S7 | Five story assets with `cost` as the string "–" (official: always an integer; SCED's AttachmentHelper compares it to a number) | Fixed |
 | S8 | Lexicon `uses` token `secret` (official: always `resource`; SCED's TokenManager raises on an unknown token if it ever spawns one; with `resource` and a count of 0 SCED spawns a counter) | Fixed (spec) |
 | S9 | Download box could not work: `GlobalApi` is not a global in an object's script, and SCED's menu reads only its own release | Fixed: the box fetches the campaign from the address in its GMNotes and spawns it (`src/tts/download_box.lua`); tests in the mock TTS |
 | S10 | The Place script (see PLACE_BUTTON_AUDIT.md) | Fixed |
 | S11 | Campaign log and guide lack `CameraZoom_ignore` / `CleanUpHelper_ignore` | Accepted: the owner's exports of the real objects carry neither |
 | S12 | The last Hour has no `doomThreshold` (96% of official agendas have one) | Accepted: it has no doom threshold by design |
-| S13 | 25 of 202 GUIDs repeat, always as copies of one card | Accepted: the official norm (99% of official copy groups share a GUID) |
+| S13 | 25 of 202 GUIDs repeated, always as copies of one card | Fixed: each repeat of a card in a deck gets its own GUID (`compile_campaign.build_deck`). The official data shares one GUID per copy group, but Place now keeps the GUIDs a box holds and SCED keys state (which locations already spawned their clues) on them; the entire-run audit found engine games invalid on the repeats. Test: every GUID in a scenario box is unique |
 | S14 | The Control script is 217 KB (the largest script in any official box 95 KB) | Watch |
 | S15 | Minicard images 0.651 aspect (not 5:7) | Accepted: follows the official minicard export |
 | S16 | `dist/cards/sthr-campaign-log.jpg` is referenced by nothing | Accepted: kept as the record of the log's face |
@@ -54,7 +55,7 @@ remains is "unlike every official box" (below).
 
 | # | Finding | Status |
 |---|---|---|
-| C1 | `dist/` was the pre-redesign build: 10 new quest cards absent (and without art), 19 changed cards stale, eight faces matching the specs badly (OCR), the shipped guide PDF without the quest cards | Fixed (build): `dist/` rebuilt from the current specs. Quest-card art: Watch (ten faces render with placeholder art until art is generated) |
+| C1 | `dist/` was the pre-redesign build: 10 new quest cards absent (and without art), 19 changed cards stale, eight faces matching the specs badly (OCR), the shipped guide PDF without the quest cards | Fixed: `dist/` rebuilt from the current specs. Quest-card art: Watch (ten faces render with placeholder art until art is generated) |
 | C2 | The Hard / Expert side of the scenario reference card ignored its override (`back_tokens` read by no renderer) and shipped stale text in the image and the metadata, in the published build too | Fixed: consumed by `apply_card_overrides`; the stale lower layer frozen to the effective text; `tests/test_content_lints.py` fails on any override key no renderer reads |
 | C3 | The Bell of Ambergrove shipped 3 charge tokens and printed 4 | Fixed (spec 4); lint: printed "Uses (N" equals `uses[0].count` |
 | C4 | `build_art_manifest.py` exited 1 (the ten quest scenes were only in the hand-edited manifests) | Fixed: scenes in the generator. The committed manifests keep their seeds (they belong to the approved art), so they are not regenerated |
@@ -67,6 +68,13 @@ remains is "unlike every official box" (below).
 | C11 | Two bonded quest cards print their rules at 20-21 px (official 31): wording tightened to 22 px, flavour left off | Watch: judge legibility in TTS |
 | C12 | Wording nits: "(limit once per loop)" lowercase on two cards, British "parlours", "flavour" in two designer docs, the loop mark "Torn" and the choice "torn out" share a word | Accepted |
 | C13 | Stale comments and a dead trait test in the play engine (`Time` trait in flow.lua; "per loop" in players.lua; 6x memory cap in CampaignState) | Watch: no effect on the build; AI heuristics for two treacheries never fire |
+| C14 | Signature, quest and unlocked cards carried `level: 0` (official signature cards carry none, so level-0 effects such as Scrounge for Supplies could fetch them) | Fixed: 20 cards without `level`; they render identically (a level-0 card prints no pip); lints require no level on these and a level on every other player card |
+| C15 | No contents, bookmarks or navigation in the guide; four of nine "Do not read until..." guards shared a page with text read before them; the later interlude stories sat beside the first | Fixed: printed contents with page numbers, PDF bookmarks, a right-click Guide menu on the Control token, guarded text and each later story on pages of their own (`tests/test_guide_layout.py`, `tests/test_guide_menu.py`) |
+| C16 | Log: three hidden-name labels overflowed the page and four showed bracket tokens; Victory locations were named in the clear; standing rules of earlier choices had to be found in the district pages; two hit-area overlaps and a field below the text frame | Fixed (log layout tests: no overlap, nothing outside the frame, labels fit) |
+| C17 | Flavour text left off 23 faces and rules at 22-24 px on four (official body 31) | Accepted as a design choice; the print audit pins the list and a 22 px floor, so a new drop fails until it is added on purpose |
+| C18 | The last Hour printed an empty doom disc | Fixed: a dash, as an act's circle prints |
+| C19 | Scenario manifest lacked the loop's fourth ending and spelled one entry differently from the guide | Fixed |
+| C20 | Four copies of each Recollection for up to eight wanted (four investigators, two copies each) | Fixed: eight |
 
 ## Verified clean (counts)
 

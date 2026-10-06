@@ -687,6 +687,25 @@ do
   newLog(W8)
   local I = newControl(W8).begin(nil)
   check("one log: no warning", not I.said("More than one Campaign Log"))
+  -- two logs, then the spare is deleted: the Control adopts the campaign the other one holds
+  local W10 = newWorld()
+  local keep = newLog(W10, { memo = memoOf(9, json.encode({ v = 2, campaign = { version = 1, bankedMemory = 21, investigators = 3,
+    loopsCompleted = 2, knowledge = {}, dissonance = 0, hourglass = 1 }, seq = 9 })) })
+  local spare = newLog(W10)
+  local M = newControl(W10).begin(nil)
+  check("with two logs the Control starts blank (it cannot tell which holds the campaign)", M.st().memory == 0 and M.st().loops == 0 and M.st().prologue)
+  spare.destroyed = true
+  M.clear()
+  M.env.onObjectDestroy(spare)
+  check("deleting the spare log: it adopts the campaign the other one holds", M.st().memory == 21 and M.st().loops == 2
+    and M.said("restored from the campaign log"), state(M) .. " memory " .. M.st().memory)
+  M.click("Memory")
+  check("...and mirrors into that log from then on", json.decode(keep.memo).seq > 9, keep.memo:sub(1, 60))
+  -- a log taken off the table that leaves nothing newer changes nothing
+  local N = newControl(W10).begin(nil)
+  local n0 = N.st().memory
+  N.env.onObjectDestroy(newLog(newWorld(), { destroyed = true }))
+  check("a log destroyed with nothing newer in the one left changes nothing", N.st().memory == n0)
 
   -- a log that holds a newer copy than the Control is not overwritten
   local W9 = newWorld()

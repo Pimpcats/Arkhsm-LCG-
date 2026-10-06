@@ -1367,6 +1367,16 @@ end
 function onObjectDestroy(obj)
   if obj == self then return end
   guarded("destroy", Board.onDestroy, obj)
+  -- a Campaign Log leaves the table (the spare one, after this token found two): the log that is left
+  -- may hold the campaign this token could not adopt
+  local isLog = pcall(function() return obj.hasTag(Board.CAMPAIGN_LOG_TAG) end) and obj.hasTag(Board.CAMPAIGN_LOG_TAG)
+  if isLog then
+    pcall(function()
+      Wait.frames(function()
+        if guarded("campaign log", adoptLogMirror, nil, true) then afterChange() end
+      end, 10)
+    end)
+  end
 end
 
 function onObjectDrop(_, obj)
