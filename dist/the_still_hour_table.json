@@ -50,7 +50,7 @@
       "MeshIndex": -1,
       "CustomMesh": {
         "MeshURL": "https://steamusercontent-a.akamaihd.net/ugc/62583916778515295/AFB8F257CE1E4973F4C06160A2E156C147AEE1E3/",
-        "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthr-box.jpg?v=3d7963b8aa",
+        "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthr-box.jpg?v=3d7963b8aa",
         "NormalURL": "",
         "ColliderURL": "",
         "Convex": true,
@@ -129,8 +129,8 @@
           ],
           "CustomDeck": {
             "99800": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrelias-m.jpg?v=7a77ebdd36",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrelias-m-back.jpg?v=9f9f80dc1c",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrelias-m.jpg?v=7a77ebdd36",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrelias-m-back.jpg?v=9f9f80dc1c",
               "NumWidth": 1,
               "NumHeight": 1,
               "BackIsHidden": true,
@@ -138,8 +138,8 @@
               "Type": 0
             },
             "99801": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrayako-m.jpg?v=4c2324367a",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrayako-m-back.jpg?v=37ff0c94e6",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrayako-m.jpg?v=4c2324367a",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrayako-m-back.jpg?v=37ff0c94e6",
               "NumWidth": 1,
               "NumHeight": 1,
               "BackIsHidden": true,
@@ -147,8 +147,8 @@
               "Type": 0
             },
             "99802": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrcass-m.jpg?v=520e7819f1",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrcass-m-back.jpg?v=803c688c41",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrcass-m.jpg?v=520e7819f1",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrcass-m-back.jpg?v=803c688c41",
               "NumWidth": 1,
               "NumHeight": 1,
               "BackIsHidden": true,
@@ -156,8 +156,8 @@
               "Type": 0
             },
             "99803": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrseraphine-m.jpg?v=74ddf2d660",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrseraphine-m-back.jpg?v=07df9be6f8",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrseraphine-m.jpg?v=74ddf2d660",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrseraphine-m-back.jpg?v=07df9be6f8",
               "NumWidth": 1,
               "NumHeight": 1,
               "BackIsHidden": true,
@@ -165,8 +165,8 @@
               "Type": 0
             },
             "99804": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrbirdie-m.jpg?v=27c2c60f8d",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrbirdie-m-back.jpg?v=e67ae96d76",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrbirdie-m.jpg?v=27c2c60f8d",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrbirdie-m-back.jpg?v=e67ae96d76",
               "NumWidth": 1,
               "NumHeight": 1,
               "BackIsHidden": true,
@@ -226,8 +226,8 @@
               "SidewaysCard": false,
               "CustomDeck": {
                 "99800": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrelias-m.jpg?v=7a77ebdd36",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrelias-m-back.jpg?v=9f9f80dc1c",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrelias-m.jpg?v=7a77ebdd36",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrelias-m-back.jpg?v=9f9f80dc1c",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "BackIsHidden": true,
@@ -287,8 +287,8 @@
               "SidewaysCard": false,
               "CustomDeck": {
                 "99801": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrayako-m.jpg?v=4c2324367a",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrayako-m-back.jpg?v=37ff0c94e6",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrayako-m.jpg?v=4c2324367a",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrayako-m-back.jpg?v=37ff0c94e6",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "BackIsHidden": true,
@@ -348,8 +348,8 @@
               "SidewaysCard": false,
               "CustomDeck": {
                 "99802": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrcass-m.jpg?v=520e7819f1",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrcass-m-back.jpg?v=803c688c41",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrcass-m.jpg?v=520e7819f1",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrcass-m-back.jpg?v=803c688c41",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "BackIsHidden": true,
@@ -409,8 +409,8 @@
               "SidewaysCard": false,
               "CustomDeck": {
                 "99803": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrseraphine-m.jpg?v=74ddf2d660",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrseraphine-m-back.jpg?v=07df9be6f8",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrseraphine-m.jpg?v=74ddf2d660",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrseraphine-m-back.jpg?v=07df9be6f8",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "BackIsHidden": true,
@@ -470,8 +470,8 @@
               "SidewaysCard": false,
               "CustomDeck": {
                 "99804": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrbirdie-m.jpg?v=27c2c60f8d",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthrbirdie-m-back.jpg?v=e67ae96d76",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrbirdie-m.jpg?v=27c2c60f8d",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthrbirdie-m-back.jpg?v=e67ae96d76",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "BackIsHidden": true,
@@ -532,7 +532,7 @@
             "CleanUpHelper_ignore"
           ],
           "CustomImage": {
-            "ImageURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthr-log-page1.jpg?v=4d3a6fffd9",
+            "ImageURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthr-log-page1.jpg?v=4d3a6fffd9",
             "ImageSecondaryURL": "",
             "ImageScalar": 1.0,
             "WidthScale": 0.0,
@@ -594,7 +594,7 @@
                 "CleanUpHelper_ignore"
               ],
               "CustomImage": {
-                "ImageURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthr-log-page2.jpg?v=e6d06fee0e",
+                "ImageURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthr-log-page2.jpg?v=e6d06fee0e",
                 "ImageSecondaryURL": "",
                 "ImageScalar": 1.0,
                 "WidthScale": 0.0,
@@ -656,7 +656,7 @@
                 "CleanUpHelper_ignore"
               ],
               "CustomImage": {
-                "ImageURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/cards/sthr-log-page3.jpg?v=3d049099c9",
+                "ImageURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/cards/sthr-log-page3.jpg?v=3d049099c9",
                 "ImageSecondaryURL": "",
                 "ImageScalar": 1.0,
                 "WidthScale": 0.0,
@@ -719,7 +719,7 @@
             "CleanUpHelper_ignore"
           ],
           "CustomPDF": {
-            "PDFUrl": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/ddb803570f7d9db1f59b5e2e0cc4320c3ef0bc6e/dist/guide/the_still_hour_campaign_guide.pdf?v=936ab5c62b",
+            "PDFUrl": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/0114a2d3b4aeb49704b2cfe34706637dacf56c0d/dist/guide/the_still_hour_campaign_guide.pdf?v=325328bc96",
             "PDFPassword": "",
             "PDFPage": 0,
             "PDFPageOffset": 0

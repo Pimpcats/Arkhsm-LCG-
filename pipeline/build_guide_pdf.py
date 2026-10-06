@@ -236,6 +236,8 @@ def register_fonts(tmp):
     from reportlab.lib.fonts import addMapping
     pdfmetrics.registerFont(TTFont("Arkhamic", os.path.join(FONTS, "Arkhamic_v2.2.ttf")))
     pdfmetrics.registerFont(TTFont("AHIcons", os.path.join(FONTS, "ArkhamFontWithCodex.ttf")))
+    # the headings of the official guides are set in Teutonic (OFL), as the cards' titles are
+    pdfmetrics.registerFont(TTFont("Teutonic", os.path.join(FONTS, "Teutonic.ttf")))
     pdfmetrics.registerFont(TTFont("Bolton", os.path.join(FONTS, "BoltonBold.ttf")))
     # Crimson Pro (OFL, committed static TTFs) is the cards' body face too
     body = {"Body": "CrimsonPro-Regular", "Body-Italic": "CrimsonPro-Italic",
@@ -280,10 +282,10 @@ def build_once(out, source, log_pages, toc_pages):
     from reportlab import rl_config
     rl_config.invariant = 1
     from reportlab.lib import colors
-    from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
+    from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
     from reportlab.lib.styles import ParagraphStyle
     from reportlab.platypus import (BaseDocTemplate, CondPageBreak, Flowable,
-                                    Frame, KeepTogether, NextPageTemplate,
+                                    Frame, HRFlowable, KeepTogether, NextPageTemplate,
                                     PageBreak, PageTemplate, Paragraph, Spacer,
                                     Table, TableStyle)
     from reportlab.lib.utils import ImageReader
@@ -361,20 +363,22 @@ def build_once(out, source, log_pages, toc_pages):
                             alignment=TA_JUSTIFY, spaceAfter=4.5, textColor=INK),
         "intro": ParagraphStyle("intro", fontName=body, fontSize=10, leading=12.6,
                                 alignment=TA_CENTER, spaceAfter=6, textColor=INK),
-        "section": ParagraphStyle("section", fontName="Arkhamic", fontSize=16.3,
-                                  leading=19, textColor=TEAL, spaceBefore=8,
-                                  spaceAfter=5, alignment=TA_CENTER),
-        "header": ParagraphStyle("header", fontName="Arkhamic", fontSize=14,
-                                 leading=16.5, textColor=TEAL, spaceBefore=7,
-                                 spaceAfter=3),
-        "sub": ParagraphStyle("sub", fontName="Arkhamic", fontSize=12,
-                              leading=14, textColor=TEAL, spaceBefore=5, spaceAfter=2),
+        # Teutonic headings in the guide teal, a rule under the section's (as the official guides do)
+        "section": ParagraphStyle("section", fontName="Teutonic", fontSize=19,
+                                  leading=22, textColor=TEAL, spaceBefore=9,
+                                  spaceAfter=1, alignment=TA_LEFT, keepWithNext=1),
+        "header": ParagraphStyle("header", fontName="Teutonic", fontSize=14.5,
+                                 leading=17, textColor=TEAL, spaceBefore=8,
+                                 spaceAfter=3, keepWithNext=1),
+        "sub": ParagraphStyle("sub", fontName="Teutonic", fontSize=11.5,
+                              leading=13.5, textColor=colors.HexColor("#2a2a2a"),
+                              spaceBefore=5, spaceAfter=2, keepWithNext=1),
         "quote": ParagraphStyle("quote", fontName=body, fontSize=9.4, leading=11.6,
                                 alignment=TA_JUSTIFY, textColor=INK),
         "cell": ParagraphStyle("cell", fontName=body, fontSize=7.9, leading=9.3),
-        "cellh": ParagraphStyle("cellh", fontName="Arkhamic", fontSize=9.5,
+        "cellh": ParagraphStyle("cellh", fontName="Teutonic", fontSize=9.5,
                                 leading=11, textColor=TEAL),
-        "reshead": ParagraphStyle("reshead", fontName="Arkhamic", fontSize=12,
+        "reshead": ParagraphStyle("reshead", fontName="Teutonic", fontSize=12.5,
                                   leading=14, textColor=RES_RED, spaceAfter=2),
         "toc0": ParagraphStyle("toc0", fontName="Body-Bold" if body == "Body" else body,
                                fontSize=9.4, leading=11, textColor=INK),
@@ -516,6 +520,12 @@ def build_once(out, source, log_pages, toc_pages):
         p._toc = (level, title_case(text))
         return p
 
+    def rule():
+        """The thin teal line under a section heading."""
+        r = HRFlowable(width="100%", thickness=0.9, color=TEAL, spaceBefore=0, spaceAfter=5, lineCap="round")
+        r.keepWithNext = 1
+        return r
+
     # the printed contents: every section, and the districts under The Districts
     entries, in_districts = [], False
     for kind, payload in blocks:
@@ -564,6 +574,7 @@ def build_once(out, source, log_pages, toc_pages):
             else:
                 story.append(CondPageBreak(1.6 * 72))
             story.append(heading(text, S["section"], 0))
+            story.append(rule())
         elif kind == "h3":
             if not story:
                 story.append(Paragraph("<i>" + inline(payload) + "</i>", S["intro"]))
