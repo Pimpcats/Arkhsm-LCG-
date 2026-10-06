@@ -217,7 +217,7 @@
     "text": ""
   },
   "sthr-quest-elias": {
-    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Prevent 5 damage with your investigator ability. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, What the Warden Remembers.",
+    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Prevent 4 damage with your investigator ability. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, What the Warden Remembers.",
     "flavor": "Somebody keeps the tally. It is not kept in your hand."
   },
   "sthr-questdone-elias": {
@@ -233,7 +233,7 @@
     "flavor": "The last word was a name. You will not say it aloud."
   },
   "sthr-quest-cass": {
-    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Cancel 4 symbol tokens with your own ability or cards. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Table Remembers.",
+    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Cancel 3 symbol tokens with your own ability or cards. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Table Remembers.",
     "flavor": "Count them as they fall. Somebody always does."
   },
   "sthr-questdone-cass": {

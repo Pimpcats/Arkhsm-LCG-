@@ -45,11 +45,11 @@ Constants.HOLD_BACK_REWINDS_PER_LOOP = 3
 -- carries the campaign hooks (Memory income, Dissonance and Hourglass ties)
 -- that the investigator's own front no longer has. A reset never clears it.
 Constants.QUEST = {
-  sthrelias     = { goal = 5,  card = "What the Warden Owes",       unlocked = "What the Warden Remembers",
+  sthrelias     = { goal = 4,  card = "What the Warden Owes",       unlocked = "What the Warden Remembers",
                     what = "damage prevented with your investigator ability" },
   sthrayako     = { goal = 8,  card = "The Unfinished Translation", unlocked = "The Translation, Finished",
                     what = "enemies you placed a first translation token on" },
-  sthrcass      = { goal = 4,  card = "A Marked Run of Cards",      unlocked = "The Table Remembers",
+  sthrcass      = { goal = 3,  card = "A Marked Run of Cards",      unlocked = "The Table Remembers",
                     what = "symbol tokens you canceled with your own ability or cards" },
   sthrseraphine = { goal = 8,  card = "The Medium's Price",         unlocked = "The Price, Remembered",
                     what = "times you used your investigator ability" },
