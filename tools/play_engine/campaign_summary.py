@@ -86,7 +86,9 @@ def summarize(games):
                 out["defeats"][who] += 1
             for why, n in (m.get("memory_on_cards") or {}).items():
                 out["memory_sources"][why] += n
-            for who, q in (m.get("quest") or {}).items():
+            # each investigator's personal quest at the end of the slot: the carried campaign state
+            quests = ((g.get("campaign_state") or {}).get("campaign") or {}).get("quest") or m.get("quest") or {}
+            for who, q in quests.items():
                 if q.get("unlocked"):
                     seen = out["quest"].setdefault(who, {})
                     seen.setdefault(g["campaign_seed"], slot)    # the first slot that ended with it met

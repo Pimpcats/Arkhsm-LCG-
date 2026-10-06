@@ -429,12 +429,6 @@ return function(H)
     else
       if e.reason == "reset" then res = "R2" elseif e.reason == "defeat" then res = "NR" else res = "R1" end
     end
-    -- each investigator's personal quest at the end of the game (tally, met)
-    m.quest = {}
-    for _, inv in ipairs(G.inv) do
-      local r = T.api("shApiQuest", { id = inv.id })
-      if type(r) == "table" then m.quest[inv.id] = { tally = r.tally, unlocked = r.unlocked == true } end
-    end
     local districts = {}
     for _, d in ipairs(G.actOrderAll or G.actOrder) do if d ~= "Prologue" then districts[d] = districtResolution(G, d) end end
     for _, id in ipairs(G.cfg.boxes) do
