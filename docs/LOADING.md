@@ -92,6 +92,13 @@ cards already on the table stay as they are.
    it (including its spare campaign log), then save your game (as described
    above).
 
+A campaign begun on a build from before the personal quest cards has no quest
+cards yet. Take each investigator's quest card from the **Player Cards** bag (it
+is listed on the back of their investigator card) and start its tally at 0 on
+the investigator card's **Quest** button; from here on the Control token and the
+campaign log keep it. Until a quest is met, that investigator has no Memory
+reaction of their own.
+
 If step 5 shows a brand-new campaign (Prologue, Memory 0), there was more than
 one campaign log on the table, or the log was deleted. Load the save from step 1
 and start again.
