@@ -991,13 +991,16 @@ function Board.mirrorToLog(blob, seq)
   end) or false
 end
 
---- The newest mirrored {blob, seq} a campaign log holds, or nil. The log has one
--- State per page and each State has its own memo: turning the page leaves the
--- newest copy on the page that was showing, not on the one that is now.
-function Board.readLogMirror(log)
+--- The mirrored {blob, seq} in a campaign log's memo, or nil. With `deep`, the
+-- newest one on any page: the log has one State per page and each State has its
+-- own memo, so turning the page leaves the newest copy on the page that was
+-- showing, not on the one that is now. (getData() runs the log's own onSave:
+-- not while the table is still loading, when the log has not read its state yet.)
+function Board.readLogMirror(log, deep)
   log = log or Board.campaignLog()
   if not log then return nil end
   local best = mirrorIn(safe(function() return log.memo end))
+  if not deep then return best end
   local data = safe(function() return log.getData() end)
   for _, state in pairs(type(data) == "table" and type(data.States) == "table" and data.States or {}) do
     local m = type(state) == "table" and mirrorIn(state.Memo)
@@ -1007,7 +1010,7 @@ function Board.readLogMirror(log)
 end
 
 --- Does a campaign log (any page) hold entries somebody made? Its starting
--- values (the party size) do not count.
+-- values (the party size) do not count. (Reads every page: see readLogMirror.)
 function Board.logHasContent(log)
   log = log or Board.campaignLog()
   if not log then return false end

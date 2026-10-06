@@ -23,6 +23,7 @@ local Interlude     = require("StillHour/Interlude")
 local SCED          = require("StillHour/SCED")
 local ChaosBag      = require("StillHour/ChaosBag")
 local Board         = require("StillHour/Board")
+local Guide         = require("StillHour/Guide")
 
 local SAVE_VERSION = 2
 
@@ -173,18 +174,33 @@ local function changeDissonance(delta)
   end
 end
 
+--- Each time the Hourglass advances or rewinds, all doom in play is removed (guide: The Hourglass).
+-- With SCED present its own doom reset does it (the doom counter, and the doom tokens on the playmats
+-- and in the play area); doom tokens lying on the Hours cards are not in either place, so the table
+-- takes those off. True when SCED did it.
+local function resetDoomInPlay()
+  return guarded("doom reset", SCED.resetDoom) == true
+end
+
 local function changeHour(delta)
   if delta > 0 then
     local before = CampaignState.getHour()
     local bandBefore = CampaignState.band()
     Hourglass.advance(delta, playCtx())
-    if CampaignState.getHour() > before and CampaignState.getHour() < 9 then
-      -- guide: The Hourglass (the Hour turns); doom on the Hours is on the table
-      announce("The Hour turns: remove all doom in play; each investigator heals 1 damage and 1 horror.")
+    if CampaignState.getHour() > before then
+      local cleared = resetDoomInPlay()
+      if CampaignState.getHour() < 9 then
+        -- guide: The Hourglass (the Hour turns)
+        announce(cleared
+          and "The Hour turns: SCED removed the doom in play (take any doom off the Hours cards yourself); each investigator heals 1 damage and 1 horror."
+          or "The Hour turns: remove all doom in play; each investigator heals 1 damage and 1 horror.")
+      end
     end
     announceWake(bandBefore)
   else
+    local before = CampaignState.getHour()
     Hourglass.rewind(-delta, playCtx())
+    if CampaignState.getHour() < before then resetDoomInPlay() end
   end
 end
 
@@ -203,6 +219,9 @@ local function holdBack()
   else
     announce("Held back: the Appointed is " .. Appointed.stageName() .. "; the Hourglass rewinds to Hour "
       .. CampaignState.getHour() .. ".")
+    if resetDoomInPlay() then
+      announce("SCED removed the doom in play (take any doom off the Hours cards yourself).")
+    end
   end
   return s
 end
@@ -1264,9 +1283,10 @@ local function restore(saved)
 end
 
 --- Adopt the copy SCED carried in the campaign log (its export/import) when it
--- is newer than ours. Returns true if adopted.
-local function adoptLogMirror(log)
-  local m = Board.readLogMirror(log)
+-- is newer than ours. Returns true if adopted. `deep` looks at every page of the
+-- log, not only the one on show (Board.readLogMirror).
+local function adoptLogMirror(log, deep)
+  local m = Board.readLogMirror(log, deep)
   if not m or m.seq <= saveSeq then return false end
   restore(m.blob)
   saveSeq = m.seq
@@ -1295,7 +1315,10 @@ function onLoad(saved)
   local blank = saved == nil or saved == ""
   if blank then CampaignState.setPrologue(true) end
   Board.init(self, { log = note })
-  local adopted = guarded("campaign log", adoptLogMirror)
+  guarded("guide menu", Guide.addMenu, self)
+  -- (a Control that begins blank was put on a table that is already loaded: its log can be asked for
+  -- every page; one that loads with its own state asks only the page on show, as the log may still be loading)
+  local adopted = guarded("campaign log", adoptLogMirror, nil, blank)
   -- the chaos bag holds this campaign's changes already (it was saved with them): the first change
   -- after a load must be seen as a change, not taken as the baseline
   appliedSig = changeSig(bagChanges())
@@ -1361,7 +1384,7 @@ function onObjectSpawn(obj)
     pcall(function()
       Wait.frames(function()
         guarded("campaign log", warnAboutLogs, false)
-        if guarded("campaign log", adoptLogMirror, obj) then afterChange() end
+        if guarded("campaign log", adoptLogMirror, obj, true) then afterChange() end
       end, 10)
     end)
   end
@@ -1462,7 +1485,7 @@ function shApiAge(p)
   afterChange()
   return r and { years = r.years, bracket = r.bracket, gained = r.yearsGained } or nil
 end
-function shApiLogMirror() local m = Board.readLogMirror() ; return m and { seq = m.seq, bytes = #m.blob } or nil end
+function shApiLogMirror() local m = Board.readLogMirror(nil, true) ; return m and { seq = m.seq, bytes = #m.blob } or nil end
 
 function shApiHoldBack() local s = guarded("hold back", holdBack) ; afterChange() ; return s end
 function shApiHunt() local m = guarded("hunt", hunt) ; afterChange() ; return m end

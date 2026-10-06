@@ -12,7 +12,7 @@
 
 | Phase | As usual, plus |
 |---|---|
-| **Mythos** (from round 2) | Place 1 doom on the current **Hour**, then check its threshold. If the Hour passes: remove all doom in play, turn the Hours deck and click **Hour** on the Control token. *Guide: Campaign Rules, The Hourglass.* |
+| **Mythos** (from round 2) | Place 1 doom on the current **Hour**, then check its threshold. If the Hour passes: turn the Hours deck and click **Hour** on the Control token (with SCED it also removes all doom in play; take any doom off the Hours cards yourself). *Guide: Campaign Rules, The Hourglass.* |
 | **Investigation** | The first move each round along a connection between two districts places 1 doom on the current Hour (**crossing doom**). *Guide: Districts and travel.* |
 | **Enemy** | If the Appointed hunts and is ready and unengaged, click **Hunt** once. *Guide: The Control token, The Appointed.* |
 | **Upkeep** | As usual. |
@@ -91,6 +91,6 @@ matching Control or investigator button (*guide: The Control token*).
 
 ## Between loops, in order
 
-Click **Reset Loop**, then **Interlude**: 1 Age, 2 Bank Memory, 3 Spend,
+Click **Reset Loop** (once more if it says the loop is not over by its count), then **Interlude**: 1 Age, 2 Bank Memory, 3 Spend,
 4 Record, 5 Check the Part, 6 Read, then **Begin Next Loop** and **Clear
 Board**, and set up at **Loop Setup**. *Guide: Between Loops; The Loop.*

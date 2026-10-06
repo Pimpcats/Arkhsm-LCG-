@@ -102,7 +102,22 @@ kept its GUID) cannot be used as is. The box never empties:
    take the tokens resting on the cards with them (Reset Loop does not clear the
    board). Before anything is taken, SCED's Token Spawn Tracker (which remembers
    by GUID which locations already spawned their clues) forgets the GUIDs about
-   to be laid out, because the objects keep their GUIDs from loop to loop.
+   to be laid out, because the objects keep their GUIDs from loop to loop; the
+   Control token drops what it remembered by GUID about a removed card for the
+   same reason, and reads a CLOSED label off the card instead of remembering it.
+5. A working copy left on the table by a save taken during a Place destroys
+   itself when it loads (unless the box it was copied from is still laying out).
+   Each step of a Place is guarded: an error in one object is logged and the
+   next object comes out, so a box is never left "placing".
+6. After a Place the Control token says, once, in one sentence naming the box as
+   printed on it, when the box is out of context (the Prologue box after the
+   Prologue, the last box before its time, a district nothing on the table
+   connects to the Square yet). It never says why.
+7. Neither the chat nor `Player.log` carries a card's title: the log names each
+   object by kind and GUID ("taking 3/10 object <guid>", then "took ... as
+   <guid>"), so a log pasted into a message spoils nothing. (An entry's `name`
+   in `getObjects()` is the object's display name, a card's title; an earlier
+   version of the trace read it.)
 
 Nothing is rebuilt from data in Lua: no `spawnObjectData`, no JSON round trip,
 no new GUIDs. The tags (`StillHourLoop`, `StillHourBox_<box id>`) are in the

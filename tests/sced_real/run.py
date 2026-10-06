@@ -29,7 +29,7 @@ SUITES = ("playthrough", "runner")
 # the story-resolution suite (tests/test_sced_resolutions.py runs it on a
 # payload built from src/, see candidate_payload) and the boxes' Place / Recall
 # suite (tests/test_sced_place.py, the same way)
-EXTRA_SUITES = ("demo", "resolutions", "place_state")
+EXTRA_SUITES = ("demo", "resolutions", "place_state", "hour_doom")
 
 PLAY_AREA_STAND_IN = """
 local enabled = false
