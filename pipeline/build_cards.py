@@ -34,11 +34,6 @@ import json
 import os
 import sys
 
-ARKHAM_ICONS = {
-    "Name": "font_arkhamicons", "Type": 1,
-    "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/",
-}
-
 # --- PLACEHOLDER art (swap for Strange Eons frames + generated art hosted on a CDN) ---
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from campaign_config import CFG  # noqa: E402
@@ -115,7 +110,9 @@ def build_gmnotes(c):
             "elderSignEffect": elder,
         })
     else:
-        if "cost" in c:
+        # SCED reads cost as a number: a card with no cost (a story asset
+        # printing a dash) carries no key, as official ones do
+        if isinstance(c.get("cost"), int) and not isinstance(c.get("cost"), bool):
             m["cost"] = c["cost"]
         if "level" in c:
             m["level"] = c["level"]
@@ -357,7 +354,6 @@ def build_card(c):
         "ColorDiffuse": dict(COLOR_DIFFUSE), "Hands": True,
         "HideWhenFaceDown": not (sideways or own_back),
         "GMNotes": build_gmnotes(c), "Transform": transform(),
-        "CustomUIAssets": [ARKHAM_ICONS],
         "CustomDeck": {deck_id: {
             "FaceURL": art.get("face") or face_ph(c["name"], land=sideways),
             "BackURL": art.get("back") or back,

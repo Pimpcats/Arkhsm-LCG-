@@ -87,12 +87,14 @@ def fake_table():
 
 
 def candidate_payload(dest_dir):
-    """dist/'s Saved Object with the Control's and the campaign log's scripts
-    rebuilt from src/ (pipeline/bundle_mod.py, pipeline/campaign_log.py), so a
-    suite plays the current code without a publish run. Returns its path."""
+    """dist/'s Saved Object with the Control's, the campaign log's and the scenario
+    boxes' scripts rebuilt from src/ (pipeline/bundle_mod.py, campaign_log.py,
+    table_presence.py), and the loop tags on what the boxes hold, so a suite plays
+    the current code without a publish run. Returns its path."""
     sys.path.insert(0, os.path.join(ROOT, "pipeline"))
     import bundle_mod  # noqa: E402
     import campaign_log  # noqa: E402
+    import table_presence  # noqa: E402
     d = json.load(open(os.path.join(ROOT, "dist", "saved_object_the_still_hour.json"), encoding="utf-8"))
     bundle = bundle_mod.build_bundle(ROOT)
 
@@ -102,17 +104,27 @@ def candidate_payload(dest_dir):
             yield from walk(c)
         for c in (o.get("States") or {}).values():
             yield from walk(c)
-    swapped = {"control": 0, "log": 0}
+    swapped = {"control": 0, "log": 0, "boxes": 0}
     for o in walk(d["ObjectStates"][0]):
         tags = o.get("Tags") or []
+        gm = {}
+        try:
+            gm = json.loads(o.get("GMNotes") or "{}")
+        except ValueError:
+            pass
         if o.get("Nickname", "").endswith("Control") and "StillHour" in tags:
             o["LuaScript"] = bundle
             swapped["control"] += 1
         elif "CampaignLog" in tags:
-            page = int(json.loads(o.get("GMNotes") or "{}").get("id", "STHR-LOG1")[-1])
+            page = int(gm.get("id", "STHR-LOG1")[-1])
             o["LuaScript"] = campaign_log.lua_script(page)
             swapped["log"] += 1
-    assert swapped["control"] == 1 and swapped["log"] == 3, swapped
+        elif isinstance(gm, dict) and gm.get("type") == "ScenarioBox":
+            # the scenario boxes' Place script and the loop tags on what they hold
+            o["LuaScript"] = table_presence.loop_box_script()
+            table_presence.tag_loop_objects(o.get("ContainedObjects") or [], gm["id"])
+            swapped["boxes"] += 1
+    assert swapped["control"] == 1 and swapped["log"] == 3 and swapped["boxes"] >= 1, swapped
     path = os.path.join(dest_dir, "candidate_saved_object.json")
     with open(path, "w", encoding="utf-8") as f:
         json.dump(d, f)

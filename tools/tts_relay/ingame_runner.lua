@@ -1618,7 +1618,11 @@ step("saved object: a scenario box's Place, Clear Board, Place again", function(
   book = book or SB.boxes[1]
   check("a scenario box from the saved object and its Control are on the table", alive(book) and alive(ctl))
   if not alive(book) or not alive(ctl) then return go() end
-  local tag = "StillHourBox:" .. book.getGUID()
+  -- src/tts/loop_box.lua boxTag() is "StillHourBox_<GMNotes id>"; the first published build's boxes
+  -- tag what they lay out with the box's GUID ("StillHourBox:<guid>"): test whichever the box has
+  local tag = "StillHourBox_" .. tostring(gm(book).id or book.getGUID())
+  local script = tostring(book.getLuaScript() or "")
+  if script ~= "" and not script:find("StillHourBox_", 1, true) then tag = "StillHourBox:" .. book.getGUID() end
   relayBoxTags[tag] = true
   local inside = #(book.getObjects() or {})
   local expected = cardsIn(book.getData())

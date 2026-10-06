@@ -107,8 +107,9 @@ end
 local function derive(f)
   local d = f.d or ""
   if d == "scar" then
-    -- scar cap: one third of the reset value (3 / 4 / 6 / 8 at 1-4 investigators)
-    local caps = { 3, 4, 6, 8 }
+    -- scar cap: 2 x investigators (4 / 4 / 6 / 8 at 1-4; solo borrows the
+    -- two-investigator value), as Constants.forCount().scarCap
+    local caps = { 4, 4, 6, 8 }
     local n = math.max(1, math.min(4, math.floor(num("investigators"))))
     return tostring(math.min(num("loops"), caps[n]))
   elseif d == "surface" then

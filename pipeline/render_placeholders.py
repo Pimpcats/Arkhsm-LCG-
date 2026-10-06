@@ -195,8 +195,9 @@ def apply_card_overrides(c, pt, ov):
     for k in OV_LOC_KEYS + OV_FLAG_KEYS + OV_COUNT_KEYS + OV_PROP_KEYS:
         if k in ov:
             c[k] = ov[k]
-    if "tokens" in ov:
-        c["tokens"] = ov["tokens"]
+    for k in ("tokens", "back_tokens"):   # the chaos-token table, both sides
+        if k in ov:
+            c[k] = ov[k]
     for k in OV_PT_KEYS:
         if k in ov:
             pt[k] = ov[k]

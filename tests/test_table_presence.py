@@ -572,12 +572,26 @@ local function count(tag)
   end
   return n
 end
+local function strays()
+  local n = 0
+  for _, o in ipairs(getObjects()) do
+    if tostring(o.getName()):find("(placing)", 1, true) then n = n + 1 end
+  end
+  return n
+end
 Wait.frames(function()
   local inside = #box.getObjects()
+  out.inside = inside
   out.placed1 = box.call("buttonClick_place")
-  -- the box lays its objects out one at a time over the next frames
+  -- pressed again while it is still placing: refused
+  out.whilePlacing = box.call("buttonClick_place")
+  -- the box makes a working copy and takes its objects out one at a time
   Wait.frames(function()
     out.onTable1 = count("StillHourLoop")
+    out.boxTag1 = count(%s)
+    out.copies1 = strays()
+    -- pressed again once everything is out: refused, no second copy
+    out.whenPlaced = box.call("buttonClick_place")
     -- play: draw a card off the placed deck and leave it on the table
     for _, o in ipairs(getObjects()) do
       if o.type == "Deck" and o.hasTag("StillHourLoop") then
@@ -594,6 +608,13 @@ Wait.frames(function()
       out.placed2 = box.call("buttonClick_place")
       Wait.frames(function()
         out.onTable3 = count("StillHourLoop")
+        out.copies3 = strays()
+        local seen, dup = {}, 0
+        for _, o in ipairs(getObjects()) do
+          if seen[o.getGUID()] then dup = dup + 1 end
+          seen[o.getGUID()] = true
+        end
+        out.dupGuids = dup
         print("@@OUT " .. JSON.encode(out))
       end, 400)
     end, 1)
@@ -615,22 +636,58 @@ def test_scenario_box_places_fresh_every_loop(tmp_path):
     book = next(b for b in books if json.loads(b["GMNotes"]).get("id") == "district_church")
     book = json.loads(json.dumps(book))
     book["LuaScript"] = T.loop_box_script()
-    chunk = LOOP_BOX_CHUNK % relay.lua_long_string(json.dumps(book, ensure_ascii=False))
+    T.tag_loop_objects(book["ContainedObjects"], "district_church")   # as the build does
+    box_tag = T.loop_tags("district_church")[1]
+    chunk = LOOP_BOX_CHUNK % (relay.lua_long_string(json.dumps(book, ensure_ascii=False)),
+                              json.dumps(box_tag))
     path = tmp_path / "chunk.lua"
     path.write_text(chunk, encoding="utf-8")
     r = subprocess.run([lua, os.path.join(ROOT, "tests", "tts_fake", "mock_tts.lua"), str(path)],
                        capture_output=True, text=True, cwd=ROOT, timeout=120)
-    outs = []
+    outs, errors = [], []
     for ln in r.stdout.splitlines():
         if ln.startswith("@@MSG "):
-            msg = json.loads(ln[6:]).get("message", "")
+            m = json.loads(ln[6:])
+            msg = m.get("message", "")
             if msg.startswith("@@OUT "):
                 outs.append(msg[6:])
+            if m.get("messageID") == 3:
+                errors.append(m.get("error"))
     assert outs, r.stdout[-2000:] + r.stderr[-2000:]
+    assert not errors, errors[:3]
     out = json.loads(outs[-1])
     n = len(book["ContainedObjects"])
     assert out["placed1"] == n and out["placed2"] == n
+    assert out["whilePlacing"] == 0 and out["whenPlaced"] == 0, "a second press must not lay a second copy"
     assert out["onTable1"] > 0 and out["drawnTagged"] is True
+    assert out["boxTag1"] == out["onTable1"], "everything placed carries the box's own tag"
+    assert out["copies1"] == 0 and out["copies3"] == 0, "the working copy is thrown away"
     assert out["onTable2"] == 0, "Recall must remove every placed copy, drawn cards too"
     assert out["boxKept"] is True, "the box never empties"
     assert out["onTable3"] == out["onTable1"]
+    assert out["dupGuids"] == 0
+
+
+def test_scenario_box_objects_are_tagged_for_the_loop():
+    # every object in a scenario box, and every card inside its decks, carries the
+    # loop tag and the box's own (letters, digits and underscores only)
+    box = json.load(open(os.path.join(ROOT, "dist", "the_still_hour_campaign.json"),
+                         encoding="utf-8"))["ObjectStates"][0]
+    sboxes = [o for o in box["ContainedObjects"] if o["Name"] == "Custom_Model_Bag"]
+    assert sboxes
+    objs = copy.deepcopy(sboxes[0]["ContainedObjects"])
+    T.tag_loop_objects(objs, "district_x")
+    tags = T.loop_tags("district_x")
+    assert re.fullmatch(r"StillHourBox_district_x", tags[1])
+
+    def walk(o):
+        yield o
+        for c in o.get("ContainedObjects") or []:
+            yield from walk(c)
+    count = 0
+    for o in objs:
+        for x in walk(o):
+            assert all(t in x["Tags"] for t in tags), x.get("Nickname")
+            assert all(re.fullmatch(r"[A-Za-z0-9_]+", t) for t in x["Tags"]), x["Tags"]
+            count += 1
+    assert count >= len(objs)

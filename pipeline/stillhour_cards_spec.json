@@ -31,11 +31,11 @@
   {
     "deck": 95015, "id": "sthr-lexicon", "type": "Asset", "name": "The Lexicon of the Hour",
     "subtitle": "", "class": "Seeker", "traits": "Item. Tome.", "cost": 2, "level": 0, "slot": "Hand",
-    "uses": [{ "count": 0, "type": "Secret", "token": "secret" }], "wilIcons": 1, "intIcons": 1
+    "uses": [{ "count": 0, "type": "Secret", "token": "resource" }], "wilIcons": 1, "intIcons": 1
   },
   {
     "deck": 95016, "id": "sthr-itmeanswait", "type": "Event", "name": "It Means 'Wait'",
-    "subtitle": "", "class": "Seeker", "traits": "Insight.", "cost": 1, "wilIcons": 1, "intIcons": 1
+    "subtitle": "", "class": "Seeker", "traits": "Insight.", "cost": 1, "level": 0, "wilIcons": 1, "intIcons": 1
   },
   {
     "deck": 95017, "id": "sthr-untranslatable", "type": "Treachery", "name": "Untranslatable",
@@ -56,7 +56,7 @@
   },
   {
     "deck": 95020, "id": "sthr-seenthishand", "type": "Event", "name": "Seen This Hand Before",
-    "subtitle": "", "class": "Rogue", "traits": "Fortune. Insight.", "cost": 1, "comIcons": 1, "agiIcons": 1
+    "subtitle": "", "class": "Rogue", "traits": "Fortune. Insight.", "cost": 1, "level": 0, "comIcons": 1, "agiIcons": 1
   },
   {
     "deck": 95021, "id": "sthr-housewins", "type": "Enemy", "name": "The House Always Wins",
@@ -74,11 +74,11 @@
   {
     "deck": 95023, "id": "sthr-bell", "type": "Asset", "name": "The Bell of Ambergrove",
     "subtitle": "", "class": "Mystic", "traits": "Relic.", "cost": 3, "level": 0, "slot": "Accessory",
-    "uses": [{ "count": 3, "type": "Charge", "token": "resource" }], "wilIcons": 2
+    "uses": [{ "count": 4, "type": "Charge", "token": "resource" }], "wilIcons": 2
   },
   {
     "deck": 95024, "id": "sthr-rememberending", "type": "Event", "name": "I Remember the Ending",
-    "subtitle": "", "class": "Mystic", "traits": "Spell. Insight.", "cost": 2, "wilIcons": 2
+    "subtitle": "", "class": "Mystic", "traits": "Spell. Insight.", "cost": 2, "level": 0, "wilIcons": 2
   },
   {
     "deck": 95025, "id": "sthr-debtofhours", "type": "Treachery", "name": "The Debt of Hours",
@@ -99,7 +99,7 @@
   },
   {
     "deck": 95028, "id": "sthr-igetout", "type": "Event", "name": "I Get Out",
-    "subtitle": "", "class": "Survivor", "traits": "Gambit.", "cost": 0, "wilIcons": 1, "agiIcons": 1
+    "subtitle": "", "class": "Survivor", "traits": "Gambit.", "cost": 0, "level": 0, "wilIcons": 1, "agiIcons": 1
   },
   {
     "deck": 95029, "id": "sthr-nobodybelieves", "type": "Treachery", "name": "Nobody Believes Her",

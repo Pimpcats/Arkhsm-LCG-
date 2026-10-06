@@ -120,7 +120,12 @@ return function(H)
   end
 
   -- objects a box laid out (its per-box tag), counting cards inside decks
-  local function boxTag(box) return "StillHourBox:" .. box.getGUID() end
+  local function boxTag(box)
+    -- loop_box.lua boxTag(): "StillHourBox_<GMNotes id>"; the first published build tags with the GUID
+    local script = box.getLuaScript and box.getLuaScript() or ""
+    if script ~= "" and not script:find("StillHourBox_", 1, true) then return "StillHourBox:" .. box.getGUID() end
+    return "StillHourBox_" .. tostring(gm(box).id or box.getGUID())
+  end
   local function placedBy(box)
     return findAll(function(o) return o.hasTag(boxTag(box)) end)
   end

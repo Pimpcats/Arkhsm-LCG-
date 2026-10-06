@@ -28,6 +28,7 @@ Run: python3 pipeline/table_presence.py      -> dist/the_still_hour_table.json
 image URLs in dist/ are refused unless --local is passed)
 """
 import copy
+import re
 import hashlib
 import json
 import os
@@ -245,11 +246,38 @@ def memory_bag(name, gm, tags, mesh, scale, contained, ml, desc="", script=None)
     return box
 
 
+LOOP_TAG = "StillHourLoop"
+
+
+def loop_tags(sid):
+    """The two tags every object in a scenario box carries (src/tts/loop_box.lua):
+    the loop tag the Control token's Reset Loop clears by, and the box's own for
+    Recall. Letters, digits and underscores only, like every tag SCED itself
+    uses."""
+    return [LOOP_TAG, "StillHourBox_" + re.sub(r"[^A-Za-z0-9_]", "_", sid)]
+
+
+def tag_loop_objects(objs, sid):
+    """Add the loop tags to each object and, inside a deck, to each of its cards
+    (a card drawn off a placed deck is still recognised as the box's)."""
+    tags = loop_tags(sid)
+    for o in objs:
+        have = o.setdefault("Tags", [])
+        for t in tags:
+            if t not in have:
+                have.append(t)
+        tag_loop_objects(o.get("ContainedObjects") or [], sid)
+        for state in (o.get("States") or {}).values():
+            tag_loop_objects([state], sid)
+    return objs
+
+
 def scenario_box(name, sid, contained, ml):
-    """A scenario book: SCED's small box mesh + memory bag (Tags: none, as
-    the exported scenario boxes have none; GMNotes {id, type: ScenarioBox})."""
+    """A scenario book: SCED's small box mesh + the replayable memory bag (the
+    box itself carries no tags, as the exported scenario boxes have none;
+    GMNotes {id, type: ScenarioBox}). What it holds is tagged for the loop."""
     return memory_bag(name, {"id": sid, "type": "ScenarioBox"}, None,
-                      MESH_SMALL, SCALE_SMALL, contained, ml,
+                      MESH_SMALL, SCALE_SMALL, tag_loop_objects(contained, sid), ml,
                       script=loop_box_script())
 
 

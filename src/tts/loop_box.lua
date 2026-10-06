@@ -3,23 +3,41 @@
 -- SCED's MemoryBag (src/tts/memory_bag.lua) takes its contents OUT on Place and
 -- only gets back what still has its original GUID on Recall. A Still Hour box is
 -- laid out again every loop, after its decks were drawn, shuffled and
--- discarded, so that cannot work. This box never empties instead:
---   * Place spawns a fresh copy of every contained object at its remembered
---     spot (LuaScriptState.ml, the same {guid: {pos, rot, lock}} layout SCED
---     uses), with new GUIDs, tagged "StillHourLoop" (every card inside a
---     deck carries the tag too, so drawn cards keep it).
---   * Recall removes the copies this box placed (and any card that came out
---     of them) from the table; the control token's Reset Loop removes every
---     box's copies at once (shClearLoopBoard).
+-- discarded, so that cannot work. This box therefore never empties:
+--   * Place makes a native copy of the whole box (what copy and paste does in
+--     Tabletop Simulator: self.clone), then does exactly what SCED's own Place
+--     does to that copy: takeObject{guid, position, rotation, smooth = false}
+--     for every remembered object (LuaScriptState.ml, the same
+--     {guid: {pos, rot, lock}} layout SCED uses), then setLock, and throws the
+--     empty copy away. Nothing is rebuilt from data in Lua: no spawnObjectData,
+--     no JSON round trip, no new GUIDs. The objects keep the GUIDs they have in
+--     the box, as the official boxes' objects do.
+--   * every object in the box (and every card inside its decks) carries the
+--     tags "StillHourLoop" and "StillHourBox_<box id>" from the build, so a
+--     drawn card is still recognised; Place also tags what it takes out.
+--   * Recall removes what this box placed (and any card that came out of it)
+--     from the table; the control token's Reset Loop removes every box's
+--     objects at once (shClearLoopBoard).
 -- The button layout matches SCED's MemoryBag so the book looks and works like
 -- an official scenario box.
 
 LOOP_TAG = "StillHourLoop"
 
+-- Frames between two takeObject calls. SCED does them all in one frame; a few
+-- frames apart changes nothing about the mechanism, but the Lua log then shows
+-- the last step reached if Tabletop Simulator ever stops.
+local STEP_FRAMES = 6
+
 local memoryList = {}
 
+local function boxId()
+  local ok, gm = pcall(JSON.decode, self.getGMNotes() or "")
+  if ok and type(gm) == "table" and gm.id then return tostring(gm.id) end
+  return tostring(self.getGUID())
+end
+
 local function boxTag()
-  return "StillHourBox:" .. tostring(self.getGUID())
+  return "StillHourBox_" .. boxId()
 end
 
 function updateSave()
@@ -56,64 +74,75 @@ function createButtons()
     tooltip = "Remove this box's cards from the table" })
 end
 
-local HEX = "0123456789abcdef"
-local function newGuid()
-  local t = {}
-  for i = 1, 6 do
-    local n = math.random(1, 16)
-    t[i] = HEX:sub(n, n)
-  end
-  return table.concat(t)
-end
-
---- Fresh GUIDs and the loop tags on an object and everything inside it.
-local function prepare(data, tags)
-  data.GUID = newGuid()
-  local have = {}
-  data.Tags = data.Tags or {}
-  for _, t in ipairs(data.Tags) do have[t] = true end
-  for _, t in ipairs(tags) do
-    if not have[t] then table.insert(data.Tags, t) end
-  end
-  for _, inner in ipairs(data.ContainedObjects or {}) do prepare(inner, tags) end
-  for _, state in pairs(data.States or {}) do prepare(state, tags) end
-  return data
-end
-
 --- Written to the Lua log (Player.log) before the step it names runs, so a
 -- crash in Tabletop Simulator leaves the failing step behind.
 local function trace(msg)
   log("StillHour box '" .. tostring(self.getName()) .. "': " .. msg)
 end
 
+local function say(msg)
+  broadcastToAll(msg, { 0.95, 0.85, 0.6 })
+end
+
+local function alive(o)
+  return o ~= nil and not o.isDestroyed()
+end
+
 local placing = false
 
---- Lay the box out: ONE object every few frames, each announced in the log
--- before it is spawned, then the board sync (the Control token's own staged
--- steps). Returns how many objects will be placed; they land over the next
--- second or so.
+--- Lay the box out. Returns how many objects will be placed (they land over
+-- the next second or so), or 0 when nothing was started.
 function buttonClick_place()
   if placing then
-    broadcastToAll(self.getName() .. ": still placing, wait a moment.", { 0.95, 0.85, 0.6 })
+    say(self.getName() .. ": still placing, wait a moment.")
     return 0
   end
-  local tags = { LOOP_TAG, boxTag() }
+  local tag = boxTag()
   trace("Place pressed")
-  local list = {}
-  for _, od in ipairs(self.getData().ContainedObjects or {}) do
-    if memoryList[od.GUID] then list[#list + 1] = od end
+
+  -- what this box can place: the remembered objects that are really inside it,
+  -- highest position first so that taking one never moves the position of a
+  -- later one (the index fallback below relies on it)
+  local inside = {}
+  for _, e in ipairs(self.getObjects()) do
+    inside[e.guid] = { index = e.index, name = (e.nickname ~= nil and e.nickname ~= "") and e.nickname or e.name }
   end
-  trace("read " .. #list .. " object(s) to place")
-  if #list == 0 then
-    broadcastToAll(self.getName() .. ": nothing to place.", { 0.95, 0.85, 0.6 })
+  local guids = {}
+  for guid in pairs(memoryList) do
+    if inside[guid] ~= nil then guids[#guids + 1] = guid end
+  end
+  table.sort(guids, function(a, b)
+    local ia, ib = inside[a].index or 0, inside[b].index or 0
+    if ia ~= ib then return ia > ib end
+    return a < b
+  end)
+  trace("read " .. #guids .. " object(s) to place")
+  if #guids == 0 then
+    say(self.getName() .. ": nothing to place.")
     return 0
   end
+
+  -- a second press must not lay a second copy on top of the first
+  local already = {}
+  local okTag, tagged = pcall(getObjectsWithTag, tag)
+  for _, o in ipairs(okTag and tagged or {}) do
+    if o ~= self and alive(o) then already[#already + 1] = o end
+  end
+  if #already > 0 then
+    trace("already placed: " .. #already .. " object(s) carry " .. tag)
+    say(self.getName() .. " is already laid out. Press Recall first (or Reset Loop on the Control token).")
+    return 0
+  end
+
   placing = true
   local placed = 0
-  local function finish()
+
+  local function done(copy, why)
     placing = false
-    trace("spawned " .. placed)
-    broadcastToAll(self.getName() .. ": " .. placed .. " object(s) placed.", { 0.95, 0.85, 0.6 })
+    if alive(copy) then copy.destruct() end
+    trace(why .. "; placed " .. placed)
+    say(self.getName() .. ": " .. placed .. " object(s) placed.")
+    if placed == 0 then return end
     -- once the cards have landed, let the control token apply the log's
     -- Knowledge to them (location sides, sealed locations, the Appointed),
     -- one announced step at a time
@@ -129,29 +158,60 @@ function buttonClick_place()
       end
     end, 2)
   end
-  local function spawnOne(i)
-    local od = list[i]
-    if not od then return finish() end
-    local ok, err = pcall(function()
-      local entry = memoryList[od.GUID]
-      local name = tostring(od.Nickname or od.Name)
-      trace(string.format("spawning %d/%d %s", i, #list, name))
-      broadcastToAll(string.format("Placing %d/%d: %s", i, #list, name), { 0.7, 0.7, 0.7 })
-      local data = prepare(JSON.decode(JSON.encode(od)), tags)
-      data.Locked = entry.lock and true or false
-      local obj = spawnObjectData({ data = data, position = entry.pos, rotation = entry.rot })
-      if obj then placed = placed + 1 end
-    end)
-    if not ok then trace("spawn failed: " .. tostring(err)) end
-    Wait.frames(function() spawnOne(i + 1) end, 8)
+
+  -- SCED's own step: take the object out of the bag at its remembered spot.
+  -- By GUID, as SCED does; if the working copy does not know that GUID (a
+  -- copy is free to renumber what it holds) by the object's position in the
+  -- bag instead, which is why the positions are taken from the highest down.
+  local function take(copy, i)
+    if not alive(copy) then return done(nil, "the working copy disappeared") end
+    local guid = guids[i]
+    if not guid then return done(copy, "all objects taken") end
+    local entry = memoryList[guid]
+    local name = tostring(inside[guid].name)
+    trace(string.format("taking %d/%d %s (%s)", i, #guids, name, guid))
+    broadcastToAll(string.format("Placing %d/%d: %s", i, #guids, name), { 0.7, 0.7, 0.7 })
+    local ok, item = pcall(copy.takeObject, {
+      guid = guid, position = entry.pos, rotation = entry.rot, smooth = false })
+    if not (ok and item) and inside[guid].index ~= nil then
+      trace("no object " .. guid .. " in the copy; taking position " .. tostring(inside[guid].index))
+      ok, item = pcall(copy.takeObject, {
+        index = inside[guid].index, position = entry.pos, rotation = entry.rot, smooth = false })
+    end
+    if ok and item then
+      item.setLock(entry.lock and true or false)
+      for _, t in ipairs({ LOOP_TAG, tag }) do
+        if not item.hasTag(t) then item.addTag(t) end
+      end
+      placed = placed + 1
+    else
+      trace("take failed for " .. name .. ": " .. tostring(ok and "nothing returned" or item))
+    end
+    Wait.frames(function() take(copy, i + 1) end, STEP_FRAMES)
   end
-  Wait.frames(function() spawnOne(1) end, 5)
-  return #list
+
+  -- the native copy SCED's Place will run on, parked above the box and frozen
+  local pos = self.getPosition()
+  local okClone, copy = pcall(self.clone, { position = { pos.x, pos.y + 6, pos.z } })
+  if not okClone or not alive(copy) then
+    placing = false
+    trace("could not copy the box: " .. tostring(copy))
+    say(self.getName() .. ": could not prepare the objects (see the log).")
+    return 0
+  end
+  copy.setLock(true)
+  copy.setName(self.getName() .. " (placing)")
+  trace("working copy made; waiting for it to be ready")
+  Wait.condition(function() take(copy, 1) end,
+    function() return alive(copy) and not copy.spawning and not copy.loading_custom end,
+    10,
+    function() done(copy, "the working copy was not ready after 10 s") end)
+  return #guids
 end
 
 function buttonClick_recall()
   local n = clearTagged(boxTag())
-  broadcastToAll(self.getName() .. ": " .. n .. " object(s) removed from the table.", { 0.95, 0.85, 0.6 })
+  say(self.getName() .. ": " .. n .. " object(s) removed from the table.")
   return n
 end
 

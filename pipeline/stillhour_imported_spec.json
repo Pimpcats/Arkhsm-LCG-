@@ -173,46 +173,46 @@
     "tokens": [
       {
         "token": "skull",
-        "text": "-1. If Dissonance is in the Glitch band or higher, -2 instead."
+        "text": "−1. If Dissonance is in the Glitch band or higher, −2 instead."
       },
       {
         "token": "cultist",
-        "text": "-2. If you fail, raise Dissonance by 1."
+        "text": "−2. If you fail by 2 or more, raise Dissonance by 1."
       },
       {
         "token": "tablet",
-        "text": "-2. If the Appointed is Sensed or later, take 1 horror."
+        "text": "−2. If The Appointed's Approach is Emerging or later, take 1 horror."
       },
       {
         "token": "elderthing",
-        "text": "-3. If you fail, advance the Hourglass by 1 Hour."
+        "text": "−3. If you fail, place 1 doom on the current Hour."
       },
       {
         "token": "static",
-        "text": "-3. Raise Dissonance by 1."
+        "text": "−3. Raise Dissonance by 1."
       }
     ],
     "difficulty": "EASY / STANDARD",
     "back_tokens": [
       {
         "token": "skull",
-        "text": "-2. If Dissonance is in the Glitch band or higher, -3 instead."
+        "text": "−2. If Dissonance is in the Glitch band or higher, −3 instead."
       },
       {
         "token": "cultist",
-        "text": "-3. Raise Dissonance by 1."
+        "text": "−3. Raise Dissonance by 1."
       },
       {
         "token": "tablet",
-        "text": "-4. If the Appointed is Sensed or later, take 1 horror. If it is Arrived, also take 1 damage."
+        "text": "−4. If The Appointed's Approach is Sensed or later, take 1 horror. If it is Arrived, also take 1 damage."
       },
       {
         "token": "elderthing",
-        "text": "-5. If you fail, advance the Hourglass by 1 Hour."
+        "text": "−5. If you fail, place 1 doom on the current Hour."
       },
       {
         "token": "static",
-        "text": "-3. Raise Dissonance by 1."
+        "text": "−3. Raise Dissonance by 1."
       }
     ]
   },
