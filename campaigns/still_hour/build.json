@@ -54,8 +54,18 @@
     "Interlude",
     "SCED",
     "ChaosBag",
+    "Guide",
     "Board"
   ],
+  "guide_page_keys": {
+    "Campaign Setup": "setup",
+    "Prologue — The First Hour": "prologue",
+    "The Loop": "loop",
+    "Between Loops": "between",
+    "Campaign Rules": "rules",
+    "Difficulty and Player Count": "difficulty",
+    "Appendix — Starting Decks": "decks"
+  },
   "control_lua": "src/tts/control.lua",
   "tests_entry": "runStillHourTests",
   "static_token": {

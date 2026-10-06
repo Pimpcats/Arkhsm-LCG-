@@ -3,9 +3,9 @@
 
 The owner's game stopped when Place laid out The First Hour (39 objects, 43 card textures). That
 was the first time TTS ever had to spawn this campaign's Card and Deck objects with their images,
-and the cause could not be told from here (docs/design/PLACE_BUTTON_AUDIT.md). This file holds four
-boxes, each laid out by the same Place script as the campaign's own, so that pressing them one by
-one on a fresh table says which part is responsible:
+and the cause could not be told from here (docs/design/PLACE_BUTTON_AUDIT.md). This file holds five
+boxes. The first four are laid out by the same Place script as the campaign's own, so that pressing
+them one by one on a fresh table says which part is responsible:
 
   1 One card         a single location card on its own 750 x 1050 images (2 textures)
   2 Structure only   The First Hour's objects and decks exactly, with every image replaced by ONE
@@ -15,7 +15,15 @@ one on a fresh table says which part is responsible:
 
 Press them in that order, Recall before the next. The first one that stops TTS names the cause
 (a card, the object structure, the textures). The Lua log (Player.log) ends on the step that was
-running. Nothing here is the campaign: no Control token, no log, no guide.
+running. The fifth box separates the script from the content:
+
+  5 SCED's own Place  the same cards and sprite sheets as 3, laid out by SCED's own, unmodified
+                      MemoryBag script (it empties the box and Recall refills it, as every official
+                      box does), with none of this campaign's code in the Place
+
+On a fresh table, press it after a stop: if 5 stops TTS too, the script is not the cause; if 5 works
+and 3 stopped TTS, the campaign's Place script is. Nothing here is the campaign: no Control token,
+no log, no guide.
 
     python3 pipeline/place_test.py [--local]      ->  dist/saved_object_place_test.json
 """
@@ -138,6 +146,11 @@ def build():
     # 4: one image per card (the first build)
     contained, ml = variant("ptest4", card_box)
     boxes.append(T.scenario_box("Test 4 — image per card", "ptest4", contained, ml))
+
+    # 5: test 3's cards, laid out by SCED's own unmodified Place (script and mesh as the campaign box's)
+    contained, ml = variant("ptest5", sheet_box)
+    boxes.append(T.memory_bag("Test 5 — SCED's own Place", {"id": "ptest5", "type": "ScenarioBox"}, None,
+                              T.MESH_SMALL, T.SCALE_SMALL, contained, ml))
 
     box = T.campaign_box(boxes, name=NAME, filename="place_test", box_id=BOX_ID, table=False)
     return {"SaveName": NAME, "GameMode": NAME, "ObjectStates": [box]}, boxes

@@ -35,6 +35,22 @@ STATIC_TOKEN_PLACEHOLDER = TOKEN.get("placeholder", "__STATIC_TOKEN_URL__")
 STATIC_TOKEN_FALLBACK = TOKEN.get("fallback_url", "https://placehold.co/512x512/14121e/e2ecf0.png?text=static")
 
 
+# The guide's page index (src/<lua_dir>/Guide.ttslua): "key=page,..." from the page numbers the guide
+# PDF build wrote next to the PDF (pipeline/build_guide_pdf.py), through the campaign's
+# "guide_page_keys" (section title -> key). Empty when there is no such file.
+GUIDE_PAGES_PLACEHOLDER = "__STILLHOUR_GUIDE_PAGES__"
+
+
+def guide_pages_text(root):
+    keys = CFG.get("guide_page_keys") or {}
+    path = os.path.join(root, "dist", "guide", CFG.slug + "_campaign_guide_pages.json")
+    if not keys or not os.path.exists(path):
+        return ""
+    pages = json.load(open(path, encoding="utf-8")).get("pages", {})
+    return ",".join("%s=%d" % (keys[t], pages[t]) for t in sorted(keys, key=lambda t: pages.get(t, 0))
+                    if t in pages)
+
+
 def static_token_url(root):
     path = CFG.path("art_urls")
     if os.path.exists(path):
@@ -86,9 +102,11 @@ def transform(z):
 def build_bundle(root):
     parts = [PREAMBLE]
     token_url = static_token_url(root)
+    guide_pages = guide_pages_text(root)
     for name in MODULES:
         path = os.path.join(root, "src", CFG.lua_dir, name + ".ttslua")
-        body = open(path, encoding="utf-8").read().replace(STATIC_TOKEN_PLACEHOLDER, token_url)
+        body = (open(path, encoding="utf-8").read().replace(STATIC_TOKEN_PLACEHOLDER, token_url)
+                .replace(GUIDE_PAGES_PLACEHOLDER, guide_pages))
         parts.append('__modules["%s/%s"] = function()\n%s\nend\n' % (CFG.lua_dir, name, body))
     control = open(os.path.join(root, CFG.control_lua), encoding="utf-8").read()
     parts.append("-- ===== control entry script =====\n" + control)
@@ -112,7 +130,7 @@ def build_save(root, bundle):
         "Name": "BlockSquare",
         "Transform": transform(3),
         "Nickname": CFG.upper_name + " — Control",
-        "Description": "Click 'Run Tests'. Open the console with the ` key to read output.",
+        "Description": CFG.name + ": campaign bookkeeping. See the guide.",
         "GUID": guid(CFG.control_guid),
         "ColorDiffuse": {"r": 0.13, "g": 0.11, "b": 0.18},
         "Locked": True,

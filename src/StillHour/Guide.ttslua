@@ -1,0 +1,59 @@
+-- THE STILL HOUR — the campaign guide's page index: "Guide: ..." entries in the Control token's
+-- right-click menu that turn the guide to a section, as the official campaigns' world-map buttons do
+-- (getObjectsWithTag("CampaignGuide")[1].Book.setPage). The page numbers are written into PAGES when
+-- the bundle is built, from the guide PDF's own layout (pipeline/build_guide_pdf.py writes
+-- dist/guide/*_pages.json and pipeline/bundle_mod.py fills the placeholder), so they cannot drift from
+-- the PDF; tests/test_dist_fresh.py checks them against it. With no placeholder filled (a source
+-- build) the menu is simply empty.
+local Guide = {}
+
+local PAGES = "__STILLHOUR_GUIDE_PAGES__"      -- "rules=2,setup=7,loop=9,..."
+
+-- (key in the pages string, menu text). Sections a first-time player must not be sent to early
+-- (the districts, the finale) are not listed: the guide itself sends you there.
+Guide.ENTRIES = {
+  { "setup",     "Guide: Campaign Setup" },
+  { "prologue",  "Guide: The Prologue" },
+  { "loop",      "Guide: Loop Setup" },
+  { "between",   "Guide: Between Loops" },
+  { "rules",     "Guide: Campaign Rules" },
+  { "difficulty", "Guide: Difficulty and Player Count" },
+  { "decks",     "Guide: Starting Decks" },
+}
+
+--- key -> one-based page, from the build-time string.
+function Guide.pages()
+  local out = {}
+  for key, page in tostring(PAGES):gmatch("(%w+)=(%d+)") do out[key] = tonumber(page) end
+  return out
+end
+
+--- Turn the campaign guide to a section. Returns true when it was turned.
+function Guide.open(color, key)
+  local page = Guide.pages()[key]
+  if not page then return false end
+  local guide = (getObjectsWithTag("CampaignGuide") or {})[1]
+  if not guide then
+    printToColor("The campaign guide is not on the table: press Place on the campaign box.", color, { 1, 0.7, 0.4 })
+    return false
+  end
+  -- Book.setPage takes a zero-based page
+  local ok = pcall(function() guide.Book.setPage(page - 1) end)
+  if not ok then
+    printToColor("Could not turn the guide: open it and go to page " .. page .. ".", color, { 1, 0.7, 0.4 })
+  end
+  return ok
+end
+
+--- Add the "Guide: ..." entries to an object's right-click menu.
+function Guide.addMenu(obj)
+  local pages = Guide.pages()
+  for _, e in ipairs(Guide.ENTRIES) do
+    local key = e[1]
+    if pages[key] then
+      obj.addContextMenuItem(e[2], function(color) Guide.open(color, key) end)
+    end
+  end
+end
+
+return Guide

@@ -5,7 +5,7 @@
 
 ## HOW TO USE THIS GUIDE
 
-This guide is read as you play. **Do not read ahead.** It tells you when to read each section: the Prologue first, then the loop, then the districts as you reach them. Story text in boxes is read aloud. Everything after a **"Do not read until…"** line stays unread until the guide sends you there.
+This guide is read as you play. **Do not read ahead.** It tells you when to read each section: the Prologue first, then the loop, then the districts as you reach them. Story text in boxes is read aloud. Everything after a **"Do not read until…"** line stays unread until the guide sends you there: it always starts on a fresh page, so you never glimpse it by accident. Use the contents on this page to find a section.
 
 The Still Hour is not a line of separate scenarios. It is **one night, lived over and over.** You will play the Prologue once, then play the night again and again (each play-through is a **loop**), learning a little more of it each time, until you know enough to end it. Every loop costs you years.
 
@@ -176,15 +176,15 @@ For finale conditions and the epilogue, an investigator's bracket is set by all 
 - **Contest.** In the finale, the Control token shows a **Contest** counter (left-click +1, right-click −1). No contest progress is automatic: click **Contest** for every source listed under **Contest progress**, including each Hold Back success and the Uninvited's defeat.
 - **Aging.** After the Prologue there is no aging: the buttons read **No Age**. After a loop, in the Interlude panel, set each investigator's **Defeated** toggle, and the first time they will reach Weathered, their −skill and +skill buttons. If you click **Age** for such an investigator before choosing, the Control token asks you to choose and applies nothing; click **Age** again to apply. The chat then names the skills changed (for example, "-1 combat, +1 willpower").
 - **Memory.** **Begin Next Loop** adds the 1 Memory an Elder or Ancient investigator begins with to their count; put the token on their investigator card at Loop Setup step 7, and do not click their Memory row for it. **Anchor Point's** Memory is not added for you: at Loop Setup step 7, put its token on the investigator card and click their **Memory** row once for it (an Elder or Ancient investigator with Anchor Point clicks once, for Anchor Point only). Click the banked **Memory** button when banked Memory changes outside the Interlude panel (The House Always Wins, a finale resolution that spends it, and the party's extra 1 in the first Prologue ending). It never goes below 0. For the Prologue's reward, click **Prologue reward** once: it banks 2 per investigator (right-click takes it back).
-- **Between loops.** Use **Reset Loop**, **Interlude**, **Begin Next Loop** and **Clear Board** as **Between Loops** and **Loop Setup** direct. **Reset Loop** counts once per loop: a second click before **Begin Next Loop** does nothing.
-- **Other buttons.** **Status** prints the current Hour, Dissonance, band, scar, Memory and Part to the chat. **Knowledge** lists the entries recorded so far. **Sync Board** re-applies the board from the campaign state (location sides and CLOSED labels, the Appointed's position and the chaos bag's Static tokens); use it if the table and the Control token disagree. **Run Tests** checks the Control token's own rules and restores your campaign afterward; you never need it in play.
+- **Between loops.** Use **Reset Loop**, **Interlude**, **Begin Next Loop** and **Clear Board** as **Between Loops** and **Loop Setup** direct. **Reset Loop** counts once per loop: a second click before **Begin Next Loop** does nothing. If it says the loop is not over by the Control token's count (the Hourglass is not at Hour IX and Dissonance is below the reset value: for example every investigator was defeated or resigned, or the Prologue ended by its act), click **Reset Loop** again to end it. **Begin Next Loop** refuses until **Reset Loop** has been clicked, and after **Reset Loop** the Control token reads **BETWEEN LOOPS**.
+- **Other buttons.** **Status** prints the current Hour, Dissonance, band, scar, Memory and Part to the chat. **Knowledge** lists the entries recorded so far. **Sync Board** re-applies the board from the campaign state (location sides and CLOSED labels, the Appointed's position and the chaos bag's Static tokens); use it if the table and the Control token disagree. Right-click the Control token for **Guide: Campaign Setup**, **The Prologue**, **Loop Setup**, **Between Loops**, **Campaign Rules**, **Difficulty and Player Count** and **Starting Decks**: each turns the campaign guide to that section.
 
 ---
 
 ## CAMPAIGN SETUP
 
 1. **Choose investigators.** The campaign is tuned for 3; it scales from 1 to 4.
-2. **Build decks.** Each investigator builds a deck under their deckbuilding rules, adding 1 random basic weakness as normal. Build a **starting deck of level 0 cards only**: Recollections and upgrades are bought later, between loops. If you would like a ready-made list, `docs/STARTER_DECKS.md` suggests one for Elias Warde, Dr. Ayako Sōma and Cass Lindqvist.
+2. **Build decks.** Each investigator builds a deck under their deckbuilding rules, adding 1 random basic weakness as normal. Build a **starting deck of level 0 cards only**: Recollections and upgrades are bought later, between loops. If you would like a ready-made list, **Appendix — Starting Decks** suggests one for each investigator.
 3. **Put the investigators on the table.** The campaign box's **Place** laid out the **Player Cards** bag. Each player takes their investigator card from it, along with the signature and other required cards listed on the back of that card (they do not count toward deck size; one of them is the investigator's **personal quest card**, see below), and the cards of their deck, and puts the investigator card on a playmat. The Control token's per-investigator rows (Memory, Age) and the buttons on each investigator card (including **Quest**) appear once the investigator cards are on the table, on their playmats.
 4. **Choose a difficulty** and assemble the chaos bag. On the Control token, click your difficulty's button (**Easy**, **Standard**, **Hard** or **Expert**): it fills SCED's chaos bag with the tokens below, plus any campaign chaos-bag changes so far (see **Campaign chaos-bag changes**). Without SCED, build the bag by hand. Then set **Investigators** on the Control token to the number of investigators.
 
@@ -284,7 +284,7 @@ There is no Appointed in the Prologue, and no Years are gained in it: ignore any
 - **Tell the town.** Stand on the Town Hall steps and tell them what is coming, though they will not believe a word. Record in your Campaign Log: *The town was warned.* (on the log token: this row's **1st** box.)
 - **Tell no one.** Whatever this is, it is yours to carry, and a secret kept is a card still in the hand. Record in your Campaign Log: *You kept the night to yourselves.* (on the log token: this row's **2nd** box.)
 
-Then, on the Control token, click **Reset Loop**. This ends the Prologue; the Prologue does not count as a loop. Turn to **The Loop**, read **Between Loops**, and begin Loop 1.
+Then, on the Control token, click **Reset Loop** (if it says the loop is not over by its count, click it again). This ends the Prologue; the Prologue does not count as a loop. Turn to **The Loop**, read **Between Loops**, and begin Loop 1.
 
 ---
 
@@ -802,6 +802,22 @@ Then read **Epilogue — What the Years Took.**
 - Values given "per investigator" (the finale's Memory thresholds) scale on their own.
 - The Control token applies all of these for you.
 - The campaign is tuned for about 6–8 loops.
+
+---
+
+## APPENDIX — STARTING DECKS
+
+Suggestions only: build your own deck if you prefer. Each list is a legal **30-card starting deck** of level 0 cards, checked against the investigator's deckbuilding options, the 2-copy limit and any per-deck limits. The cards listed on the back of the investigator card and 1 random basic weakness are added as usual and do not count toward the 30. Every card is an official Arkham Horror: The Card Game card in SCED's player cards; if one is missing from your copy, swap it for another level 0 card of the same class and a similar cost.
+
+**Elias Warde (Guardian).** *Guardian cards, Neutral cards, up to 5 Survivor cards (level 0-2).* 2 Beat Cop, 2 First Aid, 2 Machete, 2 Medical Student, 2 Physical Training, 2 Survival Knife, 1 Improvised Shield, 2 "Get behind me!", 2 Dodge, 2 Evidence!, 1 Heroic Rescue, 2 Emergency Cache, 2 Improvised Weapon, 2 Scrounge for Supplies, 2 Vicious Blow, 2 Guts.
+
+**Dr. Ayako Sōma (Seeker).** *Seeker cards, Neutral cards, up to 5 Mystic cards (level 0-2).* 2 Art Student, 2 Dr. Milan Christopher — Professor of Entomology, 2 Hyperawareness, 2 Magnifying Glass, 2 Research Librarian, 2 Holy Rosary, 2 Burning the Midnight Oil, 2 Mind over Matter, 2 Working a Hunch, 1 Emergency Cache, 2 Read the Signs, 1 Ward of Protection, 2 Deduction, 1 Eureka!, 2 Guts, 2 Perception, 1 Unexpected Courage.
+
+**Cass Lindqvist (Rogue).** *Rogue cards, Neutral cards, up to 5 cards of any other class (level 0).* 2 Burglary, 2 Lockpicks, 2 Pickpocketing, 2 Silver Tongue, 2 Stealth, 1 Sticky Fingers, 2 Holy Rosary, 1 Backstab, 2 Elusive, 2 Sneak Attack, 2 Sneak By, 2 Dodge, 2 Emergency Cache, 1 Ward of Protection, 2 Cunning, 1 Opportunist, 2 Guts.
+
+**"Birdie" Okonkwo (Survivor).** *Survivor cards, Neutral cards, up to 5 other Guardian, Mystic, Rogue and/or Seeker cards (level 0-1).* 2 Dig Deep, 1 Hunter's Instinct, 2 Leather Coat, 2 Stray Cat, 1 Flashlight, 2 Knife, 2 Live and Learn, 2 "Look what I found!", 2 Lucky!, 2 Scrounge for Supplies, 2 Emergency Cache, 1 Dodge, 1 Elusive, 2 Working a Hunch, 2 Survival Instinct, 2 Take Heart, 2 Guts.
+
+**Seraphine Vale (Mystic).** *Mystic cards, Neutral cards, up to 5 Seeker cards (level 0-2).* 2 Arcane Studies, 1 Clarity of Mind, 2 Jim Culver — Haunted Musician, 2 Rite of Seeking, 2 Shrivelling, 2 Magnifying Glass, 2 Blinding Light, 1 Meditative Trance, 2 Ward of Protection, 2 Emergency Cache, 2 Working a Hunch, 2 Defiance, 2 Fearless, 2 Guts, 1 Perception, 2 Unexpected Courage, 1 Deduction.
 
 ---
 

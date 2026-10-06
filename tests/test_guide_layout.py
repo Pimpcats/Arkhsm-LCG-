@@ -123,3 +123,41 @@ def test_every_victory_name_stays_hidden_until_claimed():
     for eid, _name, _where, _vic in L.NAMED + L.VICTORY_ENEMIES + L.VICTORY_LOCATIONS:
         f = fields["vr:" + eid]
         assert f["t"] == "rv" and f["rw"] == "v:" + eid
+
+
+# -------------------------------------------------------------- appendix --
+def _deck_lists_in_the_guide():
+    from collections import Counter
+    import build_guide_pdf as G
+    text = open(G.SOURCE, encoding="utf-8").read()
+    appendix = text.split("## APPENDIX — STARTING DECKS", 1)[1].split("\n## ", 1)[0]
+    decks = {}
+    for m in re.finditer(r"^\*\*(.+?) \((\w+)\)\.\*\* \*(.+?)\.\* (.+)$", appendix, flags=re.M):
+        cards = Counter()
+        for entry in re.split(r", (?=\d )", m.group(4).rstrip(".")):
+            qty, name = entry.split(" ", 1)
+            cards[name.strip()] += int(qty)
+        decks[m.group(1)] = cards
+    return decks
+
+
+def _deck_lists_in_the_document():
+    from collections import Counter
+    text = open(os.path.join(ROOT, "docs", "STARTER_DECKS.md"), encoding="utf-8").read()
+    decks = {}
+    for part in text.split("\n## ")[1:]:
+        head, body = part.split("\n", 1)
+        cards = Counter()
+        for qty, name in re.findall(r"^\| (\d) \| (.+?) \| (?:Asset|Event|Skill) \|", body, flags=re.M):
+            cards[name] += int(qty)
+        decks[re.sub(r" \(\w+\)$", "", head.strip())] = cards
+    return decks
+
+
+def test_the_guides_starting_decks_are_the_starter_decks_document():
+    guide, doc = _deck_lists_in_the_guide(), _deck_lists_in_the_document()
+    assert len(guide) == 5 and set(guide) == set(doc), (sorted(guide), sorted(doc))
+    for name in doc:
+        assert guide[name] == doc[name], name
+        assert sum(doc[name].values()) == 30, name
+        assert max(doc[name].values()) <= 2, name

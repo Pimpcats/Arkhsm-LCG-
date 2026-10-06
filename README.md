@@ -45,6 +45,7 @@ src/StillHour/                the campaign's Lua modules (bundled into the Contr
   Interlude.ttslua            the between-loops procedure and purchases
   Board.ttslua                table wiring: buttons, counters, card placement
   SCED.ttslua                 fail-safe adapter over SCED's public API
+  Guide.ttslua                the Control token's "Guide: ..." menu (page numbers come from the guide PDF build)
 src/tts/                      object scripts: Control entry, campaign log,
                               scenario/campaign boxes, download box
 pipeline/                     specs, renderer, compiler and packagers (Python)
