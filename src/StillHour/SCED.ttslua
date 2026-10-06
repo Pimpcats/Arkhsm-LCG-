@@ -112,6 +112,26 @@ function SCED.getInvestigatorCount()
   return nil
 end
 
+------------------------------------------------------------------------ doom --
+
+--- SCED's own doom reset (the doom counter's "startReset", which its Advance button runs when an
+-- agenda advances): the counter goes to 0 and the doom tokens on the playmats and in the play area
+-- are removed, as its option panel allows. True when it ran; false off SCED.
+function SCED.resetDoom()
+  local counter = SCED.getObjectByOwnerAndType("Mythos", "DoomCounter")
+  if not counter then return false end
+  return try(function() counter.call("startReset") ; return true end) == true
+end
+
+--- PlayAreaApi.setInvestigatorCount(n): the counter's own updateVal (SCED keeps
+-- it between 1 and 4 and says nothing in the chat for a change made this way).
+-- False when SCED, or its counter, is not there.
+function SCED.setInvestigatorCount(n)
+  local counter = SCED.getObjectByOwnerAndType("Mythos", "InvestigatorCounter")
+  if not counter then return false end
+  return try(function() counter.call("updateVal", n) ; return true end) or false
+end
+
 --------------------------------------------------------------- token spawns --
 
 local function spawnTracker()

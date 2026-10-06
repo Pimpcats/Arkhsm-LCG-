@@ -27,8 +27,9 @@ import sced_table  # noqa: E402
 SUITES = ("playthrough", "runner")
 # not in "all": the SCED-only demo for tools/godot_table's review renders, and
 # the story-resolution suite (tests/test_sced_resolutions.py runs it on a
-# payload built from src/, see candidate_payload)
-EXTRA_SUITES = ("demo", "resolutions")
+# payload built from src/, see candidate_payload) and the boxes' Place / Recall
+# suite (tests/test_sced_place.py, the same way)
+EXTRA_SUITES = ("demo", "resolutions", "place_state")
 
 PLAY_AREA_STAND_IN = """
 local enabled = false

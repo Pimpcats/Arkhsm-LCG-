@@ -74,9 +74,10 @@ print("== driving the bundle as TTS would ==")
 env.onLoad(nil)
 print("  created " .. #buttons .. " buttons: " .. table.concat(labels(), ", "))
 for _, p in ipairs({ "Memory ", "Dissonance ", "Hour ", "Appointed: ", "[static] ", "Investigators ",
-                     "Run Tests", "Reset Loop", "Interlude", "Sync Board" }) do
+                     "Reset Loop", "Interlude", "Sync Board" }) do
   expect("control has a '" .. p .. "' button", hasLabel(p) ~= nil)
 end
+expect("control has no Run Tests button (the runner calls runStillHourTests itself)", hasLabel("Run Tests") == nil)
 for _, b in ipairs(buttons) do
   expect("button '" .. b.label .. "' has a click function",
     b.click_function and type(env[b.click_function]) == "function")
@@ -152,8 +153,13 @@ expect("clicking a Recollection spends its memoryCost", env.shApiState().memory 
 env.shBuyLvl3(nil, "White", false)
 expect("clicking Lvl 3 spends 3", env.shApiState().memory == m0 - 5)
 expect("unaffordable purchase is refused", env.shApiBuy({ level = 5 }).ok == (m0 - 5 >= 5))
+local hour0 = env.shApiState().hour
+env.shBeginNextLoop()
+expect("Begin Next Loop before Reset Loop is refused (the night is not over)",
+  env.shApiState().mode == "interlude" and env.shApiState().hour == hour0 and not env.shApiState().loopEnded)
+env.shApiReset()                      -- Between Loops: the loop is reset first
 beginNext(env)
-expect("Begin Next Loop returns to the play panel", env.shApiState().mode == "play" and hasLabel("Run Tests") ~= nil)
+expect("Begin Next Loop returns to the play panel", env.shApiState().mode == "play" and hasLabel("Sync Board") ~= nil)
 
 print("\n== play sequence (console helpers) ==")
 env.shRaiseDissonance()
@@ -241,7 +247,7 @@ env.shBankOnCard()
 expect("banking moves on-card Memory to the bank", env.shApiState().memory == mem0 + 2)
 env.shApiCounter({ name = "memory", delta = 0 })
 local b = hasLabel("Birdie · Years 0")
-expect("aging row per investigator", b ~= nil and hasLabel("Defeated: no") ~= nil)
+expect("aging row per investigator", b ~= nil and hasLabel("Defeated:") ~= nil)
 -- "leaned on the loop" is derived from Birdie's own tallies (no toggle)
 expect("no Leaned toggle any more (derived label only)", hasLabel("Leaned: no") ~= nil
   and hasLabel("Leaned: no").click_function == "shNoop")
@@ -331,8 +337,13 @@ env3.shPrologueReward(nil, "White", true)
 expect("right-click takes the Prologue reward back", env3.shApiState().memory == 0)
 env3.shPrologueReward(nil, "White", false)
 env3.shReset()
+expect("Reset Loop first asks when the Prologue is not over by the Control's count",
+  env3.shApiState().prologue == true and last3:find("The loop is not over by the Control's count", 1, true) ~= nil)
 env3.shReset()
-expect("a second Reset Loop after the Prologue counts nothing and says so",
+expect("the second click ends the Prologue (not a loop)", env3.shApiState().prologue == false and env3.shApiState().loops == 0
+  and env3.shApiState().loopEnded == true)
+env3.shReset()
+expect("a further Reset Loop after the Prologue counts nothing and says so",
   env3.shApiState().loops == 0 and last3:find("already been reset", 1, true) ~= nil)
 env3.shOpenInterlude()
 expect("after the Prologue each Age button reads 'No Age'", label3("No Age") ~= nil and label3("Age") == nil)
@@ -341,8 +352,8 @@ expect("clicking it gives no Years and says why", last3:find("do not gain Years"
   and env3.shApiInvestigators()[1].years == 0)
 beginNext(env3)
 env3.shApiCounter({ name = "dissonance", delta = 16 })
-env3.shReset() ; env3.shReset()
-expect("a second Reset Loop after a loop counts one loop only", env3.shApiState().loops == 1)
+env3.shReset() ; env3.shReset() ; env3.shReset()
+expect("a further Reset Loop after a loop counts one loop only", env3.shApiState().loops == 1)
 env3.shOpenInterlude()
 expect("after a real loop the Age buttons are back", label3("Age") ~= nil and label3("No Age") == nil)
 expect("the interlude Memory button says it adjusts banked Memory",

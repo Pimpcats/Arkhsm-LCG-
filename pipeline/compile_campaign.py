@@ -6,7 +6,7 @@ card sits in which stack of which scenario. This turns that into the object
 hierarchy SCED actually expects, aligned to the vendored ground-truth objects
 in docs/art_reference/sced_objects/:
 
-    CampaignBox         Custom_Model_Bag, Tags [CampaignBox, Reloadable]
+    CampaignBox         Custom_Model_Bag, Tags [CampaignBox]
       ├── ScenarioBox   Custom_Model_Bag per scenario, GMNotes type ScenarioBox
       │     ├── Deck    one per non-empty stack (locations, act, agenda, …)
       │     └── …       memory-bag layout in LuaScriptState.ml (GUID -> pos/rot)

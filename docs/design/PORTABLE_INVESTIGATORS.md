@@ -54,6 +54,39 @@ Uniqueness against the official investigators, by ability:
 | I Get Out | "Remove I Get Out from the game" replaces "max once per game", so Birdie's recursion can never return it (it would be unlimited life) | Built |
 | Nobody Believes Her, Seen This Hand Before | unchanged | Built |
 
+Signature, quest and unlocked cards carry no level, as official signature cards
+do: SCED's metadata has no `level` for them and the FAQ says a signature card is
+not a level 0 card, so an effect that fetches a level 0 card cannot reach them.
+pipeline/stillhour_cards_spec.json has no `level` key on those 20 cards and
+tests/test_content_lints.py requires that. The ten Recollections are level 0 cards
+bought with Memory and keep `level: 0`. A card with no level renders exactly like
+one with level 0 (a level 0 prints no pips); all 20 faces were compared byte for
+byte.
+
+## Traits and deckbuilding
+
+The traits printed on a front are deckbuilding data. A card printed "Sorcerer
+deck only" is legal for an investigator with that trait, as a Neutral card at its
+printed level, so the traits open official cards that the class and level ranges
+do not (docs/design/DECKBUILDING_REVIEW.md, X1; found with
+tools/library/synergy_scan.py). 27 official cards carry such a restriction; 25
+pool rows are open to the five fronts:
+
+| Investigator | Traits | Cards the traits open (level) |
+|---|---|---|
+| Elias | Believer. Warden. | Cowl of Sekhmet (3), Mauser Tankgewehr M1918 (5), Memories of Another Life (5), Sound Support (3) |
+| Ayako | Scholar. Chronicler. | Archibald MacVeigh (5), Inquisitive (1), Library Pass (1 and 5) |
+| Cass | Criminal. Drifter. | Bound for the Horizon (2), Double Down (2), Name Your Price (2), Nose to the Grindstone (3), True Awakening (2) |
+| Birdie | Drifter. Wayward. | Bound for the Horizon (2), Nose to the Grindstone (3), True Awakening (2) |
+| Seraphine | Sorcerer. Cursed. | Blood of K'n-yan (3), Captivating Performance (3), Dimensional Vortex (5), Forbidden Sutra (2), Memories of Another Life (5), Sacred Oath x3 (5), Storm Ruler (4) |
+
+Official investigators with the same traits use the same cards (Warden: Daniela
+Reyes, Nathaniel Cho, Tommy Muldoon; Sorcerer: Marie Lambeau; Cursed: Jim Culver;
+Scholar: Kohaku Narukami; Criminal: Skids O'Toole; Drifter: Jenny Barnes), and the
+review accepted the gates as official parity. A trait line is therefore a
+decision: change one only if the cards it opens are unwanted. "Chronicler" and
+"Wayward" open nothing.
+
 ## Personal quest cards (this campaign only)
 
 Each investigator has two cards, both Permanent (no slot, not counted toward

@@ -83,6 +83,13 @@ return function(H)
     E.run(0.2)
     if st().mode ~= "play" then click(control(), "Begin Next Loop") end
   end
+  -- Reset Loop asks once when the night is not over by the Control's count (Hour IX, Dissonance at the
+  -- reset value): the second click ends it
+  local function resetLoop()
+    click(control(), "Reset Loop")
+    E.run(0.2)
+    if not st().loopEnded then click(control(), "Reset Loop") end
+  end
 
   -- SCED's chaos bag through its own Global API (ChaosBagApi)
   local function chaosBag() return E.Global.call("findChaosBag") end
@@ -504,11 +511,17 @@ return function(H)
     check("Memory button banks +4", st().memory == memBefore + 4, memBefore .. " -> " .. st().memory)
     click(control(), "Reset Loop")
     E.run(2)
+    check("the Prologue is not over by the Control's count: the first Reset Loop only asks", st().prologue == true
+      and st().loopEnded == false, J.encode(st()))
+    click(control(), "Reset Loop")
+    E.run(2)
     local s = st()
     check("Reset Loop ends the Prologue without counting a loop", s.prologue == false and s.loops == 0 and s.loopEnded == true,
       J.encode(s))
+    check("Between Loops the panel says so and offers no Hour or Dissonance", hasLabel(control(), "Interlude")
+      and not hasLabel(control(), "Hour") and not hasLabel(control(), "Dissonance"), labels(control()))
     click(control(), "Reset Loop")
-    check("a second Reset Loop is refused", st().loops == 0)
+    check("a further Reset Loop is refused", st().loops == 0)
     click(control(), "Interlude")
     check("the Interlude panel opens", hasLabel(control(), "Begin Next Loop"), labels(control()))
     beginNextLoop()
@@ -749,7 +762,14 @@ return function(H)
   end)
 
   step("Loop 1 ends: Reset Loop, an interlude purchase, Begin Next Loop", function()
-    click(control(), "Reset Loop")
+    click(control(), "Interlude")
+    E.run(1)
+    click(control(), "Begin Next Loop")
+    E.run(1)
+    check("Begin Next Loop before Reset Loop is refused", st().loops == 0 and st().loopEnded == false
+      and st().mode == "interlude", J.encode(st()))
+    click(control(), "Back")
+    resetLoop()
     E.run(1)
     check("the loop is counted", st().loops == 1 and st().loopEnded == true, J.encode(st()))
     click(control(), "Interlude")
@@ -788,7 +808,7 @@ return function(H)
   step("Part II: three surface entries before Begin Next Loop", function()
     tickLog("k:the-thirteenth-toll")
     tickLog("k:the-road-remembers")
-    click(control(), "Reset Loop")
+    resetLoop()
     E.run(1)
     click(control(), "Interlude")
     beginNextLoop()

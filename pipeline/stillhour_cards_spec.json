@@ -9,11 +9,11 @@
   },
   {
     "deck": 95011, "id": "sthr-lamp", "type": "Asset", "name": "The Ambergrove Lamp",
-    "subtitle": "", "class": "Guardian", "traits": "Item. Tool.", "cost": 2, "level": 0, "slot": "Hand", "wilIcons": 1, "agiIcons": 1
+    "subtitle": "", "class": "Guardian", "traits": "Item. Tool.", "cost": 2, "slot": "Hand", "wilIcons": 1, "agiIcons": 1
   },
   {
     "deck": 95012, "id": "sthr-donebefore", "type": "Skill", "name": "I've Done This Before",
-    "subtitle": "", "class": "Guardian", "traits": "Innate. Recollection.", "level": 0, "wildIcons": 1
+    "subtitle": "", "class": "Guardian", "traits": "Innate. Recollection.", "wildIcons": 1
   },
   {
     "deck": 95013, "id": "sthr-eighthgrave", "type": "Treachery", "name": "The Eighth Grave",
@@ -30,12 +30,12 @@
   },
   {
     "deck": 95015, "id": "sthr-lexicon", "type": "Asset", "name": "The Lexicon of the Hour",
-    "subtitle": "", "class": "Seeker", "traits": "Item. Tome.", "cost": 2, "level": 0, "slot": "Hand",
+    "subtitle": "", "class": "Seeker", "traits": "Item. Tome.", "cost": 2, "slot": "Hand",
     "uses": [{ "count": 0, "type": "Secret", "token": "resource" }], "wilIcons": 1, "intIcons": 1
   },
   {
     "deck": 95016, "id": "sthr-itmeanswait", "type": "Event", "name": "It Means 'Wait'",
-    "subtitle": "", "class": "Seeker", "traits": "Insight.", "cost": 1, "level": 0, "wilIcons": 1, "intIcons": 1
+    "subtitle": "", "class": "Seeker", "traits": "Insight.", "cost": 1, "wilIcons": 1, "intIcons": 1
   },
   {
     "deck": 95017, "id": "sthr-untranslatable", "type": "Treachery", "name": "Untranslatable",
@@ -52,11 +52,11 @@
   },
   {
     "deck": 95019, "id": "sthr-markeddeck", "type": "Asset", "name": "Marked Deck",
-    "subtitle": "", "class": "Rogue", "traits": "Item. Illicit.", "cost": 1, "level": 0, "slot": "Hand", "intIcons": 1, "agiIcons": 1
+    "subtitle": "", "class": "Rogue", "traits": "Item. Illicit.", "cost": 1, "slot": "Hand", "intIcons": 1, "agiIcons": 1
   },
   {
     "deck": 95020, "id": "sthr-seenthishand", "type": "Event", "name": "Seen This Hand Before",
-    "subtitle": "", "class": "Rogue", "traits": "Fortune. Insight.", "cost": 1, "level": 0, "comIcons": 1, "agiIcons": 1
+    "subtitle": "", "class": "Rogue", "traits": "Fortune. Insight.", "cost": 1, "comIcons": 1, "agiIcons": 1
   },
   {
     "deck": 95021, "id": "sthr-housewins", "type": "Enemy", "name": "The House Always Wins",
@@ -73,12 +73,12 @@
   },
   {
     "deck": 95023, "id": "sthr-bell", "type": "Asset", "name": "The Bell of Ambergrove",
-    "subtitle": "", "class": "Mystic", "traits": "Relic.", "cost": 3, "level": 0, "slot": "Accessory",
+    "subtitle": "", "class": "Mystic", "traits": "Relic.", "cost": 3, "slot": "Accessory",
     "uses": [{ "count": 4, "type": "Charge", "token": "resource" }], "wilIcons": 2
   },
   {
     "deck": 95024, "id": "sthr-rememberending", "type": "Event", "name": "I Remember the Ending",
-    "subtitle": "", "class": "Mystic", "traits": "Spell. Insight.", "cost": 2, "level": 0, "wilIcons": 2
+    "subtitle": "", "class": "Mystic", "traits": "Spell. Insight.", "cost": 2, "wilIcons": 2
   },
   {
     "deck": 95025, "id": "sthr-debtofhours", "type": "Treachery", "name": "The Debt of Hours",
@@ -95,11 +95,11 @@
   },
   {
     "deck": 95027, "id": "sthr-compass", "type": "Asset", "name": "Lucky Compass",
-    "subtitle": "", "class": "Survivor", "traits": "Item. Charm.", "cost": 1, "level": 0, "slot": "Accessory", "wilIcons": 1, "agiIcons": 1
+    "subtitle": "", "class": "Survivor", "traits": "Item. Charm.", "cost": 1, "slot": "Accessory", "wilIcons": 1, "agiIcons": 1
   },
   {
     "deck": 95028, "id": "sthr-igetout", "type": "Event", "name": "I Get Out",
-    "subtitle": "", "class": "Survivor", "traits": "Gambit.", "cost": 0, "level": 0, "wilIcons": 1, "agiIcons": 1
+    "subtitle": "", "class": "Survivor", "traits": "Gambit.", "cost": 0, "wilIcons": 1, "agiIcons": 1
   },
   {
     "deck": 95029, "id": "sthr-nobodybelieves", "type": "Treachery", "name": "Nobody Believes Her",
@@ -147,14 +147,14 @@
     "deck": 95039, "id": "sthr-hourlearnedname", "type": "Event", "name": "The Hour I Learned Your Name",
     "subtitle": "", "class": "Neutral", "traits": "Spell. Recollection.", "level": 0, "cost": 2, "memoryCost": 5, "wildIcons": 1
   },
-  {"deck": 95047, "id": "sthr-quest-elias", "type": "Asset", "name": "What the Warden Owes", "subtitle": "", "class": "Guardian", "traits": "Quest. Campaign.", "level": 0, "cost": 0, "permanent": true},
-  {"deck": 95048, "id": "sthr-questdone-elias", "type": "Asset", "name": "What the Warden Remembers", "subtitle": "", "class": "Guardian", "traits": "Quest. Unlocked.", "level": 0, "cost": 0, "permanent": true},
-  {"deck": 95049, "id": "sthr-quest-ayako", "type": "Asset", "name": "The Unfinished Translation", "subtitle": "", "class": "Seeker", "traits": "Quest. Campaign.", "level": 0, "cost": 0, "permanent": true},
-  {"deck": 95050, "id": "sthr-questdone-ayako", "type": "Asset", "name": "The Translation, Finished", "subtitle": "", "class": "Seeker", "traits": "Quest. Unlocked.", "level": 0, "cost": 0, "permanent": true},
-  {"deck": 95051, "id": "sthr-quest-cass", "type": "Asset", "name": "A Marked Run of Cards", "subtitle": "", "class": "Rogue", "traits": "Quest. Campaign.", "level": 0, "cost": 0, "permanent": true},
-  {"deck": 95052, "id": "sthr-questdone-cass", "type": "Asset", "name": "The Table Remembers", "subtitle": "", "class": "Rogue", "traits": "Quest. Unlocked.", "level": 0, "cost": 0, "permanent": true},
-  {"deck": 95053, "id": "sthr-quest-seraphine", "type": "Asset", "name": "The Medium's Price", "subtitle": "", "class": "Mystic", "traits": "Quest. Campaign.", "level": 0, "cost": 0, "permanent": true},
-  {"deck": 95054, "id": "sthr-questdone-seraphine", "type": "Asset", "name": "The Price, Remembered", "subtitle": "", "class": "Mystic", "traits": "Quest. Unlocked.", "level": 0, "cost": 0, "permanent": true},
-  {"deck": 95055, "id": "sthr-quest-birdie", "type": "Asset", "name": "Somewhere to Be", "subtitle": "", "class": "Survivor", "traits": "Quest. Campaign.", "level": 0, "cost": 0, "permanent": true},
-  {"deck": 95056, "id": "sthr-questdone-birdie", "type": "Asset", "name": "She Knows the Road", "subtitle": "", "class": "Survivor", "traits": "Quest. Unlocked.", "level": 0, "cost": 0, "permanent": true}
+  {"deck": 95047, "id": "sthr-quest-elias", "type": "Asset", "name": "What the Warden Owes", "subtitle": "", "class": "Guardian", "traits": "Quest. Campaign.", "cost": 0, "permanent": true},
+  {"deck": 95048, "id": "sthr-questdone-elias", "type": "Asset", "name": "What the Warden Remembers", "subtitle": "", "class": "Guardian", "traits": "Quest. Unlocked.", "cost": 0, "permanent": true},
+  {"deck": 95049, "id": "sthr-quest-ayako", "type": "Asset", "name": "The Unfinished Translation", "subtitle": "", "class": "Seeker", "traits": "Quest. Campaign.", "cost": 0, "permanent": true},
+  {"deck": 95050, "id": "sthr-questdone-ayako", "type": "Asset", "name": "The Translation, Finished", "subtitle": "", "class": "Seeker", "traits": "Quest. Unlocked.", "cost": 0, "permanent": true},
+  {"deck": 95051, "id": "sthr-quest-cass", "type": "Asset", "name": "A Marked Run of Cards", "subtitle": "", "class": "Rogue", "traits": "Quest. Campaign.", "cost": 0, "permanent": true},
+  {"deck": 95052, "id": "sthr-questdone-cass", "type": "Asset", "name": "The Table Remembers", "subtitle": "", "class": "Rogue", "traits": "Quest. Unlocked.", "cost": 0, "permanent": true},
+  {"deck": 95053, "id": "sthr-quest-seraphine", "type": "Asset", "name": "The Medium's Price", "subtitle": "", "class": "Mystic", "traits": "Quest. Campaign.", "cost": 0, "permanent": true},
+  {"deck": 95054, "id": "sthr-questdone-seraphine", "type": "Asset", "name": "The Price, Remembered", "subtitle": "", "class": "Mystic", "traits": "Quest. Unlocked.", "cost": 0, "permanent": true},
+  {"deck": 95055, "id": "sthr-quest-birdie", "type": "Asset", "name": "Somewhere to Be", "subtitle": "", "class": "Survivor", "traits": "Quest. Campaign.", "cost": 0, "permanent": true},
+  {"deck": 95056, "id": "sthr-questdone-birdie", "type": "Asset", "name": "She Knows the Road", "subtitle": "", "class": "Survivor", "traits": "Quest. Unlocked.", "cost": 0, "permanent": true}
 ]

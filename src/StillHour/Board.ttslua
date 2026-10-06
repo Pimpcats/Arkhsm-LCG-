@@ -39,9 +39,11 @@ Board.APPOINTED_OFFSET = { x = 0, y = 0.6, z = -0.9 }
 local host                       -- the object owning the button callbacks
 local say = function() end
 local st = {
+  -- Keyed by GUID, and a box lays its objects out again every loop with the GUIDs
+  -- they had before: a memory about a destroyed object must never outlive it
+  -- (Board.forgetGuid). What is on a card (its CLOSED label) is read off the card.
   flipped = {},        -- guid -> true: location we flipped to its back
   sealedMarked = {},   -- guid -> true: SCED clue auto-spawn suppressed by us
-  sealedLabel = {},    -- guid -> true: we put a SEALED label on it
   appointed = { guid = nil, placed = false, lastPos = nil, lastRot = nil },
 }
 local restoreScheduled = false
@@ -97,6 +99,40 @@ local function split(s)
   return out
 end
 
+-- Advance widths (per 1000 em) of TTS button text (Arial) for ASCII 32..126;
+-- any other character counts as 560.
+local ADVANCE = { 278, 278, 355, 556, 556, 889, 667, 191, 333, 333, 389, 584, 278, 333, 278, 278,
+  556, 556, 556, 556, 556, 556, 556, 556, 556, 556, 278, 278, 584, 584, 584, 556, 1015,
+  667, 667, 722, 722, 667, 611, 778, 722, 278, 500, 667, 556, 833, 722, 778, 667, 778, 722, 667, 611,
+  722, 667, 944, 667, 667, 611, 278, 278, 278, 469, 556, 333,
+  556, 556, 500, 556, 556, 278, 556, 556, 222, 222, 500, 222, 833, 556, 556, 556, 556, 333, 500, 278,
+  556, 500, 722, 500, 500, 500, 334, 260, 334, 584 }
+
+--- The font size for a button label: `size`, or smaller so the widest line of
+-- the label stays inside a button `width` wide (a text-only button, width 0,
+-- keeps its size). Button text that is wider than its button runs into the
+-- next button.
+function Board.fitFont(label, width, size)
+  if type(width) ~= "number" or width <= 0 then return size end
+  local widest = 0
+  for line in (tostring(label) .. "\n"):gmatch("(.-)\n") do
+    local w = 0
+    for ch in line:gmatch(".") do
+      local b = ch:byte()
+      w = w + ((b >= 32 and b <= 126) and ADVANCE[b - 31] or 560)
+    end
+    if w > widest then widest = w end
+  end
+  if widest == 0 then return size end
+  return math.max(30, math.min(size, math.floor(width * 0.95 * 1000 / widest)))
+end
+
+--- obj.createButton(def) with the label's font size fitted to the button.
+local function createFitted(obj, def)
+  def.font_size = Board.fitFont(def.label, def.width, def.font_size or 100)
+  return obj.createButton(def)
+end
+
 ------------------------------------------------------------------- lifecycle --
 
 function Board.init(hostObject, opts)
@@ -113,7 +149,6 @@ function Board.load(t)
   if type(t) ~= "table" then return end
   st.flipped = t.flipped or {}
   st.sealedMarked = t.sealedMarked or {}
-  st.sealedLabel = t.sealedLabel or {}
   st.appointed = t.appointed or { placed = false }
 end
 
@@ -392,7 +427,7 @@ function Board.refreshInvestigators(applyStats)
         yearsLabel = yearsLabel .. string.format(" · max %d/%d", eff.health, eff.sanity)
       end
       safe(function()
-        card.createButton({
+        createFitted(card, {
           click_function = "shCardMemory", function_owner = host,
           label = "Memory " .. CampaignState.getOnCardMemory(inv.id),
           tooltip = "Memory on this investigator's cards. Left-click +1 · Right-click -1",
@@ -400,7 +435,7 @@ function Board.refreshInvestigators(applyStats)
           width = 620, height = 200, font_size = 120,
           color = { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
         })
-        card.createButton({
+        createFitted(card, {
           click_function = "shNoop", function_owner = host, label = yearsLabel,
           tooltip = "Years lived in the loop (Aging). Skills on the playmat tracker include the drift.",
           position = { 0.65, 0.3, 1.25 }, rotation = { 0, 0, 0 },
@@ -408,7 +443,7 @@ function Board.refreshInvestigators(applyStats)
         })
         -- "leaned on the loop" tallies (aging v0.3 §1.1), this investigator's own
         local t = CampaignState.getTallies(inv.id)
-        card.createButton({
+        createFitted(card, {
           click_function = "shCardRaised", function_owner = host,
           label = "Dissonance raised " .. t.raises,
           tooltip = "Times THIS investigator paid 'raise Dissonance' as a cost this loop (3+ = leaned on the loop). "
@@ -417,7 +452,7 @@ function Board.refreshInvestigators(applyStats)
           width = 760, height = 180, font_size = 90,
           color = { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
         })
-        card.createButton({
+        createFitted(card, {
           click_function = "shCardSpent", function_owner = host,
           label = "Loop-power Memory " .. t.spent,
           tooltip = "Memory THIS investigator removed from their own cards for their own cards or abilities "
@@ -428,7 +463,7 @@ function Board.refreshInvestigators(applyStats)
         })
         local quest = CampaignState.getQuest(inv.id)
         if quest.goal then
-          card.createButton({
+          createFitted(card, {
             click_function = "shCardQuest", function_owner = host,
             label = quest.unlocked and "Quest met" or string.format("Quest %d / %d", quest.tally, quest.goal),
             tooltip = "Your personal quest card's tally, kept across the campaign (the Campaign Log shows it too). "
@@ -438,7 +473,7 @@ function Board.refreshInvestigators(applyStats)
             color = quest.unlocked and { 0.1, 0.25, 0.12 } or { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
           })
         end
-        card.createButton({
+        createFitted(card, {
           click_function = "shCardYears", function_owner = host,
           label = "Years pending " .. CampaignState.getPendingYears(inv.id),
           tooltip = "Years a card or resolution gave THIS investigator during the loop (A Year in a Night, "
@@ -465,6 +500,14 @@ function Board.investigatorIdOf(o)
 end
 
 ------------------------------------------------------------------ locations --
+
+local function hasLabel(o, label)
+  local buttons = safe(function() return o.getButtons() end) or {}
+  for _, b in ipairs(buttons) do
+    if b.label == label then return true end
+  end
+  return false
+end
 
 local function removeLabel(o, label)
   local buttons = safe(function() return o.getButtons() end) or {}
@@ -516,9 +559,11 @@ function Board.syncLocations()
       if Locations.isSealed(l.locId) then
         rep.sealed = rep.sealed + 1
         if SCED.markTokensSpawned(g) then st.sealedMarked[g] = true end
-        if not st.sealedLabel[g] then addLabel(o, Board.SEALED_LABEL) ; st.sealedLabel[g] = true end
+        -- looked for on the card itself, never remembered by GUID: a new card
+        -- laid out with an old card's GUID, or buttons lost in a save, get it again
+        if not hasLabel(o, Board.SEALED_LABEL) then addLabel(o, Board.SEALED_LABEL) end
       else
-        if st.sealedLabel[g] then removeLabel(o, Board.SEALED_LABEL) ; st.sealedLabel[g] = nil end
+        removeLabel(o, Board.SEALED_LABEL)
         if st.sealedMarked[g] then
           st.sealedMarked[g] = nil
           SCED.resetTokensSpawned(g)
@@ -529,6 +574,54 @@ function Board.syncLocations()
     end
   end
   return rep
+end
+
+------------------------------------------------------------------ box context --
+
+Board.FINALE_ENTRY = "the-way-the-night-breaks"
+
+--- A district none of whose locations on the table connects, through the
+-- locations that are there, to a location of the Square (the district every
+-- loop begins with). boxId is the scenario box's id.
+local function cutOff(boxId)
+  local tag = "StillHourBox_" .. boxId
+  local locs = Board.locationCards()
+  local mine, square = {}, {}
+  for _, l in ipairs(locs) do
+    if safe(function() return l.obj.hasTag(tag) end) then mine[#mine + 1] = l.guid end
+    local def = l.locId and Locations.LOCATIONS[l.locId]
+    if def and def.district == "Square" then square[l.guid] = true end
+  end
+  if #mine == 0 then return false end
+  local graph = Board.graph(locs)
+  local seen, queue = {}, {}
+  for _, g in ipairs(mine) do seen[g] = true ; queue[#queue + 1] = g end
+  local head = 1
+  while head <= #queue do
+    local g = queue[head]
+    head = head + 1
+    if square[g] then return false end
+    for _, nb in ipairs(graph[g] or {}) do
+      if not seen[nb] then seen[nb] = true ; queue[#queue + 1] = nb end
+    end
+  end
+  return true
+end
+
+--- Is a box that was just Placed out of context? "prologue-over" (the
+-- Prologue's box once the Prologue has ended), "not-yet" (the finale's box
+-- before the finale can begin), "cut-off" (a district that nothing on the
+-- table connects to the Square), else nil. The Control token only says so:
+-- nothing is refused or moved.
+function Board.boxContext(boxId)
+  if boxId == "prologue" then
+    if not CampaignState.inPrologue() then return "prologue-over" end
+  elseif boxId == "finale" then
+    if not CampaignState.inFinale() and not CampaignState.knows(Board.FINALE_ENTRY) then return "not-yet" end
+  elseif type(boxId) == "string" and boxId:sub(1, 9) == "district_" and boxId ~= "district_square" then
+    if cutOff(boxId) then return "cut-off" end
+  end
+  return nil
 end
 
 --------------------------------------------------------------- the Appointed --
@@ -629,7 +722,7 @@ function Board.refreshAppointedButtons(card)
   end
   for _, b in ipairs(defs) do
     safe(function()
-      card.createButton({
+      createFitted(card, {
         click_function = b.fn, function_owner = host, label = b.label(), tooltip = b.tip,
         position = { 0, 0.3, b.z }, rotation = { 0, 0, 0 },
         width = b.w, height = 200, font_size = b.fs,
@@ -810,7 +903,21 @@ function Board.onEnterContainer(container, obj)
   end
 end
 
+--- Forget what is remembered about one object by GUID (see the note on `st`): a
+-- new card laid out with a destroyed card's GUID is a new card.
+function Board.forgetGuid(g)
+  if g == nil then return end
+  st.flipped[g] = nil
+  st.sealedMarked[g] = nil
+  if st.appointed.engagedAt == g then st.appointed.engagedAt = nil end
+end
+
+function Board.forgetGuids(list)
+  for _, g in ipairs(type(list) == "table" and list or {}) do Board.forgetGuid(g) end
+end
+
 function Board.onDestroy(obj)
+  Board.forgetGuid(guidOf(obj))
   if Board.isAppointedObject(obj) and Appointed.isManifest() then
     restoreData = safe(function() return obj.getData() end)
     Appointed.onRemovalAttempt(Board.appointedCtx())
@@ -851,32 +958,72 @@ end
 Board.CAMPAIGN_LOG_TAG = "CampaignLog"
 Board.MEMO_KEY = "stillHour"
 
+--- How many Campaign Logs are on the table (the mirror needs exactly one).
+function Board.campaignLogCount()
+  return #(safe(function() return getObjectsWithTag(Board.CAMPAIGN_LOG_TAG) end) or {})
+end
+
 function Board.campaignLog()
   local list = safe(function() return getObjectsWithTag(Board.CAMPAIGN_LOG_TAG) end) or {}
   if #list == 1 then return list[1] end
   return nil
 end
 
---- Write `blob` (a JSON string) with sequence `seq` into the log's memo.
+local function mirrorIn(memo)
+  local t = decode(memo)
+  if t and type(t[Board.MEMO_KEY]) == "string" then
+    return { blob = t[Board.MEMO_KEY], seq = tonumber(t.seq) or 0 }
+  end
+  return nil
+end
+
+--- Write `blob` (a JSON string) with sequence `seq` into the log's memo. A log
+-- that already holds a newer copy is left alone (false, "newer"): it is the
+-- campaign, and this Control token is the blank or older one.
 function Board.mirrorToLog(blob, seq)
   local log = Board.campaignLog()
   if not log or JSON == nil then return false end
+  local held = mirrorIn(safe(function() return log.memo end))
+  if held and held.seq > seq then return false, "newer" end
   return safe(function()
     log.memo = JSON.encode({ [Board.MEMO_KEY] = blob, seq = seq })
     return true
   end) or false
 end
 
---- The mirrored {blob, seq} in a campaign log object's memo, or nil.
+--- The newest mirrored {blob, seq} a campaign log holds, or nil. The log has one
+-- State per page and each State has its own memo: turning the page leaves the
+-- newest copy on the page that was showing, not on the one that is now.
 function Board.readLogMirror(log)
   log = log or Board.campaignLog()
   if not log then return nil end
-  local memo = safe(function() return log.memo end)
-  local t = decode(memo)
-  if t and type(t[Board.MEMO_KEY]) == "string" then
-    return { blob = t[Board.MEMO_KEY], seq = tonumber(t.seq) or 0 }
+  local best = mirrorIn(safe(function() return log.memo end))
+  local data = safe(function() return log.getData() end)
+  for _, state in pairs(type(data) == "table" and type(data.States) == "table" and data.States or {}) do
+    local m = type(state) == "table" and mirrorIn(state.Memo)
+    if m and (best == nil or m.seq > best.seq) then best = m end
   end
-  return nil
+  return best
+end
+
+--- Does a campaign log (any page) hold entries somebody made? Its starting
+-- values (the party size) do not count.
+function Board.logHasContent(log)
+  log = log or Board.campaignLog()
+  if not log then return false end
+  local function filled(raw)
+    local t = decode(raw)
+    for k, v in pairs(t and type(t.values) == "table" and t.values or {}) do
+      if k ~= "investigators" and v ~= false and v ~= 0 and v ~= "" then return true end
+    end
+    return false
+  end
+  if filled(safe(function() return log.script_state end)) then return true end
+  local data = safe(function() return log.getData() end)
+  for _, state in pairs(type(data) == "table" and type(data.States) == "table" and data.States or {}) do
+    if type(state) == "table" and filled(state.LuaScriptState) then return true end
+  end
+  return false
 end
 
 return Board

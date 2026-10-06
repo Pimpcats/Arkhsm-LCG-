@@ -11,7 +11,7 @@ Ships the campaign the way SCED distributes custom content (SCED_BUILD_BRIEF §1
      contentDownloadCallback) — so the file is the object itself, not a save
      with ObjectStates. The box is the real CampaignBox shape
      (docs/art_reference/sced_objects/campaign_box_memory_bag.json): SCED's box
-     mesh + MemoryBag script (Place / Recall), Tags [CampaignBox, Reloadable],
+     mesh + MemoryBag script (Place / Recall), Tags [CampaignBox],
      GMNotes {filename, id, type}. It holds the scenario books once every
      scenario is locked in (compile_campaign.py), the investigator minicards,
      the campaign log and the campaign guide (table_presence.py), plus the
@@ -169,7 +169,8 @@ def main(argv=None):
                                                 o["Transform"].get("scaleY", 1),
                                                 o["Transform"].get("scaleZ", 1)))
         box["ContainedObjects"].append(o)
-        ml[o["GUID"]] = T.ml_entry(pos)
+        # Place keeps a locked object locked (the Control token is saved locked)
+        ml[o["GUID"]] = T.ml_entry(pos, lock=o.get("Locked", False))
     box["LuaScriptState"] = json.dumps(state, indent=2)
     box["Description"] = ("An original " + CFG.genre + " campaign (fan content, not for "
                           "sale). Place lays out the log, guide and minicards.")
@@ -197,12 +198,12 @@ def main(argv=None):
         "Nickname": CFG.upper_name + " — Download Box",
         "Description": "Click Download inside the SCED mod to fetch the campaign.",
         "GUID": guid(CFG.download_box_guid),
-        # real campaign-box tagging + GMNotes shape: docs/art_reference/
-        # sced_objects/campaign_box_memory_bag.json ("Reloadable" lets SCED
-        # re-fetch the download; "filename" is the placeholderDownload key)
+        # real campaign-box GMNotes shape: docs/art_reference/sced_objects/
+        # campaign_box_memory_bag.json ("filename" is the placeholderDownload key)
         # not tagged CampaignBox or Reloadable: SCED's campaign exporter reads an empty
         # Bag with that tag as "the campaign box with all objects placed", and its
-        # "Redownload this" asks SCED's own release for the file
+        # "Redownload this" asks SCED's own release for the file (the campaign box
+        # itself is tagged CampaignBox only, see table_presence.campaign_box)
         "Tags": [CFG.tag],
         "ColorDiffuse": {"r": 0.13, "g": 0.11, "b": 0.18},
         # campaign-box area at the top of the SCED table, off the mats

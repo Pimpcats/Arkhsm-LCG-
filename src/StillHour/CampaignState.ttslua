@@ -44,6 +44,7 @@ local function freshState(n)
     brackets = {},           -- investigatorId -> {bracket, physical, mental}
     appointedStage = 0,      -- The Appointed's Approach: 0 Unseen..3 Arrived (CO-002)
     victoryLog = {},         -- enemyId -> true (Victory claimed; once per campaign)
+    victoryPaid = {},        -- enemyId -> banked Memory its claim paid and has not been taken back (refund on un-ticking)
     onCardMemory = {},       -- investigatorId -> Memory on that investigator's cards (this loop)
     loopTallies = {},        -- investigatorId -> {raises, spent}: Aging's "leaned on the loop" inputs
     lastLoopEndDissonance = nil, -- Dissonance when the last loop ended
@@ -118,6 +119,7 @@ function CampaignState.deserialize(saved, decoder)
     state.brackets = state.brackets or {}
     state.appointedStage = state.appointedStage or 0
     state.victoryLog = state.victoryLog or {}
+    state.victoryPaid = state.victoryPaid or {}
     state.onCardMemory = state.onCardMemory or {}
     state.loopTallies = state.loopTallies or {}
     state.knowledgePaid = state.knowledgePaid or {}
@@ -365,15 +367,20 @@ function CampaignState.questUnlocked(investigatorId)
 end
 
 --- Add `delta` (may be negative; floors at 0) to the tally. Meeting the goal
--- unlocks the quest. Returns the new tally and whether this call unlocked it.
+-- unlocks the quest, taking the tally back below it locks the quest again.
+-- Returns the new tally and whether this call unlocked it.
 function CampaignState.addQuest(investigatorId, delta)
   local def = Constants.QUEST[investigatorId]
   if not def or type(investigatorId) ~= "string" then return nil, false end
   state.quest = state.quest or {}
   local q = state.quest[investigatorId] or { tally = 0, unlocked = false }
-  q.tally = math.max(0, (q.tally or 0) + math.floor(tonumber(delta) or 1))
+  local was = q.tally or 0
+  q.tally = math.max(0, was + math.floor(tonumber(delta) or 1))
   local just = false
   if not q.unlocked and q.tally >= def.goal then q.unlocked, just = true, true end
+  -- a tally taken back below the goal: the quest is no longer met (one unlocked
+  -- by hand below its goal is left as it is)
+  if q.unlocked and was >= def.goal and q.tally < def.goal then q.unlocked = false end
   state.quest[investigatorId] = q
   return q.tally, just
 end
@@ -531,14 +538,37 @@ function CampaignState.isVictoryClaimed(enemyId)
 end
 
 --- Claim an enemy's Victory: banks `memoryValue` the first time only.
--- Returns true if newly claimed (Memory banked), false if already claimed.
+-- Returns true if newly claimed (Memory banked), false if already claimed. What
+-- an earlier claim paid and the bank could not give back (spent since) is not
+-- paid twice: a re-claim after a partial refund pays only the part taken back.
 function CampaignState.claimVictory(enemyId, memoryValue)
   if state.victoryLog[enemyId] then
     return false
   end
   state.victoryLog[enemyId] = true
-  CampaignState.bankMemory(memoryValue or 0)
+  state.victoryPaid = state.victoryPaid or {}
+  local held = state.victoryPaid[enemyId] or 0
+  local full = memoryValue or 0
+  CampaignState.bankMemory(math.max(0, full - held))
+  state.victoryPaid[enemyId] = math.max(full, held)
   return true
+end
+
+--- Take a Victory claim back (its Campaign Log box un-ticked) and refund what it
+-- paid, as far as banked Memory allows. Returns (removed, refunded). A claim made
+-- before payments were recorded refunds nothing.
+function CampaignState.forgetVictory(enemyId)
+  if not state.victoryLog[enemyId] then
+    return false, 0
+  end
+  state.victoryLog[enemyId] = nil
+  state.victoryPaid = state.victoryPaid or {}
+  local paid = state.victoryPaid[enemyId] or 0
+  local refund = math.min(paid, state.bankedMemory)
+  if refund > 0 then CampaignState.bankMemory(-refund) end
+  local shortfall = paid - refund
+  state.victoryPaid[enemyId] = shortfall > 0 and shortfall or nil
+  return true, refund
 end
 
 ------------------------------------------------------------------ loop flow --

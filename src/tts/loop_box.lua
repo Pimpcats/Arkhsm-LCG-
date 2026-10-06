@@ -11,13 +11,22 @@
 --     {guid: {pos, rot, lock}} layout SCED uses), then setLock, and throws the
 --     empty copy away. Nothing is rebuilt from data in Lua: no spawnObjectData,
 --     no JSON round trip, no new GUIDs. The objects keep the GUIDs they have in
---     the box, as the official boxes' objects do.
+--     the box, as the official boxes' objects do. SCED's Token Spawn Tracker
+--     remembers cards by GUID, so before anything is taken Place makes it forget
+--     the GUIDs it is about to lay out again: a location spawns its clues in
+--     every loop, not only in the first.
 --   * every object in the box (and every card inside its decks) carries the
 --     tags "StillHourLoop" and "StillHourBox_<box id>" from the build, so a
 --     drawn card is still recognised; Place also tags what it takes out.
---   * Recall removes what this box placed (and any card that came out of it)
---     from the table; the Control token's Clear Board removes every box's
---     objects at once (shClearBoard).
+--   * Recall removes what this box placed (and any card that came out of it, and
+--     the tokens resting on them) from the table; the Control token's Clear
+--     Board does the same for every box at once (shClearBoard). Either one first
+--     stops a Place that is still running (cancelPlace), so no half layout
+--     arrives afterwards and the next Place is not refused.
+--   * a second Place is refused while this box's objects are on the table, and
+--     while objects of another box (or of an older build's box: an old Place
+--     tagged them StillHourBox:<guid>) still lie where this box lays something
+--     out: they would be dropped on and merged into what it lays there.
 -- The button layout matches SCED's MemoryBag so the book looks and works like
 -- an official scenario box.
 
@@ -28,7 +37,23 @@ LOOP_TAG = "StillHourLoop"
 -- the last step reached if Tabletop Simulator ever stops.
 local STEP_FRAMES = 6
 
+-- SCED's GUID reference handler: the way to its Token Spawn Tracker
+-- (src/StillHour/SCED.ttslua makes the same lookup).
+local SCED_HANDLER_GUID = "123456"
+
+-- What the working copy's name ends with while a Place takes objects out of it.
+local WORKING_SUFFIX = " (placing)"
+
+-- An object of another box closer than this to a spot this box lays something
+-- on would be merged with it. Boxes that share a loop's board never use the
+-- same spots (tests/test_table_presence.py), and the Appointed, which the
+-- Control token stands beside a location, is farther off.
+local SPOT_REACH = 0.75
+
 local memoryList = {}
+local placing = false      -- a Place of this box is running (not saved: a load ends it)
+local run = 0              -- which Place is current; the callbacks of a stopped one see another number
+local workingCopy = nil    -- the copy a running Place takes the objects out of
 
 local function boxId()
   local ok, gm = pcall(JSON.decode, self.getGMNotes() or "")
@@ -40,11 +65,74 @@ local function boxTag()
   return "StillHourBox_" .. boxId()
 end
 
+--- Written to the Lua log (Player.log) before the step it names runs, so a
+-- crash in Tabletop Simulator leaves the failing step behind.
+local function trace(msg)
+  log("StillHour box '" .. tostring(self.getName()) .. "': " .. msg)
+end
+
+local function say(msg)
+  broadcastToAll(msg, { 0.95, 0.85, 0.6 })
+end
+
+local function alive(o)
+  return o ~= nil and not o.isDestroyed()
+end
+
+--- Run fn; an error is written to the log (what failed) and never raised.
+local function try(what, fn)
+  local ok, err = pcall(fn)
+  if not ok then trace(what .. " failed: " .. tostring(err)) end
+  return ok
+end
+
+local function isWorkingCopy()
+  local name = tostring(self.getName() or "")
+  return name:sub(-#WORKING_SUFFIX) == WORKING_SUFFIX
+end
+
 function updateSave()
   self.script_state = JSON.encode({ ml = memoryList })
 end
 
+--- True while a Place of this box is laying it out. The working copies it makes
+-- ask their box this (a copy is a box too, and says false).
+function isPlacing()
+  return placing
+end
+
+--- Another box on the table, made from the same book, that is laying out now.
+local function madeFromAPlacingBox()
+  local mine = boxId()
+  for _, o in ipairs(getObjects()) do
+    if o ~= self and not o.isDestroyed() and tostring(o.getGMNotes()):find("ScenarioBox", 1, true) then
+      local ok, gm = pcall(JSON.decode, o.getGMNotes())
+      if ok and type(gm) == "table" and tostring(gm.id) == mine then
+        local okCall, busy = pcall(function() return o.call("isPlacing") end)
+        if okCall and busy == true then return true end
+      end
+    end
+  end
+  return false
+end
+
+--- A working copy still on the table when a game is loaded was left there by a
+-- save taken while a Place was running. It holds the same objects, so it would
+-- be a second box to lay the same things out from: throw it away, unless the
+-- box it was copied from is, right now, still laying out (the copy of a Place
+-- that is under way loads too, and is needed).
+local function discardIfStray()
+  Wait.frames(function()
+    pcall(function()
+      if self.isDestroyed() or madeFromAPlacingBox() then return end
+      trace("a working copy was left on the table by a save taken during a Place: destroyed")
+      self.destruct()
+    end)
+  end, 30)
+end
+
 function onLoad(savedData)
+  if isWorkingCopy() then return discardIfStray() end
   if savedData and savedData ~= "" then
     local ok, loaded = pcall(JSON.decode, savedData)
     if ok and type(loaded) == "table" then memoryList = loaded.ml or {} end
@@ -74,21 +162,70 @@ function createButtons()
     tooltip = "Remove this box's cards from the table" })
 end
 
---- Written to the Lua log (Player.log) before the step it names runs, so a
--- crash in Tabletop Simulator leaves the failing step behind.
-local function trace(msg)
-  log("StillHour box '" .. tostring(self.getName()) .. "': " .. msg)
+--- SCED's Token Spawn Tracker (src/tokens/TokenSpawnTracker.ttslua) remembers by
+-- GUID which cards already had their clues spawned, and forgets one only when
+-- it enters a hand or a discard pile (or from its own menu). These objects keep
+-- their GUIDs from loop to loop, so without this a location laid out again would
+-- be taken for one that already spawned. resetTokensSpawned takes a GUID string.
+-- Silent when SCED is not on the table. Returns how many GUIDs it made forget.
+local function forgetSpawns(guids)
+  local ok, n = pcall(function()
+    local handler = getObjectFromGUID(SCED_HANDLER_GUID)
+    if handler == nil then return 0 end
+    local tracker = handler.call("getObjectByOwnerAndType", { owner = "Mythos", type = "TokenSpawnTracker" })
+    if tracker == nil then return 0 end
+    local count = 0
+    for _, guid in ipairs(guids) do
+      if pcall(function() tracker.call("resetTokensSpawned", guid) end) then count = count + 1 end
+    end
+    return count
+  end)
+  return ok and n or 0
 end
 
-local function say(msg)
-  broadcastToAll(msg, { 0.95, 0.85, 0.6 })
+--- Does this object belong to a scenario box other than this one? What a box
+-- lays out carries the loop tag and the box's own tag; the previous build's
+-- boxes tagged it StillHourBox:<guid> instead, a tag this build cannot know.
+local function ofAnotherBox(o, mine)
+  local ok, tags = pcall(function() return o.getTags() end)
+  local belongs = false
+  for _, t in ipairs(ok and tags or {}) do
+    if t == mine then return false end
+    if t == LOOP_TAG or t:sub(1, 13) == "StillHourBox_" or t:sub(1, 13) == "StillHourBox:" then belongs = true end
+  end
+  return belongs
 end
 
-local function alive(o)
-  return o ~= nil and not o.isDestroyed()
+--- Objects of other boxes lying where this box would lay something out (the
+-- Prologue's cards on the mythos mat when the next box is Placed, an older
+-- build's leftovers). Boxes that share a loop's board never share a spot, so
+-- for them this is 0.
+local function foreignOnMySpots(tag, guids)
+  local n = 0
+  for _, o in ipairs(getObjects()) do
+    if o ~= self and alive(o) and ofAnotherBox(o, tag) then
+      local p = o.getPosition()
+      for _, guid in ipairs(guids) do
+        local s = memoryList[guid].pos
+        if math.abs(p.x - s.x) < SPOT_REACH and math.abs(p.z - s.z) < SPOT_REACH then n = n + 1 ; break end
+      end
+    end
+  end
+  return n
 end
 
-local placing = false
+--- Stop a Place that is still running: nothing more comes out of the box, and
+-- the working copy goes. Recall and the Control token's Clear Board call this
+-- first. Returns true when a Place was running.
+function cancelPlace()
+  if not placing then return false end
+  run = run + 1
+  placing = false
+  if alive(workingCopy) then workingCopy.destruct() end
+  workingCopy = nil
+  trace("Place stopped")
+  return true
+end
 
 --- Lay the box out. Returns how many objects will be placed (they land over
 -- the next second or so), or 0 when nothing was started.
@@ -103,11 +240,12 @@ function buttonClick_place()
   -- what this box can place: the remembered objects that are really inside it,
   -- highest position first so that taking one never moves the position of a
   -- later one (the index fallback below relies on it)
-  -- (kind and GUID only, never a card's title: a first-time player reads the chat, and
-  -- the Lua log gets pasted into messages; the GUID says which object it was)
+  -- (the GUID only, never a card's title: a first-time player reads the chat, and the
+  -- Lua log gets pasted into messages. An entry's `name` is the object's title, as
+  -- SCED's own scripts rely on, so it is not read here at all)
   local inside = {}
   for _, e in ipairs(self.getObjects()) do
-    inside[e.guid] = { index = e.index, kind = e.name or "object" }
+    inside[e.guid] = { index = e.index }
   end
   local guids = {}
   for guid in pairs(memoryList) do
@@ -136,25 +274,47 @@ function buttonClick_place()
     return 0
   end
 
+  -- cards of a box laid out earlier (another one, or an older build's) still
+  -- where this one lays something out would be merged with it
+  local clash = foreignOnMySpots(tag, guids)
+  if clash > 0 then
+    trace("not placed: " .. clash .. " object(s) of another box lie where this box lays out")
+    say(self.getName() .. ": cards from a box laid out earlier are still on the table where this one lays out."
+      .. " Click Clear Board on the Control token first.")
+    return 0
+  end
+
+  trace("SCED's spawn tracker forgets " .. forgetSpawns(guids) .. " of " .. #guids .. " GUID(s)")
+
   placing = true
+  run = run + 1
+  local myRun = run
   local placed = 0
+  local took = {}      -- the GUIDs of what came out, for the Control's board sync
 
   local function done(copy, why)
+    if myRun ~= run then                       -- stopped meanwhile: only the copy is left to throw away
+      if alive(copy) then copy.destruct() end
+      return
+    end
     placing = false
+    workingCopy = nil
     if alive(copy) then copy.destruct() end
     trace(why .. "; placed " .. placed)
     say(self.getName() .. ": " .. placed .. " object(s) placed.")
     if placed == 0 then return end
     -- once the cards have landed, let the control token apply the log's
     -- Knowledge to them (location sides, sealed locations, the Appointed),
-    -- one announced step at a time
+    -- one announced step at a time; it is told which box this was and which
+    -- GUIDs came out (what it remembered of them belongs to older objects)
     Wait.time(function()
       local ok, objs = pcall(getObjectsWithTag, "StillHour")
       for _, o in ipairs(ok and objs or {}) do
         if tostring(o.getName()):find("Control", 1, true) then
           trace("starting the board sync")
           pcall(function()
-            if not o.call("shApiSyncBoardStaged") then o.call("shApiSyncBoard") end
+            local info = { box = boxId(), name = self.getName(), guids = took }
+            if not o.call("shApiSyncBoardStaged", info) then o.call("shApiSyncBoard") end
           end)
         end
       end
@@ -165,12 +325,10 @@ function buttonClick_place()
   -- By GUID, as SCED does; if the working copy does not know that GUID (a
   -- copy is free to renumber what it holds) by the object's position in the
   -- bag instead, which is why the positions are taken from the highest down.
-  local function take(copy, i)
-    if not alive(copy) then return done(nil, "the working copy disappeared") end
+  local function takeOne(copy, i)
     local guid = guids[i]
-    if not guid then return done(copy, "all objects taken") end
     local entry = memoryList[guid]
-    local what = tostring(inside[guid].kind) .. " " .. guid
+    local what = "object " .. guid
     trace(string.format("taking %d/%d %s", i, #guids, what))
     broadcastToAll(string.format("Placing %d/%d", i, #guids), { 0.7, 0.7, 0.7 })
     local ok, item = pcall(copy.takeObject, {
@@ -181,49 +339,110 @@ function buttonClick_place()
         index = inside[guid].index, position = entry.pos, rotation = entry.rot, smooth = false })
     end
     if ok and item then
-      item.setLock(entry.lock and true or false)
-      for _, t in ipairs({ LOOP_TAG, tag }) do
-        if not item.hasTag(t) then item.addTag(t) end
-      end
+      -- what is out is counted and tagged first, so Recall and Clear Board find it
       placed = placed + 1
+      try("tagging " .. what, function()
+        for _, t in ipairs({ LOOP_TAG, tag }) do
+          if not item.hasTag(t) then item.addTag(t) end
+        end
+      end)
+      try("locking " .. what, function() item.setLock(entry.lock and true or false) end)
+      try("reading the GUID of " .. what, function()
+        took[#took + 1] = tostring(item.getGUID())
+        trace(string.format("took %d/%d %s as %s", i, #guids, what, took[#took]))
+      end)
     else
       trace("take failed for " .. what .. ": " .. tostring(ok and "nothing returned" or item))
     end
+  end
+
+  -- guarded as a whole: an error in one step is traced and the chain goes on with
+  -- the next object, so it always reaches done() and the box is never left "placing"
+  local function take(copy, i)
+    if myRun ~= run then return end            -- stopped: nothing more comes out
+    if not alive(copy) then return done(nil, "the working copy disappeared") end
+    if not guids[i] then return done(copy, "all objects taken") end
+    try(string.format("step %d/%d", i, #guids), function() takeOne(copy, i) end)
     Wait.frames(function() take(copy, i + 1) end, STEP_FRAMES)
   end
 
   -- the native copy SCED's Place will run on, parked above the box and frozen
-  local pos = self.getPosition()
-  local okClone, copy = pcall(self.clone, { position = { pos.x, pos.y + 6, pos.z } })
+  local okClone, copy = pcall(function()
+    local pos = self.getPosition()
+    return self.clone({ position = { pos.x, pos.y + 6, pos.z } })
+  end)
   if not okClone or not alive(copy) then
     placing = false
     trace("could not copy the box: " .. tostring(copy))
     say(self.getName() .. ": could not prepare the objects (see the log).")
     return 0
   end
-  copy.setLock(true)
-  copy.setName(self.getName() .. " (placing)")
-  trace("working copy made; waiting for it to be ready")
-  Wait.condition(function() take(copy, 1) end,
-    function() return alive(copy) and not copy.spawning and not copy.loading_custom end,
-    10,
-    function() done(copy, "the working copy was not ready after 10 s") end)
+  workingCopy = copy
+  local started = try("starting the Place", function()
+    copy.setLock(true)
+    copy.setName(self.getName() .. WORKING_SUFFIX)
+    trace("working copy made; waiting for it to be ready")
+    Wait.condition(function() take(copy, 1) end,
+      function() return alive(copy) and not copy.spawning and not copy.loading_custom end,
+      10,
+      function() done(copy, "the working copy was not ready after 10 s") end)
+  end)
+  if not started then
+    done(copy, "the Place could not start")
+    return 0
+  end
   return #guids
 end
 
 function buttonClick_recall()
-  local n = clearTagged(boxTag())
-  say(self.getName() .. ": " .. n .. " object(s) removed from the table.")
+  local stopped = cancelPlace()
+  local n, tokens = clearTagged(boxTag())
+  local what = n .. " object(s)" .. (tokens > 0 and (" and " .. tokens .. " token(s)") or "")
+  say(self.getName() .. ": " .. (stopped and "the Place in progress was stopped; " or "") .. what
+    .. " removed from the table.")
   return n
 end
 
+--- Tokens resting on a card (clues, doom, damage): small, unlocked, not cards,
+-- centred on the card and above it. SCED's own table pieces that merely touch
+-- the card's edge or lie under it (the lead-investigator marker, the tour
+-- starter) are never taken, nor anything SCED marks CleanUpHelper_ignore.
+-- The same rule as the Control token's Clear Board (control.lua tokensOn).
+local function tokensOn(card)
+  local found = {}
+  if type(Physics) ~= "table" or type(Physics.cast) ~= "function" then return found end
+  local b = card.getBounds()
+  local hx, hz = b.size.x / 2, b.size.z / 2
+  local hits = Physics.cast({ origin = { b.center.x, b.center.y + 2, b.center.z },
+    direction = { 0, -1, 0 }, type = 3, size = { b.size.x, 1, b.size.z }, max_distance = 3 }) or {}
+  for _, h in ipairs(hits) do
+    local o = h.hit_object
+    if o and o ~= card and not o.getLock() and (o.type == "Tile" or o.type == "Generic"
+        or o.type == "Chip") and not o.hasTag("CleanUpHelper_ignore") then
+      local p = o.getPosition()
+      if math.abs(p.x - b.center.x) <= hx and math.abs(p.z - b.center.z) <= hz and p.y >= b.center.y then
+        found[#found + 1] = o
+      end
+    end
+  end
+  return found
+end
+
 --- Destroy every loose object and deck carrying `tag` (decks: when every card
--- in them carries it; otherwise only those cards are taken out and removed).
+-- in them carries it; otherwise only those cards are taken out and removed),
+-- and the tokens resting on each card or deck removed. Returns the number of
+-- objects and of tokens removed.
 function clearTagged(tag)
-  local count = 0
+  local count, tokens = 0, 0
+  local function dropTokens(card)
+    for _, t in ipairs(tokensOn(card)) do
+      if not t.isDestroyed() then t.destruct() ; tokens = tokens + 1 end
+    end
+  end
   for _, obj in ipairs(getObjects()) do
     if obj ~= self and not obj.isDestroyed() then
       if obj.hasTag(tag) and obj.type ~= "Deck" then
+        if obj.type == "Card" then dropTokens(obj) end
         obj.destruct()
         count = count + 1
       elseif obj.type == "Deck" then
@@ -235,6 +454,7 @@ function clearTagged(tag)
           if tagged then mine[#mine + 1] = e.guid else others = others + 1 end
         end
         if #mine > 0 and others == 0 then
+          dropTokens(obj)
           obj.destruct()
           count = count + #mine
         elseif #mine > 0 then
@@ -247,5 +467,5 @@ function clearTagged(tag)
       end
     end
   end
-  return count
+  return count, tokens
 end

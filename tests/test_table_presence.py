@@ -231,7 +231,9 @@ def test_table_campaign_box_follows_sced_campaign_box():
     truth = gt("campaign_box_memory_bag.json")
     box = table_box()
     ml = _check_memory_bag(box, truth)
-    assert box["Tags"] == truth["Tags"] == ["CampaignBox", "Reloadable"]
+    # the official box also carries "Reloadable" (SCED's "Redownload this"); ours is built without it
+    # (test_campaign_box_is_not_reloadable), and the committed table file may still carry it until the next publish
+    assert "CampaignBox" in box["Tags"] and "CampaignBox" in truth["Tags"]
     md = json.loads(box["GMNotes"])
     assert set(md) == set(json.loads(truth["GMNotes"]))
     assert md["type"] == "CampaignBox" and md["filename"] == "the_still_hour"
@@ -242,6 +244,72 @@ def test_table_campaign_box_follows_sced_campaign_box():
     have = {os.path.basename(p) for p in glob.glob(os.path.join(ROOT, "dist", "cards", "*.jpg"))}
     for url in re.findall(r"/dist/cards/([^\"?/]+\.jpg)", json.dumps(box)):
         assert url in have, url
+
+
+def test_campaign_box_is_not_reloadable():
+    """SCED adds a "Redownload this" item to a Reloadable object; it can only fetch the file from its own
+    release (a 404 for a fan campaign). The download box does not need the tag: it fetches by its own URL."""
+    box = T.campaign_box()
+    assert box["Tags"] == ["CampaignBox"]
+    assert "Reloadable" not in json.dumps(box["Tags"])
+    assert json.loads(box["GMNotes"])["filename"] == "the_still_hour"        # the key SCED's importer reads stays
+
+
+def test_place_keeps_a_locked_object_locked():
+    """Place locks what the box says to lock (ml "lock"). The Control token is saved locked and must stay
+    locked once Place has laid it out; the log, guide and the rest are free, as in the official boxes."""
+    assert T.ml_entry({"x": 1, "y": 1, "z": 1}, lock=True)["lock"] is True
+    assert T.ml_entry({"x": 1, "y": 1, "z": 1})["lock"] is False
+    box = T.campaign_box()
+    ml = json.loads(box["LuaScriptState"])["ml"]
+    for o in box["ContainedObjects"]:
+        assert ml[o["GUID"]]["lock"] is bool(o.get("Locked")), o["Nickname"]
+    assert not any(e["lock"] for e in ml.values())                        # log, guide and minicards stay free
+    # the official boxes: guides and (all but one) logs are not locked
+    truth = gt("campaign_box_memory_bag.json")
+    tml = json.loads(truth["LuaScriptState"])["ml"]
+    by = {o["GUID"]: o for o in truth["ContainedObjects"]}
+    for g, e in tml.items():
+        if "CampaignLog" in by[g].get("Tags", []) or "CampaignGuide" in by[g].get("Tags", []):
+            assert e["lock"] is False
+
+
+def test_the_packaged_campaign_box_locks_the_control(tmp_path, monkeypatch):
+    import package_download as P
+    import build_cards as B
+    monkeypatch.setattr(P, "ROOT", str(tmp_path))
+    (tmp_path / "dist").mkdir()
+    (tmp_path / "src" / "tts").mkdir(parents=True)
+    (tmp_path / "src" / "tts" / "download_box.lua").write_text(
+        open(os.path.join(ROOT, "src", "tts", "download_box.lua"), encoding="utf-8").read())
+    control = {"Name": "BlockSquare", "Nickname": "THE STILL HOUR \u2014 Control", "GUID": "c0ffee", "Locked": True,
+               "Transform": {"scaleX": 1, "scaleY": 1, "scaleZ": 1}}
+    bag = {"Name": "Bag", "Nickname": "THE STILL HOUR \u2014 Player Cards", "GUID": "ba9000",
+           "Transform": {"scaleX": 1, "scaleY": 1, "scaleZ": 1}, "ContainedObjects": []}
+    static = {"Name": "Custom_Tile", "Nickname": "Static", "GUID": "5a71c0",
+              "Transform": {"scaleX": 1, "scaleY": 1, "scaleZ": 1}}
+    (tmp_path / "dist" / "the_still_hour_mod.json").write_text(json.dumps({"ObjectStates": [bag, control, static]}))
+    P.main(["--local"])
+    rel = json.load(open(tmp_path / "dist" / "downloads" / "the_still_hour.json", encoding="utf-8"))
+    ml = json.loads(rel["LuaScriptState"])["ml"]
+    assert ml["c0ffee"]["lock"] is True                                    # the Control is laid out locked
+    assert ml["ba9000"]["lock"] is False and ml["5a71c0"]["lock"] is False
+    log = next(o for o in rel["ContainedObjects"] if "CampaignLog" in (o.get("Tags") or []))
+    guide = next(o for o in rel["ContainedObjects"] if "CampaignGuide" in (o.get("Tags") or []))
+    assert ml[log["GUID"]]["lock"] is False and ml[guide["GUID"]]["lock"] is False
+    assert rel["Tags"] == ["CampaignBox"]
+
+
+def test_control_and_scenario_box_descriptions():
+    """The Control token's Description is one line pointing to the guide (it used to name the developer's test
+    button); the scenario boxes carry the campaign's name, as the official ones do."""
+    import bundle_mod
+    save = bundle_mod.build_save(ROOT, "-- bundle")
+    control = next(o for o in save["ObjectStates"] if o.get("Nickname", "").endswith("Control"))
+    assert control["Description"] == "The Still Hour: campaign bookkeeping. See the guide."
+    assert "Run Tests" not in control["Description"] and control["Locked"] is True
+    sb = T.scenario_box("A District", "district_x", [], {})
+    assert sb["Description"] == "The Still Hour"
 
 
 def test_compile_campaign_with_fixture(tmp_path, monkeypatch):
@@ -275,6 +343,7 @@ def test_compile_campaign_with_fixture(tmp_path, monkeypatch):
         ml = _check_memory_bag(sb, truth_sb)
         assert json.loads(sb["GMNotes"])["type"] == "ScenarioBox"
         assert "Tags" not in sb                      # like the exported books
+        assert sb["Description"] == "The Still Hour"  # the campaign's name, as the official boxes carry theirs
         assert (sb["Transform"]["scaleX"], sb["Transform"]["scaleZ"]) == \
             (truth_sb["Transform"]["scaleX"], truth_sb["Transform"]["scaleZ"])
         assert set(ml) == {o["GUID"] for o in sb["ContainedObjects"]}

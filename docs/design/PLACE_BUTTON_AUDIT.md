@@ -1,4 +1,4 @@
-# Place button audit (rewritten 2026-10-06)
+# Place button audit (rewritten 2026-10-06, updated after the rebuild)
 
 Designer-facing; no campaign content. Question: why does Tabletop Simulator
 stop when the owner presses Place on a scenario box (The First Hour), and is
@@ -18,11 +18,12 @@ table. Method tags: MEASURED (computed from files), READ (code), EMULATED
    rules out Lua: on the real 4.9.2 table, SCED's handlers raise no error or
    warning for our boxes (8 boxes, old and new script, 16 runs) and fire the
    same events, in the same counts, as for official boxes (EMULATED).
-2. **The owner's published build still has the first version of the Place
-   script.** `dist/saved_object_the_still_hour.json` (built 2026-10-05 20:25)
-   predates the staged-spawn commit 52cb886 (20:32); its scenario script is
-   byte-identical to `git show 52cb886^:src/tts/loop_box.lua`. The crash was
-   seen with that script, and nothing newer has reached the owner's table yet.
+2. **The owner's earlier build had the first version of the Place script.**
+   `dist/saved_object_the_still_hour.json` (built 2026-10-05 20:25) predates the
+   staged-spawn commit 52cb886; its scenario script was byte-identical to
+   `git show 52cb886^:src/tts/loop_box.lua`. The crash was seen with that
+   script. `dist/` has since been rebuilt (see the status column below); the new
+   build has not run on the owner's table.
 3. **No card of ours has been displayed in Tabletop Simulator yet.** The
    campaign box's own Place (minicards, log, guide, boxes) works; The First Hour
    is the first Place that spawns Card and Deck objects with custom images.
@@ -66,18 +67,19 @@ outside the official range, and is on a native TTS path.
 
 | # | Difference | Official | The Still Hour (published) | Status |
 |---|---|---|---|---|
-| 1 | Card textures and CustomDeck ids per box, one frame | median 9 / max 27 textures; median 7 / max 21 ids | The First Hour **43 / 29**, The Square **57 / 41**, others 12-20 (every card is its own 1x1 sheet; 128 of 128) | Planned (in progress): pack the cards into sprite sheets, a handful of textures per box |
-| 2 | Per-card `CustomUIAssets` font bundle | 4 of 11,483 cards (a helper with XML UI) | 203 of 208 cards, unused (no XML UI, no object-UI code) | Fixed in the build code (`pipeline/build_cards.py`); reaches `dist/` with the next rebuild |
-| 3 | The old Place rewrites everything in the click frame | `takeObject` of stored data, GUIDs kept | `self.getData()`, `JSON.decode(JSON.encode())` of every object, a random 6-hex GUID and two new tags on every nested object including each card in a deck, then `spawnObjectData` | Fixed in `src/tts/loop_box.lua` (a native copy of the box, SCED's own `takeObject` on it); reaches `dist/` with the next rebuild |
-| 4 | Follow-up work 2 s after Place (board sync, chaos bag) while textures load | none | Control `shApiSyncBoard` | Fixed on the branch (52cb886); not in the published build |
-| 5 | Image encoding and host | Steam CDN | `raw.githubusercontent.com`, 200 of 200 progressive JPEGs | Planned with #1: baseline JPEG sheets; the host stays |
-| 6 | Tag `StillHourBox:<guid>` (colon) | tags are letters, digits, underscore | colon, added at run time to every nested object | Fixed in the build code (`pipeline/table_presence.py`); reaches `dist/` with the next rebuild |
+| 1 | Card textures and CustomDeck ids per box, one frame | median 9 / max 27 textures; median 7 / max 21 ids | The First Hour **43 / 29**, The Square **57 / 41**, others 12-20 (every card is its own 1x1 sheet; 128 of 128) | **Fixed**: sprite sheets, at most 4 textures per box (docs/design/SPRITE_SHEETS.md) |
+| 2 | Per-card `CustomUIAssets` font bundle | 4 of 11,483 cards (a helper with XML UI) | 203 of 208 cards, unused (no XML UI, no object-UI code) | **Fixed** (`pipeline/build_cards.py`, in `dist/`) |
+| 3 | The old Place rewrites everything in the click frame | `takeObject` of stored data, GUIDs kept | `self.getData()`, `JSON.decode(JSON.encode())` of every object, a random 6-hex GUID and two new tags on every nested object including each card in a deck, then `spawnObjectData` | **Fixed** in `src/tts/loop_box.lua` (a native copy of the box, SCED's own `takeObject` on it) |
+| 4 | Follow-up work 2 s after Place (board sync, chaos bag) while textures load | none | Control `shApiSyncBoard` | **Fixed**: the sync runs in announced stages, a few frames apart |
+| 5 | Image encoding and host | Steam CDN | `raw.githubusercontent.com`, 200 of 200 progressive JPEGs | **Fixed**: baseline JPEGs and sheets; the host stays (Accepted) |
+| 6 | Tag `StillHourBox:<guid>` (colon) | tags are letters, digits, underscore | colon, added at run time to every nested object | **Fixed**: `StillHourBox_<id>`, baked into the data |
 | 7 | Windows cache path length (unverified) | | 115-134 characters per URL | Accepted (sheet URLs are shorter and far fewer) |
 | 8 | Object count, JSON size, nesting, deck size, scripts on contained objects, GMNotes and tag vocabulary, chaos-token keys, Deck/CustomDeck consistency, id collisions, SCED's Lua reaction | | all smaller than or equal to the official median, or identical | Rejected as causes (MEASURED, EMULATED) |
 
 Because items 1-3 first appear at the same step they cannot be separated from
-this data. The new build therefore removes all of them, and the owner has a
-bisection that needs only button presses (below).
+this data. The new build therefore removes all of them (scale 1.0 and
+`BackIsHidden` like the official exports too), and the owner has a bisection
+that needs only button presses (below).
 
 ## The new Place (src/tts/loop_box.lua)
 
@@ -94,8 +96,13 @@ kept its GUID) cannot be used as is. The box never empties:
    instead (highest first).
 3. The empty copy is destroyed and the board sync runs in announced stages.
 4. A second press while placing, or while the box's objects are on the table, is
-   refused (SCED would move them); Recall and the Control token's Reset Loop
-   clear by tag.
+   refused (SCED would move them), and so is a press while another box's cards
+   lie where this one lays out (Clear Board first). Recall and the Control
+   token's Clear Board clear by tag, stop a Place that is still running, and
+   take the tokens resting on the cards with them (Reset Loop does not clear the
+   board). Before anything is taken, SCED's Token Spawn Tracker (which remembers
+   by GUID which locations already spawned their clues) forgets the GUIDs about
+   to be laid out, because the objects keep their GUIDs from loop to loop.
 
 Nothing is rebuilt from data in Lua: no `spawnObjectData`, no JSON round trip,
 no new GUIDs. The tags (`StillHourLoop`, `StillHourBox_<box id>`) are in the
@@ -110,18 +117,22 @@ The log ends on the step that was running ("taking 3/8 ..." etc.).
 1. Place on **The Lighthouse**, **The Sunken Road** and **The Last Hour** (the
    smallest boxes).
 2. Place on **The First Hour**, then **The Square**.
-3. Planned: a `Place test` Saved Object (dist/saved_object_place_test.json)
-   holding the First Hour three ways: with no textures at all, with one image
-   per card (the old build) and with sprite sheets; the first that stops names
-   the cause (structure, texture count, or neither).
+3. Built: the `Place test` Saved Object (`dist/saved_object_place_test.json`,
+   steps in `docs/PLACE_TEST.md`): one card; the First Hour's structure on one
+   shared image; the First Hour on sprite sheets (the build); the First Hour
+   with one image per card (the old build); and the sprite-sheet First Hour laid
+   out by SCED's own unmodified Place script. The first that stops names the
+   cause (a card, structure, texture count, or the script itself).
 
 ## Other findings of this audit
 
-- `src/tts/download_box.lua` (the Download placeholder) cannot work as written:
-  `GlobalApi.placeholderDownload` is a module SCED's own scripts require; the
-  placeholder's script does not, so the call is nil, and the URL SCED builds is
-  Chr1Z93's release, which has no file of ours. Status: Watch (the scripting-parity
-  review will decide how the campaign is delivered).
+- `src/tts/download_box.lua` (the Download placeholder) could not work as
+  written: `GlobalApi.placeholderDownload` is a module SCED's own scripts
+  require; the placeholder's script does not, so the call was nil, and the URL
+  SCED builds is Chr1Z93's release, which has no file of ours. Status: **Fixed**:
+  the box fetches the campaign from the address in its GMNotes (GitHub's `main`
+  by default) and spawns it, as SCED's own downloader does; the Saved Object
+  stays the primary load path.
 - `All Encounter Cards` (SCED) reacts to every spawned Deck or Bag with a
   delayed `getData()`, but only when its card index is populated, which it is
   not in 4.9.2's save; ids `sthr-*` would not match anyway. Accepted.

@@ -147,8 +147,13 @@ City (a real FFG SCED save):
 
 The real structure the finalize step must emit:
 
-- **Campaign box** = one `Custom_Model_Bag`, `Tags:["CampaignBox","Reloadable"]`,
-  `GMNotes:{id,type:"CampaignBox"}`. (We already build this as `CB-STHR`.)
+- **Campaign box** = one `Custom_Model_Bag`, `Tags:["CampaignBox"]`,
+  `GMNotes:{id,type:"CampaignBox"}`. (We already build this as `CB-STHR`.) The
+  official box also carries `Reloadable`; ours does not, because that tag adds
+  SCED's "Redownload this", which can only fetch from SCED's own release
+  (404 for a fan campaign). Place keeps an object locked when its own `Locked`
+  flag is set (the Control token); the log and guide are left unlocked, as in
+  the official boxes.
 - **Each scenario** = its own nested `Custom_Model_Bag`, `GMNotes:{id:"SB…",
   type:"ScenarioBox"}`, containing its reference card, `Deck "Agenda Deck"`,
   `Bag "Act Decks"` (a bag so acts can **branch**), `Deck "Encounter Deck"`,

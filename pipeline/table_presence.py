@@ -9,9 +9,11 @@ object the owner exported (docs/art_reference/sced_objects/):
                  PDF hosted from dist/guide/                (campaign_guide_pdf.json)
   campaign log   Custom_Token, Tags [CampaignLog], GMNotes type CampaignLog,
                  one State per page, scripted fields        (campaign_log_token.json)
-  campaign box   Custom_Model_Bag on SCED's box mesh, Tags [CampaignBox,
-                 Reloadable], GMNotes {filename, id, type: CampaignBox}, SCED's
-                 MemoryBag script with Place/Recall         (campaign_box_memory_bag.json)
+  campaign box   Custom_Model_Bag on SCED's box mesh, Tags [CampaignBox],
+                 GMNotes {filename, id, type: CampaignBox}, SCED's MemoryBag
+                 script with Place/Recall. (Not Reloadable, which the official
+                 box has: that tag adds SCED's "Redownload this", and SCED can
+                 only redownload from its own release.)  (campaign_box_memory_bag.json)
   scenario box   the same memory bag on the small box mesh, GMNotes type
                  ScenarioBox                                (scenario_box_memory_bag.json)
 
@@ -219,8 +221,11 @@ def _mesh(url):
             "CastShadows": True}
 
 
-def ml_entry(pos, ry=270, rz=0):
-    return {"lock": False, "pos": {k: round(float(v), 3) for k, v in pos.items()},
+def ml_entry(pos, ry=270, rz=0, lock=False):
+    """One Place spot. `lock` is the object's own Locked flag: Place locks what
+    the box laid out when it says so (the official boxes lock their tiles and
+    leave the log and guide free), so a locked object stays locked."""
+    return {"lock": bool(lock), "pos": {k: round(float(v), 3) for k, v in pos.items()},
             "rot": {"x": 0, "y": ry, "z": rz}}
 
 
@@ -275,10 +280,11 @@ def tag_loop_objects(objs, sid):
 def scenario_box(name, sid, contained, ml):
     """A scenario book: SCED's small box mesh + the replayable memory bag (the
     box itself carries no tags, as the exported scenario boxes have none;
-    GMNotes {id, type: ScenarioBox}). What it holds is tagged for the loop."""
+    GMNotes {id, type: ScenarioBox}). Its Description is the campaign's name,
+    as the official boxes carry theirs. What it holds is tagged for the loop."""
     return memory_bag(name, {"id": sid, "type": "ScenarioBox"}, None,
                       MESH_SMALL, SCALE_SMALL, tag_loop_objects(contained, sid), ml,
-                      script=loop_box_script())
+                      desc=CAMPAIGN, script=loop_box_script())
 
 
 def campaign_box(scenario_boxes=(), name=CAMPAIGN, filename=FILENAME,
@@ -291,16 +297,16 @@ def campaign_box(scenario_boxes=(), name=CAMPAIGN, filename=FILENAME,
         pos = scenario_box_slot(i)
         sb["Transform"] = transform(pos, 270, SCALE_SMALL)
         contained.append(sb)
-        ml[sb["GUID"]] = ml_entry(pos)
+        ml[sb["GUID"]] = ml_entry(pos, lock=sb.get("Locked", False))
     if table:
         for obj, pos in ((build_minicard_deck(PLACE_MINIS), PLACE_MINIS),
                          (build_log(PLACE_LOG), PLACE_LOG),
                          (build_guide(PLACE_GUIDE), PLACE_GUIDE)):
             contained.append(obj)
-            ml[obj["GUID"]] = ml_entry(pos)
+            ml[obj["GUID"]] = ml_entry(pos, lock=obj.get("Locked", False))
     box = memory_bag(name, {"filename": filename, "id": box_id,
                             "type": "CampaignBox"},
-                     ["CampaignBox", "Reloadable"], MESH_BIG, SCALE_BIG,
+                     ["CampaignBox"], MESH_BIG, SCALE_BIG,
                      contained, ml, desc="fan campaign — not for sale")
     # where it appears when spawned: the campaign-box area at the top of the
     # SCED table (the official box sits at x 63, z 16), beside it, dropping in

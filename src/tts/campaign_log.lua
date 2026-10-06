@@ -211,13 +211,17 @@ local function clickCheckbox(key)
     local fn = values[key] and "shApiUnlockFact" or "shApiForgetFact"
     if ctl then pcall(function() ctl.call(fn, { id = fact }) end) end
   end
-  -- ticking a Named enemy as defeated banks its Victory (once per campaign)
+  -- ticking a Named enemy as defeated banks its Victory (once per campaign);
+  -- clearing the box (a mis-tick) takes the claim back and refunds what it paid
   local named = key:match("^v:(.+)$")
-  if named and values[key] then
+  if named then
     local ctl = findControl()
-    if ctl then
+    if ctl and values[key] then
       local ok, newly = pcall(function() return ctl.call("shApiClaimVictory", { id = named }) end)
       if ok and newly then setValue("vb:" .. named, true) ; updateSave() end
+    elseif ctl then
+      local ok, removed = pcall(function() return ctl.call("shApiForgetVictory", { id = named }) end)
+      if ok and removed then setValue("vb:" .. named, false) ; updateSave() end
     end
   end
 end
@@ -308,6 +312,31 @@ local function isLoaded()
   return not self.loading_custom
 end
 
+-- The control token mirrors its campaign state into the memo of the page on
+-- show ({stillHour = its saved state, seq}: control.lua persist, Board.mirrorToLog).
+-- Turning the page replaces this object with the next State, whose memo is what
+-- that page held when it was last on show (often nothing): copy the token's
+-- current state in, so the page on show always carries the newest copy. A page
+-- that already holds one as new, or newer, is left alone.
+local function seedMirror()
+  local ctl = findControl()
+  if not ctl then return end
+  local ok, raw = pcall(function() return ctl.script_state end)
+  if not ok or type(raw) ~= "string" or raw == "" then return end
+  local ok2, st = pcall(JSON.decode, raw)
+  if not (ok2 and type(st) == "table" and type(st.campaign) == "table") then return end
+  local seq = tonumber(st.seq) or 0
+  local okm, memo = pcall(function() return self.memo end)
+  if okm and type(memo) == "string" and memo ~= "" then
+    local ok3, held = pcall(JSON.decode, memo)
+    if ok3 and type(held) == "table" and type(held.stillHour) == "string"
+        and (tonumber(held.seq) or 0) >= seq then
+      return
+    end
+  end
+  pcall(function() self.memo = JSON.encode({ stillHour = raw, seq = seq }) end)
+end
+
 function onLoad(saved)
   local data = nil
   if saved and saved ~= "" then
@@ -330,6 +359,7 @@ function onLoad(saved)
   end
   Wait.condition(function() Wait.frames(buildUi, 2) end, isLoaded, 30,
     function() buildUi() end)
+  Wait.frames(seedMirror, 15)
 end
 
 ---------------------------------------------------------------------- api --

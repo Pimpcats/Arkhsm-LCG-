@@ -17,8 +17,6 @@ All the cards come from official Arkham Horror: The Card Game products that
 SCED's player cards include. If one of the packs named is not in your copy,
 swap the card for another level 0 card of the same class and a similar cost.
 
-Birdie and Seraphine have no suggested list here.
-
 ## Elias Warde (Guardian)
 
 **Deckbuilding options:** Guardian cards, Neutral cards, up to 5 Survivor cards (level 0-2).
@@ -122,4 +120,71 @@ Birdie and Seraphine have no suggested list here.
 - Winifred Habbamock Investigator Starter Deck: Lockpicks, Sneak By
 - The Path to Carcosa: Stealth
 - The Circle Undone: Cunning
+
+## "Birdie" Okonkwo (Survivor)
+
+**Deckbuilding options:** Survivor cards, Neutral cards, up to 5 other Guardian, Mystic, Rogue and/or Seeker cards (level 0-1).
+
+**Strategy:** A drifter who turns failure into fuel. Every failed test puts resolve on her, and 2 resolve return any event from her discard pile to her hand, so the deck is full of cheap events worth replaying (Look what I found!, Live and Learn, Scrounge for Supplies, Working a Hunch) and of cards that pay when a test goes wrong (Take Heart, Live and Learn). She is a poor fighter (combat 2): Stray Cat, Elusive, Dodge and Survival Instinct keep her out of fights, a Knife handles what is left, and the Seeker and Rogue slots add clues and escapes.
+
+| Qty | Card | Type | Class | Cost | Pack |
+|---|---|---|---|---|---|
+| 2 | Dig Deep | Asset | Survivor | 2 | Core Set |
+| 1 | Hunter's Instinct | Asset | Survivor | 2 | Core Set (2026) |
+| 2 | Leather Coat | Asset | Survivor | 0 | Core Set |
+| 2 | Stray Cat | Asset | Survivor | 1 | Core Set |
+| 1 | Flashlight | Asset | Neutral | 2 | Core Set |
+| 2 | Knife | Asset | Neutral | 1 | Core Set |
+| 2 | Live and Learn | Event | Survivor | 0 | Heart of the Elders |
+| 2 | "Look what I found!" | Event | Survivor | 2 | Core Set |
+| 2 | Lucky! | Event | Survivor | 1 | Core Set |
+| 2 | Scrounge for Supplies | Event | Survivor | 0 | A Thousand Shapes of Horror |
+| 2 | Emergency Cache | Event | Neutral | 0 | Core Set |
+| 1 | Dodge | Event | Guardian | 1 | Core Set |
+| 1 | Elusive | Event | Rogue | 2 | Core Set |
+| 2 | Working a Hunch | Event | Seeker | 2 | Core Set |
+| 2 | Survival Instinct | Skill | Survivor | - | Core Set |
+| 2 | Take Heart | Skill | Survivor | - | Heart of the Elders |
+| 2 | Guts | Skill | Neutral | - | Core Set |
+
+30 cards: 10 assets, 14 events, 6 skills.
+
+**Packs.** 14 of the 17 different cards are in the Core Set (or Core Set 2026). The rest come from:
+
+- Heart of the Elders: Live and Learn, Take Heart
+- A Thousand Shapes of Horror: Scrounge for Supplies
+
+## Seraphine Vale (Mystic)
+
+**Deckbuilding options:** Mystic cards, Neutral cards, up to 5 Seeker cards (level 0-2).
+
+**Strategy:** A Mystic who pays horror for tempo. Once a round she can take 1 direct horror to add +2 to a test, gain an extra action or ready a Spell, so the deck wants strong willpower tests and ways to put the horror back: Fearless, Clarity of Mind and Meditative Trance heal it, Jim Culver draws a card whenever she takes it, and Ward of Protection and Blinding Light deal with what you cannot test through. Rite of Seeking and Shrivelling are her two Spells for clues and kills, and Magnifying Glass and Working a Hunch come from the Seeker slots.
+
+| Qty | Card | Type | Class | Cost | Pack |
+|---|---|---|---|---|---|
+| 2 | Arcane Studies | Asset | Mystic | 2 | Core Set |
+| 1 | Clarity of Mind | Asset | Mystic | 2 | The Dunwich Legacy |
+| 2 | Jim Culver — Haunted Musician | Asset | Mystic | 4 | Core Set (2026) |
+| 2 | Rite of Seeking | Asset | Mystic | 4 | The Dunwich Legacy |
+| 2 | Shrivelling | Asset | Mystic | 3 | Core Set |
+| 2 | Magnifying Glass | Asset | Seeker | 1 | Core Set |
+| 2 | Blinding Light | Event | Mystic | 2 | Core Set |
+| 1 | Meditative Trance | Event | Mystic | 2 | Edge of the Earth Investigator Expansion |
+| 2 | Ward of Protection | Event | Mystic | 1 | Core Set |
+| 2 | Emergency Cache | Event | Neutral | 0 | Core Set |
+| 2 | Working a Hunch | Event | Seeker | 2 | Core Set |
+| 2 | Defiance | Skill | Mystic | - | Blood on the Altar |
+| 2 | Fearless | Skill | Mystic | - | Core Set |
+| 2 | Guts | Skill | Neutral | - | Core Set |
+| 1 | Perception | Skill | Neutral | - | Core Set |
+| 2 | Unexpected Courage | Skill | Neutral | - | Core Set |
+| 1 | Deduction | Skill | Seeker | - | Core Set |
+
+30 cards: 11 assets, 9 events, 10 skills.
+
+**Packs.** 13 of the 17 different cards are in the Core Set (or Core Set 2026). The rest come from:
+
+- The Dunwich Legacy: Clarity of Mind, Rite of Seeking
+- Edge of the Earth Investigator Expansion: Meditative Trance
+- Blood on the Altar: Defiance
 
