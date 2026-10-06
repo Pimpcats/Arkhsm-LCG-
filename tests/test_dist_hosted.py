@@ -9,7 +9,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BUILT = ["dist/stillhour_starter.json", "dist/the_still_hour.json", "dist/the_still_hour_mod.json",
          "dist/the_still_hour_encounter.json", "dist/downloads/the_still_hour.json",
          "dist/the_still_hour_table.json"]
-HOSTED = re.compile(r"https://raw\.githubusercontent\.com/[^\"]+?/dist/cards/([^\"?/]+\.jpg)")
+# a card image (dist/cards/<id>.jpg) or one of a box's sprite sheets (dist/cards/sheets/<key>-face.jpg)
+HOSTED = re.compile(r"https://raw\.githubusercontent\.com/[^\"]+?/dist/cards/((?:sheets/)?[^\"?/]+\.jpg)")
 
 
 def test_no_local_file_urls():
@@ -19,6 +20,8 @@ def test_no_local_file_urls():
 
 def test_hosted_images_exist():
     have = {os.path.basename(p) for p in glob.glob(os.path.join(ROOT, "dist", "cards", "*.jpg"))}
+    have |= {"sheets/" + os.path.basename(p)
+             for p in glob.glob(os.path.join(ROOT, "dist", "cards", "sheets", "*.jpg"))}
     for rel in BUILT:
         text = open(os.path.join(ROOT, rel), encoding="utf-8").read()
         missing = sorted(set(HOSTED.findall(text)) - have)

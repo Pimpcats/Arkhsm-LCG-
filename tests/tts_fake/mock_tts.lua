@@ -41,6 +41,11 @@ local function readFile(p)
   return s
 end
 
+-- MOCK_WEB_FIXTURES=<file>: a JSON object {url: text}, what WebRequest.get answers for those URLs
+-- (anything else is an offline error, as in the emulator)
+local fixtures = os.getenv("MOCK_WEB_FIXTURES")
+if fixtures and fixtures ~= "" then E.webFixtures = J.decode(readFile(fixtures)) end
+
 local path, pre = arg[1], arg[2]
 local save = { LuaScript = "", LuaScriptState = "", ObjectStates = {} }
 if pre then

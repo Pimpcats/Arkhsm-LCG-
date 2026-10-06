@@ -9,6 +9,9 @@ machine produced the build, so a shareable build needs hosted image URLs. This:
      (and its chaos token face, pipeline/render_token.py) to JPEG in
      dist/cards/, removing only this campaign's images from earlier builds
      (other campaigns' hosted images are never touched; stale_images())
+  2b. packs the faces and backs into a few sprite sheets per scenario box
+     (pipeline/pack_sheets.py, dist/cards/sheets/), as SCED's own boxes are
+     built: a box then loads about four textures instead of one per card
   3. writes pipeline/art_urls.json in hosted mode, pointing at
        https://raw.githubusercontent.com/<repo>/<commit>/dist/cards/<id>.jpg?v=<hash>
      where <commit> holds exactly these files (committed first if changed), so a
@@ -42,6 +45,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 FACES = os.path.join(ROOT, "art", "faces")
 OUT = os.path.join(ROOT, "dist", "cards")
+SHEETS_OUT = os.path.join(OUT, "sheets")
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from campaign_config import CFG  # noqa: E402
 # every build step this script starts builds the same campaign
@@ -56,7 +60,7 @@ STATIC_TOKEN = (CFG.static_token or {}).get("id")   # campaign-specific chaos to
 STARTER = tuple(CFG.starter)
 REBUILD = (("build_cards.py",),) + ((("build_cards.py", "--only") + STARTER,) if STARTER else ()) + (
            ("bundle_mod.py",), ("table_presence.py",),
-           ("package_download.py", "--require-hosted"))
+           ("package_download.py", "--require-hosted"), ("place_test.py",))
 GUIDE = os.path.join(ROOT, "dist", "guide", CFG.slug + "_campaign_guide.pdf")
 
 
@@ -64,7 +68,7 @@ def to_jpeg(src, name):
     """Write dist/cards/<name>.jpg; return its short content hash."""
     dest = os.path.join(OUT, name + ".jpg")
     Image.open(src).convert("RGB").save(dest, "JPEG", quality=JPEG_QUALITY,
-                                        optimize=True, progressive=True)
+                                        optimize=True, progressive=False)
     return hashlib.sha1(open(dest, "rb").read()).hexdigest()[:10]
 
 
@@ -129,10 +133,20 @@ def publish(ref, render=True):
         plan["_static_token"] = STATIC_TOKEN
     written = set(hashes)
 
+    # sprite sheets: each scenario box's cards (and the player cards, and the
+    # investigators) packed into a face sheet and a back sheet per card shape
+    sheet_specs, sheet_hashes = [], {}
+    if CFG.get("sprite_sheets", True):
+        sheet_specs, sheet_hashes = pack_sheet_images()
+
     # drop this campaign's images from earlier builds that no longer belong to
     # any of its cards; every other campaign's hosted images stay untouched
     for old in stale_images(written):
         os.remove(old)
+    for old in sorted(glob.glob(os.path.join(SHEETS_OUT, "*.jpg"))):
+        if os.path.splitext(os.path.basename(old))[0] not in {
+                s["key"] + k for s in sheet_specs for k in ("-face", "-back")}:
+            os.remove(old)
     build_guide()
 
     # phase 2: pin to the commit holding exactly these files (see pin_ref)
@@ -146,6 +160,14 @@ def publish(ref, render=True):
     urls = {}
     for key, v in plan.items():
         urls[key] = {k: url(n) for k, n in v.items()} if isinstance(v, dict) else url(v)
+    if sheet_specs:
+        sheet_base = base + "/sheets"
+        urls["_sheets"] = {
+            s["key"]: {"box": s["box"], "deck": s["deck"], "cols": s["cols"], "rows": s["rows"],
+                       "sideways": s["sideways"], "cells": s["cells"],
+                       "face": "{}/{}-face.jpg?v={}".format(sheet_base, s["key"], sheet_hashes[s["key"]]["face"]),
+                       "back": "{}/{}-back.jpg?v={}".format(sheet_base, s["key"], sheet_hashes[s["key"]]["back"])}
+            for s in sheet_specs}
     guide = guide_url(ref)
     if guide:
         urls["_campaign_guide"] = guide
@@ -172,6 +194,31 @@ def publish(ref, render=True):
         "campaign_note": None if compiled else
         "campaign box not rebuilt (scenarios not all locked); " + stale + " is stale",
         "local_urls_left": bad}
+
+
+def pack_sheet_images():
+    """Pack the freshly rendered faces into sprite sheets (pipeline/pack_sheets.py):
+    returns (the planned sheets, {key: {face: hash, back: hash}})."""
+    import pack_sheets
+    boxes, cards = pack_sheets.membership(CFG.id)
+    specs = pack_sheets.plan(boxes, pack_sheets.sideways_of_factory(cards))
+    import compile_campaign as CC
+
+    def face_path(cid):
+        return os.path.join(FACES, cid + ".png")
+
+    def back_path(box, cid):
+        # the card's own printed back if it has one; else the shared back it is
+        # built with (build_cards.build_card): a scenario box's cards are
+        # encounter cards (compile_campaign.normalize), the player bag's are not
+        own = os.path.join(FACES, cid + "-back.png")
+        if os.path.exists(own):
+            return own
+        scenario = box not in ("player", "investigators")
+        encounter = scenario and CC.normalize(cards[cid]).get("encounter")
+        shared = "encounter_back" if encounter else "player_back"
+        return os.path.join(ROOT, "assets", "backs", shared + ".png")
+    return specs, pack_sheets.write_all(specs, SHEETS_OUT, face_path, back_path)
 
 
 def other_prefixes():

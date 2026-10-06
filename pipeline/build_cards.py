@@ -20,8 +20,10 @@ placeholder or file:/// image URLs is refused unless --local is passed.
 
 Structure verified against Arkham SCE 4.8.0:
   - Card object: Name="Card", Tags=[<Type>,"PlayerCard"], SidewaysCard=True only for Investigators.
-  - CardID = int(deckId + 2-digit gridIndex). Each card uses its own 1x1 deck (index 00),
-    except Investigators, which use a unique deckbuilding back (UniqueBack=True).
+  - CardID = int(deckId + 2-digit gridIndex). A local build gives each card its own 1x1 deck
+    (index 00; Investigators have a unique deckbuilding back, UniqueBack=True); a hosted release
+    draws the cards from a few sprite sheets per box (pipeline/pack_sheets.py), as SCED's own
+    boxes do.
   - GMNotes = JSON *mechanical* metadata only; printed rules text lives on the ART, not here.
 
 Deterministic GUIDs: GUID is derived from the card id (sha1) so re-running the
@@ -61,9 +63,16 @@ def guid(card_id):
     return hashlib.sha1(card_id.encode("utf-8")).hexdigest()[:6]
 
 
-def transform():
+# Card scale as SCED's own objects carry it (docs/art_reference/sced_objects/: every card 1.0,
+# investigators 1.15; 96.6% of the official boxes' cards are 1.0). A card at 1.15 is 15% larger than
+# every official card beside it and spills over the playmats' and the mythos mat's card slots.
+CARD_SCALE = 1.0
+INVESTIGATOR_SCALE = 1.15
+
+
+def transform(scale=CARD_SCALE):
     return {"posX": 0, "posY": 1.5, "posZ": 0, "rotX": 0, "rotY": 180, "rotZ": 0,
-            "scaleX": 1.15, "scaleY": 1, "scaleZ": 1.15}
+            "scaleX": scale, "scaleY": 1, "scaleZ": scale}
 
 
 def build_gmnotes(c):
@@ -261,6 +270,31 @@ def _load_art_urls():
 ART_URLS = _load_art_urls()
 
 
+# Sprite sheets (pipeline/pack_sheets.py): a hosted release packs each scenario
+# box's cards (and the player cards, and the investigators) into a few sheet
+# images, as SCED's own boxes do, instead of one image per card. art_urls.json
+# then carries "_sheets": {key: {box, deck, cols, rows, face, back, cells: [card
+# ids]}}; a card on a sheet gets CardID = deck * 100 + its cell. Without it
+# (a local test build, the Studio's live preview) every card keeps its own 1x1
+# deck, as before.
+def _sheet_index(art_urls):
+    idx = {}
+    for s in (art_urls.get("_sheets") or {}).values():
+        for n, cid in enumerate(s["cells"]):
+            idx[(s["box"], cid)] = (s, n)
+    return idx
+
+
+SHEETS = _sheet_index(ART_URLS)
+
+
+def default_box(c):
+    """Which sheet set a card built outside a scenario box belongs to."""
+    if c["type"] == "Investigator":
+        return "investigators"
+    return "encounter" if c.get("encounter") else "player"
+
+
 # --------------------------------------------------------- release guard --
 # The release files in dist/ are what the owner loads in Tabletop Simulator:
 # they must carry the hosted image URLs publish_hosted.py writes. Run alone in
@@ -324,7 +358,10 @@ COLOR_DIFFUSE = {"r": 0.713235259, "g": 0.713235259, "b": 0.713235259}
 SIDEWAYS_TYPES = ("Investigator", "Agenda", "Act")
 
 
-def build_card(c):
+def build_card(c, box=None, sheets=True):
+    """One SCED Card object. `box` is the scenario box whose sprite sheets it is
+    drawn from (default: the player cards' or the investigators'); sheets=False
+    keeps the card's own 1x1 deck whatever art_urls.json holds."""
     is_inv = c["type"] == "Investigator"
     sideways = c["type"] in SIDEWAYS_TYPES
     is_encounter = bool(c.get("encounter"))
@@ -347,18 +384,30 @@ def build_card(c):
     # Knowledge fact flips, src/StillHour/Locations.ttslua) carries that side
     # as a unique back, readable when the board flips it
     own_back = is_inv or bool(art.get("back"))
-    return {
-        "Name": "Card", "Nickname": c["name"], "Description": c.get("subtitle", ""),
-        "GUID": guid(c["id"]), "CardID": int(deck_id + "00"), "SidewaysCard": sideways,
-        "Tags": tags_for(c), "LuaScript": "", "LuaScriptState": "",
-        "ColorDiffuse": dict(COLOR_DIFFUSE), "Hands": True,
-        "HideWhenFaceDown": not (sideways or own_back),
-        "GMNotes": build_gmnotes(c), "Transform": transform(),
-        "CustomDeck": {deck_id: {
+    hit = SHEETS.get((box or default_box(c), c["id"])) if sheets else None
+    if hit:
+        sheet, cell = hit
+        card_id = sheet["deck"] * 100 + cell
+        custom = {str(sheet["deck"]): {
+            "FaceURL": sheet["face"], "BackURL": sheet["back"],
+            "NumWidth": sheet["cols"], "NumHeight": sheet["rows"], "Type": 0,
+            "UniqueBack": True, "BackIsHidden": True}}
+    else:
+        card_id = int(deck_id + "00")
+        custom = {deck_id: {
             "FaceURL": art.get("face") or face_ph(c["name"], land=sideways),
             "BackURL": art.get("back") or back,
             "NumWidth": 1, "NumHeight": 1, "Type": 0,
-            "UniqueBack": own_back, "BackIsHidden": is_inv}},
+            "UniqueBack": own_back, "BackIsHidden": True}}
+    return {
+        "Name": "Card", "Nickname": c["name"], "Description": c.get("subtitle", ""),
+        "GUID": guid(c["id"]), "CardID": card_id, "SidewaysCard": sideways,
+        "Tags": tags_for(c), "LuaScript": "", "LuaScriptState": "",
+        "ColorDiffuse": dict(COLOR_DIFFUSE), "Hands": True,
+        "HideWhenFaceDown": not (sideways or own_back),
+        "GMNotes": build_gmnotes(c),
+        "Transform": transform(INVESTIGATOR_SCALE if is_inv else CARD_SCALE),
+        "CustomDeck": custom,
     }
 
 

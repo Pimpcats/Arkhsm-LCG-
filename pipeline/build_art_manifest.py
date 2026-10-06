@@ -223,6 +223,22 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from campaign_config import CFG  # noqa: E402
 CARD_SPECS = tuple(CFG.path("specs"))
 
+# the ten personal quest cards (a quest card and its bonded unlocked card per investigator);
+# briefs written with the cards (2026-10-06), no art generated yet
+SCENES.update({
+    "sthr-quest-elias": "a brass key and a heavy ledger on a lighthouse keeper's desk, the lamp guttering, a second shadow thrown behind the empty chair",
+    "sthr-questdone-elias": "the same ledger lying open to ruled lines in one careful hand, the lamp steady now, salt crusting the cover",
+    "sthr-quest-ayako": "a stack of annotated manuscripts and a brass pen, a half-translated page under a green-shaded lamp, the last line smudged",
+    "sthr-questdone-ayako": "the same page finished, the final word covered by a trembling hand, lamplight pooling on the paper",
+    "sthr-quest-cass": "a worn deck of cards fanned on green baize, one card face down, a thin curl of cigarette smoke",
+    "sthr-questdone-cass": "the same deck squared and left at an empty chair, a crowd of shadows watching from the walls of a back room",
+    "sthr-quest-seraphine": "a tarnished coin and a small bell on a dark cloth, a candle burning low, one thread of silver light",
+    "sthr-questdone-seraphine": "the same bell silent on the cloth, a long column of tally marks scratched into the table beside it",
+    "sthr-quest-birdie": "a battered duffel and a bus-stop sign at dusk, an empty road bending away into fog",
+    "sthr-questdone-birdie": "the same road at first light, the duffel set down, footprints leading back toward the town",
+})
+
+
 # a campaign other than The Still Hour keeps its scenes as data
 # (build.json "art_scenes": {"scenes": {id: subject}, "characters": {id: ref},
 # "text_only": {id: reason}}); The Still Hour's are the tables above

@@ -73,6 +73,8 @@ def select(monkeypatch, root, cid, prefix, token=None):
     monkeypatch.setattr(ph, "CFG", cfg)
     monkeypatch.setattr(ph, "PREFIX", prefix)
     monkeypatch.setattr(ph, "STATIC_TOKEN", token)
+    # these tests are about the per-card images; sprite sheets have their own test below
+    monkeypatch.setattr(ph, "pack_sheet_images", lambda: ([], {}))
 
 
 def names(root):
@@ -117,3 +119,31 @@ def test_shorter_prefix_never_claims_a_longer_one(table, monkeypatch):
     left = set(names(root))
     assert {"sthr-loc-square", "sthr-loc-square-back", "sthrelias", "sthr-static-token"} <= left
     assert "sth-gone" not in left and "sth-loc-x" in left
+
+
+def test_sprite_sheets_are_hosted_pinned_and_cleaned(table, monkeypatch):
+    """A release packs each box's cards into sheets (pipeline/pack_sheets.py): the sheet
+    URLs, grids and cell lists go to art_urls.json, pinned to the commit like every image,
+    and a sheet of an earlier build that no longer exists is removed."""
+    root, _ = table
+    select(monkeypatch, root, "zz_test", "zztt")
+    sheets = root / "dist" / "cards" / "sheets"
+    png(str(sheets / "oldbox-p-face.jpg"))                   # a stale sheet
+    spec = {"key": "boxA-p", "box": "boxA", "deck": 99100, "sideways": False, "cols": 2, "rows": 1,
+            "cell": [585, 819], "cells": ["zztt-loc-a", "zztt-loc-b"]}
+
+    def fake_pack():
+        png(str(sheets / "boxA-p-face.jpg"))
+        png(str(sheets / "boxA-p-back.jpg"))
+        return [spec], {"boxA-p": {"face": "aaaaaaaaaa", "back": "bbbbbbbbbb"}}
+    monkeypatch.setattr(ph, "pack_sheet_images", fake_pack)
+    monkeypatch.setattr(ph, "SHEETS_OUT", str(sheets))
+    ph.publish("deadbeef", render=False)
+    urls = json.load(open(str(root / "out" / "zz_test" / "art_urls.json"), encoding="utf-8"))
+    entry = urls["_sheets"]["boxA-p"]
+    base = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/deadbeef/dist/cards/sheets/"
+    assert entry["face"] == base + "boxA-p-face.jpg?v=aaaaaaaaaa"
+    assert entry["back"] == base + "boxA-p-back.jpg?v=bbbbbbbbbb"
+    assert (entry["box"], entry["deck"], entry["cols"], entry["rows"]) == ("boxA", 99100, 2, 1)
+    assert entry["cells"] == ["zztt-loc-a", "zztt-loc-b"] and entry["sideways"] is False
+    assert sorted(os.listdir(str(sheets))) == ["boxA-p-back.jpg", "boxA-p-face.jpg"]   # the stale one went

@@ -691,3 +691,84 @@ def test_scenario_box_objects_are_tagged_for_the_loop():
             assert all(re.fullmatch(r"[A-Za-z0-9_]+", t) for t in x["Tags"]), x["Tags"]
             count += 1
     assert count >= len(objs)
+
+
+# ------------------------------------------------------- download box (fake TTS) --
+DOWNLOAD_CHUNK = r"""
+local PLACEHOLDER = %s
+local box = spawnObjectJSON({ json = PLACEHOLDER })
+local out = {}
+local function campaignBoxes()
+  local n = 0
+  for _, o in ipairs(getObjects()) do
+    if tostring(o.getGMNotes()):find("CampaignBox", 1, true) then n = n + 1 end
+  end
+  return n
+end
+Wait.frames(function()
+  out.before = campaignBoxes()
+  box.call("downloadStillHour")
+  box.call("downloadStillHour")          -- a second press while downloading does nothing
+  Wait.frames(function()
+    out.after = campaignBoxes()
+    out.boxLeft = (box ~= nil and not box.isDestroyed()) and 1 or 0
+    print("@@OUT " .. JSON.encode(out))
+  end, 200)
+end, 10)
+"""
+
+
+def _run_download(tmp_path, gm, fixtures):
+    import shutil
+    lua = shutil.which("lua5.2")
+    if not lua:
+        pytest.skip("lua5.2 not installed")
+    sys.path.insert(0, os.path.join(ROOT, "tools", "tts_relay"))
+    import relay
+    import campaign_config
+    script = campaign_config.lua_text(os.path.join(ROOT, "src", "tts", "download_box.lua"))
+    placeholder = {"Name": "Bag", "Nickname": "Download Box", "GUID": "d10ad0", "Tags": ["StillHour"],
+                   "GMNotes": json.dumps(gm), "LuaScript": script, "LuaScriptState": "",
+                   "Transform": {"posX": 63, "posY": 2.5, "posZ": 8, "rotX": 0, "rotY": 180, "rotZ": 0,
+                                 "scaleX": 1, "scaleY": 1, "scaleZ": 1}}
+    chunk = tmp_path / "chunk.lua"
+    chunk.write_text(DOWNLOAD_CHUNK % relay.lua_long_string(json.dumps(placeholder)), encoding="utf-8")
+    fx = tmp_path / "fixtures.json"
+    fx.write_text(json.dumps(fixtures), encoding="utf-8")
+    env = dict(os.environ, MOCK_WEB_FIXTURES=str(fx))
+    r = subprocess.run([lua, os.path.join(ROOT, "tests", "tts_fake", "mock_tts.lua"), str(chunk)],
+                       capture_output=True, text=True, cwd=ROOT, timeout=120, env=env)
+    out, said, errors = None, [], []
+    for ln in r.stdout.splitlines():
+        if ln.startswith("@@MSG "):
+            m = json.loads(ln[6:])
+            msg = m.get("message", "")
+            if msg.startswith("@@OUT "):
+                out = json.loads(msg[6:])
+            elif msg:
+                said.append(msg)
+            if m.get("messageID") == 3:
+                errors.append(m.get("error"))
+    assert out is not None and not errors, (r.stdout[-1500:], r.stderr[-500:])
+    return out, said
+
+
+def test_download_box_fetches_the_campaign_and_puts_its_box_on_the_table(tmp_path):
+    url = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/downloads/the_still_hour.json"
+    campaign = {"Name": "Custom_Model_Bag", "Nickname": "Still Hour", "GUID": "cb0001",
+                "GMNotes": json.dumps({"filename": "the_still_hour", "id": "CB-STHR", "type": "CampaignBox"}),
+                "Tags": ["CampaignBox"], "Transform": {"posX": 63, "posY": 2.5, "posZ": 8, "rotX": 0, "rotY": 270,
+                                                       "rotZ": 0, "scaleX": 1, "scaleY": 1, "scaleZ": 1}}
+    out, said = _run_download(tmp_path, {"filename": "the_still_hour", "url": url}, {url: json.dumps(campaign)})
+    assert out["before"] == 0 and out["after"] == 1, out        # one box, though Download was pressed twice
+    assert out["boxLeft"] == 0, "the download box goes once the campaign has arrived"
+    assert any("on the table" in m for m in said), said
+
+
+def test_download_box_failure_keeps_the_box_and_says_why(tmp_path):
+    url = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/main/dist/downloads/the_still_hour.json"
+    out, said = _run_download(tmp_path, {"filename": "the_still_hour", "url": url}, {})        # offline
+    assert out["after"] == 0 and out["boxLeft"] == 1, out
+    assert any("download failed" in m for m in said), said
+    out, said = _run_download(tmp_path, {"filename": "the_still_hour"}, {})                      # no address
+    assert out["boxLeft"] == 1 and any("no address" in m for m in said), said

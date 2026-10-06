@@ -1402,7 +1402,7 @@
     "text": "Permanent. Campaign: The Still Hour.\nQuest – Place a first translation token on 8 different enemies. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Translation, Finished."
   },
   "sthr-questdone-ayako": {
-    "text": "Permanent. Bonded (The Unfinished Translation).\n[reaction] After you succeed at an [int] test: Place 1 Memory on Dr. Ayako Sōma. (Limit twice per game.)\nA Recollection you draw with your elder sign costs 2 fewer resources to play until the end of the round.\nWhile there are 3 or more banked Memory, It Means 'Wait' may instead be played when an Hour's Forced ability (other than Hour IX's) or an attack by The Appointed against you would resolve. Cancel that ability or attack, and raise Dissonance by 1."
+    "text": "Permanent. Bonded (The Unfinished Translation).\n[reaction] After you succeed at an [int] test: Place 1 Memory on Dr. Ayako Sōma. (Limit twice per game.)\nA Recollection you draw with your elder sign costs 2 fewer resources to play this round.\nWhile there are 3 or more banked Memory, you may play It Means 'Wait' when an Hour's Forced ability (other than Hour IX's) or an attack by The Appointed against you would resolve: cancel it and raise Dissonance by 1."
   },
   "sthr-quest-cass": {
     "text": "Permanent. Campaign: The Still Hour.\nQuest – Cancel 3 symbol tokens with your own ability or cards. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Table Remembers."
@@ -1414,7 +1414,7 @@
     "text": "Permanent. Campaign: The Still Hour.\nQuest – Use your investigator ability 8 times. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Price, Remembered."
   },
   "sthr-questdone-seraphine": {
-    "text": "Permanent. Bonded (The Medium's Price).\n[reaction] After you are dealt horror: Place 1 Memory on Seraphine Vale. (Limit twice per game.)\nYour investigator ability may be paid by raising Dissonance by 1 instead of taking 1 direct horror.\nThe Bell of Ambergrove gains: \"[action] Exhaust The Bell of Ambergrove, spend 1 charge and raise Dissonance by 2: Advance or rewind the Hourglass by 1 Hour. This ability cannot be triggered during the finale. (Limit once per game.)\""
+    "text": "Permanent. Bonded (The Medium's Price).\n[reaction] After you are dealt horror: Place 1 Memory on Seraphine Vale. (Limit twice per game.)\nYou may raise Dissonance by 1 instead of taking 1 direct horror to pay for your investigator ability.\nThe Bell of Ambergrove gains: \"[action] Exhaust The Bell of Ambergrove, spend 1 charge and raise Dissonance by 2: Advance or rewind the Hourglass by 1 Hour. (Limit once per game. Not during the finale.)\""
   },
   "sthr-quest-birdie": {
     "text": "Permanent. Campaign: The Still Hour.\nQuest – Spend 8 resolve. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, She Knows the Road."

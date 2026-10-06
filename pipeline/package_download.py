@@ -18,9 +18,12 @@ Ships the campaign the way SCED distributes custom content (SCED_BUILD_BRIEF §1
      player-card bag, the encounter bag and the scripted Control token.
 
   2. A **placeholder download box** `the_still_hour_box.json` — the small object a
-     user adds to their SCED game; its GMNotes carries {"filename":"the_still_hour"}
-     and its Lua calls GlobalApi.placeholderDownload(filename) to pull and spawn
-     the release asset in place of the box.
+     user adds to their SCED game. Press Download: its Lua fetches the release asset
+     from the address in its GMNotes ({"filename", "url"}) with WebRequest.get and
+     spawns it in its place with spawnObjectJSON, as SCED's own Download menu does
+     (the menu itself only reads SCED's own release, so it cannot load ours). The
+     address is the build's own file on GitHub: the main branch by default,
+     --download-ref names another branch or commit.
 
 Card images, log pages and the guide PDF carry whatever URLs
 pipeline/art_urls.json holds: hosted raw.githubusercontent URLs after
@@ -54,7 +57,8 @@ FILENAME = CFG.slug   # the SCED-downloads release asset name
 # The mod's Global fetches {filename}.json from this base (verify in your fork;
 # for a custom campaign, host the asset at your own releases and point SOURCE_REPO
 # there). Recorded here for documentation / the box's GMNotes.
-SOURCE_REPO = "https://github.com/Chr1Z93/SCED-downloads/releases/latest/download/"
+SOURCE_REPO = "https://github.com/Chr1Z93/SCED-downloads/releases/latest/download/"   # SCED's own menu only reads this
+REPO = "Pimpcats/Arkhsm-LCG-"
 
 # Place spots for the loose content, beside the story-deck row the real
 # campaign box uses (z -36.385).
@@ -131,6 +135,8 @@ def main(argv=None):
     ap.add_argument("--campaign", help="campaign id (campaigns/<id>/build.json); default $CAMPAIGN or still_hour")
     ap.add_argument("--require-hosted", action="store_true",
                     help="fail if any file:/// URL would ship (publish_hosted.py)")
+    ap.add_argument("--download-ref", default=os.environ.get("DOWNLOAD_REF", "main"),
+                    help="branch or commit the download box fetches the campaign from (default main)")
     B.add_local_flag(ap)
     a = ap.parse_args(argv)
 
@@ -193,12 +199,16 @@ def main(argv=None):
         # real campaign-box tagging + GMNotes shape: docs/art_reference/
         # sced_objects/campaign_box_memory_bag.json ("Reloadable" lets SCED
         # re-fetch the download; "filename" is the placeholderDownload key)
-        "Tags": ["CampaignBox", "Reloadable", CFG.tag],
+        # not tagged CampaignBox or Reloadable: SCED's campaign exporter reads an empty
+        # Bag with that tag as "the campaign box with all objects placed", and its
+        # "Redownload this" asks SCED's own release for the file
+        "Tags": [CFG.tag],
         "ColorDiffuse": {"r": 0.13, "g": 0.11, "b": 0.18},
         # campaign-box area at the top of the SCED table, off the mats
         "Transform": dict(transform(63.0), posZ=8.0),
-        "GMNotes": json.dumps({"filename": FILENAME, "id": CFG.box_id,
-                               "type": "CampaignBox"}, separators=(",", ":")),
+        "GMNotes": json.dumps({"filename": FILENAME, "id": CFG.box_id, "type": "DownloadBox",
+                               "url": "https://raw.githubusercontent.com/{}/{}/dist/downloads/{}.json".format(
+                                   REPO, a.download_ref, FILENAME)}, separators=(",", ":")),
         "LuaScript": box_lua,
         "LuaScriptState": "",
     }
@@ -216,8 +226,9 @@ def main(argv=None):
         assert any(o["GUID"] == g for o in rel["ContainedObjects"]), g
     kinds = sorted({o["Name"] for o in rel["ContainedObjects"]})
     b = json.load(open(box_path, encoding="utf-8"))["ObjectStates"][0]
-    assert json.loads(b["GMNotes"])["filename"] == FILENAME
-    assert "placeholderDownload" in b["LuaScript"]
+    bgm = json.loads(b["GMNotes"])
+    assert bgm["filename"] == FILENAME and bgm["url"].endswith("/dist/downloads/{}.json".format(FILENAME))
+    assert "WebRequest.get" in b["LuaScript"] and "spawnObjectJSON" in b["LuaScript"]
     n_local = local_urls(rel)
     print("OK  release asset: {}  ({} objects: {}; scenarios {})".format(
         release_path, len(rel["ContainedObjects"]), ", ".join(kinds),
@@ -228,8 +239,8 @@ def main(argv=None):
         if a.require_hosted:
             raise SystemExit("FAIL: " + msg + " (run pipeline/publish_hosted.py)")
         print("WARN: " + msg + " — fine for solo testing, not for sharing")
-    print("Next: upload {}.json as a release asset reachable at SOURCE_REPO,".format(FILENAME))
-    print("      then add the download box object to the SCED game (verify GlobalApi.placeholderDownload).")
+    print("Next: commit and push dist/downloads/{0}.json; the download box fetches it from {1}.".format(
+        FILENAME, bgm["url"]))
 
 
 if __name__ == "__main__":

@@ -42,7 +42,7 @@ def card_object(card_id, campaign="still_hour"):
     spec = next((c for c in specs if c["id"] == card_id), None)
     if spec is None:
         raise KeyError("no card with id " + card_id)
-    obj = build_cards.build_card(spec)
+    obj = build_cards.build_card(spec, sheets=False)
     faces = os.path.join(runner.repo_root(), "art", "faces")
 
     def file_url(name):

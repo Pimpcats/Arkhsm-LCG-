@@ -181,7 +181,7 @@ def guid(key):
     return hashlib.sha1(key.encode("utf-8")).hexdigest()[:6]
 
 
-def transform(x=0.0, z=0.0, y=1.5, ry=180, scale=1.15, rz=0):
+def transform(x=0.0, z=0.0, y=1.5, ry=180, scale=B.CARD_SCALE, rz=0):
     return {"posX": x, "posY": y, "posZ": z, "rotX": 0, "rotY": ry, "rotZ": rz,
             "scaleX": scale, "scaleY": 1, "scaleZ": scale}
 
@@ -240,10 +240,11 @@ def normalize(c):
     return c
 
 
-def build_deck(cards, nickname, key, x, z, face_down=False):
+def build_deck(cards, nickname, key, x, z, face_down=False, box=None):
     """A TTS Deck object holding the cards of one stack (single card -> card),
-    `cards` in stage order: the first one ends up on top either way."""
-    objs = [B.build_card(normalize(c)) for c in cards]
+    `cards` in stage order: the first one ends up on top either way. `box` is
+    the scenario box's id: its cards come from that box's sprite sheets."""
+    objs = [B.build_card(normalize(c), box=box) for c in cards]
     if not face_down:
         objs.reverse()
     if not objs:
@@ -270,6 +271,19 @@ def build_deck(cards, nickname, key, x, z, face_down=False):
     }
 
 
+def scenario_card_ids(sc, assign, cards):
+    """The card ids a scenario box lays out, in stack order, each once. The one
+    place that says what a box holds: build_scenario_box lays these out and
+    pack_sheets.py packs exactly these into the box's sprite sheets."""
+    out = []
+    for stack, _label in STACK_ORDER:
+        ids = [i for i in (assign.get(stack) or []) if i in cards]
+        if not ids or (stack == "reference" and sc.get("shared_from")):
+            continue
+        out += [i for i in ids if i not in out]
+    return out
+
+
 def build_scenario_box(sc, assign, cards, campaign_name="Campaign"):
     """One scenario = a memory-bag book that lays its stacks out on Place."""
     sid = sc["id"]
@@ -294,7 +308,7 @@ def build_scenario_box(sc, assign, cards, campaign_name="Campaign"):
                     y, rot = LOCATION_GRID["y"], LOCATION_GRID["rot"]
                 else:
                     (x, y, z), rot = location_slot(n)
-                o = B.build_card(normalize(cards[cid]))
+                o = B.build_card(normalize(cards[cid]), box=sid)
                 # a location with an unrevealed side goes in unrevealed side
                 # up (face down, like location_unrevealed.json); SCED spawns
                 # its clues when the investigators flip it
@@ -313,7 +327,7 @@ def build_scenario_box(sc, assign, cards, campaign_name="Campaign"):
         d = build_deck([cards[i] for i in ids],
                        "{} — {}".format(sc.get("name", sid), label),
                        "{}:{}".format(sid, stack), x, z,
-                       face_down=bool(rz))
+                       face_down=bool(rz), box=sid)
         if d:
             d["Transform"] = transform(x, z, y=y, ry=rot, rz=rz)
             contained.append(d)
