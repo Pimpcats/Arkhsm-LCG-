@@ -67,14 +67,17 @@ unlocked clauses apply.
 
 | Investigator | Quest card | Goal (tally across the campaign) | Unlocked card | What it carries |
 |---|---|---|---|---|
-| Elias | What the Warden Owes | prevent 8 damage with his ability | What the Warden Remembers | 1 Memory when dealt damage (three times per game); the Lamp's move may raise Dissonance by 1 so it places no doom |
-| Ayako | The Unfinished Translation | first translation token on 12 different enemies | The Translation, Finished | 1 Memory on an [int] success (twice per game); Recollections drawn by her elder sign cost 2 less; It Means 'Wait' also reaches Hour text and The Appointed's attack |
-| Cass | A Marked Run of Cards | cancel 8 symbol tokens with her own ability or cards | The Table Remembers | 1 Memory per symbol reveal (twice per game); Marked Deck may pay Dissonance and Memory instead of 2 resources |
-| Birdie | Somewhere to Be | spend 10 resolve | She Knows the Road | 1 Memory when she fails by 2 or more (three times per game); Lucky Compass may remove 1 Memory instead of spending 2 resources; I Get Out places 1 Memory on the Compass |
-| Seraphine | The Medium's Price | use her ability 10 times | The Price, Remembered | 1 Memory when dealt horror (twice per game); Dissonance may pay for her ability; the Bell may advance or rewind the Hourglass |
+| Elias | What the Warden Owes | prevent 4 damage with his ability | What the Warden Remembers | 1 Memory when dealt damage (three times per game); the Lamp's move may raise Dissonance by 1 so it places no doom |
+| Ayako | The Unfinished Translation | first translation token on 8 different enemies | The Translation, Finished | 1 Memory on an [int] success (twice per game); Recollections drawn by her elder sign cost 2 less; It Means 'Wait' also reaches Hour text and The Appointed's attack |
+| Cass | A Marked Run of Cards | cancel 3 symbol tokens with her own ability or cards | The Table Remembers | 1 Memory per symbol reveal (twice per game); Marked Deck may pay Dissonance and Memory instead of 2 resources |
+| Birdie | Somewhere to Be | spend 8 resolve | She Knows the Road | 1 Memory when she fails by 2 or more (three times per game); Lucky Compass may remove 1 Memory instead of spending 2 resources; I Get Out places 1 Memory on the Compass |
+| Seraphine | The Medium's Price | use her ability 8 times | The Price, Remembered | 1 Memory when dealt horror (twice per game); Dissonance may pay for her ability; the Bell may advance or rewind the Hourglass |
 
-The goals are first values: the whole-campaign measurements in
-docs/design/FINISHING_BALANCE.md (section "Quest cards, 2026-10-06") set them.
+The goals are set by the whole-campaign measurements in
+docs/design/FINISHING_BALANCE.md (section "Quest cards, 2026-10-06"): each is met
+around the second or third night, which keeps experience inside 35-45. They live
+in one place (`Constants.QUEST` in src/StillHour/Constants.ttslua) and on the
+quest card text; change both together.
 The Lighthouse act's own text still heals 1 horror with Elias's elder sign once
 "The Keeper's Ninth Death" is recorded; that text is on the scenario card, not
 on a quest card.
