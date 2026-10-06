@@ -16,8 +16,8 @@
 --     tags "StillHourLoop" and "StillHourBox_<box id>" from the build, so a
 --     drawn card is still recognised; Place also tags what it takes out.
 --   * Recall removes what this box placed (and any card that came out of it)
---     from the table; the control token's Reset Loop removes every box's
---     objects at once (shClearLoopBoard).
+--     from the table; the Control token's Clear Board removes every box's
+--     objects at once (shClearBoard).
 -- The button layout matches SCED's MemoryBag so the book looks and works like
 -- an official scenario box.
 
@@ -103,9 +103,11 @@ function buttonClick_place()
   -- what this box can place: the remembered objects that are really inside it,
   -- highest position first so that taking one never moves the position of a
   -- later one (the index fallback below relies on it)
+  -- (kind and GUID only, never a card's title: a first-time player reads the chat, and
+  -- the Lua log gets pasted into messages; the GUID says which object it was)
   local inside = {}
   for _, e in ipairs(self.getObjects()) do
-    inside[e.guid] = { index = e.index, name = (e.nickname ~= nil and e.nickname ~= "") and e.nickname or e.name }
+    inside[e.guid] = { index = e.index, kind = e.name or "object" }
   end
   local guids = {}
   for guid in pairs(memoryList) do
@@ -130,7 +132,7 @@ function buttonClick_place()
   end
   if #already > 0 then
     trace("already placed: " .. #already .. " object(s) carry " .. tag)
-    say(self.getName() .. " is already laid out. Press Recall first (or Reset Loop on the Control token).")
+    say(self.getName() .. " is already laid out. Press Recall first (or Clear Board on the Control token).")
     return 0
   end
 
@@ -168,9 +170,9 @@ function buttonClick_place()
     local guid = guids[i]
     if not guid then return done(copy, "all objects taken") end
     local entry = memoryList[guid]
-    local name = tostring(inside[guid].name)
-    trace(string.format("taking %d/%d %s (%s)", i, #guids, name, guid))
-    broadcastToAll(string.format("Placing %d/%d: %s", i, #guids, name), { 0.7, 0.7, 0.7 })
+    local what = tostring(inside[guid].kind) .. " " .. guid
+    trace(string.format("taking %d/%d %s", i, #guids, what))
+    broadcastToAll(string.format("Placing %d/%d", i, #guids), { 0.7, 0.7, 0.7 })
     local ok, item = pcall(copy.takeObject, {
       guid = guid, position = entry.pos, rotation = entry.rot, smooth = false })
     if not (ok and item) and inside[guid].index ~= nil then
@@ -185,7 +187,7 @@ function buttonClick_place()
       end
       placed = placed + 1
     else
-      trace("take failed for " .. name .. ": " .. tostring(ok and "nothing returned" or item))
+      trace("take failed for " .. what .. ": " .. tostring(ok and "nothing returned" or item))
     end
     Wait.frames(function() take(copy, i + 1) end, STEP_FRAMES)
   end

@@ -199,7 +199,7 @@ For finale conditions and the epilogue, an investigator's bracket is set by all 
 5. **Take the Campaign Log** (the log token, or the pages at the back of this guide). Record your investigators and difficulty. The log keeps what you have not yet learned hidden: each Knowledge entry, Named enemy and choice has a row, and its name appears on the token only when you tick it (on the printed pages, write it on the row's line). Each investigator starts at **0 Years**; banked Memory (one shared pool) starts at **0**.
 6. Turn to **Prologue — The First Hour.**
 
-**Boxes.** Every box has **Place** and **Recall**. **Place** lays the box out afresh each time you press it, so pressing it twice lays out a second copy of the district: press it once. To take a box back (a district placed by mistake, or the end of a loop), press **Recall** on that box.
+**Boxes.** Every box has **Place** and **Recall**. A district's **Place** takes a few seconds: it lays the cards out one at a time and says in the chat how far it has got. Press it once; while the district is on the table, pressing it again is refused (it would lay a second copy on top of the first). To take a box back (a district placed by mistake, or the end of a loop), press **Recall** on that box; **Clear Board** on the Control token takes back every district at once.
 
 ---
 

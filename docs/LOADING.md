@@ -33,10 +33,15 @@ GitHub, so the build works on any PC.
    tells you when to press each button on the Control token and each box's
    **Place**.
 
-Every box has **Place** and **Recall**. **Place** is not idempotent: it lays
-the box out afresh each time, so pressing it twice lays out a second copy of a
-district (a duplicate). Press it once. To take a box back (a district placed by
-mistake, or a loop that is over), press **Recall** on that box.
+Every box has **Place** and **Recall**. A scenario box's **Place** takes a few
+seconds: it lays its cards out one at a time and says what it is placing in the
+chat. Press it once; pressing it again while its cards are on the table is
+refused (it would lay a second copy on top of the first). To take a box back (a
+district placed by mistake, or a loop that is over), press **Recall** on that
+box, or **Clear Board** on the Control token for every box at once.
+
+If Tabletop Simulator stops when you press **Place**, do not press it again: see
+`docs/PLACE_TEST.md` (a small Saved Object that finds out why).
 
 The Control token does the campaign's bookkeeping: Hour, Dissonance and the
 `[static]` tokens in the chaos bag, Memory, the loop count, aging and the
@@ -136,3 +141,14 @@ empties); the campaign box carries SCED's own `src/tts/memory_bag.lua`. Never
 edit generated files in `dist/` by hand.
 
 In-game verification runs through the TTS relay: `docs/TTS_RELAY.md`.
+
+## Loading with the Download box (optional)
+
+Instead of copying the 1 MB Saved Object into the Saved Objects folder you can
+copy the 2 KB `dist/downloads/the_still_hour_box.json` there. **Objects → Saved
+Objects → The Still Hour — Download Box**, then press **Download** on it: it
+fetches the campaign from GitHub (the way SCED's own Download menu loads its
+campaigns), puts the campaign box where it stood and removes itself. The box it
+fetches is the build on GitHub's `main` branch (a build made with
+`pipeline/package_download.py --download-ref <branch or commit>` fetches that
+one). Everything after that is the same as above.
