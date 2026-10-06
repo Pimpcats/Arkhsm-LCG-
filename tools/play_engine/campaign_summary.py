@@ -103,6 +103,10 @@ def summarize(games):
         wins = sum(1 for g in slot_games.get(slot, []) if slot_won(g))
         per_slot.append(wins / campaigns)
     out["mean_rate_all_slots"] = statistics.mean(per_slot)
+    # the headline: Prologue to Night 8. The Finale slot only records reaching the contest, so it is
+    # shown but kept out of the mean (as in FINISHING_BALANCE.md's earlier whole-campaign table)
+    out["mean_rate_nine"] = statistics.mean(per_slot[:9])
+    out["target_mean_nine"] = statistics.mean(CURVE[:9]) / 100
     out["xp"] = {"mean": statistics.mean(xp), "min": min(xp), "max": max(xp),
                  "stdev": statistics.pstdev(xp) if len(xp) > 1 else 0.0, "per_campaign": xp}
     return out
@@ -115,7 +119,8 @@ def render(s, title=""):
         met = r["wins"] / s["campaigns"]
         lines.append("%-10s  %5.0f%%   %5.0f%%        %5.0f%%            %3.0f%%" %
                      (r["name"], 100 * r["reached"], 100 * met, 100 * r["rate"], 100 * r["target"]))
-    lines.append("mean goal-met rate over the ten slots (design target 60%%): %.1f%%" % (100 * s["mean_rate_all_slots"]))
+    lines.append("mean goal-met rate, Prologue to Night 8 (target curve mean %.1f%%, design target about 60%%): %.1f%%" %
+                 (100 * s["target_mean_nine"], 100 * s["mean_rate_nine"]))
     x = s["xp"]
     lines.append("Memory banked per investigator over the campaign: mean %.1f, range %.1f-%.1f (official 35-45)" %
                  (x["mean"], x["min"], x["max"]))
