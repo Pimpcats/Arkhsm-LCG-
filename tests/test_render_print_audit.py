@@ -9,6 +9,7 @@ check catches each defect on a real frame, then render every face and require
 none.
 """
 import os
+import re
 import subprocess
 import sys
 
@@ -19,6 +20,17 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "pipeline"))
 
 import render_placeholders as rp  # noqa: E402
+
+# Faces whose flavour text is left off because their rules are too dense to keep it at 27px+
+# (official faces do the same). Dense rules text is the cause; shortening the rules brings it back.
+FLAVOUR_DROPPED_OK = {
+    "sthr-appointed", "sthr-appointed-approach", "sthr-bellringer", "sthr-borrowedtime",
+    "sthr-hourlearnedname", "sthr-item-almanac", "sthr-item-drownedpage", "sthr-item-ledger",
+    "sthr-item-logbook", "sthr-item-register", "sthr-loc-hubsquare", "sthr-loc-lanternroom",
+    "sthr-onewhorides", "sthr-quest-ayako", "sthr-quest-cass", "sthr-questdone-ayako",
+    "sthr-questdone-birdie", "sthr-questdone-cass", "sthr-questdone-elias",
+    "sthr-questdone-seraphine", "sthrayako", "sthrbirdie", "sthrelias"}
+BODY_PX_FLOOR = 22          # the smallest rules text any face prints (official body text: 31)
 
 pytestmark = pytest.mark.skipif(not rp.has_se_frames(),
                                 reason="Strange Eons frame kit not present")
@@ -107,3 +119,14 @@ def test_every_face_prints_clean():
     out = r.stdout + r.stderr
     assert r.returncode == 0, out[-4000:]
     assert "PRINT AUDIT" not in out and "TEXT OVERFLOW" not in out, out[-4000:]
+
+    # The renderer drops a card's flavour text when its rules are too dense, and prints it small
+    # when they are denser still. Both are design choices; neither may happen by accident: a face
+    # that newly loses its flavour, or sets its rules below the floor, fails here until its id is
+    # added on purpose (docs/design/DATABASE_AUDIT.md, TXT-16).
+    m = re.search(r"flavour left off[^\n:]*: ([^\n]*)", out)
+    dropped = set(i.strip() for i in m.group(1).split(",")) if m else set()
+    assert dropped <= FLAVOUR_DROPPED_OK, "flavour newly left off: %s" % sorted(dropped - FLAVOUR_DROPPED_OK)
+    m = re.search(r"rules set below 25px[^\n:]*: ([^\n]*)", out)
+    small = re.findall(r"(\S+) (\d+)px", m.group(1)) if m else []
+    assert all(int(px) >= BODY_PX_FLOOR for _cid, px in small), "rules set below %dpx: %s" % (BODY_PX_FLOOR, small)

@@ -2892,6 +2892,14 @@ def s_agenda(c, pt, dest, art_path=None, placement=None):
         _box_text(d, str(c["doom"]), db, stat=True, grow=1.0,
                   max_size=int((db[3] - db[1]) * 0.60),
                   fill=(238, 232, 216), pos_key="doom")
+    else:
+        # an agenda with no doom threshold (the last Hour): the circle prints a
+        # dash, as an act's does, rather than an empty medallion
+        db = se_reg("Agenda", "Doom")
+        cx, cy = (db[0] + db[2]) // 2, (db[1] + db[3]) // 2
+        half = max(6, (db[2] - db[0]) // 5)
+        d.line([(cx - half, cy), (cx + half, cy)], fill=(238, 232, 216),
+               width=max(3, half // 3))
     _scenario_body(d, "Agenda", c, pt)
     _card_footer(img, d, "Agenda", c, art_path)
     _encounter_mark(img, d, "Agenda", c)

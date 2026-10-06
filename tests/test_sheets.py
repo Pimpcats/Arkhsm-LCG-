@@ -196,3 +196,30 @@ def test_a_compiled_campaign_draws_every_scenario_card_from_its_boxs_sheets(tmp_
                 assert len(o["CustomDeck"]) <= 2
                 assert sorted(o["DeckIDs"]) == sorted(c["CardID"] for c in o["ContainedObjects"])
     assert checked >= 100
+
+
+def test_every_object_in_a_scenario_box_has_its_own_guid(tmp_path):
+    # Place keeps the GUIDs a box holds and SCED keys per-card state on them (which locations have
+    # spawned their clues, ...), so a card listed several times in a deck must not repeat one
+    out = tmp_path / "campaign.json"
+    assert CC.compile_campaign(str(out))["ok"]
+    box = json.load(open(out, encoding="utf-8"))["ObjectStates"][0]
+    boxes = 0
+    for sb in box["ContainedObjects"]:
+        if sb.get("Name") != "Custom_Model_Bag" or json.loads(sb["GMNotes"]).get("type") != "ScenarioBox":
+            continue
+        boxes += 1
+        seen = {}
+
+        def walk(o, path):
+            g = o.get("GUID")
+            assert g not in seen, "%s: GUID %s on %s and %s" % (sb["Nickname"], g, seen[g], path)
+            seen[g] = path
+            for c in o.get("ContainedObjects") or []:
+                walk(c, path + "/" + str(c.get("Nickname")))
+        for o in sb["ContainedObjects"]:
+            walk(o, str(o.get("Nickname")))
+        # the memory list names direct children only, each once
+        ml = json.loads(sb["LuaScriptState"])["ml"]
+        assert set(ml) == {o["GUID"] for o in sb["ContainedObjects"]}, sb["Nickname"]
+    assert boxes == 8

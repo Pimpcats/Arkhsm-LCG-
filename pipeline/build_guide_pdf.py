@@ -37,6 +37,7 @@ Needs: reportlab
 """
 import argparse
 import hashlib
+import json
 import os
 import re
 import sys
@@ -52,6 +53,8 @@ GUIDE_DIR = os.path.join(ROOT, "assets", "frames", "se", "guide")
 FONTS = os.path.join(ROOT, "assets", "fonts")
 FACES = os.path.join(ROOT, "art", "faces")
 LOG_PAGES = list(CFG.log_pages)
+
+LOG_TITLE = "Campaign Log"  # the contents entry for the log pages at the back
 
 PX = 72.0 / 150.0           # template pixels -> PDF points
 PAGE_W, PAGE_H = 1275 * PX, 1650 * PX
@@ -144,6 +147,10 @@ def parse(md):
         ln = lines[i]
         st = ln.strip()
         if not st or st == "---":
+            i += 1
+            continue
+        if st == "<!-- pagebreak -->":
+            blocks.append(("pagebreak", None))     # a story that waits for its own loop gets its own page
             i += 1
             continue
         if st.startswith("```resolution"):
@@ -249,6 +256,27 @@ def register_fonts(tmp):
 
 # ----------------------------------------------------------------- layout --
 def build(out=OUT, source=SOURCE, log_pages=True):
+    """Typeset the guide. The printed contents carry page numbers, which are known
+    only once the pages exist: build until the numbers it printed are the numbers
+    the layout produced (the contents block has a fixed height, so this settles
+    on the second pass)."""
+    pages = {}
+    for _ in range(4):
+        info, found = build_once(out, source, log_pages, pages)
+        if found == pages:
+            # the page each section starts on, for the Control token's "Open guide" menu
+            # (Book.setPage takes a zero-based page); nothing hand-keeps these numbers
+            pages_path = os.path.splitext(out)[0] + "_pages.json"
+            with open(pages_path, "w", encoding="utf-8", newline="\n") as f:
+                json.dump({"pages": found, "count": info["pages"]}, f, indent=1,
+                          ensure_ascii=False, sort_keys=True)
+                f.write("\n")
+            return info
+        pages = found
+    raise SystemExit("the guide's contents did not settle on stable page numbers")
+
+
+def build_once(out, source, log_pages, toc_pages):
     from reportlab import rl_config
     rl_config.invariant = 1
     from reportlab.lib import colors
@@ -296,12 +324,30 @@ def build(out=OUT, source=SOURCE, log_pages=True):
 
     def log_bg(c, doc):
         i = min(doc._log_i, len(doc._log_pages) - 1)
+        if doc._log_i == 0:
+            doc._toc_found[LOG_TITLE] = doc.page
+            c.bookmarkPage("log")
+            c.addOutlineEntry(LOG_TITLE, "log", level=0, closed=False)
         doc._log_i += 1
         c.drawImage(doc._log_pages[i], 0, 0, PAGE_W, PAGE_H)
 
-    doc = BaseDocTemplate(out, pagesize=(PAGE_W, PAGE_H), title=CFG.name + " — Campaign Guide",
-                          author=CFG.name + " (fan campaign)", subject="Campaign Guide",
-                          creator="pipeline/build_guide_pdf.py")
+    class GuideDoc(BaseDocTemplate):
+        """Notes every heading's page (the printed contents and the PDF's
+        bookmarks both come from it)."""
+
+        def afterFlowable(self, flowable):
+            toc = getattr(flowable, "_toc", None)
+            if toc:
+                level, title = toc
+                key = "sec%d" % len(self._toc_found)
+                self.canv.bookmarkPage(key)
+                self.canv.addOutlineEntry(title, key, level=level, closed=False)
+                self._toc_found[title] = self.page
+
+    doc = GuideDoc(out, pagesize=(PAGE_W, PAGE_H), title=CFG.name + " — Campaign Guide",
+                   author=CFG.name + " (fan campaign)", subject="Campaign Guide",
+                   creator="pipeline/build_guide_pdf.py")
+    doc._toc_found = {}
     doc.addPageTemplates([
         PageTemplate("title", [frame_px(R_LEFT_TITLE, "tl"), frame_px(R_RIGHT_TITLE, "tr")],
                      onPage=lambda c, d: page_bg(c, d, True)),
@@ -330,6 +376,12 @@ def build(out=OUT, source=SOURCE, log_pages=True):
                                 leading=11, textColor=TEAL),
         "reshead": ParagraphStyle("reshead", fontName="Arkhamic", fontSize=12,
                                   leading=14, textColor=RES_RED, spaceAfter=2),
+        "toc0": ParagraphStyle("toc0", fontName="Body-Bold" if body == "Body" else body,
+                               fontSize=9.4, leading=11, textColor=INK),
+        "toc1": ParagraphStyle("toc1", fontName=body, fontSize=9, leading=10.6,
+                               leftIndent=12, textColor=INK),
+        "tocn": ParagraphStyle("tocn", fontName=body, fontSize=9.4, leading=11,
+                               alignment=2, textColor=INK),
         "noread": ParagraphStyle("noread", fontName=body, fontSize=10.2,
                                  leading=12.6, alignment=TA_CENTER,
                                  textColor=RES_RED, spaceBefore=8, spaceAfter=8),
@@ -453,6 +505,43 @@ def build(out=OUT, source=SOURCE, log_pages=True):
 
     story = []
     blocks = parse(open(source, encoding="utf-8").read())
+
+    def brk():
+        """End the page (never twice in a row: that would print a blank page)."""
+        if story and not isinstance(story[-1], PageBreak):
+            story.append(PageBreak())
+
+    def heading(text, style, level):
+        p = Paragraph(inline(title_case(text)), style)
+        p._toc = (level, title_case(text))
+        return p
+
+    # the printed contents: every section, and the districts under The Districts
+    entries, in_districts = [], False
+    for kind, payload in blocks:
+        if kind == "h2":
+            in_districts = payload.startswith("THE DISTRICTS")
+            entries.append((0, title_case(payload)))
+        elif kind == "h3" and in_districts:
+            entries.append((1, title_case(payload)))
+    if log_pages and any(os.path.exists(os.path.join(FACES, pid + ".png")) for pid in LOG_PAGES):
+        entries.append((0, LOG_TITLE))
+
+    def contents():
+        """'Contents' with the page each section starts on (0 until known)."""
+        rows = [[Paragraph(inline(t), S["toc%d" % lv]),
+                 Paragraph(str(toc_pages.get(t, 0)), S["tocn"])] for lv, t in entries]
+        aw = R_LEFT_TITLE[2] * PX - 8
+        tbl = Table(rows, colWidths=[aw - 26, 26])
+        tbl.setStyle(TableStyle([
+            ("VALIGN", (0, 0), (-1, -1), "TOP"),
+            ("LINEBELOW", (0, 0), (-1, -1), 0.3, colors.HexColor("#b9ab94")),
+            ("TOPPADDING", (0, 0), (-1, -1), 1.2), ("BOTTOMPADDING", (0, 0), (-1, -1), 1.8),
+            ("LEFTPADDING", (0, 0), (-1, -1), 2), ("RIGHTPADDING", (0, 0), (-1, -1), 2)]))
+        return KeepTogether([Paragraph("Contents", S["header"]), tbl, Spacer(1, 6)])
+
+    contents_done = False
+    section = ""
     first_h1 = True
     for kind, payload in blocks:
         if kind == "h1":
@@ -462,16 +551,25 @@ def build(out=OUT, source=SOURCE, log_pages=True):
             story.append(Paragraph(inline(title_case(payload)), S["section"]))
         elif kind == "h2":
             text = payload
-            if re.search(r"PROLOGUE|THE DISTRICTS|FINALE", text):
-                story.append(PageBreak())
-            elif re.search(r"THE LOOP|BETWEEN LOOPS", text):
+            section = text
+            if not contents_done and re.search(r"NEW RULES", text):
+                contents_done = True
+                story.append(contents())    # after "How to use this guide", before the rules
+            if re.search(r"PROLOGUE|THE DISTRICTS|FINALE|DIFFICULTY AND PLAYER|APPENDIX|BETWEEN LOOPS", text):
+                # nothing guarded shares a page with what comes next (Between Loops is also read
+                # once after the Prologue, before any loop's resolutions have been earned)
+                brk()
+            elif re.search(r"THE LOOP", text):
                 story.append(CondPageBreak(3.2 * 72))
             else:
                 story.append(CondPageBreak(1.6 * 72))
-            story.append(Paragraph(inline(title_case(text)), S["section"]))
+            story.append(heading(text, S["section"], 0))
         elif kind == "h3":
             if not story:
                 story.append(Paragraph("<i>" + inline(payload) + "</i>", S["intro"]))
+            elif section.startswith("THE DISTRICTS"):
+                brk()                       # a district starts on its own page, clear of the last one's resolutions
+                story.append(heading(payload, S["header"], 1))
             else:
                 story.append(CondPageBreak(1.3 * 72))
                 story.append(Paragraph(inline(title_case(payload)), S["header"]))
@@ -481,6 +579,7 @@ def build(out=OUT, source=SOURCE, log_pages=True):
             if payload.strip("*").startswith("Do not read"):
                 story.append(Paragraph("<b>" + inline(payload.strip("*")) + "</b>",
                                        S["noread"]))
+                brk()           # what the line guards starts on the next page
                 continue
             style = S["intro"] if len(story) < 2 and payload.startswith("*") else S["p"]
             story.append(Paragraph(inline(payload), style))
@@ -554,8 +653,11 @@ def build(out=OUT, source=SOURCE, log_pages=True):
                 ("LEFTPADDING", (0, 0), (-1, -1), 2),
                 ("RIGHTPADDING", (0, 0), (-1, -1), 3),
             ]))
-            story.append(t)
-            story.append(Spacer(1, 6))
+            story.append(KeepTogether([t, Spacer(1, 6)]) if len(rows) <= 14 else t)
+            if len(rows) > 14:
+                story.append(Spacer(1, 6))
+        elif kind == "pagebreak":
+            brk()
         elif kind == "map":
             story.append(KeepTogether([MapFlowable(payload), Spacer(1, 6)]))
 
@@ -581,8 +683,9 @@ def build(out=OUT, source=SOURCE, log_pages=True):
     os.makedirs(os.path.dirname(out), exist_ok=True)
     doc.build(story)
     data = open(out, "rb").read()
-    return {"out": os.path.relpath(out, ROOT), "pages": doc.page,
-            "bytes": len(data), "sha1": hashlib.sha1(data).hexdigest()[:10]}
+    return ({"out": os.path.relpath(out, ROOT), "pages": doc.page,
+             "bytes": len(data), "sha1": hashlib.sha1(data).hexdigest()[:10]},
+            dict(doc._toc_found))
 
 
 def main():
@@ -597,7 +700,6 @@ def main():
     ap.add_argument("--no-log", action="store_true",
                     help="leave the campaign-log pages off the end")
     a = ap.parse_args()
-    import json
     print(json.dumps(build(a.out, log_pages=not a.no_log)))
 
 

@@ -526,6 +526,13 @@
         "log": "Mark the loop Taken (+1 Year each for being defeated). Second or later Taken loop: read its interlude beat."
       },
       {
+        "id": "R3",
+        "name": "You Walk Out of the Night",
+        "condition": "every investigator resigned or was defeated, and at least one resigned",
+        "source": "campaign guide §4",
+        "log": "Mark the loop Closed at the Hour. Each defeated investigator gains the +1 Year for being defeated; an investigator who resigned does not."
+      },
+      {
         "id": "R1",
         "name": "The Appointed Hour",
         "condition": "the Hourglass reached Hour IX",
@@ -773,7 +780,7 @@
         {
           "id": "R1",
           "name": "The Ninth Line",
-          "condition": "you completed The Ninth Death this loop",
+          "condition": "you completed The Keeper's Ninth Death this loop",
           "source": "player guide"
         },
         {

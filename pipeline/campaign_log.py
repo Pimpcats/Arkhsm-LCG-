@@ -56,15 +56,15 @@ FACTS = [
     ("the-lamp-was-never-lit", "The Lamp Remembers", "Lighthouse", "surface",
      "The Lantern Room enters play calm side up."),
     ("the-keepers-ninth-death", "The Keeper's Ninth Death", "Lighthouse", "deep",
-     "A defeated investigator first places 1 Memory. Elias Warde's [elder] heals 1 horror too."),
+     "A defeated investigator first places 1 Memory. Elias Warde's Elder Sign heals 1 horror too."),
     ("the-thirteenth-toll", "The Thirteenth Toll", "Church", "surface",
      "Hour III: no extra Dissonance at a Church location."),
     ("the-hour-was-wrong", "The Hour Was Wrong", "Church", "deep",
-     "Hour IV's Forced ability does not resolve. −1 [elderthing]."),
+     "Hour IV's Forced ability does not resolve. Bag: −1 Elder Thing."),
     ("the-road-remembers", "The Road Remembers", "Sunken Road", "surface",
      "Group limit once per loop: moving Square–Milestones places no doom."),
     ("who-walks-beside-you", "Who Walks Beside You", "Sunken Road", "deep",
-     "Each Echo gets −1 fight. −1 [cultist]."),
+     "Each Echo gets −1 fight. Bag: −1 Cultist."),
     ("the-sheriff-is-already-dead", "The Sheriff Is Already Dead", "Square", "surface",
      "The Town Hall Steps enter play calm side up."),
     ("the-vote-that-never-ends", "The Vote That Never Ends", "Square", "deep",
@@ -76,7 +76,7 @@ FACTS = [
     ("what-the-almanac-hid", "What the Almanac Hid", "Almanac", "surface",
      "Hour VI: the bag holds 1 fewer Static token instead of 1 more."),
     ("the-appointeds-name", "The Appointed's Name", "Almanac", "deep",
-     "Hour VII: exhaust The Appointed. −1 [tablet]. Seraphine's thread: known (if she is playing)."),
+     "Hour VII: exhaust The Appointed. Bag: −1 Tablet. Seraphine's thread: known (if she is playing)."),
     ("the-way-the-night-breaks", "The Way the Night Breaks", "assembled", "assembled",
      "The finale may be begun."),
 ]
@@ -114,6 +114,16 @@ CHOICES = [
     ("ticket", "The Fairground", "You hold the ticket", "You refused the ticket"),
     ("name", "The Almanac House", "You have spoken the name", "The name is kept unspoken"),
 ]
+
+# Choices whose option carries a rule that applies from then on (guide: "Loop Setup", step 9).
+# It shows under the choice once that option is ticked, so nobody has to find it in the
+# district's resolution pages again. (choice key, option) -> the rule as the guide words it.
+STANDING = {
+    ("page", "a"): "From the next loop: group limit once per loop, moving between The Square "
+                   "and The Reading Room places no doom.",
+    ("ticket", "b"): "From the next loop: the first time a Lost Hour is drawn each loop, "
+                     "cancel its revelation effect.",
+}
 
 BRACKETS = [("prime", "Prime", 0, 4), ("weathered", "Weathered", 5, 9),
             ("elder", "Elder", 10, 14), ("ancient", "Ancient", 15, 99)]
@@ -164,6 +174,9 @@ class Page:
         """Text that appears on the token only once `watch` is ticked (names
         stay hidden until earned); the printed page shows a write-in rule."""
         self.ops.append(("line", x0, y + 4, x1))
+        est = len(text) * 0.455 * (h / 2.0)       # an average letter of the label font, in px
+        if est > (x1 - x0) - 10:
+            h = max(24, int(h * ((x1 - x0) - 10) / est))
         self.fields.append({"k": key, "t": "rv", "rw": watch, "rt": text,
                             "x": x0, "y": y - h + 6, "w": x1 - x0, "h": h})
 
@@ -213,7 +226,7 @@ def _pages():
     for i, (px, py) in enumerate(panels, start=1):
         _investigator_panel(p1, i, px, py)
 
-    bm = row2 + PANEL_H + 46                        # the Banked Memory block follows the panels
+    bm = row2 + PANEL_H + 38                        # the Banked Memory block follows the panels
     p1.header(bm, "Banked Memory")
     y = bm + 54
     p1.text(90, y, "Banked Memory", size=24, style="bold")
@@ -225,8 +238,8 @@ def _pages():
     y = bm + 104
     p1.text(90, y, "Spent on:", size=24, style="bold")
     p1.line("spent_on", 210, 1190, y)
-    p1.text(90, bm + 148, "Campaign notes", size=24, style="bold")
-    p1.line("notes1", 90, 1190, bm + 180, rows=2, row_h=30)
+    p1.text(90, bm + 144, "Campaign notes", size=24, style="bold")
+    p1.line("notes1", 90, 1190, bm + 172, rows=2, row_h=30)
 
     p2 = Page(2, "Campaign Log — continued")
     p2.text(PAGE_W // 2, 116, "The Knowledge Track", size=52, style="title",
@@ -271,9 +284,8 @@ def _pages():
         p2.checkbox("vb:" + eid, 940, y)
         y += 34
     for eid, name, where, vic in VICTORY_LOCATIONS:
-        p2.text(90, y, name, size=21, style="bold")
-        p2.text(470, y, "({}, Victory {})".format(where, vic), size=19,
-                style="italic", fill=SOFT)
+        p2.text(90, y, "{} — location (Victory {})".format(where, vic), size=20, style="bold")
+        p2.reveal("vr:" + eid, "v:" + eid, name, 420, 750, y, h=30)
         p2.checkbox("v:" + eid, 780, y)
         p2.checkbox("vb:" + eid, 940, y)
         y += 34
@@ -322,6 +334,13 @@ def _pages():
         p3.reveal(key + "_ar", key + "_a", a, 420, 760, y, h=28)
         p3.checkbox(key + "_b", 780, y, "2nd", size=18, group="ch_" + key)
         p3.reveal(key + "_br", key + "_b", b, 870, 1185, y, h=28)
+        for side in ("a", "b"):
+            if (key, side) in STANDING:
+                y += 30
+                p3.text(90, y, "Standing rule ({}):".format("1st" if side == "a" else "2nd"),
+                        size=17, style="italic", fill=SOFT)
+                p3.reveal("{}_{}s".format(key, side), "{}_{}".format(key, side),
+                          STANDING[(key, side)], 300, 1185, y, h=24)
         y += 42
     p3.text(90, y, "Name (Lighthouse):", size=21, style="bold")
     p3.line("ninth_signer", 330, 760, y)
@@ -391,11 +410,11 @@ def _investigator_panel(p, i, px, py):
     x = p.checkbox("inv{}_dagi".format(i), x, y, "−1 [agi]", size=20)
     x = p.checkbox("inv{}_dwil".format(i), x, y, "+1 [wil]", size=20)
     p.checkbox("inv{}_dint".format(i), x, y, "+1 [int]", size=20)
-    y += 42
+    y += 46
     p.text(x0, y, "Quest", size=22, style="bold")
     p.counter("inv{}_quest".format(i), x0 + 100, y - 8, 0, 99)
     p.checkbox("inv{}_questdone".format(i), x0 + 142, y, "met: swap the quest card", size=20)
-    y += 54
+    y += 50
     p.text(x0, y, "Recollections", size=22, style="bold")
     p.line("inv{}_recollections".format(i), x0 + 150, x1, y, rows=2, row_h=32)
     y += 32 + 36

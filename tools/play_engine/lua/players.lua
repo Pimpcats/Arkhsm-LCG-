@@ -814,7 +814,7 @@ return function(R, T)
     return n
   end
 
-  --- Birdie: [free] during your turn, remove 2 resolve: return an event from
+  --- Birdie: [free] during your turn, spend 2 resolve: return an event from
   -- your discard pile to your hand (once per round). Policy: only an event
   -- that is worth having again; Lucky! first. Returns true if one came back.
   local RECUR = { ["Lucky!"] = 9, ["Emergency Cache"] = 6, ["Cunning Distraction"] = 5, ["Rehearsed Escape"] = 7,

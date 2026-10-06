@@ -245,6 +245,16 @@ def build_deck(cards, nickname, key, x, z, face_down=False, box=None):
     `cards` in stage order: the first one ends up on top either way. `box` is
     the scenario box's id: its cards come from that box's sprite sheets."""
     objs = [B.build_card(normalize(c), box=box) for c in cards]
+    # a card listed n times is n objects; build_card derives the GUID from the id alone, so every
+    # copy after the first gets its own (Place keeps the GUIDs a box holds, and SCED keys state,
+    # such as which locations already spawned their clues, on them)
+    seen = {}
+    for c, o in zip(cards, objs):
+        cid = c.get("id") or o["GUID"]
+        k = seen.get(cid, 0)
+        seen[cid] = k + 1
+        if k:
+            o["GUID"] = guid("{}-copy{}".format(cid, k))
     if not face_down:
         objs.reverse()
     if not objs:

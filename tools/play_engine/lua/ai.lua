@@ -486,7 +486,7 @@ return function(R, T)
   function A.startTurn(inv)
     local G = R.G
     local L = R.locOf(inv)
-    -- Birdie: [free] remove 2 resolve: return an event from her discard pile
+    -- Birdie: [free] spend 2 resolve: return an event from her discard pile
     if inv.id == "sthrbirdie" then P.birdieRecur(inv) end
     -- Cass names a symbol (2 resources) when she can spare them
     if inv.id == "sthrcass" and not inv.round.cassNamed and inv.resources >= 4 then

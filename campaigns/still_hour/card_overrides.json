@@ -1208,7 +1208,7 @@
     "memoryCost": 2
   },
   "sthrbirdie": {
-    "text": "[reaction] After you fail a skill test: Place 1 resolve on \"Birdie\". (Limit twice per round.)\n[free] During your turn, remove 2 resolve from \"Birdie\": Return an event from your discard pile to your hand. (Limit once per round.)\n[elder] effect: +1. If you have failed a skill test this round, this token is +3 instead.",
+    "text": "[reaction] After you fail a skill test: Place 1 resolve on \"Birdie\". (Limit twice per round.)\n[free] During your turn, spend 2 resolve from \"Birdie\": Return an event from your discard pile to your hand. (Limit once per round.)\n[elder] effect: +1. If you have failed a skill test this round, this token is +3 instead.",
     "back_text": "Deck Size: 30.\nDeckbuilding Options: Survivor cards level 0–5, Neutral cards level 0–5, up to 5 other Guardian, Mystic, Rogue and/or Seeker cards level 0–1, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): Lucky Compass, I Get Out, Nobody Believes Her, Somewhere to Be, 1 random basic weakness.",
     "elderSign": "+1. If you have failed a skill test this round, this token is +3 instead.",
     "health": 7
@@ -1287,7 +1287,7 @@
     "wilIcons": 1,
     "agiIcons": 1,
     "flavor": "",
-    "text": "Each investigator at your location gets +1 [agi] while evading.\n[action] Exhaust The Ambergrove Lamp: Look at the top card of the encounter deck. You may take 1 horror to put it on the bottom. Then, you may move to a connecting location. This action does not provoke attacks of opportunity."
+    "text": "Each investigator at your location gets +1 [agi] while evading.\n[action] Exhaust The Ambergrove Lamp: Look at the top card of the encounter deck. You may take 1 direct horror to put it on the bottom. Then, you may move to a connecting location. This action does not provoke attacks of opportunity."
   },
   "sthr-rehearsedescape": {
     "wildIcons": 1,
