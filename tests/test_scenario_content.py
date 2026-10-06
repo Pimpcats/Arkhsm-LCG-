@@ -438,8 +438,12 @@ class ContentGapTests(unittest.TestCase):
                 self.assertTrue(CARDS[cid].get("back_text"))
                 deck = next(iter(objs[cid]["CustomDeck"].values()))
                 self.assertTrue(deck["UniqueBack"])
-                self.assertIn("/dist/cards/{}-back.jpg".format(cid), deck["BackURL"])
+                # on a sprite sheet (the box's own back sheet) or, in a build without sheets, its own back image
+                back = deck["BackURL"].split("?")[0]
+                self.assertTrue(back.endswith("-back.jpg"), back)
+                self.assertIn("/dist/cards/", back)
                 self.assertTrue(os.path.exists(os.path.join(ROOT, "dist", "cards", cid + "-back.jpg")))
+                self.assertTrue(os.path.exists(os.path.join(ROOT, back[back.index("dist/"):])), back)
                 self.assertNotEqual(deck["BackURL"], deck["FaceURL"])
 
 
