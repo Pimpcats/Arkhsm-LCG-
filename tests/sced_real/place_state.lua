@@ -9,6 +9,8 @@
 --   N-2  the CLOSED label is read off the card, so a new card gets it and Sync Board repairs it
 --   N-4  Recall and Clear Board stop a Place that is still running; the next Place is not refused
 --   N-5  Recall takes the tokens resting on the cards it removes, and nothing else
+--   N-8  a clue beside a removed card, or one SCED spawns just after it left, is taken too; a Place
+--        clears leftover clues standing on its location spots
 --   N-6  a save taken during a Place leaves no second, Place-able box behind
 --   N-7  a box out of context is laid out all the same and the chat says so, once
 --   G12  a Place is refused while another box's cards (or an older build's) lie where it lays out
@@ -350,6 +352,37 @@ return function(H)
     for _, o in ipairs(mine) do if o.isDestroyed() then lost = lost + 1 end end
     check("SCED's own table objects are untouched", lost == 0, lost)
     far.destruct(); E.run(0.3)
+  end)
+
+  ----------------------------------------------------------- N-8 --
+
+  step("N-8: a clue beside a removed card, or spawned just after it, goes too; a Place clears leftovers on its spots", function()
+    local road = place("district_road", false)
+    local card = looseCard("sthr-loc-milestones")
+    local b = E.aabb(card)
+    local cx, cz = (b.min.x + b.max.x) / 2, (b.min.z + b.max.z) / 2
+    -- SCED marks every clue and doom token it spawns with the memo "clueDoom"
+    local function clue(px, pz)
+      return E.spawnData({ Name = "Custom_Tile", Nickname = "", Memo = "clueDoom",
+        Transform = { posX = px, posY = 1.7, posZ = pz, scaleX = 0.25, scaleY = 1, scaleZ = 0.25 } }, {}, "table")
+    end
+    local beside = clue(b.max.x + 0.9, cz)          -- rolled off the card's edge
+    local far = clue(b.max.x + 12, b.max.z + 12)    -- nowhere near
+    E.run(0.3)
+    road.call("buttonClick_recall"); E.run(0.5)
+    check("a clue standing just outside the removed card went with it", beside.isDestroyed())
+    check("a clue far from every removed card stays", not far.isDestroyed())
+    local late = clue(cx, cz)                       -- SCED's staggered spawn of a revealed location's clues
+    E.run(2)
+    check("a clue spawned a moment after the card left is taken too", late.isDestroyed())
+    far.destruct(); E.run(0.3)
+    -- a leftover standing on a location spot is taken when a box lays out there
+    local left = clue(cx, cz)
+    E.run(0.3)
+    place("district_road", false)
+    check("a clue left on a location spot is gone when the box lays out", left.isDestroyed())
+    check("the Place still laid its cards out", looseCard("sthr-loc-milestones") ~= nil)
+    road.call("buttonClick_recall"); E.run(0.5)
   end)
 
   ----------------------------------------------------------- N-6 --

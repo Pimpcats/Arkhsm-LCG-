@@ -4247,6 +4247,54 @@ local function tokensOn(card)
   return found
 end
 
+--- Clue and doom tokens standing near where a card was, resting on it or not. SCED's token spawner gives
+-- every clue and doom token the memo "clueDoom". One can roll off a card's edge, and SCED spawns a
+-- revealed location's clues over a second or two, so a Clear Board a moment after a Place could leave
+-- clues standing on an empty map slot (the same rule as src/tts/loop_box.lua).
+local function memoOf(o)
+  local ok, m = pcall(function() return o.memo end)
+  return ok and m or nil
+end
+
+local function clueTokensNear(places, margin)
+  local found = {}
+  if #places == 0 then return found end
+  for _, o in ipairs(getObjects()) do
+    if not o.isDestroyed() and memoOf(o) == "clueDoom" and not o.getLock() then
+      local p = o.getPosition()
+      for _, pl in ipairs(places) do
+        if math.abs(p.x - pl.x) <= pl.hx + margin and math.abs(p.z - pl.z) <= pl.hz + margin then
+          found[#found + 1] = o
+          break
+        end
+      end
+    end
+  end
+  return found
+end
+
+local function sweepClues(places)
+  local n = 0
+  for _, t in ipairs(clueTokensNear(places, 1.2)) do
+    if not t.isDestroyed() then t.destruct() ; n = n + 1 end
+  end
+  if #places > 0 then
+    for _, delay in ipairs({ 1.5, 5, 12 }) do
+      Wait.time(function()
+        for _, t in ipairs(clueTokensNear(places, 1.2)) do
+          if not t.isDestroyed() then t.destruct() end
+        end
+      end, delay)
+    end
+  end
+  return n
+end
+
+local function placeOf(o)
+  local b = o.getBounds()
+  return { x = b.center.x, z = b.center.z, hx = b.size.x / 2, hz = b.size.z / 2 }
+end
+
 --- A scenario box's Place takes about a second to lay its objects out. Stop any
 -- that is still running (src/tts/loop_box.lua cancelPlace), or the rest of the
 -- box would arrive on the cleared board. Returns how many were stopped.
@@ -4270,12 +4318,18 @@ local function clearLoopBoard()
   local removed, tokens = 0, 0
   if type(getObjects) ~= "function" then return { cards = 0, tokens = 0, stopped = 0 } end
   local stopped = stopPlaces()
+  local places = {}
+  local function note(o)
+    local ok, pl = pcall(placeOf, o)
+    if ok then places[#places + 1] = pl end
+  end
   for pass = 1, 2 do
     for _, o in ipairs(getObjects()) do
       if not o.isDestroyed() and (o.type == "Card" or o.type == "Deck") then
         if o.type == "Card" then
           if isLoopCard(o.getTags and o.getTags() or {}, o.getGMNotes()) then
             for _, t in ipairs(tokensOn(o)) do t.destruct() ; tokens = tokens + 1 end
+            note(o)
             Board.forgetGuid(o.getGUID())
             o.destruct()
             removed = removed + 1
@@ -4287,6 +4341,7 @@ local function clearLoopBoard()
           end
           if #mine > 0 and others == 0 then
             for _, t in ipairs(tokensOn(o)) do t.destruct() ; tokens = tokens + 1 end
+            note(o)
             Board.forgetGuids(mine)
             o.destruct()
             removed = removed + #mine
@@ -4302,6 +4357,7 @@ local function clearLoopBoard()
       end
     end
   end
+  tokens = tokens + sweepClues(places)
   return { cards = removed, tokens = tokens, stopped = stopped }
 end
 

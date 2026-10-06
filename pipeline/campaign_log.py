@@ -569,6 +569,14 @@ def lua_script(page):
     for fid, _n, _d, layer, _s in FACTS:
         head.append("  [{}] = {},".format(_lua(fid), _lua(layer)))
     head.append("}")
+    # One global function per field, the name its button or input calls (as every button of the Control token
+    # does). Functions made at run time with self.setVar were never reached by a click in Tabletop Simulator.
+    head.append("-- click / input handlers: sthrLog_<field number>")
+    for i, f in enumerate(pg["fields"], 1):
+        if f["t"] == "tx":
+            head.append("function sthrLog_{0}(_, _, value, selected) fieldInput({0}, value, selected) end".format(i))
+        elif f["t"] in ("cb", "ct"):
+            head.append("function sthrLog_{0}(_, _, alt) fieldClick({0}, alt) end".format(i))
     return "\n".join(head) + "\n\n" + lib
 
 

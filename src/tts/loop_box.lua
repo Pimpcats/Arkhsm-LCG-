@@ -214,6 +214,57 @@ local function foreignOnMySpots(tag, guids)
   return n
 end
 
+--- Clue and doom tokens that stand near where a card was, whether or not they rest on it. SCED's
+-- token spawner gives every clue and doom token the memo "clueDoom". A token can roll off a card's
+-- edge, and SCED spawns a revealed location's clues over a second or two, so a Recall or Clear Board
+-- that came a moment after a Place could leave clues standing on an empty map slot.
+-- `places`: { { x, z, hx, hz }, ... } (card centres and half sizes, in world units).
+local function memoOf(o)
+  local ok, m = pcall(function() return o.memo end)
+  return ok and m or nil
+end
+
+local function clueTokensNear(places, margin)
+  local found = {}
+  if #places == 0 then return found end
+  for _, o in ipairs(getObjects()) do
+    if not o.isDestroyed() and memoOf(o) == "clueDoom" and not o.getLock() then
+      local p = o.getPosition()
+      for _, pl in ipairs(places) do
+        if math.abs(p.x - pl.x) <= pl.hx + margin and math.abs(p.z - pl.z) <= pl.hz + margin then
+          found[#found + 1] = o
+          break
+        end
+      end
+    end
+  end
+  return found
+end
+
+local function placeOf(o)
+  local b = o.getBounds()
+  return { x = b.center.x, z = b.center.z, hx = b.size.x / 2, hz = b.size.z / 2 }
+end
+
+--- Take the clue and doom tokens near `places` now and again shortly after (tokens SCED is still
+-- spawning). Returns how many went at once.
+local function sweepClues(places, once)
+  local n = 0
+  for _, t in ipairs(clueTokensNear(places, 1.2)) do
+    if not t.isDestroyed() then t.destruct() ; n = n + 1 end
+  end
+  if #places > 0 and not once then
+    for _, delay in ipairs({ 1.5, 5, 12 }) do
+      Wait.time(function()
+        for _, t in ipairs(clueTokensNear(places, 1.2)) do
+          if not t.isDestroyed() then t.destruct() end
+        end
+      end, delay)
+    end
+  end
+  return n
+end
+
 --- Stop a Place that is still running: nothing more comes out of the box, and
 -- the working copy goes. Recall and the Control token's Clear Board call this
 -- first. Returns true when a Place was running.
@@ -245,7 +296,7 @@ function buttonClick_place()
   -- SCED's own scripts rely on, so it is not read here at all)
   local inside = {}
   for _, e in ipairs(self.getObjects()) do
-    inside[e.guid] = { index = e.index }
+    inside[e.guid] = { index = e.index, tags = e.tags }
   end
   local guids = {}
   for guid in pairs(memoryList) do
@@ -285,6 +336,18 @@ function buttonClick_place()
   end
 
   trace("SCED's spawn tracker forgets " .. forgetSpawns(guids) .. " of " .. #guids .. " GUID(s)")
+
+  -- clue tokens left standing where this box lays its locations out (from a box that went before, or
+  -- a build that did not take them with their cards) would be taken for the new locations' own
+  local spots = {}
+  for _, guid in ipairs(guids) do
+    local isLocation = false
+    for _, t in ipairs(inside[guid].tags or {}) do if t == "Location" then isLocation = true end end
+    local pos = memoryList[guid].pos
+    if isLocation and pos then spots[#spots + 1] = { x = pos.x, z = pos.z, hx = 1.55, hz = 1.1 } end
+  end
+  local leftovers = sweepClues(spots, true)
+  if leftovers > 0 then trace("took " .. leftovers .. " clue/doom token(s) left standing on the location spots") end
 
   placing = true
   run = run + 1
@@ -434,10 +497,13 @@ end
 -- objects and of tokens removed.
 function clearTagged(tag)
   local count, tokens = 0, 0
+  local places = {}
   local function dropTokens(card)
     for _, t in ipairs(tokensOn(card)) do
       if not t.isDestroyed() then t.destruct() ; tokens = tokens + 1 end
     end
+    local ok, pl = pcall(placeOf, card)
+    if ok then places[#places + 1] = pl end
   end
   for _, obj in ipairs(getObjects()) do
     if obj ~= self and not obj.isDestroyed() then
@@ -467,5 +533,6 @@ function clearTagged(tag)
       end
     end
   end
+  tokens = tokens + sweepClues(places)
   return count, tokens
 end

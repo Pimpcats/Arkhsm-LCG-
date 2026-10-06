@@ -240,6 +240,30 @@ local function typed(key, value, selected)
   end
 end
 
+-- What a click or an input reaches (the generated functions sthrLog_<n> call these). An error is
+-- said in the chat rather than lost: a click that did nothing is the hardest fault to find.
+local function guardedField(what, fn)
+  local ok, err = pcall(fn)
+  if not ok then
+    broadcastToAll("Campaign log (" .. what .. "): " .. tostring(err), { 1, 0.6, 0.4 })
+  end
+end
+
+function fieldClick(i, alt)
+  local f = FIELDS[i]
+  if not f then return end
+  guardedField("field " .. tostring(f.k), function()
+    if f.t == "cb" then clickCheckbox(f.k)
+    elseif f.t == "ct" then clickCounter(f.k, alt) end
+  end)
+end
+
+function fieldInput(i, value, selected)
+  local f = FIELDS[i]
+  if not f then return end
+  guardedField("field " .. tostring(f.k), function() typed(f.k, value, selected) end)
+end
+
 -------------------------------------------------------------------- build --
 
 function buildUi()
@@ -269,7 +293,6 @@ function buildUi()
       local rows = f.rows or 1
       local hu = units(h)
       local fs = math.max(20, math.floor((hu - 23) / rows * 0.82))
-      self.setVar(fname, function(_, _, value, selected) typed(f.k, value, selected) end)
       self.createInput({
         input_function = fname, function_owner = self,
         label = "", alignment = 2,
@@ -284,13 +307,7 @@ function buildUi()
       ni = ni + 1
     else
       local click = "click_none"
-      if f.t == "cb" then
-        self.setVar(fname, function() clickCheckbox(f.k) end)
-        click = fname
-      elseif f.t == "ct" then
-        self.setVar(fname, function(_, _, alt) clickCounter(f.k, alt) end)
-        click = fname
-      end
+      if f.t == "cb" or f.t == "ct" then click = fname end      -- the generated function sthrLog_<i>
       local size = units(math.min(w, h))
       self.createButton({
         click_function = click, function_owner = self,
