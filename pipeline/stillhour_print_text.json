@@ -215,5 +215,45 @@
     "investigator3": "",
     "xp3": "",
     "text": ""
+  },
+  "sthr-quest-elias": {
+    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Prevent 8 damage with your investigator ability. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, What the Warden Remembers.",
+    "flavor": "Somebody keeps the tally. It is not kept in your hand."
+  },
+  "sthr-questdone-elias": {
+    "text": "Permanent. Bonded (What the Warden Owes).\n[reaction] After you are dealt damage: Place 1 Memory on Elias Warde. (Limit three times per game.)\nYour Ambergrove Lamp's move may also raise Dissonance by 1 (limit once per game). If you do, that move does not place doom on the current Hour.\nIf your Campaign Log records The Keeper's Ninth Death, when your elder sign heals damage from you, it also heals 1 horror from you.",
+    "flavor": "Every line of it was in your own hand."
+  },
+  "sthr-quest-ayako": {
+    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Place a first translation token on 12 different enemies. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Translation, Finished.",
+    "flavor": "Every language has a word it keeps back."
+  },
+  "sthr-questdone-ayako": {
+    "text": "Permanent. Bonded (The Unfinished Translation).\n[reaction] After you succeed at an [int] test: Place 1 Memory on Dr. Ayako S\u014dma. (Limit twice per game.)\nA Recollection you draw with your elder sign costs 2 fewer resources to play until the end of the round.\nWhile there are 3 or more banked Memory, It Means 'Wait' may instead be played when an Hour's Forced ability (other than Hour IX's) or an attack by The Appointed against you would resolve. Cancel that ability or attack, and raise Dissonance by 1.",
+    "flavor": "The last word was a name. You will not say it aloud."
+  },
+  "sthr-quest-cass": {
+    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Cancel 8 symbol tokens with your own ability or cards. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Table Remembers.",
+    "flavor": "Count them as they fall. Somebody always does."
+  },
+  "sthr-questdone-cass": {
+    "text": "Permanent. Bonded (A Marked Run of Cards).\n[reaction] After you reveal a symbol token: Place 1 Memory on Cass Lindqvist. (Limit twice per game.)\nMarked Deck's second ability may instead raise Dissonance by 1 and remove 1 Memory from a card you control, instead of spending 2 resources.",
+    "flavor": "You were never the only one counting."
+  },
+  "sthr-quest-seraphine": {
+    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Use your investigator ability 10 times. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Price, Remembered.",
+    "flavor": "Nothing is given for nothing."
+  },
+  "sthr-questdone-seraphine": {
+    "text": "Permanent. Bonded (The Medium's Price).\n[reaction] After you are dealt horror: Place 1 Memory on Seraphine Vale. (Limit twice per game.)\nYour investigator ability may be paid by raising Dissonance by 1 instead of taking 1 direct horror.\nThe Bell of Ambergrove gains: \"[action] Exhaust The Bell of Ambergrove, spend 1 charge and raise Dissonance by 2: Advance or rewind the Hourglass by 1 Hour. This ability cannot be triggered during the finale. (Limit once per game.)\"",
+    "flavor": "Something has been keeping the receipts."
+  },
+  "sthr-quest-birdie": {
+    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Spend 10 resolve. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, She Knows the Road.",
+    "flavor": "Always a little further down the road."
+  },
+  "sthr-questdone-birdie": {
+    "text": "Permanent. Bonded (Somewhere to Be).\n[reaction] After you fail a skill test by 2 or more: Place 1 Memory on \"Birdie\" Okonkwo. (Limit three times per game.)\nLucky Compass's second ability may instead remove 1 Memory from it, instead of spending 2 resources.\nWhen you play I Get Out while you control Lucky Compass, place 1 Memory on Lucky Compass.",
+    "flavor": "The road was never the thing she was leaving."
   }
 }

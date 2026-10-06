@@ -635,6 +635,19 @@ local function changeTally(id, kind, delta)
   return CampaignState.addTally(id, kind, delta)
 end
 
+--- Add to an investigator's personal quest tally; announces the swap when the
+-- goal is met. Returns the tally and whether this unlocked the quest.
+local function changeQuest(id, delta)
+  if type(id) ~= "string" then return nil end
+  local tally, just = CampaignState.addQuest(id, delta)
+  local def = Constants.QUEST[id]
+  if just and def then
+    announce(string.format("Quest met: swap %s for its unlocked card, %s (Campaign Log: %d of %d).",
+      def.card, def.unlocked, tally, def.goal), { 0.7, 1, 0.7 })
+  end
+  return tally, just
+end
+
 local function bankOnCard()
   local n, dropped = Interlude.bankOnCard(inPlaySet())
   announce(string.format("Banked %d on-card Memory (%d banked).%s", n, CampaignState.getBankedMemory(),
@@ -1045,6 +1058,11 @@ function shCardSpent(obj, _, alt)
   guarded("tally", changeTally, Board.investigatorIdOf(obj), "spent", alt and -1 or 1)
   afterChange()
 end
+--- The Quest button on an investigator card: left +1, right -1.
+function shCardQuest(obj, _, alt)
+  guarded("quest", changeQuest, Board.investigatorIdOf(obj), alt and -1 or 1)
+  afterChange()
+end
 function shAgePhys1() toggleAging(1, "physical") end
 function shAgePhys2() toggleAging(2, "physical") end
 function shAgePhys3() toggleAging(3, "physical") end
@@ -1281,6 +1299,8 @@ function shApiInvestigators()
     out[i] = inv
     out[i].memory = CampaignState.getOnCardMemory(inv.id)
     out[i].years = CampaignState.getYears(inv.id)
+    local q = CampaignState.getQuest(inv.id)
+    out[i].quest, out[i].questGoal, out[i].questUnlocked = q.tally, q.goal, q.unlocked
   end
   return out
 end
@@ -1290,6 +1310,21 @@ function shApiOnCardMemory(p)
   return CampaignState.getOnCardMemory(p and p.id)
 end
 function shApiBankOnCard() local n = guarded("bank", bankOnCard) ; afterChange() ; return n end
+--- p = {id, delta} adds to the quest tally; p = {id, unlock = true|false}
+-- sets the unlocked state; p = {id} only reads. Returns {tally, unlocked, goal, just}.
+function shApiQuest(p)
+  p = p or {}
+  local just = false
+  if p.unlock ~= nil then
+    CampaignState.setQuestUnlocked(p.id, p.unlock == true)
+  elseif p.delta then
+    local _
+    _, just = guarded("quest", changeQuest, p.id, tonumber(p.delta) or 1)
+  end
+  afterChange()
+  local q = CampaignState.getQuest(p.id)
+  return { tally = q.tally, unlocked = q.unlocked, goal = q.goal, just = just == true }
+end
 --- p = {id, kind = "raises"|"spent", delta}
 function shApiTally(p)
   p = p or {}

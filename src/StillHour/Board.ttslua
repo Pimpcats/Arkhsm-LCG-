@@ -344,7 +344,7 @@ local function removeByPrefix(o, prefixes)
   end
 end
 
-Board.INV_PREFIXES = { "Memory ", "Years ", "Dissonance raised ", "Loop-power Memory " }
+Board.INV_PREFIXES = { "Memory ", "Years ", "Dissonance raised ", "Loop-power Memory ", "Quest " }
 
 --- The printed stat line from investigator metadata (SCED GMNotes keys).
 function Board.baseStats(md)
@@ -426,6 +426,18 @@ function Board.refreshInvestigators(applyStats)
           width = 760, height = 180, font_size = 90,
           color = { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
         })
+        local quest = CampaignState.getQuest(inv.id)
+        if quest.goal then
+          card.createButton({
+            click_function = "shCardQuest", function_owner = host,
+            label = quest.unlocked and "Quest met" or string.format("Quest %d / %d", quest.tally, quest.goal),
+            tooltip = "Your personal quest card's tally, kept across the campaign (the Campaign Log shows it too). "
+              .. "At the goal, swap the quest card for its unlocked card. Left-click +1 · Right-click -1",
+            position = { 0, 0.3, 2.45 }, rotation = { 0, 0, 0 },
+            width = 760, height = 180, font_size = 90,
+            color = quest.unlocked and { 0.1, 0.25, 0.12 } or { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
+          })
+        end
         card.createButton({
           click_function = "shCardYears", function_owner = host,
           label = "Years pending " .. CampaignState.getPendingYears(inv.id),

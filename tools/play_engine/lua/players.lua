@@ -18,7 +18,7 @@ return function(R, T)
                  ["Peter Sylvestre (2)"] = { 1, 3 } }
   -- uses when played
   local USES = { [".45 Automatic"] = 4, ["Flashlight"] = 3, ["First Aid"] = 3, ["Shrivelling"] = 4,
-                 ["The Bell of Ambergrove"] = 3, ["The Lexicon of the Hour"] = 0, ["Stolen Minute"] = 2,
+                 ["The Bell of Ambergrove"] = 4, ["The Lexicon of the Hour"] = 0, ["Stolen Minute"] = 2,
                  ["Shotgun (4)"] = 2, ["Lightning Gun (5)"] = 3, [".41 Derringer (2)"] = 3, ["Chicago Typewriter (4)"] = 4,
                  ["Shrivelling (3)"] = 4, ["Shrivelling (5)"] = 4 }
   -- constant +skill while in play: name -> {skill, amount, when}
@@ -262,35 +262,17 @@ return function(R, T)
     R.log("%s draws weakness %s", inv.name, n)
     inv.discard[#inv.discard + 1] = card
     if card.id == "sthr-eighthgrave" then
-      if R.investigatorMemory(inv) > 0 then
-        -- 1 horror per Memory on Elias (maximum 2), then remove 1 Memory from him
-        R.hurt(inv, 0, math.min(2, R.investigatorMemory(inv)), "The Eighth Grave")
-        R.addMemory(inv, -1, "The Eighth Grave")
-      else
-        local c = T.searchEncounter(function(md) return R.hasTrait(R.card(md.id), "Echo") and R.card(md.id).type == "Enemy" end)
-        if c then
-          local en = R.spawnEnemy(c, R.locOf(inv), nil, { want = "engaged with Elias" })
-          en.wakeLoop = true
-          en.engaged = inv
-          R.placeEnemy(en)
-        else
-          R.hurt(inv, 0, 2, "The Eighth Grave")
-        end
-        local enc = T.encounterDeck()
-        if enc and enc.type == "Deck" then enc.shuffle() end
-      end
+      -- Revelation: test [wil] (3); take 1 damage for each point you fail by (maximum 3)
+      local ok, margin = R.test(inv, "wil", 3, { kind = "treachery", peril = true })
+      if not ok then R.hurt(inv, math.min(3, -margin), 0, "The Eighth Grave") end
     elseif card.id == "sthr-untranslatable" then
-      local banked = R.state().memory or 0
-      local n2 = math.min((R.WHATIF or {}).untransMax or 5, 2 + math.floor(banked / 4))
-      R.hurt(inv, 0, n2, "Untranslatable")
+      -- Revelation: take 2 horror, then remove every translation token from every enemy
+      R.hurt(inv, 0, 2, "Untranslatable")
+      for _, en in ipairs(G.enemies) do en.translation = nil end
     elseif card.id == "sthr-debtofhours" then
-      local band = R.band()
+      -- Revelation: take 2 horror and place 1 doom on the current Hour
       R.hurt(inv, 0, 2, "The Debt of Hours")
-      if band == "Noticed" then
-        if R.stage() < 3 then T.ctl("Appointed") ; R.touch() end
-      elseif band == "Calm" then
-        R.raise(1, "The Debt of Hours")
-      end
+      R.placeDoom(1, "The Debt of Hours")
     elseif card.id == "sthr-nobodybelieves" then
       inv.round.nobodyBelieves = true
       -- 1 horror, 1 more if no other investigator is at her location
@@ -384,23 +366,28 @@ return function(R, T)
         end }
       end
     end
-    -- Seraphine: take 1 horror: +2 (limit twice per round)
-    if inv.id == "sthrseraphine" and (inv.round.sera or 0) < 2 and R.G.phase == "investigation" and R.G.turnOf == inv then
+    -- Seraphine: take 1 direct horror: +2 (limit once per round)
+    if inv.id == "sthrseraphine" and (inv.round.sera or 0) < 1 and R.G.phase == "investigation" and R.G.turnOf == inv then
       out[#out + 1] = { gain = 2, cost = "horror", pay = function() return P.seraphine(inv) end }
     end
     return out
   end
 
-  function P.seraphine(inv, choice, asset, repeating)
+  --- Seraphine's [free] ability: take 1 direct horror, then +2 skill value (the
+  -- caller adds it), 1 additional action, or ready a Spell. Once per round. The
+  -- quest back lets Dissonance pay instead (viaDissonance).
+  function P.seraphine(inv, choice, asset, viaDissonance)
     inv.round.sera = (inv.round.sera or 0) + 1
-    R.hurt(inv, 0, 1, "Seraphine's ability (cost)", { direct = true })
+    if viaDissonance and inv.questUnlocked then
+      R.raise(1, "Seraphine's ability (cost)", inv)
+      T.api("shApiTally", { id = inv.id, kind = "raises", delta = 1 })
+    else
+      R.hurt(inv, 0, 1, "Seraphine's ability (cost)", { direct = true })
+    end
+    P.quest(inv, 1)
     if choice == "action" then inv.actionsLeft = inv.actionsLeft + 1
     elseif choice == "ready" and asset then asset.exhausted = false end
-    if not repeating then
-      local repeated = P.afterOwnAbility(inv,{canRepeat=function() return inv.round.sera < 2 end,
-        resolve=function() P.seraphine(inv,choice,asset,true) end})
-      return not choice and repeated and 2 or 0
-    end
+    return 0
   end
 
   --- Cards in hand that could commit to this skill: {card, icons}.
@@ -464,31 +451,61 @@ return function(R, T)
   end
 
   --- The investigator's elder sign: its modifier (effects are applied after).
+  -- Pure, because the AI also calls it to estimate odds. Elias spends 2 cards
+  -- from the top of his deck for +3 only while he can spare them.
+  function P.eliasSpends(inv) return #inv.deck >= 8 end
   function P.elderSign(inv)
-    local G = R.G
-    if inv.id == "sthrelias" then return R.investigatorMemory(inv) >= 3 and 3 or 1 end
-    if inv.id == "sthrayako" then return R.investigatorMemory(inv) >= 2 and 3 or 2 end
+    if inv.id == "sthrelias" then return P.eliasSpends(inv) and 3 or 1 end
+    if inv.id == "sthrayako" then return 2 end
     if inv.id == "sthrcass" then return 1 end
-    if inv.id == "sthrseraphine" then return math.min(3, R.investigatorMemory(inv)) end
+    if inv.id == "sthrseraphine" then return 2 end
     if inv.id == "sthrbirdie" then return inv.round.failed and 3 or 1 end
     return 1
   end
+
+  --- Ayako's translation tokens: the enemy at her location most worth tagging
+  -- (engaged with her first, then the toughest), or nil.
+  function P.translateTarget(inv)
+    local best, bv
+    for _, en in ipairs(R.G.enemies) do
+      if en.loc == inv.loc and not en.dead then
+        local v = (en.engaged == inv and 100 or 0) + ((en.def.health or 1) - en.damage) - 20 * math.min(en.translation or 0, 1)
+        if bv == nil or v > bv then best, bv = en, v end
+      end
+    end
+    return best
+  end
+  function P.translate(inv, en, why)
+    local first = (en.translation or 0) == 0
+    en.translation = (en.translation or 0) + 1
+    R.log("%s places a translation token on %s (%d) (%s)", inv.name, en.name, en.translation, why or "?")
+    R.G.metrics.translations = (R.G.metrics.translations or 0) + 1
+    if first then P.quest(inv, 1) end       -- her quest counts the first token on an enemy
+  end
+
   function P.elderSignAfter(inv, modifier)
-    if inv.id == "sthrelias" and R.investigatorMemory(inv) >= 3 then
-      local healed = inv.damage > 0
-      R.heal(inv, 1, healed and R.knows("the-keepers-ninth-death") and 1 or 0)
+    if inv.id == "sthrelias" and P.eliasSpends(inv) then
+      for _ = 1, 2 do inv.discard[#inv.discard + 1] = table.remove(inv.deck) end
+      local t = R.AI.mostHurtHere(inv)
+      if t and t.damage > 0 then
+        local knows = inv.questUnlocked and R.knows("the-keepers-ninth-death")
+        R.heal(t, 1, (knows and t == inv and inv.horror > 0) and 1 or 0)
+      end
     elseif inv.id == "sthrayako" then
-      local cards = P.draw(inv, 1) or {}
-      for _, c in ipairs(cards) do
-        if tostring(c.traits or ""):find("Recollection", 1, true) then
-          inv.round.recollectionDiscount = inv.round.recollectionDiscount or {}
-          inv.round.recollectionDiscount[c] = 2
+      local en = P.translateTarget(inv)
+      if en then P.translate(inv, en, "elder sign")
+      else
+        local cards = P.draw(inv, 1) or {}
+        for _, c in ipairs(cards) do
+          -- quest back: a Recollection drawn this way costs 2 fewer this round
+          if inv.questUnlocked and tostring(c.traits or ""):find("Recollection", 1, true) then
+            inv.round.recollectionDiscount = inv.round.recollectionDiscount or {}
+            inv.round.recollectionDiscount[c] = 2
+          end
         end
       end
     elseif inv.id == "sthrcass" then
-      inv.resources = inv.resources + math.min(3, R.investigatorMemory(inv))
-    elseif inv.id == "sthrseraphine" then
-      -- +X, where X is the Memory on her (maximum +3): nothing is spent
+      inv.resources = inv.resources + 2
     end
   end
 
@@ -520,14 +537,25 @@ return function(R, T)
       if c.card.traits and tostring(c.card.traits):find("Recollection", 1, true) then c.owner.lastTurn.recollection = true end
     end
     if ok then
-      -- Ayako: after you succeed at an [int] test: 1 Memory (once per round, 3 per loop)
+      -- Ayako: after you succeed at a skill test while an enemy is at your location:
+      -- 1 translation token on it (once per round)
+      if inv.id == "sthrayako" and not inv.round.translated then
+        local en = P.translateTarget(inv)
+        if en then inv.round.translated = true ; P.translate(inv, en, "success") end
+      end
+      -- Quest back: after you succeed at an [int] test: 1 Memory (limit twice per game)
       if inv.id == "sthrayako" and skill == "int" then P.memoryReaction(inv, "Ayako: [int] success") end
       local lex = P.findAsset(inv, "The Lexicon of the Hour")
       if lex and skill == "int" and margin >= 2 and lex.uses < 4 then lex.uses = lex.uses + 1 end
     else
       inv.round.failed = true
       inv.failedTypes[skill] = true
-      -- Birdie: after you fail by 2 or more: 1 Memory (once per round, 3 per loop)
+      -- Birdie: after you fail a skill test: 1 resolve on her (limit twice per round)
+      if inv.id == "sthrbirdie" and (inv.round.resolveGain or 0) < 2 then
+        inv.round.resolveGain = (inv.round.resolveGain or 0) + 1
+        inv.resolve = (inv.resolve or 0) + 1
+      end
+      -- Quest back: after you fail by 2 or more: 1 Memory (limit three times per game)
       if inv.id == "sthrbirdie" and margin <= -2 then P.memoryReaction(inv, "Birdie: failed by 2 or more") end
       local foot = P.findAsset(inv, "Rabbit's Foot")
       if foot and not foot.exhausted then foot.exhausted = true ; P.draw(inv, 1) end
@@ -536,17 +564,9 @@ return function(R, T)
     inv.testedTypes[skill] = true
   end
 
-  --- "When you would fail": Lucky!, then Birdie's once-per-loop save. Returns the new margin or nil.
+  --- "When you would fail": Lucky! Returns the new margin or nil.
   function P.wouldFail(inv, margin, tokenName, opts)
-    if tokenName == "Auto-fail" then
-      if inv.id == "sthrbirdie" and not inv.loopUsed.birdieSave and R.investigatorMemory(inv) >= 3 and opts.important then
-        inv.loopUsed.birdieSave = true
-        R.addMemory(inv, -3, "Birdie: succeed instead")
-        T.api("shApiTally", { id = inv.id, kind = "spent", delta = 3 })
-        return 0
-      end
-      return nil
-    end
+    if tokenName == "Auto-fail" then return nil end
     if margin >= -2 and inv.resources >= 1 then
       for _, c in ipairs(inv.hand) do
         if c.name == "Lucky!" then
@@ -557,12 +577,6 @@ return function(R, T)
           return margin + 2
         end
       end
-    end
-    if inv.id == "sthrbirdie" and not inv.loopUsed.birdieSave and R.investigatorMemory(inv) >= 3 and opts.important then
-      inv.loopUsed.birdieSave = true
-      R.addMemory(inv, -3, "Birdie: succeed instead")
-      T.api("shApiTally", { id = inv.id, kind = "spent", delta = 3 })
-      return 0
     end
     return nil
   end
@@ -577,6 +591,7 @@ return function(R, T)
         P.discardFromHand(inv, c)
         inv.resources = inv.resources - 1 + ((tonumber(tokenName) ~= nil) and 1 or 2)
         R.log("%s cancels %s with Seen This Hand Before", inv.name, tokenName)
+        if tonumber(tokenName) == nil then P.quest(inv, 1) end
         return true
       end
     end
@@ -591,6 +606,7 @@ return function(R, T)
       if c.name == "\"I Get Out\"" or c.name == "I Get Out" then
         inv.loopUsed.igetout = true
         P.discardFromHand(inv, c)
+        table.remove(inv.discard)          -- it removes itself from the game: Birdie's recursion never finds it
         inv.damage = math.min(inv.damage, inv.health - 1)
         inv.horror = math.min(inv.horror, inv.sanity - 1)
         for _, en in ipairs(R.G.enemies) do if en.engaged == inv then en.engaged = nil ; R.placeEnemy(en) end end
@@ -599,7 +615,7 @@ return function(R, T)
         local to = R.AI.chooseMove(inv, here, true)
         if to then R.moveInv(inv, to, { noAoO = true }) end
         local compass = P.findAsset(inv, "Lucky Compass")
-        if compass then R.addMemory(inv, 1, "I Get Out (Lucky Compass)", compass) end
+        if compass and inv.questUnlocked then R.addMemory(inv, 1, "I Get Out (Lucky Compass)", compass) end
         if R.G.phase == "investigation" and R.G.turnOf == inv then inv.actionsLeft = 0 end
         R.log("Birdie: I Get Out")
         return true
@@ -635,7 +651,8 @@ return function(R, T)
       if target ~= ayako or ayako.horror >= ayako.sanity - 1 then return false end
       return playIMW(ayako, what, true)
     end
-    if (R.state().memory or 0) < 3 or R.dissonance() + 1 >= R.consts().glitch then return false end
+    -- quest back: with 3 or more banked Memory, an Hour's text or an attack by The Appointed
+    if not ayako.questUnlocked or (R.state().memory or 0) < 3 or R.dissonance() + 1 >= R.consts().glitch then return false end
     if what == "appointed-attack" then
       if target ~= ayako then return false end
       return playIMW(ayako, what, false)
@@ -659,9 +676,9 @@ return function(R, T)
     if worth <= 0 then return false end
     for _, x in ipairs(R.investigatorsAt(R.locOf(inv))) do
       local lex = P.findAsset(x, "The Lexicon of the Hour")
-      if lex and not lex.exhausted and lex.uses >= 2 and worth >= 2 and not x.loopUsed.lexicon then
+      if lex and not lex.exhausted and lex.uses >= 2 and worth >= 2 and not x.round.lexicon then
         lex.exhausted = true ; lex.uses = lex.uses - 2
-        x.loopUsed.lexicon = true
+        x.round.lexicon = true
         R.log("The Lexicon cancels %s", def.name or id)
         return true
       end
@@ -741,17 +758,81 @@ return function(R, T)
     end
   end
 
-  --- An investigator's own Memory reaction (each of the five has one):
-  -- "Place 1 Memory on <investigator>. (Limit three times per loop.)"
-  -- (twice per loop for Ayako, Cass and Seraphine, whose triggers come up most often).
-  -- Returns true if the Memory was placed.
+  --- An investigator's own Memory reaction, on the unlocked quest card (each of
+  -- the five has one): "Place 1 Memory on <investigator>. (Limit n times per
+  -- game.)" Twice for Ayako, Cass and Seraphine, whose triggers come up most
+  -- often. Returns true if the Memory was placed.
   P.MEMORY_REACTION_PER_LOOP = 3
   P.MEMORY_REACTION_LOOP_CAP = { sthrcass = 2, sthrayako = 2, sthrseraphine = 2 }
   function P.memoryReaction(inv, why)
+    if not inv.questUnlocked then return false end
     local cap = P.MEMORY_REACTION_LOOP_CAP[inv.id] or P.MEMORY_REACTION_PER_LOOP
     if (inv.loopUsed.memoryReaction or 0) >= cap then return false end
     inv.loopUsed.memoryReaction = (inv.loopUsed.memoryReaction or 0) + 1
     R.addMemory(inv, 1, why)
+    return true
+  end
+
+  --- Add to an investigator's personal quest tally (kept on the Control across
+  -- the campaign). Returns nothing; the unlock takes effect at once.
+  function P.quest(inv, n)
+    if not n or n <= 0 then return end
+    local r = T.api("shApiQuest", { id = inv.id, delta = n })
+    if type(r) ~= "table" then return end
+    inv.questTally = r.tally
+    if r.just then
+      inv.questUnlocked = true
+      local m = R.G.metrics
+      m.quest_unlocked = m.quest_unlocked or {}
+      m.quest_unlocked[inv.id] = R.G.round
+      R.log("%s's quest is met (%d)", inv.name, r.tally)
+    end
+  end
+
+  --- Elias: prevent damage that would be dealt to an investigator at his
+  -- location (himself included) by discarding up to 3 cards from the top of his
+  -- deck, 1 prevented per card. Once per round. Policy: a hit of 2 or more or
+  -- one that leaves the target nearly down, and only while he keeps a few
+  -- cards (an empty deck costs horror and he has little sanity). Returns the
+  -- amount prevented.
+  P.ELIAS_DECK_FLOOR = 4
+  function P.eliasPrevent(target, dmg, source)
+    local elias = R.invById("sthrelias")
+    if not elias or elias.defeated or elias.loc ~= target.loc or elias.round.prevent then return 0 end
+    -- Nobody Believes Her: other investigators' abilities cannot affect her
+    if target ~= elias and target.round.nobodyBelieves then return 0 end
+    local remaining = target.health - target.damage
+    if dmg < 2 and remaining - dmg > 2 and #elias.deck < 16 then return 0 end   -- a spare deck pays for a single point too
+    local n = math.min(3, dmg, #elias.deck - P.ELIAS_DECK_FLOOR)
+    if n <= 0 then return 0 end
+    elias.round.prevent = true
+    for _ = 1, n do elias.discard[#elias.discard + 1] = table.remove(elias.deck) end
+    R.G.metrics.prevented = (R.G.metrics.prevented or 0) + n
+    R.log("Elias discards %d card(s) and prevents %d damage to %s (%s)", n, n, target.name, source or "?")
+    P.quest(elias, n)
+    return n
+  end
+
+  --- Birdie: [free] during your turn, remove 2 resolve: return an event from
+  -- your discard pile to your hand (once per round). Policy: only an event
+  -- that is worth having again; Lucky! first. Returns true if one came back.
+  local RECUR = { ["Lucky!"] = 9, ["Emergency Cache"] = 6, ["Cunning Distraction"] = 5, ["Rehearsed Escape"] = 7,
+                  ["Elusive"] = 5, ["Dodge"] = 8, ["Working a Hunch"] = 6 }
+  function P.birdieRecur(inv)
+    if inv.id ~= "sthrbirdie" or (inv.resolve or 0) < 2 or inv.round.recur then return false end
+    local best, bv
+    for _, c in ipairs(inv.discard) do
+      local v = c.type == "Event" and (RECUR[c.name] or ((tostring(c.traits or ""):find("Recollection", 1, true)) and 4 or 0)) or 0
+      if v > 0 and (bv == nil or v > bv) then best, bv = c, v end
+    end
+    if not best then return false end
+    for i, c in ipairs(inv.discard) do if c == best then table.remove(inv.discard, i) break end end
+    inv.hand[#inv.hand + 1] = best
+    inv.resolve = inv.resolve - 2
+    inv.round.recur = true
+    R.G.metrics.recurred = (R.G.metrics.recurred or 0) + 1
+    R.log("Birdie spends 2 resolve: %s returns to her hand", best.name)
+    P.quest(inv, 2)
     return true
   end
 
@@ -814,16 +895,27 @@ return function(R, T)
     if #entries == 0 then return false end
     local entry = R.pick(entries)
     if mode == "number" then
-      if inv.loopUsed.marked or R.syncMemory(inv) < 1 then return false end
+      -- [free] Exhaust, spend 2 resources: choose a number token to seal (limit once per
+      -- game). Quest back: instead raise Dissonance by 1 and remove 1 Memory.
+      if inv.loopUsed.marked then return false end
+      local payMemory = false
+      if inv.resources < 2 then
+        if not (inv.questUnlocked and R.syncMemory(inv) >= 1) then return false end
+        payMemory = true
+      end
       local best
       for _, e in ipairs(entries) do
         local n = tonumber(e.name or e.nickname)
         if n and (not best or n > best) then entry, best = e, n end
       end
       if not best then return false end
-      R.raise(1, "Marked Deck (cost)", inv)
-      R.addMemory(inv, -1, "Marked Deck", "any")
-      T.api("shApiTally", { id = inv.id, kind = "spent", delta = 1 })
+      if payMemory then
+        R.raise(1, "Marked Deck (cost)", inv)
+        R.addMemory(inv, -1, "Marked Deck", "any")
+        T.api("shApiTally", { id = inv.id, kind = "spent", delta = 1 })
+      else
+        inv.resources = inv.resources - 2
+      end
       inv.loopUsed.marked = true
     end
     local pos = inv.card.getPosition()

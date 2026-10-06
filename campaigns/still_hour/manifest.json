@@ -838,5 +838,65 @@
     "art_type": "enemy",
     "scene": "a gaunt stooped figure on a cobbled 1920s side street at night, one arm impossibly long and thin like the hand of a clock, its coat hung with stopped pocket watches, head cocked as if listening for a tick",
     "seed": 3041
+  },
+  {
+    "id": "sthr-quest-elias",
+    "art_type": "asset",
+    "scene": "a brass key and a heavy ledger on a lighthouse keeper's desk, the lamp guttering, a second shadow thrown behind the empty chair",
+    "seed": 9106
+  },
+  {
+    "id": "sthr-questdone-elias",
+    "art_type": "asset",
+    "scene": "the same ledger lying open to ruled lines in one careful hand, the lamp steady now, salt crusting the cover",
+    "seed": 2332
+  },
+  {
+    "id": "sthr-quest-ayako",
+    "art_type": "asset",
+    "scene": "a stack of annotated manuscripts and a brass pen, a half-translated page under a green-shaded lamp, the last line smudged",
+    "seed": 5695
+  },
+  {
+    "id": "sthr-questdone-ayako",
+    "art_type": "asset",
+    "scene": "the same page finished, the final word covered by a trembling hand, lamplight pooling on the paper",
+    "seed": 5729
+  },
+  {
+    "id": "sthr-quest-cass",
+    "art_type": "asset",
+    "scene": "a worn deck of cards fanned on green baize, one card face down, a thin curl of cigarette smoke",
+    "seed": 9352
+  },
+  {
+    "id": "sthr-questdone-cass",
+    "art_type": "asset",
+    "scene": "the same deck squared and left at an empty chair, a crowd of shadows watching from the walls of a back room",
+    "seed": 4229
+  },
+  {
+    "id": "sthr-quest-seraphine",
+    "art_type": "asset",
+    "scene": "a tarnished coin and a small bell on a dark cloth, a candle burning low, one thread of silver light",
+    "seed": 4820
+  },
+  {
+    "id": "sthr-questdone-seraphine",
+    "art_type": "asset",
+    "scene": "the same bell silent on the cloth, a long column of tally marks scratched into the table beside it",
+    "seed": 9577
+  },
+  {
+    "id": "sthr-quest-birdie",
+    "art_type": "asset",
+    "scene": "a battered duffel and a bus-stop sign at dusk, an empty road bending away into fog",
+    "seed": 9597
+  },
+  {
+    "id": "sthr-questdone-birdie",
+    "art_type": "asset",
+    "scene": "the same road at first light, the duffel set down, footprints leading back toward the town",
+    "seed": 9927
   }
 ]

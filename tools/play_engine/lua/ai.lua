@@ -486,6 +486,8 @@ return function(R, T)
   function A.startTurn(inv)
     local G = R.G
     local L = R.locOf(inv)
+    -- Birdie: [free] remove 2 resolve: return an event from her discard pile
+    if inv.id == "sthrbirdie" then P.birdieRecur(inv) end
     -- Cass names a symbol (2 resources) when she can spare them
     if inv.id == "sthrcass" and not inv.round.cassNamed and inv.resources >= 4 then
       inv.round.cassNamed = true
@@ -568,9 +570,11 @@ return function(R, T)
     -- 1. engaged enemies: fight or evade any of them (the most dangerous or the
     -- easiest to remove scores best), not only the first to engage
     local eng = engagedWith(inv)
-    if inv.id == "sthrseraphine" and (inv.round.sera or 0) < 2 and inv.sanity - inv.horror >= 4
-       and inv.actionsLeft <= 1 and act then
-      add(80,"ability",function() P.seraphine(inv,"action") end,{actions=0,provokes=false})
+    if inv.id == "sthrseraphine" and (inv.round.sera or 0) < 1 and inv.actionsLeft <= 1 and act then
+      local viaDiss = inv.questUnlocked and inv.sanity - inv.horror <= 4 and R.dissonance() + 1 < R.consts().glitch - 1
+      if viaDiss or inv.sanity - inv.horror >= 4 then
+        add(80,"ability",function() P.seraphine(inv,"action",nil,viaDiss) end,{actions=0,provokes=false})
+      end
     end
     local worst, worstThreat = nil, -1
     for _, en in ipairs(eng) do
@@ -578,8 +582,8 @@ return function(R, T)
       if threat > worstThreat then worst, worstThreat = en, threat end
       local weapon = bestWeapon(inv)
       local skill = weapon and (P.WEAPON[weapon.name][4] or "com") or "com"
-      local pf = R.prob(inv, R.skillBase(inv, skill) + P.staticBonus(inv, skill, { kind = "fight", weapon = weapon }) - R.enemyFight(en) + 1)
-      local pe = R.prob(inv, R.skillBase(inv, "agi") + P.staticBonus(inv, "agi", { kind = "evade" }) - R.enemyEvade(en) + 1)
+      local pf = R.prob(inv, R.skillBase(inv, skill, { enemy = en }) + P.staticBonus(inv, skill, { kind = "fight", weapon = weapon }) - R.enemyFight(en) + 1)
+      local pe = R.prob(inv, R.skillBase(inv, "agi", { enemy = en }) + P.staticBonus(inv, "agi", { kind = "evade" }) - R.enemyEvade(en) + 1)
       local left = (en.def.health or 1) - en.damage
       local per = 1 + ((weapon and P.WEAPON[weapon.name][2]) or 0)
       local hits = math.ceil(left / per)
@@ -761,10 +765,13 @@ return function(R, T)
           end
           local lamp = P.findAsset(inv, "The Ambergrove Lamp")
           if lamp and not lamp.exhausted then add(s + 2,"move",function() R.ACT.assetAbility(inv,lamp,"move",step) end,{provokes=false}) end
-          if compass and not compass.exhausted and (compass.memory or 0) >= 1 and target.revealed and not target.closed then
-            local known = false
-            for fact,v in pairs(G.knowledge) do if v and R.SCEN.FACT_DISTRICT[fact] == target.district then known = true end end
-            if known then add(s+4,"move",function() R.ACT.assetAbility(inv,compass,"jump",target) end,{provokes=false}) end
+          if compass and not compass.exhausted and target.revealed and not target.closed then
+            local empty = true
+            for _, en in ipairs(G.enemies) do if en.loc == target.guid and not en.dead then empty = false end end
+            local viaMemory = inv.questUnlocked and (compass.memory or 0) >= 1
+            if empty and (viaMemory or inv.resources >= 4) then
+              add(s+4,"move",function() R.ACT.assetAbility(inv,compass,"jump",target) end,{provokes=false})
+            end
           end
           for _,c in ipairs(inv.hand) do
             if c.name == "The Long Way Round" and P.playCost(inv,c) <= inv.resources then
@@ -822,7 +829,7 @@ return function(R, T)
         if n == "Mind over Matter" and not inv.mindOverMatter and #eng > 0 and inv.stats.int > inv.stats.agi then
           add(20, "play", function() R.ACT.play(inv, c) end, { actions = 0, provokes = false })
         end
-        if n == "I Remember the Ending" and not inv.loopUsed.rememberEnding and R.dissonance() <= 2 and R.hour() >= 3 then
+        if n == "I Remember the Ending" and not inv.loopUsed.rememberEnding and R.hour() >= 3 then
           add(17, "play", function() R.ACT.play(inv, c) end)
         end
       end
@@ -835,7 +842,7 @@ return function(R, T)
         add(25,"investigate",function() R.ACT.assetAbility(inv,a) end)
       end
       if a.name == "Marked Deck" and not a.exhausted and not inv.sealedToken then
-        if not inv.loopUsed.marked and R.syncMemory(inv) >= 1 and R.dissonance()+1 < R.consts().glitch then
+        if not inv.loopUsed.marked and (inv.resources >= 5 or (inv.questUnlocked and R.syncMemory(inv) >= 1 and R.dissonance()+1 < R.consts().glitch)) then
           add(45,"ability",function() R.ACT.assetAbility(inv,a,"number") end,{actions=0,provokes=false})
         else add(5,"ability",function() R.ACT.assetAbility(inv,a,"random") end,{actions=0,provokes=false}) end
       end
@@ -857,7 +864,7 @@ return function(R, T)
         if enemy then add(70, "ability", function() R.ACT.assetAbility(inv, a, "damage", enemy) end, {actions=0,provokes=false}) end
       end
       if a.name == "The Bell of Ambergrove" and not a.exhausted and a.uses > 0 and act and R.hour() >= 5
-         and not inv.loopUsed.bell and not G.finale
+         and inv.questUnlocked and not inv.loopUsed.bell and not G.finale
          and R.dissonance() + 2 < R.consts().glitch - 1 and (inv.raisedCost or 0) < 2 then
         add(12, "ability", function() R.ACT.assetAbility(inv, a) end)
       end
@@ -880,7 +887,7 @@ return function(R, T)
       if en.loc == L.guid and not en.engaged and not R.sleepwalking(en) and not en.dead then
         local weapon = bestWeapon(inv)
         local skill = weapon and (P.WEAPON[weapon.name][4] or "com") or "com"
-        local pf = R.prob(inv, R.skillBase(inv, skill) + P.staticBonus(inv, skill, { kind = "fight", weapon = weapon }) - R.enemyFight(en))
+        local pf = R.prob(inv, R.skillBase(inv, skill, { enemy = en }) + P.staticBonus(inv, skill, { kind = "fight", weapon = weapon }) - R.enemyFight(en))
         local s = 0
         if (en.def.victory or 0) > 0 and pf >= 0.55 and (G.finale == false or en.id == "sthr-uninvited") then s = 9 * pf end
         if en.id == "sthr-uninvited" then s = 25 * pf end

@@ -58,6 +58,7 @@ local function freshState(n)
     pendingYears = {},       -- investigatorId -> Years a card gave this loop (added at Age)
     holdBackRewinds = 0,     -- Hold Back rewinds this loop (at most Constants.HOLD_BACK_REWINDS_PER_LOOP)
     marks = {},              -- markId -> true: campaign-long marks a reset never clears (e.g. "torn")
+    quest = {},              -- investigatorId -> {tally, unlocked}: the personal quest card (campaign-long)
     difficulty = nil,        -- the chaos bag preset last chosen on the Control (1 Easy .. 4 Expert)
   }
 end
@@ -121,6 +122,7 @@ function CampaignState.deserialize(saved, decoder)
     state.loopTallies = state.loopTallies or {}
     state.knowledgePaid = state.knowledgePaid or {}
     state.marks = state.marks or {}
+    state.quest = state.quest or {}
     state.bankedMemory = math.max(0, math.floor(tonumber(state.bankedMemory) or 0))
     state.loopEnded = state.loopEnded == true
     state.finale = state.finale == true
@@ -342,6 +344,48 @@ function CampaignState.knownFacts()
   end
   table.sort(list)
   return list
+end
+
+------------------------------------------------------------ personal quests --
+-- One quest card per investigator (Constants.QUEST). The tally is campaign-long
+-- (a reset never clears it); at the goal the quest is unlocked, which stays
+-- until a player takes it back with setQuestUnlocked(id, false).
+
+--- {tally, unlocked, goal} for one investigator (goal is nil for an investigator
+-- with no quest card).
+function CampaignState.getQuest(investigatorId)
+  state.quest = state.quest or {}
+  local q = state.quest[investigatorId] or {}
+  local def = Constants.QUEST[investigatorId]
+  return { tally = q.tally or 0, unlocked = q.unlocked == true, goal = def and def.goal or nil }
+end
+
+function CampaignState.questUnlocked(investigatorId)
+  return CampaignState.getQuest(investigatorId).unlocked
+end
+
+--- Add `delta` (may be negative; floors at 0) to the tally. Meeting the goal
+-- unlocks the quest. Returns the new tally and whether this call unlocked it.
+function CampaignState.addQuest(investigatorId, delta)
+  local def = Constants.QUEST[investigatorId]
+  if not def or type(investigatorId) ~= "string" then return nil, false end
+  state.quest = state.quest or {}
+  local q = state.quest[investigatorId] or { tally = 0, unlocked = false }
+  q.tally = math.max(0, (q.tally or 0) + math.floor(tonumber(delta) or 1))
+  local just = false
+  if not q.unlocked and q.tally >= def.goal then q.unlocked, just = true, true end
+  state.quest[investigatorId] = q
+  return q.tally, just
+end
+
+--- Unlock (or take back) a quest by hand, e.g. after a table correction.
+function CampaignState.setQuestUnlocked(investigatorId, on)
+  if not Constants.QUEST[investigatorId] then return false end
+  state.quest = state.quest or {}
+  local q = state.quest[investigatorId] or { tally = 0, unlocked = false }
+  q.unlocked = on == true
+  state.quest[investigatorId] = q
+  return q.unlocked
 end
 
 ----------------------------------------------------------- campaign marks --

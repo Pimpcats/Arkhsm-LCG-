@@ -134,6 +134,12 @@ return function(H)
       end
     end
     c.appointedStage = 0
+    -- personal quest cards: a representative night from the third on (loops >= 2)
+    -- has every quest met; earlier nights are still on their tallies
+    c.quest = {}
+    if (sc.loops or 0) >= ((cfg.questUnlockLoop) or 2) then
+      for _, id in ipairs(party) do c.quest[id] = { tally = 99, unlocked = true } end
+    end
     c.oncePerLoopFlags = {}
     if sc.part == 2 and c.knowledge["what-the-almanac-hid"] and c.knowledge["the-vote-that-never-ends"]
        and not c.knowledge["the-appointeds-name"] then
@@ -355,13 +361,18 @@ return function(H)
     -- investigators at the Square
     local start = R.locById("sthr-loc-hubsquare") or R.locById("sthr-loc-square")
     local invStats = {}
-    for _, x in ipairs(T.api("shApiInvestigators") or {}) do invStats[x.id] = x.stats end
+    local invQuest = {}
+    for _, x in ipairs(T.api("shApiInvestigators") or {}) do
+      invStats[x.id] = x.stats
+      invQuest[x.id] = { tally = x.quest or 0, unlocked = x.questUnlocked == true }
+    end
     for i, s in ipairs(seats) do
       local w = campaignWeaknesses and campaignWeaknesses[s.id] or R.pick(decks.weaknesses)
       local mini = T.minicard(s.id)
       -- later nights play the XP deck of that night (decks.py TIERS: n2, n3, n4, n6, fin)
       local deck = campaignDecks and campaignDecks[s.id] or (sc.xp and decks.tiers and decks.tiers[sc.xp] and decks.tiers[sc.xp][s.id]) or decks.decks[s.id]
       local inv = R.P.newInvestigator(i, s.id, s.color, s.card, mini, invStats[s.id], deck, w)
+      inv.questTally, inv.questUnlocked = (invQuest[s.id] or {}).tally or 0, (invQuest[s.id] or {}).unlocked == true
       inv.years = (restored.campaign.years or {})[s.id] or sc.years or 0
       inv.bracket = inv.years >= 15 and "Ancient" or inv.years >= 10 and "Elder" or inv.years >= 5 and "Weathered" or "Prime"
       inv.loc = start.guid

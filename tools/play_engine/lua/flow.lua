@@ -41,7 +41,7 @@ return function(R, T)
     -- RR ST.1 -> ST.2: a player window before cards are committed.
     R.playerWindow("skill test before commits")
     G.metrics.tests = G.metrics.tests + 1
-    local base = R.skillBase(inv, skill) + P.staticBonus(inv, skill, opts) + (opts.bonus or 0)
+    local base = R.skillBase(inv, skill, opts) + P.staticBonus(inv, skill, opts) + (opts.bonus or 0)
     -- the AI commits cards and pays for boosts up to its target odds
     local committed, boost = R.AI.prepareTest(inv, skill, diff, base, opts)
     inv.lastCommitted = {}
@@ -82,8 +82,14 @@ return function(R, T)
       local cancelled = false
       if inv.namedToken and inv.namedToken == name then
         inv.namedToken, cancelled = nil, true
+        if tonumber(name) == nil then P.quest(inv, 1) end
       end
-      -- Cass: after you reveal a symbol token: 1 Memory (once per round, 3 per loop)
+      -- Cass: after you reveal a symbol token during a skill test: gain 1 resource (once per round)
+      if inv.id == "sthrcass" and name and tonumber(name) == nil and not inv.round.cassGain then
+        inv.round.cassGain = true
+        inv.resources = inv.resources + 1
+      end
+      -- Quest back: after you reveal a symbol token: 1 Memory (limit twice per game)
       if inv.id == "sthrcass" and name and tonumber(name) == nil then P.memoryReaction(inv, "Cass: revealed a symbol token") end
       if not cancelled and total >= diff and (mod == nil or total + mod < diff)
          and P.cancelToken(inv, name, mod and total + mod - diff or -1, total - diff, opts) then cancelled = true end
@@ -302,6 +308,8 @@ return function(R, T)
     G.metrics.attacks = G.metrics.attacks + 1
     R.log("%s attacks %s (%s)", en.name, inv.name, why or "")
     local dealt = R.hurt(inv, en.def.damage or 0, en.def.horror or 0, en.name, { enemy = en })
+    -- The House Always Wins, Forced: after its attack deals damage, that investigator discards 2 resources
+    if en.id == "sthr-housewins" and dealt and dealt.damage > 0 then inv.resources = math.max(0, inv.resources - 2) end
     FX.afterAttack(en, inv)
     if en.id == "weakness:Silver Twilight Acolyte" or en.name == "Silver Twilight Acolyte" then R.placeDoom(1, "Silver Twilight Acolyte (doom)") end
   end
@@ -402,7 +410,7 @@ return function(R, T)
     if en.id ~= "sthr-housewins" then return false end
     local cass = R.invById("sthrcass")
     if not cass then return false end
-    for _, x in ipairs(R.G.inv) do if x ~= cass and (x.memory or 0) >= (cass.memory or 0) then return false end end
+    for _, x in ipairs(R.G.inv) do if x ~= cass and not x.defeated and x.resources >= cass.resources then return false end end
     return true
   end
 
@@ -535,10 +543,10 @@ return function(R, T)
         end
       end
     elseif n == "I Remember the Ending" then
-      -- Test [wil] (X = Dissonance, minimum 2): look at the top 3; for 1
-      -- Dissonance, put the worst of them on the bottom; the rest on top, the
-      -- worst last.
-      local ok = R.test(inv, "wil", math.max(2, R.dissonance()), { kind = "ability", important = true })
+      -- Test [wil] (3): look at the top 3 encounter cards, bottom any, the rest on
+      -- top in any order. Policy: the worst of them goes to the bottom, the rest on
+      -- top with the worst last.
+      local ok = R.test(inv, "wil", 3, { kind = "ability", important = true })
       if ok then
         local function threat(md)
           local def=R.card(md.id)
@@ -552,8 +560,7 @@ return function(R, T)
             worst = math.max(worst, threat(T.decode(e.gm_notes) or {}))
           end
         end
-        if worst >= 3 and R.dissonance() + 1 < R.consts().glitch then
-          R.raise(1, "I Remember the Ending", inv)
+        if worst >= 3 then
           T.reorderEncounterTop(3, function(md) return -threat(md) end)
           T.moveTopEncounterBottom()
           T.reorderEncounterTop(2, threat)
@@ -600,7 +607,7 @@ return function(R, T)
             if x == inv or not x.round.nobodyBelieves then R.heal(x, 0, 1) end
           end
         end
-      else
+      elseif inv.questUnlocked then
         inv.loopUsed.bell = true
         R.raise(2, "The Bell of Ambergrove (cost)", inv)
         if mode == "advance" then R.advance(1, "The Bell of Ambergrove") else R.rewind(1, "The Bell of Ambergrove") end
@@ -608,8 +615,12 @@ return function(R, T)
     elseif a.name == "Lucky Compass" then
       a.exhausted = true
       if mode == "jump" then
-        R.addMemory(inv, -1, "Lucky Compass", a)
-        T.api("shApiTally", { id = inv.id, kind = "spent", delta = 1 })
+        if inv.questUnlocked and (a.memory or 0) >= 1 then
+          R.addMemory(inv, -1, "Lucky Compass", a)
+          T.api("shApiTally", { id = inv.id, kind = "spent", delta = 1 })
+        else
+          inv.resources = inv.resources - 2
+        end
       else
         for _, en in ipairs(G.enemies) do
           if en.engaged == inv and not R.hasTrait(en.def, "Elite") then en.engaged = nil ; R.placeEnemy(en) end
@@ -641,7 +652,7 @@ return function(R, T)
         end
       end
       if target then
-        local free = not inv.loopUsed.lamp and R.isCrossing(R.locOf(inv), target) and R.dissonance() + 1 < R.consts().glitch
+        local free = inv.questUnlocked and not inv.loopUsed.lamp and R.isCrossing(R.locOf(inv), target) and R.dissonance() + 1 < R.consts().glitch
         if free then inv.loopUsed.lamp = true ; R.raise(1, "The Ambergrove Lamp (cost)", inv) end
         R.moveInv(inv, target, { noHour = free })
       end

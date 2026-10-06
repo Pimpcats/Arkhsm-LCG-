@@ -489,11 +489,17 @@ return function(R, T)
 
   ------------------------------------------------------------ investigators --
 
-  function R.skillBase(inv, skill)
+  function R.skillBase(inv, skill, opts)
     local v = inv.stats[skill] or 1
     -- persistent weaknesses and effects
     if inv.threat and inv.threat["Haunted"] then v = v - 1 end
     if inv.mindOverMatter and (skill == "com" or skill == "agi") then v = math.max(v, inv.stats.int) end
+    -- Ayako: while attacking or evading an enemy with 1 or more translation
+    -- tokens, she may use her [intellect] in place of [combat] or [agility]
+    if inv.id == "sthrayako" and (skill == "com" or skill == "agi") and opts and opts.enemy
+       and (opts.enemy.translation or 0) >= 1 then
+      v = math.max(v, inv.stats.int)
+    end
     return v
   end
 
@@ -515,18 +521,6 @@ return function(R, T)
       dmg = dmg - 1
       R.log("Keeper's Logbook: %s takes 1 less damage", inv.name)
       if dmg <= 0 and hor <= 0 then return dealt end
-    end
-    -- Elias: take damage for another investigator at his location
-    if dmg > 0 and not opts.direct and not inv.round.nobodyBelieves and inv.id ~= "sthrelias" then
-      local elias = R.invById("sthrelias")
-      if elias and not elias.defeated and elias.loc == inv.loc and not elias.round.redirect
-         and (elias.health - elias.damage) > dmg + 1 then
-        elias.round.redirect = true
-        R.log("Elias takes %d damage for %s", dmg, inv.name)
-        R.hurt(elias, dmg, 0, (source or "damage") .. " (redirected)", { enemy = opts.enemy, fromWeakness = opts.fromWeakness })
-        dmg = 0
-        if hor <= 0 then return dealt end
-      end
     end
     if not opts.direct then
       for _, a in ipairs(inv.assets) do
@@ -553,6 +547,10 @@ return function(R, T)
       end
       R.syncMemory(inv)       -- tokens on discarded assets leave play too
     end
+    -- Elias: when damage would be dealt to you or another investigator at your
+    -- location, discard up to 3 cards from the top of your deck; prevent 1 of it
+    -- for each (limit once per round). Between assigning and applying damage.
+    if dmg > 0 then dmg = dmg - R.P.eliasPrevent(inv, dmg, source) end
     dealt.damage, dealt.horror = dmg + dealt.assetDamage, hor + dealt.assetHorror
     inv.damage = inv.damage + dmg
     inv.horror = inv.horror + hor
@@ -563,7 +561,8 @@ return function(R, T)
     if hor > 0 then G.metrics.horror_by[src] = (G.metrics.horror_by[src] or 0) + hor end
     R.log("%s takes %d damage, %d horror (%s): %d/%d, %d/%d", inv.name, dmg, hor, source or "?",
       inv.damage, inv.health, inv.horror, inv.sanity)
-    -- Elias: after you are dealt damage: 1 Memory. Seraphine: after you are dealt horror: 1 Memory
+    -- Quest back (unlocked only): Elias, after you are dealt damage: 1 Memory.
+    -- Seraphine, after you are dealt horror: 1 Memory
     if inv.id == "sthrelias" and dealt.damage > 0 then R.P.memoryReaction(inv, "Elias: dealt damage") end
     if inv.id == "sthrseraphine" and dealt.horror > 0 then R.P.memoryReaction(inv, "Seraphine: dealt horror") end
     -- Psychosis / Hypochondria
@@ -625,9 +624,6 @@ return function(R, T)
       if en.engaged == inv then en.engaged = nil ; R.placeEnemy(en) end
     end
     if G.appointed.engaged == inv then G.appointed.engaged = nil end
-    if opts and opts.enemy and opts.enemy.id == "sthr-housewins" then
-      for _ = 1, 3 do T.ctl("Memory", true) end
-    end
     -- the minicard leaves the map
     if T.alive(inv.mini) then inv.mini.setPosition({ -60, 2, -20 + 4 * inv.idx }) end
     local any = false

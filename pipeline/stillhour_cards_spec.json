@@ -3,8 +3,9 @@
     "deck": 95010, "id": "sthrelias", "type": "Investigator", "name": "Elias Warde",
     "subtitle": "The Ninth Death", "class": "Guardian", "traits": "Believer. Warden.",
     "wil": 3, "int": 2, "com": 4, "agi": 3, "health": 9, "sanity": 5,
-    "signatures": [{ "sthr-lamp": 1, "sthr-donebefore": 1, "sthr-eighthgrave": 1 }],
-    "elderSign": "+1. If there are 3 or more Memory on Elias Warde, this token is +3 instead, and heal 1 damage from you."
+    "signatures": [{ "sthr-lamp": 1, "sthr-donebefore": 1, "sthr-eighthgrave": 1,
+     "sthr-quest-elias": 1}],
+    "elderSign": "+1. You may discard the top 2 cards of your deck. If you do, this token is +3 instead and heal 1 damage from an investigator at your location."
   },
   {
     "deck": 95011, "id": "sthr-lamp", "type": "Asset", "name": "The Ambergrove Lamp",
@@ -23,8 +24,9 @@
     "deck": 95014, "id": "sthrayako", "type": "Investigator", "name": "Dr. Ayako Sōma",
     "subtitle": "The Translator", "class": "Seeker", "traits": "Scholar. Chronicler.",
     "wil": 3, "int": 5, "com": 1, "agi": 3, "health": 6, "sanity": 8,
-    "signatures": [{ "sthr-lexicon": 1, "sthr-itmeanswait": 1, "sthr-untranslatable": 1 }],
-    "elderSign": "+2 (+3 if there are 2 or more Memory on Dr. Ayako Sōma). Draw 1 card. If it is a Recollection, it costs 2 fewer resources to play until the end of the round."
+    "signatures": [{ "sthr-lexicon": 1, "sthr-itmeanswait": 1, "sthr-untranslatable": 1,
+     "sthr-quest-ayako": 1}],
+    "elderSign": "+2. Place 1 translation token on an enemy at your location. If there is none, draw 1 card."
   },
   {
     "deck": 95015, "id": "sthr-lexicon", "type": "Asset", "name": "The Lexicon of the Hour",
@@ -44,8 +46,9 @@
     "deck": 95018, "id": "sthrcass", "type": "Investigator", "name": "Cass Lindqvist",
     "subtitle": "The Card Counter", "class": "Rogue", "traits": "Criminal. Drifter.",
     "wil": 2, "int": 3, "com": 3, "agi": 5, "health": 7, "sanity": 6,
-    "signatures": [{ "sthr-markeddeck": 1, "sthr-seenthishand": 1, "sthr-housewins": 1 }],
-    "elderSign": "+1. Gain 1 resource for each Memory on Cass (maximum 3)."
+    "signatures": [{ "sthr-markeddeck": 1, "sthr-seenthishand": 1, "sthr-housewins": 1,
+     "sthr-quest-cass": 1}],
+    "elderSign": "+1. Gain 2 resources."
   },
   {
     "deck": 95019, "id": "sthr-markeddeck", "type": "Asset", "name": "Marked Deck",
@@ -64,8 +67,9 @@
     "deck": 95022, "id": "sthrseraphine", "type": "Investigator", "name": "Seraphine Vale",
     "subtitle": "The Medium", "class": "Mystic", "traits": "Sorcerer. Cursed.",
     "wil": 5, "int": 3, "com": 2, "agi": 2, "health": 6, "sanity": 8,
-    "signatures": [{ "sthr-bell": 1, "sthr-rememberending": 1, "sthr-debtofhours": 1 }],
-    "elderSign": "+X, where X is the number of Memory on Seraphine (maximum +3)."
+    "signatures": [{ "sthr-bell": 1, "sthr-rememberending": 1, "sthr-debtofhours": 1,
+     "sthr-quest-seraphine": 1}],
+    "elderSign": "+2. You may take 1 direct horror. If you do, ready a Spell asset you control."
   },
   {
     "deck": 95023, "id": "sthr-bell", "type": "Asset", "name": "The Bell of Ambergrove",
@@ -85,7 +89,8 @@
     "deck": 95026, "id": "sthrbirdie", "type": "Investigator", "name": "\"Birdie\" Okonkwo",
     "subtitle": "The One Who Wandered", "class": "Survivor", "traits": "Drifter. Wayward.",
     "wil": 3, "int": 3, "com": 2, "agi": 4, "health": 7, "sanity": 7,
-    "signatures": [{ "sthr-compass": 1, "sthr-igetout": 1, "sthr-nobodybelieves": 1 }],
+    "signatures": [{ "sthr-compass": 1, "sthr-igetout": 1, "sthr-nobodybelieves": 1,
+     "sthr-quest-birdie": 1}],
     "elderSign": "+1. If you have failed a skill test this round, this token is +3 instead."
   },
   {
@@ -141,5 +146,15 @@
   {
     "deck": 95039, "id": "sthr-hourlearnedname", "type": "Event", "name": "The Hour I Learned Your Name",
     "subtitle": "", "class": "Neutral", "traits": "Spell. Recollection.", "level": 0, "cost": 2, "memoryCost": 5, "wildIcons": 1
-  }
+  },
+  {"deck": 95047, "id": "sthr-quest-elias", "type": "Asset", "name": "What the Warden Owes", "subtitle": "", "class": "Guardian", "traits": "Quest. Campaign.", "level": 0, "cost": 0, "permanent": true},
+  {"deck": 95048, "id": "sthr-questdone-elias", "type": "Asset", "name": "What the Warden Remembers", "subtitle": "", "class": "Guardian", "traits": "Quest. Unlocked.", "level": 0, "cost": 0, "permanent": true},
+  {"deck": 95049, "id": "sthr-quest-ayako", "type": "Asset", "name": "The Unfinished Translation", "subtitle": "", "class": "Seeker", "traits": "Quest. Campaign.", "level": 0, "cost": 0, "permanent": true},
+  {"deck": 95050, "id": "sthr-questdone-ayako", "type": "Asset", "name": "The Translation, Finished", "subtitle": "", "class": "Seeker", "traits": "Quest. Unlocked.", "level": 0, "cost": 0, "permanent": true},
+  {"deck": 95051, "id": "sthr-quest-cass", "type": "Asset", "name": "A Marked Run of Cards", "subtitle": "", "class": "Rogue", "traits": "Quest. Campaign.", "level": 0, "cost": 0, "permanent": true},
+  {"deck": 95052, "id": "sthr-questdone-cass", "type": "Asset", "name": "The Table Remembers", "subtitle": "", "class": "Rogue", "traits": "Quest. Unlocked.", "level": 0, "cost": 0, "permanent": true},
+  {"deck": 95053, "id": "sthr-quest-seraphine", "type": "Asset", "name": "The Medium's Price", "subtitle": "", "class": "Mystic", "traits": "Quest. Campaign.", "level": 0, "cost": 0, "permanent": true},
+  {"deck": 95054, "id": "sthr-questdone-seraphine", "type": "Asset", "name": "The Price, Remembered", "subtitle": "", "class": "Mystic", "traits": "Quest. Unlocked.", "level": 0, "cost": 0, "permanent": true},
+  {"deck": 95055, "id": "sthr-quest-birdie", "type": "Asset", "name": "Somewhere to Be", "subtitle": "", "class": "Survivor", "traits": "Quest. Campaign.", "level": 0, "cost": 0, "permanent": true},
+  {"deck": 95056, "id": "sthr-questdone-birdie", "type": "Asset", "name": "She Knows the Road", "subtitle": "", "class": "Survivor", "traits": "Quest. Unlocked.", "level": 0, "cost": 0, "permanent": true}
 ]

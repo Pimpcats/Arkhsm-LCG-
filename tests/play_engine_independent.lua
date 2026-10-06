@@ -107,63 +107,85 @@ case("timed delivery matrix",function()
   expect("untimed carry arrival still delivers",FX.canAdvance({id="fixture-carry",holder=i})~=nil)
 end)
 
+local function deckOf(n) local d={};for k=1,n do d[k]={name="card "..k} end;return d end
 for _,which in ipairs({"ordinary","direct","prohibited"}) do
-  case("redirection "..which,function()
+  case("prevention "..which,function()
     local R,P,FX,AI,T,st,new=fixture();local e,a=new("sthrelias"),new("sthrayako")
-    local coat={name="Leather Coat",hp=3,sp=0,dmg=0,hor=0,rec={name="Leather Coat"}}
-    e.assets={coat};if which=="prohibited" then a.round.nobodyBelieves=true end
+    e.deck=deckOf(20);if which=="prohibited" then a.round.nobodyBelieves=true end
     R.hurt(a,2,0,"fixture attack",{direct=which=="direct"})
-    if which=="ordinary" then
-      expect("redirect remains ordinary with eligible soak",e.damage==0 and coat.dmg==2 and a.damage==0)
-      expect("redirect award belongs on investigator",e.cardMemory==1 and e.memory==1)
-    else expect(which.." damage not redirected",a.damage==2 and e.memory==0 and coat.dmg==0) end
+    if which=="prohibited" then expect("prevention does not affect Nobody Believes Her",a.damage==2 and #e.deck==20)
+    else expect("prevention "..which.." damage: 2 cards discarded, 2 prevented",a.damage==0 and #e.deck==18 and #e.discard==2) end
   end)
 end
-case("redirection context/no soak",function()
+case("prevention limits",function()
   local R,P,FX,AI,T,st,new=fixture();local e,a=new("sthrelias"),new("sthrayako")
-  local enemy={damage=0};e.assets={{name="Guard Dog",hp=3,sp=1,dmg=0,hor=0,rec={name="Guard Dog"}}}
-  R.hurt(a,1,0,"fixture attack",{enemy=enemy})
-  expect("redirect preserves enemy for asset reaction",enemy.damage==1)
-  e.round={};e.assets={};R.hurt(a,1,0,"fixture attack",{enemy=enemy})
-  expect("redirect without asset damages recipient ordinarily",e.damage==1 and a.damage==0)
+  e.deck=deckOf(20)
+  R.hurt(a,5,0,"fixture attack")
+  expect("at most 3 cards: 3 prevented, the rest dealt",a.damage==2 and #e.deck==17)
+  R.hurt(a,2,0,"fixture attack")
+  expect("once per round",a.damage==4 and #e.deck==17)
+  e.round={};e.deck=deckOf(5)
+  R.hurt(a,2,0,"fixture attack")
+  expect("he keeps 4 cards: with 5 he spends only 1",a.damage==5 and #e.deck==4)
+  e.round={};e.deck=deckOf(3);R.hurt(a,1,0,"fixture attack")
+  expect("with 3 cards left he prevents nothing",a.damage==6 and #e.deck==3)
+end)
+case("prevention uses a spare deck for a single point",function()
+  local R,P,FX,AI,T,st,new=fixture();local e,a=new("sthrelias"),new("sthrayako")
+  e.deck=deckOf(10);R.hurt(a,1,0,"fixture attack")
+  expect("a single point is not worth the deck while it is short",a.damage==1 and #e.deck==10)
+  e.round={};e.deck=deckOf(16);R.hurt(a,1,0,"fixture attack")
+  expect("with 16 cards a single point is prevented",a.damage==1 and #e.deck==15)
+end)
+case("prevention counts toward the quest",function()
+  local R,P,FX,AI,T,st,new,L,calls=fixture();local e,a=new("sthrelias"),new("sthrayako")
+  e.deck=deckOf(20);R.hurt(a,3,0,"fixture attack")
+  local got=0;for _,c in ipairs(calls) do if c.name=="shApiQuest" and c.p.id=="sthrelias" then got=got+c.p.delta end end
+  expect("3 damage prevented adds 3 to Elias's quest tally",got==3)
 end)
 
 for _,prevented in ipairs({false,true}) do
-  case("lone damage reaction "..tostring(prevented),function()
-    local R,P,FX,AI,T,st,new=fixture();local e=new("sthrelias")
+  case("quest-back damage reaction "..tostring(prevented),function()
+    local R,P,FX,AI,T,st,new=fixture();local e=new("sthrelias");e.questUnlocked=true
     e.assets={{name="Leather Coat",hp=3,sp=0,dmg=0,hor=0,rec={name="Leather Coat"}}}
     if prevented then e.story={id="sthr-item-logbook"} end
     R.enemyAttack({id="fixture",name="fixture",def={damage=1,horror=0}},e,"fixture")
     expect(prevented and "fully prevented attack awards no Memory" or "owned-asset attack awards Memory",e.cardMemory==(prevented and 0 or 1))
     R.enemyAttack({id="fixture",name="fixture",def={damage=1,horror=0}},e,"fixture")
-    expect("lone reaction places 1 Memory per damaging attack "..tostring(prevented),e.cardMemory==(prevented and 1 or 2))
+    expect("the reaction places 1 Memory per damaging attack "..tostring(prevented),e.cardMemory==(prevented and 1 or 2))
   end)
 end
-case("special enemy lone reaction",function()
+case("damage reaction waits for the quest",function()
   local R,P,FX,AI,T,st,new=fixture();local e=new("sthrelias")
+  e.assets={{name="Leather Coat",hp=3,sp=0,dmg=0,hor=0,rec={name="Leather Coat"}}}
+  R.enemyAttack({id="fixture",name="fixture",def={damage=1,horror=0}},e,"fixture")
+  expect("no Memory before the quest is met",e.cardMemory==0)
+end)
+case("special enemy damage reaction",function()
+  local R,P,FX,AI,T,st,new=fixture();local e=new("sthrelias");e.questUnlocked=true
   e.assets={{name="Leather Coat",hp=3,sp=0,dmg=0,hor=0,rec={name="Leather Coat"}}}
   R.CARDS["sthr-appointed"]={damage=1,horror=0}
   R.appointedAttack(e,"fixture")
-  expect("special enemy attack awards lone reaction for owned damage",e.cardMemory==1)
+  expect("special enemy attack awards the reaction for owned damage",e.cardMemory==1)
 end)
 
 case("Memory sources and thresholds",function()
   local R,P,FX,AI,T,st,new=fixture();local b,e,c=new("sthrbirdie"),new("sthrelias"),new("sthrcass")
-  local compass={name="Lucky Compass",memory=1};b.assets={compass};b.cardMemory=2;R.syncMemory(b)
-  expect("2 investigator plus 1 asset cannot pay investigator-only save",P.wouldFail(b,-2,"Auto-fail",{important=true})==nil)
-  R.addMemory(b,1,"fixture");local saved=P.wouldFail(b,-2,"Auto-fail",{important=true})
-  expect("3 investigator Memory pays without consuming asset",saved==0 and b.cardMemory==0 and compass.memory==1 and b.memory==1)
+  local compass={name="Lucky Compass",memory=1};b.assets={compass};b.cardMemory=3;R.syncMemory(b)
+  expect("there is no Memory save: an auto-fail still fails",P.wouldFail(b,-2,"Auto-fail",{important=true})==nil and b.cardMemory==3)
   e.assets={{name="Notebook",memory=3}};R.syncMemory(e)
-  expect("asset Memory cannot improve investigator elder sign",P.elderSign(e)==1)
+  expect("Elias's elder sign is +1 with a short deck, whatever Memory he has",P.elderSign(e)==1)
+  e.deck=deckOf(8)
+  expect("with 8 cards he may spend 2 for +3",P.elderSign(e)==3)
   c.assets={{name="Notebook",memory=3}};R.syncMemory(c);local before=c.resources;P.elderSignAfter(c,1)
-  expect("asset Memory cannot pay investigator elder resources",c.resources==before)
+  expect("Cass's elder sign gains 2 resources",c.resources==before+2)
   b.assets={};R.syncMemory(b)
-  expect("departed asset Memory removed from aggregate",b.memory==0)
-  e.cardMemory=3;e.damage=2;e.horror=2;R.syncMemory(e);R.G.knowledge["the-keepers-ninth-death"]=true
+  expect("departed asset Memory removed from aggregate",b.memory==3)
+  e.questUnlocked=true;e.damage=2;e.horror=2;R.G.knowledge["the-keepers-ninth-death"]=true
   P.elderSignAfter(e,3)
-  expect("lasting elder heal resolves after actual damage heal",e.damage==1 and e.horror==1)
-  e.damage=0;P.elderSignAfter(e,3)
-  expect("lasting horror heal needs actual damage healed",e.horror==1)
+  expect("the elder sign discards 2 cards and heals 1 damage (and, on the quest back with the entry, 1 horror)",e.damage==1 and e.horror==1 and #e.deck==6 and #e.discard==2)
+  e.horror=1;e.damage=0;e.deck=deckOf(8);P.elderSignAfter(e,3)
+  expect("no damage to heal, no horror healed either",e.horror==1 and #e.deck==6)
 end)
 case("Memory discarded/replaced with asset",function()
   local R,P,FX,AI,T,st,new=fixture();local i=new("sthrayako")
@@ -183,9 +205,16 @@ for _,tracks in ipairs({{9,0},{0,8},{9,8}}) do
     R.G.turnOf=b;AI.chooseMove=function() return nil end
     expect("defeat prevention available "..tracks[1].."/"..tracks[2],P.tryIGetOut(b)==true)
     expect("defeat prevention only lowers injury "..tracks[1].."/"..tracks[2],b.damage==math.min(8,tracks[1]) and b.horror==math.min(7,tracks[2]))
-    expect("defeat prevention ends own turn and adds asset Memory "..tracks[1].."/"..tracks[2],b.actionsLeft==0 and b.cardMemory==0 and b.assets[1].memory==1)
+    expect("defeat prevention ends own turn; the Compass Memory is the quest back's "..tracks[1].."/"..tracks[2],b.actionsLeft==0 and b.cardMemory==0 and b.assets[1].memory==0)
+    expect("I Get Out removes itself from the game "..tracks[1].."/"..tracks[2],#b.discard==0 and #b.hand==0)
   end)
 end
+case("defeat prevention on the quest back",function()
+  local R,P,FX,AI,T,st,new=fixture();local b=new("sthrbirdie");b.questUnlocked=true
+  b.damage=9;b.hand={{name="I Get Out"}};b.assets={{name="Lucky Compass",memory=0}};R.G.turnOf=b;AI.chooseMove=function() return nil end
+  P.tryIGetOut(b)
+  expect("with the quest met, I Get Out places 1 Memory on Lucky Compass",b.assets[1].memory==1)
+end)
 case("defeat prevention outside own turn",function()
   local R,P,FX,AI,T,st,new=fixture();local b,a=new("sthrbirdie"),new("sthrayako")
   b.damage=9;b.hand={{name="I Get Out"}};R.G.turnOf=a;AI.chooseMove=function() return nil end
@@ -247,13 +276,20 @@ case("incoming/outgoing weakness scope",function()
   R.ACT.assetAbility(b,{name="First Aid",uses=2})
   expect("own healing still allowed",b.damage==2)
 end)
-case("Marked Deck asset-memory option and sealing",function()
+case("Marked Deck costs 2 resources; the quest back may pay Dissonance and Memory",function()
   local R,P,FX,AI,T,st,new,L,calls,released,tally=fixture();local c=new("sthrcass")
-  local a={name="Marked Deck",rec={name="Marked Deck",slot="Hand"}};local memoryAsset={name="Notebook",memory=1,rec={name="Notebook"}}
-  c.assets={a,memoryAsset};R.syncMemory(c)
+  local a={name="Marked Deck",rec={name="Marked Deck",slot="Hand"}}
+  c.assets={a};R.syncMemory(c)
   local ok=P.markedDeck(c,a,"number")
-  expect("Marked Deck number option can spend controlled-asset Memory",ok==true and memoryAsset.memory==0 and c.cardMemory==0)
-  expect("Marked Deck paid costs tally and seal chosen number",tally("spent",c.id)==1 and tally("raises",c.id)==1 and c.sealedToken and c.sealedToken.getName()=="0")
+  expect("the number option spends 2 resources and seals the chosen number",ok==true and c.resources==3 and c.sealedToken and c.sealedToken.getName()=="0")
+  expect("and costs no Memory or Dissonance",tally("spent",c.id)==0 and tally("raises",c.id)==0 and st.dissonance==0)
+  local c2=new("sthrcass");c2.resources=1;local a2={name="Marked Deck",rec={name="Marked Deck",slot="Hand"}};local memoryAsset={name="Notebook",memory=1,rec={name="Notebook"}}
+  c2.assets={a2,memoryAsset};R.syncMemory(c2)
+  expect("without 2 resources and without the quest it cannot be used",P.markedDeck(c2,a2,"number")==false and c2.sealedToken==nil)
+  c2.questUnlocked=true
+  local ok2=P.markedDeck(c2,a2,"number")
+  expect("with the quest met it can spend controlled-asset Memory and Dissonance instead",ok2==true and memoryAsset.memory==0 and st.dissonance==1 and c2.resources==1)
+  expect("the paid costs tally",tally("spent",c2.id)==1 and tally("raises",c2.id)==1)
 end)
 case("sealed asset departure",function()
   local R,P,FX,AI,T,st,new,L,calls,released=fixture();local c=new("sthrcass")
@@ -263,12 +299,15 @@ case("sealed asset departure",function()
   local replacement={name="Switchblade",type="Asset",cost=1,slot="Hand"};c.hand={replacement};P.playAsset(c,replacement)
   expect("departing sealing asset releases its sealed token",c.sealedToken==nil and #released==1)
 end)
-case("Compass loop-power cost",function()
+case("Compass second ability",function()
   local R,P,FX,AI,T,st,new,L,calls,released,tally=fixture();local b=new("sthrbirdie")
   local a={name="Lucky Compass",memory=1};b.assets={a};R.syncMemory(b)
   R.ACT.assetAbility(b,a,"jump",L)
-  expect("Compass removes its asset token",a.memory==0 and b.cardMemory==0)
-  expect("Compass token cost counts toward loop-power Years",tally("spent",b.id)==1)
+  expect("it spends 2 resources and keeps its Memory",b.resources==3 and a.memory==1 and tally("spent",b.id)==0)
+  b.questUnlocked=true;a.exhausted=false
+  R.ACT.assetAbility(b,a,"jump",L)
+  expect("on the quest back it may remove 1 Memory instead",b.resources==3 and a.memory==0 and b.cardMemory==0)
+  expect("and that Memory counts toward loop-power Years",tally("spent",b.id)==1)
 end)
 case("cannot-be-evaded condition",function()
   local R,P,FX,AI,T,st,new=fixture();local c=new("sthrcass")
@@ -282,14 +321,89 @@ end)
 
 case("investigator Memory reaction limits",function()
   local R,P,FX,AI,T,st,new=fixture();local i=new("sthrayako")
+  P.afterTest(i,true,0,"int",{},{})
+  expect("Ayako's reaction is the quest back's: nothing before it is met",i.memory==0)
+  i.questUnlocked=true
   P.afterTest(i,true,0,"int",{},{});P.afterTest(i,true,0,"int",{},{})
-  expect("Ayako's reaction is limited twice per loop",i.memory==2)
+  expect("Ayako's reaction is limited twice per game",i.memory==2)
   for _=1,4 do i.round={};P.afterTest(i,true,0,"int",{},{}) end
-  expect("and no more than twice in a loop",i.memory==2)
-  local b=new("sthrbirdie");P.afterTest(b,false,-1,"agi",{},{})
+  expect("and no more than twice in a game",i.memory==2)
+  local b=new("sthrbirdie");b.questUnlocked=true;P.afterTest(b,false,-1,"agi",{},{})
   expect("Birdie's reaction needs a failure by 2 or more",b.memory==0)
   P.afterTest(b,false,-2,"agi",{},{})
   expect("Birdie's reaction places 1 Memory",b.memory==1)
+end)
+case("Ayako's translation tokens",function()
+  local R,P,FX,AI,T,st,new,L,calls=fixture();local a=new("sthrayako")
+  local en={id="e1",name="enemy one",loc="x",damage=0,def={health=3}};local far={id="e2",name="far",loc="y",damage=0,def={health=3}}
+  R.G.enemies={en,far}
+  P.afterTest(a,false,-1,"int",{},{})
+  expect("a failure places no token",(en.translation or 0)==0)
+  P.afterTest(a,true,1,"agi",{},{})
+  expect("any success with an enemy at her location places 1 token on it",en.translation==1 and (far.translation or 0)==0)
+  P.afterTest(a,true,1,"int",{},{})
+  expect("limit once per round",en.translation==1)
+  a.round={};P.afterTest(a,true,1,"int",{},{})
+  expect("again next round",en.translation==2)
+  local q=0;for _,c in ipairs(calls) do if c.name=="shApiQuest" and c.p.id=="sthrayako" then q=q+c.p.delta end end
+  expect("her quest counts the first token on an enemy only",q==1)
+  R.G.enemies={}
+  a.round={};P.afterTest(a,true,1,"int",{},{})
+  expect("with no enemy at her location nothing is placed",true)
+  a.deck={{name="drawn"}};a.hand={}
+  P.elderSignAfter(a,2)
+  expect("her elder sign draws a card when there is no enemy",#a.hand==1)
+  R.G.enemies={far};far.loc="x"
+  P.elderSignAfter(a,2)
+  expect("and places a token when there is one",far.translation==1)
+  expect("her elder sign is +2",P.elderSign(a)==2)
+end)
+case("Ayako uses intellect against translated enemies",function()
+  local R,P,FX,AI,T,st,new=fixture();local a=new("sthrayako");a.stats={wil=3,int=5,com=1,agi=2}
+  R.skillBase=nil;dofile("tools/play_engine/lua/rules.lua")(R,T)
+  local en={translation=0}
+  expect("no tokens: her printed combat",R.skillBase(a,"com",{enemy=en})==1 and R.skillBase(a,"agi",{enemy=en})==2)
+  en.translation=1
+  expect("one token: intellect in place of combat and agility",R.skillBase(a,"com",{enemy=en})==5 and R.skillBase(a,"agi",{enemy=en})==5)
+  expect("only against that enemy and only for attacking or evading",R.skillBase(a,"com",{enemy={}})==1 and R.skillBase(a,"wil",{enemy=en})==3)
+  local o=new("sthrcass");o.stats={wil=2,int=5,com=2,agi=2}
+  expect("only Ayako",R.skillBase(o,"com",{enemy=en})==2)
+end)
+case("Birdie's resolve",function()
+  local R,P,FX,AI,T,st,new,L,calls=fixture();local b=new("sthrbirdie");b.questUnlocked=false
+  P.afterTest(b,false,-1,"agi",{},{})
+  expect("a failure places 1 resolve",b.resolve==1)
+  P.afterTest(b,false,-1,"agi",{},{});P.afterTest(b,false,-1,"agi",{},{})
+  expect("at most twice per round",b.resolve==2)
+  b.round={};P.afterTest(b,false,-1,"agi",{},{})
+  expect("and again next round",b.resolve==3)
+  P.afterTest(b,true,1,"agi",{},{})
+  expect("a success places none",b.resolve==3)
+  b.round={}
+  local lucky={name="Lucky!",type="Event"};local other={name="Dodge",type="Event"};local asset={name="Knife",type="Asset"}
+  b.discard={asset,other,lucky}
+  expect("she returns the best event for 2 resolve",P.birdieRecur(b)==true and b.resolve==1 and #b.hand==1 and b.hand[1]==lucky and #b.discard==2)
+  expect("once per round",P.birdieRecur(b)==false)
+  b.round={};b.resolve=1
+  expect("and only with 2 resolve",P.birdieRecur(b)==false)
+  b.resolve=4;b.discard={asset}
+  expect("and only an event",P.birdieRecur(b)==false and b.resolve==4)
+  local q=0;for _,c in ipairs(calls) do if c.name=="shApiQuest" and c.p.id=="sthrbirdie" then q=q+c.p.delta end end
+  expect("spent resolve counts toward her quest",q==2)
+end)
+case("Cass's resource reaction and elder sign",function()
+  local R,P,FX,AI,T,st,new,L,calls=fixture();local c=new("sthrcass")
+  T.drawToken=function() return "Skull",{getName=function() return "Skull" end,getGUID=function() return "t" end} end
+  AI.prepareTest=function() return {},0 end
+  local before=c.resources
+  R.test(c,"agi",0,{});
+  expect("a symbol token during a test gains 1 resource",c.resources==before+1 and c.round.cassGain==true)
+  R.test(c,"agi",0,{})
+  expect("once per round",c.resources==before+1)
+  expect("Cass's elder sign is +1",P.elderSign(c)==1)
+  c.round={};c.namedToken="Skull";R.test(c,"agi",0,{})
+  local q=0;for _,x in ipairs(calls) do if x.name=="shApiQuest" and x.p.id=="sthrcass" then q=q+x.p.delta end end
+  expect("a symbol canceled by her named token counts toward her quest",q==1)
 end)
 case("Rehearsed Escape Elite choice once per loop",function()
   local R,P,FX,AI,T,st,new=fixture();local c=new("sthrbirdie");FX.onEvade=function() end
@@ -343,27 +457,30 @@ case("permanent setup",function()
   expect("Anchor Point increases maximum sanity",i.sanity==9)
 end)
 for _,bank in ipairs({0,1,3,12}) do
-  case("banked-memory weakness "..bank,function()
+  case("Untranslatable "..bank,function()
     local R,P,FX,AI,T,st,new=fixture();local i=new("sthrayako");st.memory=bank
+    local near,far={translation=3,name="n"},{translation=1,name="f"};R.G.enemies={near,far}
     P.weakness(i,{id="sthr-untranslatable",name="Untranslatable"})
-    expect("banked-memory weakness ceiling/cap "..bank,i.horror==math.min(5,2+math.floor(bank/4)))
+    expect("Untranslatable takes 2 horror whatever is banked "..bank,i.horror==2)
+    expect("and removes every translation token from every enemy "..bank,near.translation==nil and far.translation==nil)
   end)
 end
-for _,spec in ipairs({{"Calm",0,1,2},{"Glitch",1,0,2},{"Noticed",2,0,2},{"Noticed",3,0,2}}) do
-  case("band weakness "..spec[1].."/"..spec[2],function()
-    local R,P,FX,AI,T,st,new=fixture();local i=new("sthrseraphine");st.band=spec[1];st.stage=spec[2]
-    P.weakness(i,{id="sthr-debtofhours",name="The Debt of Hours"})
-    expect("band weakness correct effect "..spec[1].."/"..spec[2],st.dissonance==spec[3] and i.horror==spec[4] and st.stage==(spec[1]=="Noticed" and spec[2]==2 and 3 or spec[2]))
-  end)
-end
-case("specific investigator-memory weakness",function()
+case("The Debt of Hours",function()
+  local R,P,FX,AI,T,st,new=fixture();local i=new("sthrseraphine")
+  P.weakness(i,{id="sthr-debtofhours",name="The Debt of Hours"})
+  expect("2 horror and 1 doom on the current agenda, in any band; Dissonance and the Approach do not move",i.horror==2 and R.G.doom==1 and st.dissonance==0 and st.stage==0)
+end)
+case("The Eighth Grave",function()
   local R,P,FX,AI,T,st,new=fixture();local i=new("sthrelias")
-  i.assets={{name="Notebook",memory=4}};R.syncMemory(i)
+  R.test=function() return false,-2 end
   P.weakness(i,{id="sthr-eighthgrave",name="The Eighth Grave"})
-  expect("investigator-only weakness does not count asset tokens",i.horror==2)
-  i.cardMemory=1;R.syncMemory(i);i.horror=0
+  expect("it deals 1 damage for each point failed by",i.damage==2)
+  R.test=function() return false,-5 end;i.damage=0
   P.weakness(i,{id="sthr-eighthgrave",name="The Eighth Grave"})
-  expect("investigator-only weakness counts exactly its own tokens",i.horror==1)
+  expect("at most 3",i.damage==3)
+  R.test=function() return true,1 end;i.damage=0
+  P.weakness(i,{id="sthr-eighthgrave",name="The Eighth Grave"})
+  expect("and none on a success",i.damage==0)
 end)
 case("defeated investigator seal",function()
   local R,P,FX,AI,T,st,new,L,calls,released=fixture();local c,a=new("sthrcass"),new("sthrayako")
@@ -386,12 +503,13 @@ for _,n in ipairs({1,2,3,4}) do
     expect("full fare pays printed scale at "..n,advanced==1 and i.resources==0)
   end)
 end
-case("investigator boost repeat through policy",function()
+case("investigator boost, once per round",function()
   local R,P,FX,AI,T,st,new,L,calls,released,tally=fixture();local i=new("sthrseraphine")
   R.G.turnOf=i;i.hand={{name="The Same Doorway Twice",type="Event",cost=1,traits="Recollection."}}
   local committed,boost=AI.prepareTest(i,"wil",8,3,{important=true})
-  expect("Seraphine repeated skill ability supplies both +2 bonuses",boost==4)
-  expect("Seraphine repeated ability takes 1 horror each time and awards Memory for each horror dealt",i.horror==2 and i.round.sera==2 and i.cardMemory==2 and st.dissonance==1)
+  expect("Seraphine supplies +2 once: her ability is limited to once per round",boost==2)
+  expect("it takes 1 direct horror, no Dissonance, and the quest back's Memory is not yet on offer",i.horror==1 and i.round.sera==1 and i.cardMemory==0 and st.dissonance==0 and #i.hand==1)
+  expect("it counts toward her quest",(function() local q=0;for _,c in ipairs(calls) do if c.name=="shApiQuest" and c.p.id=="sthrseraphine" then q=q+c.p.delta end end return q==1 end)())
 end)
 case("secret boost repeat through policy",function()
   local R,P,FX,AI,T,st,new=fixture();local i=new("sthrayako")
@@ -404,10 +522,15 @@ case("additional-action and ready choices",function()
   local R,P,FX,AI,T,st,new=fixture();local i=new("sthrseraphine");R.G.turnOf=i
   local a={name="Spell fixture",exhausted=true,rec={traits="Spell."}};i.assets={a}
   P.seraphine(i,"ready",a)
-  expect("Seraphine may ready her Spell",not a.exhausted and i.round.sera==1)
-  P.seraphine(i,"action")
-  expect("Seraphine may gain action and earns Memory for each raise",i.actionsLeft==4 and i.round.sera==2 and i.cardMemory==2)
-  expect("Seraphine further boosts unavailable at printed limit",#P.boosts(i,"wil",{})==0)
+  expect("Seraphine may ready her Spell",not a.exhausted and i.round.sera==1 and i.horror==1)
+  expect("and has no further boost this round",#P.boosts(i,"wil",{})==0)
+  i.round={};P.seraphine(i,"action")
+  expect("or gain an action",i.actionsLeft==4 and i.horror==2)
+  i.round={};i.questUnlocked=true;P.seraphine(i,"action",nil,true)
+  expect("on the quest back Dissonance may pay instead of horror",st.dissonance==1 and i.horror==2 and i.actionsLeft==5)
+  i.round={};P.seraphine(i,"action",nil,true);i.questUnlocked=false;i.round={}
+  P.seraphine(i,"action",nil,true)
+  expect("without the quest, horror is still paid",i.horror==3)
 end)
 case("Knowledge reaction repeat",function()
   local R,P,FX,AI,T,st,new=fixture();local i=new("sthrayako");R.G.turnOf=i
@@ -443,7 +566,7 @@ for _,firstSuccess in ipairs({false,true}) do
 end
 for _,cancel in ipairs({false,true}) do
   case("reset during token resolution "..tostring(cancel),function()
-    local R,P,FX,AI,T,st,new=fixture();local i=new("sthrayako");st.dissonance=23
+    local R,P,FX,AI,T,st,new=fixture();local i=new("sthrayako");st.dissonance=23;i.questUnlocked=true
     if cancel then i.story={id="sthr-item-almanac"} end
     local draws=0
     T.drawToken=function()

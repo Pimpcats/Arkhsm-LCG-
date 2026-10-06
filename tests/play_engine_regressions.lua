@@ -30,39 +30,47 @@ R.advanceAct=function() advanced=advanced+1 end
 FX.afterAdvance()
 check("Hourglass advance resolves timed carry act", advanced==1)
 
-local coat={name="Leather Coat",hp=2,sp=0,dmg=0,hor=0,rec={name="Leather Coat"}}
-elias.assets={coat}
+-- Elias: when damage would be dealt to an investigator at his location, discard up to
+-- 3 cards from the top of his deck and prevent 1 of it per card (once per round)
+for k=1,20 do elias.deck[#elias.deck+1]={name="card "..k} end
+R.hurt(ayako,3,0,"enemy attack")
+check("Elias prevents damage to another investigator, 1 per card discarded",ayako.damage==0 and #elias.deck==17 and #elias.discard==3)
+check("prevented damage needs no soak and leaves his own damage alone",elias.damage==0)
 R.hurt(ayako,2,0,"enemy attack")
-check("redirected ordinary damage can be assigned to armor",elias.damage==0 and coat.dmg==2 and ayako.damage==0)
-check("redirect reaction awards investigator Memory",R.investigatorMemory(elias)==1)
+check("the prevention is limited once per round",ayako.damage==2 and #elias.deck==17)
+elias.round={}
 birdie.round.nobodyBelieves=true
-elias.round={}
-R.hurt(birdie,1,0,"enemy attack")
-check("Birdie's weakness blocks Elias affecting her",birdie.damage==1 and not elias.round.redirect)
-elias.assets={ {name="Guard Dog",hp=3,sp=1,dmg=0,hor=0,rec={name="Guard Dog"}} }
-local retaliated=0
-R.damageEnemy=function(_,n) retaliated=retaliated+n end
-R.hurt(ayako,1,0,"enemy attack",{enemy={}})
-check("redirection preserves attacking enemy context",retaliated==1)
+R.hurt(birdie,2,0,"enemy attack")
+check("Birdie's weakness blocks Elias affecting her",birdie.damage==2 and not elias.round.prevent and #elias.deck==17)
+birdie.round.nobodyBelieves=nil
+elias.deck={}
+for k=1,4 do elias.deck[#elias.deck+1]={name="card "..k} end
+R.hurt(elias,2,0,"enemy attack")
+check("Elias keeps a few cards: with 4 in his deck he prevents nothing",elias.damage==2 and #elias.deck==4)
+elias.damage,elias.round={},{}
+elias.damage=0
+elias.questUnlocked=false
+check("the Memory reaction is on the quest back: not before it is met",R.investigatorMemory(elias)==0)
+elias.questUnlocked=true
+R.hurt(elias,1,0,"enemy attack")
+check("after the quest is met, being dealt damage places 1 Memory",R.investigatorMemory(elias)==1)
 
+elias.questUnlocked=false
+elias.deck,elias.discard,elias.round,elias.damage={},{},{},0
 elias.assets={ {name="Leather Coat",hp=2,sp=0,dmg=0,hor=0,rec={name="Leather Coat"}} }
-elias.round={}
 R.G.inv={elias}
 R.investigatorsAt=function() return {elias} end
 FX.afterAttack=function() end
-local before=R.investigatorMemory(elias)
 R.enemyAttack({id="enemy",name="enemy",def={damage=1,horror=0}},elias,"fixture")
-check("solo reaction includes owned-asset damage",R.investigatorMemory(elias)==before+1 and elias.damage==0)
+check("a solo attack soaked by armor is not prevented without spare cards",elias.damage==0 and elias.assets[1].dmg==1)
 
 local compass={name="Lucky Compass",memory=1}
 birdie.assets={compass}
-birdie.cardMemory,birdie.memory=2,3
-check("Birdie's investigator-only cost cannot use Compass Memory",P.wouldFail(birdie,-3,"Auto-fail",{important=true})==nil)
-R.addMemory(birdie,1,"fixture")
-check("Birdie can pay three investigator Memory",P.wouldFail(birdie,-3,"Auto-fail",{important=true})==0 and birdie.cardMemory==0 and compass.memory==1)
+birdie.cardMemory,birdie.memory=3,4
+check("there is no Memory save: an auto-fail still fails",P.wouldFail(birdie,-3,"Auto-fail",{important=true})==nil and birdie.cardMemory==3)
 birdie.assets={}
 R.syncMemory(birdie)
-check("asset Memory leaves play with the asset",birdie.memory==0)
+check("asset Memory leaves play with the asset",birdie.memory==3)
 
 birdie.hand={{name="I Get Out"}}
 birdie.damage,birdie.horror,birdie.actionsLeft=birdie.health,0,2
@@ -71,6 +79,7 @@ R.G.phase,R.G.turnOf="investigation",birdie
 R.AI={chooseMove=function() return nil end}
 check("defeat prevention plays",P.tryIGetOut(birdie))
 check("defeat prevention only heals and ends own turn",birdie.damage==birdie.health-1 and birdie.horror==0 and birdie.actionsLeft==0)
+check("I Get Out removes itself from the game: it is not in her discard pile",#birdie.discard==0 and #birdie.hand==0)
 
 local muscle={name="Muscle Memory",type="Skill",traits="Recollection.",icons={wild=1}}
 ayako.hand,ayako.testedTypes,ayako.years={muscle},{com=true},5
@@ -96,6 +105,7 @@ check("Foreknowledge maximum applies across owners",P.commit(ayako,P.commitables
 P.afterTest(helper,true,1,"int",{},committed)
 check("paid Foreknowledge draws on success",#helper.hand==1)
 
+birdie.round.nobodyBelieves=true
 local lamp=inv("lamp owner")
 lamp.assets={{name="The Ambergrove Lamp"}}
 R.investigatorsAt=function() return {birdie,lamp} end
