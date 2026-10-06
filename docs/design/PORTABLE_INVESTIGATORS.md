@@ -67,7 +67,7 @@ unlocked clauses apply.
 
 | Investigator | Quest card | Goal (tally across the campaign) | Unlocked card | What it carries |
 |---|---|---|---|---|
-| Elias | What the Warden Owes | prevent 4 damage with his ability | What the Warden Remembers | 1 Memory when dealt damage (three times per game); the Lamp's move may raise Dissonance by 1 so it places no doom |
+| Elias | What the Warden Owes | prevent 4 damage with his ability | What the Warden Remembers | 1 Memory when dealt damage or when his ability prevents damage (three times per game); the Lamp's move may raise Dissonance by 1 so it places no doom |
 | Ayako | The Unfinished Translation | first translation token on 8 different enemies | The Translation, Finished | 1 Memory on an [int] success (twice per game); Recollections drawn by her elder sign cost 2 less; It Means 'Wait' also reaches Hour text and The Appointed's attack |
 | Cass | A Marked Run of Cards | cancel 3 symbol tokens with her own ability or cards | The Table Remembers | 1 Memory per symbol reveal (twice per game); Marked Deck may pay Dissonance and Memory instead of 2 resources |
 | Birdie | Somewhere to Be | spend 8 resolve | She Knows the Road | 1 Memory when she fails by 2 or more (three times per game); Lucky Compass may remove 1 Memory instead of spending 2 resources; I Get Out places 1 Memory on the Compass |

@@ -809,6 +809,8 @@ return function(R, T)
     R.G.metrics.prevented = (R.G.metrics.prevented or 0) + n
     R.log("Elias discards %d card(s) and prevents %d damage to %s (%s)", n, n, target.name, source or "?")
     P.quest(elias, n)
+    -- quest back: after your ability prevents damage: 1 Memory (same limit as being dealt damage)
+    P.memoryReaction(elias, "Elias: prevented damage")
     return n
   end
 
