@@ -86,8 +86,10 @@ def summarize(games):
                 out["defeats"][who] += 1
             for why, n in (m.get("memory_on_cards") or {}).items():
                 out["memory_sources"][why] += n
-            for who, rnd in (m.get("quest_unlocked") or {}).items():
-                out["quest"].setdefault(who, []).append(slot)
+            for who, q in (m.get("quest") or {}).items():
+                if q.get("unlocked"):
+                    seen = out["quest"].setdefault(who, {})
+                    seen.setdefault(g["campaign_seed"], slot)    # the first slot that ended with it met
     # how often the new abilities fire, per played slot (the Prologue included)
     all_games = [g for gs in slot_games.values() for g in gs]
     for key, label in (("prevented", "damage prevented by Elias"), ("translations", "translation tokens placed"),
@@ -118,8 +120,9 @@ def render(s, title=""):
     lines.append("Memory banked per investigator over the campaign: mean %.1f, range %.1f-%.1f (official 35-45)" %
                  (x["mean"], x["min"], x["max"]))
     if s["quest"]:
-        lines.append("quest card met, slot number (mean / earliest / latest):")
-        for who, slots in sorted(s["quest"].items()):
+        lines.append("quest card met by the end of slot (mean / earliest / latest; 1 = Prologue):")
+        for who, bycamp in sorted(s["quest"].items()):
+            slots = list(bycamp.values())
             lines.append("  %-14s %.1f / %d / %d   (%d of %d campaigns)" %
                          (who, statistics.mean(slots), min(slots), max(slots), len(slots), s["campaigns"]))
     if s["usage"]:

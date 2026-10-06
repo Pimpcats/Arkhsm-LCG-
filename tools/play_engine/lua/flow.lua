@@ -599,6 +599,8 @@ return function(R, T)
       a.exhausted = true
       P.draw(inv, 1)
     elseif a.name == "The Bell of Ambergrove" then
+      -- its second ability is the quest back's: without it, only the evade exists
+      if not (mode == "evade" and target) and not inv.questUnlocked then return false end
       a.exhausted = true
       a.uses = a.uses - 1
       if mode == "evade" and target then
@@ -607,15 +609,17 @@ return function(R, T)
             if x == inv or not x.round.nobodyBelieves then R.heal(x, 0, 1) end
           end
         end
-      elseif inv.questUnlocked then
+      else
         inv.loopUsed.bell = true
         R.raise(2, "The Bell of Ambergrove (cost)", inv)
         if mode == "advance" then R.advance(1, "The Bell of Ambergrove") else R.rewind(1, "The Bell of Ambergrove") end
       end
     elseif a.name == "Lucky Compass" then
+      local viaMemory = inv.questUnlocked and (a.memory or 0) >= 1
+      if mode == "jump" and not viaMemory and inv.resources < 2 then return false end   -- it cannot be paid
       a.exhausted = true
       if mode == "jump" then
-        if inv.questUnlocked and (a.memory or 0) >= 1 then
+        if viaMemory then
           R.addMemory(inv, -1, "Lucky Compass", a)
           T.api("shApiTally", { id = inv.id, kind = "spent", delta = 1 })
         else

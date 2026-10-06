@@ -132,11 +132,11 @@ function buttonClick_place()
   local function spawnOne(i)
     local od = list[i]
     if not od then return finish() end
-    local entry = memoryList[od.GUID]
-    local name = tostring(od.Nickname or od.Name)
-    trace(string.format("spawning %d/%d %s", i, #list, name))
-    broadcastToAll(string.format("Placing %d/%d: %s", i, #list, name), { 0.7, 0.7, 0.7 })
     local ok, err = pcall(function()
+      local entry = memoryList[od.GUID]
+      local name = tostring(od.Nickname or od.Name)
+      trace(string.format("spawning %d/%d %s", i, #list, name))
+      broadcastToAll(string.format("Placing %d/%d: %s", i, #list, name), { 0.7, 0.7, 0.7 })
       local data = prepare(JSON.decode(JSON.encode(od)), tags)
       data.Locked = entry.lock and true or false
       local obj = spawnObjectData({ data = data, position = entry.pos, rotation = entry.rot })

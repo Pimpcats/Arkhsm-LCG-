@@ -1318,8 +1318,10 @@ function shApiQuest(p)
   if p.unlock ~= nil then
     CampaignState.setQuestUnlocked(p.id, p.unlock == true)
   elseif p.delta then
-    local _
-    _, just = guarded("quest", changeQuest, p.id, tonumber(p.delta) or 1)
+    -- guarded() hands back only the first result, so read the flip from the state
+    local was = CampaignState.getQuest(p.id).unlocked
+    guarded("quest", changeQuest, p.id, tonumber(p.delta) or 1)
+    just = (not was) and CampaignState.getQuest(p.id).unlocked
   end
   afterChange()
   local q = CampaignState.getQuest(p.id)

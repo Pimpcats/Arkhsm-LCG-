@@ -208,23 +208,25 @@ def _pages():
     p1.checkbox("act3", x, y, "The Last Hour available", group="act")
 
     p1.header(468, "Investigators")
-    panels = [(80, 500), (660, 500), (80, 934), (660, 934)]
+    row2 = 500 + PANEL_H + 20                      # the second row of panels
+    panels = [(80, 500), (660, 500), (80, row2), (660, row2)]
     for i, (px, py) in enumerate(panels, start=1):
         _investigator_panel(p1, i, px, py)
 
-    p1.header(1394, "Banked Memory")
-    y = 1448
+    bm = row2 + PANEL_H + 46                        # the Banked Memory block follows the panels
+    p1.header(bm, "Banked Memory")
+    y = bm + 54
     p1.text(90, y, "Banked Memory", size=24, style="bold")
     p1.counter("banked", 300, y - 9, 0, 99)
     p1.text(345, y, "(cap 10 × investigators after spending; never below 0)",
             size=20, style="italic", fill=SOFT)
     p1.text(900, y, "Spent this interlude", size=24, style="bold")
     p1.counter("spent", 1150, y - 9, 0, 99)
-    y = 1498
+    y = bm + 104
     p1.text(90, y, "Spent on:", size=24, style="bold")
     p1.line("spent_on", 210, 1190, y)
-    p1.text(90, 1542, "Campaign notes", size=24, style="bold")
-    p1.line("notes1", 90, 1190, 1574, rows=2, row_h=30)
+    p1.text(90, bm + 148, "Campaign notes", size=24, style="bold")
+    p1.line("notes1", 90, 1190, bm + 180, rows=2, row_h=30)
 
     p2 = Page(2, "Campaign Log — continued")
     p2.text(PAGE_W // 2, 116, "The Knowledge Track", size=52, style="title",

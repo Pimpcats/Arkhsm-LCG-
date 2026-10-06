@@ -309,6 +309,14 @@ case("Compass second ability",function()
   expect("on the quest back it may remove 1 Memory instead",b.resources==3 and a.memory==0 and b.cardMemory==0)
   expect("and that Memory counts toward loop-power Years",tally("spent",b.id)==1)
 end)
+case("quest-gated abilities do nothing, and cost nothing, before the quest is met",function()
+  local R,P,FX,AI,T,st,new,L,calls,released,tally=fixture();local i=new("sthrseraphine")
+  local bell={name="The Bell of Ambergrove",uses=4,exhausted=false}
+  expect("the Bell's Hourglass ability needs the quest back",R.ACT.assetAbility(i,bell)==false and bell.uses==4 and not bell.exhausted and st.dissonance==0)
+  local b=new("sthrbirdie");b.resources=1
+  local compass={name="Lucky Compass",memory=0,exhausted=false};b.assets={compass}
+  expect("the Compass jump needs 2 resources or the quest back's Memory",R.ACT.assetAbility(b,compass,"jump",L)==false and not compass.exhausted and b.resources==1)
+end)
 case("cannot-be-evaded condition",function()
   local R,P,FX,AI,T,st,new=fixture();local c=new("sthrcass")
   c.cardMemory=2;R.syncMemory(c)

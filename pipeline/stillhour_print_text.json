@@ -217,7 +217,7 @@
     "text": ""
   },
   "sthr-quest-elias": {
-    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Prevent 8 damage with your investigator ability. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, What the Warden Remembers.",
+    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Prevent 5 damage with your investigator ability. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, What the Warden Remembers.",
     "flavor": "Somebody keeps the tally. It is not kept in your hand."
   },
   "sthr-questdone-elias": {
@@ -225,7 +225,7 @@
     "flavor": "Every line of it was in your own hand."
   },
   "sthr-quest-ayako": {
-    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Place a first translation token on 12 different enemies. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Translation, Finished.",
+    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Place a first translation token on 8 different enemies. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Translation, Finished.",
     "flavor": "Every language has a word it keeps back."
   },
   "sthr-questdone-ayako": {
@@ -233,7 +233,7 @@
     "flavor": "The last word was a name. You will not say it aloud."
   },
   "sthr-quest-cass": {
-    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Cancel 8 symbol tokens with your own ability or cards. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Table Remembers.",
+    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Cancel 4 symbol tokens with your own ability or cards. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Table Remembers.",
     "flavor": "Count them as they fall. Somebody always does."
   },
   "sthr-questdone-cass": {
@@ -241,7 +241,7 @@
     "flavor": "You were never the only one counting."
   },
   "sthr-quest-seraphine": {
-    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Use your investigator ability 10 times. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Price, Remembered.",
+    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Use your investigator ability 8 times. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Price, Remembered.",
     "flavor": "Nothing is given for nothing."
   },
   "sthr-questdone-seraphine": {
@@ -249,7 +249,7 @@
     "flavor": "Something has been keeping the receipts."
   },
   "sthr-quest-birdie": {
-    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Spend 10 resolve. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, She Knows the Road.",
+    "text": "Permanent. Campaign: The Still Hour.\nQuest \u2013 Spend 8 resolve. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, She Knows the Road.",
     "flavor": "Always a little further down the road."
   },
   "sthr-questdone-birdie": {

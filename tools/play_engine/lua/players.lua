@@ -379,8 +379,7 @@ return function(R, T)
   function P.seraphine(inv, choice, asset, viaDissonance)
     inv.round.sera = (inv.round.sera or 0) + 1
     if viaDissonance and inv.questUnlocked then
-      R.raise(1, "Seraphine's ability (cost)", inv)
-      T.api("shApiTally", { id = inv.id, kind = "raises", delta = 1 })
+      R.raise(1, "Seraphine's ability (cost)", inv)      -- tallied by R.raise as a paid cost
     else
       R.hurt(inv, 0, 1, "Seraphine's ability (cost)", { direct = true })
     end

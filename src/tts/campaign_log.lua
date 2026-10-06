@@ -437,7 +437,7 @@ function syncFromCampaignState(st)
           local q = (st.quest or {})[inv.id]
           if type(q) == "table" then
             put("inv" .. i .. "_quest", tonumber(q.tally) or 0)
-            if q.unlocked then tick("inv" .. i .. "_questdone") end
+            put("inv" .. i .. "_questdone", q.unlocked == true)
           end
           -- 18 Years at Between Loops step 1: aged out (Years)
           if (tonumber(years) or 0) >= 18 then tick("inv" .. i .. "_agedout") end

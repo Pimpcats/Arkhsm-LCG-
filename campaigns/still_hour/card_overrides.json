@@ -1393,31 +1393,31 @@
     "text": "You wake at First Dark with the taste of salt and the certainty that you have done this before. The others feel it too. No one in Ambergrove will believe you."
   },
   "sthr-quest-elias": {
-    "text": "Permanent. Campaign: The Still Hour.\nQuest – Prevent 8 damage with your investigator ability. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, What the Warden Remembers."
+    "text": "Permanent. Campaign: The Still Hour.\nQuest – Prevent 5 damage with your investigator ability. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, What the Warden Remembers."
   },
   "sthr-questdone-elias": {
     "text": "Permanent. Bonded (What the Warden Owes).\n[reaction] After you are dealt damage: Place 1 Memory on Elias Warde. (Limit three times per game.)\nYour Ambergrove Lamp's move may also raise Dissonance by 1 (limit once per game). If you do, that move does not place doom on the current Hour."
   },
   "sthr-quest-ayako": {
-    "text": "Permanent. Campaign: The Still Hour.\nQuest – Place a first translation token on 12 different enemies. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Translation, Finished."
+    "text": "Permanent. Campaign: The Still Hour.\nQuest – Place a first translation token on 8 different enemies. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Translation, Finished."
   },
   "sthr-questdone-ayako": {
     "text": "Permanent. Bonded (The Unfinished Translation).\n[reaction] After you succeed at an [int] test: Place 1 Memory on Dr. Ayako Sōma. (Limit twice per game.)\nA Recollection you draw with your elder sign costs 2 fewer resources to play until the end of the round.\nWhile there are 3 or more banked Memory, It Means 'Wait' may instead be played when an Hour's Forced ability (other than Hour IX's) or an attack by The Appointed against you would resolve. Cancel that ability or attack, and raise Dissonance by 1."
   },
   "sthr-quest-cass": {
-    "text": "Permanent. Campaign: The Still Hour.\nQuest – Cancel 8 symbol tokens with your own ability or cards. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Table Remembers."
+    "text": "Permanent. Campaign: The Still Hour.\nQuest – Cancel 4 symbol tokens with your own ability or cards. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Table Remembers."
   },
   "sthr-questdone-cass": {
     "text": "Permanent. Bonded (A Marked Run of Cards).\n[reaction] After you reveal a symbol token: Place 1 Memory on Cass Lindqvist. (Limit twice per game.)\nMarked Deck's second ability may instead raise Dissonance by 1 and remove 1 Memory from a card you control, instead of spending 2 resources."
   },
   "sthr-quest-seraphine": {
-    "text": "Permanent. Campaign: The Still Hour.\nQuest – Use your investigator ability 10 times. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Price, Remembered."
+    "text": "Permanent. Campaign: The Still Hour.\nQuest – Use your investigator ability 8 times. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, The Price, Remembered."
   },
   "sthr-questdone-seraphine": {
     "text": "Permanent. Bonded (The Medium's Price).\n[reaction] After you are dealt horror: Place 1 Memory on Seraphine Vale. (Limit twice per game.)\nYour investigator ability may be paid by raising Dissonance by 1 instead of taking 1 direct horror.\nThe Bell of Ambergrove gains: \"[action] Exhaust The Bell of Ambergrove, spend 1 charge and raise Dissonance by 2: Advance or rewind the Hourglass by 1 Hour. This ability cannot be triggered during the finale. (Limit once per game.)\""
   },
   "sthr-quest-birdie": {
-    "text": "Permanent. Campaign: The Still Hour.\nQuest – Spend 10 resolve. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, She Knows the Road."
+    "text": "Permanent. Campaign: The Still Hour.\nQuest – Spend 8 resolve. Keep the tally on your Campaign Log; it carries from night to night.\nWhen the tally reaches its goal: Swap this card for its bonded card, She Knows the Road."
   },
   "sthr-questdone-birdie": {
     "text": "Permanent. Bonded (Somewhere to Be).\n[reaction] After you fail a skill test by 2 or more: Place 1 Memory on \"Birdie\" Okonkwo. (Limit three times per game.)\nLucky Compass's second ability may instead remove 1 Memory from it, instead of spending 2 resources.\nWhen you play I Get Out while you control Lucky Compass, place 1 Memory on Lucky Compass."
