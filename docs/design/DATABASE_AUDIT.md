@@ -27,7 +27,7 @@ rules code).
 ## Structure
 
 Verdict: no structural defect was found that explains a native Tabletop
-Simulator stop by itself. Decks, ids, grids, `ml` memory lists, URLs (all 200
+Simulator stop by itself. Decks, ids, grids, `ml` memory lists, URLs (all 101
 hosted files exist, match their `?v=` hash, are byte-identical in the pinned
 commit and answered HTTP 200), tags, transforms and Lua syntax are clean. What
 remains is "unlike every official box" (below).
@@ -44,12 +44,16 @@ remains is "unlike every official box" (below).
 | S8 | Lexicon `uses` token `secret` (official: always `resource`; SCED's TokenManager raises on an unknown token if it ever spawns one; with `resource` and a count of 0 SCED spawns a counter) | Fixed (spec) |
 | S9 | Download box could not work: `GlobalApi` is not a global in an object's script, and SCED's menu reads only its own release | Fixed: the box fetches the campaign from the address in its GMNotes and spawns it (`src/tts/download_box.lua`); tests in the mock TTS |
 | S10 | The Place script (see PLACE_BUTTON_AUDIT.md) | Fixed |
-| S11 | Campaign log and guide lack `CameraZoom_ignore` / `CleanUpHelper_ignore` | Accepted: the owner's exports of the real objects carry neither |
+| S11 | Campaign log and guide lacked `CameraZoom_ignore` / `CleanUpHelper_ignore` (SCED's Clean Up Helper trashes every unlocked, untagged object lying in the play area) | Fixed: the guide, log, Control token and static token carry the ignore tags (90% of official logs and 55% of official guides do); the Control and the box stay locked
 | S12 | The last Hour has no `doomThreshold` (96% of official agendas have one) | Accepted: it has no doom threshold by design |
 | S13 | 25 of 202 GUIDs repeated, always as copies of one card | Fixed: each repeat of a card in a deck gets its own GUID (`compile_campaign.build_deck`). The official data shares one GUID per copy group, but Place now keeps the GUIDs a box holds and SCED keys state (which locations already spawned their clues) on them; the entire-run audit found engine games invalid on the repeats. Test: every GUID in a scenario box is unique |
 | S14 | The Control script is 217 KB (the largest script in any official box 95 KB) | Watch |
 | S15 | Minicard images 0.651 aspect (not 5:7) | Accepted: follows the official minicard export |
 | S16 | `dist/cards/sthr-campaign-log.jpg` is referenced by nothing | Accepted: kept as the record of the log's face |
+| S17 | The investigator minicards took deck ids from a hash into 99000-99899, and Seraphine's equalled a sprite sheet's id (the Fairground's): two images under one id (audit rule A10; found on the first audit of the real rebuild) | Fixed: one id per investigator from 99800 up, sheets stay below it (asserted in `pack_sheets`) |
+| S18 | The Place test's structure box showed one image where its per-card twin shows many, under the same deck ids | Fixed: its own ids (`place_test.new_deck_ids`); test |
+| S19 | The audit treated the Place test as a second campaign (cross-file comparisons, repeated cards) and compared where a card's picture sits between boxes that pack their own sheets | Fixed (tool): the Place test is a diagnostic file; a card two boxes share has a CardID in each box's sheets (info); copies are compared by content; a CardID repeated inside one box is still an error |
+| S20 | `tests/test_publish_hosted.py` deleted the repository's `dist/cards/sheets` (its stale-sheet cleanup was not redirected with `OUT`) | Fixed |
 
 ## Content
 

@@ -132,6 +132,13 @@ def _real():
         return "no SCED save at %s" % SAVE
     if not LUA:
         return "no lua5.2 installed"
+    # the engine boots SCED's own scripts from the pinned checkout (run.table_for never fetches it): a fresh
+    # checkout has none yet, so get it here (the real-SCED tests do the same) or skip
+    sys.path.insert(0, os.path.join(ROOT, "tests", "sced_real"))
+    import sced_table
+    src, why = sced_table.find_sced(allow_fetch=True)
+    if not src:
+        return "SCED source not available: %s" % why
     return None
 
 
