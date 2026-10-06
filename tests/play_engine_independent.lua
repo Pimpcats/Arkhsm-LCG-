@@ -183,7 +183,7 @@ case("Memory sources and thresholds",function()
   expect("departed asset Memory removed from aggregate",b.memory==3)
   e.questUnlocked=true;e.damage=2;e.horror=2;R.G.knowledge["the-keepers-ninth-death"]=true
   P.elderSignAfter(e,3)
-  expect("the elder sign discards 2 cards and heals 1 damage (and, on the quest back with the entry, 1 horror)",e.damage==1 and e.horror==1 and #e.deck==6 and #e.discard==2)
+  expect("the elder sign discards 2 cards and heals 1 damage (and, with the Lighthouse entry, 1 horror)",e.damage==1 and e.horror==1 and #e.deck==6 and #e.discard==2)
   e.horror=1;e.damage=0;e.deck=deckOf(8);P.elderSignAfter(e,3)
   expect("no damage to heal, no horror healed either",e.horror==1 and #e.deck==6)
 end)

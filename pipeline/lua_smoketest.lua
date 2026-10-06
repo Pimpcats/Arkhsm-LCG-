@@ -468,6 +468,36 @@ Interlude.beginNextLoop()
 check("tallies clear when the next loop begins", CampaignState.getTallies("sthrelias").raises == 0
   and Interlude.leanedOnLoop("sthrcass") == false)
 
+print("== Personal quest cards: a campaign-long tally per investigator ==")
+CampaignState.init(3)
+local goal = Constants.QUEST.sthrelias.goal
+check("every investigator has a quest card", Constants.QUEST.sthrelias and Constants.QUEST.sthrayako and Constants.QUEST.sthrcass
+  and Constants.QUEST.sthrseraphine and Constants.QUEST.sthrbirdie and true)
+check("a fresh quest is at 0 and locked", CampaignState.getQuest("sthrelias").tally == 0
+  and CampaignState.questUnlocked("sthrelias") == false and CampaignState.getQuest("sthrelias").goal == goal)
+local qt, qj = CampaignState.addQuest("sthrelias", goal - 1)
+check("short of the goal it stays locked", qt == goal - 1 and qj == false and not CampaignState.questUnlocked("sthrelias"))
+qt, qj = CampaignState.addQuest("sthrelias", 1)
+check("meeting the goal unlocks it once", qt == goal and qj == true and CampaignState.questUnlocked("sthrelias"))
+qt, qj = CampaignState.addQuest("sthrelias", 3)
+check("past the goal it does not unlock again", qt == goal + 3 and qj == false)
+check("a tally never goes below 0", CampaignState.addQuest("sthrcass", -5) == 0)
+check("an investigator with no quest is ignored", CampaignState.addQuest("someoneelse", 1) == nil)
+check("tallies are per investigator", CampaignState.getQuest("sthrayako").tally == 0 and not CampaignState.questUnlocked("sthrayako"))
+check("a table correction can take a quest back or unlock one", CampaignState.setQuestUnlocked("sthrayako", true) == true
+  and CampaignState.questUnlocked("sthrayako") and CampaignState.setQuestUnlocked("sthrayako", false) == false)
+local qblob = CampaignState.serialize()
+CampaignState.init(3) ; CampaignState.deserialize(qblob)
+check("quests survive save/load", CampaignState.getQuest("sthrelias").tally == goal + 3 and CampaignState.questUnlocked("sthrelias"))
+CampaignState.reset()
+check("a reset never clears a quest", CampaignState.getQuest("sthrelias").tally == goal + 3 and CampaignState.questUnlocked("sthrelias"))
+Interlude.beginNextLoop()
+check("nor does the next loop", CampaignState.questUnlocked("sthrelias"))
+CampaignState.raw().quest = nil
+local legacy = CampaignState.serialize()
+CampaignState.init(3) ; CampaignState.deserialize(legacy)
+check("a save made before quest cards loads with empty quests", CampaignState.getQuest("sthrelias").tally == 0)
+
 print("== Board wiring: SCED adapter is inert without SCED ==")
 local SCED = require("StillHour/SCED")
 check("SCED absent offline", SCED.isPresent() == false)

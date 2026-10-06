@@ -146,11 +146,15 @@ doom and deck size are in `docs/design/CAMPAIGN_DESIGN_LESSONS.md` section 1):
 - player cards, signature weaknesses;
 - investigators: front, back with deckbuilding and a spoiler-free background
   story, and minicards.
-- **portable investigators** (docs/design/CAMPAIGN_DESIGN_LESSONS.md, guideline
-  13): strike every reference to the campaign's own trackers from each
-  investigator front and signature card; each ability and elder sign must
-  still do something and each weakness must still hurt. Record the result in
-  the audit.
+- **portable investigators** (docs/design/CAMPAIGN_DESIGN_LESSONS.md, guidelines
+  13-15): strike every reference to the campaign's own trackers from each
+  investigator front, signature card and weakness; each ability and elder sign
+  must still do something and each weakness must still hurt. The campaign hooks
+  live on one Permanent **personal quest card** per investigator (tally on the
+  log, bonded unlocked card). Price abilities in direct horror/damage, and
+  review each investigator's whole deckbuilding pool for loops
+  (docs/design/DECKBUILDING_REVIEW.md, with a status for each risk). Record the
+  result in the audit.
 
 ## 6. Balance (simulate before the table)
 

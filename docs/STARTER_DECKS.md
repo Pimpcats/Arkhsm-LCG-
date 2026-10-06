@@ -23,7 +23,7 @@ Birdie and Seraphine have no suggested list here.
 
 **Deckbuilding options:** Guardian cards, Neutral cards, up to 5 Survivor cards (level 0-2).
 
-**Strategy:** A front-line fighter and healer. Weapons and allies carry the fighting, Dodge and First Aid keep you standing, and the five Survivor cards (Lucky!, Perseverance, Leather Coat) are insurance for bad tests.
+**Strategy:** A front-line fighter who shields the party with his deck. When damage would land on anyone at his location, he discards up to 3 cards from the top of his deck to prevent it, so the five Survivor slots are cards that like a full discard pile: Improvised Weapon and Improvised Shield are played from it, and Scrounge for Supplies brings a level 0 card back. Weapons and allies carry the fighting, Dodge and First Aid keep you standing. Watch the deck: spending 3 cards on a bad round is fine, but an empty deck costs horror and Elias has only 5 sanity.
 
 | Qty | Card | Type | Class | Cost | Pack |
 |---|---|---|---|---|---|
@@ -33,31 +33,32 @@ Birdie and Seraphine have no suggested list here.
 | 2 | Medical Student | Asset | Guardian | 2 | Edge of the Earth Investigator Expansion |
 | 2 | Physical Training | Asset | Guardian | 2 | Core Set |
 | 2 | Survival Knife | Asset | Guardian | 2 | The Forgotten Age |
-| 1 | Leather Coat | Asset | Survivor | 0 | Core Set |
+| 1 | Improvised Shield | Asset | Survivor | 1 | The Scarlet Keys Investigator Expansion |
 | 2 | "Get behind me!" | Event | Guardian | 0 | Edge of the Earth Investigator Expansion |
 | 2 | Dodge | Event | Guardian | 1 | Core Set |
 | 2 | Evidence! | Event | Guardian | 1 | Core Set |
 | 1 | Heroic Rescue | Event | Guardian | 1 | Echoes of the Past |
 | 2 | Emergency Cache | Event | Neutral | 0 | Core Set |
-| 2 | Lucky! | Event | Survivor | 1 | Core Set |
-| 2 | Perseverance | Event | Survivor | 2 | Threads of Fate |
+| 2 | Improvised Weapon | Event | Survivor | 1 | The Forgotten Age |
+| 2 | Scrounge for Supplies | Event | Survivor | 0 | A Thousand Shapes of Horror |
 | 2 | Vicious Blow | Skill | Guardian | - | Core Set |
 | 2 | Guts | Skill | Neutral | - | Core Set |
 
 30 cards: 13 assets, 13 events, 4 skills.
 
-**Packs.** 11 of the 16 different cards are in the Core Set (or Core Set 2026). The rest come from:
+**Packs.** 9 of the 16 different cards are in the Core Set (or Core Set 2026). The rest come from:
 
-- The Forgotten Age: Survival Knife
+- The Forgotten Age: Survival Knife, Improvised Weapon
 - Edge of the Earth Investigator Expansion: Medical Student, "Get behind me!"
 - Echoes of the Past: Heroic Rescue
-- Threads of Fate: Perseverance
+- A Thousand Shapes of Horror: Scrounge for Supplies
+- The Scarlet Keys Investigator Expansion: Improvised Shield
 
 ## Dr. Ayako Sōma (Seeker)
 
 **Deckbuilding options:** Seeker cards, Neutral cards, up to 5 Mystic cards (level 0-2).
 
-**Strategy:** A clue-gatherer. Magnifying Glass, Hyperawareness and the Research Librarian pull clues fast, Working a Hunch and Deduction finish tests, and the Mystic wards (Holy Rosary, Ward of Protection) cover your sanity.
+**Strategy:** A clue-gatherer who can fight when she must. Any success with an enemy at her location tags it with a translation token, and she can attack or evade a tagged enemy with her intellect, so spare actions go to whichever the moment needs; her damage stays low, so bring a weapon or two from the Mystic slots. Magnifying Glass, Hyperawareness and the Research Librarian pull clues fast, Working a Hunch and Deduction finish tests, and the Mystic wards (Holy Rosary, Ward of Protection) cover your sanity.
 
 | Qty | Card | Type | Class | Cost | Pack |
 |---|---|---|---|---|---|
@@ -92,7 +93,7 @@ Birdie and Seraphine have no suggested list here.
 
 **Deckbuilding options:** Rogue cards, Neutral cards, up to 5 cards of any other class (level 0).
 
-**Strategy:** A quick, cheap, slippery clue-thief. Burglary and Pickpocketing keep resources and cards coming, Sneak By, Elusive and Dodge keep you out of fights, and Sneak Attack and Backstab deal with what does catch you.
+**Strategy:** A quick, cheap, slippery clue-thief who earns resources from the chaos bag (a symbol token during a test pays 1) and can spend 2 to cancel the symbol she fears. Burglary and Pickpocketing keep resources and cards coming, Sneak By, Elusive and Dodge keep you out of fights, and Sneak Attack and Backstab deal with what does catch you.
 
 | Qty | Card | Type | Class | Cost | Pack |
 |---|---|---|---|---|---|

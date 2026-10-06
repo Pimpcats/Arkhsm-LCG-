@@ -433,6 +433,12 @@ function syncFromCampaignState(st)
         if i then
           if fresh then put("inv" .. i .. "_name", inv.name) end
           put("inv" .. i .. "_years", tonumber(years) or 0)
+          -- the personal quest card: its tally, and whether it has been met (swapped)
+          local q = (st.quest or {})[inv.id]
+          if type(q) == "table" then
+            put("inv" .. i .. "_quest", tonumber(q.tally) or 0)
+            if q.unlocked then tick("inv" .. i .. "_questdone") end
+          end
           -- 18 Years at Between Loops step 1: aged out (Years)
           if (tonumber(years) or 0) >= 18 then tick("inv" .. i .. "_agedout") end
           local br = (st.brackets or {})[inv.id]

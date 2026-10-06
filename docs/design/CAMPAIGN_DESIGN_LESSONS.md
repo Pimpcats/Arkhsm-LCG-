@@ -199,20 +199,41 @@ Rules of thumb that follow from it:
     locations): reward thorough play without punishing a first play.
 13. **Investigators must work outside the campaign** (every official
     campaign). New investigators fit the campaign's theme, but their
-    abilities, elder signs and signature cards use only core-game concepts
-    and tokens on their own cards, so they are playable in any campaign. A
-    campaign's own tracker (Dissonance, an hourglass, banked Memory, the
-    Campaign Log) may appear only as a bonus clause that fails harmlessly
-    ("if", "while") or as a cost that has a core-game fallback on the same
-    card, never as the only way the kit works. Campaign-flavoured player
-    cards (Recollections here) may lean on the tracker, but each still has a
-    usable base effect. Test: strike every reference to the campaign's
-    trackers from the investigator front and every signature card. Each
-    ability and elder sign must still do something useful and each weakness
-    must still hurt. Fix any that do not. The Still Hour's audit (2026-10-03)
-    found two investigators that failed (Seraphine's cost and elder sign ran
-    on Dissonance; Ayako's Memory had no use of its own) and two weaknesses
-    that went dead (Untranslatable, The Debt of Hours).
+    abilities, elder signs, signature cards and weaknesses use only
+    core-game concepts and tokens named on their own cards (a translation
+    token, resolve), so they are playable in any campaign. Nothing on an
+    investigator front or a signature card may name the campaign's trackers
+    (Dissonance, an hourglass, banked Memory, the Campaign Log), not even as a
+    harmless bonus. The campaign hooks move to a **personal quest card**: one
+    Permanent card per investigator (a requirement printed on the back, no
+    slot, not counted toward deck size) with a quest to be met by playing the
+    investigator's own style and a tally kept on the Campaign Log across the
+    whole campaign. Meeting it swaps the card for its bonded unlocked card,
+    which carries the Memory income and every clause that touches the
+    trackers. Test: strike every campaign reference from the investigator
+    front, every signature card and every weakness. Each ability and elder
+    sign must still do something useful and each weakness must still hurt.
+    The Still Hour's first audit (2026-10-03) found two investigators that
+    failed (Seraphine's cost and elder sign ran on Dissonance; Ayako's Memory
+    had no use of its own) and two weaknesses that went dead (Untranslatable,
+    The Debt of Hours).
+14. **Price an ability in something nobody can soak.** A cost of "take 1
+    horror" may be reassigned to an Ally and still counts as paid (Rules
+    Reference, Dealing Damage/Horror), and most pools hold dozens of Allies
+    with sanity. Write "take 1 direct horror", as official investigators who
+    pay horror do. Check every damage or horror cost, and every prevention,
+    the same way.
+15. **Review every investigator's whole pool for loops before the build.**
+    Pull every card the deckbuilding options allow (class and level ranges
+    from the card library), search them for recursion, prevention stacking,
+    deck and discard engines, token control and extra actions, and write down
+    each risk with a status (fixed, accepted, watch) in
+    docs/design/DECKBUILDING_REVIEW.md. The Still Hour's review found one
+    broken loop (a recurrable "you are not defeated" card: it now removes
+    itself from the game), one unpaid cost (the ally soak above) and four
+    combinations to watch in the simulation. Recursion and prevention are the
+    usual culprits; anything that returns a card from the discard pile needs
+    a once-per-round limit or a currency the investigator cannot farm.
 
 ## 6. Pre-brief checklist
 

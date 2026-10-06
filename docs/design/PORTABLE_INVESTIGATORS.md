@@ -1,92 +1,86 @@
-# Portable investigators (proposal, 2026-10-03)
+# Portable investigators (built 2026-10-06)
 
-Designer-facing; contains rules text. Status: **proposal, not yet in the cards or
-the engine.** Rule (CAMPAIGN_DESIGN_LESSONS.md, guideline 13, tightened): an
+Designer-facing; contains rules text. Status: **built on the branch, not
+published.** Rule (CAMPAIGN_DESIGN_LESSONS.md, guidelines 13-15): an
 investigator, their signature cards and their weaknesses use only core-game
 concepts (resources, cards, clues, damage, horror, doom, skill values, chaos
 tokens) and tokens named on their own cards. No Memory, Dissonance, Hourglass,
 Hours, loops, Recollections or Campaign Log. They then work in any campaign.
-The campaign flavour moves to one **personal quest card** per investigator,
+The campaign flavour is on one **personal quest card** per investigator,
 unlocked in this campaign only.
 
-## Revision 2 (2026-10-05): proposed fronts, awaiting owner approval
-
 Owner direction applied: keep Cass; Seraphine once per round; no once-per-game
-abilities; every ability and elder sign unique against the official
-investigators (checked against library/cards/player/*/investigators.md) and
-independent of card level (deckbuilding stays level 0–5). Elias, Ayako and
-Birdie are new designs; the first-proposal fronts below are superseded.
-Tokens are named on the investigator's own card, so nothing needs the campaign.
+abilities on an investigator; every ability and elder sign unique against the
+official investigators (checked against library/cards/player/*/investigators.md)
+and independent of card level (deckbuilding stays level 0-5); Elias leans on
+the Survivor discard cards; Ayako can investigate or fight on any turn; Birdie
+kept.
+
+## Investigator fronts (as printed)
 
 - **Elias Warde (Guardian).** [reaction] When damage would be dealt to you or another investigator at your location: Discard up to 3 cards from the top of your deck. Prevent 1 of that damage for each card discarded. (Limit once per round.) Elder: +1. You may discard the top 2 cards of your deck. If you do, this token is +3 instead and heal 1 damage from an investigator at your location.
-- **Dr. Ayako Sōma (Seeker).** [reaction] After you succeed at a skill test while an enemy is at your location: Place 1 translation token on an enemy at your location. (Limit once per round.) While attacking or evading an enemy that has 1 or more translation tokens, you may use your [intellect] in place of your [combat] or [agility]. Elder: +2. Place 1 translation token on an enemy at your location; if there is none, draw 1 card.
-- **Cass Lindqvist (Rogue), unchanged from the first proposal except that the reaction now names skill tests.** [free] Spend 2 resources: name a symbol token (not auto-fail); the next time you reveal it this round, cancel it (once per round). [reaction] After you reveal a symbol token during a skill test: gain 1 resource (once per round). Elder: +1, gain 2 resources.
-- **"Birdie" Okonkwo (Survivor).** [reaction] After you fail a skill test: Place 1 resolve on Birdie. (Limit twice per round.) [free] During your turn, remove 2 resolve from Birdie: Return an event from your discard pile to your hand. (Limit once per round.) Elder: +1. If you have failed a skill test this round, this token is +3 instead.
-- **Seraphine Vale (Mystic).** [free] During your turn, take 1 direct horror: choose one – +2 skill value for this test; gain 1 additional action; or ready a Spell asset you control. (Limit once per round.) Elder: +2. You may take 1 direct horror. If you do, ready a Spell asset you control. (The first proposal's "+X, X = horror on you" is dropped: it is Agnes Baker's official elder sign.)
+- **Dr. Ayako Sōma (Seeker).** [reaction] After you succeed at a skill test while an enemy is at your location: Place 1 translation token on an enemy at your location. (Limit once per round.) While attacking or evading an enemy that has 1 or more translation tokens, you may use your [int] in place of your [com] or [agi]. Elder: +2. Place 1 translation token on an enemy at your location. If there is none, draw 1 card.
+- **Cass Lindqvist (Rogue).** [free] Spend 2 resources: Name a symbol token other than [autofail]. The next time you reveal that symbol during a skill test this round, cancel it. (Limit once per round.) [reaction] After you reveal a symbol token during a skill test: Gain 1 resource. (Limit once per round.) Elder: +1. Gain 2 resources.
+- **"Birdie" Okonkwo (Survivor).** [reaction] After you fail a skill test: Place 1 resolve on "Birdie". (Limit twice per round.) [free] During your turn, remove 2 resolve from "Birdie": Return an event from your discard pile to your hand. (Limit once per round.) Elder: +1. If you have failed a skill test this round, this token is +3 instead.
+- **Seraphine Vale (Mystic).** [free] During your turn, take 1 direct horror: Choose one – +2 skill value for this test; gain 1 additional action; or ready a Spell asset you control. (Limit once per round.) Elder: +2. You may take 1 direct horror. If you do, ready a Spell asset you control.
 
-Official overlap check, by ability:
+Uniqueness against the official investigators, by ability:
 
-| Ability | Closest official | Why it is distinct |
+| Ability | Closest official | Why it is distinct | Status |
+|---|---|---|---|
+| Elias, deck discarded to prevent damage | Survivors who may be assigned damage meant for allies or others | No official investigator spends deck cards to prevent damage; his prevents, theirs reassigns | Built |
+| Ayako, translation tokens and [int] for attack/evade | Survivor that seals bless/curse on an evaded enemy; Mind over Matter (a card) | Her own tokens, placed by successes, and a stat swap no investigator has | Built |
+| Birdie, resolve from failures to return events | Seeker/Mystic play of Spell/Insight from discard; Survivor skill recursion for horror | Failure currency; any event; returned to hand, not played | Built |
+| Birdie elder, +3 after a failure this round | none found | unique | Built |
+| Seraphine, direct horror for one of three effects | Agnes Baker (horror triggers); Rogues that spend resources for an extra action | Horror is the price, the buyer picks the effect | Built |
+| Seraphine elder, take 1 direct horror to ready a Spell | none found | unique (the first draft's "+X for horror on you" was Agnes Baker's elder sign) | Built |
+
+## Signature cards and weaknesses (as printed)
+
+| Card | Text (changes from the first campaign build) | Status |
 |---|---|---|
-| Elias, deck discarded to prevent damage | Survivors who may be assigned damage meant for allies or others | No official investigator spends deck cards to prevent damage; his ability prevents, theirs reassigns |
-| Ayako, translation tokens and [intellect] for attack/evade (any success tags an enemy, so she can fight or evade the next action) | Survivor that seals bless/curse on an evaded enemy; Mind over Matter (a card) | Her own tokens, placed by successes, and a stat swap no investigator has |
-| Birdie, resolve from failures to return events | Seeker/Mystic play of Spell/Insight from discard; Survivor skill recursion for horror | Failure currency; any event; returned to hand, not played |
-| Birdie elder, +3 after a failure this round | none found | unique |
-| Seraphine, horror for one of three effects | Agnes Baker (horror triggers); Rogues that spend resources for an extra action | Horror is the price, the buyer picks the effect |
-| Seraphine elder, take 1 horror to ready a Spell | none found | unique |
-
-Signature cards and weaknesses follow from these fronts (the table below is
-the first proposal and is being updated: no once-per-game clauses, nothing
-that needs the campaign, each tied to its investigator's new tokens where
-that helps). The five personal quests tally the new verbs: Elias prevents 8
-damage; Ayako places 8 translation tokens; Cass cancels 8 symbol tokens;
-Birdie spends 10 resolve; Seraphine uses her ability 10 times.
-
-## Investigator fronts (first proposal, superseded above)
-
-- **Elias Warde (Guardian).** [reaction] When another investigator at your location would be dealt non-direct damage: it is dealt to you instead (once per round). [reaction] After an enemy attack deals you damage: draw 1 card (once per round). Elder: +1; with 3 or more damage on you, +3 instead and heal 1 damage.
-- **Dr. Ayako Sōma (Seeker).** [reaction] After you succeed at an [int] test by 2 or more: draw 1 card or gain 2 resources (once per round). Elder: +2, draw 1 card.
-- **Cass Lindqvist (Rogue).** [free] Spend 2 resources: name a symbol token (not auto-fail); the next time you reveal it this round, cancel it (once per round). [reaction] After you reveal a symbol token: gain 1 resource (once per round). Elder: +1, gain 2 resources.
-- **"Birdie" Okonkwo (Survivor).** [reaction] After you fail a test by 2 or more: place 1 resolve on her (once per round). [reaction] When you would fail a test (even by auto-fail), remove 3 resolve: succeed by 0 instead (once per game). Elder: +1, or +3 if you have failed a test this round.
-- **Seraphine Vale (Mystic).** [free] During your turn, take 1 horror: +2 skill value for this test, or 1 additional action, or ready a Spell (twice per round). Elder: +X, X = horror on you (maximum +3).
-
-## Signature cards and weaknesses (core-only text)
-
-| Card | New text (changes only) |
-|---|---|
-| Ambergrove Lamp | drop the Dissonance clause; keep +1 agility to evade and the look/move action |
-| I've Done This Before | "during this game" |
-| The Eighth Grave (weakness) | Revelation: test willpower (3); take 1 damage for each point you fail by (maximum 3) |
-| Lexicon of the Hour | unchanged except "once per game" |
-| It Means 'Wait' | first clause only (cancel a treachery, take 1 horror) |
-| Untranslatable (weakness) | Revelation: take 2 horror; −2 intellect until the end of the round |
-| Marked Deck | second ability costs 2 resources instead of Dissonance and Memory |
-| The House Always Wins | cannot be evaded while Cass has the most resources; after its attack deals damage, that investigator discards 2 resources |
-| Bell of Ambergrove | 4 charges; evade with willpower and heal 1 horror; second ability removed |
-| I Remember the Ending | test willpower (3); look at the top 3 encounter cards, bottom any, rest on top in any order |
-| The Debt of Hours (weakness) | Revelation: take 2 horror and place 1 doom on the current agenda |
-| Lucky Compass | second ability: spend 2 resources, move to any revealed location with no enemy |
-| I Get Out | drop the Compass Memory clause; "once per game" |
-| Nobody Believes Her, Seen This Hand Before | unchanged |
+| Ambergrove Lamp | the Dissonance clause is gone; +1 [agi] to evade, the look-and-move action stays | Built |
+| I've Done This Before | "during this game" | Built |
+| The Eighth Grave (weakness) | Revelation: test [wil] (3); for each point you fail by (maximum 3), take 1 damage | Built |
+| Lexicon of the Hour | its cancel clause is once per round (its 2-secret cost already gates it) | Built |
+| It Means 'Wait' | first clause only (cancel a treachery, take 1 horror) | Built |
+| Untranslatable (weakness) | Revelation: take 2 horror; remove each translation token from each enemy | Built |
+| Marked Deck | second ability costs 2 resources (limit once per game, a game is one scenario) | Built |
+| The House Always Wins | cannot be evaded while Cass has more resources than each other investigator; after its attack deals damage, that investigator discards 2 resources | Built |
+| Bell of Ambergrove | 4 charges; evade with willpower and heal 1 horror; the second ability moved to the quest back | Built |
+| I Remember the Ending | test [wil] (3); look at the top 3 encounter cards, bottom 1, rest on top in any order (max once per game) | Built |
+| The Debt of Hours (weakness) | Revelation: take 2 horror and place 1 doom on the current agenda | Built |
+| Lucky Compass | second ability: spend 2 resources, move to any revealed location with no enemy | Built |
+| I Get Out | "Remove I Get Out from the game" replaces "max once per game", so Birdie's recursion can never return it (it would be unlimited life) | Built |
+| Nobody Believes Her, Seen This Hand Before | unchanged | Built |
 
 ## Personal quest cards (this campaign only)
 
-Each investigator has one **Permanent** quest card (no slot, does not count
-toward deck size) in their campaign deck from the start, showing a quest and a
-tally to keep on the Campaign Log across nights. Meeting the quest flips it to
-its unlocked side, which carries what used to be the campaign hooks (Memory
-placement, Dissonance and Hourglass ties). Quests are met by playing the
-investigator's own style, so they need no scenario hooks:
+Each investigator has two cards, both Permanent (no slot, not counted toward
+deck size): a **quest card**, listed in the deckbuilding requirements on the
+investigator's back, and its **bonded unlocked card**, taken from the Player
+Cards bag when the quest is met (the swap is the official bonded pattern, as
+with the Resolute cards). The tally is kept on the investigator card's **Quest**
+button, mirrored on the Campaign Log's panel (counter and "met" box) and in the
+Control token's state. A reset never clears it. Until the swap, none of the
+unlocked clauses apply.
 
-| Investigator | Quest (tally across the campaign) | Unlocked side adds |
-|---|---|---|
-| Elias | take 8 damage for other investigators | Memory when dealt damage (twice per loop); a Dissonance tie on the Lamp |
-| Ayako | succeed at 10 [int] tests by 2 or more | Memory on [int] successes (twice per loop); Recollections cost 2 less after her elder sign |
-| Cass | cancel 8 symbol tokens | Memory per symbol token revealed (twice per loop); Marked Deck seals Memory-priced number tokens |
-| Birdie | spend resolve to succeed 3 times | Memory when she fails by 2 or more; the Compass reaches Knowledge districts |
-| Seraphine | use her ability 10 times | Dissonance may pay for her ability; Memory when she is dealt horror; the Bell moves the Hourglass |
+| Investigator | Quest card | Goal (tally across the campaign) | Unlocked card | What it carries |
+|---|---|---|---|---|
+| Elias | What the Warden Owes | prevent 8 damage with his ability | What the Warden Remembers | 1 Memory when dealt damage (three times per game); the Lamp's move may raise Dissonance by 1 so it places no doom |
+| Ayako | The Unfinished Translation | first translation token on 12 different enemies | The Translation, Finished | 1 Memory on an [int] success (twice per game); Recollections drawn by her elder sign cost 2 less; It Means 'Wait' also reaches Hour text and The Appointed's attack |
+| Cass | A Marked Run of Cards | cancel 8 symbol tokens with her own ability or cards | The Table Remembers | 1 Memory per symbol reveal (twice per game); Marked Deck may pay Dissonance and Memory instead of 2 resources |
+| Birdie | Somewhere to Be | spend 10 resolve | She Knows the Road | 1 Memory when she fails by 2 or more (three times per game); Lucky Compass may remove 1 Memory instead of spending 2 resources; I Get Out places 1 Memory on the Compass |
+| Seraphine | The Medium's Price | use her ability 10 times | The Price, Remembered | 1 Memory when dealt horror (twice per game); Dissonance may pay for her ability; the Bell may advance or rewind the Hourglass |
 
-Open work if approved: quest card art and fronts, a quest row on the Campaign
-Log and Control, engine and AI support, Memory-income rebalancing so every
-party stays inside 35–45 XP (the reactions that supply most of it move onto the
-quest cards), the whole-campaign difficulty check, guide, tests, publish.
+The goals are first values: the whole-campaign measurements in
+docs/design/FINISHING_BALANCE.md (section "Quest cards, 2026-10-06") set them.
+The Lighthouse act's own text still heals 1 horror with Elias's elder sign once
+"The Keeper's Ninth Death" is recorded; that text is on the scenario card, not
+on a quest card.
+
+## Art
+
+Ten quest-card faces are briefed in pipeline/art_manifest.json (scene prompts,
+no characters) and render with placeholder art until the art is generated and
+registered. No image tool was available when they were built.

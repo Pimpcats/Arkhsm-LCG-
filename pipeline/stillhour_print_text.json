@@ -221,7 +221,7 @@
     "flavor": "Somebody keeps the tally. It is not kept in your hand."
   },
   "sthr-questdone-elias": {
-    "text": "Permanent. Bonded (What the Warden Owes).\n[reaction] After you are dealt damage: Place 1 Memory on Elias Warde. (Limit three times per game.)\nYour Ambergrove Lamp's move may also raise Dissonance by 1 (limit once per game). If you do, that move does not place doom on the current Hour.\nIf your Campaign Log records The Keeper's Ninth Death, when your elder sign heals damage from you, it also heals 1 horror from you.",
+    "text": "Permanent. Bonded (What the Warden Owes).\n[reaction] After you are dealt damage: Place 1 Memory on Elias Warde. (Limit three times per game.)\nYour Ambergrove Lamp's move may also raise Dissonance by 1 (limit once per game). If you do, that move does not place doom on the current Hour.",
     "flavor": "Every line of it was in your own hand."
   },
   "sthr-quest-ayako": {

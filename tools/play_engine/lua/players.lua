@@ -488,8 +488,8 @@ return function(R, T)
       for _ = 1, 2 do inv.discard[#inv.discard + 1] = table.remove(inv.deck) end
       local t = R.AI.mostHurtHere(inv)
       if t and t.damage > 0 then
-        local knows = inv.questUnlocked and R.knows("the-keepers-ninth-death")
-        R.heal(t, 1, (knows and t == inv and inv.horror > 0) and 1 or 0)
+        -- the Lighthouse's act (The Keeper's Ninth Death): his [elder] heal also heals 1 horror
+        R.heal(t, 1, R.knows("the-keepers-ninth-death") and 1 or 0)
       end
     elseif inv.id == "sthrayako" then
       local en = P.translateTarget(inv)

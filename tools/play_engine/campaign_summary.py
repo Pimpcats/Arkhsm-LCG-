@@ -59,7 +59,7 @@ def summarize(games):
         by[g["campaign_seed"]].append(g)
     campaigns = len(by)
     out = {"campaigns": campaigns, "slots": {}, "xp": {}, "quest": {}, "defeats": collections.Counter(),
-           "memory_sources": collections.Counter(), "players": None}
+           "memory_sources": collections.Counter(), "players": None, "usage": {}}
     slot_games = collections.defaultdict(list)
     xp = []
     for seed, slots in by.items():
@@ -88,6 +88,13 @@ def summarize(games):
                 out["memory_sources"][why] += n
             for who, rnd in (m.get("quest_unlocked") or {}).items():
                 out["quest"].setdefault(who, []).append(slot)
+    # how often the new abilities fire, per played slot (the Prologue included)
+    all_games = [g for gs in slot_games.values() for g in gs]
+    for key, label in (("prevented", "damage prevented by Elias"), ("translations", "translation tokens placed"),
+                       ("recurred", "events returned by Birdie"), ("reshuffles", "deck reshuffles (empty deck)")):
+        vals = [(g.get("metrics") or {}).get(key) or 0 for g in all_games]
+        if any(vals):
+            out["usage"][label] = statistics.mean(vals)
     # a campaign that ended early counts its unplayed slots as lost
     per_slot = []
     for slot in range(1, 11):
@@ -115,6 +122,8 @@ def render(s, title=""):
         for who, slots in sorted(s["quest"].items()):
             lines.append("  %-14s %.1f / %d / %d   (%d of %d campaigns)" %
                          (who, statistics.mean(slots), min(slots), max(slots), len(slots), s["campaigns"]))
+    if s["usage"]:
+        lines.append("per played slot: " + "; ".join("%s %.1f" % (k, v) for k, v in s["usage"].items()))
     if s["defeats"]:
         lines.append("slots with a defeat, by investigator: " + ", ".join("%s %d" % kv for kv in sorted(s["defeats"].items())))
     top = s["memory_sources"].most_common(8)

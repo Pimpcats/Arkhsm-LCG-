@@ -208,23 +208,23 @@ def _pages():
     p1.checkbox("act3", x, y, "The Last Hour available", group="act")
 
     p1.header(468, "Investigators")
-    panels = [(80, 500), (660, 500), (80, 894), (660, 894)]
+    panels = [(80, 500), (660, 500), (80, 934), (660, 934)]
     for i, (px, py) in enumerate(panels, start=1):
         _investigator_panel(p1, i, px, py)
 
-    p1.header(1314, "Banked Memory")
-    y = 1368
+    p1.header(1394, "Banked Memory")
+    y = 1448
     p1.text(90, y, "Banked Memory", size=24, style="bold")
     p1.counter("banked", 300, y - 9, 0, 99)
     p1.text(345, y, "(cap 10 × investigators after spending; never below 0)",
             size=20, style="italic", fill=SOFT)
     p1.text(900, y, "Spent this interlude", size=24, style="bold")
     p1.counter("spent", 1150, y - 9, 0, 99)
-    y = 1424
+    y = 1498
     p1.text(90, y, "Spent on:", size=24, style="bold")
     p1.line("spent_on", 210, 1190, y)
-    p1.text(90, 1474, "Campaign notes", size=24, style="bold")
-    p1.line("notes1", 90, 1190, 1512, rows=2, row_h=34)
+    p1.text(90, 1542, "Campaign notes", size=24, style="bold")
+    p1.line("notes1", 90, 1190, 1574, rows=2, row_h=30)
 
     p2 = Page(2, "Campaign Log — continued")
     p2.text(PAGE_W // 2, 116, "The Knowledge Track", size=52, style="title",
@@ -390,15 +390,19 @@ def _investigator_panel(p, i, px, py):
     x = p.checkbox("inv{}_dwil".format(i), x, y, "+1 [wil]", size=20)
     p.checkbox("inv{}_dint".format(i), x, y, "+1 [int]", size=20)
     y += 42
+    p.text(x0, y, "Quest", size=22, style="bold")
+    p.counter("inv{}_quest".format(i), x0 + 100, y - 8, 0, 99)
+    p.checkbox("inv{}_questdone".format(i), x0 + 142, y, "met: swap the quest card", size=20)
+    y += 54
     p.text(x0, y, "Recollections", size=22, style="bold")
     p.line("inv{}_recollections".format(i), x0 + 150, x1, y, rows=2, row_h=32)
-    y += 32 + 50
+    y += 32 + 36
     x = p.checkbox("inv{}_agedout".format(i), x0, y, "Aged out", size=20)
     p.text(x, y, "Finale:", size=20, style="bold")
     p.line("inv{}_deadloop".format(i), x + 80, x1, y)
 
 
-PANEL_H = 374
+PANEL_H = 414
 
 
 # ---------------------------------------------------------------- render --
