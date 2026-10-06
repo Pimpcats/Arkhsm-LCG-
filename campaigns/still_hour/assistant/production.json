@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "campaign": "still_hour",
-  "stage": "portable_investigators_built_offline_validated_awaiting_live_playtest",
+  "stage": "place_rebuild_and_flow_audits_built_offline_validated_awaiting_live_playtest",
   "owner_preferences": {
     "minimal_manual_work": true,
     "first_time_player": true,
@@ -11,9 +11,9 @@
   },
   "validation": {
     "current_effective_cards": 133,
-    "built_card_records": 143,
-    "hosted_card_images": 200,
-    "guide_pages": 24,
+    "built_card_records": 153,
+    "hosted_card_images": 210,
+    "guide_pages": 40,
     "scenarios_locked": 8,
     "scenario_readiness_errors": 0,
     "scenario_readiness_warnings": 0,
@@ -21,14 +21,14 @@
     "objectives_feasible_1_to_4_investigators": true,
     "lua_rules_tests": "309/309 each on Lua 5.2 and 5.4 (re-run 2026-10-02)",
     "play_engine_regressions": "7 fixtures, 652 checks each on Lua 5.2 and 5.4",
-    "pytest": "115 passed, 2 skipped (optional render test; other-campaign audit when Still Hour is selected), 155 subtests passed; also passes with CAMPAIGN set to a scaffolded campaign",
+    "pytest": "300 passed, 2 skipped, 165 subtests in the working tree with the cached official data (the real SCED 4.9.2 suites); 281 passed, 21 skipped, 165 subtests in a clean checkout (those suites skip there) (2026-10-06)",
     "verify_bundle": "OK on Lua 5.2 and 5.4 (re-run 2026-10-02); current built bundle",
     "cardforge_selftest": "20 passed, 0 failed, sandboxed (re-run 2026-10-02); owner-only golden prompts unavailable",
     "independent_review": "3 independent reviewers; no remaining blocker in their recorded scopes",
     "scenario_audit": "8/8 locked, 0 errors, 0 warnings",
     "godot": "4.7.2: three real-SCED emulator scenes rendered, exit0, no scene/script errors",
     "godot_limits": "Two-round scenes; one nonvisual SCED sound/effect bundle has no mesh renderer. Campaign raw assets seeded from hash-verified local bytes matching the immutable GitHub commit.",
-    "hosted_asset_commit": "edb319dc44156898bd22b8f11382d4e94e8fd485",
+    "hosted_asset_commit": "096328c8b56c5c7109543e7a2206f65878ac34d6",
     "immutable_remote_assets_verified": true,
     "full_renderer_run": true,
     "art_missing": 0,
@@ -74,7 +74,9 @@
     "tts_relay_latest": "Historical 89/89 on 5bb290d; current build has not run on the owner PC",
     "tests_leave_checkout_clean": true,
     "art_complete": true,
-    "campaign_log_hidden_names": "implemented: unearned names stay hidden on the log until ticked"
+    "campaign_log_hidden_names": "implemented: unearned names stay hidden on the log until ticked",
+    "database_audit": "python3 tools/audit_database.py: 0 ERROR, 6 WARN, 49 INFO on the rebuilt dist; 101 hosted images byte-identical in the pinned commit 096328c and answering HTTP 200 (--online)",
+    "place": "scenario-box Place rewritten on a native copy with SCED's own takeObject step (4 textures per box); real-table suites place_state (three layouts, tracker reset, Recall, Clear Board), control_flow and hour_doom pass; Place test with five boxes built; NOT run in real Tabletop Simulator"
   },
   "evidence": [
     "python3 pipeline/scenario_content.py: 8/8 scenarios, 0 errors (notes: one inherited stat deviation, five cross-district symbol repeats in distinct colours)",
@@ -92,14 +94,17 @@
     "2026-09-29: the 7 remaining monster illustrations imported (owner-generated), framed with committed art placements (campaigns/still_hour/art_placements.json).",
     "2026-10-02: reviewed finishing corrections applied; 133 effective cards, 200 framed images, 24-page guide. 111 pytest tests and 155 subtests; both Lua versions, real-SCED harness, CardForge and three Godot renders pass. 70 final measurement cells / 1319 slots; 400 scoped proposal trials separately archived. See docs/design/FINISHING_CORRECTIONS.md and FINISHING_BALANCE.md. Exact target curve and human playtest approval remain open.",
     "2026-10-02: release housekeeping. publish_hosted.py removes only the published campaign's own earlier images (prefix-scoped; Still Hour URLs unchanged; tests/test_publish_hosted.py). Full suite passes with CAMPAIGN set to a scaffolded campaign (tests/conftest.py pins still_hour): 116 passed, 1 skipped there; 115 passed, 2 skipped, 155 subtests in the checkout. CardForge selftest 20/20, Lua rules 309/309 and bundle check OK on Lua 5.2 and 5.4. Art complete; log hidden-name decision already implemented. Owner docs refreshed; player quick reference docs/QUICK_REFERENCE.md added (play aid).",
-    "2026-10-06: portable investigators and ten personal quest cards built on branch claude/loving-bohr-n7ixl4 (unpublished); Lua rules tests pass on 5.2 and 5.4 (smoke 322 checks); whole-campaign simulation: nine-night goal rate 56.1% (Elias/Ayako/Cass) and 61.7% (Birdie/Cass/Seraphine), experience 37.2-40.7 per investigator across five parties; see docs/design/FINISHING_BALANCE.md 'Quest cards, 2026-10-06' and docs/design/verification/2026-10-06/"
+    "2026-10-06: portable investigators and ten personal quest cards built on branch claude/loving-bohr-n7ixl4 (unpublished); Lua rules tests pass on 5.2 and 5.4 (smoke 322 checks); whole-campaign simulation: nine-night goal rate 56.1% (Elias/Ayako/Cass) and 61.7% (Birdie/Cass/Seraphine), experience 37.2-40.7 per investigator across five parties; see docs/design/FINISHING_BALANCE.md 'Quest cards, 2026-10-06' and docs/design/verification/2026-10-06/",
+    "2026-10-06: Place rebuilt (loop_box.lua: native copy, SCED's own takeObject, sprite sheets), Control flow and log mirror fixes, guide with contents, bookmarks and a right-click page menu (40 pages), starter decks for all five investigators, doom reset on Hour changes, database audit tool, parity/flow/stuck-state audits (docs/design/PARITY_AND_FLOW_AUDIT.md, DATABASE_AUDIT.md, PLACE_BUTTON_AUDIT.md, DECKBUILDING_REVIEW.md); dist/ rebuilt and pushed with images pinned to 096328c. Offline only: nothing here ran in real Tabletop Simulator and nothing has been played by a person."
   ],
   "next_actions": [
-    "Owner: decide whether to publish the branch (investigator redesign, quest cards, Place-step logging).",
+    "Owner: load the rebuilt campaign file (docs/LOADING.md), press Place on The First Hour box and tell the assistant whether Tabletop Simulator stopped; if it did, run docs/PLACE_TEST.md and send the last 60 lines of Player.log.",
+    "Owner: check that a laid-out box keeps its GUIDs through TTS's copy (Place a district, flip a location, Clear Board, Place again, count clues); landscape sheet cells; legibility of the smallest rules text; then play the Prologue and Night 1.",
     "Art: generate and register the ten quest-card illustrations briefed in pipeline/art_manifest.json (placeholders until then).",
-    "Open defect: TTS crash on Place (The First Hour); need the last 60 lines of Player.log and whether The Lighthouse box also crashes (docs/design/PLACE_BUTTON_AUDIT.md).",
-    "Owner: run current main through the live TTS relay (Start TTS Relay.bat; docs/TTS_RELAY.md).",
-    "Human playtest: opening, first night and complete campaigns at intended difficulty/player count; record objective success, defeats, earned XP and purchases by played slot."
+    "Optional: a Set Up Loop button on the Control token (designed in docs/design/PARITY_AND_FLOW_AUDIT.md G5, not built).",
+    "Trim the per-object 'Placing i/N' chat lines once Place is verified in TTS.",
+    "Human playtest: opening, first night and complete campaigns at intended difficulty/player count; record objective success, defeats, earned XP and purchases by played slot.",
+    "Owner: the in-game Download Box reads dist/downloads from the main branch: the rebuilt build reaches it only when this branch is merged (the Saved Object file in dist/ can be copied in directly meanwhile)."
   ],
   "connection": "GitHub handoff; no live connection to the owner's desktop or TTS.",
   "tts_relay": {

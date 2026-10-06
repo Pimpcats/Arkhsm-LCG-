@@ -39,6 +39,11 @@ optional; their machine-specific settings live in `rig.local.json`.
 - **Knowledge** — facts you earn that change later nights.
 - **Aging** — living the same night again has a cost.
 
+## Status (2026-10-06)
+- ✅ The scenario boxes' **Place** was rewritten (native copy, SCED's own `takeObject`, four textures per box instead of 43-57) after Place stopped Tabletop Simulator on The First Hour. It is checked on SCED's real table headless, **not** in Tabletop Simulator: press **Place** on The First Hour; if the game stops, follow `docs/PLACE_TEST.md`.
+- ✅ New since 2026-10-02: guide contents, bookmarks and a right-click page menu on the Control token; starter decks for all five investigators; the Control's Reset Loop question and Between Loops panel; SCED's doom reset on Hour changes; audits in `docs/design/` (parity and flow, database, Place, deck building).
+- The rebuilt files are on branch `claude/loving-bohr-n7ixl4`; the in-game Download Box reads `main`.
+
 ## Status (2026-10-02)
 - ✅ Campaign content, rules wording passes, guide PDF and campaign log built; offline checks pass (pytest suite, CardForge selftest, Lua rules suite on Lua 5.2 and 5.4, bundle check, scenario audit). Current counts and results: `campaigns/still_hour/assistant/production.json`; summary: `docs/STILL_HOUR_HANDOFF.txt`.
 - ✅ Card art: complete. Every illustration is approved and composited into the faces in `dist/`.
