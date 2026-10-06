@@ -34,13 +34,17 @@ decks in one frame via spawnObjectData; the 6-hex-digit GUIDs from an unseeded
 math.random (collisions across boxes or repeats); the board sync firing 2
 seconds later while images are still loading.
 
-## Planned (no code changed yet)
+## Done and still planned
 
-1. Step logging before each action, so Player.log names the last thing run.
-2. Spawn a few objects at a time (Wait.frames between batches) and run the board
-   sync from the last spawn's callback instead of a fixed 2 seconds.
-3. Seed the GUID generator and check each GUID against the table before use.
-4. If it still crashes: a variant box that uses SCED's exact takeObject Place
+Done (commit 52cb886, made while this audit was written): Place now spawns one
+object every 8 frames, writes each step to the Lua log (Player.log) and to chat
+before it runs, ignores a second press while placing, and runs the board sync
+in announced stages from the Control token (shApiSyncBoardStaged) instead of one
+call. A crash now leaves the failing step as the last line of the log.
+
+Still planned, in order, only if the log points there:
+1. Seed the GUID generator and check each GUID against the table before use.
+2. If it still crashes: a variant box that uses SCED's exact takeObject Place
    for first use, to separate "our spawn method" from "our data".
 
 Needed from the owner: the last 60 lines of Player.log after the crash, and
