@@ -134,7 +134,9 @@ def build_save(root, bundle):
         "GUID": guid(CFG.control_guid),
         "ColorDiffuse": {"r": 0.13, "g": 0.11, "b": 0.18},
         "Locked": True,
-        "Tags": [CFG.tag],
+        # SCED's Clean Up Helper ("Reset play areas") trashes whatever lies in the play area that is not locked
+        # and not tagged like this, as it does with the official campaign guide and log
+        "Tags": [CFG.tag, "CleanUpHelper_ignore"],
         "LuaScript": bundle,
         "LuaScriptState": "",
     }
@@ -149,7 +151,7 @@ def build_save(root, bundle):
         "Description": TOKEN["description"],
         "GUID": guid(TOKEN["id"]),
         "ColorDiffuse": {"r": 1, "g": 1, "b": 1},
-        "Tags": [TOKEN["tag"]],
+        "Tags": [TOKEN["tag"], "CleanUpHelper_ignore"],
         "Hands": False,
         "HideWhenFaceDown": False,
         "CustomImage": {

@@ -119,8 +119,14 @@ def investigator_specs():
     return [c for c in spec if c.get("type") == "Investigator"]
 
 
+MINICARD_DECK_BASE = 99800     # above the sprite sheets' ids (pack_sheets.DECK_BASE up), below the block's end
+
+
 def minicard_deck_id(mid):
-    return 99000 + int(guid("minicard:" + mid), 16) % 900
+    """One deck id per investigator minicard, in the campaign's investigator order. (A hash into 99000-99899
+    gave Seraphine's the id of the Fairground's sheet: TTS identifies a sheet by its id.)"""
+    order = [c["id"] + "-m" for c in investigator_specs()]
+    return MINICARD_DECK_BASE + order.index(mid)
 
 
 def build_minicard(inv):
@@ -174,7 +180,7 @@ def build_guide(pos=None):
         Transform=transform(pos, ry=270, scale=(2.2, 1.0, 2.2)),
         Nickname=CAMPAIGN + " - Campaign Guide", Description="",
         GMNotes=gmnotes({"id": CFG.guide_id, "type": "CampaignGuide"}),
-        ColorDiffuse=dict(WHITE), Tags=["CampaignGuide"],
+        ColorDiffuse=dict(WHITE), Tags=["CampaignGuide", "CleanUpHelper_ignore"],
         CustomPDF={"PDFUrl": guide_url(), "PDFPassword": "", "PDFPage": 0,
                    "PDFPageOffset": 0},
     )
@@ -189,7 +195,7 @@ def _log_state(page, pos=None):
         Transform=transform(pos, ry=270, scale=(3.4, 1.0, 3.4)),
         Nickname=CAMPAIGN + " - Campaign Log", Description="Page {}".format(page),
         GMNotes=gmnotes({"id": "{}{}".format(L.LOG_ID, page), "type": "CampaignLog"}),
-        ColorDiffuse=dict(WHITE), Tags=["CampaignLog"],
+        ColorDiffuse=dict(WHITE), Tags=["CampaignLog", "CameraZoom_ignore", "CleanUpHelper_ignore"],
         CustomImage={"ImageURL": url, "ImageSecondaryURL": "", "ImageScalar": 1.0,
                      "WidthScale": 0.0,
                      "CustomToken": {"Thickness": 0.2, "MergeDistancePixels": 15.0,

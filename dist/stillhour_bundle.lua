@@ -60,6 +60,24 @@ Constants.AGE_OUT_YEARS = 18
 -- Hour VIII forever once an Hour took two Mythos phases)
 Constants.HOLD_BACK_REWINDS_PER_LOOP = 3
 
+-- Personal quest cards (this campaign only; docs/design/PORTABLE_INVESTIGATORS.md).
+-- Each investigator has one Permanent quest card with a tally kept across the
+-- whole campaign. Meeting the goal swaps it for its bonded unlocked card, which
+-- carries the campaign hooks (Memory income, Dissonance and Hourglass ties)
+-- that the investigator's own front no longer has. A reset never clears it.
+Constants.QUEST = {
+  sthrelias     = { goal = 4,  card = "What the Warden Owes",       unlocked = "What the Warden Remembers",
+                    what = "damage prevented with your investigator ability" },
+  sthrayako     = { goal = 8,  card = "The Unfinished Translation", unlocked = "The Translation, Finished",
+                    what = "enemies you placed a first translation token on" },
+  sthrcass      = { goal = 3,  card = "A Marked Run of Cards",      unlocked = "The Table Remembers",
+                    what = "symbol tokens you canceled with your own ability or cards" },
+  sthrseraphine = { goal = 8,  card = "The Medium's Price",         unlocked = "The Price, Remembered",
+                    what = "times you used your investigator ability" },
+  sthrbirdie    = { goal = 8,  card = "Somewhere to Be",            unlocked = "She Knows the Road",
+                    what = "resolve spent" },
+}
+
 --- Compute the full constant set for a given investigator count.
 -- @param n integer number of investigators (>= 1)
 -- @return table of thresholds
@@ -168,6 +186,7 @@ local function freshState(n)
     brackets = {},           -- investigatorId -> {bracket, physical, mental}
     appointedStage = 0,      -- The Appointed's Approach: 0 Unseen..3 Arrived (CO-002)
     victoryLog = {},         -- enemyId -> true (Victory claimed; once per campaign)
+    victoryPaid = {},        -- enemyId -> banked Memory its claim paid and has not been taken back (refund on un-ticking)
     onCardMemory = {},       -- investigatorId -> Memory on that investigator's cards (this loop)
     loopTallies = {},        -- investigatorId -> {raises, spent}: Aging's "leaned on the loop" inputs
     lastLoopEndDissonance = nil, -- Dissonance when the last loop ended
@@ -182,6 +201,7 @@ local function freshState(n)
     pendingYears = {},       -- investigatorId -> Years a card gave this loop (added at Age)
     holdBackRewinds = 0,     -- Hold Back rewinds this loop (at most Constants.HOLD_BACK_REWINDS_PER_LOOP)
     marks = {},              -- markId -> true: campaign-long marks a reset never clears (e.g. "torn")
+    quest = {},              -- investigatorId -> {tally, unlocked}: the personal quest card (campaign-long)
     difficulty = nil,        -- the chaos bag preset last chosen on the Control (1 Easy .. 4 Expert)
   }
 end
@@ -241,10 +261,12 @@ function CampaignState.deserialize(saved, decoder)
     state.brackets = state.brackets or {}
     state.appointedStage = state.appointedStage or 0
     state.victoryLog = state.victoryLog or {}
+    state.victoryPaid = state.victoryPaid or {}
     state.onCardMemory = state.onCardMemory or {}
     state.loopTallies = state.loopTallies or {}
     state.knowledgePaid = state.knowledgePaid or {}
     state.marks = state.marks or {}
+    state.quest = state.quest or {}
     state.bankedMemory = math.max(0, math.floor(tonumber(state.bankedMemory) or 0))
     state.loopEnded = state.loopEnded == true
     state.finale = state.finale == true
@@ -468,6 +490,53 @@ function CampaignState.knownFacts()
   return list
 end
 
+------------------------------------------------------------ personal quests --
+-- One quest card per investigator (Constants.QUEST). The tally is campaign-long
+-- (a reset never clears it); at the goal the quest is unlocked, which stays
+-- until a player takes it back with setQuestUnlocked(id, false).
+
+--- {tally, unlocked, goal} for one investigator (goal is nil for an investigator
+-- with no quest card).
+function CampaignState.getQuest(investigatorId)
+  state.quest = state.quest or {}
+  local q = state.quest[investigatorId] or {}
+  local def = Constants.QUEST[investigatorId]
+  return { tally = q.tally or 0, unlocked = q.unlocked == true, goal = def and def.goal or nil }
+end
+
+function CampaignState.questUnlocked(investigatorId)
+  return CampaignState.getQuest(investigatorId).unlocked
+end
+
+--- Add `delta` (may be negative; floors at 0) to the tally. Meeting the goal
+-- unlocks the quest, taking the tally back below it locks the quest again.
+-- Returns the new tally and whether this call unlocked it.
+function CampaignState.addQuest(investigatorId, delta)
+  local def = Constants.QUEST[investigatorId]
+  if not def or type(investigatorId) ~= "string" then return nil, false end
+  state.quest = state.quest or {}
+  local q = state.quest[investigatorId] or { tally = 0, unlocked = false }
+  local was = q.tally or 0
+  q.tally = math.max(0, was + math.floor(tonumber(delta) or 1))
+  local just = false
+  if not q.unlocked and q.tally >= def.goal then q.unlocked, just = true, true end
+  -- a tally taken back below the goal: the quest is no longer met (one unlocked
+  -- by hand below its goal is left as it is)
+  if q.unlocked and was >= def.goal and q.tally < def.goal then q.unlocked = false end
+  state.quest[investigatorId] = q
+  return q.tally, just
+end
+
+--- Unlock (or take back) a quest by hand, e.g. after a table correction.
+function CampaignState.setQuestUnlocked(investigatorId, on)
+  if not Constants.QUEST[investigatorId] then return false end
+  state.quest = state.quest or {}
+  local q = state.quest[investigatorId] or { tally = 0, unlocked = false }
+  q.unlocked = on == true
+  state.quest[investigatorId] = q
+  return q.unlocked
+end
+
 ----------------------------------------------------------- campaign marks --
 
 --- Set a campaign-long mark (never cleared by a reset). Returns true if new.
@@ -611,14 +680,37 @@ function CampaignState.isVictoryClaimed(enemyId)
 end
 
 --- Claim an enemy's Victory: banks `memoryValue` the first time only.
--- Returns true if newly claimed (Memory banked), false if already claimed.
+-- Returns true if newly claimed (Memory banked), false if already claimed. What
+-- an earlier claim paid and the bank could not give back (spent since) is not
+-- paid twice: a re-claim after a partial refund pays only the part taken back.
 function CampaignState.claimVictory(enemyId, memoryValue)
   if state.victoryLog[enemyId] then
     return false
   end
   state.victoryLog[enemyId] = true
-  CampaignState.bankMemory(memoryValue or 0)
+  state.victoryPaid = state.victoryPaid or {}
+  local held = state.victoryPaid[enemyId] or 0
+  local full = memoryValue or 0
+  CampaignState.bankMemory(math.max(0, full - held))
+  state.victoryPaid[enemyId] = math.max(full, held)
   return true
+end
+
+--- Take a Victory claim back (its Campaign Log box un-ticked) and refund what it
+-- paid, as far as banked Memory allows. Returns (removed, refunded). A claim made
+-- before payments were recorded refunds nothing.
+function CampaignState.forgetVictory(enemyId)
+  if not state.victoryLog[enemyId] then
+    return false, 0
+  end
+  state.victoryLog[enemyId] = nil
+  state.victoryPaid = state.victoryPaid or {}
+  local paid = state.victoryPaid[enemyId] or 0
+  local refund = math.min(paid, state.bankedMemory)
+  if refund > 0 then CampaignState.bankMemory(-refund) end
+  local shortfall = paid - refund
+  state.victoryPaid[enemyId] = shortfall > 0 and shortfall or nil
+  return true, refund
 end
 
 ------------------------------------------------------------------ loop flow --
@@ -2290,6 +2382,26 @@ function SCED.getInvestigatorCount()
   return nil
 end
 
+------------------------------------------------------------------------ doom --
+
+--- SCED's own doom reset (the doom counter's "startReset", which its Advance button runs when an
+-- agenda advances): the counter goes to 0 and the doom tokens on the playmats and in the play area
+-- are removed, as its option panel allows. True when it ran; false off SCED.
+function SCED.resetDoom()
+  local counter = SCED.getObjectByOwnerAndType("Mythos", "DoomCounter")
+  if not counter then return false end
+  return try(function() counter.call("startReset") ; return true end) == true
+end
+
+--- PlayAreaApi.setInvestigatorCount(n): the counter's own updateVal (SCED keeps
+-- it between 1 and 4 and says nothing in the chat for a change made this way).
+-- False when SCED, or its counter, is not there.
+function SCED.setInvestigatorCount(n)
+  local counter = SCED.getObjectByOwnerAndType("Mythos", "InvestigatorCounter")
+  if not counter then return false end
+  return try(function() counter.call("updateVal", n) ; return true end) or false
+end
+
 --------------------------------------------------------------- token spawns --
 
 local function spawnTracker()
@@ -2395,7 +2507,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/sthr-static-token.jpg?v=a556271511"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -2702,6 +2814,69 @@ return ChaosBag
 
 end
 
+__modules["StillHour/Guide"] = function()
+-- THE STILL HOUR — the campaign guide's page index: "Guide: ..." entries in the Control token's
+-- right-click menu that turn the guide to a section, as the official campaigns' world-map buttons do
+-- (getObjectsWithTag("CampaignGuide")[1].Book.setPage). The page numbers are written into PAGES when
+-- the bundle is built, from the guide PDF's own layout (pipeline/build_guide_pdf.py writes
+-- dist/guide/*_pages.json and pipeline/bundle_mod.py fills the placeholder), so they cannot drift from
+-- the PDF; tests/test_dist_fresh.py checks them against it. With no placeholder filled (a source
+-- build) the menu is simply empty.
+local Guide = {}
+
+local PAGES = "rules=2,setup=7,prologue=9,loop=10,between=13,difficulty=35,decks=36"      -- "rules=2,setup=7,loop=9,..."
+
+-- (key in the pages string, menu text). Sections a first-time player must not be sent to early
+-- (the districts, the finale) are not listed: the guide itself sends you there.
+Guide.ENTRIES = {
+  { "setup",     "Guide: Campaign Setup" },
+  { "prologue",  "Guide: The Prologue" },
+  { "loop",      "Guide: Loop Setup" },
+  { "between",   "Guide: Between Loops" },
+  { "rules",     "Guide: Campaign Rules" },
+  { "difficulty", "Guide: Difficulty and Player Count" },
+  { "decks",     "Guide: Starting Decks" },
+}
+
+--- key -> one-based page, from the build-time string.
+function Guide.pages()
+  local out = {}
+  for key, page in tostring(PAGES):gmatch("(%w+)=(%d+)") do out[key] = tonumber(page) end
+  return out
+end
+
+--- Turn the campaign guide to a section. Returns true when it was turned.
+function Guide.open(color, key)
+  local page = Guide.pages()[key]
+  if not page then return false end
+  local guide = (getObjectsWithTag("CampaignGuide") or {})[1]
+  if not guide then
+    printToColor("The campaign guide is not on the table: press Place on the campaign box.", color, { 1, 0.7, 0.4 })
+    return false
+  end
+  -- Book.setPage takes a zero-based page
+  local ok = pcall(function() guide.Book.setPage(page - 1) end)
+  if not ok then
+    printToColor("Could not turn the guide: open it and go to page " .. page .. ".", color, { 1, 0.7, 0.4 })
+  end
+  return ok
+end
+
+--- Add the "Guide: ..." entries to an object's right-click menu.
+function Guide.addMenu(obj)
+  local pages = Guide.pages()
+  for _, e in ipairs(Guide.ENTRIES) do
+    local key = e[1]
+    if pages[key] then
+      obj.addContextMenuItem(e[2], function(color) Guide.open(color, key) end)
+    end
+  end
+end
+
+return Guide
+
+end
+
 __modules["StillHour/Board"] = function()
 --- THE STILL HOUR — board plumbing (BUILD_STATUS "path to the table" item 2).
 --
@@ -2744,9 +2919,11 @@ Board.APPOINTED_OFFSET = { x = 0, y = 0.6, z = -0.9 }
 local host                       -- the object owning the button callbacks
 local say = function() end
 local st = {
+  -- Keyed by GUID, and a box lays its objects out again every loop with the GUIDs
+  -- they had before: a memory about a destroyed object must never outlive it
+  -- (Board.forgetGuid). What is on a card (its CLOSED label) is read off the card.
   flipped = {},        -- guid -> true: location we flipped to its back
   sealedMarked = {},   -- guid -> true: SCED clue auto-spawn suppressed by us
-  sealedLabel = {},    -- guid -> true: we put a SEALED label on it
   appointed = { guid = nil, placed = false, lastPos = nil, lastRot = nil },
 }
 local restoreScheduled = false
@@ -2802,6 +2979,40 @@ local function split(s)
   return out
 end
 
+-- Advance widths (per 1000 em) of TTS button text (Arial) for ASCII 32..126;
+-- any other character counts as 560.
+local ADVANCE = { 278, 278, 355, 556, 556, 889, 667, 191, 333, 333, 389, 584, 278, 333, 278, 278,
+  556, 556, 556, 556, 556, 556, 556, 556, 556, 556, 278, 278, 584, 584, 584, 556, 1015,
+  667, 667, 722, 722, 667, 611, 778, 722, 278, 500, 667, 556, 833, 722, 778, 667, 778, 722, 667, 611,
+  722, 667, 944, 667, 667, 611, 278, 278, 278, 469, 556, 333,
+  556, 556, 500, 556, 556, 278, 556, 556, 222, 222, 500, 222, 833, 556, 556, 556, 556, 333, 500, 278,
+  556, 500, 722, 500, 500, 500, 334, 260, 334, 584 }
+
+--- The font size for a button label: `size`, or smaller so the widest line of
+-- the label stays inside a button `width` wide (a text-only button, width 0,
+-- keeps its size). Button text that is wider than its button runs into the
+-- next button.
+function Board.fitFont(label, width, size)
+  if type(width) ~= "number" or width <= 0 then return size end
+  local widest = 0
+  for line in (tostring(label) .. "\n"):gmatch("(.-)\n") do
+    local w = 0
+    for ch in line:gmatch(".") do
+      local b = ch:byte()
+      w = w + ((b >= 32 and b <= 126) and ADVANCE[b - 31] or 560)
+    end
+    if w > widest then widest = w end
+  end
+  if widest == 0 then return size end
+  return math.max(30, math.min(size, math.floor(width * 0.95 * 1000 / widest)))
+end
+
+--- obj.createButton(def) with the label's font size fitted to the button.
+local function createFitted(obj, def)
+  def.font_size = Board.fitFont(def.label, def.width, def.font_size or 100)
+  return obj.createButton(def)
+end
+
 ------------------------------------------------------------------- lifecycle --
 
 function Board.init(hostObject, opts)
@@ -2818,7 +3029,6 @@ function Board.load(t)
   if type(t) ~= "table" then return end
   st.flipped = t.flipped or {}
   st.sealedMarked = t.sealedMarked or {}
-  st.sealedLabel = t.sealedLabel or {}
   st.appointed = t.appointed or { placed = false }
 end
 
@@ -3049,7 +3259,7 @@ local function removeByPrefix(o, prefixes)
   end
 end
 
-Board.INV_PREFIXES = { "Memory ", "Years ", "Dissonance raised ", "Loop-power Memory " }
+Board.INV_PREFIXES = { "Memory ", "Years ", "Dissonance raised ", "Loop-power Memory ", "Quest " }
 
 --- The printed stat line from investigator metadata (SCED GMNotes keys).
 function Board.baseStats(md)
@@ -3097,7 +3307,7 @@ function Board.refreshInvestigators(applyStats)
         yearsLabel = yearsLabel .. string.format(" · max %d/%d", eff.health, eff.sanity)
       end
       safe(function()
-        card.createButton({
+        createFitted(card, {
           click_function = "shCardMemory", function_owner = host,
           label = "Memory " .. CampaignState.getOnCardMemory(inv.id),
           tooltip = "Memory on this investigator's cards. Left-click +1 · Right-click -1",
@@ -3105,7 +3315,7 @@ function Board.refreshInvestigators(applyStats)
           width = 620, height = 200, font_size = 120,
           color = { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
         })
-        card.createButton({
+        createFitted(card, {
           click_function = "shNoop", function_owner = host, label = yearsLabel,
           tooltip = "Years lived in the loop (Aging). Skills on the playmat tracker include the drift.",
           position = { 0.65, 0.3, 1.25 }, rotation = { 0, 0, 0 },
@@ -3113,7 +3323,7 @@ function Board.refreshInvestigators(applyStats)
         })
         -- "leaned on the loop" tallies (aging v0.3 §1.1), this investigator's own
         local t = CampaignState.getTallies(inv.id)
-        card.createButton({
+        createFitted(card, {
           click_function = "shCardRaised", function_owner = host,
           label = "Dissonance raised " .. t.raises,
           tooltip = "Times THIS investigator paid 'raise Dissonance' as a cost this loop (3+ = leaned on the loop). "
@@ -3122,7 +3332,7 @@ function Board.refreshInvestigators(applyStats)
           width = 760, height = 180, font_size = 90,
           color = { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
         })
-        card.createButton({
+        createFitted(card, {
           click_function = "shCardSpent", function_owner = host,
           label = "Loop-power Memory " .. t.spent,
           tooltip = "Memory THIS investigator removed from their own cards for their own cards or abilities "
@@ -3131,7 +3341,19 @@ function Board.refreshInvestigators(applyStats)
           width = 760, height = 180, font_size = 90,
           color = { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
         })
-        card.createButton({
+        local quest = CampaignState.getQuest(inv.id)
+        if quest.goal then
+          createFitted(card, {
+            click_function = "shCardQuest", function_owner = host,
+            label = quest.unlocked and "Quest met" or string.format("Quest %d / %d", quest.tally, quest.goal),
+            tooltip = "Your personal quest card's tally, kept across the campaign (the Campaign Log shows it too). "
+              .. "At the goal, swap the quest card for its unlocked card. Left-click +1 · Right-click -1",
+            position = { 0, 0.3, 2.45 }, rotation = { 0, 0, 0 },
+            width = 760, height = 180, font_size = 90,
+            color = quest.unlocked and { 0.1, 0.25, 0.12 } or { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
+          })
+        end
+        createFitted(card, {
           click_function = "shCardYears", function_owner = host,
           label = "Years pending " .. CampaignState.getPendingYears(inv.id),
           tooltip = "Years a card or resolution gave THIS investigator during the loop (A Year in a Night, "
@@ -3158,6 +3380,14 @@ function Board.investigatorIdOf(o)
 end
 
 ------------------------------------------------------------------ locations --
+
+local function hasLabel(o, label)
+  local buttons = safe(function() return o.getButtons() end) or {}
+  for _, b in ipairs(buttons) do
+    if b.label == label then return true end
+  end
+  return false
+end
 
 local function removeLabel(o, label)
   local buttons = safe(function() return o.getButtons() end) or {}
@@ -3209,9 +3439,11 @@ function Board.syncLocations()
       if Locations.isSealed(l.locId) then
         rep.sealed = rep.sealed + 1
         if SCED.markTokensSpawned(g) then st.sealedMarked[g] = true end
-        if not st.sealedLabel[g] then addLabel(o, Board.SEALED_LABEL) ; st.sealedLabel[g] = true end
+        -- looked for on the card itself, never remembered by GUID: a new card
+        -- laid out with an old card's GUID, or buttons lost in a save, get it again
+        if not hasLabel(o, Board.SEALED_LABEL) then addLabel(o, Board.SEALED_LABEL) end
       else
-        if st.sealedLabel[g] then removeLabel(o, Board.SEALED_LABEL) ; st.sealedLabel[g] = nil end
+        removeLabel(o, Board.SEALED_LABEL)
         if st.sealedMarked[g] then
           st.sealedMarked[g] = nil
           SCED.resetTokensSpawned(g)
@@ -3222,6 +3454,54 @@ function Board.syncLocations()
     end
   end
   return rep
+end
+
+------------------------------------------------------------------ box context --
+
+Board.FINALE_ENTRY = "the-way-the-night-breaks"
+
+--- A district none of whose locations on the table connects, through the
+-- locations that are there, to a location of the Square (the district every
+-- loop begins with). boxId is the scenario box's id.
+local function cutOff(boxId)
+  local tag = "StillHourBox_" .. boxId
+  local locs = Board.locationCards()
+  local mine, square = {}, {}
+  for _, l in ipairs(locs) do
+    if safe(function() return l.obj.hasTag(tag) end) then mine[#mine + 1] = l.guid end
+    local def = l.locId and Locations.LOCATIONS[l.locId]
+    if def and def.district == "Square" then square[l.guid] = true end
+  end
+  if #mine == 0 then return false end
+  local graph = Board.graph(locs)
+  local seen, queue = {}, {}
+  for _, g in ipairs(mine) do seen[g] = true ; queue[#queue + 1] = g end
+  local head = 1
+  while head <= #queue do
+    local g = queue[head]
+    head = head + 1
+    if square[g] then return false end
+    for _, nb in ipairs(graph[g] or {}) do
+      if not seen[nb] then seen[nb] = true ; queue[#queue + 1] = nb end
+    end
+  end
+  return true
+end
+
+--- Is a box that was just Placed out of context? "prologue-over" (the
+-- Prologue's box once the Prologue has ended), "not-yet" (the finale's box
+-- before the finale can begin), "cut-off" (a district that nothing on the
+-- table connects to the Square), else nil. The Control token only says so:
+-- nothing is refused or moved.
+function Board.boxContext(boxId)
+  if boxId == "prologue" then
+    if not CampaignState.inPrologue() then return "prologue-over" end
+  elseif boxId == "finale" then
+    if not CampaignState.inFinale() and not CampaignState.knows(Board.FINALE_ENTRY) then return "not-yet" end
+  elseif type(boxId) == "string" and boxId:sub(1, 9) == "district_" and boxId ~= "district_square" then
+    if cutOff(boxId) then return "cut-off" end
+  end
+  return nil
 end
 
 --------------------------------------------------------------- the Appointed --
@@ -3322,7 +3602,7 @@ function Board.refreshAppointedButtons(card)
   end
   for _, b in ipairs(defs) do
     safe(function()
-      card.createButton({
+      createFitted(card, {
         click_function = b.fn, function_owner = host, label = b.label(), tooltip = b.tip,
         position = { 0, 0.3, b.z }, rotation = { 0, 0, 0 },
         width = b.w, height = 200, font_size = b.fs,
@@ -3503,7 +3783,21 @@ function Board.onEnterContainer(container, obj)
   end
 end
 
+--- Forget what is remembered about one object by GUID (see the note on `st`): a
+-- new card laid out with a destroyed card's GUID is a new card.
+function Board.forgetGuid(g)
+  if g == nil then return end
+  st.flipped[g] = nil
+  st.sealedMarked[g] = nil
+  if st.appointed.engagedAt == g then st.appointed.engagedAt = nil end
+end
+
+function Board.forgetGuids(list)
+  for _, g in ipairs(type(list) == "table" and list or {}) do Board.forgetGuid(g) end
+end
+
 function Board.onDestroy(obj)
+  Board.forgetGuid(guidOf(obj))
   if Board.isAppointedObject(obj) and Appointed.isManifest() then
     restoreData = safe(function() return obj.getData() end)
     Appointed.onRemovalAttempt(Board.appointedCtx())
@@ -3544,32 +3838,75 @@ end
 Board.CAMPAIGN_LOG_TAG = "CampaignLog"
 Board.MEMO_KEY = "stillHour"
 
+--- How many Campaign Logs are on the table (the mirror needs exactly one).
+function Board.campaignLogCount()
+  return #(safe(function() return getObjectsWithTag(Board.CAMPAIGN_LOG_TAG) end) or {})
+end
+
 function Board.campaignLog()
   local list = safe(function() return getObjectsWithTag(Board.CAMPAIGN_LOG_TAG) end) or {}
   if #list == 1 then return list[1] end
   return nil
 end
 
---- Write `blob` (a JSON string) with sequence `seq` into the log's memo.
+local function mirrorIn(memo)
+  local t = decode(memo)
+  if t and type(t[Board.MEMO_KEY]) == "string" then
+    return { blob = t[Board.MEMO_KEY], seq = tonumber(t.seq) or 0 }
+  end
+  return nil
+end
+
+--- Write `blob` (a JSON string) with sequence `seq` into the log's memo. A log
+-- that already holds a newer copy is left alone (false, "newer"): it is the
+-- campaign, and this Control token is the blank or older one.
 function Board.mirrorToLog(blob, seq)
   local log = Board.campaignLog()
   if not log or JSON == nil then return false end
+  local held = mirrorIn(safe(function() return log.memo end))
+  if held and held.seq > seq then return false, "newer" end
   return safe(function()
     log.memo = JSON.encode({ [Board.MEMO_KEY] = blob, seq = seq })
     return true
   end) or false
 end
 
---- The mirrored {blob, seq} in a campaign log object's memo, or nil.
-function Board.readLogMirror(log)
+--- The mirrored {blob, seq} in a campaign log's memo, or nil. With `deep`, the
+-- newest one on any page: the log has one State per page and each State has its
+-- own memo, so turning the page leaves the newest copy on the page that was
+-- showing, not on the one that is now. (getData() runs the log's own onSave:
+-- not while the table is still loading, when the log has not read its state yet.)
+function Board.readLogMirror(log, deep)
   log = log or Board.campaignLog()
   if not log then return nil end
-  local memo = safe(function() return log.memo end)
-  local t = decode(memo)
-  if t and type(t[Board.MEMO_KEY]) == "string" then
-    return { blob = t[Board.MEMO_KEY], seq = tonumber(t.seq) or 0 }
+  local best = mirrorIn(safe(function() return log.memo end))
+  if not deep then return best end
+  local data = safe(function() return log.getData() end)
+  for _, state in pairs(type(data) == "table" and type(data.States) == "table" and data.States or {}) do
+    local m = type(state) == "table" and mirrorIn(state.Memo)
+    if m and (best == nil or m.seq > best.seq) then best = m end
   end
-  return nil
+  return best
+end
+
+--- Does a campaign log (any page) hold entries somebody made? Its starting
+-- values (the party size) do not count. (Reads every page: see readLogMirror.)
+function Board.logHasContent(log)
+  log = log or Board.campaignLog()
+  if not log then return false end
+  local function filled(raw)
+    local t = decode(raw)
+    for k, v in pairs(t and type(t.values) == "table" and t.values or {}) do
+      if k ~= "investigators" and v ~= false and v ~= 0 and v ~= "" then return true end
+    end
+    return false
+  end
+  if filled(safe(function() return log.script_state end)) then return true end
+  local data = safe(function() return log.getData() end)
+  for _, state in pairs(type(data) == "table" and type(data.States) == "table" and data.States or {}) do
+    if type(state) == "table" and filled(state.LuaScriptState) then return true end
+  end
+  return false
 end
 
 return Board
@@ -3602,6 +3939,7 @@ local Interlude     = require("StillHour/Interlude")
 local SCED          = require("StillHour/SCED")
 local ChaosBag      = require("StillHour/ChaosBag")
 local Board         = require("StillHour/Board")
+local Guide         = require("StillHour/Guide")
 
 local SAVE_VERSION = 2
 
@@ -3633,6 +3971,7 @@ local investigatorList = {}     -- cached Board.investigators() for the row butt
 local aging = {}                -- investigatorId -> interlude aging inputs {defeated, physical, mental, aged}
 local saveSeq = 0               -- bumps on every change; newest copy wins (control vs campaign log)
 local beginWarned = false       -- Begin Next Loop already told the table what is outstanding
+local resetAsked = false        -- Reset Loop asked once (the loop is not over by the Control's count): the next click ends it
 
 -------------------------------------------------------------- board contexts --
 
@@ -3695,10 +4034,18 @@ local function changeMemory(delta)
   CampaignState.bankMemory(delta)
 end
 
+--- SCED's own investigator counter (it sets the clues SCED spawns on a location
+-- and what its scenario helpers read) follows ours, one way. Silent without SCED.
+local function pushInvestigatorCount()
+  local n = CampaignState.constants().investigators
+  if SCED.getInvestigatorCount() ~= n then SCED.setInvestigatorCount(n) end
+end
+
 local function changeInvestigators(delta)
   local bandBefore = CampaignState.band()
   local n = CampaignState.constants().investigators + delta
   CampaignState.setInvestigatorCount(math.max(1, math.min(4, n)))
+  guarded("investigator counter", pushInvestigatorCount)
   local c = CampaignState.constants()
   if mode == "interlude" or CampaignState.isLoopEnded() then
     -- the next loop starts at the scar for the NEW party size
@@ -3743,18 +4090,33 @@ local function changeDissonance(delta)
   end
 end
 
+--- Each time the Hourglass advances or rewinds, all doom in play is removed (guide: The Hourglass).
+-- With SCED present its own doom reset does it (the doom counter, and the doom tokens on the playmats
+-- and in the play area); doom tokens lying on the Hours cards are not in either place, so the table
+-- takes those off. True when SCED did it.
+local function resetDoomInPlay()
+  return guarded("doom reset", SCED.resetDoom) == true
+end
+
 local function changeHour(delta)
   if delta > 0 then
     local before = CampaignState.getHour()
     local bandBefore = CampaignState.band()
     Hourglass.advance(delta, playCtx())
-    if CampaignState.getHour() > before and CampaignState.getHour() < 9 then
-      -- guide: The Hourglass (the Hour turns); doom on the Hours is on the table
-      announce("The Hour turns: remove all doom in play; each investigator heals 1 damage and 1 horror.")
+    if CampaignState.getHour() > before then
+      local cleared = resetDoomInPlay()
+      if CampaignState.getHour() < 9 then
+        -- guide: The Hourglass (the Hour turns)
+        announce(cleared
+          and "The Hour turns: SCED removed the doom in play (take any doom off the Hours cards yourself); each investigator heals 1 damage and 1 horror."
+          or "The Hour turns: remove all doom in play; each investigator heals 1 damage and 1 horror.")
+      end
     end
     announceWake(bandBefore)
   else
+    local before = CampaignState.getHour()
     Hourglass.rewind(-delta, playCtx())
+    if CampaignState.getHour() < before then resetDoomInPlay() end
   end
 end
 
@@ -3773,6 +4135,9 @@ local function holdBack()
   else
     announce("Held back: the Appointed is " .. Appointed.stageName() .. "; the Hourglass rewinds to Hour "
       .. CampaignState.getHour() .. ".")
+    if resetDoomInPlay() then
+      announce("SCED removed the doom in play (take any doom off the Hours cards yourself).")
+    end
   end
   return s
 end
@@ -3804,12 +4169,30 @@ local function inPlaySet()
   return set
 end
 
-local function resetLoop()
+--- The night is over by the Control's own count: Hour IX, or Dissonance at the
+-- reset value (the finale ends the same way). Everyone defeated or resigned
+-- also ends a loop, which only the players can see.
+local function loopOverByCount()
+  return CampaignState.getHour() >= Constants.HOUR_LAST
+    or CampaignState.getDissonance() >= CampaignState.constants().resetThreshold
+end
+
+--- ask: what the button does. A loop that is not over by the count is only
+-- asked about (the table is told once; the next click ends it, any other click
+-- in between withdraws the question). The runner API and the tests end it at once.
+local function resetLoop(ask)
   -- a second click before the next loop begins must not count another loop
   if CampaignState.isLoopEnded() then
+    resetAsked = false
     announce("The loop has already been reset. Continue Between Loops, then click Begin Next Loop.")
     return false
   end
+  if ask and not resetAsked and not loopOverByCount() then
+    resetAsked = true
+    announce("The loop is not over by the Control's count. Click Reset Loop again to end it now.")
+    return false
+  end
+  resetAsked = false
   local prologue = CampaignState.inPrologue()
   -- a loop that ended at the reset value is Torn (campaign chaos-bag change)
   if not prologue and CampaignState.getDissonance() >= CampaignState.constants().resetThreshold then
@@ -3864,18 +4247,36 @@ local function tokensOn(card)
   return found
 end
 
+--- A scenario box's Place takes about a second to lay its objects out. Stop any
+-- that is still running (src/tts/loop_box.lua cancelPlace), or the rest of the
+-- box would arrive on the cleared board. Returns how many were stopped.
+local function stopPlaces()
+  local stopped = 0
+  for _, o in ipairs(getObjects()) do
+    if not o.isDestroyed() and tostring(o.getGMNotes()):find("ScenarioBox", 1, true) then
+      local ok, was = pcall(function() return o.call("cancelPlace") end)
+      if ok and was == true then stopped = stopped + 1 end
+    end
+  end
+  return stopped
+end
+
 --- Loop Setup step 1: take every card the scenario boxes laid out (and the
 -- tokens on them) off the table, so the boxes can be Placed fresh. Player
 -- cards, minicards, mats and the campaign's own objects are never touched.
+-- What the board remembers by GUID about a card it removes goes with it: the
+-- box lays the same GUIDs out again.
 local function clearLoopBoard()
   local removed, tokens = 0, 0
-  if type(getObjects) ~= "function" then return { cards = 0, tokens = 0 } end
+  if type(getObjects) ~= "function" then return { cards = 0, tokens = 0, stopped = 0 } end
+  local stopped = stopPlaces()
   for pass = 1, 2 do
     for _, o in ipairs(getObjects()) do
       if not o.isDestroyed() and (o.type == "Card" or o.type == "Deck") then
         if o.type == "Card" then
           if isLoopCard(o.getTags and o.getTags() or {}, o.getGMNotes()) then
             for _, t in ipairs(tokensOn(o)) do t.destruct() ; tokens = tokens + 1 end
+            Board.forgetGuid(o.getGUID())
             o.destruct()
             removed = removed + 1
           end
@@ -3886,6 +4287,7 @@ local function clearLoopBoard()
           end
           if #mine > 0 and others == 0 then
             for _, t in ipairs(tokensOn(o)) do t.destruct() ; tokens = tokens + 1 end
+            Board.forgetGuids(mine)
             o.destruct()
             removed = removed + #mine
           elseif #mine > 0 then
@@ -3893,14 +4295,14 @@ local function clearLoopBoard()
             for _, g in ipairs(mine) do
               if o.isDestroyed() then break end
               local ok, c = pcall(o.takeObject, { guid = g, position = { pos.x, pos.y + 3, pos.z }, smooth = false })
-              if ok and c then c.destruct() ; removed = removed + 1 end
+              if ok and c then Board.forgetGuid(g) ; c.destruct() ; removed = removed + 1 end
             end
           end
         end
       end
     end
   end
-  return { cards = removed, tokens = tokens }
+  return { cards = removed, tokens = tokens, stopped = stopped }
 end
 
 -- The campaign guide's chaos bags (Campaign Setup), as SCED's token ids
@@ -3961,6 +4363,7 @@ local appliedSig  -- the changes the physical bag holds (set at load and on each
 
 --- Fill SCED's chaos bag for a difficulty, then put the band's [static] back.
 local function setDifficulty(i)
+  resetAsked = false
   local d = DIFFICULTY[i]
   if not d then return false end
   CampaignState.setDifficulty(i)
@@ -4049,7 +4452,10 @@ local function unlockFact(id)
   end
   if newly and mode == "interlude" then checkPartTwo() end
   -- the Almanac House's act 1a advancing in Part II: act 2a becomes current
-  -- if its requirements are met (the Sealed Study opens)
+  -- if its requirements are met (the Sealed Study opens). The other order, the
+  -- Vote recorded after act 1a's entry, makes nothing current: the act deck is
+  -- gone (guide: a district's act deck); only a Place of the box does it
+  -- (almanacActTwoAtPlace)
   if newly and id == "what-the-almanac-hid" and Locations.markAlmanacActTwoCurrent() then
     note("The Appointed's Name is the current act: the Sealed Study opens.")
   end
@@ -4079,6 +4485,10 @@ local function forgetFact(id)
       and not CampaignState.inFinale() and not Knowledge.canAssembleFinale() then
     Knowledge.forget("the-way-the-night-breaks")
     announce("The Way the Night Breaks no longer has all its entries: untick it on the Campaign Log too.")
+  end
+  -- the finale is being played: it carries on (stopping it would lose its contest), the table is told
+  if removed and id == "the-way-the-night-breaks" and CampaignState.inFinale() then
+    announce("The Way the Night Breaks was unticked while the finale is running: the finale carries on, so tick it again.")
   end
   local rep = guarded("locations", Board.syncLocations) or {}
   return { removed = removed, refund = refund or 0, report = rep }
@@ -4173,9 +4583,16 @@ local function outstandingInterlude()
   return out
 end
 
---- force: start the night without the check (the runner API).
+--- force: start the night without the checks (the runner API).
 local function beginNextLoop(force)
-  if mode == "interlude" and not force and not beginWarned then
+  -- Reset Loop folds the night first (counts it, sets the Hour and Dissonance
+  -- back): a night begun before it would carry the old Hour, Dissonance and
+  -- Appointed into the next one, and never count
+  if not force and not CampaignState.isLoopEnded() then
+    announce("Click Reset Loop first: the loop is not over yet.")
+    return false
+  end
+  if not force and not beginWarned then
     local out = outstandingInterlude()
     if #out > 0 then
       beginWarned = true
@@ -4199,6 +4616,15 @@ local function beginNextLoop(force)
   guarded("aging", Board.refreshInvestigators, true)
   announce(string.format("A new night begins. Memory capped at %d; %d lost.",
     CampaignState.constants().memoryCap, lost))
+  -- every investigator the Control can see has aged out, and nobody has taken their place
+  local listed = guarded("investigators", Board.investigators) or {}
+  local anyone = false
+  for _, inv in ipairs(listed) do
+    if CampaignState.getYears(inv.id) < Constants.AGE_OUT_YEARS then anyone = true end
+  end
+  if #listed > 0 and not anyone then
+    announce("No investigator can continue; see the guide, Age stories.")
+  end
   return true
 end
 
@@ -4212,6 +4638,24 @@ end
 --- kind = "raises" | "spent"
 local function changeTally(id, kind, delta)
   return CampaignState.addTally(id, kind, delta)
+end
+
+--- Add to an investigator's personal quest tally; announces the swap when the
+-- goal is met. Returns the tally and whether this unlocked the quest.
+local function changeQuest(id, delta)
+  if type(id) ~= "string" then return nil end
+  local was = CampaignState.getQuest(id).unlocked
+  local tally, just = CampaignState.addQuest(id, delta)
+  local def = Constants.QUEST[id]
+  if just and def then
+    announce(string.format("Quest met: swap %s for its unlocked card, %s (Campaign Log: %d of %d).",
+      def.card, def.unlocked, tally, def.goal), { 0.7, 1, 0.7 })
+  end
+  if was and def and not CampaignState.getQuest(id).unlocked then
+    announce(string.format("Quest no longer met: swap %s back for %s (Campaign Log: %d of %d).",
+      def.unlocked, def.card, tally, def.goal), { 1, 0.8, 0.5 })
+  end
+  return tally, just
 end
 
 local function bankOnCard()
@@ -4296,7 +4740,7 @@ local function button(fn, label, x, z, w, tooltip, fs)
     self.createButton({
       click_function = fn, function_owner = self, label = label, tooltip = tooltip or "",
       position = { x, BTN_Y, z }, rotation = { 0, 0, 0 },
-      width = w or 620, height = 300, font_size = fs or 100,
+      width = w or 620, height = 300, font_size = Board.fitFont(label, w or 620, fs or 100),
       color = BTN_COLOR, font_color = BTN_FONT,
     })
   end)
@@ -4316,37 +4760,47 @@ local PLUS_MINUS = "Left-click +1 · Right-click -1"
 
 local function drawPlay()
   local c = CampaignState.constants()
+  -- Reset Loop clicked, Begin Next Loop not yet: no night is in play. The Hour,
+  -- Dissonance and Appointed are not offered (a click would count toward the next
+  -- night), and the panel does not call itself the next loop, which has not begun.
+  local between = CampaignState.isLoopEnded()
   header(CampaignState.inPrologue() and "THE STILL HOUR · Prologue"
-    or string.format("THE STILL HOUR · loop %d", CampaignState.getLoopsCompleted() + 1), -2.3)
+    or (between and "BETWEEN LOOPS"
+      or string.format("THE STILL HOUR · loop %d", CampaignState.getLoopsCompleted() + 1)), -2.3)
   button("shClickMemory", string.format("Memory %d / %d", CampaignState.getBankedMemory(), c.memoryCap),
     -PAIR_X, -1.7, 1000, "Banked Memory. " .. PLUS_MINUS)
   button("shClickInvestigators", "Investigators " .. c.investigators, PAIR_X, -1.7, 1000,
     "Sets every threshold. " .. PLUS_MINUS .. (SCED.getInvestigatorCount()
       and (" (SCED counter: " .. SCED.getInvestigatorCount() .. ")") or ""))
-  button("shClickDissonance", string.format("Dissonance %d / %d · %s", CampaignState.getDissonance(),
-    c.resetThreshold, CampaignState.band()), -PAIR_X, -1.1, 1000, "Left-click raise · Right-click reduce")
   local d = bag.describe()
-  button("shClickStatic", string.format("[static] %d", d.target), PAIR_X, -1.1, 1000,
-    "Static tokens the bag holds (band + temporary; bag mode: " .. tostring(d.mode) .. "). Left-click: a card adds one for a time. Right-click: remove a temporary one.")
-  local h = CampaignState.getHour()
-  button("shClickHour", string.format("Hour %d · %s", h, Hourglass.HOUR_NAMES[h] or "?"), -PAIR_X, -0.5, 1000,
-    "Left-click advance (resolves the Hour) · Right-click rewind")
-  button("shClickAppointed", "Appointed: " .. Appointed.stageName(), PAIR_X, -0.5, 1000,
-    "Left-click: a card advances its Approach by 1 stage (min Sensed). Hold Back is on its card.")
   investigatorList = guarded("investigators", Board.investigators) or {}
-  for i, inv in ipairs(investigatorList) do
-    if i > 4 then break end
-    button("shInvMem" .. i, string.format("%s · Memory %d", inv.name, CampaignState.getOnCardMemory(inv.id)),
-      (i % 2 == 1) and -PAIR_X or PAIR_X, 0.1 + math.floor((i - 1) / 2) * 0.55, 1000,
-      "Memory on this investigator's cards (prey = most). " .. PLUS_MINUS, 80)
+  if not between then
+    button("shClickDissonance", string.format("Dissonance %d / %d · %s", CampaignState.getDissonance(),
+      c.resetThreshold, CampaignState.band()), -PAIR_X, -1.1, 1000, "Left-click raise · Right-click reduce")
+    button("shClickStatic", string.format("[static] %d", d.target), PAIR_X, -1.1, 1000,
+      "Static tokens the bag holds (band + temporary; bag mode: " .. tostring(d.mode) .. "). Left-click: a card adds one for a time. Right-click: remove a temporary one.")
+    local h = CampaignState.getHour()
+    button("shClickHour", string.format("Hour %d · %s", h, Hourglass.HOUR_NAMES[h] or "?"), -PAIR_X, -0.5, 1000,
+      "Left-click advance (resolves the Hour) · Right-click rewind")
+    button("shClickAppointed", "Appointed: " .. Appointed.stageName(), PAIR_X, -0.5, 1000,
+      "Left-click: a card advances its Approach by 1 stage (min Sensed). Hold Back is on its card.")
+    for i, inv in ipairs(investigatorList) do
+      if i > 4 then break end
+      button("shInvMem" .. i, string.format("%s · Memory %d", inv.name, CampaignState.getOnCardMemory(inv.id)),
+        (i % 2 == 1) and -PAIR_X or PAIR_X, 0.1 + math.floor((i - 1) / 2) * 0.55, 1000,
+        "Memory on this investigator's cards (prey = most). " .. PLUS_MINUS, 80)
+    end
   end
-  -- two rows of three, spaced so no button overlaps another
-  button("runStillHourTests", "Run Tests", -ROW3_X, 1.4)
-  button("shStatus", "Status", 0.0, 1.4)
-  button("shSyncBoard", "Sync Board", ROW3_X, 1.4, 620, "Re-apply location faces and CLOSED labels, the Appointed and the chaos bag.")
+  -- rows of three, spaced so no button overlaps another
+  button("shStatus", "Status", -ROW3_X, 1.4)
+  button("shSyncBoard", "Sync Board", 0.0, 1.4, 620, "Re-apply location faces and CLOSED labels, the Appointed and the chaos bag.")
   button("shReset", "Reset Loop", -ROW3_X, 2.0)
   button("shOpenInterlude", "Interlude", 0.0, 2.0, 620, "Spend Memory: Recollections and level-ups.")
   button("shKnowledgeStatus", "Knowledge", ROW3_X, 2.0)
+  if between then
+    button("shBeginNextLoop", "Begin Next Loop", 0.0, 2.6, 620,
+      "After the Interlude: cap Memory and start the next night.")
+  end
   if CampaignState.inPrologue() then
     local n = c.investigators
     button("shPrologueReward", string.format("Prologue reward +%d", 2 * n), 0.0, 2.6, 620,
@@ -4358,8 +4812,9 @@ local function drawPlay()
     button("shClickContest", string.format("Contest %d / %d", CampaignState.getContest(), c.contestTarget),
       0.0, 2.6, 620, "The Last Hour: contest progress. " .. PLUS_MINUS
         .. ". Right-click at 0: the finale was not begun after all.")
-  elseif CampaignState.knows("the-way-the-night-breaks") and not CampaignState.isLoopEnded() then
-    -- the finale begins during a loop, never Between Loops (after Reset Loop)
+  elseif CampaignState.knows("the-way-the-night-breaks") and not CampaignState.isLoopEnded()
+      and not CampaignState.inPrologue() then
+    -- the finale begins during a loop, never Between Loops (after Reset Loop) or in the Prologue
     button("shBeginFinale", "Begin Finale", 0.0, 2.6, 620,
       "Click when you begin the finale (The Last Hour). Hour IX then ends the finale, not the loop.")
   end
@@ -4418,20 +4873,22 @@ local function drawInterlude()
     local a = agingFor(inv.id)
     local zi = -0.65 + (i - 1) * 0.95
     local yrs = CampaignState.getYears(inv.id)
+    -- wide, so a long name and the bracket fit; it ends short of the tally buttons
     button("shNoop", string.format("%s · Years %d · %s", inv.name, yrs, Aging.bracketForYears(yrs)),
-      X - 0.75, zi, 1000, "", 80)
+      X - 0.55, zi, 1200, "", 80)
     local t = CampaignState.getTallies(inv.id)
-    button("shTalRaised" .. i, "Dissonance raised " .. t.raises, X + 1.45, zi, 560,
+    button("shTalRaised" .. i, "Dissonance raised " .. t.raises, X + 1.45, zi, 620,
       "Times this investigator paid 'raise Dissonance' as a cost this loop (3+ = leaned). " .. PLUS_MINUS, 70)
-    button("shTalSpent" .. i, "Loop-power Memory " .. t.spent, X + 2.75, zi, 560,
+    button("shTalSpent" .. i, "Loop-power Memory " .. t.spent, X + 2.75, zi, 620,
       "Memory this investigator removed from their own cards for their own cards or abilities this loop (4+ = leaned). " .. PLUS_MINUS, 70)
     local locked = (CampaignState.getBracket(inv.id) or {}).physical ~= nil
-    button("shAgeDef" .. i, "Defeated: " .. (a.defeated and "yes" or "no"), X - 1.45, zi + 0.42, 330, "", 70)
+    -- the narrow buttons of the second row take two lines where one would run into the next button
+    button("shAgeDef" .. i, "Defeated:\n" .. (a.defeated and "yes" or "no"), X - 1.45, zi + 0.42, 330, "", 70)
     button("shNoop", "Leaned: " .. (Interlude.leanedOnLoop(inv.id) and "yes" or "no"), X - 0.7, zi + 0.42, 330,
       "Derived: paid 'raise Dissonance' as a cost 3+ times, or removed 4+ Memory from own cards for own cards or abilities, this loop.", 70)
-    button("shAgePhys" .. i, "-" .. a.physical .. (locked and " (locked)" or ""), X + 0.05, zi + 0.42, 330,
+    button("shAgePhys" .. i, "-" .. a.physical .. (locked and "\n(locked)" or ""), X + 0.05, zi + 0.42, 330,
       "Physical skill that drifts down (chosen once, locked).", 60)
-    button("shAgeMent" .. i, "+" .. a.mental .. (locked and " (locked)" or ""), X + 0.8, zi + 0.42, 330,
+    button("shAgeMent" .. i, "+" .. a.mental .. (locked and "\n(locked)" or ""), X + 0.8, zi + 0.42, 330,
       "Mental skill that drifts up (chosen once, locked).", 60)
     local afterPrologue = CampaignState.getLoopsCompleted() == 0
     button("shAge" .. i, a.aged and ("Aged +" .. a.aged) or (afterPrologue and "No Age" or "Age"),
@@ -4461,6 +4918,8 @@ local function persist()
 end
 
 refreshControl = function()
+  -- every other click redraws the panel, which withdraws a pending "Reset Loop?"
+  resetAsked = false
   pcall(function() self.clearButtons() end)
   if mode == "interlude" then drawInterlude() else drawPlay() end
   -- Token UI is transient in TTS. Reattach by saved GUID on reload/restore;
@@ -4624,6 +5083,11 @@ function shCardSpent(obj, _, alt)
   guarded("tally", changeTally, Board.investigatorIdOf(obj), "spent", alt and -1 or 1)
   afterChange()
 end
+--- The Quest button on an investigator card: left +1, right -1.
+function shCardQuest(obj, _, alt)
+  guarded("quest", changeQuest, Board.investigatorIdOf(obj), alt and -1 or 1)
+  afterChange()
+end
 function shAgePhys1() toggleAging(1, "physical") end
 function shAgePhys2() toggleAging(2, "physical") end
 function shAgePhys3() toggleAging(3, "physical") end
@@ -4640,6 +5104,11 @@ function shAge4() ageAt(4) end
 function shBeginFinale()
   guarded("finale", function()
     if not CampaignState.knows("the-way-the-night-breaks") or CampaignState.inFinale() then return end
+    -- the button is not drawn in the Prologue; a call from outside must not begin the finale there
+    if CampaignState.inPrologue() then
+      announce("The finale cannot begin during the Prologue.")
+      return
+    end
     -- Between Loops (Reset Loop clicked, Begin Next Loop not yet): a finale
     -- begun now would carry into the next loop's Hour IX and Contest counter
     if CampaignState.isLoopEnded() then
@@ -4730,23 +5199,46 @@ local function restore(saved)
 end
 
 --- Adopt the copy SCED carried in the campaign log (its export/import) when it
--- is newer than ours. Returns true if adopted.
-local function adoptLogMirror(log)
-  local m = Board.readLogMirror(log)
+-- is newer than ours. Returns true if adopted. `deep` looks at every page of the
+-- log, not only the one on show (Board.readLogMirror).
+local function adoptLogMirror(log, deep)
+  local m = Board.readLogMirror(log, deep)
   if not m or m.seq <= saveSeq then return false end
   restore(m.blob)
   saveSeq = m.seq
   Dissonance.syncBag(bag)
+  guarded("investigator counter", pushInvestigatorCount)
   announce("Still Hour campaign state restored from the campaign log.")
   return true
+end
+
+--- More than one Campaign Log: the Control token cannot tell which holds its
+-- campaign, so it keeps its state in neither. A token that starts a new campaign
+-- beside a log that has entries says so too (it found no copy of the campaign).
+local function warnAboutLogs(startedBlank)
+  if Board.campaignLogCount() > 1 then
+    announce("More than one Campaign Log is on the table, so this Control token cannot keep its campaign in either: "
+      .. "delete the spare one.")
+  elseif startedBlank and Board.logHasContent() then
+    announce("The Campaign Log has entries, but no saved campaign was found for this Control token: "
+      .. "it starts a new campaign.")
+  end
 end
 
 function onLoad(saved)
   guarded("load", restore, saved)
   -- a brand-new campaign begins with the Prologue, which is not a loop
-  if saved == nil or saved == "" then CampaignState.setPrologue(true) end
+  local blank = saved == nil or saved == ""
+  if blank then CampaignState.setPrologue(true) end
   Board.init(self, { log = note })
-  guarded("campaign log", adoptLogMirror)
+  guarded("guide menu", Guide.addMenu, self)
+  -- (a Control that begins blank was put on a table that is already loaded: its log can be asked for
+  -- every page; one that loads with its own state asks only the page on show, as the log may still be loading)
+  local adopted = guarded("campaign log", adoptLogMirror, nil, blank)
+  -- the chaos bag holds this campaign's changes already (it was saved with them): the first change
+  -- after a load must be seen as a change, not taken as the baseline
+  appliedSig = changeSig(bagChanges())
+  guarded("campaign log", warnAboutLogs, blank and not adopted)
   bag.count = bag.target()
   refreshControl()
   -- let the table settle (SCED's own objects load too) before touching it
@@ -4754,13 +5246,13 @@ function onLoad(saved)
     Wait.frames(function()
       guarded("chaos bag", Dissonance.syncBag, bag)
       guarded("board", Board.syncAll, { log = hourLog })
+      guarded("investigator counter", pushInvestigatorCount)
       refreshControl()
     end, 60)
   end)
   if not ok then guarded("chaos bag", Dissonance.syncBag, bag) end
   print("THE STILL HOUR control ready. Investigators = " ..
-    CampaignState.constants().investigators .. (SCED.isPresent() and " (SCED detected)" or "")
-    .. ". Click 'Run Tests' to verify the build.")
+    CampaignState.constants().investigators .. (SCED.isPresent() and " (SCED detected)" or "") .. ".")
 end
 
 ---------------------------------------------------- table events (universal) --
@@ -4791,6 +5283,16 @@ end
 function onObjectDestroy(obj)
   if obj == self then return end
   guarded("destroy", Board.onDestroy, obj)
+  -- a Campaign Log leaves the table (the spare one, after this token found two): the log that is left
+  -- may hold the campaign this token could not adopt
+  local isLog = pcall(function() return obj.hasTag(Board.CAMPAIGN_LOG_TAG) end) and obj.hasTag(Board.CAMPAIGN_LOG_TAG)
+  if isLog then
+    pcall(function()
+      Wait.frames(function()
+        if guarded("campaign log", adoptLogMirror, nil, true) then afterChange() end
+      end, 10)
+    end)
+  end
 end
 
 function onObjectDrop(_, obj)
@@ -4807,7 +5309,8 @@ function onObjectSpawn(obj)
   if isLog then
     pcall(function()
       Wait.frames(function()
-        if guarded("campaign log", adoptLogMirror, obj) then afterChange() end
+        guarded("campaign log", warnAboutLogs, false)
+        if guarded("campaign log", adoptLogMirror, obj, true) then afterChange() end
       end, 10)
     end)
   end
@@ -4860,6 +5363,8 @@ function shApiInvestigators()
     out[i] = inv
     out[i].memory = CampaignState.getOnCardMemory(inv.id)
     out[i].years = CampaignState.getYears(inv.id)
+    local q = CampaignState.getQuest(inv.id)
+    out[i].quest, out[i].questGoal, out[i].questUnlocked = q.tally, q.goal, q.unlocked
   end
   return out
 end
@@ -4869,6 +5374,23 @@ function shApiOnCardMemory(p)
   return CampaignState.getOnCardMemory(p and p.id)
 end
 function shApiBankOnCard() local n = guarded("bank", bankOnCard) ; afterChange() ; return n end
+--- p = {id, delta} adds to the quest tally; p = {id, unlock = true|false}
+-- sets the unlocked state; p = {id} only reads. Returns {tally, unlocked, goal, just}.
+function shApiQuest(p)
+  p = p or {}
+  local just = false
+  if p.unlock ~= nil then
+    CampaignState.setQuestUnlocked(p.id, p.unlock == true)
+  elseif p.delta then
+    -- guarded() hands back only the first result, so read the flip from the state
+    local was = CampaignState.getQuest(p.id).unlocked
+    guarded("quest", changeQuest, p.id, tonumber(p.delta) or 1)
+    just = (not was) and CampaignState.getQuest(p.id).unlocked
+  end
+  afterChange()
+  local q = CampaignState.getQuest(p.id)
+  return { tally = q.tally, unlocked = q.unlocked, goal = q.goal, just = just == true }
+end
 --- p = {id, kind = "raises"|"spent", delta}
 function shApiTally(p)
   p = p or {}
@@ -4889,12 +5411,72 @@ function shApiAge(p)
   afterChange()
   return r and { years = r.years, bracket = r.bracket, gained = r.yearsGained } or nil
 end
-function shApiLogMirror() local m = Board.readLogMirror() ; return m and { seq = m.seq, bytes = #m.blob } or nil end
+function shApiLogMirror() local m = Board.readLogMirror(nil, true) ; return m and { seq = m.seq, bytes = #m.blob } or nil end
 
 function shApiHoldBack() local s = guarded("hold back", holdBack) ; afterChange() ; return s end
 function shApiHunt() local m = guarded("hunt", hunt) ; afterChange() ; return m end
 function shApiReset() guarded("reset", resetLoop) ; afterChange() ; return shApiState() end
 function shApiSyncBoard() return shSyncBoard() end
+--- Part II, the Almanac House laid out with both of its entries recorded: act 2a
+-- is its current act this loop (guide: a district's act deck), so the Sealed
+-- Study opens. `p` names the box that was Placed; without it, any Almanac House
+-- location on the table counts.
+local function almanacActTwoAtPlace(p)
+  local placed = type(p) == "table" and p.box ~= nil and p.box == "district_almanac"
+  if not placed and not (type(p) == "table" and p.box ~= nil) then
+    for _, l in ipairs(guarded("locations", Board.locationCards) or {}) do
+      local def = l.locId and Locations.LOCATIONS[l.locId]
+      if def and def.district == "Almanac" then placed = true end
+    end
+  end
+  if placed and Locations.markAlmanacActTwoCurrent() then
+    note("The Appointed's Name is the current act: the Sealed Study opens.")
+  end
+end
+
+--- The board sync that follows a box's Place, one step per few frames, each
+-- step announced in the chat and the log BEFORE it runs, so a crash in real
+-- Tabletop Simulator leaves the failing step on screen and in Player.log.
+--- p (from a box's Place) = { box = its id, name = as printed on the box, guids = what it laid out }.
+function shApiSyncBoardStaged(p)
+  if type(p) == "table" then
+    -- what the board remembers by GUID belongs to older objects with the same GUIDs
+    guarded("placed objects", Board.forgetGuids, p.guids)
+    -- a box that does not belong in this loop is laid out all the same; the table is told once
+    local why = guarded("box context", Board.boxContext, p.box)
+    local name = tostring(p.name or "This box")
+    if why == "prologue-over" then
+      announce(name .. " is laid out, but the Prologue is already over.")
+    elseif why == "not-yet" then
+      announce(name .. " is laid out, but it is not its time yet.")
+    elseif why == "cut-off" then
+      announce(name .. " is laid out, but nothing on the table connects it to the Square yet.")
+    end
+  end
+  local steps = {
+    { "locations", function() almanacActTwoAtPlace(p) ; Board.syncLocations() end },
+    { "the Appointed", function() Board.syncAppointed({ log = hourLog, applyStats = true }) end },
+    { "investigators", function() Board.refreshInvestigators(true) end },
+    { "chaos bag", function() Dissonance.syncBag(bag) end },
+    { "control panel", function() refreshControl() end },
+  }
+  local function run(i)
+    local step = steps[i]
+    if not step then
+      note("Board synced.")
+      return
+    end
+    local msg = string.format("Board sync %d/%d: %s", i, #steps, step[1])
+    log(msg)
+    broadcastToAll(msg, { 0.7, 0.7, 0.7 })
+    Wait.frames(function()
+      guarded(step[1], step[2])
+      Wait.frames(function() run(i + 1) end, 20)
+    end, 10)
+  end
+  run(1)
+  return true
+end
 function shApiUnlockFact(p) local r = unlockFact(p and p.id) ; guarded("chaos bag", refreshBag) ; refreshControl() ; return r end
 --- A Campaign Log Knowledge box un-ticked: p = {id}
 function shApiForgetFact(p) local r = forgetFact(p and p.id) ; guarded("chaos bag", refreshBag) ; refreshControl() ; return r end
@@ -4946,6 +5528,7 @@ function shApiBeginNextLoop(p) guarded("next loop", beginNextLoop, not (p and p.
 ------------------------------------------------------------------ console --
 
 function shStatus()
+  resetAsked = false
   local c = CampaignState.constants()
   print(string.format(
     "STILL HOUR | loop %d | scar %d | %s | Memory %d/%d | Dissonance %d/%d (%s) | Hour %s | Appointed: %s | contest %d/%d | [static] %d (%s)%s",
@@ -4976,9 +5559,11 @@ function shRaiseDissonance()
 end
 
 function shClearBoard()
-  local r = guarded("clear board", clearLoopBoard) or { cards = 0, tokens = 0 }
-  announce(string.format("The board is cleared: %d scenario card(s) and %d token(s) removed. "
-    .. "Press Place on The Square's box to set up the next loop.", r.cards, r.tokens))
+  resetAsked = false
+  local r = guarded("clear board", clearLoopBoard) or { cards = 0, tokens = 0, stopped = 0 }
+  announce(string.format("The board is cleared: %d scenario card(s) and %d token(s) removed. %s"
+    .. "Press Place on The Square's box to set up the next loop.", r.cards, r.tokens,
+    (r.stopped or 0) > 0 and "A Place that was still running was stopped. " or ""))
   return r
 end
 
@@ -5010,6 +5595,19 @@ function shApiClaimVictory(p)
   return newly
 end
 
+--- A Campaign Log Victory box un-ticked: forget the claim and take back what it
+-- paid (as far as the bank holds it).
+function shApiForgetVictory(p)
+  local id = p and p.id
+  if not VICTORY[id] then return false end
+  local removed, refund = CampaignState.forgetVictory(id)
+  if removed and refund > 0 then
+    announce(string.format("Victory removed: -%d banked Memory (%d banked).", refund, CampaignState.getBankedMemory()))
+  end
+  afterChange()
+  return removed
+end
+
 function shClickContest(_, _, alt)
   if alt and CampaignState.getContest() == 0 and CampaignState.inFinale() then
     -- Begin Finale was clicked by mistake
@@ -5033,7 +5631,8 @@ function shDifficulty4() setDifficulty(4) end
 function shApiDifficulty(p) return setDifficulty(p and p.i) end
 
 function shReset()
-  guarded("reset", resetLoop)
+  guarded("reset", resetLoop, true)
+  if resetAsked then return end      -- it only asked: nothing else happens
   afterChange()
   shStatus()
 end
@@ -5075,6 +5674,7 @@ end
 
 -- P6: report Act/finale gates and the campaign locations on the table.
 function shKnowledgeStatus()
+  resetAsked = false
   print(string.format("Knowledge: %d surface, %d deep. Act II %s. Finale %s.",
     Knowledge.surfaceKnownCount(), Knowledge.deepKnownCount(),
     Knowledge.actIIOpen() and "OPEN" or "closed",

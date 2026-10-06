@@ -73,7 +73,7 @@ def plan(boxes, sideways_of, id_digits=None):
                               "cell": list(geometry["cell"]), "cells": chunk})
     for i, s in enumerate(sorted(specs, key=lambda s: s["key"])):
         s["deck"] = DECK_BASE + i
-    assert DECK_BASE + len(specs) <= 99999, "too many sheets for the reserved deck id block"
+    assert DECK_BASE + len(specs) <= 99800, "too many sheets for the reserved deck id block (99800 up is the minicards')"
     return sorted(specs, key=lambda s: s["key"])
 
 

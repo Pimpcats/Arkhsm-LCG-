@@ -38,13 +38,7 @@ HAVE_DIST = os.path.exists(os.path.join(ROOT, "dist", "saved_object_the_still_ho
 # clean.  Each entry has to keep firing: once the defect is fixed the entry is
 # removed (test_known_errors_still_fire fails otherwise), so a waiver cannot
 # outlive its defect.
-KNOWN_ERRORS = {
-    "D01.value-type": (
-        "five story-asset cards ship GMNotes cost \"–\" (a string); every official card has an integer "
-        "cost or no key, and SCED's AttachmentHelper.findCard compares metadata.cost > 9. Fixed in the "
-        "build (build_cards.py writes cost only when numeric, commit 349a6bf); dist/ still has it until "
-        "the next rebuild and publish"),
-}
+KNOWN_ERRORS = {}
 
 # a 10x14 baseline and a progressive JPEG (made with PIL, 632 and 521 bytes)
 BASELINE_JPEG = base64.b64decode(

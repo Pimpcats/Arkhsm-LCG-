@@ -541,7 +541,11 @@ class Doc(object):
             prefix = "" if self.kind == "object" else "/%s[%d]" % (_label(r), i)
             walk_tree(r, prefix, None, 0, self.nodes)
         base = os.path.basename(name)
-        if self.kind == "save" and re.match(r"saved_object_", base):
+        if self.kind == "save" and re.match(r"saved_object_place_test", base):
+            # pipeline/place_test.py: the same cards laid out several ways on purpose (one image per card,
+            # sprite sheets, one shared image); it is no campaign file, so nothing is compared with it
+            self.role = "diagnostic"
+        elif self.kind == "save" and re.match(r"saved_object_", base):
             self.role = "saved"
         elif "downloads" in name.replace("\\", "/").split("/") and base.endswith("_box.json"):
             self.role = "placeholder"
@@ -1960,6 +1964,7 @@ class Auditor(object):
     # deck id <-> image mapping ------------------------------------------------
     def a_deck_map(self, doc):
         pairs = collections.defaultdict(dict)       # deck id -> {(face, back, flags): where}
+        card_box = collections.defaultdict(dict)    # card id -> {CardID: the scenario box holding it}
         card_ids = collections.defaultdict(set)     # gm id -> {CardID}
         id_of_card = collections.defaultdict(set)   # CardID -> {gm id}
         for node in doc.nodes:
@@ -1977,6 +1982,8 @@ class Auditor(object):
                 if gid is not None:
                     card_ids[gid].add(o["CardID"])
                     id_of_card[o["CardID"]].add(gid)
+                    segs = (node.path or "/").strip("/").split("/")
+                    card_box[gid].setdefault(o["CardID"], "/".join(segs[:2 if doc.kind == "save" else 1]))
         for k, variants in pairs.items():
             if len(variants) > 1:
                 locs = list(variants.values())
@@ -1991,16 +1998,24 @@ class Auditor(object):
             for (face, back, flags) in variants:
                 by_pair[(face, back)].add(k)
         shared = {p: ids for p, ids in by_pair.items() if len(ids) > 1}
-        if shared:
+        if shared and doc.role != "diagnostic":
             p, ids = sorted(shared.items(), key=lambda kv: sorted(kv[1]))[0]
             self.add(WARN, "A10.pair-two-ids", doc.name,
                      "%d image pair(s) are registered under more than one deck id" % len(shared),
                      "e.g. ids %s -> %s" % (", ".join(sorted(ids)), short(p[0], 60)),
                      "Reuse one deck id per image pair (unless the duplication is intended).", count=len(shared))
         for gid, ids in card_ids.items():
-            if len(ids) > 1:
-                self.grp(ERROR, "A10.id-two-cardids", "one card id has several CardIDs in a file (copies would show "
-                         "different art)", "One card id, one CardID.").hit(doc.name, "%s -> %s" % (gid, sorted(ids)))
+            if len(ids) > 1 and doc.role != "diagnostic":
+                boxes = list(card_box[gid].values())
+                if len(set(boxes)) < len(boxes):
+                    self.grp(ERROR, "A10.id-two-cardids", "one card id has several CardIDs inside one box (copies "
+                             "would show different art)", "One card id, one CardID per box.").hit(
+                        doc.name, "%s -> %s" % (gid, sorted(ids)))
+                else:
+                    # each scenario box packs its own sprite sheets, so a card two boxes share has a cell in each
+                    # (the official boxes do the same); the art is the same
+                    self.grp(INFO, "A10.id-two-cardids-across-boxes", "a card two boxes share has a CardID in each "
+                             "box's sheets (same art)", "Nothing needed.").hit(doc.name, "%s -> %s" % (gid, sorted(ids)))
         for cid, gids in id_of_card.items():
             if len(gids) > 1:
                 self.grp(ERROR, "A10.cardid-two-ids", "one CardID belongs to several card ids (TTS shows one image)",
@@ -3189,8 +3204,11 @@ class Auditor(object):
         bundle = ctl["text"]
         placeholder = (c.get("static_token") or {}).get("placeholder", "__STATIC_TOKEN_URL__")
 
+        # build-time fillings: the static token's image URL, the guide's page numbers (bundle_mod.py)
+        fillings = "|".join(re.escape(x) for x in (placeholder, "__STILLHOUR_GUIDE_PAGES__"))
+
         def present(body):
-            parts = body.split(placeholder)
+            parts = re.split(fillings, body)
             pos = bundle.find(parts[0])
             if pos < 0:
                 return False
@@ -3247,12 +3265,19 @@ class Auditor(object):
         return None if a == b else (path or "/")
 
     @staticmethod
-    def card_signature(o):
+    def card_signature(o, content_only=False):
+        """What a card is. content_only drops where its picture sits (CardID, CustomDeck: a scenario box
+        packs its own sprite sheets, a loose build one image per card) and the loop tags a box bakes in."""
         ok, gm, _ = parse_gmnotes(o)
         cd = o.get("CustomDeck") if isinstance(o.get("CustomDeck"), dict) else {}
-        return {"CardID": o.get("CardID"), "GMNotes": json.dumps(gm, sort_keys=True) if gm else o.get("GMNotes"),
-                "CustomDeck": json.dumps(cd, sort_keys=True), "Nickname": o.get("Nickname"),
-                "Tags": sorted(taglist(o)), "SidewaysCard": hk(o.get("SidewaysCard"))}
+        tags = sorted(taglist(o))
+        sig = {"CardID": o.get("CardID"), "GMNotes": json.dumps(gm, sort_keys=True) if gm else o.get("GMNotes"),
+               "CustomDeck": json.dumps(cd, sort_keys=True), "Nickname": o.get("Nickname"),
+               "Tags": tags, "SidewaysCard": hk(o.get("SidewaysCard"))}
+        if content_only:
+            del sig["CardID"], sig["CustomDeck"]
+            sig["Tags"] = [t for t in tags if not (t.endswith("Loop") or "Box_" in t)]
+        return sig
 
     def check_f(self):
         saved = self.doc_by_role("saved")
@@ -3349,11 +3374,13 @@ class Auditor(object):
         # every card id means one card everywhere
         by_id = collections.defaultdict(dict)       # id -> signature json -> docs
         for d in self.docs:
+            if d.role == "diagnostic":
+                continue
             for n in cards_of(d):
                 cid = card_id_of(n.obj)
                 if cid is None:
                     continue
-                by_id[cid].setdefault(json.dumps(self.card_signature(n.obj), sort_keys=True), set()).add(d.name)
+                by_id[cid].setdefault(json.dumps(self.card_signature(n.obj, True), sort_keys=True), set()).add(d.name)
         clash = {i: v for i, v in by_id.items() if len(v) > 1}
         if clash:
             i = sorted(clash)[0]
@@ -3365,11 +3392,13 @@ class Auditor(object):
                      "e.g. %s differs in %s" % (i, ", ".join(keys)), "Rebuild dist so every copy comes from one spec.",
                      count=len(clash))
         else:
-            rows.append("every card id has identical id/CardID/CustomDeck/GMNotes/tags in all %d files "
-                        "(%d card ids)" % (len(self.docs), len(by_id)))
+            rows.append("every card id has identical id/GMNotes/name/tags in all %d files "
+                        "(%d card ids)" % (len([d for d in self.docs if d.role != "diagnostic"]), len(by_id)))
         # box scripts: every scenario box carries the same script in every file
         hashes = collections.defaultdict(set)
         for d in self.docs:
+            if d.role == "diagnostic":
+                continue
             for n in d.nodes:
                 ok, gm, _ = parse_gmnotes(n.obj)
                 if gm and gm.get("type") in ("ScenarioBox", "CampaignBox") and n.obj.get("Name") == "Custom_Model_Bag" \

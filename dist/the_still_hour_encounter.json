@@ -15,9 +15,9 @@
         "rotX": 0,
         "rotY": 180,
         "rotZ": 0,
-        "scaleX": 1.15,
+        "scaleX": 1.0,
         "scaleY": 1,
-        "scaleZ": 1.15
+        "scaleZ": 1.0
       },
       "ContainedObjects": [
         {
@@ -47,26 +47,19 @@
             "rotX": 0,
             "rotY": 180,
             "rotZ": 0,
-            "scaleX": 1.15,
+            "scaleX": 1.0,
             "scaleY": 1,
-            "scaleZ": 1.15
+            "scaleZ": 1.0
           },
-          "CustomUIAssets": [
-            {
-              "Name": "font_arkhamicons",
-              "Type": 1,
-              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-            }
-          ],
           "CustomDeck": {
             "95040": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/sthr-appointed.jpg?v=75d3c51143",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/encounter_back.jpg?v=8f98d69b44",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/sthr-appointed.jpg?v=e1396c018f",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/encounter_back.jpg?v=1c54f8a11e",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
               "UniqueBack": false,
-              "BackIsHidden": false
+              "BackIsHidden": true
             }
           }
         },
@@ -97,26 +90,19 @@
             "rotX": 0,
             "rotY": 180,
             "rotZ": 0,
-            "scaleX": 1.15,
+            "scaleX": 1.0,
             "scaleY": 1,
-            "scaleZ": 1.15
+            "scaleZ": 1.0
           },
-          "CustomUIAssets": [
-            {
-              "Name": "font_arkhamicons",
-              "Type": 1,
-              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-            }
-          ],
           "CustomDeck": {
             "95041": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/sthr-appointedwhisper.jpg?v=692f9b7a96",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/encounter_back.jpg?v=8f98d69b44",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/sthr-appointedwhisper.jpg?v=b9c7097b11",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/encounter_back.jpg?v=1c54f8a11e",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
               "UniqueBack": false,
-              "BackIsHidden": false
+              "BackIsHidden": true
             }
           }
         },
@@ -147,26 +133,19 @@
             "rotX": 0,
             "rotY": 180,
             "rotZ": 0,
-            "scaleX": 1.15,
+            "scaleX": 1.0,
             "scaleY": 1,
-            "scaleZ": 1.15
+            "scaleZ": 1.0
           },
-          "CustomUIAssets": [
-            {
-              "Name": "font_arkhamicons",
-              "Type": 1,
-              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-            }
-          ],
           "CustomDeck": {
             "95042": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/sthr-crossing.jpg?v=0ce34fdf3d",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/encounter_back.jpg?v=8f98d69b44",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/sthr-crossing.jpg?v=bc9fe00785",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/encounter_back.jpg?v=1c54f8a11e",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
               "UniqueBack": false,
-              "BackIsHidden": false
+              "BackIsHidden": true
             }
           }
         },
@@ -197,26 +176,19 @@
             "rotX": 0,
             "rotY": 180,
             "rotZ": 0,
-            "scaleX": 1.15,
+            "scaleX": 1.0,
             "scaleY": 1,
-            "scaleZ": 1.15
+            "scaleZ": 1.0
           },
-          "CustomUIAssets": [
-            {
-              "Name": "font_arkhamicons",
-              "Type": 1,
-              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-            }
-          ],
           "CustomDeck": {
             "95043": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/sthr-bellringer.jpg?v=5e3babbac5",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/encounter_back.jpg?v=8f98d69b44",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/sthr-bellringer.jpg?v=aa81744919",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/encounter_back.jpg?v=1c54f8a11e",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
               "UniqueBack": false,
-              "BackIsHidden": false
+              "BackIsHidden": true
             }
           }
         },
@@ -247,26 +219,19 @@
             "rotX": 0,
             "rotY": 180,
             "rotZ": 0,
-            "scaleX": 1.15,
+            "scaleX": 1.0,
             "scaleY": 1,
-            "scaleZ": 1.15
+            "scaleZ": 1.0
           },
-          "CustomUIAssets": [
-            {
-              "Name": "font_arkhamicons",
-              "Type": 1,
-              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-            }
-          ],
           "CustomDeck": {
             "95044": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/sthr-wearssheriff.jpg?v=1a18ce5060",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/encounter_back.jpg?v=8f98d69b44",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/sthr-wearssheriff.jpg?v=2b62257e7b",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/encounter_back.jpg?v=1c54f8a11e",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
               "UniqueBack": false,
-              "BackIsHidden": false
+              "BackIsHidden": true
             }
           }
         },
@@ -297,26 +262,19 @@
             "rotX": 0,
             "rotY": 180,
             "rotZ": 0,
-            "scaleX": 1.15,
+            "scaleX": 1.0,
             "scaleY": 1,
-            "scaleZ": 1.15
+            "scaleZ": 1.0
           },
-          "CustomUIAssets": [
-            {
-              "Name": "font_arkhamicons",
-              "Type": 1,
-              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-            }
-          ],
           "CustomDeck": {
             "95045": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/sthr-onewhorides.jpg?v=8a72f04e7a",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/encounter_back.jpg?v=8f98d69b44",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/sthr-onewhorides.jpg?v=e52decb5eb",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/encounter_back.jpg?v=1c54f8a11e",
               "NumWidth": 1,
               "NumHeight": 1,
               "Type": 0,
               "UniqueBack": false,
-              "BackIsHidden": false
+              "BackIsHidden": true
             }
           }
         }

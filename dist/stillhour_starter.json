@@ -15,9 +15,9 @@
         "rotX": 0,
         "rotY": 180,
         "rotZ": 0,
-        "scaleX": 1.15,
+        "scaleX": 1.0,
         "scaleY": 1,
-        "scaleZ": 1.15
+        "scaleZ": 1.0
       },
       "ContainedObjects": [
         {
@@ -25,7 +25,7 @@
           "Nickname": "Elias Warde",
           "Description": "The Ninth Death",
           "GUID": "ef2890",
-          "CardID": 9501000,
+          "CardID": 9911400,
           "SidewaysCard": true,
           "Tags": [
             "Investigator",
@@ -40,7 +40,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": false,
-          "GMNotes": "{\"id\":\"sthrelias\",\"type\":\"Investigator\",\"class\":\"Guardian\",\"traits\":\"Believer. Warden.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":2,\"combatIcons\":4,\"agilityIcons\":3,\"health\":9,\"sanity\":5,\"signatures\":[{\"sthr-lamp\":1,\"sthr-donebefore\":1,\"sthr-eighthgrave\":1}],\"elderSignEffect\":{\"description\":\"+1. If there are 3 or more Memory on Elias Warde, this token is +3 instead, and heal 1 damage from you.\",\"modifier\":1}}",
+          "GMNotes": "{\"id\":\"sthrelias\",\"type\":\"Investigator\",\"class\":\"Guardian\",\"traits\":\"Believer. Warden.\",\"cycle\":\"The Still Hour\",\"willpowerIcons\":3,\"intellectIcons\":2,\"combatIcons\":4,\"agilityIcons\":3,\"health\":9,\"sanity\":5,\"signatures\":[{\"sthr-lamp\":1,\"sthr-donebefore\":1,\"sthr-eighthgrave\":1,\"sthr-quest-elias\":1}],\"elderSignEffect\":{\"description\":\"+1. You may discard the top 2 cards of your deck. If you do, this token is +3 instead and heal 1 damage from an investigator at your location.\",\"modifier\":1}}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -52,18 +52,11 @@
             "scaleY": 1,
             "scaleZ": 1.15
           },
-          "CustomUIAssets": [
-            {
-              "Name": "font_arkhamicons",
-              "Type": 1,
-              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-            }
-          ],
           "CustomDeck": {
-            "95010": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/sthrelias.jpg?v=4800309da2",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/sthrelias-back.jpg?v=6cf6fd5a13",
-              "NumWidth": 1,
+            "99114": {
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/sheets/investigators-l-face.jpg?v=775905e918",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/sheets/investigators-l-back.jpg?v=c144e497e2",
+              "NumWidth": 5,
               "NumHeight": 1,
               "Type": 0,
               "UniqueBack": true,
@@ -76,7 +69,7 @@
           "Nickname": "The Ambergrove Lamp",
           "Description": "",
           "GUID": "052059",
-          "CardID": 9501100,
+          "CardID": 9911500,
           "SidewaysCard": false,
           "Tags": [
             "Asset",
@@ -91,7 +84,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-lamp\",\"type\":\"Asset\",\"class\":\"Guardian\",\"traits\":\"Item. Tool.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"level\":0,\"willpowerIcons\":1,\"agilityIcons\":1,\"slot\":\"Hand\"}",
+          "GMNotes": "{\"id\":\"sthr-lamp\",\"type\":\"Asset\",\"class\":\"Guardian\",\"traits\":\"Item. Tool.\",\"cycle\":\"The Still Hour\",\"cost\":2,\"willpowerIcons\":1,\"agilityIcons\":1,\"slot\":\"Hand\"}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -99,26 +92,19 @@
             "rotX": 0,
             "rotY": 180,
             "rotZ": 0,
-            "scaleX": 1.15,
+            "scaleX": 1.0,
             "scaleY": 1,
-            "scaleZ": 1.15
+            "scaleZ": 1.0
           },
-          "CustomUIAssets": [
-            {
-              "Name": "font_arkhamicons",
-              "Type": 1,
-              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-            }
-          ],
           "CustomDeck": {
-            "95011": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/sthr-lamp.jpg?v=ed3a51f84f",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/player_back.jpg?v=66196e40c9",
-              "NumWidth": 1,
-              "NumHeight": 1,
+            "99115": {
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/sheets/player-p-face.jpg?v=abde86a8b4",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/sheets/player-p-back.jpg?v=c67d5adecd",
+              "NumWidth": 7,
+              "NumHeight": 5,
               "Type": 0,
-              "UniqueBack": false,
-              "BackIsHidden": false
+              "UniqueBack": true,
+              "BackIsHidden": true
             }
           }
         },
@@ -127,7 +113,7 @@
           "Nickname": "I've Done This Before",
           "Description": "",
           "GUID": "9ab227",
-          "CardID": 9501200,
+          "CardID": 9911501,
           "SidewaysCard": false,
           "Tags": [
             "PlayerCard"
@@ -141,7 +127,7 @@
           },
           "Hands": true,
           "HideWhenFaceDown": true,
-          "GMNotes": "{\"id\":\"sthr-donebefore\",\"type\":\"Skill\",\"class\":\"Guardian\",\"traits\":\"Innate. Recollection.\",\"cycle\":\"The Still Hour\",\"level\":0,\"wildIcons\":1}",
+          "GMNotes": "{\"id\":\"sthr-donebefore\",\"type\":\"Skill\",\"class\":\"Guardian\",\"traits\":\"Innate. Recollection.\",\"cycle\":\"The Still Hour\",\"wildIcons\":1}",
           "Transform": {
             "posX": 0,
             "posY": 1.5,
@@ -149,26 +135,19 @@
             "rotX": 0,
             "rotY": 180,
             "rotZ": 0,
-            "scaleX": 1.15,
+            "scaleX": 1.0,
             "scaleY": 1,
-            "scaleZ": 1.15
+            "scaleZ": 1.0
           },
-          "CustomUIAssets": [
-            {
-              "Name": "font_arkhamicons",
-              "Type": 1,
-              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-            }
-          ],
           "CustomDeck": {
-            "95012": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/sthr-donebefore.jpg?v=e7a9cb1f50",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/player_back.jpg?v=66196e40c9",
-              "NumWidth": 1,
-              "NumHeight": 1,
+            "99115": {
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/sheets/player-p-face.jpg?v=abde86a8b4",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/sheets/player-p-back.jpg?v=c67d5adecd",
+              "NumWidth": 7,
+              "NumHeight": 5,
               "Type": 0,
-              "UniqueBack": false,
-              "BackIsHidden": false
+              "UniqueBack": true,
+              "BackIsHidden": true
             }
           }
         },
@@ -177,7 +156,7 @@
           "Nickname": "The Eighth Grave",
           "Description": "",
           "GUID": "c0ab9a",
-          "CardID": 9501300,
+          "CardID": 9911502,
           "SidewaysCard": false,
           "Tags": [
             "PlayerCard"
@@ -199,26 +178,19 @@
             "rotX": 0,
             "rotY": 180,
             "rotZ": 0,
-            "scaleX": 1.15,
+            "scaleX": 1.0,
             "scaleY": 1,
-            "scaleZ": 1.15
+            "scaleZ": 1.0
           },
-          "CustomUIAssets": [
-            {
-              "Name": "font_arkhamicons",
-              "Type": 1,
-              "URL": "https://steamusercontent-a.akamaihd.net/ugc/16577956848173876106/49B31DA9BD35FC54A6B33926EA220FBBB2CAD038/"
-            }
-          ],
           "CustomDeck": {
-            "95013": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/sthr-eighthgrave.jpg?v=ddbcc87eea",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/9d4b3ce2a18429d31b072becae7dc9f72954775b/dist/cards/player_back.jpg?v=66196e40c9",
-              "NumWidth": 1,
-              "NumHeight": 1,
+            "99115": {
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/sheets/player-p-face.jpg?v=abde86a8b4",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/096328c8b56c5c7109543e7a2206f65878ac34d6/dist/cards/sheets/player-p-back.jpg?v=c67d5adecd",
+              "NumWidth": 7,
+              "NumHeight": 5,
               "Type": 0,
-              "UniqueBack": false,
-              "BackIsHidden": false
+              "UniqueBack": true,
+              "BackIsHidden": true
             }
           }
         }
