@@ -446,6 +446,12 @@ return function(H)
     if not G.finale then
       T.ctl("Reset Loop")
       E.run(0.5)
+      -- a night that ended by its objective (not by the Hourglass or Dissonance) is not over by the Control's
+      -- count: the first click only asks, the second ends it
+      if T.st().loopEnded == false then
+        T.ctl("Reset Loop")
+        E.run(0.5)
+      end
       if not G.prologue then
         T.api("shApiInterlude", { open = true })
         for _, inv in ipairs(G.inv) do
