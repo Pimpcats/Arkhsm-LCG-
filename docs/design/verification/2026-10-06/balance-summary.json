@@ -1,0 +1,1286 @@
+{
+ "_comment": "Whole-campaign simulations (tools/play_engine/run.py --campaign), seed 5000, 3 investigators, Standard difficulty. 'difficulty' = the goalsPerNight 2 method (every night has two goals), 'experience' = the default carried campaign. Built from tools/play_engine/campaign_summary.py. The table is SCED assembled from argonui/SCED commit 0e12534a (the owner's 4.8.0 save was not available), so absolute numbers can differ slightly from earlier reports; the published-main runs on the same table are the paired baseline. Simulation, not playtest.",
+ "runs": {
+  "new_EAC_difficulty": {
+   "campaigns": 20,
+   "slots": {
+    "1": {
+     "name": "Prologue",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 18,
+     "rate": 0.9,
+     "target": 0.8
+    },
+    "2": {
+     "name": "Night 1",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 13,
+     "rate": 0.65,
+     "target": 0.8
+    },
+    "3": {
+     "name": "Night 2",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 16,
+     "rate": 0.8,
+     "target": 0.7
+    },
+    "4": {
+     "name": "Night 3",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 3,
+     "rate": 0.15,
+     "target": 0.7
+    },
+    "5": {
+     "name": "Night 4",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 12,
+     "rate": 0.6,
+     "target": 0.6
+    },
+    "6": {
+     "name": "Night 5",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 5,
+     "rate": 0.25,
+     "target": 0.6
+    },
+    "7": {
+     "name": "Night 6",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 13,
+     "rate": 0.65,
+     "target": 0.5
+    },
+    "8": {
+     "name": "Night 7",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 10,
+     "rate": 0.5,
+     "target": 0.5
+    },
+    "9": {
+     "name": "Night 8",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 11,
+     "rate": 0.55,
+     "target": 0.4
+    },
+    "10": {
+     "name": "Finale",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 19,
+     "rate": 0.95,
+     "target": 0.4
+    }
+   },
+   "xp": {
+    "mean": 42.85,
+    "min": 33.0,
+    "max": 49.333333333333336,
+    "stdev": 4.363325693907242
+   },
+   "quest": {
+    "sthrelias": {
+     "mean_slot": 3.2,
+     "campaigns": 20
+    },
+    "sthrayako": {
+     "mean_slot": 2.7,
+     "campaigns": 20
+    },
+    "sthrcass": {
+     "mean_slot": 3.0,
+     "campaigns": 20
+    }
+   },
+   "defeats": {
+    "sthrelias": 54,
+    "sthrcass": 19,
+    "sthrayako": 26
+   },
+   "memory_sources": {
+    "The Long Pier": 1,
+    "Elias: prevented damage": 215,
+    "Ayako: [int] success": 298,
+    "Cass: revealed a symbol token": 301,
+    "Elias: dealt damage": 104,
+    "The Reading Room": 7,
+    "Cassandra's Notebook": 16,
+    "Anchor Point: begins the loop with 1 Memory": 94,
+    "every death is written down": 44,
+    "Familiar Face": 6
+   },
+   "players": 3,
+   "usage": {
+    "damage prevented by Elias": 1.89,
+    "translation tokens placed": 5.595,
+    "deck reshuffles (empty deck)": 0.445
+   },
+   "mean_rate_all_slots": 0.6,
+   "mean_rate_nine": 0.5611111111111111,
+   "target_mean_nine": 0.6222222222222222,
+   "method": "goalsPerNight 2",
+   "party": "Elias, Ayako, Cass",
+   "commit": "5c76f34",
+   "file": "n2_g2_eac"
+  },
+  "new_BCS_difficulty": {
+   "campaigns": 20,
+   "slots": {
+    "1": {
+     "name": "Prologue",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 17,
+     "rate": 0.85,
+     "target": 0.8
+    },
+    "2": {
+     "name": "Night 1",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 14,
+     "rate": 0.7,
+     "target": 0.8
+    },
+    "3": {
+     "name": "Night 2",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 10,
+     "rate": 0.5,
+     "target": 0.7
+    },
+    "4": {
+     "name": "Night 3",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 10,
+     "rate": 0.5,
+     "target": 0.7
+    },
+    "5": {
+     "name": "Night 4",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 16,
+     "rate": 0.8,
+     "target": 0.6
+    },
+    "6": {
+     "name": "Night 5",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 8,
+     "rate": 0.4,
+     "target": 0.6
+    },
+    "7": {
+     "name": "Night 6",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 15,
+     "rate": 0.75,
+     "target": 0.5
+    },
+    "8": {
+     "name": "Night 7",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 9,
+     "rate": 0.45,
+     "target": 0.5
+    },
+    "9": {
+     "name": "Night 8",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 12,
+     "rate": 0.6,
+     "target": 0.4
+    },
+    "10": {
+     "name": "Finale",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 20,
+     "rate": 1.0,
+     "target": 0.4
+    }
+   },
+   "xp": {
+    "mean": 46.3,
+    "min": 38.666666666666664,
+    "max": 49.333333333333336,
+    "stdev": 2.8085187871505823
+   },
+   "quest": {
+    "sthrseraphine": {
+     "mean_slot": 1.65,
+     "campaigns": 20
+    },
+    "sthrcass": {
+     "mean_slot": 2.7,
+     "campaigns": 20
+    },
+    "sthrbirdie": {
+     "mean_slot": 3.3,
+     "campaigns": 20
+    }
+   },
+   "defeats": {
+    "sthrseraphine": 73,
+    "sthrcass": 24,
+    "sthrbirdie": 28
+   },
+   "memory_sources": {
+    "Seraphine: dealt horror": 340,
+    "Cass: revealed a symbol token": 300,
+    "Birdie: failed by 2 or more": 365,
+    "The Reading Room": 7,
+    "Anchor Point: begins the loop with 1 Memory": 188,
+    "every death is written down": 52,
+    "Familiar Face": 2
+   },
+   "players": 3,
+   "usage": {
+    "events returned by Birdie": 1.675,
+    "deck reshuffles (empty deck)": 0.395
+   },
+   "mean_rate_all_slots": 0.655,
+   "mean_rate_nine": 0.6166666666666667,
+   "target_mean_nine": 0.6222222222222222,
+   "method": "goalsPerNight 2",
+   "party": "Birdie, Cass, Seraphine",
+   "commit": "824d1b6 (identical for this party: no Elias)",
+   "file": "n2_g2_bcs"
+  },
+  "old_EAC_difficulty": {
+   "campaigns": 20,
+   "slots": {
+    "1": {
+     "name": "Prologue",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 19,
+     "rate": 0.95,
+     "target": 0.8
+    },
+    "2": {
+     "name": "Night 1",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 13,
+     "rate": 0.65,
+     "target": 0.8
+    },
+    "3": {
+     "name": "Night 2",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 14,
+     "rate": 0.7,
+     "target": 0.7
+    },
+    "4": {
+     "name": "Night 3",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 6,
+     "rate": 0.3,
+     "target": 0.7
+    },
+    "5": {
+     "name": "Night 4",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 15,
+     "rate": 0.75,
+     "target": 0.6
+    },
+    "6": {
+     "name": "Night 5",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 3,
+     "rate": 0.15,
+     "target": 0.6
+    },
+    "7": {
+     "name": "Night 6",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 12,
+     "rate": 0.6,
+     "target": 0.5
+    },
+    "8": {
+     "name": "Night 7",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 13,
+     "rate": 0.65,
+     "target": 0.5
+    },
+    "9": {
+     "name": "Night 8",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 8,
+     "rate": 0.4,
+     "target": 0.4
+    },
+    "10": {
+     "name": "Finale",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 19,
+     "rate": 0.95,
+     "target": 0.4
+    }
+   },
+   "xp": {
+    "mean": 45.25,
+    "min": 39.0,
+    "max": 49.333333333333336,
+    "stdev": 3.140903974619055
+   },
+   "quest": {},
+   "defeats": {
+    "sthrelias": 62,
+    "sthrayako": 45,
+    "sthrcass": 23
+   },
+   "memory_sources": {
+    "Ayako: [int] success": 375,
+    "Cass: revealed a symbol token": 375,
+    "Elias: dealt damage": 405,
+    "Cassandra's Notebook": 12,
+    "The Reading Room": 6,
+    "Familiar Face": 6,
+    "Anchor Point: begins the loop with 1 Memory": 118,
+    "every death is written down": 56
+   },
+   "players": 3,
+   "usage": {
+    "deck reshuffles (empty deck)": 0.435
+   },
+   "mean_rate_all_slots": 0.61,
+   "mean_rate_nine": 0.5722222222222222,
+   "target_mean_nine": 0.6222222222222222,
+   "method": "goalsPerNight 2",
+   "party": "Elias, Ayako, Cass",
+   "commit": "main 44d2c9d",
+   "file": "goals2"
+  },
+  "old_BCS_difficulty": {
+   "campaigns": 20,
+   "slots": {
+    "1": {
+     "name": "Prologue",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 17,
+     "rate": 0.85,
+     "target": 0.8
+    },
+    "2": {
+     "name": "Night 1",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 10,
+     "rate": 0.5,
+     "target": 0.8
+    },
+    "3": {
+     "name": "Night 2",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 8,
+     "rate": 0.4,
+     "target": 0.7
+    },
+    "4": {
+     "name": "Night 3",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 7,
+     "rate": 0.35,
+     "target": 0.7
+    },
+    "5": {
+     "name": "Night 4",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 13,
+     "rate": 0.65,
+     "target": 0.6
+    },
+    "6": {
+     "name": "Night 5",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 4,
+     "rate": 0.2,
+     "target": 0.6
+    },
+    "7": {
+     "name": "Night 6",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 14,
+     "rate": 0.7,
+     "target": 0.5
+    },
+    "8": {
+     "name": "Night 7",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 12,
+     "rate": 0.6,
+     "target": 0.5
+    },
+    "9": {
+     "name": "Night 8",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 7,
+     "rate": 0.35,
+     "target": 0.4
+    },
+    "10": {
+     "name": "Finale",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 19,
+     "rate": 0.95,
+     "target": 0.4
+    }
+   },
+   "xp": {
+    "mean": 42.4,
+    "min": 31.333333333333332,
+    "max": 53.333333333333336,
+    "stdev": 4.99622079398241
+   },
+   "quest": {},
+   "defeats": {
+    "sthrseraphine": 73,
+    "sthrcass": 22,
+    "sthrbirdie": 24
+   },
+   "memory_sources": {
+    "Cass: revealed a symbol token": 372,
+    "Birdie: failed by 2 or more": 484,
+    "Seraphine: Dissonance raised in the investigation phase": 463,
+    "Familiar Face": 4,
+    "The Long Pier": 1,
+    "The Reading Room": 5,
+    "Anchor Point: begins the loop with 1 Memory": 196,
+    "every death is written down": 24
+   },
+   "players": 3,
+   "usage": {
+    "deck reshuffles (empty deck)": 0.395
+   },
+   "mean_rate_all_slots": 0.5549999999999999,
+   "mean_rate_nine": 0.5111111111111111,
+   "target_mean_nine": 0.6222222222222222,
+   "method": "goalsPerNight 2",
+   "party": "Birdie, Cass, Seraphine",
+   "commit": "main 44d2c9d",
+   "file": "goals2_bcs"
+  },
+  "new_EAC_experience": {
+   "campaigns": 20,
+   "slots": {
+    "1": {
+     "name": "Prologue",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 17,
+     "rate": 0.85,
+     "target": 0.8
+    },
+    "2": {
+     "name": "Night 1",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 15,
+     "rate": 0.75,
+     "target": 0.8
+    },
+    "3": {
+     "name": "Night 2",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 19,
+     "rate": 0.95,
+     "target": 0.7
+    },
+    "4": {
+     "name": "Night 3",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 20,
+     "rate": 1.0,
+     "target": 0.7
+    },
+    "5": {
+     "name": "Night 4",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 17,
+     "rate": 0.85,
+     "target": 0.6
+    },
+    "6": {
+     "name": "Night 5",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 17,
+     "rate": 0.85,
+     "target": 0.6
+    },
+    "7": {
+     "name": "Night 6",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 20,
+     "rate": 1.0,
+     "target": 0.5
+    },
+    "8": {
+     "name": "Night 7",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 20,
+     "rate": 1.0,
+     "target": 0.5
+    },
+    "9": {
+     "name": "Night 8",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 14,
+     "rate": 0.7,
+     "target": 0.4
+    },
+    "10": {
+     "name": "Finale",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 18,
+     "rate": 0.9,
+     "target": 0.4
+    }
+   },
+   "xp": {
+    "mean": 38.416666666666664,
+    "min": 31.333333333333332,
+    "max": 45.333333333333336,
+    "stdev": 3.1935264381418724
+   },
+   "quest": {
+    "sthrelias": {
+     "mean_slot": 3.55,
+     "campaigns": 20
+    },
+    "sthrcass": {
+     "mean_slot": 3.1,
+     "campaigns": 20
+    },
+    "sthrayako": {
+     "mean_slot": 2.8,
+     "campaigns": 20
+    }
+   },
+   "defeats": {
+    "sthrelias": 53,
+    "sthrcass": 17,
+    "sthrayako": 23
+   },
+   "memory_sources": {
+    "The Long Pier": 1,
+    "Familiar Face": 11,
+    "Elias: prevented damage": 236,
+    "Cass: revealed a symbol token": 306,
+    "Ayako: [int] success": 309,
+    "Elias: dealt damage": 108,
+    "Cassandra's Notebook": 13,
+    "The Reading Room": 21,
+    "Anchor Point: begins the loop with 1 Memory": 90
+   },
+   "players": 3,
+   "usage": {
+    "damage prevented by Elias": 2.015,
+    "translation tokens placed": 5.515,
+    "deck reshuffles (empty deck)": 0.545
+   },
+   "mean_rate_all_slots": 0.885,
+   "mean_rate_nine": 0.8833333333333333,
+   "target_mean_nine": 0.6222222222222222,
+   "method": "default",
+   "party": "Elias, Ayako, Cass",
+   "commit": "5c76f34",
+   "file": "xp_eac"
+  },
+  "new_BCS_experience": {
+   "campaigns": 20,
+   "slots": {
+    "1": {
+     "name": "Prologue",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 16,
+     "rate": 0.8,
+     "target": 0.8
+    },
+    "2": {
+     "name": "Night 1",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 13,
+     "rate": 0.65,
+     "target": 0.8
+    },
+    "3": {
+     "name": "Night 2",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 20,
+     "rate": 1.0,
+     "target": 0.7
+    },
+    "4": {
+     "name": "Night 3",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 17,
+     "rate": 0.85,
+     "target": 0.7
+    },
+    "5": {
+     "name": "Night 4",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 15,
+     "rate": 0.75,
+     "target": 0.6
+    },
+    "6": {
+     "name": "Night 5",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 20,
+     "rate": 1.0,
+     "target": 0.6
+    },
+    "7": {
+     "name": "Night 6",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 20,
+     "rate": 1.0,
+     "target": 0.5
+    },
+    "8": {
+     "name": "Night 7",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 20,
+     "rate": 1.0,
+     "target": 0.5
+    },
+    "9": {
+     "name": "Night 8",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 16,
+     "rate": 0.8,
+     "target": 0.4
+    },
+    "10": {
+     "name": "Finale",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 19,
+     "rate": 0.95,
+     "target": 0.4
+    }
+   },
+   "xp": {
+    "mean": 39.36666666666667,
+    "min": 35.0,
+    "max": 44.333333333333336,
+    "stdev": 2.3235509223791264
+   },
+   "quest": {
+    "sthrseraphine": {
+     "mean_slot": 1.65,
+     "campaigns": 20
+    },
+    "sthrcass": {
+     "mean_slot": 3.25,
+     "campaigns": 20
+    },
+    "sthrbirdie": {
+     "mean_slot": 3.3,
+     "campaigns": 20
+    }
+   },
+   "defeats": {
+    "sthrseraphine": 65,
+    "sthrcass": 26,
+    "sthrbirdie": 36
+   },
+   "memory_sources": {
+    "Seraphine: dealt horror": 366,
+    "Cass: revealed a symbol token": 295,
+    "Birdie: failed by 2 or more": 363,
+    "The Reading Room": 16,
+    "Anchor Point: begins the loop with 1 Memory": 181,
+    "Familiar Face": 6
+   },
+   "players": 3,
+   "usage": {
+    "events returned by Birdie": 1.75,
+    "deck reshuffles (empty deck)": 0.495
+   },
+   "mean_rate_all_slots": 0.88,
+   "mean_rate_nine": 0.8722222222222222,
+   "target_mean_nine": 0.6222222222222222,
+   "method": "default",
+   "party": "Birdie, Cass, Seraphine",
+   "commit": "824d1b6 (identical for this party: no Elias)",
+   "file": "xp_bcs"
+  },
+  "new_EBS_experience": {
+   "campaigns": 12,
+   "slots": {
+    "1": {
+     "name": "Prologue",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 12,
+     "rate": 1.0,
+     "target": 0.8
+    },
+    "2": {
+     "name": "Night 1",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 7,
+     "rate": 0.5833333333333334,
+     "target": 0.8
+    },
+    "3": {
+     "name": "Night 2",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 12,
+     "rate": 1.0,
+     "target": 0.7
+    },
+    "4": {
+     "name": "Night 3",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 11,
+     "rate": 0.9166666666666666,
+     "target": 0.7
+    },
+    "5": {
+     "name": "Night 4",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 6,
+     "rate": 0.5,
+     "target": 0.6
+    },
+    "6": {
+     "name": "Night 5",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 10,
+     "rate": 0.8333333333333334,
+     "target": 0.6
+    },
+    "7": {
+     "name": "Night 6",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 11,
+     "rate": 0.9166666666666666,
+     "target": 0.5
+    },
+    "8": {
+     "name": "Night 7",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 11,
+     "rate": 0.9166666666666666,
+     "target": 0.5
+    },
+    "9": {
+     "name": "Night 8",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 11,
+     "rate": 0.9166666666666666,
+     "target": 0.4
+    },
+    "10": {
+     "name": "Finale",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 11,
+     "rate": 0.9166666666666666,
+     "target": 0.4
+    }
+   },
+   "xp": {
+    "mean": 38.52777777777778,
+    "min": 33.0,
+    "max": 44.333333333333336,
+    "stdev": 3.125339487732533
+   },
+   "quest": {
+    "sthrseraphine": {
+     "mean_slot": 1.6666666666666667,
+     "campaigns": 12
+    },
+    "sthrelias": {
+     "mean_slot": 3.6666666666666665,
+     "campaigns": 12
+    },
+    "sthrbirdie": {
+     "mean_slot": 3.0,
+     "campaigns": 12
+    }
+   },
+   "defeats": {
+    "sthrelias": 32,
+    "sthrseraphine": 38,
+    "sthrbirdie": 22
+   },
+   "memory_sources": {
+    "Seraphine: dealt horror": 215,
+    "Elias: prevented damage": 144,
+    "Birdie: failed by 2 or more": 240,
+    "Familiar Face": 12,
+    "Elias: dealt damage": 46,
+    "The Reading Room": 8,
+    "Anchor Point: begins the loop with 1 Memory": 86
+   },
+   "players": 3,
+   "usage": {
+    "damage prevented by Elias": 1.975,
+    "events returned by Birdie": 1.975,
+    "deck reshuffles (empty deck)": 0.5166666666666667
+   },
+   "mean_rate_all_slots": 0.85,
+   "mean_rate_nine": 0.8425925925925926,
+   "target_mean_nine": 0.6222222222222222,
+   "method": "default",
+   "party": "Elias, Birdie, Seraphine",
+   "commit": "5c76f34",
+   "file": "xp_ebs"
+  },
+  "new_AES_experience": {
+   "campaigns": 12,
+   "slots": {
+    "1": {
+     "name": "Prologue",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 9,
+     "rate": 0.75,
+     "target": 0.8
+    },
+    "2": {
+     "name": "Night 1",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 11,
+     "rate": 0.9166666666666666,
+     "target": 0.8
+    },
+    "3": {
+     "name": "Night 2",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 12,
+     "rate": 1.0,
+     "target": 0.7
+    },
+    "4": {
+     "name": "Night 3",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 12,
+     "rate": 1.0,
+     "target": 0.7
+    },
+    "5": {
+     "name": "Night 4",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 10,
+     "rate": 0.8333333333333334,
+     "target": 0.6
+    },
+    "6": {
+     "name": "Night 5",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 10,
+     "rate": 0.8333333333333334,
+     "target": 0.6
+    },
+    "7": {
+     "name": "Night 6",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 12,
+     "rate": 1.0,
+     "target": 0.5
+    },
+    "8": {
+     "name": "Night 7",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 12,
+     "rate": 1.0,
+     "target": 0.5
+    },
+    "9": {
+     "name": "Night 8",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 6,
+     "rate": 0.5,
+     "target": 0.4
+    },
+    "10": {
+     "name": "Finale",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 12,
+     "rate": 1.0,
+     "target": 0.4
+    }
+   },
+   "xp": {
+    "mean": 40.69444444444444,
+    "min": 33.666666666666664,
+    "max": 46.666666666666664,
+    "stdev": 3.8501042153603837
+   },
+   "quest": {
+    "sthrseraphine": {
+     "mean_slot": 1.5833333333333333,
+     "campaigns": 12
+    },
+    "sthrelias": {
+     "mean_slot": 2.9166666666666665,
+     "campaigns": 12
+    },
+    "sthrayako": {
+     "mean_slot": 2.75,
+     "campaigns": 12
+    }
+   },
+   "defeats": {
+    "sthrseraphine": 33,
+    "sthrelias": 19,
+    "sthrayako": 16
+   },
+   "memory_sources": {
+    "Familiar Face": 11,
+    "Seraphine: dealt horror": 219,
+    "The Long Pier": 1,
+    "Elias: prevented damage": 153,
+    "Ayako: [int] success": 190,
+    "Cassandra's Notebook": 9,
+    "Elias: dealt damage": 54,
+    "The Reading Room": 9,
+    "Anchor Point: begins the loop with 1 Memory": 116
+   },
+   "players": 3,
+   "usage": {
+    "damage prevented by Elias": 2.1166666666666667,
+    "translation tokens placed": 6.058333333333334,
+    "deck reshuffles (empty deck)": 0.6583333333333333
+   },
+   "mean_rate_all_slots": 0.8833333333333333,
+   "mean_rate_nine": 0.8703703703703703,
+   "target_mean_nine": 0.6222222222222222,
+   "method": "default",
+   "party": "Ayako, Elias, Seraphine",
+   "commit": "5c76f34",
+   "file": "xp_aes"
+  },
+  "new_ABC_experience": {
+   "campaigns": 12,
+   "slots": {
+    "1": {
+     "name": "Prologue",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 7,
+     "rate": 0.5833333333333334,
+     "target": 0.8
+    },
+    "2": {
+     "name": "Night 1",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 5,
+     "rate": 0.4166666666666667,
+     "target": 0.8
+    },
+    "3": {
+     "name": "Night 2",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 12,
+     "rate": 1.0,
+     "target": 0.7
+    },
+    "4": {
+     "name": "Night 3",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 12,
+     "rate": 1.0,
+     "target": 0.7
+    },
+    "5": {
+     "name": "Night 4",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 10,
+     "rate": 0.8333333333333334,
+     "target": 0.6
+    },
+    "6": {
+     "name": "Night 5",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 12,
+     "rate": 1.0,
+     "target": 0.6
+    },
+    "7": {
+     "name": "Night 6",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 12,
+     "rate": 1.0,
+     "target": 0.5
+    },
+    "8": {
+     "name": "Night 7",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 12,
+     "rate": 1.0,
+     "target": 0.5
+    },
+    "9": {
+     "name": "Night 8",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 10,
+     "rate": 0.8333333333333334,
+     "target": 0.4
+    },
+    "10": {
+     "name": "Finale",
+     "played": 12,
+     "reached": 1.0,
+     "wins": 11,
+     "rate": 0.9166666666666666,
+     "target": 0.4
+    }
+   },
+   "xp": {
+    "mean": 37.22222222222222,
+    "min": 32.333333333333336,
+    "max": 43.666666666666664,
+    "stdev": 3.192390644124142
+   },
+   "quest": {
+    "sthrcass": {
+     "mean_slot": 3.5,
+     "campaigns": 12
+    },
+    "sthrayako": {
+     "mean_slot": 2.9166666666666665,
+     "campaigns": 12
+    },
+    "sthrbirdie": {
+     "mean_slot": 3.4166666666666665,
+     "campaigns": 12
+    }
+   },
+   "defeats": {
+    "sthrbirdie": 7,
+    "sthrcass": 7,
+    "sthrayako": 13
+   },
+   "memory_sources": {
+    "Cass: revealed a symbol token": 168,
+    "Ayako: [int] success": 178,
+    "Cassandra's Notebook": 11,
+    "Birdie: failed by 2 or more": 198,
+    "The Reading Room": 13,
+    "Anchor Point: begins the loop with 1 Memory": 132,
+    "Familiar Face": 1
+   },
+   "players": 3,
+   "usage": {
+    "translation tokens placed": 5.391666666666667,
+    "events returned by Birdie": 1.4083333333333334,
+    "deck reshuffles (empty deck)": 0.525
+   },
+   "mean_rate_all_slots": 0.8583333333333334,
+   "mean_rate_nine": 0.8518518518518519,
+   "target_mean_nine": 0.6222222222222222,
+   "method": "default",
+   "party": "Ayako, Birdie, Cass",
+   "commit": "5c76f34",
+   "file": "xp_abc"
+  },
+  "old_EAC_experience": {
+   "campaigns": 20,
+   "slots": {
+    "1": {
+     "name": "Prologue",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 17,
+     "rate": 0.85,
+     "target": 0.8
+    },
+    "2": {
+     "name": "Night 1",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 13,
+     "rate": 0.65,
+     "target": 0.8
+    },
+    "3": {
+     "name": "Night 2",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 20,
+     "rate": 1.0,
+     "target": 0.7
+    },
+    "4": {
+     "name": "Night 3",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 19,
+     "rate": 0.95,
+     "target": 0.7
+    },
+    "5": {
+     "name": "Night 4",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 17,
+     "rate": 0.85,
+     "target": 0.6
+    },
+    "6": {
+     "name": "Night 5",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 19,
+     "rate": 0.95,
+     "target": 0.6
+    },
+    "7": {
+     "name": "Night 6",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 20,
+     "rate": 1.0,
+     "target": 0.5
+    },
+    "8": {
+     "name": "Night 7",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 20,
+     "rate": 1.0,
+     "target": 0.5
+    },
+    "9": {
+     "name": "Night 8",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 16,
+     "rate": 0.8,
+     "target": 0.4
+    },
+    "10": {
+     "name": "Finale",
+     "played": 20,
+     "reached": 1.0,
+     "wins": 15,
+     "rate": 0.75,
+     "target": 0.4
+    }
+   },
+   "xp": {
+    "mean": 39.53333333333333,
+    "min": 34.0,
+    "max": 45.333333333333336,
+    "stdev": 3.3356658505711665
+   },
+   "quest": {},
+   "defeats": {
+    "sthrelias": 63,
+    "sthrayako": 54,
+    "sthrcass": 30
+   },
+   "memory_sources": {
+    "Ayako: [int] success": 390,
+    "Cass: revealed a symbol token": 388,
+    "Elias: dealt damage": 411,
+    "Cassandra's Notebook": 12,
+    "The Reading Room": 16,
+    "Anchor Point: begins the loop with 1 Memory": 112,
+    "Familiar Face": 11
+   },
+   "players": 3,
+   "usage": {
+    "deck reshuffles (empty deck)": 0.5
+   },
+   "mean_rate_all_slots": 0.88,
+   "mean_rate_nine": 0.8944444444444445,
+   "target_mean_nine": 0.6222222222222222,
+   "method": "default",
+   "party": "Elias, Ayako, Cass",
+   "commit": "main 44d2c9d",
+   "file": "games"
+  }
+ }
+}

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "campaign": "still_hour",
-  "stage": "offline_validated_awaiting_live_playtest_and_curve_calibration",
+  "stage": "portable_investigators_built_offline_validated_awaiting_live_playtest",
   "owner_preferences": {
     "minimal_manual_work": true,
     "first_time_player": true,
@@ -91,13 +91,15 @@
     "2026-09-29: owner decision: assets/plugins/ArkhamHorrorLCG.seext stays in the repo (sharing allowed; public, non-commercial use).",
     "2026-09-29: the 7 remaining monster illustrations imported (owner-generated), framed with committed art placements (campaigns/still_hour/art_placements.json).",
     "2026-10-02: reviewed finishing corrections applied; 133 effective cards, 200 framed images, 24-page guide. 111 pytest tests and 155 subtests; both Lua versions, real-SCED harness, CardForge and three Godot renders pass. 70 final measurement cells / 1319 slots; 400 scoped proposal trials separately archived. See docs/design/FINISHING_CORRECTIONS.md and FINISHING_BALANCE.md. Exact target curve and human playtest approval remain open.",
-    "2026-10-02: release housekeeping. publish_hosted.py removes only the published campaign's own earlier images (prefix-scoped; Still Hour URLs unchanged; tests/test_publish_hosted.py). Full suite passes with CAMPAIGN set to a scaffolded campaign (tests/conftest.py pins still_hour): 116 passed, 1 skipped there; 115 passed, 2 skipped, 155 subtests in the checkout. CardForge selftest 20/20, Lua rules 309/309 and bundle check OK on Lua 5.2 and 5.4. Art complete; log hidden-name decision already implemented. Owner docs refreshed; player quick reference docs/QUICK_REFERENCE.md added (play aid)."
+    "2026-10-02: release housekeeping. publish_hosted.py removes only the published campaign's own earlier images (prefix-scoped; Still Hour URLs unchanged; tests/test_publish_hosted.py). Full suite passes with CAMPAIGN set to a scaffolded campaign (tests/conftest.py pins still_hour): 116 passed, 1 skipped there; 115 passed, 2 skipped, 155 subtests in the checkout. CardForge selftest 20/20, Lua rules 309/309 and bundle check OK on Lua 5.2 and 5.4. Art complete; log hidden-name decision already implemented. Owner docs refreshed; player quick reference docs/QUICK_REFERENCE.md added (play aid).",
+    "2026-10-06: portable investigators and ten personal quest cards built on branch claude/loving-bohr-n7ixl4 (unpublished); Lua rules tests pass on 5.2 and 5.4 (smoke 322 checks); whole-campaign simulation: nine-night goal rate 56.1% (Elias/Ayako/Cass) and 61.7% (Birdie/Cass/Seraphine), experience 37.2-40.7 per investigator across five parties; see docs/design/FINISHING_BALANCE.md 'Quest cards, 2026-10-06' and docs/design/verification/2026-10-06/"
   ],
   "next_actions": [
+    "Owner: decide whether to publish the branch (investigator redesign, quest cards, Place-step logging).",
+    "Art: generate and register the ten quest-card illustrations briefed in pipeline/art_manifest.json (placeholders until then).",
+    "Open defect: TTS crash on Place (The First Hour); need the last 60 lines of Player.log and whether The Lighthouse box also crashes (docs/design/PLACE_BUTTON_AUDIT.md).",
     "Owner: run current main through the live TTS relay (Start TTS Relay.bat; docs/TTS_RELAY.md).",
-    "Human playtest: opening, first night and complete campaigns at intended difficulty/player count; record objective success, defeats, earned XP and purchases by played slot.",
-    "Calibration: investigate the first-to-second-night reversal, route outliers and finale residual with actual carried decks; do not approve the exact target curve from the current model.",
-    "Optional: vary campaign/scenario box art, which currently shares a texture."
+    "Human playtest: opening, first night and complete campaigns at intended difficulty/player count; record objective success, defeats, earned XP and purchases by played slot."
   ],
   "connection": "GitHub handoff; no live connection to the owner's desktop or TTS.",
   "tts_relay": {

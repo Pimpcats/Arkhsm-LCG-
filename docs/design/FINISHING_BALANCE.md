@@ -126,3 +126,89 @@ The correction ledger links the three independent reviews. `verification/2026-10
 ## Experience by party (2026-10-03)
 
 Whole carried campaigns, three investigators, 20 campaigns per party, Memory banked per investigator (mean, range): Elias/Ayako/Cass 39.0 (32.7–44.3); Birdie/Cass/Seraphine 40.1 (34.0–46.3); Elias/Birdie/Seraphine 38.8 (32.0–50.7); Ayako/Elias/Seraphine 42.6 (35.7–47.0); Ayako/Birdie/Cass 40.1 (33.0–48.7). The spread between parties is 3.8, inside the official 35–45 band. Before the change the Elias/Birdie/Seraphine party earned 36. Each investigator's own Memory reaction now has no per-round limit and a per-loop cap (twice for Ayako and Cass, three times for the others); Elias gains Memory whenever he is dealt damage, Seraphine whenever Dissonance is raised in the investigation phase, and her elder sign is capped at +3.
+
+## Quest cards, 2026-10-06
+
+Designer-facing; spoilers. What was measured after the investigators were made
+portable (docs/design/PORTABLE_INVESTIGATORS.md): new fronts, signature cards and
+weaknesses, and a personal quest card whose unlocked side carries each
+investigator's Memory reaction. Simulation, not playtest. Raw per-run figures:
+docs/design/verification/2026-10-06/balance-summary.json; the tool is
+`tools/play_engine/campaign_summary.py`.
+
+**Method.** Whole carried campaigns (`run.py --campaign`), three investigators,
+Standard difficulty, seed 5000. *Difficulty* uses the `goalsPerNight 2` method
+above (every night has two goals; a night is won when every goal is done).
+*Experience* is the default carried campaign (Memory banked per investigator,
+the bank's gain each slot). Elias/Ayako/Cass and Birdie/Cass/Seraphine: 20
+campaigns for both measures; the other three parties: 12 campaigns for
+experience. The table is SCED assembled from argonui/SCED at commit 0e12534a,
+because the owner's 4.8.0 save was not in the build container. To check that it
+reproduces the earlier numbers, the published `main` build was run on the same
+table: Elias/Ayako/Cass nine-night goal rate 57.2% (earlier report 59%) and
+experience 39.5 per investigator (earlier 39.0). Old numbers below are those
+paired `main` runs, except experience for the other four parties (earlier
+report, 2026-10-03).
+
+### Difficulty (goals met per night; Prologue to Night 8 mean against the curve)
+
+| Night | Curve | Elias/Ayako/Cass new | old | Birdie/Cass/Seraphine new | old |
+|---|---:|---:|---:|---:|---:|
+| Prologue | 80 | 90 | 95 | 85 | 85 |
+| Night 1 | 80 | 65 | 65 | 70 | 50 |
+| Night 2 | 70 | 80 | 70 | 50 | 40 |
+| Night 3 | 70 | 15 | 30 | 50 | 35 |
+| Night 4 | 60 | 60 | 75 | 80 | 65 |
+| Night 5 | 60 | 25 | 15 | 40 | 20 |
+| Night 6 | 50 | 65 | 60 | 75 | 70 |
+| Night 7 | 50 | 50 | 65 | 45 | 60 |
+| Night 8 | 40 | 55 | 40 | 60 | 35 |
+| **Mean, nine nights** | 62 | **56.1** | 57.2 | **61.7** | 51.1 |
+
+Per-night rates swing about 22 points at n = 20 and depend on which districts
+the fixed route draws (Night 3 and Night 5 are the two district pairs that are
+hard in both builds); read the mean. The new build sits at the old level for
+Elias/Ayako/Cass and 10 points higher for Birdie/Cass/Seraphine (whose Memory
+elder sign and Dissonance costs are gone). The finale slot only records that
+the contest was reached (95-100%) and is not a difficulty measure.
+
+### Experience (Memory banked per investigator over a campaign; official 35-45)
+
+| Party | New, mean (range) | Old |
+|---|---|---:|
+| Elias, Ayako, Cass | 38.4 (31.3-45.3) | 39.0 |
+| Birdie, Cass, Seraphine | 39.4 (35.0-44.3) | 40.1 |
+| Elias, Birdie, Seraphine | 38.5 (33.0-44.3) | 38.8 |
+| Ayako, Elias, Seraphine | 40.7 (33.7-46.7) | 42.6 |
+| Ayako, Birdie, Cass | 37.2 (32.3-43.7) | 40.1 |
+
+The spread between parties is 3.5, inside the official band, as before (3.8).
+The quest cards cost 0.3 to 2.9 Memory per investigator against the old build,
+because a reaction pays only after its quest is met.
+
+### Quest timing and what the abilities do (per played slot)
+
+| Quest (goal) | Met by the end of slot (mean; 1 = Prologue) | Ability use |
+|---|---|---|
+| Elias: prevent 4 damage | 3.2-3.7 | prevents about 2 damage a slot; deck reshuffles 0.4-0.7 a slot (0.4 before) |
+| Ayako: first token on 8 enemies | 2.7-2.9 | about 5.5 translation tokens a slot |
+| Cass: cancel 3 symbols | 2.7-3.5 | about 1 a slot |
+| Birdie: spend 8 resolve | 3.0-3.4 | returns an event 1.4-2.0 times a slot |
+| Seraphine: use ability 8 times | 1.6-1.7 | about 4 times a slot |
+
+Seraphine's quest is met in the Prologue or Night 1 in every campaign; a few
+campaigns meet Elias's or Cass's during the Prologue (slot 1); the latest any
+quest is met is slot 6, in every campaign.
+
+### What changed during the measurement, and what is still open
+
+| Item | Detail | Status |
+|---|---|---|
+| Quest goals | First goals (8-12) were met on nights 4-7 and left experience near 34. Now 4, 8, 3, 8, 8 (`Constants.QUEST` and the card text) | Fixed |
+| Elias's experience | His prevention left him dealt less damage, which starved his damage-triggered Memory reaction. His unlocked card now also pays when his ability prevents damage (same limit, three a game) | Fixed |
+| Quest-met flag | The simulation only applied a quest from the next night (found by code review); fixed before the numbers above | Fixed |
+| Seraphine is defeated in about a third of played nights | 65-73 of 200 slots, the same as before (73), now from the horror she pays; unchanged by this work | Watch |
+| Elias is defeated in about a quarter of nights | 53-54 of 200 (62 before) | Watch |
+| Ayako's kill rate, Birdie's "Look what I found!" clue rate, Cass's token control | Not measured: the simulation's decks do not include those cards or policies | Watch (playtest) |
+| Seeds and sample size | n = 20 and 12 campaigns; a screen, not certification | Watch |
+| Human playtest | Nothing here replaces one | Open |
