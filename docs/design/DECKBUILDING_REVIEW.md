@@ -111,8 +111,15 @@ Options (unchanged): Mystic 0-5, Neutral 0-5, up to 5 Seeker 0-2.
 Requirements: The Bell of Ambergrove (4 charges), I Remember the Ending,
 The Debt of Hours, The Medium's Price.
 
-## Open checks after the build
+## Measured after the build (simulation, FINISHING_BALANCE.md "Quest cards, 2026-10-06")
 
-1. Whole-campaign difficulty and experience, both default parties
-   (FINISHING_BALANCE.md, "Quest cards, 2026-10-06").
-2. Elias deck-outs per scenario; Ayako kill rate; Birdie recursions a game.
+| Item | Result | Status |
+|---|---|---|
+| Elias deck-outs | 0.4-0.7 reshuffles (1 horror each) per played night, 0.4 before the redesign | Accepted |
+| Elias's prevention | about 2 damage a night; he is defeated in about a quarter of nights (a third before) | Accepted |
+| Ayako's tagging | about 5.5 tokens a night; her kill rate is not measured (the simulation's decks have no Mystic-slot weapons) | Watch |
+| Birdie's recursion | an event returns 1.4-2.0 times a night; "Look what I found!" is not in the simulation's decks | Watch |
+| Seraphine's horror cost | defeated in about a third of nights, the same as before the redesign | Watch |
+| Cass's token control | not measured | Watch |
+
+Everything marked Watch needs a human playtest or a simulation deck that carries the card.
