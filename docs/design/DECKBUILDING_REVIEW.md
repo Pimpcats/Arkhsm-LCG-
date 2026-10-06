@@ -65,14 +65,19 @@ round; the 2-secret cost already gates it), It Means 'Wait' (first clause only),
 Untranslatable (weakness: take 2 horror, then remove every translation token
 from every enemy; hurts outside the campaign and bites her kit inside it).
 
-## Cass Lindqvist (Rogue, unchanged front)
+## Cass Lindqvist (Rogue, front unchanged except the trigger names skill tests)
 
-Options: Rogue 0-5, Neutral 0-5, up to 5 cards of any other class at level 0.
-Her resource trigger (1 per symbol reveal, once per round) is smaller than her
-cancel cost (2), so the loop is a net spend, not an engine. No degenerate
-partner found in the level 0 any-class slot. Requirements: Marked Deck,
-Seen This Hand Before, The House Always Wins; portable text per
-PORTABLE_INVESTIGATORS.md, no further change.
+Options: Rogue 0-5, Neutral 0-5, up to 5 cards of any other class at level 0
+(998 cards scanned 2026-10-06; the first version of this review did not scan
+her pool and said "no degenerate partner found". That was wrong to claim.)
+
+| Risk | Detail | Verdict / fix |
+|---|---|---|
+| Trigger wording | "After you reveal a symbol token" fires on reveals outside tests (Voice of Ra, Henry Wan, Astral Travel, 21 or Bust) | Fixed: now "during a skill test" |
+| Token-control stacking | Her cancel (2 resources), Marked Deck's seal, Seen This Hand Before, plus Olive McBride (reveal 3, keep 2), Heavy Furs, Defiance, Analysis, Skeptic: she could steer almost every test | Highest risk for her. Marked Deck's choose-a-number ability stays "limit once per game" (a game is one scenario in the official rules), which keeps it from running every round. Measure token outcomes in the simulation; fallback: choose only among tokens of 0 or lower |
+| Olive McBride with her elder sign | Two resolved tokens could each be the elder sign (2 resources each) | Bounded (1 in 16 per token). Accepted |
+| Looping Seen This Hand Before | Scrounge for Supplies / Hunter's Instinct (Survivor level 0, legal in her any-class slot) return it; it costs 1, gains 1-2 | Net about +1 resource per action plus a cancel. Weak. Accepted |
+| The House Always Wins | Cannot be evaded while she holds the most resources, so a resource engine feeds it | Self-balancing |
 
 ## "Birdie" Okonkwo (Survivor, resolve from failures, recurs events)
 
@@ -93,13 +98,18 @@ Nobody Believes Her (unchanged).
 
 ## Seraphine Vale (Mystic, horror for an effect, once per round)
 
-Options (unchanged): Mystic 0-5, Neutral 0-5, up to 5 Seeker 0-2. Her ability
-buys one extra action, +2 skill or a ready Spell for 1 horror a round. The
-horror is sustained by Mystic and Seeker healing (Clarity of Mind, Occult
-Records, Psychology Student, the Bell of Ambergrove) but every source costs an
-action, a charge or a supply, so the extra action is never free. No card was
-found that scales with horror on her and none that grants a free heal each
-round. "Ready a Spell" is her weakest mode (few Spells exhaust); accepted.
+Options (unchanged): Mystic 0-5, Neutral 0-5, up to 5 Seeker 0-2. Corrected
+2026-10-06 after a second scan; the first version missed the first row.
+
+| Risk | Detail | Verdict / fix |
+|---|---|---|
+| Her horror cost can be soaked by an Ally | The Rules Reference says horror taken as a cost may be reassigned to an asset and the cost still counts as paid. 50 Allies in her pool have sanity (Jim Culver, Olive McBride, Dr. Milan, Psychology Student...) | Fixed: the cost and the elder sign now say "direct horror" (the official wording, as on Survivor investigators who pay horror) |
+| Jim Culver (Mystic ally, level 0 and 4) | "After you take damage and/or horror: draw 1 card" (level 4 adds 1 resource). With the direct cost she gets an extra action or +2, a card and a resource every round for 1 horror | Strongest legitimate pair. Not broken (one horror a round, her sanity is 8, healing costs actions), but watch it in the simulation |
+| Key of Ys (Neutral level 5) | Horror placed on her goes onto the Key instead; +1 to each skill per horror on it | Bounded: the Key has 4 sanity, so it breaks at 4 horror and mills 10 cards. A late, costly, self-destroying option. Accepted |
+| Extra-action stackers (Bide Your Time, Ace of Rods, Astral Mirror, Press Pass, Captivating Performance) | Stack with her one extra action a round | Each is limited by its own card; nothing loops. Accepted |
+| Horror healing | Clarity of Mind, Occult Records, Psychology Student, the Bell of Ambergrove | Every source costs an action, a charge or a supply, so the horror cost is real |
+| "Ready a Spell" mode | Few Spells exhaust | Weakest mode; accepted |
+
 Requirements: Bell of Ambergrove (evade with willpower, heal 1 horror, second
 ability removed), I Remember the Ending (test willpower 3, scry 3 encounter
 cards), The Debt of Hours (take 2 horror, place 1 doom on the current agenda).
