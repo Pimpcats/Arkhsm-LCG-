@@ -9,7 +9,7 @@ them one by one on a fresh table says which part is responsible:
 
   1 One card         a single location card on its own 750 x 1050 images (2 textures)
   2 Structure only   The First Hour's objects and decks exactly, with every image replaced by ONE
-                     shared image (1 texture, 43 deck ids)
+                     shared image (1 texture, one deck id per distinct card, as in 4)
   3 Sprite sheets    The First Hour as the build now makes it (4 textures)
   4 One image/card   The First Hour as the first build made it, one image per card (43 textures)
 
@@ -43,6 +43,7 @@ import table_presence as T  # noqa: E402
 OUT = os.path.join(ROOT, "dist", "saved_object_place_test.json")
 NAME = "The Still Hour — Place test"
 BOX_ID = "CB-PTEST"
+BARE_DECK_IDS = 70000        # the structure test's own deck ids (every other box's are 95xxx-99xxx)
 
 
 def prologue_box(sheets):
@@ -93,6 +94,43 @@ def one_texture(objs, url):
         one_texture(o.get("ContainedObjects") or [], url)
 
 
+def deck_ids_in(objs, out=None):
+    """Every deck id (CustomDeck key) in `objs`, contained objects included."""
+    out = set() if out is None else out
+    for o in objs:
+        out.update(int(k) for k in (o.get("CustomDeck") or {}))
+        deck_ids_in(o.get("ContainedObjects") or [], out)
+    return out
+
+
+def new_deck_ids(objs, base, avoid):
+    """Give every deck id in `objs` a new one (counting up from `base`, never one in `avoid`) and keep
+    which cards share an id: each card's CardID, each CustomDeck key and each Deck's DeckIDs follow.
+    TTS identifies a sheet by its id, so two boxes of one file that show different images must not
+    share an id (tools/audit_database.py A10); the structure test shows one image where the others
+    show many, so its ids are its own."""
+    mapping = {}
+    nxt = base
+    for old in sorted(deck_ids_in(objs)):
+        while nxt in avoid:
+            nxt += 1
+        mapping[old] = nxt
+        nxt += 1
+
+    def walk(o):
+        if o.get("CustomDeck"):
+            o["CustomDeck"] = {str(mapping[int(k)]): v for k, v in o["CustomDeck"].items()}
+        if "CardID" in o:
+            o["CardID"] = mapping[o["CardID"] // 100] * 100 + o["CardID"] % 100
+        if "DeckIDs" in o:
+            o["DeckIDs"] = [mapping[i // 100] * 100 + i % 100 for i in o["DeckIDs"]]
+        for c in o.get("ContainedObjects") or []:
+            walk(c)
+    for o in objs:
+        walk(o)
+    return mapping
+
+
 def variant(sid, box):
     """(objects, ml) of a copy of `box` for the test box `sid`: own GUIDs, no loop tags yet."""
     contained = copy.deepcopy(box["ContainedObjects"])
@@ -137,6 +175,8 @@ def build():
         shared = B.ART_URLS["_encounter_back"].get("face") or shared
     shared = shared or B.ENCOUNTER_BACK
     one_texture(contained, shared)
+    new_deck_ids(contained, BARE_DECK_IDS,
+                 deck_ids_in(card_box["ContainedObjects"]) | deck_ids_in(sheet_box["ContainedObjects"]))
     boxes.append(T.scenario_box("Test 2 — structure, one image", "ptest2", contained, ml))
 
     # 3: sprite sheets (the build)

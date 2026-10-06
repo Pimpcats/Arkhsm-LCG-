@@ -321,7 +321,10 @@ return function(H)
     E.run(0.5)
   end
   local function endLoop()            -- Between Loops: Reset Loop, then Interlude
-    ctl("shReset") ; ctl("shOpenInterlude")
+    ctl("shReset")
+    -- a loop not over by the Control's count asks first: the second click ends it
+    if not st().loopEnded then ctl("shReset") end
+    ctl("shOpenInterlude")
   end
   local function age(id, defeated)
     local i = slot[id]

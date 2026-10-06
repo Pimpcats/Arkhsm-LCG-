@@ -58,11 +58,13 @@ def test_the_test_boxes_differ_only_in_what_they_load(sheets):
     assert PT.count_images(packed["ContainedObjects"]) <= 4
     assert PT.count_images(per_card["ContainedObjects"]) >= 30         # the first build's one image per card
     assert len(one["ContainedObjects"]) == 1
-    # the structure test keeps the first scenario's objects and deck ids, with one image
+    # the structure test keeps the first scenario's objects and how its cards share deck ids, with one image
     assert len(bare["ContainedObjects"]) == len(per_card["ContainedObjects"]) == len(packed["ContainedObjects"])
     ids = lambda b: sorted(  # noqa: E731
         k for o in objects(b) for k in (o.get("CustomDeck") or {}))
-    assert ids(bare) == ids(per_card) and len(set(ids(bare))) >= 25
+    assert len(ids(bare)) == len(ids(per_card)) and len(set(ids(bare))) == len(set(ids(per_card))) >= 25
+    assert [len(o.get("CustomDeck") or {}) for o in objects(bare)] == \
+        [len(o.get("CustomDeck") or {}) for o in objects(per_card)]
     # each box lays out and recalls on its own: own id, own tag, own GUIDs, nothing shared
     tags = set()
     guids = set()
@@ -177,3 +179,27 @@ def test_the_fifth_box_places_with_scedS_own_script(sheets, tmp_path):
     out = json.loads(outs[-1])
     # SCED's Place takes every object out of the box: all on the table, the box empty
     assert out["inside"] == len(guids) and out["onTable"] == len(guids) and out["left"] == 0, out
+
+
+def test_a_deck_id_never_means_two_images(sheets):
+    """TTS identifies a sheet by its id: the five boxes share one file, and the structure test shows one
+    image where its twin shows one per card, so its ids must not be the twin's (audit rule A10)."""
+    save, boxes = PT.build()
+    seen = {}
+
+    def walk(o):
+        for k, e in (o.get("CustomDeck") or {}).items():
+            pair = (e["FaceURL"], e["BackURL"])
+            assert seen.setdefault(k, pair) == pair, "deck id %s shows two images (%s)" % (k, o.get("Nickname"))
+        for c in o.get("ContainedObjects") or []:
+            walk(c)
+    walk(save["ObjectStates"][0])
+    assert len(seen) >= 30
+    # and a card's CardID, a Deck's DeckIDs and the CustomDeck keys agree after the renumbering
+    keys = lambda o: set(int(k) for k in (o.get("CustomDeck") or {}))  # noqa: E731
+    for box in boxes:
+        for o in objects(box):
+            if "CardID" in o:
+                assert o["CardID"] // 100 in keys(o), (box["Nickname"], o.get("Nickname"))
+            for i in o.get("DeckIDs") or []:
+                assert i // 100 in keys(o), (box["Nickname"], o.get("Nickname"))
