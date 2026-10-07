@@ -123,6 +123,8 @@ STANDING = {
                    "and The Reading Room places no doom.",
     ("ticket", "b"): "From the next loop: the first time a Lost Hour is drawn each loop, "
                      "cancel its revelation effect.",
+    ("ring", "b"): "When the Lighthouse is placed: after an investigator lights the lamp, "
+                   "exhaust each Echo in the Sunken Road district.",
 }
 
 BRACKETS = [("prime", "Prime", 0, 4), ("weathered", "Weathered", 5, 9),

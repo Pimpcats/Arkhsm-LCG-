@@ -626,7 +626,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 *If your Campaign Log records You hold the ticket, add:*
 
-> The ticket in your pocket is warm. The barker's eyes slide past you as if you had already paid.
+> The ticket in your pocket is warm. The ticket-taker's eyes slide past you as if you had already paid.
 
 **When you Place this box:** The Wheel, The Hall of Mirrors and The Ticket Booth join the map. Shuffle its encounter set ([set:node_fairground] The Barker, The Wheel's Turn, Your Reflection Lies) into the encounter deck. Its act deck: **The Wheel Still Turns** (1a) and a second act (2a) that opens in Part II. **Part II:** a new enemy joins this district: shuffle it into the encounter deck with its encounter set; it spawns at **The Wheel** when drawn.
 
