@@ -340,7 +340,21 @@ local function memoOf(o)
   return ok and m or nil
 end
 
-local function clueTokensNear(places, margin)
+--- True when a card or deck stands under this point. A clue there belongs to that card: a delayed sweep
+-- must leave the clues of a location a later Place has already laid on the same spot.
+local function underACard(p)
+  for _, o in ipairs(getObjects()) do
+    if not o.isDestroyed() and (o.type == "Card" or o.type == "Deck") then
+      local b = o.getBounds()
+      if math.abs(p.x - b.center.x) <= b.size.x / 2 and math.abs(p.z - b.center.z) <= b.size.z / 2 then
+        return true
+      end
+    end
+  end
+  return false
+end
+
+local function clueTokensNear(places, margin, keepCovered)
   local found = {}
   if #places == 0 then return found end
   for _, o in ipairs(getObjects()) do
@@ -348,7 +362,7 @@ local function clueTokensNear(places, margin)
       local p = o.getPosition()
       for _, pl in ipairs(places) do
         if math.abs(p.x - pl.x) <= pl.hx + margin and math.abs(p.z - pl.z) <= pl.hz + margin then
-          found[#found + 1] = o
+          if not (keepCovered and underACard(p)) then found[#found + 1] = o end
           break
         end
       end
@@ -365,7 +379,7 @@ local function sweepClues(places)
   if #places > 0 then
     for _, delay in ipairs({ 1.5, 5, 12 }) do
       Wait.time(function()
-        for _, t in ipairs(clueTokensNear(places, 1.2)) do
+        for _, t in ipairs(clueTokensNear(places, 1.2, true)) do
           if not t.isDestroyed() then t.destruct() end
         end
       end, delay)

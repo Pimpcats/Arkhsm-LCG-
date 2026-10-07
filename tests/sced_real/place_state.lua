@@ -9,6 +9,7 @@
 --   N-2  the CLOSED label is read off the card, so a new card gets it and Sync Board repairs it
 --   N-4  Recall and Clear Board stop a Place that is still running; the next Place is not refused
 --   N-5  Recall takes the tokens resting on the cards it removes, and nothing else
+--   N-9  the delayed sweep after a Recall never takes the clues of a location laid on the same spot
 --   N-8  a clue beside a removed card, or one SCED spawns just after it left, is taken too; a Place
 --        clears leftover clues standing on its location spots
 --   N-6  a save taken during a Place leaves no second, Place-able box behind
@@ -383,6 +384,23 @@ return function(H)
     place("district_road", false)
     check("a clue left on a location spot is gone when the box lays out", left.isDestroyed())
     check("the Place still laid its cards out", looseCard("sthr-loc-milestones") ~= nil)
+    road.call("buttonClick_recall"); E.run(0.5)
+  end)
+
+  ----------------------------------------------------------- N-9 --
+
+  step("N-9: the delayed sweep after a Recall leaves the clues of a location laid on the same spot", function()
+    local road = place("district_road", false)
+    road.call("buttonClick_recall"); E.run(0.2)
+    place("district_road", false)               -- the next Place, inside the sweep's 12 seconds
+    local card = looseCard("sthr-loc-milestones")
+    local b = E.aabb(card)
+    local cx, cz = (b.min.x + b.max.x) / 2, (b.min.z + b.max.z) / 2
+    local mine = E.spawnData({ Name = "Custom_Tile", Nickname = "", Memo = "clueDoom",
+      Transform = { posX = cx, posY = 1.7, posZ = cz, scaleX = 0.25, scaleY = 1, scaleZ = 0.25 } }, {}, "table")
+    E.run(14)
+    check("a clue on a location a later Place laid survives the earlier Recall's sweeps", not mine.isDestroyed())
+    mine.destruct(); E.run(0.2)
     road.call("buttonClick_recall"); E.run(0.5)
   end)
 
