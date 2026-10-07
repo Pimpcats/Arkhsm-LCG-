@@ -229,6 +229,20 @@ def parse(md):
     return blocks
 
 
+def part_label(h2):
+    """The name of the part of the book an H2 section belongs to."""
+    h = h2.upper()
+    for key, label in (("HOW TO USE", "RULES"), ("NEW RULES", "RULES"), ("CAMPAIGN RULES", "RULES"),
+                       ("DIFFICULTY AND PLAYER", "RULES"), ("CAMPAIGN SETUP", "SETUP"),
+                       ("AMBERGROVE MAP", "SETUP"), ("PROLOGUE", "PROLOGUE"),
+                       ("BETWEEN LOOPS", "BETWEEN LOOPS"), ("THE LOOP", "THE LOOP"),
+                       ("THE DISTRICTS", "THE DISTRICTS"), ("FINALE", "FINALE"),
+                       ("APPENDIX", "APPENDIX")):
+        if key in h:
+            return label
+    return None
+
+
 # ------------------------------------------------------------------ fonts --
 def register_fonts(tmp):
     from reportlab.pdfbase import pdfmetrics
@@ -310,6 +324,10 @@ def build_once(out, source, log_pages, toc_pages):
 
     def page_bg(c, doc, title=False):
         n = doc.page
+        label = ""
+        for start, name in part_starts:
+            if start <= n:
+                label = name
         if title:
             c.drawImage(tpl_title, 0, 0, PAGE_W, PAGE_H)
             c.setFillColor(colors.white)
@@ -323,6 +341,17 @@ def build_once(out, source, log_pages, toc_pages):
         c.setFillColor(colors.black)
         c.setFont("Bolton", 12)
         c.drawCentredString((x + w / 2) * PX, PAGE_H - (y + h * 0.72) * PX, str(n))
+        if label:
+            # the part of the book this page is in, beside the page number on the dark edge of the
+            # page: right of the disc on odd pages, left of it on even ones
+            c.setFillColor(colors.HexColor("#e6dcc4"))
+            c.setFont("Arkhamic", 10)
+            base = PAGE_H - (y + h * 0.70) * PX
+            mid = x + w / 2
+            if n % 2 == 0:
+                c.drawRightString((mid - 36) * PX, base, label)
+            else:
+                c.drawString((mid + 36) * PX, base, label)
 
     def log_bg(c, doc):
         i = min(doc._log_i, len(doc._log_pages) - 1)
@@ -510,6 +539,21 @@ def build_once(out, source, log_pages, toc_pages):
     story = []
     blocks = parse(open(source, encoding="utf-8").read())
 
+    # the book's parts, named beside the page number: rules, setup, the Prologue, the loop, each
+    # district, the finale, the appendices. A part runs from the page its heading starts on to the
+    # page before the next one starts (the page numbers are known from the previous pass).
+    part_starts, _section = [], ""
+    for kind, payload in blocks:
+        label = None
+        if kind == "h2":
+            _section = payload
+            label = part_label(payload)
+        elif kind == "h3" and _section.startswith("THE DISTRICTS"):
+            label = "DISTRICT \u2014 " + title_case(payload).upper()
+        if label and toc_pages.get(title_case(payload)):
+            part_starts.append((toc_pages[title_case(payload)], label))
+    part_starts.sort()
+
     def brk():
         """End the page (never twice in a row: that would print a blank page)."""
         if story and not isinstance(story[-1], PageBreak):
@@ -565,14 +609,11 @@ def build_once(out, source, log_pages, toc_pages):
             if not contents_done and re.search(r"NEW RULES", text):
                 contents_done = True
                 story.append(contents())    # after "How to use this guide", before the rules
-            if re.search(r"PROLOGUE|THE DISTRICTS|FINALE|DIFFICULTY AND PLAYER|APPENDIX|BETWEEN LOOPS", text):
-                # nothing guarded shares a page with what comes next (Between Loops is also read
-                # once after the Prologue, before any loop's resolutions have been earned)
+            # every section starts on a clean page, so a part of the book is never mixed with the
+            # one before it (nothing guarded shares a page with what comes next, and Between Loops,
+            # also read once after the Prologue, never sits under a loop's resolutions)
+            if story and any(getattr(f, "_toc", None) for f in story):
                 brk()
-            elif re.search(r"THE LOOP", text):
-                story.append(CondPageBreak(3.2 * 72))
-            else:
-                story.append(CondPageBreak(1.6 * 72))
             story.append(heading(text, S["section"], 0))
             story.append(rule())
         elif kind == "h3":
@@ -582,7 +623,7 @@ def build_once(out, source, log_pages, toc_pages):
                 brk()                       # a district starts on its own page, clear of the last one's resolutions
                 story.append(heading(payload, S["header"], 1))
             else:
-                story.append(CondPageBreak(1.3 * 72))
+                brk()                       # a sub-section (What You Saw) also starts a clean page
                 story.append(Paragraph(inline(title_case(payload)), S["header"]))
         elif kind == "h4":
             story.append(Paragraph(inline(title_case(payload)), S["sub"]))

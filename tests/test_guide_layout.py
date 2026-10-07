@@ -44,13 +44,50 @@ def test_text_after_a_guard_starts_on_the_next_page(guide):
         assert "Resolution" not in after, "page %d: a resolution shares the page with its guard" % (i + 1)
 
 
+def _body(text):
+    """A page's text without the page number and the part's name printed at its foot."""
+    return re.sub(r"^\s*(?:\d+\s*)?(?:[A-Z][A-Z \u2014]+\n)?", "", text).lstrip()
+
+
 def test_each_district_and_section_starts_a_page(guide):
     starts = {title: page for _lvl, title, page in guide["toc"]}
-    for name in ("The Lighthouse", "The Drowned Church", "The Sunken Road", "The Square",
-                 "The Fairground", "The Almanac House", "The Districts", "Between Loops",
-                 "Finale — The Last Hour", "Difficulty and Player Count"):
-        text = re.sub(r"^\s*\d+\s*\n", "", guide["pages"][starts[name] - 1])   # the page-number disc
-        assert text.lstrip().lower().startswith(name.lower()), "%s does not open its page" % name
+    for name in ("New Rules", "Campaign Rules", "Difficulty and Player Count", "Campaign Setup",
+                 "The Ambergrove Map", "Prologue — The First Hour", "The Loop", "Between Loops",
+                 "The Districts", "The Lighthouse", "The Drowned Church", "The Sunken Road", "The Square",
+                 "The Fairground", "The Almanac House", "Finale — The Last Hour",
+                 "Appendix — Starting Decks", "Appendix — Encounter Deck Contents"):
+        text = _body(guide["pages"][starts[name] - 1])
+        assert text.lower().startswith(name.lower()), "%s does not open its page" % name
+
+
+def test_what_you_saw_starts_its_own_page(guide):
+    page = next(t for t in guide["pages"] if "Salt on your tongue. The same lanterns" in " ".join(t.split()))
+    assert _body(page).startswith("What You Saw"), "What You Saw shares a page with the Prologue's endings"
+
+
+def test_every_page_names_its_part_beside_the_page_number(guide):
+    """Rules, setup, the Prologue, the loop, each district, the finale and the appendices each say so
+    at the foot of their pages, from the page their heading starts on to the page before the next."""
+    import build_guide_pdf as G
+    starts = sorted((page, title) for _lvl, title, page in guide["toc"] if title != "Campaign Log")
+    log_start = next((page for _lvl, title, page in guide["toc"] if title == "Campaign Log"),
+                     len(guide["pages"]) + 1)
+    districts = ("The Lighthouse", "The Drowned Church", "The Sunken Road", "The Square",
+                 "The Fairground", "The Almanac House")
+    expected, label = {}, None
+    for i, (page, title) in enumerate(starts):
+        label = ("DISTRICT \u2014 " + title.upper()) if title in districts else \
+            G.part_label(title.upper()) or label
+        end = starts[i + 1][0] if i + 1 < len(starts) else log_start
+        for n in range(page, end):
+            expected[n] = label
+    expected.pop(1, None)                        # the title page carries no page number
+    assert len(expected) >= 38
+    for n, label in expected.items():
+        page = guide["doc"][n - 1]
+        foot = " ".join(w[4] for w in page.get_text("words") if w[1] > page.rect.height - 40)
+        assert label.replace("\u2014", "\u2014") in foot or label.split(" \u2014 ")[-1] in foot, \
+            "page %d should say %s at the foot, not %r" % (n, label, foot)
 
 
 def test_printed_contents_name_the_real_pages(guide):
