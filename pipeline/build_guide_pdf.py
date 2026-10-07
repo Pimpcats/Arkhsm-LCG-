@@ -229,6 +229,18 @@ def parse(md):
     return blocks
 
 
+PART_COLORS = {"RULES": "#2f5a55", "SETUP": "#6a5a2a", "PROLOGUE": "#4a3a63", "THE LOOP": "#2c4a7c",
+               "BETWEEN LOOPS": "#8a5a1c", "THE DISTRICTS": "#63251d", "FINALE": "#4d1218",
+               "APPENDIX": "#4b4640",
+               "THE LIGHTHOUSE": "#2c5f8a", "THE DROWNED CHURCH": "#5b3d7a", "THE SUNKEN ROAD": "#3f6f3a",
+               "THE SQUARE": "#9a7a1c", "THE FAIRGROUND": "#b0561c", "THE ALMANAC HOUSE": "#a03a6a"}
+
+
+def part_color(label):
+    """The colour of a part's header and tab: one per part, and one per district."""
+    return PART_COLORS.get(label.split(" \u2014 ")[-1], PART_COLORS.get(label, "#2f5a55"))
+
+
 def part_label(h2):
     """The name of the part of the book an H2 section belongs to."""
     h = h2.upper()
@@ -322,6 +334,74 @@ def build_once(out, source, log_pages, toc_pages):
     Image.open(tpl_empty).transpose(Image.FLIP_LEFT_RIGHT).save(mirrored, quality=90)
     campaign = CFG.name
 
+    def draw_part(c, n, label):
+        """Say which part of the book this page is in, where it cannot be missed: a running header
+        across the top of the page (the part's name in the headings' gothic face between rules and
+        small diamonds) and a coloured index tab on the page's outer edge (the district pages
+        carry their district's colour). Odd pages are right-hand pages: their tab is on the right."""
+        from reportlab.pdfbase import pdfmetrics
+        name = label.split(" \u2014 ")[-1]
+        col = colors.HexColor(part_color(label))
+        mid = PAGE_W / 2
+        # -- running header, in the paper's top margin
+        size = 17.5
+        text = label.upper()
+        tw = pdfmetrics.stringWidth(text, "Teutonic", size) + 1.6 * (len(text) - 1)
+        base = PAGE_H - 71 * PX
+        c.saveState()
+        c.setFillColor(col)
+        c.setStrokeColor(col)
+        t = c.beginText()
+        t.setFont("Teutonic", size)
+        t.setCharSpace(1.6)
+        t.setTextOrigin(mid - tw / 2, base)
+        t.textOut(text)
+        c.drawText(t)
+        gap = 16
+        ymid = base + size * 0.34
+        for x0, x1, tip in ((120 * PX, mid - tw / 2 - gap, 1), (mid + tw / 2 + gap, PAGE_W - 120 * PX, -1)):
+            c.setLineWidth(1.1)
+            c.line(x0, ymid, x1, ymid)
+            c.setLineWidth(0.4)
+            c.line(x0, ymid - 2.6, x1, ymid - 2.6)
+        for x in (mid - tw / 2 - gap + 1, mid + tw / 2 + gap - 1):      # a diamond where each rule meets the name
+            d = 3.2
+            c.setFillColor(col)
+            pth = c.beginPath()
+            pth.moveTo(x - d, ymid - 1.3)
+            pth.lineTo(x, ymid + d - 1.3)
+            pth.lineTo(x + d, ymid - 1.3)
+            pth.lineTo(x, ymid - d - 1.3)
+            pth.close()
+            c.drawPath(pth, stroke=0, fill=1)
+        # -- index tab on the outer edge
+        tsize = 16
+        ttw = pdfmetrics.stringWidth(name.upper(), "Teutonic", tsize) + 1.2 * (len(name) - 1)
+        tab_w, tab_h = 34, ttw + 50
+        right = n % 2 == 1
+        x0 = PAGE_W - tab_w if right else 0
+        y_top = PAGE_H - 215 * PX
+        c.setFillColor(col)
+        c.setStrokeColor(colors.HexColor("#e6dcc4"))
+        c.setLineWidth(1.1)
+        c.roundRect(x0 - (8 if right else 0) + (0 if right else -8), y_top - tab_h, tab_w + 8, tab_h, 7, stroke=0, fill=1)
+        inner = x0 + 3.2 if right else x0 + tab_w - 3.2 + 8 - 8
+        c.setLineWidth(0.8)
+        ix = x0 + 3.0 if right else x0 + tab_w - 3.0
+        c.roundRect(min(ix, ix + (tab_w - 6)) if right else x0 + 3.0, y_top - tab_h + 4, tab_w - 6.0, tab_h - 8, 4, stroke=1, fill=0)
+        c.setFillColor(colors.HexColor("#f1e8cf"))
+        c.translate(x0 + tab_w / 2 + (tsize * 0.30 if right else -tsize * 0.30), y_top - 23)
+        c.rotate(-90 if right else 90)
+        if not right:
+            c.translate(-ttw, 0)
+        t = c.beginText()
+        t.setFont("Teutonic", tsize)
+        t.setCharSpace(1.2)
+        t.setTextOrigin(0, 0)
+        t.textOut(name.upper())
+        c.drawText(t)
+        c.restoreState()
+
     def page_bg(c, doc, title=False):
         n = doc.page
         label = ""
@@ -342,16 +422,7 @@ def build_once(out, source, log_pages, toc_pages):
         c.setFont("Bolton", 12)
         c.drawCentredString((x + w / 2) * PX, PAGE_H - (y + h * 0.72) * PX, str(n))
         if label:
-            # the part of the book this page is in, beside the page number on the dark edge of the
-            # page: right of the disc on odd pages, left of it on even ones
-            c.setFillColor(colors.HexColor("#e6dcc4"))
-            c.setFont("Arkhamic", 10)
-            base = PAGE_H - (y + h * 0.70) * PX
-            mid = x + w / 2
-            if n % 2 == 0:
-                c.drawRightString((mid - 36) * PX, base, label)
-            else:
-                c.drawString((mid + 36) * PX, base, label)
+            draw_part(c, n, label)
 
     def log_bg(c, doc):
         i = min(doc._log_i, len(doc._log_pages) - 1)
