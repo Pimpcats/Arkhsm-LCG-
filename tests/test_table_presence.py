@@ -598,12 +598,45 @@ def test_boxes_sharing_the_loop_board_never_stack_on_each_other(tmp_path):
         if sb.get("Name") != "Custom_Model_Bag" or sb["Nickname"] not in shared:
             continue
         for e in json.loads(sb["LuaScriptState"])["ml"].values():
-            spots.append((sb["Nickname"], e["pos"]["x"], e["pos"]["z"]))
-    assert len({s[0] for s in spots}) == len(shared)
+            if "alt" in e:
+                # a district's act deck: the mat's labelled Act slot when it is free (the one spot the
+                # boxes share on purpose), else its own column of the district row: that fallback never
+                # stacks on anything
+                assert (round(e["pos"]["x"], 2), round(e["pos"]["z"], 2)) == (-2.94, -5.05), sb["Nickname"]
+                spots.append((sb["Nickname"] + " (fallback)", e["alt"]["pos"]["x"], e["alt"]["pos"]["z"]))
+            else:
+                spots.append((sb["Nickname"], e["pos"]["x"], e["pos"]["z"]))
+    assert len({s[0].replace(" (fallback)", "") for s in spots}) == len(shared)
     for i, a in enumerate(spots):
         for b in spots[i + 1:]:
             # cards are ~2.5 x 3.5: two stacks closer than that on both axes overlap
             assert abs(a[1] - b[1]) >= 2.5 or abs(a[2] - b[2]) >= 2.5, (a, b)
+
+
+def test_every_district_act_deck_prefers_the_labelled_act_slot(tmp_path):
+    out = tmp_path / "c.json"
+    assert cc.compile_campaign(str(out))["ok"]
+    box = json.load(open(out, encoding="utf-8"))["ObjectStates"][0]
+    seen = 0
+    for sb in box["ContainedObjects"]:
+        if sb.get("Name") != "Custom_Model_Bag":
+            continue
+        ml = json.loads(sb["LuaScriptState"])["ml"]
+        for c in sb["ContainedObjects"]:
+            if c.get("Name") == "Deck" and "Act Deck" in c["Nickname"]:
+                e = ml[c["GUID"]]
+                assert (e["pos"]["x"], e["pos"]["z"]) == (-2.94, -5.05) and e["rot"]["y"] == 180, c["Nickname"]
+                assert e.get("alt") and e["alt"]["pos"]["x"] == -13.8, c["Nickname"]
+                seen += 1
+    assert seen == 6          # the Square and the five other districts
+    # The Last Hour's act takes the slot from whichever act deck lies there
+    fin = next(sb for sb in box["ContainedObjects"] if sb.get("Name") == "Custom_Model_Bag"
+               and json.loads(sb["GMNotes"])["id"] == "finale")
+    ml = json.loads(fin["LuaScriptState"])["ml"]
+    acts = [e for g, e in ml.items() if (e["pos"]["x"], e["pos"]["z"]) == (-2.94, -5.05)]
+    assert len(acts) == 1 and set(acts[0]["yield"]) == {
+        "district_square", "district_lighthouse", "district_church", "district_road",
+        "district_fairground", "district_almanac"}
 
 
 def test_no_box_lays_a_stack_on_sceds_own_objects(tmp_path):

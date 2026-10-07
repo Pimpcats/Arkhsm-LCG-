@@ -149,7 +149,8 @@ return function(H)
     for _, sb in ipairs(payload.ObjectStates[1].ContainedObjects) do
       if (decode(sb.GMNotes) or {}).id == id then
         local out = {}
-        for _, e in pairs(decode(sb.LuaScriptState).ml) do out[#out + 1] = e.pos end
+        -- an entry with a fallback (a district's act deck) never refuses a Place: it moves to the fallback
+        for _, e in pairs(decode(sb.LuaScriptState).ml) do if not e.alt then out[#out + 1] = e.pos end end
         return out
       end
     end
@@ -383,6 +384,47 @@ return function(H)
     check("a clue left on a location spot is gone when the box lays out", left.isDestroyed())
     check("the Place still laid its cards out", looseCard("sthr-loc-milestones") ~= nil)
     road.call("buttonClick_recall"); E.run(0.5)
+  end)
+
+  ----------------------------------------------------------- A-1 --
+
+  step("A-1: an act deck takes the mythos mat's Act slot when it is free, its own column when another box holds it", function()
+    local function actDeck(prefix)
+      return find(function(o)
+        local n = tostring(o.getName())
+        return o.type == "Deck" and n:find(prefix, 1, true) ~= nil and n:find("Act Deck", 1, true) ~= nil
+      end)
+    end
+    local function at(o, x, z)
+      if not o then return false end
+      local p = o.getPosition()
+      return math.abs(p.x - x) < 0.4 and math.abs(p.z - z) < 0.4
+    end
+    click(control(), "Clear Board"); E.run(0.5)
+    place("district_lighthouse", false)
+    local lone = actDeck("The Lighthouse")
+    check("a district placed alone lays its act deck in the labelled Act slot", at(lone, -2.94, -5.05),
+      lone and tostring(lone.getPosition().x) .. "," .. tostring(lone.getPosition().z))
+    click(control(), "Clear Board"); E.run(0.5)
+    place("district_square", false)
+    place("district_lighthouse", false)
+    local sq, lh = actDeck("The Square"), actDeck("The Lighthouse")
+    check("with the Square placed first, the Square's act deck holds the Act slot", at(sq, -2.94, -5.05))
+    check("...and the Lighthouse's act deck goes to its own column of the row", at(lh, -13.8, 9.18),
+      lh and tostring(lh.getPosition().x) .. "," .. tostring(lh.getPosition().z))
+    -- The Last Hour's act takes the slot from the Square's act deck, which moves to its own column
+    local finale = scenarioBox("finale")
+    local mark = chatMark()
+    click(finale, "Place")
+    E.runUntil(function() return not finale.call("isPlacing") end, 12); E.run(0.5)
+    local contest = looseCard("sthr-act-lasthour")
+    check("the finale's act takes the Act slot", contest ~= nil and at(contest, -2.94, -5.05),
+      contest and tostring(contest.getPosition().x) .. "," .. tostring(contest.getPosition().z))
+    check("the Square's act deck moved to its own column of the row", at(actDeck("The Square"), -13.8, -3.06),
+      actDeck("The Square") and tostring(actDeck("The Square").getPosition().z))
+    check("the Place was not refused for it", not chatHas(mark, "are still on the table where this one lays out"), tail(mark))
+    click(control(), "Clear Board"); E.run(0.5)
+    check("Clear Board takes both act decks", actDeck("The Square") == nil and actDeck("The Lighthouse") == nil)
   end)
 
   ----------------------------------------------------------- N-6 --

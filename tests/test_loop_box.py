@@ -397,7 +397,10 @@ end, 10)
 
 # ------------------------------------------------- a Place refused for another box's cards --
 def _spots(book):
-    return [(e["pos"]["x"], e["pos"]["z"]) for e in json.loads(book["LuaScriptState"])["ml"].values()]
+    """The spots a Place needs free. An entry with a fallback (a district's act deck) is left out: it takes
+    the labelled Act slot when free and its own column otherwise, so it never refuses a Place."""
+    return [(e["pos"]["x"], e["pos"]["z"]) for e in json.loads(book["LuaScriptState"])["ml"].values()
+            if "alt" not in e]
 
 
 def _reach():

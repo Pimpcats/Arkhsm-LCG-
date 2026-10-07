@@ -200,18 +200,73 @@ end
 -- Prologue's cards on the mythos mat when the next box is Placed, an older
 -- build's leftovers). Boxes that share a loop's board never share a spot, so
 -- for them this is 0.
+--- The id of the box an object of the loop belongs to (its StillHourBox_<id> tag), or nil.
+local function boxIdOf(o)
+  local ok, tags = pcall(function() return o.getTags() end)
+  for _, t in ipairs(ok and tags or {}) do
+    if t:sub(1, 13) == "StillHourBox_" then return t:sub(14) end
+  end
+  return nil
+end
+
 local function foreignOnMySpots(tag, guids)
   local n = 0
   for _, o in ipairs(getObjects()) do
     if o ~= self and alive(o) and ofAnotherBox(o, tag) then
       local p = o.getPosition()
+      local owner = boxIdOf(o)
       for _, guid in ipairs(guids) do
-        local s = memoryList[guid].pos
-        if math.abs(p.x - s.x) < SPOT_REACH and math.abs(p.z - s.z) < SPOT_REACH then n = n + 1 ; break end
+        local e = memoryList[guid]
+        local s = e.pos
+        -- an object with a fallback spot (a district's act deck) never clashes: it uses the fallback
+        -- when another box's deck holds its first choice (spotFor); one that makes the other box's
+        -- object yield (the finale's act) does not clash with the boxes it names (yieldTo)
+        local yields = e.yield ~= nil and owner ~= nil and e.yield[owner] ~= nil
+        if not e.alt and not yields and math.abs(p.x - s.x) < SPOT_REACH and math.abs(p.z - s.z) < SPOT_REACH then
+          n = n + 1 ; break
+        end
       end
     end
   end
   return n
+end
+
+--- An object that takes its spot from another box's (the finale's act takes the Act slot from the
+-- Square's or a district's act deck): the other box's object moves to the place that box gave it.
+local function yieldTo(tag, entry)
+  if not entry.yield then return end
+  local s = entry.pos
+  for _, o in ipairs(getObjects()) do
+    if o ~= self and alive(o) and ofAnotherBox(o, tag) then
+      local p = o.getPosition()
+      local to = entry.yield[boxIdOf(o) or ""]
+      if to and math.abs(p.x - s.x) < SPOT_REACH and math.abs(p.z - s.z) < SPOT_REACH then
+        trace("moving an object of " .. tostring(boxIdOf(o)) .. " off the spot")
+        pcall(function()
+          o.setPosition({ to.pos.x, to.pos.y + 0.5, to.pos.z })
+          o.setRotation({ to.rot.x, to.rot.y, o.getRotation().z })
+        end)
+      end
+    end
+  end
+end
+
+--- Where an object of this box goes: its first spot, or its fallback (`alt`) when another box's
+-- object already lies on the first. A district's act deck takes the mythos mat's labelled Act slot
+-- when it is free and its own column of the district row when it is not.
+local function spotFor(tag, entry)
+  local alt = entry.alt
+  if not alt then return entry end
+  local s = entry.pos
+  for _, o in ipairs(getObjects()) do
+    if o ~= self and alive(o) and ofAnotherBox(o, tag) then
+      local p = o.getPosition()
+      if math.abs(p.x - s.x) < SPOT_REACH and math.abs(p.z - s.z) < SPOT_REACH then
+        return { pos = alt.pos, rot = alt.rot, lock = entry.lock, alt = nil }
+      end
+    end
+  end
+  return entry
 end
 
 --- Clue and doom tokens that stand near where a card was, whether or not they rest on it. SCED's
@@ -390,7 +445,8 @@ function buttonClick_place()
   -- bag instead, which is why the positions are taken from the highest down.
   local function takeOne(copy, i)
     local guid = guids[i]
-    local entry = memoryList[guid]
+    yieldTo(tag, memoryList[guid])
+    local entry = spotFor(tag, memoryList[guid])
     local what = "object " .. guid
     trace(string.format("taking %d/%d %s", i, #guids, what))
     broadcastToAll(string.format("Placing %d/%d", i, #guids), { 0.7, 0.7, 0.7 })

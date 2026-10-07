@@ -99,8 +99,10 @@ PLACE = {
 # mythos mat and the town map (x -13.8), its encounter set and Named enemy
 # face-down in the row just below the mat (x -7.05). Both rows are where the
 # official Drowned City boxes put their extra stacks (Summit Deck / Open
-# Skies at x -13.8, Star Spawn at x -7.05). The act snap stays free for the
-# Prologue's and the finale's act.
+# Skies at x -13.8, Star Spawn at x -7.05). A district's act deck first tries
+# the mat's labelled Act slot, as the Prologue's and the finale's act always
+# do: the first act deck laid out takes it, and a later one (another district
+# placed beside it) goes to its own column of the row (stack_alt).
 DISTRICT_ROW = {"district_fairground": 15.3, "district_lighthouse": 9.18,
                 "district_almanac": 3.06, "district_square": -3.06,
                 "district_road": -9.18, "district_church": -15.3}
@@ -131,13 +133,25 @@ SCED_COUNTERS = {"doom counter": (-5.9, 0.38, 0.45), "other doom in play": (-5.9
                  "master clue counter": (-5.9, -5.1, 0.45), "investigator count": (-12.03, -4.0, 0.35)}
 
 
+def stack_alt(sc, stack):
+    """The fallback spot of a stack whose first choice another box may already hold: a district's act deck
+    sits in the mythos mat's labelled Act slot (stack_anchor), and when another box's act deck already lies
+    there it goes to its own column of the district row instead (a loop lays several districts onto one
+    board, and the slot holds one deck). None for every other stack."""
+    sid = sc.get("id")
+    z = DISTRICT_ROW.get(sid)
+    if z is not None and stack == "act_deck":
+        return {"pos": (DISTRICT_ACT_X, 1.61, z), "rot": 180}
+    return None
+
+
 def stack_anchor(sc, stack):
     """Where a scenario's stack lands on Place (see DISTRICT_ROW)."""
     sid = sc.get("id")
     z = DISTRICT_ROW.get(sid)
     if z is not None:
         if stack == "act_deck":
-            return {"pos": (DISTRICT_ACT_X, 1.61, z), "rot": 180}
+            return PLACE["act_deck"]            # the labelled Act slot, whenever it is free (stack_alt)
         if stack == "encounter" and sc.get("shared_from"):
             return {"pos": (DISTRICT_SET_X, 1.62, z + 1.4), "rot": 270,
                     "face_down": True}
@@ -345,6 +359,17 @@ def build_scenario_box(sc, assign, cards, campaign_name="Campaign"):
                              "pos": {"x": round(x, 3), "y": round(y, 3),
                                      "z": round(z, 3)},
                              "rot": {"x": 0, "y": rot, "z": rz}}
+            alt = stack_alt(sc, stack)
+            if alt:
+                ax, ay, az = alt["pos"]
+                ml[d["GUID"]]["alt"] = {"pos": {"x": round(ax, 3), "y": round(ay, 3), "z": round(az, 3)},
+                                        "rot": {"x": 0, "y": alt["rot"], "z": 0}}
+            if sid == "finale" and stack == "act_deck":
+                # The Last Hour's act is the loop's objective: it takes the labelled Act slot even when the
+                # Square's (or a district's) act deck lies there, which moves to its own column of the row
+                ml[d["GUID"]]["yield"] = {
+                    bid: {"pos": {"x": DISTRICT_ACT_X, "y": 1.61, "z": z0}, "rot": {"x": 0, "y": 180, "z": 0}}
+                    for bid, z0 in DISTRICT_ROW.items()}
     # SCED's scenario book: small box mesh + the MemoryBag script (Place /
     # Recall) reading ml. Connections travel on the cards' locationFront /
     # locationBack metadata, not in the box.
