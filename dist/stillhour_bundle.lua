@@ -2507,7 +2507,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/869281a3dcfe1b7099132febac5c08b10b6046de/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/f758803cba1087c442db470c6fd8372e02a0fd34/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -2824,7 +2824,7 @@ __modules["StillHour/Guide"] = function()
 -- build) the menu is simply empty.
 local Guide = {}
 
-local PAGES = "rules=2,setup=6,prologue=8,loop=9,between=12,difficulty=34,decks=35"      -- "rules=2,setup=7,loop=9,..."
+local PAGES = "rules=2,setup=7,difficulty=7,prologue=9,loop=10,between=13,decks=35"      -- "rules=2,setup=7,loop=9,..."
 
 -- (key in the pages string, menu text). Sections a first-time player must not be sent to early
 -- (the districts, the finale) are not listed: the guide itself sends you there.

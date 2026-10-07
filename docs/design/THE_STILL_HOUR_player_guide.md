@@ -179,6 +179,18 @@ For finale conditions and the epilogue, an investigator's bracket is set by all 
 
 ---
 
+## DIFFICULTY AND PLAYER COUNT
+
+- **3 investigators:** every value as printed (Dissonance bands at 8 / 16, reset at 24, Memory cap 30, scar cap 6).
+- **2 or 4 investigators:** the reset comes at **8 × investigators**; the Glitch band starts at one-third of the reset and the Noticed band at two-thirds (rounded down: 5 / 10 at two, 10 / 21 at four). The Memory cap is **10 × investigators**, and the scar cap is **2 × investigators**. With **2 investigators**, each gets **+2 maximum health** and **+2 maximum sanity** (the Control token shows them).
+- **1 investigator:** use the two-investigator bands: the reset comes at **16**, the Noticed band at **10** and Glitch at **5**; the scar cap is **4**. The Memory cap is **10**. Your investigator gets **+3 maximum health** and **+3 maximum sanity** (the Control token shows the new maximums on their card). **Second wind:** once each loop (and once in the finale), when your investigator would be defeated, they are not: remove all damage and horror from them, and they gain **1 Year** (click **Years pending**).
+- The finale's contest is **6** at 2 or 3 investigators, **5** with one and **7** with four: its sources barely grow with the party, but four investigators get more tries at Hold Back each round.
+- Values given "per investigator" (the finale's Memory thresholds) scale on their own.
+- The Control token applies all of these for you.
+- The campaign is tuned for about 6–8 loops.
+
+---
+
 ## CAMPAIGN SETUP
 
 1. **Choose investigators.** The campaign is tuned for 3; it scales from 1 to 4.
@@ -778,18 +790,6 @@ Then read **Epilogue — What the Years Took.**
   - **Unheard:** *Seraphine never learns what answered her that night. Some evenings she lays out the cards and waits, and nothing reaches back.*
   - **Suspected:** *Seraphine copies every name from the town's ledger into a notebook. Hers is not among them. She reads the list every night anyway, looking for the one that should have been hers.*
   - **Known:** *Seraphine never speaks the name again. But she sets a second cup at the table each night, and some mornings it has been drunk.*
-
----
-
-## DIFFICULTY AND PLAYER COUNT
-
-- **3 investigators:** every value as printed (Dissonance bands at 8 / 16, reset at 24, Memory cap 30, scar cap 6).
-- **2 or 4 investigators:** the reset comes at **8 × investigators**; the Glitch band starts at one-third of the reset and the Noticed band at two-thirds (rounded down: 5 / 10 at two, 10 / 21 at four). The Memory cap is **10 × investigators**, and the scar cap is **2 × investigators**. With **2 investigators**, each gets **+2 maximum health** and **+2 maximum sanity** (the Control token shows them).
-- **1 investigator:** use the two-investigator bands: the reset comes at **16**, the Noticed band at **10** and Glitch at **5**; the scar cap is **4**. The Memory cap is **10**. Your investigator gets **+3 maximum health** and **+3 maximum sanity** (the Control token shows the new maximums on their card). **Second wind:** once each loop (and once in the finale), when your investigator would be defeated, they are not: remove all damage and horror from them, and they gain **1 Year** (click **Years pending**).
-- The finale's contest is **6** at 2 or 3 investigators, **5** with one and **7** with four: its sources barely grow with the party, but four investigators get more tries at Hold Back each round.
-- Values given "per investigator" (the finale's Memory thresholds) scale on their own.
-- The Control token applies all of these for you.
-- The campaign is tuned for about 6–8 loops.
 
 ---
 
