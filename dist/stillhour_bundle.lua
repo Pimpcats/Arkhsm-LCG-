@@ -2507,7 +2507,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/fa3052ddc1137f61de4cf603666cc0ef486d4788/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/7e6126d0651a4d2d44674ca4dcefd7de1e30c84b/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's

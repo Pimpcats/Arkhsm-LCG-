@@ -374,26 +374,30 @@ def build_once(out, source, log_pages, toc_pages):
             pth.lineTo(x, ymid - d - 1.3)
             pth.close()
             c.drawPath(pth, stroke=0, fill=1)
-        # -- index tab on the outer edge
+        # -- index tab on the outer edge: its name is centred across the tab's width and along its length
         tsize = 16
+        cap = 0.668 * tsize                      # Teutonic's capital height (668 of 1000 units); the
+                                                 # few swashed capitals (B, C, D, R) dip below it
         ttw = pdfmetrics.stringWidth(name.upper(), "Teutonic", tsize) + 1.2 * (len(name) - 1)
-        tab_w, tab_h = 34, ttw + 50
-        right = n % 2 == 1
-        x0 = PAGE_W - tab_w if right else 0
+        tab_w, tab_h = 36, ttw + 50
+        right = n % 2 == 1                       # odd pages are right-hand pages
         y_top = PAGE_H - 215 * PX
+        y_mid = y_top - tab_h / 2
         c.setFillColor(col)
         c.setStrokeColor(colors.HexColor("#e6dcc4"))
-        c.setLineWidth(1.1)
-        c.roundRect(x0 - (8 if right else 0) + (0 if right else -8), y_top - tab_h, tab_w + 8, tab_h, 7, stroke=0, fill=1)
-        inner = x0 + 3.2 if right else x0 + tab_w - 3.2 + 8 - 8
+        # the tab runs off the page edge, so only its inner corners show rounded
+        rx = PAGE_W - tab_w if right else -8
+        c.roundRect(rx, y_top - tab_h, tab_w + 8, tab_h, 7, stroke=0, fill=1)
         c.setLineWidth(0.8)
-        ix = x0 + 3.0 if right else x0 + tab_w - 3.0
-        c.roundRect(min(ix, ix + (tab_w - 6)) if right else x0 + 3.0, y_top - tab_h + 4, tab_w - 6.0, tab_h - 8, 4, stroke=1, fill=0)
+        c.roundRect(PAGE_W - tab_w + 3 if right else -8, y_top - tab_h + 4, tab_w + 8 - 3, tab_h - 8, 4,
+                    stroke=1, fill=0)
         c.setFillColor(colors.HexColor("#f1e8cf"))
-        c.translate(x0 + tab_w / 2 + (tsize * 0.30 if right else -tsize * 0.30), y_top - 23)
-        c.rotate(-90 if right else 90)
-        if not right:
-            c.translate(-ttw, 0)
+        if right:       # reads downward; the letters' tops point to the outer edge
+            c.translate(PAGE_W - tab_w / 2 - cap / 2, y_mid + ttw / 2)
+            c.rotate(-90)
+        else:           # reads upward; the letters' tops point to the outer edge
+            c.translate(tab_w / 2 + cap / 2, y_mid - ttw / 2)
+            c.rotate(90)
         t = c.beginText()
         t.setFont("Teutonic", tsize)
         t.setCharSpace(1.2)
