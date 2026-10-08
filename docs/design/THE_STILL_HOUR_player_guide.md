@@ -237,11 +237,15 @@ A small town at the end of a shore road, under a starless, snagged sky. **The Sq
 
 > You are in Ambergrove for your own reasons: a letter, a debt, a promise, a rumor. Soon, you will not remember them.
 >
-> Ambergrove is a town on no one's way to anywhere: a church, a road out to the shore, a lighthouse no ship has needed in years, a printing house that sells almanacs to three counties. Tonight it is full. The almanac has promised an occultation, a star swallowed by the dark of something passing in front of it, once in a hundred years, and visible from here and nowhere else.
+> You came in at dusk by the shore road, the last miles with the sea on one side and dark fields on the other. A lighthouse stood at the end of it, unlit, and no one could tell you the last time it had been. The innkeeper shrugged. "No ship has needed it in years," he said, and went back to polishing a glass that was already clean.
 >
-> The whole town has turned out for the occultation. Lanterns are strung across the Square. A band is tuning up by the Town Hall steps, and children ride their fathers' shoulders, pointing at a sky that is not quite right.
+> Ambergrove is a town on no one's way to anywhere: a church, a road out to the shore, a lighthouse no ship has needed in years, a printing house that sells almanacs to three counties. Tonight it is full. The almanac has promised an occultation, a star swallowed by the dark of something passing in front of it, once in a hundred years, and visible from here and nowhere else. People have come from every county the almanac reaches, with folding chairs and thermoses and copies of the almanac itself, the date and the hour of the occultation printed on its front page in fresh black type.
+>
+> The whole town has turned out. Lanterns are strung across the Square. A band is tuning up by the Town Hall steps, where the sheriff stands rehearsing a speech to no one, and children ride their fathers' shoulders, pointing at a sky that is not quite right. Somewhere beyond the rooftops a bell is counting the hour. You lose the count.
 >
 > The almanac promised the occultation at midnight. It is eleven, and the stars are already sliding behind something that has no edge. You will remember everything else.
+
+<!-- pagebreak -->
 
 **Setup**
 1. Press **Place** on **The First Hour** box. It lays out:
