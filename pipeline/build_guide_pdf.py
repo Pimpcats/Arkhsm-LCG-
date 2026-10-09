@@ -688,7 +688,11 @@ def build_once(out, source, log_pages, toc_pages):
             # one before it (nothing guarded shares a page with what comes next, and Between Loops,
             # also read once after the Prologue, never sits under a loop's resolutions)
             if story and any(getattr(f, "_toc", None) for f in story):
-                brk()
+                if re.search(r"DIFFICULTY AND PLAYER", text):
+                    # still the rules: it follows Campaign Rules on the same page when it fits
+                    story.append(CondPageBreak(2.4 * 72))
+                else:
+                    brk()
             story.append(heading(text, S["section"], 0))
             story.append(rule())
         elif kind == "h3":
@@ -768,8 +772,15 @@ def build_once(out, source, log_pages, toc_pages):
             data = [[Paragraph(inline(h), S["cellh"]) for h in head]] + \
                    [[Paragraph(inline(c), S["cell"]) for c in r] for r in rows]
             aw = R_LEFT[2] * PX - 8
-            widths = [aw * 0.36, aw * 0.24, aw * 0.40] if len(head) == 3 else \
-                [aw / len(head)] * len(head)
+            if len(head) == 3:
+                widths = [aw * 0.36, aw * 0.24, aw * 0.40]
+            elif len(head) == 2:
+                # a two-column table takes its columns' share from their longest entries
+                lens = [max(len(re.sub(r"[*\[\]]", "", r[i])) for r in [head] + rows) for i in range(2)]
+                share = min(0.78, max(0.22, lens[0] / float(sum(lens))))
+                widths = [aw * share, aw * (1 - share)]
+            else:
+                widths = [aw / len(head)] * len(head)
             t = Table(data, colWidths=widths, repeatRows=1)
             t.setStyle(TableStyle([
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),

@@ -50,7 +50,7 @@
       "MeshIndex": -1,
       "CustomMesh": {
         "MeshURL": "https://steamusercontent-a.akamaihd.net/ugc/62583916778515295/AFB8F257CE1E4973F4C06160A2E156C147AEE1E3/",
-        "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthr-box.jpg?v=3d7963b8aa",
+        "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthr-box.jpg?v=3d7963b8aa",
         "NormalURL": "",
         "ColliderURL": "",
         "Convex": true,
@@ -120,7 +120,7 @@
           "MeshIndex": -1,
           "CustomMesh": {
             "MeshURL": "https://steamusercontent-a.akamaihd.net/ugc/62583916778515333/9F0BE0C211BE3BD1725B4B855F5D3C9C0D020394/",
-            "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthr-box.jpg?v=3d7963b8aa",
+            "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthr-box.jpg?v=3d7963b8aa",
             "NormalURL": "",
             "ColliderURL": "",
             "Convex": true,
@@ -177,8 +177,8 @@
               },
               "CustomDeck": {
                 "99117": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                   "NumWidth": 7,
                   "NumHeight": 3,
                   "Type": 0,
@@ -228,8 +228,8 @@
               ],
               "CustomDeck": {
                 "99116": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
                   "NumWidth": 7,
                   "NumHeight": 2,
                   "Type": 0,
@@ -273,8 +273,8 @@
                   },
                   "CustomDeck": {
                     "99116": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -318,8 +318,8 @@
                   },
                   "CustomDeck": {
                     "99116": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -363,8 +363,8 @@
                   },
                   "CustomDeck": {
                     "99116": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -408,8 +408,8 @@
                   },
                   "CustomDeck": {
                     "99116": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -453,8 +453,8 @@
                   },
                   "CustomDeck": {
                     "99116": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -498,8 +498,8 @@
                   },
                   "CustomDeck": {
                     "99116": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -543,8 +543,8 @@
                   },
                   "CustomDeck": {
                     "99116": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -588,8 +588,8 @@
                   },
                   "CustomDeck": {
                     "99116": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -633,8 +633,8 @@
                   },
                   "CustomDeck": {
                     "99116": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -680,8 +680,8 @@
               },
               "CustomDeck": {
                 "99116": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-face.jpg?v=b7200e3634",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-l-back.jpg?v=747d516c38",
                   "NumWidth": 7,
                   "NumHeight": 2,
                   "Type": 0,
@@ -726,8 +726,8 @@
               },
               "CustomDeck": {
                 "99117": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                   "NumWidth": 7,
                   "NumHeight": 3,
                   "Type": 0,
@@ -772,8 +772,8 @@
               },
               "CustomDeck": {
                 "99117": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                   "NumWidth": 7,
                   "NumHeight": 3,
                   "Type": 0,
@@ -818,8 +818,8 @@
               },
               "CustomDeck": {
                 "99117": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                   "NumWidth": 7,
                   "NumHeight": 3,
                   "Type": 0,
@@ -881,8 +881,8 @@
               ],
               "CustomDeck": {
                 "99117": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                   "NumWidth": 7,
                   "NumHeight": 3,
                   "Type": 0,
@@ -926,8 +926,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -971,8 +971,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1016,8 +1016,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1061,8 +1061,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1106,8 +1106,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1151,8 +1151,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1196,8 +1196,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1241,8 +1241,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1286,8 +1286,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1331,8 +1331,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1376,8 +1376,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1421,8 +1421,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1466,8 +1466,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1511,8 +1511,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1556,8 +1556,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1601,8 +1601,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1646,8 +1646,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1691,8 +1691,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1736,8 +1736,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1781,8 +1781,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1826,8 +1826,8 @@
                   },
                   "CustomDeck": {
                     "99117": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                       "NumWidth": 7,
                       "NumHeight": 3,
                       "Type": 0,
@@ -1873,8 +1873,8 @@
               },
               "CustomDeck": {
                 "99117": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-face.jpg?v=c8bea8b6ae",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/prologue-p-back.jpg?v=701cb87710",
                   "NumWidth": 7,
                   "NumHeight": 3,
                   "Type": 0,
@@ -1933,7 +1933,7 @@
           "MeshIndex": -1,
           "CustomMesh": {
             "MeshURL": "https://steamusercontent-a.akamaihd.net/ugc/62583916778515333/9F0BE0C211BE3BD1725B4B855F5D3C9C0D020394/",
-            "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthr-box.jpg?v=3d7963b8aa",
+            "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthr-box.jpg?v=3d7963b8aa",
             "NormalURL": "",
             "ColliderURL": "",
             "Convex": true,
@@ -1989,8 +1989,8 @@
               ],
               "CustomDeck": {
                 "99106": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-l-face.jpg?v=2d799b3093",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-l-back.jpg?v=8b0f5cd4a5",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-l-face.jpg?v=2d799b3093",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-l-back.jpg?v=8b0f5cd4a5",
                   "NumWidth": 2,
                   "NumHeight": 1,
                   "Type": 0,
@@ -2034,8 +2034,8 @@
                   },
                   "CustomDeck": {
                     "99106": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-l-face.jpg?v=2d799b3093",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-l-back.jpg?v=8b0f5cd4a5",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-l-face.jpg?v=2d799b3093",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-l-back.jpg?v=8b0f5cd4a5",
                       "NumWidth": 2,
                       "NumHeight": 1,
                       "Type": 0,
@@ -2079,8 +2079,8 @@
                   },
                   "CustomDeck": {
                     "99106": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-l-face.jpg?v=2d799b3093",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-l-back.jpg?v=8b0f5cd4a5",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-l-face.jpg?v=2d799b3093",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-l-back.jpg?v=8b0f5cd4a5",
                       "NumWidth": 2,
                       "NumHeight": 1,
                       "Type": 0,
@@ -2127,8 +2127,8 @@
               },
               "CustomDeck": {
                 "99107": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-p-face.jpg?v=e809b8a712",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-p-back.jpg?v=e1c9ed1a2e",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-p-face.jpg?v=e809b8a712",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-p-back.jpg?v=e1c9ed1a2e",
                   "NumWidth": 6,
                   "NumHeight": 1,
                   "Type": 0,
@@ -2173,8 +2173,8 @@
               },
               "CustomDeck": {
                 "99107": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-p-face.jpg?v=e809b8a712",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-p-back.jpg?v=e1c9ed1a2e",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-p-face.jpg?v=e809b8a712",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-p-back.jpg?v=e1c9ed1a2e",
                   "NumWidth": 6,
                   "NumHeight": 1,
                   "Type": 0,
@@ -2219,8 +2219,8 @@
               },
               "CustomDeck": {
                 "99107": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-p-face.jpg?v=e809b8a712",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-p-back.jpg?v=e1c9ed1a2e",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-p-face.jpg?v=e809b8a712",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-p-back.jpg?v=e1c9ed1a2e",
                   "NumWidth": 6,
                   "NumHeight": 1,
                   "Type": 0,
@@ -2263,8 +2263,8 @@
               ],
               "CustomDeck": {
                 "99107": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-p-face.jpg?v=e809b8a712",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-p-back.jpg?v=e1c9ed1a2e",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-p-face.jpg?v=e809b8a712",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-p-back.jpg?v=e1c9ed1a2e",
                   "NumWidth": 6,
                   "NumHeight": 1,
                   "Type": 0,
@@ -2308,8 +2308,8 @@
                   },
                   "CustomDeck": {
                     "99107": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-p-face.jpg?v=e809b8a712",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-p-back.jpg?v=e1c9ed1a2e",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-p-face.jpg?v=e809b8a712",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-p-back.jpg?v=e1c9ed1a2e",
                       "NumWidth": 6,
                       "NumHeight": 1,
                       "Type": 0,
@@ -2353,8 +2353,8 @@
                   },
                   "CustomDeck": {
                     "99107": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-p-face.jpg?v=e809b8a712",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-p-back.jpg?v=e1c9ed1a2e",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-p-face.jpg?v=e809b8a712",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-p-back.jpg?v=e1c9ed1a2e",
                       "NumWidth": 6,
                       "NumHeight": 1,
                       "Type": 0,
@@ -2400,8 +2400,8 @@
               },
               "CustomDeck": {
                 "99107": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-p-face.jpg?v=e809b8a712",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_lighthouse-p-back.jpg?v=e1c9ed1a2e",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-p-face.jpg?v=e809b8a712",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_lighthouse-p-back.jpg?v=e1c9ed1a2e",
                   "NumWidth": 6,
                   "NumHeight": 1,
                   "Type": 0,
@@ -2460,7 +2460,7 @@
           "MeshIndex": -1,
           "CustomMesh": {
             "MeshURL": "https://steamusercontent-a.akamaihd.net/ugc/62583916778515333/9F0BE0C211BE3BD1725B4B855F5D3C9C0D020394/",
-            "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthr-box.jpg?v=3d7963b8aa",
+            "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthr-box.jpg?v=3d7963b8aa",
             "NormalURL": "",
             "ColliderURL": "",
             "Convex": true,
@@ -2516,8 +2516,8 @@
               ],
               "CustomDeck": {
                 "99102": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-l-face.jpg?v=eafdc40db8",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-l-back.jpg?v=d3abdce003",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-l-face.jpg?v=eafdc40db8",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-l-back.jpg?v=d3abdce003",
                   "NumWidth": 2,
                   "NumHeight": 1,
                   "Type": 0,
@@ -2561,8 +2561,8 @@
                   },
                   "CustomDeck": {
                     "99102": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-l-face.jpg?v=eafdc40db8",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-l-back.jpg?v=d3abdce003",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-l-face.jpg?v=eafdc40db8",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-l-back.jpg?v=d3abdce003",
                       "NumWidth": 2,
                       "NumHeight": 1,
                       "Type": 0,
@@ -2606,8 +2606,8 @@
                   },
                   "CustomDeck": {
                     "99102": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-l-face.jpg?v=eafdc40db8",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-l-back.jpg?v=d3abdce003",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-l-face.jpg?v=eafdc40db8",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-l-back.jpg?v=d3abdce003",
                       "NumWidth": 2,
                       "NumHeight": 1,
                       "Type": 0,
@@ -2654,8 +2654,8 @@
               },
               "CustomDeck": {
                 "99103": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
                   "NumWidth": 7,
                   "NumHeight": 2,
                   "Type": 0,
@@ -2700,8 +2700,8 @@
               },
               "CustomDeck": {
                 "99103": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
                   "NumWidth": 7,
                   "NumHeight": 2,
                   "Type": 0,
@@ -2746,8 +2746,8 @@
               },
               "CustomDeck": {
                 "99103": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
                   "NumWidth": 7,
                   "NumHeight": 2,
                   "Type": 0,
@@ -2792,8 +2792,8 @@
               },
               "CustomDeck": {
                 "99103": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
                   "NumWidth": 7,
                   "NumHeight": 2,
                   "Type": 0,
@@ -2838,8 +2838,8 @@
               ],
               "CustomDeck": {
                 "99103": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
                   "NumWidth": 7,
                   "NumHeight": 2,
                   "Type": 0,
@@ -2883,8 +2883,8 @@
                   },
                   "CustomDeck": {
                     "99103": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -2928,8 +2928,8 @@
                   },
                   "CustomDeck": {
                     "99103": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -2973,8 +2973,8 @@
                   },
                   "CustomDeck": {
                     "99103": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -3018,8 +3018,8 @@
                   },
                   "CustomDeck": {
                     "99103": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -3065,8 +3065,8 @@
               },
               "CustomDeck": {
                 "99103": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
                   "NumWidth": 7,
                   "NumHeight": 2,
                   "Type": 0,
@@ -3109,8 +3109,8 @@
               ],
               "CustomDeck": {
                 "99103": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
                   "NumWidth": 7,
                   "NumHeight": 2,
                   "Type": 0,
@@ -3154,8 +3154,8 @@
                   },
                   "CustomDeck": {
                     "99103": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -3199,8 +3199,8 @@
                   },
                   "CustomDeck": {
                     "99103": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-face.jpg?v=ba7a80ad17",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_church-p-back.jpg?v=a97abd7c43",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -3261,7 +3261,7 @@
           "MeshIndex": -1,
           "CustomMesh": {
             "MeshURL": "https://steamusercontent-a.akamaihd.net/ugc/62583916778515333/9F0BE0C211BE3BD1725B4B855F5D3C9C0D020394/",
-            "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthr-box.jpg?v=3d7963b8aa",
+            "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthr-box.jpg?v=3d7963b8aa",
             "NormalURL": "",
             "ColliderURL": "",
             "Convex": true,
@@ -3317,8 +3317,8 @@
               ],
               "CustomDeck": {
                 "99108": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-l-face.jpg?v=7010445bc8",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-l-back.jpg?v=810d3d6ea7",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-l-face.jpg?v=7010445bc8",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-l-back.jpg?v=810d3d6ea7",
                   "NumWidth": 2,
                   "NumHeight": 1,
                   "Type": 0,
@@ -3362,8 +3362,8 @@
                   },
                   "CustomDeck": {
                     "99108": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-l-face.jpg?v=7010445bc8",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-l-back.jpg?v=810d3d6ea7",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-l-face.jpg?v=7010445bc8",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-l-back.jpg?v=810d3d6ea7",
                       "NumWidth": 2,
                       "NumHeight": 1,
                       "Type": 0,
@@ -3407,8 +3407,8 @@
                   },
                   "CustomDeck": {
                     "99108": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-l-face.jpg?v=7010445bc8",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-l-back.jpg?v=810d3d6ea7",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-l-face.jpg?v=7010445bc8",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-l-back.jpg?v=810d3d6ea7",
                       "NumWidth": 2,
                       "NumHeight": 1,
                       "Type": 0,
@@ -3455,8 +3455,8 @@
               },
               "CustomDeck": {
                 "99109": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-p-face.jpg?v=ef35b893ec",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-p-back.jpg?v=439df15d5f",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-p-face.jpg?v=ef35b893ec",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-p-back.jpg?v=439df15d5f",
                   "NumWidth": 6,
                   "NumHeight": 1,
                   "Type": 0,
@@ -3501,8 +3501,8 @@
               },
               "CustomDeck": {
                 "99109": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-p-face.jpg?v=ef35b893ec",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-p-back.jpg?v=439df15d5f",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-p-face.jpg?v=ef35b893ec",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-p-back.jpg?v=439df15d5f",
                   "NumWidth": 6,
                   "NumHeight": 1,
                   "Type": 0,
@@ -3547,8 +3547,8 @@
               },
               "CustomDeck": {
                 "99109": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-p-face.jpg?v=ef35b893ec",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-p-back.jpg?v=439df15d5f",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-p-face.jpg?v=ef35b893ec",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-p-back.jpg?v=439df15d5f",
                   "NumWidth": 6,
                   "NumHeight": 1,
                   "Type": 0,
@@ -3592,8 +3592,8 @@
               ],
               "CustomDeck": {
                 "99109": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-p-face.jpg?v=ef35b893ec",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-p-back.jpg?v=439df15d5f",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-p-face.jpg?v=ef35b893ec",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-p-back.jpg?v=439df15d5f",
                   "NumWidth": 6,
                   "NumHeight": 1,
                   "Type": 0,
@@ -3637,8 +3637,8 @@
                   },
                   "CustomDeck": {
                     "99109": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-p-face.jpg?v=ef35b893ec",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-p-back.jpg?v=439df15d5f",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-p-face.jpg?v=ef35b893ec",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-p-back.jpg?v=439df15d5f",
                       "NumWidth": 6,
                       "NumHeight": 1,
                       "Type": 0,
@@ -3682,8 +3682,8 @@
                   },
                   "CustomDeck": {
                     "99109": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-p-face.jpg?v=ef35b893ec",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-p-back.jpg?v=439df15d5f",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-p-face.jpg?v=ef35b893ec",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-p-back.jpg?v=439df15d5f",
                       "NumWidth": 6,
                       "NumHeight": 1,
                       "Type": 0,
@@ -3727,8 +3727,8 @@
                   },
                   "CustomDeck": {
                     "99109": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-p-face.jpg?v=ef35b893ec",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_road-p-back.jpg?v=439df15d5f",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-p-face.jpg?v=ef35b893ec",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_road-p-back.jpg?v=439df15d5f",
                       "NumWidth": 6,
                       "NumHeight": 1,
                       "Type": 0,
@@ -3789,7 +3789,7 @@
           "MeshIndex": -1,
           "CustomMesh": {
             "MeshURL": "https://steamusercontent-a.akamaihd.net/ugc/62583916778515333/9F0BE0C211BE3BD1725B4B855F5D3C9C0D020394/",
-            "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthr-box.jpg?v=3d7963b8aa",
+            "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthr-box.jpg?v=3d7963b8aa",
             "NormalURL": "",
             "ColliderURL": "",
             "Convex": true,
@@ -3846,8 +3846,8 @@
               },
               "CustomDeck": {
                 "99111": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                   "NumWidth": 7,
                   "NumHeight": 5,
                   "Type": 0,
@@ -3897,8 +3897,8 @@
               ],
               "CustomDeck": {
                 "99110": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
                   "NumWidth": 7,
                   "NumHeight": 2,
                   "Type": 0,
@@ -3942,8 +3942,8 @@
                   },
                   "CustomDeck": {
                     "99110": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -3987,8 +3987,8 @@
                   },
                   "CustomDeck": {
                     "99110": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -4032,8 +4032,8 @@
                   },
                   "CustomDeck": {
                     "99110": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -4077,8 +4077,8 @@
                   },
                   "CustomDeck": {
                     "99110": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -4122,8 +4122,8 @@
                   },
                   "CustomDeck": {
                     "99110": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -4167,8 +4167,8 @@
                   },
                   "CustomDeck": {
                     "99110": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -4212,8 +4212,8 @@
                   },
                   "CustomDeck": {
                     "99110": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -4257,8 +4257,8 @@
                   },
                   "CustomDeck": {
                     "99110": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -4302,8 +4302,8 @@
                   },
                   "CustomDeck": {
                     "99110": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -4348,8 +4348,8 @@
               ],
               "CustomDeck": {
                 "99110": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
                   "NumWidth": 7,
                   "NumHeight": 2,
                   "Type": 0,
@@ -4393,8 +4393,8 @@
                   },
                   "CustomDeck": {
                     "99110": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -4438,8 +4438,8 @@
                   },
                   "CustomDeck": {
                     "99110": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-face.jpg?v=fe90fb938e",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-l-back.jpg?v=eaaa081b56",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -4486,8 +4486,8 @@
               },
               "CustomDeck": {
                 "99111": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                   "NumWidth": 7,
                   "NumHeight": 5,
                   "Type": 0,
@@ -4532,8 +4532,8 @@
               },
               "CustomDeck": {
                 "99111": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                   "NumWidth": 7,
                   "NumHeight": 5,
                   "Type": 0,
@@ -4578,8 +4578,8 @@
               },
               "CustomDeck": {
                 "99111": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                   "NumWidth": 7,
                   "NumHeight": 5,
                   "Type": 0,
@@ -4624,8 +4624,8 @@
               },
               "CustomDeck": {
                 "99111": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                   "NumWidth": 7,
                   "NumHeight": 5,
                   "Type": 0,
@@ -4691,8 +4691,8 @@
               ],
               "CustomDeck": {
                 "99111": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                   "NumWidth": 7,
                   "NumHeight": 5,
                   "Type": 0,
@@ -4736,8 +4736,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -4781,8 +4781,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -4826,8 +4826,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -4871,8 +4871,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -4916,8 +4916,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -4961,8 +4961,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5006,8 +5006,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5051,8 +5051,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5096,8 +5096,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5141,8 +5141,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5186,8 +5186,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5231,8 +5231,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5276,8 +5276,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5321,8 +5321,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5366,8 +5366,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5411,8 +5411,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5456,8 +5456,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5501,8 +5501,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5546,8 +5546,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5591,8 +5591,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5636,8 +5636,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5681,8 +5681,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5726,8 +5726,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5771,8 +5771,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5816,8 +5816,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -5863,8 +5863,8 @@
               },
               "CustomDeck": {
                 "99111": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                   "NumWidth": 7,
                   "NumHeight": 5,
                   "Type": 0,
@@ -5912,8 +5912,8 @@
               ],
               "CustomDeck": {
                 "99111": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                   "NumWidth": 7,
                   "NumHeight": 5,
                   "Type": 0,
@@ -5957,8 +5957,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -6002,8 +6002,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -6047,8 +6047,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -6092,8 +6092,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -6137,8 +6137,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -6182,8 +6182,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -6227,8 +6227,8 @@
                   },
                   "CustomDeck": {
                     "99111": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-face.jpg?v=547ec9336a",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_square-p-back.jpg?v=c28a7c80cc",
                       "NumWidth": 7,
                       "NumHeight": 5,
                       "Type": 0,
@@ -6289,7 +6289,7 @@
           "MeshIndex": -1,
           "CustomMesh": {
             "MeshURL": "https://steamusercontent-a.akamaihd.net/ugc/62583916778515333/9F0BE0C211BE3BD1725B4B855F5D3C9C0D020394/",
-            "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthr-box.jpg?v=3d7963b8aa",
+            "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthr-box.jpg?v=3d7963b8aa",
             "NormalURL": "",
             "ColliderURL": "",
             "Convex": true,
@@ -6345,8 +6345,8 @@
               ],
               "CustomDeck": {
                 "99104": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-l-face.jpg?v=73c5425317",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-l-back.jpg?v=eea59b31ed",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-l-face.jpg?v=73c5425317",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-l-back.jpg?v=eea59b31ed",
                   "NumWidth": 2,
                   "NumHeight": 1,
                   "Type": 0,
@@ -6390,8 +6390,8 @@
                   },
                   "CustomDeck": {
                     "99104": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-l-face.jpg?v=73c5425317",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-l-back.jpg?v=eea59b31ed",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-l-face.jpg?v=73c5425317",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-l-back.jpg?v=eea59b31ed",
                       "NumWidth": 2,
                       "NumHeight": 1,
                       "Type": 0,
@@ -6435,8 +6435,8 @@
                   },
                   "CustomDeck": {
                     "99104": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-l-face.jpg?v=73c5425317",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-l-back.jpg?v=eea59b31ed",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-l-face.jpg?v=73c5425317",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-l-back.jpg?v=eea59b31ed",
                       "NumWidth": 2,
                       "NumHeight": 1,
                       "Type": 0,
@@ -6483,8 +6483,8 @@
               },
               "CustomDeck": {
                 "99105": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-p-face.jpg?v=3f86a3a85b",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-p-back.jpg?v=53cc791936",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-p-face.jpg?v=3f86a3a85b",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-p-back.jpg?v=53cc791936",
                   "NumWidth": 7,
                   "NumHeight": 1,
                   "Type": 0,
@@ -6529,8 +6529,8 @@
               },
               "CustomDeck": {
                 "99105": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-p-face.jpg?v=3f86a3a85b",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-p-back.jpg?v=53cc791936",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-p-face.jpg?v=3f86a3a85b",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-p-back.jpg?v=53cc791936",
                   "NumWidth": 7,
                   "NumHeight": 1,
                   "Type": 0,
@@ -6575,8 +6575,8 @@
               },
               "CustomDeck": {
                 "99105": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-p-face.jpg?v=3f86a3a85b",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-p-back.jpg?v=53cc791936",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-p-face.jpg?v=3f86a3a85b",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-p-back.jpg?v=53cc791936",
                   "NumWidth": 7,
                   "NumHeight": 1,
                   "Type": 0,
@@ -6620,8 +6620,8 @@
               ],
               "CustomDeck": {
                 "99105": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-p-face.jpg?v=3f86a3a85b",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-p-back.jpg?v=53cc791936",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-p-face.jpg?v=3f86a3a85b",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-p-back.jpg?v=53cc791936",
                   "NumWidth": 7,
                   "NumHeight": 1,
                   "Type": 0,
@@ -6665,8 +6665,8 @@
                   },
                   "CustomDeck": {
                     "99105": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-p-face.jpg?v=3f86a3a85b",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-p-back.jpg?v=53cc791936",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-p-face.jpg?v=3f86a3a85b",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-p-back.jpg?v=53cc791936",
                       "NumWidth": 7,
                       "NumHeight": 1,
                       "Type": 0,
@@ -6710,8 +6710,8 @@
                   },
                   "CustomDeck": {
                     "99105": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-p-face.jpg?v=3f86a3a85b",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-p-back.jpg?v=53cc791936",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-p-face.jpg?v=3f86a3a85b",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-p-back.jpg?v=53cc791936",
                       "NumWidth": 7,
                       "NumHeight": 1,
                       "Type": 0,
@@ -6755,8 +6755,8 @@
                   },
                   "CustomDeck": {
                     "99105": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-p-face.jpg?v=3f86a3a85b",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-p-back.jpg?v=53cc791936",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-p-face.jpg?v=3f86a3a85b",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-p-back.jpg?v=53cc791936",
                       "NumWidth": 7,
                       "NumHeight": 1,
                       "Type": 0,
@@ -6802,8 +6802,8 @@
               },
               "CustomDeck": {
                 "99105": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-p-face.jpg?v=3f86a3a85b",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_fairground-p-back.jpg?v=53cc791936",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-p-face.jpg?v=3f86a3a85b",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_fairground-p-back.jpg?v=53cc791936",
                   "NumWidth": 7,
                   "NumHeight": 1,
                   "Type": 0,
@@ -6862,7 +6862,7 @@
           "MeshIndex": -1,
           "CustomMesh": {
             "MeshURL": "https://steamusercontent-a.akamaihd.net/ugc/62583916778515333/9F0BE0C211BE3BD1725B4B855F5D3C9C0D020394/",
-            "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthr-box.jpg?v=3d7963b8aa",
+            "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthr-box.jpg?v=3d7963b8aa",
             "NormalURL": "",
             "ColliderURL": "",
             "Convex": true,
@@ -6918,8 +6918,8 @@
               ],
               "CustomDeck": {
                 "99100": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-l-face.jpg?v=df391b35a4",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-l-back.jpg?v=aebf7559a1",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-l-face.jpg?v=df391b35a4",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-l-back.jpg?v=aebf7559a1",
                   "NumWidth": 2,
                   "NumHeight": 1,
                   "Type": 0,
@@ -6963,8 +6963,8 @@
                   },
                   "CustomDeck": {
                     "99100": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-l-face.jpg?v=df391b35a4",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-l-back.jpg?v=aebf7559a1",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-l-face.jpg?v=df391b35a4",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-l-back.jpg?v=aebf7559a1",
                       "NumWidth": 2,
                       "NumHeight": 1,
                       "Type": 0,
@@ -7008,8 +7008,8 @@
                   },
                   "CustomDeck": {
                     "99100": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-l-face.jpg?v=df391b35a4",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-l-back.jpg?v=aebf7559a1",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-l-face.jpg?v=df391b35a4",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-l-back.jpg?v=aebf7559a1",
                       "NumWidth": 2,
                       "NumHeight": 1,
                       "Type": 0,
@@ -7056,8 +7056,8 @@
               },
               "CustomDeck": {
                 "99101": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-p-face.jpg?v=bf10c9503e",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-p-back.jpg?v=074fe0d601",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-p-face.jpg?v=bf10c9503e",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-p-back.jpg?v=074fe0d601",
                   "NumWidth": 7,
                   "NumHeight": 2,
                   "Type": 0,
@@ -7102,8 +7102,8 @@
               },
               "CustomDeck": {
                 "99101": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-p-face.jpg?v=bf10c9503e",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-p-back.jpg?v=074fe0d601",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-p-face.jpg?v=bf10c9503e",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-p-back.jpg?v=074fe0d601",
                   "NumWidth": 7,
                   "NumHeight": 2,
                   "Type": 0,
@@ -7148,8 +7148,8 @@
               },
               "CustomDeck": {
                 "99101": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-p-face.jpg?v=bf10c9503e",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-p-back.jpg?v=074fe0d601",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-p-face.jpg?v=bf10c9503e",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-p-back.jpg?v=074fe0d601",
                   "NumWidth": 7,
                   "NumHeight": 2,
                   "Type": 0,
@@ -7194,8 +7194,8 @@
               ],
               "CustomDeck": {
                 "99101": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-p-face.jpg?v=bf10c9503e",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-p-back.jpg?v=074fe0d601",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-p-face.jpg?v=bf10c9503e",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-p-back.jpg?v=074fe0d601",
                   "NumWidth": 7,
                   "NumHeight": 2,
                   "Type": 0,
@@ -7239,8 +7239,8 @@
                   },
                   "CustomDeck": {
                     "99101": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-p-face.jpg?v=bf10c9503e",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-p-back.jpg?v=074fe0d601",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-p-face.jpg?v=bf10c9503e",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-p-back.jpg?v=074fe0d601",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -7284,8 +7284,8 @@
                   },
                   "CustomDeck": {
                     "99101": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-p-face.jpg?v=bf10c9503e",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-p-back.jpg?v=074fe0d601",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-p-face.jpg?v=bf10c9503e",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-p-back.jpg?v=074fe0d601",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -7329,8 +7329,8 @@
                   },
                   "CustomDeck": {
                     "99101": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-p-face.jpg?v=bf10c9503e",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-p-back.jpg?v=074fe0d601",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-p-face.jpg?v=bf10c9503e",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-p-back.jpg?v=074fe0d601",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -7374,8 +7374,8 @@
                   },
                   "CustomDeck": {
                     "99101": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-p-face.jpg?v=bf10c9503e",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-p-back.jpg?v=074fe0d601",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-p-face.jpg?v=bf10c9503e",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-p-back.jpg?v=074fe0d601",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -7421,8 +7421,8 @@
               },
               "CustomDeck": {
                 "99101": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-p-face.jpg?v=bf10c9503e",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/district_almanac-p-back.jpg?v=074fe0d601",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-p-face.jpg?v=bf10c9503e",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/district_almanac-p-back.jpg?v=074fe0d601",
                   "NumWidth": 7,
                   "NumHeight": 2,
                   "Type": 0,
@@ -7481,7 +7481,7 @@
           "MeshIndex": -1,
           "CustomMesh": {
             "MeshURL": "https://steamusercontent-a.akamaihd.net/ugc/62583916778515333/9F0BE0C211BE3BD1725B4B855F5D3C9C0D020394/",
-            "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthr-box.jpg?v=3d7963b8aa",
+            "DiffuseURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthr-box.jpg?v=3d7963b8aa",
             "NormalURL": "",
             "ColliderURL": "",
             "Convex": true,
@@ -7538,8 +7538,8 @@
               },
               "CustomDeck": {
                 "99112": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-l-face.jpg?v=ba41e20cf7",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-l-back.jpg?v=83e46f7bdb",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-l-face.jpg?v=ba41e20cf7",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-l-back.jpg?v=83e46f7bdb",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "Type": 0,
@@ -7589,8 +7589,8 @@
               ],
               "CustomDeck": {
                 "99113": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
                   "NumWidth": 7,
                   "NumHeight": 2,
                   "Type": 0,
@@ -7634,8 +7634,8 @@
                   },
                   "CustomDeck": {
                     "99113": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -7679,8 +7679,8 @@
                   },
                   "CustomDeck": {
                     "99113": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -7724,8 +7724,8 @@
                   },
                   "CustomDeck": {
                     "99113": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -7769,8 +7769,8 @@
                   },
                   "CustomDeck": {
                     "99113": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -7814,8 +7814,8 @@
                   },
                   "CustomDeck": {
                     "99113": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -7859,8 +7859,8 @@
                   },
                   "CustomDeck": {
                     "99113": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -7904,8 +7904,8 @@
                   },
                   "CustomDeck": {
                     "99113": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -7949,8 +7949,8 @@
                   },
                   "CustomDeck": {
                     "99113": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -7994,8 +7994,8 @@
                   },
                   "CustomDeck": {
                     "99113": {
-                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
-                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
+                      "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-face.jpg?v=e3ad8d0e22",
+                      "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sheets/finale-p-back.jpg?v=8d1564d23d",
                       "NumWidth": 7,
                       "NumHeight": 2,
                       "Type": 0,
@@ -8065,8 +8065,8 @@
           ],
           "CustomDeck": {
             "99800": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrelias-m.jpg?v=7a77ebdd36",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrelias-m-back.jpg?v=9f9f80dc1c",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrelias-m.jpg?v=7a77ebdd36",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrelias-m-back.jpg?v=9f9f80dc1c",
               "NumWidth": 1,
               "NumHeight": 1,
               "BackIsHidden": true,
@@ -8074,8 +8074,8 @@
               "Type": 0
             },
             "99801": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrayako-m.jpg?v=4c2324367a",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrayako-m-back.jpg?v=37ff0c94e6",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrayako-m.jpg?v=4c2324367a",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrayako-m-back.jpg?v=37ff0c94e6",
               "NumWidth": 1,
               "NumHeight": 1,
               "BackIsHidden": true,
@@ -8083,8 +8083,8 @@
               "Type": 0
             },
             "99802": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrcass-m.jpg?v=520e7819f1",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrcass-m-back.jpg?v=803c688c41",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrcass-m.jpg?v=520e7819f1",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrcass-m-back.jpg?v=803c688c41",
               "NumWidth": 1,
               "NumHeight": 1,
               "BackIsHidden": true,
@@ -8092,8 +8092,8 @@
               "Type": 0
             },
             "99803": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrseraphine-m.jpg?v=74ddf2d660",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrseraphine-m-back.jpg?v=07df9be6f8",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrseraphine-m.jpg?v=74ddf2d660",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrseraphine-m-back.jpg?v=07df9be6f8",
               "NumWidth": 1,
               "NumHeight": 1,
               "BackIsHidden": true,
@@ -8101,8 +8101,8 @@
               "Type": 0
             },
             "99804": {
-              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrbirdie-m.jpg?v=27c2c60f8d",
-              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrbirdie-m-back.jpg?v=e67ae96d76",
+              "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrbirdie-m.jpg?v=27c2c60f8d",
+              "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrbirdie-m-back.jpg?v=e67ae96d76",
               "NumWidth": 1,
               "NumHeight": 1,
               "BackIsHidden": true,
@@ -8162,8 +8162,8 @@
               "SidewaysCard": false,
               "CustomDeck": {
                 "99800": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrelias-m.jpg?v=7a77ebdd36",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrelias-m-back.jpg?v=9f9f80dc1c",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrelias-m.jpg?v=7a77ebdd36",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrelias-m-back.jpg?v=9f9f80dc1c",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "BackIsHidden": true,
@@ -8223,8 +8223,8 @@
               "SidewaysCard": false,
               "CustomDeck": {
                 "99801": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrayako-m.jpg?v=4c2324367a",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrayako-m-back.jpg?v=37ff0c94e6",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrayako-m.jpg?v=4c2324367a",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrayako-m-back.jpg?v=37ff0c94e6",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "BackIsHidden": true,
@@ -8284,8 +8284,8 @@
               "SidewaysCard": false,
               "CustomDeck": {
                 "99802": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrcass-m.jpg?v=520e7819f1",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrcass-m-back.jpg?v=803c688c41",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrcass-m.jpg?v=520e7819f1",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrcass-m-back.jpg?v=803c688c41",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "BackIsHidden": true,
@@ -8345,8 +8345,8 @@
               "SidewaysCard": false,
               "CustomDeck": {
                 "99803": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrseraphine-m.jpg?v=74ddf2d660",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrseraphine-m-back.jpg?v=07df9be6f8",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrseraphine-m.jpg?v=74ddf2d660",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrseraphine-m-back.jpg?v=07df9be6f8",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "BackIsHidden": true,
@@ -8406,8 +8406,8 @@
               "SidewaysCard": false,
               "CustomDeck": {
                 "99804": {
-                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrbirdie-m.jpg?v=27c2c60f8d",
-                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthrbirdie-m-back.jpg?v=e67ae96d76",
+                  "FaceURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrbirdie-m.jpg?v=27c2c60f8d",
+                  "BackURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthrbirdie-m-back.jpg?v=e67ae96d76",
                   "NumWidth": 1,
                   "NumHeight": 1,
                   "BackIsHidden": true,
@@ -8468,7 +8468,7 @@
             "CleanUpHelper_ignore"
           ],
           "CustomImage": {
-            "ImageURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthr-log-page1.jpg?v=4d3a6fffd9",
+            "ImageURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthr-log-page1.jpg?v=4d3a6fffd9",
             "ImageSecondaryURL": "",
             "ImageScalar": 1.0,
             "WidthScale": 0.0,
@@ -8530,7 +8530,7 @@
                 "CleanUpHelper_ignore"
               ],
               "CustomImage": {
-                "ImageURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthr-log-page2.jpg?v=e6d06fee0e",
+                "ImageURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthr-log-page2.jpg?v=e6d06fee0e",
                 "ImageSecondaryURL": "",
                 "ImageScalar": 1.0,
                 "WidthScale": 0.0,
@@ -8592,7 +8592,7 @@
                 "CleanUpHelper_ignore"
               ],
               "CustomImage": {
-                "ImageURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/cards/sthr-log-page3.jpg?v=f4de67b76d",
+                "ImageURL": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/cards/sthr-log-page3.jpg?v=f4de67b76d",
                 "ImageSecondaryURL": "",
                 "ImageScalar": 1.0,
                 "WidthScale": 0.0,
@@ -8655,7 +8655,7 @@
             "CleanUpHelper_ignore"
           ],
           "CustomPDF": {
-            "PDFUrl": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d34847cf5457bed5922d920ac7cb85f433bae37e/dist/guide/the_still_hour_campaign_guide.pdf?v=de04708bb7",
+            "PDFUrl": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/04562b4a5fd9eb49aeb055d0ce8f015e9a96257f/dist/guide/the_still_hour_campaign_guide.pdf?v=d154ebe917",
             "PDFPassword": "",
             "PDFPage": 0,
             "PDFPageOffset": 0
