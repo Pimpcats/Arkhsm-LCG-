@@ -922,38 +922,64 @@ local function drawPlay()
     or (between and "BETWEEN LOOPS"
       or string.format("THE STILL HOUR · loop %d", CampaignState.getLoopsCompleted() + 1)), -2.3)
   button("shClickMemory", string.format("Memory %d / %d", CampaignState.getBankedMemory(), c.memoryCap),
-    -PAIR_X, -1.7, 1000, "Banked Memory. " .. PLUS_MINUS)
+    -PAIR_X, -1.7, 1000, "Banked Memory, the party's shared pool. " .. PLUS_MINUS .. ". Click when it changes "
+      .. "outside the Interlude: The House Always Wins, a finale resolution that spends it, or the first "
+      .. "Prologue ending's extra 1.")
   button("shClickInvestigators", "Investigators " .. c.investigators, PAIR_X, -1.7, 1000,
-    "Sets every threshold. " .. PLUS_MINUS .. (SCED.getInvestigatorCount()
+    "The number of investigators; it sets every threshold. Change it when an investigator ages out and is "
+      .. "not replaced. " .. PLUS_MINUS .. (SCED.getInvestigatorCount()
       and (" (SCED counter: " .. SCED.getInvestigatorCount() .. ")") or ""))
   local d = bag.describe()
   investigatorList = guarded("investigators", Board.investigators) or {}
   if not between then
     button("shClickDissonance", string.format("Dissonance %d / %d · %s", CampaignState.getDissonance(),
-      c.resetThreshold, CampaignState.band()), -PAIR_X, -1.1, 1000, "Left-click raise · Right-click reduce")
+      c.resetThreshold, CampaignState.band()), -PAIR_X, -1.1, 1000,
+      "Click each time a card or ability raises (left) or lowers (right) Dissonance; this adds and removes the "
+        .. "band's Static tokens and advances the Approach. A revealed Static token: use Resolve on the token "
+        .. "instead. If an investigator paid it as a cost, also click Dissonance raised on their card. "
+        .. "Canceled Hour III: right-click once. Canceled Hour VIII: right-click twice.")
     button("shClickStatic", string.format("[static] %d", d.target), PAIR_X, -1.1, 1000,
-      "Static tokens the bag holds (band + temporary; bag mode: " .. tostring(d.mode) .. "). Left-click: a card adds one for a time. Right-click: remove a temporary one.")
+      "Static tokens the bag holds (band + temporary; bag mode: " .. tostring(d.mode) .. "). Left-click when a "
+        .. "card adds one for a limited time; right-click when that time ends or the Press removes it. Hour VI's "
+        .. "is added by Hour (if Hour VI is canceled, use Undo Hour VI).")
     local h = CampaignState.getHour()
     button("shClickHour", string.format("Hour %d · %s", h, Hourglass.HOUR_NAMES[h] or "?"), -PAIR_X, -0.5, 1000,
-      "Left-click advance (resolves the Hour) · Right-click rewind")
+      "Each time the Hourglass advances or rewinds, move the Hours deck and click once per Hour (left advance, "
+        .. "right rewind). With SCED it clears all doom in play (take doom off the Hours cards yourself). It applies "
+        .. "Hour III's +1 Dissonance, the Approach at Hours V, VII and VIII, Hour VI's Static token and Hour VIII's "
+        .. "+2 Dissonance. You resolve the rest: each investigator heals 1 damage and 1 horror, Hour II's draws, "
+        .. "Hour III's extra +1 at a Church location (click Dissonance) and The Belfry, Hour IV, Hour VII's "
+        .. "exhaust, Hour VIII's +1 fight, Hour IX. After Hold Back, do not right-click: Hold Back rewinds it.")
     button("shClickAppointed", "Appointed: " .. Appointed.stageName(), PAIR_X, -0.5, 1000,
-      "Left-click: a card advances its Approach by 1 stage (min Sensed). Hold Back is on its card.")
+      "Left-click once per stage when The Crossing, The Debt of Hours or the finale advances the Approach. "
+        .. "Right-click once per stage an effect pushes it back beyond Hold Back (The Hour I Learned Your Name's "
+        .. "extra stage), or to undo a canceled advance (Hour V once if it moved; Hours VII and VIII once per "
+        .. "stage). Hold Back and Hunt are on its card.")
     for i, inv in ipairs(investigatorList) do
       if i > 4 then break end
       button("shInvMem" .. i, string.format("%s · Memory %d", inv.name, CampaignState.getOnCardMemory(inv.id)),
         (i % 2 == 1) and -PAIR_X or PAIR_X, 0.1 + math.floor((i - 1) / 2) * 0.55, 1000,
-        "Memory on this investigator's cards (prey = most). " .. PLUS_MINUS, 80)
+        "Memory on this investigator's cards (the Appointed hunts the most). Click whenever Memory is placed on "
+          .. "or removed from their cards. " .. PLUS_MINUS .. ". At Loop Setup, Anchor Point's token takes one "
+          .. "click; an Elder or Ancient investigator's start Memory is already counted.", 80)
     end
   end
   -- rows of three, spaced so no button overlaps another
-  button("shStatus", "Status", -ROW3_X, 1.4)
-  button("shSyncBoard", "Sync Board", 0.0, 1.4, 620, "Re-apply location faces and CLOSED labels, the Appointed and the chaos bag.")
-  button("shReset", "Reset Loop", -ROW3_X, 2.0)
-  button("shOpenInterlude", "Interlude", 0.0, 2.0, 620, "Spend Memory: Recollections and level-ups.")
-  button("shKnowledgeStatus", "Knowledge", ROW3_X, 2.0)
+  button("shStatus", "Status", -ROW3_X, 1.4, 620, "Print the Hour, Dissonance, band, scar, Memory and Part to the chat.")
+  button("shSyncBoard", "Sync Board", 0.0, 1.4, 620, "Use when the table and the Control disagree: re-applies location sides and CLOSED labels, the "
+    .. "Appointed's position and the chaos bag's Static tokens.")
+  button("shReset", "Reset Loop", -ROW3_X, 2.0, 620, "When the loop ends (Between Loops). Counts once per loop. "
+    .. "If it says the loop is not over by its count (every investigator defeated or resigned, or the Prologue "
+    .. "ended by its act), click it again. Begin Next Loop waits for it.")
+  button("shOpenInterlude", "Interlude", 0.0, 2.0, 620, "Between Loops steps 1-3: age the investigators, bank on-card Memory, then spend it on Recollections "
+    .. "and upgrades.")
+  button("shKnowledgeStatus", "Knowledge", ROW3_X, 2.0, 620, "List the Knowledge recorded so far. Record an entry "
+    .. "(or a Victory) by ticking it on the Campaign Log token: the Control turns the locations it changes and banks "
+    .. "the Memory it pays, the first time only. Unticking a mistake takes them back, as far as banked Memory allows.")
   if between then
     button("shBeginNextLoop", "Begin Next Loop", 0.0, 2.6, 620,
-      "After the Interlude: cap Memory and start the next night.")
+      "After the Interlude: caps banked Memory, adds an Elder or Ancient investigator's start Memory and starts "
+        .. "the next night. If Age or Bank on-card Memory was skipped, the first click says what is left.")
   end
   if CampaignState.inPrologue() then
     local n = c.investigators
@@ -964,8 +990,9 @@ local function drawPlay()
   end
   if CampaignState.inFinale() then
     button("shClickContest", string.format("Contest %d / %d", CampaignState.getContest(), c.contestTarget),
-      0.0, 2.6, 620, "The Last Hour: contest progress. " .. PLUS_MINUS
-        .. ". Right-click at 0: the finale was not begun after all.")
+      0.0, 2.6, 620, "The Last Hour: click once for every source of contest progress (each Hold Back success, "
+        .. "the Uninvited's defeat, each deep entry spent, You have spoken the name); none is automatic. "
+        .. PLUS_MINUS .. ". Right-click at 0: the finale was not begun after all.")
   elseif CampaignState.knows("the-way-the-night-breaks") and not CampaignState.isLoopEnded()
       and not CampaignState.inPrologue() then
     -- the finale begins during a loop, never Between Loops (after Reset Loop) or in the Prologue
@@ -1032,22 +1059,25 @@ local function drawInterlude()
       X - 0.55, zi, 1200, "", 80)
     local t = CampaignState.getTallies(inv.id)
     button("shTalRaised" .. i, "Dissonance raised " .. t.raises, X + 1.45, zi, 620,
-      "Times this investigator paid 'raise Dissonance' as a cost this loop (3+ = leaned). " .. PLUS_MINUS, 70)
+      "Times this investigator paid 'raise Dissonance' as a cost this loop (3+ = leaned on the loop, +1 Year). " .. PLUS_MINUS, 70)
     button("shTalSpent" .. i, "Loop-power Memory " .. t.spent, X + 2.75, zi, 620,
       "Memory this investigator removed from their own cards for their own cards or abilities this loop (4+ = leaned). " .. PLUS_MINUS, 70)
     local locked = (CampaignState.getBracket(inv.id) or {}).physical ~= nil
     -- the narrow buttons of the second row take two lines where one would run into the next button
-    button("shAgeDef" .. i, "Defeated:\n" .. (a.defeated and "yes" or "no"), X - 1.45, zi + 0.42, 330, "", 70)
+    button("shAgeDef" .. i, "Defeated:\n" .. (a.defeated and "yes" or "no"), X - 1.45, zi + 0.42, 330,
+      "Was this investigator defeated during the loop? (+1 Year) Set it before Age.", 70)
     button("shNoop", "Leaned: " .. (Interlude.leanedOnLoop(inv.id) and "yes" or "no"), X - 0.7, zi + 0.42, 330,
       "Derived: paid 'raise Dissonance' as a cost 3+ times, or removed 4+ Memory from own cards for own cards or abilities, this loop.", 70)
     button("shAgePhys" .. i, "-" .. a.physical .. (locked and "\n(locked)" or ""), X + 0.05, zi + 0.42, 330,
-      "Physical skill that drifts down (chosen once, locked).", 60)
+      "The first time they reach Weathered: the physical skill that drops (chosen once, locked). Choose before Age.", 60)
     button("shAgeMent" .. i, "+" .. a.mental .. (locked and "\n(locked)" or ""), X + 0.8, zi + 0.42, 330,
-      "Mental skill that drifts up (chosen once, locked).", 60)
+      "The first time they reach Weathered: the mental skill that rises (chosen once, locked). Choose before Age.", 60)
     local afterPrologue = CampaignState.getLoopsCompleted() == 0
     button("shAge" .. i, a.aged and ("Aged +" .. a.aged) or (afterPrologue and "No Age" or "Age"),
       X + 1.6, zi + 0.42, 330, afterPrologue and "After the Prologue, investigators do not gain Years."
-        or "Apply this interlude's Years.", 70)
+        or "Apply this interlude's Years (reset Years plus Years pending). Set Defeated first and, the first time "
+          .. "they reach Weathered, the skills: clicked before choosing, Age asks and applies nothing. The chat "
+          .. "names the skills changed.", 70)
   end
 end
 
@@ -1084,7 +1114,9 @@ refreshControl = function()
       if obj.clearButtons then pcall(obj.clearButtons) end
       obj.createButton({ click_function = "shResolveStaticToken", function_owner = self, label = "Resolve",
         position = {0,0.3,0}, rotation = {0,0,0}, width = 900, height = 260, font_size = 140,
-        tooltip = "Left: this Static resolves. Right: cancel this token's effect. Returning a preview also cancels it." })
+        tooltip = "If it resolves in a skill test, left-click before continuing (applies its +1 Dissonance; do not also "
+          .. "click Dissonance). Canceled or only previewed (Marked Deck): right-click, or return it to the bag. A "
+          .. "sealed token later treated as revealed: click Dissonance yourself only if it resolves." })
     end
   end
   persist()
