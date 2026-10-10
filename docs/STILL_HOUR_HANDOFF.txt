@@ -1,8 +1,16 @@
 THE STILL HOUR — HANDOFF
-Updated 2026-10-02. Spoiler-free.
+Updated 2026-10-10. Spoiler-free.
 
 Repository: https://github.com/Pimpcats/Arkhsm-LCG-
 Working branch: main.
+
+STATUS 2026-10-10
+Every scenario was reviewed one by one (Prologue, the loop and agenda, each district, the finale): 0 blockers, 28 should-fix and 70 wording findings, each checked against the source and applied (docs/design/review/2026-10-07_story_and_resolution_review.md, section 5, designer-only).
+A story-map test (tools/story_map.py, tests/test_story_map.py) now checks on every build that every record is read later, every pointer resolves, every objective and resolution leads somewhere, and the finale's 7 endings depend on the choices made (16 distinct combinations, all reachable).
+Place now also does Loop Setup (encounter deck, Approach, act decks, shuffle).
+Tests: full suite passing (one card shortened to meet the print floor, then its tests re-run); database audit 0 errors.
+Simulation, 3 investigators, 30 games each, before and after these fixes, for the scenarios whose rules changed: changes are within the noise of 30 games (for example the Sunken Road's first objective 87% -> 83%, its deep objective 90% -> 93%, the finale's contest 60% -> 63%); no scenario stalls. The 1, 2 and 4 investigator runs were not repeated.
+Not tested in Tabletop Simulator and not played by a person.
 
 STATUS
 The finishing corrections are applied and the campaign package is rebuilt.
