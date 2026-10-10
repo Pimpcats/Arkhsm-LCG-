@@ -50,7 +50,37 @@ return function(R, T)
     end
   end
   --- The Flooded Crypt: "Forced – At the end of the round: Each investigator at the Flooded Crypt takes 1 damage."
+  --- Who Walks Beside You: an Echo is always waiting at the Turning (the act spawns
+  -- one when it becomes current and at the end of each round if none is there).
+  function FX.walkerToTurning()
+    local G = R.G
+    local turning = R.locById("sthr-loc-turning")
+    if not turning then return end
+    for _, en in ipairs(G.enemies) do
+      if not en.dead and en.loc == turning.guid and R.hasTrait(en.def, "Echo") then return end
+    end
+    local c = T.searchEncounter(function(md) return md.id == "sthr-waitingcongregation" end)
+    if c then
+      R.spawnEnemy(c, turning, nil, { want = "The Turning" })
+      local enc = T.encounterDeck()
+      if enc and enc.type == "Deck" then enc.shuffle() end
+      return
+    end
+    for _, en in ipairs(G.enemies) do
+      if not en.dead and en.id == "sthr-waitingcongregation" then
+        en.engaged = nil
+        en.loc = turning.guid
+        R.placeEnemy(en)
+        R.log("Who Walks Beside You: a Waiting Congregation in play moves to the Turning")
+        return
+      end
+    end
+    G.metrics.bad_spawns[#G.metrics.bad_spawns + 1] = { id = "sthr-waitingcongregation", want = "The Turning",
+      used = "none", note = "no Waiting Congregation in the encounter deck, discard pile or play" }
+  end
+
   function FX.endOfRound()
+    if R.G.walksBesideCurrent then FX.walkerToTurning() end
     local crypt = R.locById("sthr-loc-floodedcrypt")
     if crypt and crypt.revealed and not crypt.closed then
       for _, inv in ipairs(R.investigatorsAt(crypt)) do
@@ -71,11 +101,14 @@ return function(R, T)
     if h == 2 then
       for _, inv in ipairs(R.aliveInvs()) do R.drawEncounter(inv) end
     elseif h == 3 and G.bellDefeated then
+      -- the Belfry's own Forced still reveals it
+      local belfry = R.locById("sthr-loc-belfry")
+      if belfry and not belfry.revealed and not belfry.closed then R.reveal(belfry) end
       -- The Bell-Ringer Beneath was defeated: Hour III's text does not resolve
       -- (undo the +1 the Control applied)
       R.lower(1, "Hour III does not resolve (the Bell-Ringer is defeated)")
     elseif h == 3 then
-      -- the Belfry's unrevealed side: "Forced – When Hour III is reached: Reveal the Belfry."
+      -- the Belfry's unrevealed side: "Forced – After the Hourglass advances to Hour III: Reveal The Belfry."
       local belfry = R.locById("sthr-loc-belfry")
       if belfry and not belfry.revealed and not belfry.closed then R.reveal(belfry) end
       local atChurch = false
@@ -122,7 +155,8 @@ return function(R, T)
       end
       local best, bc
       for _, L in ipairs(G.locList) do
-        if L.revealed and not L.closed and L.id ~= "sthr-loc-hubsquare" and L.id ~= "sthr-loc-square" then
+        if L.revealed and not L.closed and L.id ~= "sthr-loc-hubsquare" and L.id ~= "sthr-loc-square"
+           and L.id ~= "sthr-loc-townhallsteps" then
           local c = R.clues(L)
           local occupied = #R.investigatorsAt(L) > 0
           local degree = 0
@@ -270,7 +304,7 @@ return function(R, T)
         R.lower(1, "The Vestry")
       end }
     end
-    if L.id == "sthr-loc-turning" and not G.group.turning then
+    if L.id == "sthr-loc-turning" and not G.group.turning and not G.finale then
       out[#out + 1] = { name = "Turning", actions = 1, kind = "rewind", fn = function()
         G.group.turning = true
         R.raise(2, "The Turning (cost)", inv)
@@ -557,6 +591,7 @@ return function(R, T)
       R.endLoop("act")
     end
     if act.id == "sthr-act-lamp" then G.lampLit = true end
+    if act.id == "sthr-act-walksbeside" then G.walksBesideCurrent = false end   -- its rules end with it
     if A.fact then
       T.tickLog("k:" .. A.fact, true)
       R.touch()
@@ -607,16 +642,7 @@ return function(R, T)
       if c and steps then R.spawnEnemy(c, steps, nil, { want = "The Town Hall Steps" }) end
     elseif act.id == "sthr-act-walksbeside" then
       G.walksBesideCurrent = true
-      local turning = R.locById("sthr-loc-turning")
-      local c = T.searchEncounter(function(md) return md.id == "sthr-waitingcongregation" end)
-      if c and turning then
-        R.spawnEnemy(c, turning, nil, { want = "The Turning" })
-        local enc = T.encounterDeck()
-        if enc and enc.type == "Deck" then enc.shuffle() end
-      elseif turning then
-        G.metrics.bad_spawns[#G.metrics.bad_spawns + 1] = { id = "sthr-waitingcongregation", want = "The Turning",
-          used = "none", note = "no Waiting Congregation left in the encounter deck or discard pile" }
-      end
+      FX.walkerToTurning()
     elseif act.id == "sthr-act-appointedname" then
       -- the Sealed Study opens (the Control: act 2a is current)
       R.scanLocations()

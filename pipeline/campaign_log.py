@@ -56,19 +56,19 @@ FACTS = [
     ("the-lamp-was-never-lit", "The Lamp Remembers", "Lighthouse", "surface",
      "The Lantern Room enters play calm side up."),
     ("the-keepers-ninth-death", "The Keeper's Ninth Death", "Lighthouse", "deep",
-     "A defeated investigator first places 1 Memory. Elias Warde's Elder Sign heals 1 horror too."),
+     "A defeated investigator first places 1 Memory. Elias Warde's Elder Sign also heals 1 horror from the same investigator."),
     ("the-thirteenth-toll", "The Thirteenth Toll", "Church", "surface",
-     "Hour III: no extra Dissonance at a Church location."),
+     "Hour III: no extra Dissonance at a Church location. The Belfry: no Dissonance on entering."),
     ("the-hour-was-wrong", "The Hour Was Wrong", "Church", "deep",
      "Hour IV's Forced ability does not resolve. Bag: −1 Elder Thing."),
     ("the-road-remembers", "The Road Remembers", "Sunken Road", "surface",
-     "Group limit once per loop: moving Square–Milestones places no doom."),
+     "Group limit once per loop: the round's first Square–Milestones move places no doom."),
     ("who-walks-beside-you", "Who Walks Beside You", "Sunken Road", "deep",
      "Each Echo gets −1 fight. Bag: −1 Cultist."),
     ("the-sheriff-is-already-dead", "The Sheriff Is Already Dead", "Square", "surface",
      "The Town Hall Steps enter play calm side up."),
     ("the-vote-that-never-ends", "The Vote That Never Ends", "Square", "deep",
-     "The Same Speech: no extra horror. Seraphine's thread: suspected (if she is playing)."),
+     "The Same Speech: no extra horror. Seraphine's thread: suspected (if she was there)."),
     ("the-wheel-still-turns", "The Wheel Still Turns", "Fairground", "surface",
      "At The Wheel, group limit once per loop: reorder top 2 encounter cards."),
     ("the-ticket-takers-bargain", "The Ticket-Taker's Bargain", "Fairground", "deep",
@@ -76,7 +76,7 @@ FACTS = [
     ("what-the-almanac-hid", "What the Almanac Hid", "Almanac", "surface",
      "Hour VI: the bag holds 1 fewer Static token instead of 1 more."),
     ("the-appointeds-name", "The Appointed's Name", "Almanac", "deep",
-     "Hour VII: exhaust The Appointed. Bag: −1 Tablet. Seraphine's thread: known (if she is playing)."),
+     "Hour VII: exhaust The Appointed. Bag: −1 Tablet. Seraphine's thread: known (if she was there)."),
     ("the-way-the-night-breaks", "The Way the Night Breaks", "assembled", "assembled",
      "The finale may be begun."),
 ]
@@ -119,13 +119,13 @@ CHOICES = [
 # It shows under the choice once that option is ticked, so nobody has to find it in the
 # district's resolution pages again. (choice key, option) -> the rule as the guide words it.
 STANDING = {
-    ("page", "a"): "From the next loop: group limit once per loop, moving between The Square "
-                   "and The Reading Room places no doom.",
+    ("page", "a"): "From the next loop: group limit once per loop, the round's first move "
+                   "between The Square and The Reading Room places no doom.",
     ("ticket", "b"): "From the next loop: the first time a Lost Hour is drawn each loop, "
                      "cancel its revelation effect.",
     ("page", "b"): "From the next loop: the first time Thirteen is drawn each loop, "
                    "cancel its revelation effect.",
-    ("ring", "b"): "When the Lighthouse is placed: after an investigator lights the lamp, "
+    ("ring", "b"): "When the Lighthouse is placed: after The Lantern Room's lamp is lit, "
                    "exhaust each Echo in the Sunken Road district.",
 }
 
@@ -321,7 +321,7 @@ def _pages():
     p3.text(90, y, "Prologue ended:", size=22, style="bold")
     x = p3.checkbox("pro_r1", 330, y, "R1", group="pro")
     x = p3.checkbox("pro_r2", x, y, "R2", group="pro")
-    x = p3.checkbox("pro_nr", x, y, "No Resolution", group="pro")
+    x = p3.checkbox("pro_nr", x, y, "The First Death", group="pro")
     y += 50
     p3.text(90, y, "Loops ended:  Torn", size=22, style="bold")
     p3.counter("torn", 330, y - 9, 0, 99)

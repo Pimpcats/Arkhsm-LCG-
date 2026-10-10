@@ -660,10 +660,13 @@ return function(R, T)
     if a and not opts.teleport and R.isCrossing(a, b) then
       local key = R.crossKey(a, b)
       G.metrics.crossings = G.metrics.crossings + 1
-      if not opts.noHour and not G.crossedThisRound[key] and not R.FX.freeCrossing(a, b, inv) then
+      -- a free crossing (The Road Remembers, the Press) is still that round's first move
+      if not opts.noHour and not G.crossedThisRound[key] then
         G.crossedThisRound[key] = true
-        G.metrics.crossing_hours = G.metrics.crossing_hours + 1
-        R.placeDoom(1, "district crossing")
+        if not R.FX.freeCrossing(a, b, inv) then
+          G.metrics.crossing_hours = G.metrics.crossing_hours + 1
+          R.placeDoom(1, "district crossing")
+        end
       end
     end
     return true

@@ -144,7 +144,8 @@ function Appointed.holdBack(ctx)
   -- during the finale the night gives no Hours back (guide: The Last Hour)
   local rewound = false
   if not CampaignState.inFinale()
-      and CampaignState.getHoldBackRewinds() < Constants.HOLD_BACK_REWINDS_PER_LOOP then
+      and CampaignState.getHoldBackRewinds() < Constants.HOLD_BACK_REWINDS_PER_LOOP
+      and CampaignState.getHour() > Constants.HOUR_FIRST then           -- never before Hour I
     CampaignState.useHoldBackRewind()
     Hourglass.rewind(1, ctx)
     rewound = true

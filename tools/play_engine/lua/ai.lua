@@ -688,6 +688,9 @@ return function(R, T)
           end
         end
       end
+      if spec.sequence and target == L and (inv.walk or 0) >= 1 and R.clues(L) == 0 and inv.clues > 0 then
+        add(60, "objective", function() R.walkSpend(inv, L) end)
+      end
       if spec.needLamp and not G.lampLit and L.id == "sthr-loc-lanternroom" then
         for _, ab in ipairs(FX.locationAbilities(inv, L)) do
           if ab.kind == "lamp" then add(58, "ability", ab.fn) end

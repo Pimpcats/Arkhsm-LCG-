@@ -131,7 +131,7 @@ function ChaosBag.new(opts)
   end
 
   function a.target()
-    return math.max(0, a.baseline - (a.almanac and 1 or 0)) + a.extra
+    return math.max(0, a.baseline - (a.almanac and 1 or 0) - (a.press and 1 or 0)) + a.extra
   end
 
   --- Tokens drawn out of the bag that still exist on the table.
@@ -253,10 +253,18 @@ function ChaosBag.new(opts)
     return a.reconcile()
   end
 
+  --- The finale with The true page reached the Press: 1 fewer [static] than the
+  -- bag would otherwise hold, on top of Hour VI's (never fewer than 0). Idempotent.
+  function a.setPress(on)
+    a.press = on and true or false
+    return a.reconcile()
+  end
+
   --- Temporary [static] lasts "until the next reset" (Hour VI).
   function a.clearTemporary()
     a.extra = 0
     a.almanac = false
+    a.press = false
     a.pendingStatic = {}
     return a.reconcile()
   end
@@ -308,7 +316,7 @@ function ChaosBag.new(opts)
     local pending = 0
     for _ in pairs(a.pendingStatic) do pending = pending + 1 end
     return { mode = a.lastMode, target = a.target(), baseline = a.baseline,
-             extra = a.extra, almanac = a.almanac, physical = phys, pending = pending }
+             extra = a.extra, almanac = a.almanac, press = a.press, physical = phys, pending = pending }
   end
 
   function a.save()
@@ -316,7 +324,7 @@ function ChaosBag.new(opts)
     for g in pairs(a.out) do out[#out + 1] = g end
     for g in pairs(a.pendingStatic) do pending[#pending + 1] = g end
     table.sort(out) ; table.sort(pending)
-    return { baseline = a.baseline, extra = a.extra, almanac = a.almanac, out = out, pendingStatic = pending }
+    return { baseline = a.baseline, extra = a.extra, almanac = a.almanac, press = a.press, out = out, pendingStatic = pending }
   end
 
   function a.load(t)
@@ -324,6 +332,7 @@ function ChaosBag.new(opts)
     a.baseline = tonumber(t.baseline) or 0
     a.extra = math.max(0, tonumber(t.extra) or 0)
     a.almanac = t.almanac == true or (tonumber(t.extra) or 0) < 0
+    a.press = t.press == true
     a.out = {}
     for _, g in ipairs(t.out or {}) do a.out[g] = true end
     a.pendingStatic = {}

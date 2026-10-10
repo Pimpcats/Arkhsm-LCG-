@@ -112,7 +112,7 @@ def test_printed_contents_name_the_real_pages(guide):
 
 def test_the_later_interlude_stories_wait_on_their_own_pages(guide):
     # each later story sits alone: the page that holds one holds no other story
-    markers = ("The Shape of the Hour (when Part II begins)", "After the fourth loop and every later loop",
+    markers = ("The Shape of the Hour (when Part II begins)", "After the fourth and fifth loops",
                "Age stories. The first time any investigator", "Before the finale (once your log records")
     holders = [[m for m in markers if m in " ".join(t.split())] for t in guide["pages"]]
     assert sum(len(h) for h in holders) == len(markers), "a later story went missing from the guide"
@@ -212,6 +212,10 @@ def test_no_guard_line_sits_alone_in_the_second_column(guide):
     """A "Do not read until..." line ends what is read before it, so it sits under that text in the first
     column, never alone at the top of the second (The Loop's page, 2026-10-10)."""
     for i, page in enumerate(guide["doc"]):
-        for b in page.get_text("blocks"):
-            if "Do not read until" in b[4]:
-                assert b[0] < page.rect.width / 2, "page %d: the guard line sits in the second column" % (i + 1)
+        blocks = page.get_text("blocks")
+        half = page.rect.width / 2
+        for b in blocks:
+            if "Do not read until" in b[4] and b[0] >= half:
+                above = [x for x in blocks if x[0] >= half and x[3] <= b[1] + 1 and x is not b
+                         and x[1] > 30 and x[4].strip()]
+                assert above, "page %d: the guard line sits alone at the top of the second column" % (i + 1)

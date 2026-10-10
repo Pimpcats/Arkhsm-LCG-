@@ -100,6 +100,9 @@ local function announceResetReached()
   if CampaignState.inFinale() then
     announce("Dissonance reached the reset value: the finale ends and the contest is not reached.",
       { 1, 0.4, 0.4 })
+  elseif CampaignState.inPrologue() then
+    announce("Dissonance reached the reset value: the night ends. Read the Prologue's resolutions, then click Reset Loop.",
+      { 1, 0.4, 0.4 })
   else
     announce("Dissonance reached the reset value: the loop ends. Read the loop's resolutions, then click Reset Loop.",
       { 1, 0.4, 0.4 })
@@ -1305,13 +1308,13 @@ function shBeginFinale()
     end
     CampaignState.setFinale(true)
     CampaignState.setContest(0)
-    -- The true page reached the Press: 1 fewer Static than the band for the finale
-    -- (the same flag as Hour VI's; it never stacks, and the next reset clears it)
+    -- The true page reached the Press: 1 fewer Static for the finale, on top of
+    -- Hour VI's (the next reset clears it)
     local log = Board.campaignLog()
     local lv = log and guarded("log", function() return log.call("getLogValues") end)
     if type(lv) == "table" and type(lv.values) == "table" and lv.values.page_a then
-      bag.setAlmanac(true)
-      announce("The true page reached the Press: the chaos bag holds 1 fewer Static token than its band.")
+      bag.setPress(true)
+      announce("The true page reached the Press: until the finale ends, the chaos bag holds 1 fewer Static token.")
     end
     announce(string.format("The finale begins: contest progress 0 / %d. If Hour IX is reached, the finale ends "
       .. "and the contest is not reached.", CampaignState.constants().contestTarget))
@@ -1762,7 +1765,10 @@ local function setUpPlacedBox(p)
     done[#done + 1] = why
   end
   if deck then
-    if CampaignState.knows(deep) then
+    if CampaignState.inFinale() then
+      -- the finale sets every district's act deck aside, abilities unresolved
+      removeDeck("act deck set aside (the finale)")
+    elseif CampaignState.knows(deep) then
       removeDeck("act deck removed (its objectives are complete)")
     elseif CampaignState.knows(surf) then
       if not partTwo then

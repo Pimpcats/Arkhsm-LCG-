@@ -34,7 +34,7 @@ Read this aloud before the Prologue. It is the whole idea in plain terms. **Camp
 
 The **Static token** is a new chaos token: **−3, and raise Dissonance by 1**.
 
-**The Appointed** cannot be defeated, only held back. It climbs toward you as Dissonance and the Hours rise, and it hunts whoever carries the most Memory on their cards. An investigator at its location can **Hold Back** it: a success pushes it back a stage and rewinds the Hourglass by 1 Hour (at most 3 times a loop).
+**The Appointed** cannot be defeated, only held back. It climbs toward you as Dissonance and the Hours rise, and it hunts whoever carries the most Memory on their cards. An investigator at its location can **Hold Back** it: a success pushes it back a stage and rewinds the Hourglass by 1 Hour (the rewind at most 3 times a loop).
 
 **Memory is your experience.** During a loop you gain Memory tokens on your cards. At the reset they go into one shared pool, **banked Memory**, which you spend between loops on **Recollections** (cards that remember the loop) and upgrades. Carrying Memory also makes you the one being hunted.
 
@@ -118,8 +118,8 @@ So jump, don't climb: level 0 to 2 to 4 costs 6, level 0 straight to 4 costs 4. 
 
 **Knowledge.** Completing a district's act records a **Knowledge** entry in your Campaign Log. It belongs to the party and changes the night from then on; its lasting effect is printed on the log beside it. Entries from acts 1a are **surface** entries, from acts 2a **deep** entries. Knowledge is never bought, only found. "Your Campaign Log records X" means X is written on the log; "you completed <act> this loop" means that act advanced this loop.
 - **Knowledge pays Memory** the first time your log records an entry: each investigator gains **1** banked Memory for a surface entry and **3** for a deep one (counted at that moment's investigators). The Prologue's entry and The Way the Night Breaks pay nothing.
-- **The Way the Night Breaks** is recorded together with The Appointed's Name, whose act needs What the Almanac Hid and The Vote That Never Ends. If either of those two is unticked, untick it too. The Control token tells you when to record it.
-- **Seraphine's thread** (unheard, suspected or known) starts unheard; cards say when to mark it. If Seraphine joins after one of those cards, mark it then as that card would have (**known** if your log records The Appointed's Name, otherwise **suspected** if it records The Vote That Never Ends). It only changes one line of the epilogue.
+- **The Way the Night Breaks** is recorded together with The Appointed's Name, whose act needs What the Almanac Hid and The Vote That Never Ends. If The Appointed's Name or The Vote That Never Ends is later unticked, untick it too. The Control token tells you when to record it.
+- **Seraphine's thread** (unheard, suspected or known) starts unheard; The Vote That Never Ends and The Appointed's Name say when to mark it, by where Seraphine is when they advance, and a mark never goes back. A Seraphine who joins later starts unheard. It only changes one line of the epilogue.
 
 **Years.** At each reset, each investigator gains Years:
 
@@ -141,7 +141,7 @@ Years that a card or resolution gives (A Year in a Night, the Hall of Mirrors, t
 
 An investigator whose Years reach **18** at Between Loops step 1 ages out at once and does not play the next loop. The first time anyone ages out, add 1 [elderthing] to the chaos bag for the rest of the campaign. Their player may begin the next loop with a new investigator not yet used (0 Years, a new level 0 deck, no Recollections, purchases from the next Between Loops; they take the log panel of the investigator they replace), or the party continues without them: set **Investigators** on the Control token. If no investigator can continue, the campaign ends; see **Age stories**. For finale conditions and the epilogue, a bracket counts every Year, including those gained during that loop and the finale.
 
-**Victory.** Each **Victory X** pays once per campaign: when you defeat an enemy with Victory X (a **Named** enemy from Part II, or one of a few optional monsters), or a loop ends with a Victory X location in play, revealed and with no clues, record its name on your Campaign Log's Victory list if it is not there, and each investigator gains X banked Memory. A defeated Victory enemy goes to the victory display for the rest of the loop and can be met again later without paying again. An enemy that a district's act 2a spawns appears only while that act is current, so defeat it before completing the act if you want its Victory.
+**Victory.** Each **Victory X** pays once per campaign: when you defeat an enemy with Victory X (a **Named** enemy from Part II, or one of a few optional monsters), or a loop ends with a Victory X location in play, revealed and with no clues, record its name on your Campaign Log's Victory list if it is not there, and each investigator gains X banked Memory. A defeated Victory enemy goes to the victory display for the rest of the loop and can be met again later without paying again. A Named enemy that a district's act 2a spawns appears only while that act is current, so defeat it before completing the act if you want its Victory.
 
 **Campaign chaos-bag changes.** Some results add or remove a [cultist], [tablet] or [elderthing] token for the rest of the campaign, on top of your difficulty's tokens; remove one only if it is in the bag. If you built the bag with the Control token's difficulty buttons, the token makes every change and says so in the chat; otherwise make each change by hand and note it on your log. Three are public: Part II begins, add 1 [tablet]; the first loop marked **Torn**, add 1 [cultist]; the first investigator to age out, add 1 [elderthing].
 
@@ -213,7 +213,7 @@ A small town at the end of a shore road, under a starless, snagged sky. **The Sq
 >
 > At dusk the last carts came in by the shore road, the sea on one side and dark fields on the other. At the end of that road the lighthouse stood unlit. Ask about it at the inn and you get a shrug. "No ship has needed it in years," the innkeeper says, and goes back to polishing a glass that is already clean.
 >
-> Ambergrove is a town on no one's way to anywhere: a church, a road out to the shore, a lighthouse no ship has needed in years, a printing house that sells almanacs to three counties. Tonight it is full. The almanac has promised an occultation, a star swallowed by the dark of something passing in front of it, once in a hundred years, and visible from here and nowhere else. People have come from every county the almanac reaches, with folding chairs and thermoses and copies of the almanac itself, the date and the hour of the occultation printed on its front page in fresh black type.
+> Ambergrove is a town on no one's way to anywhere: a church, a road out to the shore, a dark lighthouse at the end of it, a printing house that sells almanacs to three counties. Tonight it is full. The almanac has promised an occultation, a star swallowed by the dark of something passing in front of it, once in a hundred years, and visible from here and nowhere else. People have come from every county the almanac reaches, with folding chairs and thermoses and copies of the almanac itself, the date and the hour of the occultation printed on its front page in fresh black type.
 >
 > The whole town has turned out. Lanterns are strung across the Square. A band is tuning up by the Town Hall steps, where the sheriff is waiting to give his speech, and children ride their fathers' shoulders, pointing at a sky that is not quite right. Somewhere beyond the rooftops a bell is counting the hour. You lose the count.
 >
@@ -236,7 +236,7 @@ A small town at the end of a shore road, under a starless, snagged sky. **The Sq
 3. The Control token starts a new campaign in the Prologue, at **Hour I** with Dissonance **0**. The chaos bag is in the Calm band.
 4. Each investigator takes 5 resources and draws an opening hand of 5 cards (mulligan as normal). Choose a lead investigator. You are ready to begin.
 
-**The objective.** The act **The First Hour** can advance only once the Hourglass has reached Hour VIII or later: investigators at The Almanac Steps spend its clues as a group. So the Prologue lasts about eight rounds or more. Each time an investigator enters The Almanac Steps, Dissonance rises by 1 (it is printed on the location), so waiting elsewhere until Hour VIII is cheaper than waiting on the Steps or going back and forth to them.
+**The objective.** The act **The First Hour** can advance only once the Hourglass has reached Hour VIII: investigators at The Almanac Steps spend the act's clues (2 per investigator) as a group. So the Prologue lasts about eight rounds or more. Each time an investigator enters The Almanac Steps, Dissonance rises by 1 (it is printed on the location); staying there costs nothing more, so enter it as few times as you can rather than going back and forth.
 
 There is no Appointed in the Prologue, and no Years are gained in it: ignore any text that refers to the Appointed, and A Year in a Night gives no Year. The Prologue ends when The First Hour advances, or the way a loop does: at Hour IX, when every investigator is defeated, or when Dissonance reaches the reset value. Its locations belong to no district, so moving between them never places doom.
 
@@ -324,22 +324,22 @@ A loop ends the moment one of its endings happens. Before anything else, claim V
 
 Run this after every reset, and once after the Prologue. First, if you have not already, click **Reset Loop** on the Control token; then click **Interlude** on it for steps 1 to 3.
 
-1. **Age.** (Skip this step after the Prologue: it grants no Years, and Reset Loop discards its Years pending.) Each investigator adds their reset Years for the loop just ended plus their Years pending (see **Years**). Apply any bracket change now (the first time an investigator reaches Weathered, choose their skills on the Interlude panel before clicking **Age**), then tick the same skills in the investigator's panel on page 1 of the Campaign Log (Sync from campaign does this on the log token). An investigator who reaches 18 Years ages out.
+1. **Age.** (Skip this step after the Prologue: it grants no Years, and Reset Loop discards its Years pending.) Each investigator adds their reset Years for the loop just ended plus their Years pending (see **Years**). Apply any bracket change now (the first time an investigator reaches Weathered, choose their skills on the Interlude panel before clicking **Age**), then tick the same skills in the investigator's panel on page 1 of the Campaign Log (Sync from campaign does this on the log token). An investigator who reaches 18 Years ages out; the first time anyone does, add 1 [elderthing] to the chaos bag for the rest of the campaign (the Control token's difficulty buttons make this change for you).
 2. **Bank Memory.** On the Interlude panel, click **Bank on-card Memory** once. It moves all Memory on cards (including the cards of investigators defeated this loop) to banked Memory. Memory on the cards of an investigator who aged out at step 1 is lost with them. Then take the Memory tokens off your cards.
 3. **Spend.** Spend banked Memory as **Memory** describes (Recollections, upgrades and new level 0 cards; upgraded cards replace their base versions). For a new level 0 card, right-click the banked **Memory** button once. Once your log records The Way the Night Breaks, **Before the finale** says what to keep.
 4. **Record.** On page 1 of the log token, right-click it and choose **Sync from campaign**, then do the same on page 2: it fills in what the Control token tracks (loops, banked Memory, Years, skill changes, quest tallies and the Part on page 1; Knowledge and Victory on page 2). On page 3, tick any new choices and write anyone who aged out under **Those Who Left the Loop**; on page 1, write what you spent and on what. On the printed pages, write it all by hand. (Tick any Knowledge entry or Victory still missing before **Begin Next Loop**.)
-5. **Check the Part.** If Part II has not begun, and your log now records **3 or more** surface Knowledge entries or you have completed **Loop 3**, Part II begins (see **Parts of the campaign**): read **The Shape of the Hour** at step 6.
-6. **Read** one interlude story: the Torn or Taken story if the loop's resolution gave one, otherwise the one below that fits, with any sentence the resolution adds. Then read **The Shape of the Hour** if Part II began at step 5, **Before the finale** the first time your log records The Way the Night Breaks, and any age story. Click **Begin Next Loop** and turn to **Loop Setup**.
+5. **Check the Part.** If Part II has not begun, and your log now records **3 or more** surface Knowledge entries or you have completed **Loop 3**, Part II begins (see **Parts of the campaign**): add 1 [tablet] to the chaos bag for the rest of the campaign (the Control token's difficulty buttons make this change for you), and read **The Shape of the Hour** at step 6.
+6. **Read** one interlude story: the Torn or Taken story if the loop's resolution gave one, otherwise the loop-count story below, with any sentence the resolution adds (after the Prologue, What You Saw was its interlude story: read none here). Then read any age story, **The Shape of the Hour** if Part II began at step 5, and **Before the finale** if your log records The Way the Night Breaks and you have not read it yet. Click **Begin Next Loop** and turn to **Loop Setup**.
 
-> **After the Prologue and each of the first three loops.** You wake at First Dark with the taste of salt and the certainty that you have done this before. The others feel it too. No one in Ambergrove will believe you.
+*If your Campaign Log records The Road Remembers, add to the story you read:* Some nights you dream the Sunken Road, walking it toward town the way the walkers never do, counting the milestones down. You always wake before the last one.
 
-<!-- pagebreak -->
-
-> **The Shape of the Hour** (when Part II begins). The town has begun to notice that you notice. Somewhere past the edge of the Square, something that has been climbing politely toward the Square all night, every night, begins to whisper. From the next loop, each district's second objective opens, the Appointed's Whispers join the encounter deck, and the Named enter the night.
+> **After each of the first three loops.** You wake at First Dark with the taste of salt and the certainty that you have done this before. The others feel it too. No one in Ambergrove will believe you.
 
 <!-- pagebreak -->
 
-> **After the fourth loop and every later loop.** The night is the same. You are not. You catch yourself counting the hours in your sleep, and waking at eleven before the bell. The town is exactly as young as it was the first time. Every morning that never comes, you are a little older than it.
+> **After the fourth and fifth loops.** The night is the same. You are not. You catch yourself counting the hours in your sleep, and waking at eleven before the bell. The town is exactly as young as it was the first time. Every morning that never comes, you are a little older than it.
+
+> **After the sixth loop and every later loop.** You no longer count the loops. You count what is left: the Years in your hands, the Memory in the pool, the few things the night has not yet told you. The town is as young as ever. You are running out of night to spend.
 
 <!-- pagebreak -->
 
@@ -349,6 +349,10 @@ Run this after every reset, and once after the Prologue. First, if you have not 
 - **Ancient** (15 Years): *A child in the Square takes your hand to help you down the Town Hall steps. You have known this child for every night you can remember. To them you are a kind old stranger, and always will be.*
 - If an investigator **ages out** (18 Years): *They do not wake at First Dark. You find them on the Sunken Road, walking in the same direction as the others, hood up. They do not turn when you call their name.*
 - If **no investigator can continue** (every investigator has aged out and no new investigator takes their place), the campaign ends here. Read: *Eleven o'clock comes, and no one is standing in the Square to feel it. The lanterns are lit, the band tunes up, and the night goes on without anyone left to remember it.* Do not read **The Last Hour** or the epilogue.
+
+<!-- pagebreak -->
+
+> **The Shape of the Hour** (when Part II begins). The town has begun to notice that you notice. Somewhere past the edge of the Square, something that has been climbing politely toward the Square all night, every night, begins to whisper. From the next loop, each district's second objective opens, the Appointed's Whispers join the encounter deck, and the Named enter the night.
 
 <!-- pagebreak -->
 
@@ -379,9 +383,9 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 *If your Campaign Log already records The Lamp Remembers, read this instead:*
 
-> The beam you lit last time is gone, as if it had never been. The wick is dry again, the glass is cold, and the stair has forgotten your footsteps. But your hands have not forgotten the way up.
+> The beam you lit is gone, as if it had never been. The wick is dry again, the glass is cold, and the stair has forgotten your footsteps. But your hands have not forgotten the way up.
 
-*If your Campaign Log records The walkers keep their ring, add the following. This loop, after an investigator lights the lamp, exhaust each Echo in the Sunken Road district.*
+*If your Campaign Log records The walkers keep their ring, add the following. This loop, after The Lantern Room's lamp is lit (by Light the Lamp or by The Lantern Room's [action]), exhaust each Echo in the Sunken Road district.*
 
 > Far below, on the Sunken Road, the walkers have stopped. Every hood is turned toward the tower, waiting, as though someone once promised them a light.
 
@@ -396,6 +400,10 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 *If your Campaign Log records The ninth line was left blank, add:*
 
 > The keeper's book lies open on the shelf, the ninth line still empty. Someone has drawn a careful stroke through it, as if to say: no one.
+
+*If your Campaign Log records The Wheel Still Turns, add:*
+
+> From the gallery the fair is small and bright, the wheel turning against the wrong sky. You have looked at this tower from the top of that wheel. Up here it is easy to believe that, all night, every night, the tower has been looking back.
 
 **When you Place this box:** The Lighthouse is reached only through the Sunken Road, so Place the Sunken Road's box too. The Lantern Room (revealed), The Winding Stair and The Keeper's Quarters join the map. Encounter set: [set:node_lighthouse] The Dark That Waits, Something on the Stair. Act deck: **Light the Lamp** (1a), then 2a in Part II. Its story asset is set aside.
 
@@ -443,7 +451,11 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > The kneeling congregation counts with the bell now: twelve, and then they stop, though the bell does not.
 
-**When you Place this box:** The Nave, The Belfry, The Vestry and The Flooded Crypt join the map. The Flooded Crypt enters play closed; its second act (2a) opens it, and it enters play open (revealed) in every loop once your Campaign Log records that act's deep entry. Encounter set: [set:node_church] The Drowned Choir, The Drowned Verger, Thirteen, Rising Water. Act deck: **Why Thirteen?** (1a), then 2a in Part II. Its story assets are set aside. **Part II:** a new enemy joins this district, set aside until the second act spawns it.
+*If your Campaign Log records The Sheriff Is Already Dead, add:*
+
+> At the end of the front pew one place is empty, a hat floating on the black water where a man would kneel. No one in the congregation looks at it.
+
+**When you Place this box:** The Nave, The Belfry, The Vestry and The Flooded Crypt join the map. The Flooded Crypt enters play closed; the district's second act (2a) opens it, and it enters play open (revealed) in every loop once your Campaign Log records that act's deep entry. Encounter set: [set:node_church] The Drowned Choir, The Drowned Verger, Thirteen, Rising Water. Act deck: **Why Thirteen?** (1a), then 2a in Part II. Its story assets are set aside. **Part II:** a new enemy joins this district, set aside until the second act spawns it.
 
 **Do not read until the loop ends.**
 
@@ -452,27 +464,29 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 - If you defeated **The Bell-Ringer Beneath** this loop, add: *Below the flooded steps the rope hangs slack. For the rest of that night, and only that night, the thirteenth stroke never came.*
 - If **Seraphine Vale** is one of your investigators, add: *Seraphine stood in the nave with her palm against the cold stone until the water rose. "I heard it," she says afterward. "The first night, here, and for weeks before that, very far off. I heard it strike thirteen, and I reached for it."*
 - **The investigators must decide** (choose one):
-  - **Carry the page to the Press.** Where the wrong hour was set, the right one can be set again. Record in your Campaign Log: *The true page reached the Press.* Standing rule, from the next loop on: group limit once per loop, moving between The Square and The Reading Room does not place doom.
+  - **Carry the page to the Press.** Where the wrong hour was set, the right one can be set again. Record in your Campaign Log: *The true page reached the Press.* Standing rule, from the next loop on: group limit once per loop, when the round's first move between The Square and The Reading Room would place doom on the current Hour, it places none (it is still that round's first move).
   - **Read it to the drowned.** They have knelt in the water all night waiting for someone to tell them the hour. Record in your Campaign Log: *The drowned heard the true hour.* Standing rule, from the next loop on: the first time **Thirteen** is drawn each loop, cancel its revelation effect. The drowned keep the count for you.
 ```
 
 ```resolution Resolution 2 — Twelve Strokes and One (you completed Why Thirteen? this loop)
 > You close the register on the torn thirteenth stroke. Someone in this church knew the bell had rung wrong, and pressed so hard the nib went through. When the bell tolls the next hour, you listen to the thirteenth ring with new ears. It is not an echo. It is a count that does not end.
+- If you defeated **The Bell-Ringer Beneath** this loop, end this resolution's story after "…pressed so hard the nib went through." Then read Resolution 1's first add-on in place of the rest.
 - If **Seraphine Vale** is one of your investigators, add: *Seraphine does not look at the belfry for the rest of the night. When you ask why, she says only that she has heard that bell before, and not in this town.*
 ```
 
 ```resolution Resolution 3 — Kneeling Water (you completed no act here this loop, and your Campaign Log records at least one of this district's Knowledge entries)
 > The church kept its secrets tonight, and kept its congregation, kneeling and patient in the black water. You know more of it than they do. It is less comforting than it should be.
+- If your Campaign Log records The Hour Was Wrong, read this instead: *The congregation knelt in the black water and the bell counted past twelve, as it always will. You have already carried up the one thing the church was keeping. Below the flooded steps there is nothing left but the cold.*
 - If you defeated **The Bell-Ringer Beneath** this loop, read Resolution 1's first add-on instead of this resolution's story.
 ```
 
-```resolution No Resolution — Thirteen (your Campaign Log records none of this district's Knowledge entries)
+```resolution No Resolution — The Count Goes On (your Campaign Log records none of this district's Knowledge entries)
 > You leave with the bell still counting behind you. Twelve. Thirteen. You do not remember the moment you started counting along with it, under your breath, like a prayer you were taught as a child.
 ```
 
 ### The Sunken Road
 
-> The road between the town and the shore. The same figures walk it every loop, in the same direction, hoods up, never arriving. Some of them turn to look at you now.
+> The road between the town and the shore. The same figures walk it every loop, in the same direction, hoods up, never arriving. None of them looks up as you pass.
 
 *If your Campaign Log already records The Road Remembers, read this instead:*
 
@@ -484,7 +498,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 *If your Campaign Log records The ninth line was left blank, add:*
 
-> At the Turning a walker stops and looks back toward the tower, the way someone looks for a name they expected to be called. Then they walk on.
+> At the Turning a walker stops and lifts their hood toward the tower, the way someone looks for a name they expected to be called. Then they walk on.
 
 *If your Campaign Log records You carry the walker's ring, add:*
 
@@ -492,11 +506,15 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 *If your Campaign Log records You hold the ticket, add:*
 
-> At the Turning the walkers glance at your pocket, where the ticket is, and step aside as if for a paying passenger.
+> Where the road narrows, the walkers glance at your pocket, where the ticket is, and step aside as if for a paying passenger.
 
 *If your Campaign Log records You refused the ticket, add:*
 
 > One of the walkers holds out a hand as you pass, palm up, like a conductor waiting for a fare. Then the hand drops.
+
+*If your Campaign Log records The Lamp Remembers, add:*
+
+> Once, as you pass, every walker on the road stops mid-stride and turns toward the dark tower, as if somewhere up there a match had been struck. Then, together, they walk on.
 
 **When you Place this box:** The Milestones, The Low Bridge and The Turning join the map. Encounter set: [set:node_road] The Waiting Congregation, The Mile-Counter, The Bridge Remembers. Act deck: **Walk It Backward** (1a), then 2a in Part II.
 
@@ -506,7 +524,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 > You cannot stop seeing the face beneath the hood, worn smooth as a step, and the ring on the hand that rose to stop you. When the night folds you look for them in the crowd at the Square, and do not find them. They are on the road. They are always on the road. You wonder, for the first time, how many loops it takes to wear a face away, and what a night like this needs to hold it in place.
 - If **"Birdie" Okonkwo** is one of your investigators, add: *Birdie's compass swung toward the walker and held there, steady as north, until the night ended. She has not put it away since.*
 - **The investigators must decide** (choose one):
-  - **Take the ring.** The walker opens their hand and lets it go, as if it had been waiting a long time to be carried somewhere else. Record in your Campaign Log: *You carry the walker's ring.*
+  - **Take the ring.** The walker holds out their hand and lets you draw the ring from their finger, as if it had been waiting a long time to be carried somewhere else. Record in your Campaign Log: *You carry the walker's ring.*
   - **Leave it with them.** It is the last thing they have that is theirs. Record in your Campaign Log: *The walkers keep their ring.*
 ```
 
@@ -530,11 +548,15 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 *If your Campaign Log already records The Sheriff Is Already Dead, read this instead:*
 
-> The sheriff clears his throat on the Town Hall steps and begins the speech you know by heart. You mouth the words along with him. Down in the Well, you know exactly what he is.
+> The sheriff clears his throat on the Town Hall steps and begins the speech you know by heart. You mouth the words along with him. You know exactly where he is: at the bottom of the Well.
 
 *If your Campaign Log records The town was warned, add:*
 
 > Near the back of the crowd a woman in a green shawl is not watching the sheriff. She is watching you, frowning, the way you frown at a word on the tip of your tongue.
+
+*If your Campaign Log records The Lamp Remembers, add:*
+
+> Out past the rooftops the lighthouse is dark again. Now and then someone in the crowd glances toward it, as if they half expect it to come on, and cannot say why.
 
 *If your Campaign Log records The vote was torn out, add:*
 
@@ -544,7 +566,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > The applause comes exactly on cue, every hand at once.
 
-**Every loop:** the Square's box is placed in Loop Setup, so its locations (The Square and The Town Hall Steps revealed; The Well and The Records Office unrevealed), encounter set ([set:node_square] The Crossing, The Band on the Steps, The Same Speech, The Crowd Turns) and act deck are always in play. Act deck: **The Sheriff Is Already Dead** (1a), then 2a in Part II. Its story asset is in the set-aside pile. **Part II:** a new enemy joins this district, set aside until the second act spawns it.
+**Every loop:** the Square's box is placed in Loop Setup. It lays out the Hours as the agenda deck and the loop's encounter deck (the five shared sets plus its own, [set:node_square] The Crossing, The Band on the Steps, The Same Speech, The Crowd Turns); The Square and The Town Hall Steps enter play revealed, The Well and The Records Office unrevealed. The Appointed's Approach goes into play beside the Hours, and The Appointed starts the set-aside pile; from Part II the Appointed's Whispers join the encounter deck. Act deck: **The Sheriff Is Already Dead** (1a), then 2a in Part II, set up from your Campaign Log like any district's. Its story asset is in the set-aside pile. **Part II:** a new enemy joins this district, set aside until the second act spawns it.
 
 **Do not read until the loop ends.**
 
@@ -565,6 +587,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 ```resolution Resolution 3 — The Same Speech (you completed no act here this loop, and your Campaign Log records at least one of this district's Knowledge entries)
 > The speech ended the way it always ends, and the crowd answered it. You stood at the back and knew what they did not, and the knowing sat in you like a stone.
+- If your Campaign Log records The Vote That Never Ends, read this instead: *The speech ended the way it always ends, and the crowd answered it. You know the minutes now. You stood at the back and kept your hands still.*
 - If you defeated **What Wears the Sheriff** this loop, read Resolution 1's first add-on instead of this resolution's story.
 ```
 
@@ -594,7 +617,11 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 *If your Campaign Log records You hold the ticket, add:*
 
-> The ticket in your pocket is warm. The ticket-taker's eyes slide past you as if you had already paid.
+> The ticket in your pocket is warm. When the ticket-taker's count comes round to you, he skips you, as if you had already paid.
+
+*If your Campaign Log records You refused the ticket, add:*
+
+> The ticket-taker counts you as you pass, and frowns at the total, as if it never quite comes out right.
 
 **When you Place this box:** The Wheel, The Hall of Mirrors and The Ticket Booth join the map. Encounter set: [set:node_fairground] The Barker, The Wheel's Turn, Your Reflection Lies. Act deck: **The Wheel Still Turns** (1a), then 2a in Part II. **Part II:** a new enemy joins this district's encounter set; it spawns at **The Wheel** when drawn.
 
@@ -602,7 +629,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 ```resolution Resolution 1 — The Fare (you completed The Ticket-Taker's Bargain this loop)
 > He named no price for the way out. He only told you there was one, and that you would know it when you could afford it. As the night folds you can still hear the fair music playing its one unfinished bar, and under it, very softly, the punch of a ticket.
-- If you defeated **The One Who Rides Forever** this loop, add: *The wheel stopped for the first time in a hundred years. It started again at eleven o'clock, as though nothing had happened. Something had.*
+- If you defeated **The One Who Rides Forever** this loop, add: *The wheel stopped, and for the rest of that night it stayed stopped. It started again at eleven o'clock, as though nothing had happened. Something had.*
 - If **Cass Lindqvist** is one of your investigators, add: *He called Cass by name and asked after her debts. Cass has never told anyone in Ambergrove about her debts. She spends the rest of the night working out the odds on how he knew, and does not like any of them.*
 - **The investigators must decide** (choose one):
   - **Take the ticket.** He holds it out between two fingers. It is warm, and blank, and it is yours. Record in your Campaign Log: *You hold the ticket.*
@@ -630,22 +657,26 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 *If your Campaign Log already records What the Almanac Hid, read this instead:*
 
-> The press has set the wrong hour again overnight, as if you had never touched it. The stacks are bound and waiting. But the study door at the back is not as closed as it was. You can feel it, the way you feel someone behind you in an empty room.
+> The press has set the wrong hour again since the night folded, as if you had never touched it. The stacks are bound and waiting. But the study door at the back is not as closed as it was. You can feel it, the way you feel someone behind you in an empty room.
+
+*If your Campaign Log records The Appointed's Name, read this instead:*
+
+> The press has set the wrong hour again, as it always will. At the back of the house the study door stands open, and inside it is eleven o'clock exactly. You have read everything this house was keeping. What is left is to decide when to use it.
 
 *If your Campaign Log records The true page reached the Press, add:*
 
-> The page you brought up out of the flooded crypt lies on the bed of the press, dry now, and the type beside it has been set in the right order. Someone has been working here in the loops you were not watching. They have propped the side door to the Square open with a wedge of type.
+> The page you brought up out of the flooded crypt lies on the bed of the press, dry now, and beside the wrong type in the bed someone has set the true hour, letter by letter, ready to go in. Someone has been working here in the loops you were not watching. They have propped the side door to the Square open with a wedge of type.
 
 *If your Campaign Log records The drowned heard the true hour, add:*
 
-> The press sets the wrong hour again, as it always does. But under the floorboards, faint as water moving in a pipe, a murmur of voices is counting, and they are not counting the hour on the page.
+> Under the floorboards, faint as water moving in a pipe, a murmur of voices is counting, and they are not counting the hour on the page.
 
-**When you Place this box:** The Reading Room, The Press and The Sealed Study join the map. The Sealed Study enters play closed; its second act (2a) opens it, and it enters play open (revealed) in every loop once your Campaign Log records that act's deep entry. Encounter set: [set:node_almanac] The Compositor, The Page That Wasn't, Ink Runs Backward, The Study Door. Act deck: **What the Almanac Hid** (1a), then 2a in Part II. Its story asset is set aside.
+**When you Place this box:** The Reading Room, The Press and The Sealed Study join the map. The Sealed Study enters play closed; the district's second act (2a) opens it, and it enters play open (revealed) in every loop once your Campaign Log records that act's deep entry. Encounter set: [set:node_almanac] The Compositor, The Page That Wasn't, Ink Runs Backward, The Study Door. Act deck: **What the Almanac Hid** (1a), then 2a in Part II once your Campaign Log also records the Square's deep entry; until it does, Place removes this act deck once act 1a is complete. Its story asset is set aside.
 
 **Do not read until the loop ends.**
 
 ```resolution Resolution 1 — Written Once (you completed The Appointed's Name this loop)
-> You did not say it aloud. None of you did. But you carried it out of the Study all the same, and the night felt you carry it. For the rest of the loop the thing on the hill came on more slowly, like a guest who has heard their name called from inside the house and is no longer sure of their welcome.
+> You did not say it aloud. None of you did. But you carried it out of the study all the same, and the night felt you carry it. For a while afterward the thing on the hill came on more slowly, like a guest who has heard their name called from inside the house and is no longer sure of their welcome.
 - If **Dr. Ayako Sōma** is one of your investigators, add: *Ayako knows the language it is written in. She has spent her life trying to find someone who spoke it. She has found them.*
 - If **Seraphine Vale** is one of your investigators, add: *Seraphine knows the name. She heard it once before, on the night she reached for the sky and something, very politely, reached back.*
 - **The investigators must decide** (choose one):
@@ -655,6 +686,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 ```resolution Resolution 2 — The Altered Hour (you completed What the Almanac Hid this loop)
 > For the rest of the night the reprinted pages lay warm on the press, with the struck hour left blank, and the sky above the Almanac House was almost ordinary. Almost. When the night folds, the press will set the changed hour again. But you know now that somebody changed it by hand, after the proofs were pulled. The changed proof cannot tell you what was there before.
+- If your Campaign Log does not record The Vote That Never Ends, add: *The study door at the back still will not give. Somewhere in town, someone wrote down what is kept behind it.*
 - If **Dr. Ayako Sōma** is one of your investigators, add: *In the margin of the reprint, in a hand she recognizes as her own, is a translation note Ayako does not remember writing. It is one word. The word is "wait."*
 ```
 
@@ -676,11 +708,11 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 **When to begin.** Beginning the finale at Hour IX gives you the most time: the Hourglass goes back to Hour V (Setup, step 2). Beginning at Hours V to VIII leaves the Hourglass where it is, with fewer Hours before Hour IX ends the finale.
 
-**The finale and the loop.** The finale is part of the loop in which it begins: damage, horror, cards in play, the Hourglass, Dissonance and every "once per loop" limit already used stay as they are. During the finale you may still Place a district's box before moving into it, as Loop Setup step 2 allows. When the finale ends, first claim Victory, then read the finale resolution, then fill in the **Finale Record** on your Campaign Log (the loop, banked Memory at the finale, the deep entries spent, the resolution and the Years paid). Memory still on cards does not count as banked Memory for Resolutions 1b, 5 and 6. After Resolution 5 the loop ends as usual: read each placed district's resolution (except one you read before the finale), then **Between Loops**. Investigators defeated during the finale are still present for the finale resolution and the epilogue: they wake at dawn with the others. After Resolutions 1–4 (including 1b) the campaign ends and no reset Years are gained; for their conditions and the epilogue, an investigator's Years are their recorded Years plus their Years pending plus any Years the resolution gives.
+**The finale and the loop.** The finale is part of the loop in which it begins: damage, horror, cards in play, the Hourglass, Dissonance and every "once per loop" limit already used stay as they are. During the finale you may still Place a district's box before moving into it, as Loop Setup step 2 allows; set its act deck aside at once without resolving any of its abilities (the Control token does this). When the finale ends, first claim Victory, then read the finale resolution, then fill in the **Finale Record** on your Campaign Log (the loop, whether the contest was reached, banked Memory when the finale ended, the deep entries spent, the resolution, how the night ended and the Years paid). Memory still on cards does not count as banked Memory for Resolutions 1b, 5 and 6. After Resolution 5 the loop ends as usual: read each placed district's resolution (except one you read before the finale), then **Between Loops**. Investigators defeated during the finale are still present for the finale resolution and the epilogue: they wake at dawn with the others. After Resolutions 1–4 (including 1b) the campaign ends and no reset Years are gained; for their conditions and the epilogue, an investigator's Years are their recorded Years plus their Years pending plus any Years the resolution gives.
 
-Before the finale begins: if you completed a district's act this loop, read that district's resolution now (the first that applies) and make any choice it asks (any Years it gives are gained now: click **Years pending**). Then read:
+Before the finale begins: if you have not yet read **Before the finale** (Between Loops), read it now. Then, if you completed a district's act this loop, read that district's resolution now (the first that applies) and make any choice it asks (any Years it gives are gained now: click **Years pending**). Then read:
 
-> You have lived this night more times than you can hold. You know the ledger, the wrong sky, the name. You know what the town agreed to: an appointment made in ink and never kept.
+> You have lived this night more times than you can hold. You know the ledger, the wrong sky, the name. And you know the brown ink: someone who signed that vote wrote the hour one late, to put the bill off by a single hour, and the whole town has been standing in that hour ever since. You know what the town agreed to: an appointment made in ink and never kept.
 >
 > You feel the loops in your body now. In the joints of your hands, in the way the Town Hall steps seem steeper each night. The town has not aged a single night. You have aged all of them.
 >
@@ -695,49 +727,51 @@ Before the finale begins: if you completed a district's act this loop, read that
 
    Then spawn the set-aside **Uninvited** where the Appointed would manifest (see **The Appointed**).
 3. On the Control token, click **Begin Finale**: the **Contest** counter appears at 0. Then apply each of these your Campaign Log records:
-   - *You have spoken the name:* gain 1 contest progress. It already knows that you know.
-   - *The drowned heard the true hour:* rewind the Hourglass by 1 Hour. Below the church, a congregation is keeping time for you.
-   - *The true page reached the Press:* until the finale ends, the chaos bag holds 1 fewer Static token than its band calls for (never fewer than 0). Every almanac in town now carries the true hour, and the sky is a little less wrong. This does not stack with Hour VI's "1 fewer" (What the Almanac Hid): the bag never holds more than 1 fewer Static token than its band calls for. **Begin Finale** applies it for you.
+   - *You have spoken the name:* gain 1 contest progress (click **Contest** once). It already knows that you know.
+   - *The drowned heard the true hour:* rewind the Hourglass by 1 Hour (right-click **Hour** once). Below the church, a congregation is keeping time for you.
+   - *The true page reached the Press:* until the finale ends, the chaos bag holds 1 fewer Static token than it otherwise would (never fewer than 0); this adds to Hour VI's "1 fewer" (What the Almanac Hid). Every almanac in town now carries the true hour, and the sky is a little less wrong. **Begin Finale** applies it for you.
    - *You refused the ticket:* the fair's clock stops for you once more. Cancel the revelation effect of the first Lost Hour drawn during the finale, even if one was canceled earlier this loop.
 
 **Contest progress.** Gain 1 contest progress:
 - each time an investigator succeeds at Hold Back;
 - when the Uninvited is defeated (its card says so);
 - each time a deep Knowledge entry is spent with the [action] on Contest the Crossing. Each entry can be spent once per finale. Note it on the Finale Record; it stays recorded for every other purpose, including the resolutions. Read its line aloud when you spend it:
-  - *The Keeper's Ninth Death:* "Eight times the keeper climbed the stair and died. You tell it the ninth line is not its to write."
+  - *The Keeper's Ninth Death:* "Eight times the keeper walked out along the beam and died. You tell it the ninth line is not its to write."
   - *The Hour Was Wrong:* "You tell it the true hour. It has been keeping the wrong one."
   - *Who Walks Beside You:* "On the road behind you the walkers stop, and turn, and wait with you."
-  - *The Vote That Never Ends:* "You read it the minutes. It knows them better than you, but it listens."
+  - *The Vote That Never Ends:* "You read it the minutes. It knows them better than you, but it listens." (If the vote was torn out: "You recite the minutes from memory. The torn page is not there to argue.")
   - *The Ticket-Taker's Bargain:* "Far off, a ticket is punched. On the hill, something checks its fare."
   - *The Appointed's Name:* "You do not say it. You let it see that you could."
 
-When contest progress reaches **6** (**5** with one investigator, **7** with four), advance Contest the Crossing: the contest is reached. Every deep entry you carry into the finale is one step of it; the rest must be taken from the Appointed. During the finale, a Hold Back success does not rewind the Hourglass (the Control token knows this). The finale also ends, with the contest **not** reached, when Hour IX is reached, when every investigator has been defeated, or when Dissonance reaches the reset value.
+When contest progress reaches **6** (**5** with one investigator, **7** with four), advance Contest the Crossing: the contest is reached. Every deep entry you carry into the finale is one step of it; the rest must be won on the hill. During the finale, a Hold Back success does not rewind the Hourglass (the Control token knows this). The finale also ends, with the contest **not** reached, when Hour IX is reached, when every investigator has been defeated, or when Dissonance reaches the reset value.
 
 During the finale, if your log records:
-- *You carry the walker's ring:* once during the finale, when an investigator takes the Hold Back action, they may resolve it without a skill test: push the Appointed's Approach back 1 stage, disengage and exhaust the Appointed. This counts as succeeding at Hold Back.
-- *The name is kept unspoken:* once during the finale, when the Hourglass would advance for any reason, the investigators may speak the name to cancel that entire advance (remove all doom from the current Hour).
+- *You carry the walker's ring:* once during the finale, when an investigator takes the Hold Back action, they may resolve it without a skill test: push the Appointed's Approach back 1 stage, disengage and exhaust the Appointed. This counts as succeeding at Hold Back. Read aloud: *The ring turns cold on your finger. For one step someone stands beside you on the hill, keeping exact time with you, and the thing in front of you stops.*
+- *The name is kept unspoken:* once during the finale, after setup, when the Hourglass would advance for any reason, the investigators may speak the name to cancel that entire advance (remove all doom from the current Hour). Read aloud: *You say it once, aloud, at last. Every clock in Ambergrove holds its breath, and the hand does not move.*
 
 > **Halfway.** The first time your contest progress reaches half its target, rounded up, read aloud: *Every clock in Ambergrove stops, then starts again, ticking backward. For one breath you are all the ages you have ever been at once: young and tired and old, standing on every step of every stair you ever climbed in this town. Then the moment passes, and the thing on the hill is closer, and so is the dawn.*
 
 **Do not read until the end of the finale.**
 
-An investigator is **present** if they took part in the finale, even if they were defeated during it. Years gained from a finale resolution never make an investigator age out, except where Resolution 4 says so.
+An investigator is **present** if they took part in the finale, even if they were defeated during it. After Resolutions 1–4 no investigator ages out (there is no Between Loops), except as Resolution 4 says.
 
 When the finale ends, find where you stand:
 - **If the contest was reached**, the night can be ended. **The investigators must decide how.** Choose **one** of Resolutions 1, 1b, 2, 3 or 4 whose condition you meet and read it. Resolution 4 is always available.
 - **If the contest was not reached**, read Resolution 5 if banked Memory is at least 4 per investigator (12 at three investigators); otherwise read Resolution 6.
 
-Then read **Epilogue — What the Years Took.**
+After Resolutions 1–4 (including 1b), read **Epilogue — What the Years Took.**
 
 ```resolution Resolution 1 — Take Its Place (contest reached, and an Ancient investigator, or the investigator who signed the ninth line, is present)
 > Someone has to hold the night's crease closed from the inside. The one the night has marked knows it before anyone speaks. They take the lamp, or the pen, or simply each of your hands in turn, and they walk out onto the hill to meet the guest.
-- The investigators choose one present investigator who is Ancient or who signed the ninth line. That investigator becomes the night's new anchor: kept behind, decades older, so that the loop ends for everyone else. They do not come back down. Mark them **kept as anchor** on your Campaign Log.
+- The investigators choose one present investigator who is Ancient or who signed the ninth line. That investigator becomes the night's new anchor: kept behind, decades older, so that the loop ends for everyone else. They do not come back down. Mark them **kept as anchor** under **Those Who Left the Loop**. Far down the Sunken Road, the walker with the worn ring stops at last and sits down at the roadside to rest.
 - If your log records **Who Walks Beside You**, instead: the ones who walk the Sunken Road come up the hill and take the anchor's weight with you. At dawn the anchor walks out with the others, free and not kept, but **3 Years** older. If your log also records *The walkers keep their ring*, the walkers carry the anchor almost the whole way: **1 Year** older instead of 3.
+- If the anchor signed the ninth line, add: *The keeper's book has its ninth line now, in a hand that chose it.*
 - The town wakes for the first time in a hundred years. The campaign is over.
 ```
 
 ```resolution Resolution 1b — Let It In, On Your Terms (contest reached, your log records The Ticket-Taker's Bargain and You hold the ticket, and banked Memory is at least 4 per investigator, or 3 per investigator if you kept the night to yourselves)
 > He punches your ticket without looking. He has been expecting you for a very long time. The door opens, not the way the town opened it, begging, but the way you open a door to a guest you have decided to receive. It comes in. It sits down at the edge of the Square in the lantern light, and it is smaller than you feared, and it is very, very old.
+- If your log records *You kept the night to yourselves*, add: *As the door swings open he touches one finger to the side of his nose. A man who keeps a secret knows what one is worth.*
 - The door opens on your terms, not the town's, and the night finally ends.
 - The fare is everything you carried: banked Memory drops to **0**, and each present investigator gains **2 Years**.
 - Ambergrove wakes to a morning with one more guest in it. The campaign is over.
@@ -754,17 +788,18 @@ Then read **Epilogue — What the Years Took.**
 - Every present investigator escapes, and each gains **2 Years**: the night closes on your heels. The campaign is over.
 - But the loop is only paused. Somewhere, some night, an almanac will be printed with the wrong hour again. Was it really ended?
 - If your log records *The ninth line was left blank*, read this instead of the last point: *No one is written into the keeper's book. No one is owed. The loop has nothing left to hold, and it does not start again.*
+- If an investigator signed the ninth line, add: *Somewhere in the keeper's book a name is waiting. One night, the book may call it.*
 ```
 
 ```resolution Resolution 4 — Seal by Force (contest reached)
 > The door is sealed, but not closed. Someone has to lean against it until the dawn comes, and the dawn is a long way off.
-- The investigators choose one present investigator. They age out holding the door shut. The campaign is over.
+- The investigators choose one present investigator. They age out holding the door shut: write them under **Those Who Left the Loop** as aged out. The campaign is over.
 - If your log records *The vote was torn out*, no debt is owed behind that door, and it pushes back with nothing but its own weight. The chosen investigator holds it until morning and walks away **3 Years** older instead of aging out.
 ```
 
 ```resolution Resolution 5 — Next Time (contest not reached, banked Memory at least 4 per investigator)
 > The loop wins tonight. The guest keeps its appointment, and the night folds along its old crease. But you have carried so much of it now that the fold does not quite close over you. You wake at First Dark closer than ever, older than ever, and certain.
-- The loop ends. Mark it as its ending would: **Torn** if Dissonance reached the reset value (with that ending's chaos-bag change), **Taken** if every investigator was defeated, otherwise **Closed at the Hour**. Read each placed district's resolution (a district whose resolution you read before the finale reads nothing more), and proceed to **Between Loops**. You may attempt the finale again. At the next attempt, fill in the Finale Record again.
+- The loop ends. Mark it as its ending would: **Torn** if Dissonance reached the reset value (with that ending's chaos-bag change and interlude story), **Taken** if every investigator was defeated (with that ending's interlude story), otherwise **Closed at the Hour**. Read each placed district's resolution (a district whose resolution you read before the finale reads nothing more), and proceed to **Between Loops**. You may attempt the finale again. At the next attempt, fill in the Finale Record again.
 - Do not read the epilogue yet.
 ```
 
@@ -773,7 +808,13 @@ Then read **Epilogue — What the Years Took.**
 - The campaign ends. Do not read the epilogue.
 ```
 
-**Epilogue — What the Years Took.** Unless you read Resolution 5 or 6, read one line for each investigator who is present at the end, was not kept as anchor and did not age out, matching their age bracket after the resolution's Years.
+**Epilogue — What the Years Took.** First, the dawn. Read once: *At midnight the church bell strikes twelve, and stops.* Then add each of these your Campaign Log records:
+- *The Sheriff Is Already Dead:* *Someone finally lifts the board from the Well. The town buries its sheriff on an ordinary morning.*
+- *The Wheel Still Turns:* *At the fairground the tune reaches its last bar, and the wheel stops with an empty car at the top.*
+- *The Road Remembers:* *The milestones on the shore road count in order, all the way to town.*
+- *The Lamp Remembers*, and no one was kept as anchor: *Out at the point the lamp stands dark, and for once it is only a lamp.*
+
+Then read one line for each investigator who is present at the end, was not kept as anchor and did not age out, matching their age bracket after the resolution's Years.
 - **Prime:** *You leave Ambergrove as young as you came, and no one on the train believes how tired you are.*
 - **Weathered:** *There is gray in your hair that was not there the night you arrived. You keep it. It is the only proof.*
 - **Elder:** *Your hands shake a little now in the mornings. You spent years on one night, and you would spend them again.*
@@ -785,7 +826,12 @@ Then read **Epilogue — What the Years Took.**
 - If **Seraphine Vale** has an epilogue line, also read the line for her thread on your Campaign Log:
   - **Unheard:** *Seraphine never learns what answered her that night. Some evenings she lays out the cards and waits, and nothing reaches back.*
   - **Suspected:** *Seraphine copies every name from the town's ledger into a notebook. Hers is not among them. She reads the list every night anyway, looking for the one that should have been hers.*
-  - **Known:** *Seraphine never speaks the name again. But she sets a second cup at the table each night, and some mornings it has been drunk.*
+  - **Known:** *Seraphine never says the name aloud. But she sets a second cup at the table each night, and some mornings it has been drunk.*
+- If **Elias Warde** has an epilogue line, also read: *Elias does not take the train. He walks the Sunken Road out to the point, climbs the stair he has climbed for thirty-one years, and lights the lamp in broad daylight, for no ship at all. The keeper's book stays on its shelf. He does not open it.*
+- If **Dr. Ayako Sōma** has an epilogue line, also read: *Ayako fills a fifth notebook on the train and stops halfway down a page. She has translated everything the night said but one word, and she leaves that one in the language it was written in.*
+- If **Cass Lindqvist** has an epilogue line, also read: *Cass deals a hand face up on the seat beside her and watches it a long while. Nobody else is counting now. For the first time since Ambergrove, she can see the whole table.*
+- If **"Birdie" Okonkwo** has an epilogue line, also read: *At the station Birdie's compass swings once, wavers, and settles on north for the first time in its life. She looks at it for a long time. Then she takes the road anyway.*
+- If **Those Who Left the Loop** names anyone who aged out before the finale, also read once: *On the shore road the walkers have stopped. In the first light they push back their hoods, one by one, like people at the end of a long shift. One of them is someone you know. They do not look up as the train goes by, but they are smiling.*
 
 ---
 
@@ -821,4 +867,4 @@ You never need this with the boxes: **Place** builds every deck. Use it to build
 
 Every scenario card prints its set's symbol. A district's locations, acts and story assets print its district's symbol ([set:node_square] The Square, [set:node_lighthouse] The Lighthouse, [set:node_church] The Drowned Church, [set:node_road] The Sunken Road, [set:node_fairground] The Fairground, [set:node_almanac] The Almanac House); the Hours, the Prologue's cards and the story cards print [set:occultation_skips]; the Named print [set:named]; The Last Hour's cards print [set:appointed].
 
-The Prologue's deck is the first five sets (21 cards). A loop's deck is those five sets plus the Square's (25 cards), plus each placed district's set, plus the Whispers from Part II.
+The Prologue's deck is the first five sets (21 cards). A loop's deck is those five sets plus the Square's (25 cards), plus each placed district's set, plus, from Part II, the Whispers and the Fairground's new enemy (when the Fairground is placed).

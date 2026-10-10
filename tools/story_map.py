@@ -201,11 +201,14 @@ class Map:
         for cid, c in self.cards.items():
             t = card_text(c, ("text", "back_text"))
             scn = card_scenario(cid, self.assign)
-            for m in re.finditer(r"→\s*(?:(Loop|Finale) Resolution |R)(\d+b?)", t):
+            for m in re.finditer(r"→\s*(?:(Loop|Finale|Prologue) Resolution |R)(\d+b?)", t):
                 kind, n = m.group(1), "R" + m.group(2)
                 if kind == "Loop":
                     table = loop
-                elif kind == "Finale" or scn == "finale" or cid.startswith("sthr-act-lasthour"):
+                elif kind == "Prologue":
+                    table = prologue
+                elif (kind == "Finale" or scn == "finale" or cid.startswith("sthr-act-lasthour")
+                      or "finale" in t[max(0, m.start() - 90):m.start()].split(".")[-1].lower()):
                     table = finale
                 elif scn == "prologue" or "Prologue" in t[max(0, m.start() - 40):m.start()]:
                     table = prologue

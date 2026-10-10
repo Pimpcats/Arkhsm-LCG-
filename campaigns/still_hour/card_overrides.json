@@ -25,9 +25,9 @@
   },
   "sthr-hour-4": {
     "name": "Hour IV — The Road Gives Way",
-    "text": "Forced – When the Hourglass advances to this Hour, unless your Campaign Log records The Hour Was Wrong: The lead investigator chooses one of the revealed locations with the fewest clues, other than The Square. Until the Hourglass next advances or rewinds, the chosen location is impassable. Each investigator there moves to a connecting location of their choice (this does not place doom).",
+    "text": "Forced – When the Hourglass advances to this Hour, unless your Campaign Log records The Hour Was Wrong: The lead investigator chooses one of the revealed locations with the fewest clues, other than The Square or The Town Hall Steps. Until the Hourglass next advances or rewinds, the chosen location is impassable. Each investigator there moves to a connecting location of their choice (this does not place doom).",
     "doom": 2,
-    "back_flavor": "Out past the Milestones the road simply stops being there. The walkers on it do not break stride.",
+    "back_flavor": "Out past the Milestones the lamps gutter one by one, and the dark comes in off the fields. The walkers on the road do not break stride.",
     "back_text": "Set this Hour aside beside the Hours deck. Hour V becomes the current agenda.",
     "flavor": "Out at the edge of town, the lamps go out one street at a time."
   },
@@ -65,7 +65,7 @@
   },
   "sthr-hour-9": {
     "name": "Hour IX — The Appointed Hour",
-    "text": "Forced – When the Hourglass advances to this Hour: In the Prologue, (→R2). In the finale, the finale ends and the contest is not reached. Otherwise, the loop ends (→Loop Resolution 1), unless your Campaign Log records The Way the Night Breaks and you begin the finale instead.",
+    "text": "Forced – When the Hourglass advances to this Hour: In the Prologue, (→Prologue Resolution 2). In the finale, the finale ends and the contest is not reached (→R5 or R6). Otherwise, the loop ends (→Loop Resolution 1), unless your Campaign Log records The Way the Night Breaks and you begin the finale instead.",
     "back_flavor": "The occultation completes at the almanac's hour, an hour after it began.",
     "back_text": "",
     "flavor": "The last of the stars goes out."
@@ -177,7 +177,8 @@
     "name": "The Crossing",
     "traits": "Omen.",
     "text": "Revelation – Advance The Appointed's Approach by 1 stage and place 1 doom on the current Hour.",
-    "quantity": 1
+    "quantity": 1,
+    "flavor": "A door stands free in the Square. Its far side shows the same Square, one hour later."
   },
   "sthr-loc-square": {
     "name": "The Square",
@@ -302,7 +303,7 @@
     ],
     "flavor": "The light remembers a path the dark has forgotten.",
     "back_shroud": 3,
-    "back_text": "Calm side (your Campaign Log records The Lamp Remembers).\n[action]: Light the lamp. It stays lit until the end of the loop.\nWhile The Lantern Room's lamp is lit, each Echo in the Lighthouse and Sunken Road districts is Sleepwalking while Dissonance is in the Calm or Glitch band (unless another effect says it is not Sleepwalking), and The Dark That Waits treats investigators here as not at The Lantern Room.",
+    "back_text": "Calm side (your Campaign Log records The Lamp Remembers).\n[action]: Light the lamp. It stays lit until the end of the loop.\nWhile The Lantern Room's lamp is lit, each Echo in the Lighthouse and Sunken Road districts is Sleepwalking while Dissonance is in the Calm or Glitch band (unless another effect says it is not Sleepwalking).",
     "back_flavor": "You know how to light it now. Some part of you always did."
   },
   "sthr-loc-windingstair": {
@@ -349,13 +350,13 @@
       }
     ],
     "unrevealed": true,
-    "unrevealed_flavor": "A narrow door at the foot of the tower, painted the same green as a hundred years of salt allowed.",
+    "unrevealed_flavor": "A narrow door at the foot of the tower, painted whatever green a hundred years of salt have left it.",
     "flavor": "Eight lines in his own hand, each signed with his own name. The ninth is ruled, and waiting."
   },
   "sthr-darkthatwaits": {
     "name": "The Dark That Waits",
     "traits": "Terror.",
-    "text": "Revelation – Test [wil] (3). If you fail, take 1 horror. If you are at The Lantern Room, take 2 horror instead.",
+    "text": "Revelation – Test [wil] (3). If you fail, take 1 horror. If you are at The Lantern Room and its lamp is not lit, take 2 horror instead.",
     "quantity": 1
   },
   "sthr-somethingonstair": {
@@ -418,7 +419,7 @@
     "unrevealed": true,
     "unrevealed_flavor": "The bell rope disappears up through a hole in the ceiling. It is swaying, though there is no wind.",
     "text": "Forced – After you enter The Belfry: If your Campaign Log does not record The Thirteenth Toll, raise Dissonance by 1.",
-    "unrevealed_text": "Forced – When Hour III is reached: Reveal The Belfry."
+    "unrevealed_text": "Forced – After the Hourglass advances to Hour III: Reveal The Belfry."
   },
   "sthr-loc-floodedcrypt": {
     "name": "The Flooded Crypt",
@@ -493,7 +494,7 @@
     ],
     "flavor": "The road between the town and the shore, counted out in stones that never change.",
     "unrevealed": true,
-    "unrevealed_flavor": "Stone markers along the verge, each one carved with a number. The numbers do not go in order.",
+    "unrevealed_flavor": "Stone markers along the verge, each one carved with a number. From here you cannot tell which way they count.",
     "text": "Forced – After you discover 1 or more clues at The Milestones: If your Campaign Log does not record The Road Remembers, test [wil] (2). If you fail, take 1 horror."
   },
   "sthr-loc-lowbridge": {
@@ -524,7 +525,7 @@
     "traits": "Road.",
     "shroud": 2,
     "clues": 2,
-    "text": "[action] Raise Dissonance by 2: Rewind the Hourglass by 1 Hour. (Group limit once per loop.)",
+    "text": "[action] Raise Dissonance by 2: Rewind the Hourglass by 1 Hour. (Group limit once per loop. Not during the finale.)",
     "clues_per_investigator": true,
     "icons": "slash",
     "color": "#8a5a2e",
@@ -572,7 +573,7 @@
       }
     ],
     "back_shroud": 2,
-    "flavor": "The sheriff gives the same speech to the same crowd. He has been giving it since ten o'clock.",
+    "flavor": "The sheriff gives the same speech to the same crowd. He has been dead since before it began.",
     "back_text": "Calm side (your Campaign Log records The Sheriff Is Already Dead).\n[free]: Name an Hour after the current Hour, other than Hour IX. The next time the Hourglass advances to it this loop, cancel its Forced ability. (Group limit once per loop.)",
     "back_flavor": "The speech is the night's program, hour by hour. You know it by heart now, and you know which line to interrupt."
   },
@@ -618,7 +619,7 @@
   "sthr-samespeech": {
     "name": "The Same Speech",
     "traits": "Terror.",
-    "text": "Peril.\nRevelation – Test [wil] (3). If you fail, take 1 horror. Unless your Campaign Log records The Vote That Never Ends, take 1 additional horror for every 3 completed loops (maximum 3).",
+    "text": "Peril.\nRevelation – Test [wil] (3). If you fail, take 1 horror, plus 1 more horror for every 3 completed loops (maximum 3 more) unless your Campaign Log records The Vote That Never Ends.",
     "flavor": "Word for word. Pause for pause. Applause on the same beat.",
     "quantity": 1
   },
@@ -633,7 +634,7 @@
     "traits": "Fairground.",
     "shroud": 3,
     "clues": 1,
-    "text": "Forced – After the Hourglass advances: Each investigator at The Wheel takes 1 horror.",
+    "text": "Forced – After the Hourglass advances: Each investigator at The Wheel takes 1 horror.\nIf your Campaign Log records The Wheel Still Turns: [free]: Look at the top 2 cards of the encounter deck and put them back in any order. Only an investigator here may trigger this ability. (Group limit once per loop.)",
     "clues_per_investigator": true,
     "icons": "spade",
     "color": "#7c2a5c",
@@ -739,7 +740,7 @@
     "traits": "Almanac House.",
     "shroud": 3,
     "clues": 1,
-    "text": "[action] Spend 1 clue: Remove from the chaos bag 1 Static token that a card effect added until the end of a turn or round. (Group limit once per round.)",
+    "text": "[action] Spend 1 clue: Choose a Static token that a card added to the chaos bag only until the end of a turn or round, and remove it from the chaos bag. (Group limit once per round.)",
     "clues_per_investigator": true,
     "icons": "triangle",
     "color": "#4a3c6c",
@@ -851,8 +852,8 @@
     "flavor": "The lamp is dark. It has never, in any loop, been lit.",
     "deck": 95103,
     "index": "1a",
-    "back_flavor": "The wick takes on the third try. For the first time in more nights than anyone can count, the beam swings out across the water, and down on the Sunken Road every walker stops and turns to face the light.",
-    "back_text": "Record in your Campaign Log: The Lamp Remembers.\nThe Lantern Room's lamp is lit until the end of this loop. While it is lit, each Echo in the Lighthouse and Sunken Road districts is Sleepwalking while Dissonance is in the Calm or Glitch band (unless another effect says it is not Sleepwalking), and The Dark That Waits treats investigators at The Lantern Room as not at The Lantern Room.\nFrom now on The Lantern Room is calm side up: flip it now (do not add clues), and in every later loop it enters play calm side up.\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game.",
+    "back_flavor": "The wick takes on the third try. For the first time in more nights than anyone can count, the beam swings out across the water, and down on the Sunken Road every walker stops and lifts their hood to the light.",
+    "back_text": "Record in your Campaign Log: The Lamp Remembers.\nThe Lantern Room's lamp is lit until the end of this loop. While it is lit, each Echo in the Lighthouse and Sunken Road districts is Sleepwalking while Dissonance is in the Calm or Glitch band (unless another effect says it is not Sleepwalking).\nFrom now on The Lantern Room is calm side up: flip it now (do not add clues), and in every later loop it enters play calm side up.\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game.",
     "clues_per_investigator": true,
     "no_threshold": true
   },
@@ -862,7 +863,7 @@
     "index": "2a",
     "flavor": "A keeper writes his log at the lamp, by its light. Every line in this one was written in the dark.",
     "back_flavor": "Eight deaths in the keeper's own careful hand, each one dated tonight. Each line records where he fell, each a little farther out along the path the beam would sweep across the water, if it were ever lit: eight tries to walk out of the night by a light that never came. The ninth line is ruled and waiting.",
-    "back_text": "Record in your Campaign Log: The Keeper's Ninth Death.\nRemove Keeper's Logbook from the game.\nFrom now on, when an investigator is defeated, they first place 1 Memory on their investigator card: every death is written down.\nFrom now on, when Elias Warde's [elder] effect heals damage, it also heals 1 horror.\nThe Lighthouse's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "back_text": "Record in your Campaign Log: The Keeper's Ninth Death.\nRemove Keeper's Logbook from the game.\nFrom now on, when an investigator is defeated, they first place 1 Memory on their investigator card: every death is written down.\nFrom now on, when Elias Warde's [elder] effect heals damage from an investigator, it also heals 1 horror from that investigator.\nThe Lighthouse's objectives are complete. From now on, do not use this act deck when you Place this box.",
     "clues_per_investigator": true,
     "take": {
       "asset": "sthr-item-logbook",
@@ -905,22 +906,22 @@
   },
   "sthr-act-walkbackward": {
     "name": "Walk It Backward",
-    "text": "Objective – If one investigator has discovered 3 clues at The Turning, then 1 clue at The Low Bridge, then 1 clue at The Milestones, in that order, during this loop, advance. (With one investigator: 2, then 1, then 1.) Each investigator counts separately; discoveries elsewhere or out of order do not count and do not reset your count. (Keep a separate pile of resources from the token pool on this act for each investigator, 1 per clue that counts.)",
+    "text": "Objective – If one investigator has discovered 3 clues at The Turning, then 1 at The Low Bridge, then 1 at The Milestones, in that order, during this loop, advance. (With one investigator: 2, then 1, then 1.) Each investigator counts separately, with resources on this act; discoveries elsewhere or out of order do not count. If The Low Bridge or The Milestones has no clues when you need one there, [action]: Spend 1 clue there to count it.",
     "flavor": "The same figures walk it every loop, in the same direction, never arriving.",
     "deck": 95106,
     "index": "1a",
     "back_flavor": "Walking against them, you see the road the way the walkers never do: from the shore back toward town. The milestones count down instead of up. You will not lose your way on this road again.",
-    "back_text": "Record in your Campaign Log: The Road Remembers.\nGroup limit once per loop: moving between The Square and The Milestones does not place doom on the current Hour.\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game.",
+    "back_text": "Record in your Campaign Log: The Road Remembers.\nFrom now on, group limit once per loop: when the round's first move between The Square and The Milestones would place doom on the current Hour, it places none (it is still that round's first move).\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game.",
     "no_threshold": true
   },
   "sthr-act-walksbeside": {
     "name": "Who Walks Beside You",
-    "text": "Part II only.\nForced – When this act becomes the current act: Search the encounter deck and discard pile for a copy of The Waiting Congregation (if there is none, take one in play), spawn it at The Turning and shuffle the encounter deck.\nEchoes at The Turning are not Sleepwalking.\nObjective – [action] Investigators at The Turning spend 3 [perinv] clues, as a group: Stand Firm. Choose a ready Echo there and test [wil] or [com] (X), where X is its fight value. If you succeed, exhaust it and advance. If you fail, place the spent clues there.\n[reaction] After an investigator at The Turning evades an Echo there, investigators there spend 3 [perinv] clues, as a group: Advance.",
+    "text": "Part II only.\nForced – When this act becomes current, and at the end of each round with no Echo at The Turning: Spawn a Waiting Congregation from the encounter deck or discard pile at The Turning (or move one in play there, unengaged). Shuffle the encounter deck.\nEchoes at The Turning are not Sleepwalking and cannot move.\nObjective – [action] Investigators at The Turning spend 3 [perinv] clues, as a group: Stand Firm. Test [wil] or [com] (X) against a ready Echo there (X is its fight value). Success: exhaust it and advance. Failure: place the spent clues there.\n[reaction] After an investigator at The Turning evades an Echo there, investigators there spend 3 [perinv] clues, as a group: Advance.",
     "flavor": "Some of them turn to look at you now.",
     "deck": 95107,
     "index": "2a",
     "back_flavor": "The face under the hood is worn almost smooth, like a step a thousand feet have climbed. You know the coat. You know the ring on the hand that lifts to stop you, worn thin on the inside like an anchor's ring, as if it had held against the pull of a thousand nights. They were here before you, and they looped until there was nothing left to loop.",
-    "back_text": "Record in your Campaign Log: Who Walks Beside You.\nRemove 1 [cultist] token from the chaos bag for the rest of the campaign.\nWhile your Campaign Log records Who Walks Beside You, each Echo gets −1 fight.\nThe Sunken Road's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "back_text": "Record in your Campaign Log: Who Walks Beside You.\nAny Waiting Congregation this act spawned stays on the road as an ordinary Echo.\nRemove 1 [cultist] token from the chaos bag for the rest of the campaign.\nWhile your Campaign Log records Who Walks Beside You, each Echo gets −1 fight.\nThe Sunken Road's objectives are complete. From now on, do not use this act deck when you Place this box.",
     "clues": 3,
     "clues_per_investigator": true,
     "no_threshold": true
@@ -943,8 +944,8 @@
     "flavor": "The Records Office keeps every decision the town ever made. The speech on the steps is one of them, read again every night.",
     "deck": 95109,
     "index": "2a",
-    "back_flavor": "The minutes are dated the night of the first occultation. A motion to open the door, that Ambergrove should never be forgotten. Every name in the town, each in its own hand. Carried, unanimous. Under the tally the clerk has written: the cost to be settled at the appointed hour. Beneath it, in another hand and a brown ink: and the hour to be printed one late. The name it was called by, the minutes say, is kept in the Almanac House, in the study, under seal.",
-    "back_text": "Record in your Campaign Log: The Vote That Never Ends. If Seraphine Vale is one of your investigators, mark Seraphine's thread “suspected.”\nRemove Town Ledger and What Wears the Sheriff from the game.\nFrom now on, The Same Speech deals no extra horror for completed loops: you know what the speech is asking for.\nThe Square's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "back_flavor": "The minutes are dated the night of the first occultation. A motion to open the door, that Ambergrove should never be forgotten. Every name in the town, each in its own hand. Carried, unanimous. Under the tally the clerk has written: the cost to be settled at the appointed hour. Beneath it, in another hand and a brown ink: and the hour to be printed one late. The name of what they invited, the minutes say, is kept in the Almanac House, in the study, under seal.",
+    "back_text": "Record in your Campaign Log: The Vote That Never Ends. If Seraphine Vale controls Town Ledger or is at The Town Hall Steps, mark Seraphine's thread “suspected.”\nRemove Town Ledger and What Wears the Sheriff from the game.\nFrom now on, The Same Speech deals no extra horror for completed loops: you know what the speech is asking for.\nThe Square's objectives are complete. From now on, do not use this act deck when you Place this box.",
     "clues_per_investigator": true,
     "take": {
       "asset": "sthr-item-ledger",
@@ -966,7 +967,7 @@
   },
   "sthr-act-bargain": {
     "name": "The Ticket-Taker's Bargain",
-    "text": "Part II only.\nObjective – [action] Parley. Investigators at The Ticket Booth pay a fare of 3 [perinv], as a group, in any mix of clues (1 each), Memory removed from their own cards (1 each) and resources (3 count as 1): Advance. Only an investigator at The Ticket Booth may trigger this ability.",
+    "text": "Part II only.\nObjective – [action] Investigators at The Ticket Booth pay a fare of 3 [perinv], as a group, in any mix of clues (1 each), Memory removed from their own cards (1 each) and resources (3 count as 1): Parley. Advance. Only an investigator at The Ticket Booth may trigger this ability. (Memory paid as fare does not count toward leaning on the loop.)",
     "flavor": "He smiles at you like he's been expecting you for a very long time.",
     "deck": 95111,
     "index": "2a",
@@ -985,7 +986,7 @@
     "index": "1a",
     "clues_per_investigator": true,
     "back_flavor": "One copy in the hundred was pulled from the press before the type was changed. On it the hour of the occultation is scored through by hand until it cannot be read, and a later hour written above it in brown ink. You lift the changed hour out of the type and run the press without it. The pages come out warm, the hour on them blank where the struck line was. For a moment the sky over the Almanac House looks almost ordinary.",
-    "back_text": "Record in your Campaign Log: What the Almanac Hid.\nRemove Bound Almanac from the game.\nAt Hour VI, the chaos bag holds 1 fewer Static token for the rest of the loop instead of 1 more.\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game.",
+    "back_text": "Record in your Campaign Log: What the Almanac Hid.\nRemove Bound Almanac from the game.\nFrom now on, Hour VI's Forced ability is reversed: until the end of the loop, the chaos bag holds 1 fewer Static token than its band calls for (never fewer than 0), instead of 1 more.\nIn Part II, advance to act 2a if its requirements are met. Otherwise, remove this act deck from the game.",
     "take": {
       "asset": "sthr-item-almanac",
       "at": "The Reading Room",
@@ -1000,7 +1001,7 @@
     "deck": 95113,
     "index": "2a",
     "back_flavor": "It is written once, in the middle of an otherwise blank page. You read it. You do not say it aloud. Somewhere on the hill, something pauses mid-step.",
-    "back_text": "Record in your Campaign Log: The Appointed's Name. If Seraphine Vale is one of your investigators, mark Seraphine's thread “known.”\nRemove 1 [tablet] token from the chaos bag for the rest of the campaign.\nAt Hour VII, exhaust The Appointed.\nAlso record The Way the Night Breaks: the finale may now be begun.\nThe Almanac House's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "back_text": "Record in your Campaign Log: The Appointed's Name. If Seraphine Vale is at The Sealed Study, mark Seraphine's thread “known.”\nRemove 1 [tablet] token from the chaos bag for the rest of the campaign.\nFrom now on, when the Hourglass advances to Hour VII, exhaust The Appointed.\nAlso record The Way the Night Breaks: the finale may now be begun.\nThe Almanac House's objectives are complete. From now on, do not use this act deck when you Place this box.",
     "clues_per_investigator": true
   },
   "sthr-act-lasthour": {
@@ -1039,7 +1040,7 @@
   "sthr-res-5": {
     "name": "Next Time",
     "traits": "Resolution 5.",
-    "text": "Contest not reached, and banked Memory is at least 4 per investigator.\nMark this loop as its ending would (Torn, Taken or Closed at the Hour), read each placed district's resolution (except one whose Resolution 1 you read before the finale), and proceed to Between Loops; the finale may be begun again.",
+    "text": "Contest not reached, and banked Memory is at least 4 per investigator.\nMark this loop as its ending would (Torn, with its chaos-bag change; Taken; or Closed at the Hour), read each placed district's resolution (except one whose resolution you read before the finale), and proceed to Between Loops; the finale may be begun again.",
     "deck": 95119
   },
   "sthr-res-6": {
@@ -1058,7 +1059,7 @@
   "sthr-story-beforefinale": {
     "name": "Before the finale",
     "traits": "Interlude.",
-    "text": "You know the shape of the night now. You know what it costs to end it. Something has held this night in place all along, the way an anchor holds against the tide. The only question left is who pays. To keep a second attempt, enter the finale with at least 4 banked Memory per investigator.",
+    "text": "You know the shape of the night now. You know what it costs to end it. Something has held this night in place all along, the way an anchor holds against the tide. The only question left is who pays. To keep a second attempt, enter the finale with at least 4 banked Memory per investigator (banked Memory is the pool, not Memory on your cards).",
     "flavor": "In the Almanac House a window is still lit. Everywhere else, the town has gone quiet to listen.",
     "deck": 95122
   },
@@ -1244,7 +1245,8 @@
   "sthrelias": {
     "text": "[reaction] When damage would be dealt to you or another investigator at your location: Discard up to 3 cards from the top of your deck. Prevent 1 of that damage for each card discarded. (Limit once per round.)\n[elder] effect: +1. You may discard the top 2 cards of your deck. If you do, this token is +3 instead and heal 1 damage from an investigator at your location.",
     "elderSign": "+1. You may discard the top 2 cards of your deck. If you do, this token is +3 instead and heal 1 damage from an investigator at your location.",
-    "back_text": "Deck Size: 30.\nDeckbuilding Options: Guardian cards level 0–5, Neutral cards level 0–5, up to 5 Survivor cards level 0–2, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): The Ambergrove Lamp, I've Done This Before, The Eighth Grave, What the Warden Owes, 1 random basic weakness."
+    "back_text": "Deck Size: 30.\nDeckbuilding Options: Guardian cards level 0–5, Neutral cards level 0–5, up to 5 Survivor cards level 0–2, any number of Recollection cards.\nDeckbuilding Requirements (do not count toward deck size): The Ambergrove Lamp, I've Done This Before, The Eighth Grave, What the Warden Owes, 1 random basic weakness.",
+    "back_flavor": "Elias Warde has kept the Ambergrove light for thirty-one years. He knows every step of the tower stair by feel and every rock off the point by name, and he has pulled more drowned men from the water than he cares to count. When the night began to repeat, he did what he has always done: he climbed the stairs, faced the dark, and stood between it and the town. Tonight, for the first time, he did not."
   },
   "sthr-lexicon": {
     "text": "Uses (0 secrets).\n[reaction] After you succeed at an [int] test by 2 or more: Place 1 secret on it (maximum 4).\n[free] Exhaust it and spend 1 secret: You get +2 [int] for this test.\n[reaction] When a non-weakness treachery is drawn at your location, exhaust it and spend 2 secrets: Cancel its revelation effect. (Limit once per round.)",
@@ -1311,7 +1313,7 @@
     "text": "Peril.\nRevelation – Take 1 horror. If The Appointed's Approach is Emerging or Arrived, take 2 horror instead and raise Dissonance by 1."
   },
   "sthr-appointed": {
-    "text": "Prey – Most Memory on their cards only.\nIt cannot be attacked, evaded, damaged or defeated, and leaves play only when its Approach is pushed back to Unseen.\n[action] If The Appointed is ready: Hold Back. Test [wil] or [com] (4). This does not provoke an attack of opportunity from it. If you succeed, push The Appointed's Approach back 1 stage, disengage and exhaust it, and rewind the Hourglass by 1 Hour (not during the finale; at most 3 rewinds each loop)."
+    "text": "Prey – Most Memory on their cards only.\nIt cannot be attacked, evaded, damaged or defeated, and leaves play only when its Approach is pushed back to Unseen.\n[action] If The Appointed is ready: Hold Back. Test [wil] or [com] (4). This does not provoke an attack of opportunity from it. If you succeed, push The Appointed's Approach back 1 stage, disengage and exhaust it, and rewind the Hourglass by 1 Hour (not during the finale; Hold Back rewinds the Hourglass at most 3 times each loop)."
   },
   "sthr-minutehand": {
     "name": "The Minute Hand",
@@ -1340,7 +1342,7 @@
   "sthr-item-logbook": {
     "name": "Keeper's Logbook",
     "traits": "Item. Tome.",
-    "text": "[reaction] When you would take 1 or more damage, exhaust Keeper's Logbook: Take 1 less damage.\nForced – When you are eliminated: Place Keeper's Logbook at your location.\n[action] If Keeper's Logbook is uncontrolled: Take control of it. Any investigator at its location may trigger this ability.",
+    "text": "[reaction] When damage would be dealt to you, exhaust Keeper's Logbook: Prevent 1 of that damage.\nForced – When you are eliminated: Place Keeper's Logbook at your location.\n[action] If Keeper's Logbook is uncontrolled: Take control of it. Any investigator at its location may trigger this ability.",
     "flavor": "Eight deaths in the keeper's hand, each with its hour and its cause.",
     "deck": 95124,
     "unique": true,
@@ -1349,7 +1351,7 @@
   "sthr-item-register": {
     "name": "Parish Register",
     "traits": "Item. Tome.",
-    "text": "While you control Parish Register, The Drowned Verger loses aloof and gains hunter and “Prey – Investigator with Parish Register only.”\n[reaction] When The Belfry or Thirteen would raise Dissonance, exhaust it: Cancel that.\nForced – When you are eliminated: Place it at your location.\n[action] If it is uncontrolled: Take control of it. (Any investigator at its location.)",
+    "text": "While you control Parish Register, The Drowned Verger loses aloof and gains hunter and “Prey – Investigator with Parish Register only.”\n[reaction] When The Belfry or Thirteen would raise Dissonance, exhaust it: Cancel that.\nForced – When you are eliminated: Place Parish Register at your location.\n[action] If Parish Register is uncontrolled: Take control of it. Any investigator at its location may trigger this ability.",
     "flavor": "Every service since the church was raised, in faded black ink. Every one ends at twelve.",
     "deck": 95125,
     "unique": true,
@@ -1367,7 +1369,7 @@
   "sthr-item-ledger": {
     "name": "Town Ledger",
     "traits": "Item. Tome.",
-    "text": "[action] Exhaust Town Ledger: Choose an Echo at your location. You read its name from the minutes: it is Sleepwalking until the end of the round.\nForced – When you are eliminated: Place Town Ledger at your location.\n[action] If Town Ledger is uncontrolled: Take control of it. Any investigator at its location may trigger this ability.",
+    "text": "[action] Exhaust Town Ledger: Choose an Echo at your location. You read its name from the minutes: it is Sleepwalking until the end of the round, even if another effect says it is not.\nForced – When you are eliminated: Place Town Ledger at your location.\n[action] If Town Ledger is uncontrolled: Take control of it. Any investigator at its location may trigger this ability.",
     "flavor": "The minutes of every meeting the town has ever held, and every name in it.",
     "deck": 95127,
     "unique": true,
@@ -1376,7 +1378,7 @@
   "sthr-item-almanac": {
     "name": "Bound Almanac",
     "traits": "Item. Tome.",
-    "text": "You get −1 [agi].\n[reaction] When you reveal a Static token during a skill test, exhaust Bound Almanac: Cancel it and reveal another.\nForced – When you are eliminated: Place it at your location.\n[action] If it is uncontrolled: Take control of it. (Any investigator at its location.)",
+    "text": "You get −1 [agi].\n[reaction] When you reveal a Static token during a skill test, exhaust Bound Almanac: Cancel it and reveal another.\nForced – When you are eliminated: Place Bound Almanac at your location.\n[action] If Bound Almanac is uncontrolled: Take control of it. Any investigator at its location may trigger this ability.",
     "flavor": "The one proof in the hundred, pulled before the type was changed. You carry it flat and careful, as if the hour on it might spill.",
     "deck": 95128,
     "unique": true,
@@ -1390,7 +1392,7 @@
     "text": "Permanent. Limit 1 per deck.\nYou get +1 maximum sanity.\nForced – At the start of each loop: Place 1 Memory on your investigator card."
   },
   "sthr-story-firstdark": {
-    "text": "You wake at First Dark with the taste of salt and the certainty that you have done this before. The others feel it too. No one in Ambergrove will believe you."
+    "text": "Read at Between Loops after each of the first three loops.\nYou wake at First Dark with the taste of salt and the certainty that you have done this before. The others feel it too. No one in Ambergrove will believe you."
   },
   "sthr-quest-elias": {
     "text": "Permanent. Campaign: The Still Hour.\nQuest – Prevent 4 damage with your investigator ability. Keep the tally on your Campaign Log; it carries from loop to loop.\nWhen the tally reaches its goal: Swap this card for its bonded card, What the Warden Remembers."

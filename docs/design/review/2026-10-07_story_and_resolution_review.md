@@ -134,3 +134,40 @@ Left as is (deliberate): the brown-ink hand stays unnamed (S6 above); "kneeling 
 Waiting Congregation (different words in play); Cassandra's Notebook name; the printed collector number
 (S8); the campaign box's description text; a fifth log panel (a replacement takes the replaced
 investigator's panel).
+
+## 5. Scenario-by-scenario pass and the story map (2026-10-10)
+
+**Why issues kept surfacing.** The same facts live in four places (guide, card text, log, Control
+scripts). Each earlier pass fixed what it touched; nothing mechanical checked that every thread still
+connected. `tools/story_map.py` (run by `tests/test_story_map.py`) now does: every Knowledge entry is
+written by one act and read outside its own district; every choice option is offered once, changes the
+finale and echoes elsewhere; loop marks and Prologue records are read; every printed pointer resolves;
+every act and district resolution leads somewhere; the agenda is complete; and the finale's open
+endings depend on the story (enumerated: 7 endings, all reachable, 16 distinct open sets).
+
+**Nine reviewers, one per scenario** (Prologue; loop/agenda/interludes; six districts; finale), each
+reading every card face and guide line of its scenario and quoting both sides of each finding. Totals:
+0 blockers, 28 should-fix, 70 nits. All were verified against the source and applied, except where
+noted. Highlights:
+
+- **Rules that could stall or did nothing:** Walk It Backward could become impossible (clue depletion,
+  certain solo) → a spend-1-clue fallback; Who Walks Beside You could stall if its Echo left/died →
+  respawn at end of round and Echoes there cannot move; The Road Remembers / the Press saved nothing
+  for a party crossing together → the free move still counts as the round's first move; the Press's
+  finale payoff never applied after Hour VI → its own 1-fewer Static (ChaosBag `press`); Seraphine's
+  thread always ended "known" → marked by where she is when the acts advance; a district placed in the
+  finale resolved its act 2a → the Control sets it aside; Hold Back at Hour I used up a rewind.
+- **Story connections:** the four surface entries that mattered only locally now each echo elsewhere
+  (Lamp → Square and Road; Road → Between Loops; Sheriff → Church; Wheel → Lighthouse) and in a dawn
+  block at the epilogue; the finale explains the brown-ink hour; the ring, the kept night, the signed
+  ninth line and the unspoken name get read-aloud lines; four investigators gain epilogue lines; the
+  walkers and those who aged out get a closing line; Before the finale is now always read.
+- **Consistency:** R2/R3 variants for finished districts; the Bell-Ringer add-on vs R2; the ticket-
+  taker's three reactions; the sheriff's timeline; walker direction; the Almanac's act-2a dependency on
+  the Square stated; Hour IX/R5 pointers; interlude repeats after the Prologue; later-loop story added.
+- **Simulator parity:** the engine follows each rules change (walk spend, walker respawn and hold,
+  first-move crossings, Belfry reveal after a Bell-Ringer defeat, Turning not in the finale, Hour IV
+  sparing the Town Hall Steps).
+
+Left as is: the brown-ink hand stays unnamed (S6); "kneeling congregation" wording; Cassandra's
+Notebook; Square N5's alternative of restricting Hour IV further was applied only to the Steps.

@@ -182,7 +182,8 @@ local HOUR_HANDLERS = {
     if CampaignState.inPrologue() then
       return "The guest approaches. (There is no Appointed in the Prologue.)"
     end
-    return "The guest approaches. The Appointed is Emerging"
+    return "The guest approaches. The Appointed is "
+      .. (CampaignState.getAppointedStage() >= 3 and "Arrived" or "Emerging")
       .. (CampaignState.knows("the-appointeds-name") and ". Exhaust the Appointed." or ".")
   end,
 

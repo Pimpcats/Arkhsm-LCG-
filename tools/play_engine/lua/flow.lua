@@ -173,26 +173,40 @@ return function(R, T)
         G.metrics.clues_by_round[G.round] = (G.metrics.clues_by_round[G.round] or 0) + 1
         inv.lastTurn.clueAt = L.guid
         R.log("%s discovers a clue at %s (%d held, %d left there)", inv.name, L.name, inv.clues, #toks - 1)
-        -- Walk It Backward: the Turning, the Low Bridge, the Milestones, in that order
-        local seq = { "sthr-loc-turning", "sthr-loc-lowbridge", "sthr-loc-milestones" }
-        local step = (inv.walk or 0) + 1
-        -- clues per step (Walk It Backward); what-if walkSteps {a, b, c} or walkPer n
-        local steps = (R.WHATIF or {}).walkSteps
-        local per = (steps and steps[step]) or (R.WHATIF or {}).walkPer or (G.n == 1 and { 2, 1, 1 } or { 3, 1, 1 })[step]   -- the card's one-investigator clause
-        if seq[step] == L.id then inv.walkCount = (inv.walkCount or 0) + 1 end
-        if seq[step] == L.id and inv.walkCount >= per then
-          inv.walk = step
-          inv.walkCount = 0
-          R.log("%s: Walk It Backward step %d (%s)", inv.name, step, L.name)
-          local act = G.acts.Road
-          if step == 3 and act and act.id == "sthr-act-walkbackward" and not act.completed then
-            R.advanceAct(act, inv)
-            if G.ended then return end
-          end
-        end
+        R.walkCount(inv, L)
+        if G.ended then return end
         FX.afterDiscover(inv, L)
       end
     end
+    R.checkObjectives()
+  end
+
+  --- Walk It Backward: a clue counted at the Turning, the Low Bridge, the Milestones, in that order.
+  function R.walkCount(inv, L)
+    local G = R.G
+    local seq = { "sthr-loc-turning", "sthr-loc-lowbridge", "sthr-loc-milestones" }
+    local step = (inv.walk or 0) + 1
+    -- clues per step (Walk It Backward); what-if walkSteps {a, b, c} or walkPer n
+    local steps = (R.WHATIF or {}).walkSteps
+    local per = (steps and steps[step]) or (R.WHATIF or {}).walkPer or (G.n == 1 and { 2, 1, 1 } or { 3, 1, 1 })[step]   -- the card's one-investigator clause
+    if seq[step] ~= L.id then return end
+    inv.walkCount = (inv.walkCount or 0) + 1
+    if inv.walkCount < per then return end
+    inv.walk = step
+    inv.walkCount = 0
+    R.log("%s: Walk It Backward step %d (%s)", inv.name, step, L.name)
+    local act = G.acts.Road
+    if step == 3 and act and act.id == "sthr-act-walkbackward" and not act.completed then
+      R.advanceAct(act, inv)
+    end
+  end
+
+  --- Walk It Backward's [action]: at the Low Bridge or the Milestones with no clues
+  -- left there, spend 1 clue to count it as discovered.
+  function R.walkSpend(inv, L)
+    R.spendClues({ inv }, 1, true)
+    R.log("%s spends 1 clue at %s (Walk It Backward: none left to discover)", inv.name, L.name)
+    R.walkCount(inv, L)
     R.checkObjectives()
   end
 
@@ -784,7 +798,9 @@ return function(R, T)
     for _, en in ipairs(copyList(G.enemies)) do
       if not en.dead and not en.engaged and not en.exhausted and not R.sleepwalking(en) and R.isHunter(en) then
         local here = G.locs[en.loc]
-        if here and #R.investigatorsAt(here) == 0 then
+        -- Who Walks Beside You: Echoes at the Turning cannot move
+        local held = G.walksBesideCurrent and here and here.id == "sthr-loc-turning" and R.hasTrait(en.def, "Echo")
+        if here and not held and #R.investigatorsAt(here) == 0 then
           local target = R.AI.huntTarget(en)
           if target then
             local step = R.route(here, target, { enemy = true })

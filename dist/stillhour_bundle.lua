@@ -1202,7 +1202,8 @@ local HOUR_HANDLERS = {
     if CampaignState.inPrologue() then
       return "The guest approaches. (There is no Appointed in the Prologue.)"
     end
-    return "The guest approaches. The Appointed is Emerging"
+    return "The guest approaches. The Appointed is "
+      .. (CampaignState.getAppointedStage() >= 3 and "Arrived" or "Emerging")
       .. (CampaignState.knows("the-appointeds-name") and ". Exhaust the Appointed." or ".")
   end,
 
@@ -1637,7 +1638,8 @@ function Appointed.holdBack(ctx)
   -- during the finale the night gives no Hours back (guide: The Last Hour)
   local rewound = false
   if not CampaignState.inFinale()
-      and CampaignState.getHoldBackRewinds() < Constants.HOLD_BACK_REWINDS_PER_LOOP then
+      and CampaignState.getHoldBackRewinds() < Constants.HOLD_BACK_REWINDS_PER_LOOP
+      and CampaignState.getHour() > Constants.HOUR_FIRST then           -- never before Hour I
     CampaignState.useHoldBackRewind()
     Hourglass.rewind(1, ctx)
     rewound = true
@@ -2507,7 +2509,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/367afe5db5a6b87fdae60b7e9aefb75457fe17c8/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/11ffed4be19811871cde40f55476c561666fe2e4/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -2605,7 +2607,7 @@ function ChaosBag.new(opts)
   end
 
   function a.target()
-    return math.max(0, a.baseline - (a.almanac and 1 or 0)) + a.extra
+    return math.max(0, a.baseline - (a.almanac and 1 or 0) - (a.press and 1 or 0)) + a.extra
   end
 
   --- Tokens drawn out of the bag that still exist on the table.
@@ -2727,10 +2729,18 @@ function ChaosBag.new(opts)
     return a.reconcile()
   end
 
+  --- The finale with The true page reached the Press: 1 fewer [static] than the
+  -- bag would otherwise hold, on top of Hour VI's (never fewer than 0). Idempotent.
+  function a.setPress(on)
+    a.press = on and true or false
+    return a.reconcile()
+  end
+
   --- Temporary [static] lasts "until the next reset" (Hour VI).
   function a.clearTemporary()
     a.extra = 0
     a.almanac = false
+    a.press = false
     a.pendingStatic = {}
     return a.reconcile()
   end
@@ -2782,7 +2792,7 @@ function ChaosBag.new(opts)
     local pending = 0
     for _ in pairs(a.pendingStatic) do pending = pending + 1 end
     return { mode = a.lastMode, target = a.target(), baseline = a.baseline,
-             extra = a.extra, almanac = a.almanac, physical = phys, pending = pending }
+             extra = a.extra, almanac = a.almanac, press = a.press, physical = phys, pending = pending }
   end
 
   function a.save()
@@ -2790,7 +2800,7 @@ function ChaosBag.new(opts)
     for g in pairs(a.out) do out[#out + 1] = g end
     for g in pairs(a.pendingStatic) do pending[#pending + 1] = g end
     table.sort(out) ; table.sort(pending)
-    return { baseline = a.baseline, extra = a.extra, almanac = a.almanac, out = out, pendingStatic = pending }
+    return { baseline = a.baseline, extra = a.extra, almanac = a.almanac, press = a.press, out = out, pendingStatic = pending }
   end
 
   function a.load(t)
@@ -2798,6 +2808,7 @@ function ChaosBag.new(opts)
     a.baseline = tonumber(t.baseline) or 0
     a.extra = math.max(0, tonumber(t.extra) or 0)
     a.almanac = t.almanac == true or (tonumber(t.extra) or 0) < 0
+    a.press = t.press == true
     a.out = {}
     for _, g in ipairs(t.out or {}) do a.out[g] = true end
     a.pendingStatic = {}
@@ -2824,7 +2835,7 @@ __modules["StillHour/Guide"] = function()
 -- build) the menu is simply empty.
 local Guide = {}
 
-local PAGES = "rules=3,difficulty=5,setup=6,prologue=8,loop=12,between=14,decks=36"      -- "rules=2,setup=7,loop=9,..."
+local PAGES = "rules=3,difficulty=5,setup=6,prologue=8,loop=12,between=14,decks=37"      -- "rules=2,setup=7,loop=9,..."
 
 -- (key in the pages string, menu text). Sections a first-time player must not be sent to early
 -- (the districts, the finale) are not listed: the guide itself sends you there.
@@ -4026,6 +4037,9 @@ end
 local function announceResetReached()
   if CampaignState.inFinale() then
     announce("Dissonance reached the reset value: the finale ends and the contest is not reached.",
+      { 1, 0.4, 0.4 })
+  elseif CampaignState.inPrologue() then
+    announce("Dissonance reached the reset value: the night ends. Read the Prologue's resolutions, then click Reset Loop.",
       { 1, 0.4, 0.4 })
   else
     announce("Dissonance reached the reset value: the loop ends. Read the loop's resolutions, then click Reset Loop.",
@@ -5232,13 +5246,13 @@ function shBeginFinale()
     end
     CampaignState.setFinale(true)
     CampaignState.setContest(0)
-    -- The true page reached the Press: 1 fewer Static than the band for the finale
-    -- (the same flag as Hour VI's; it never stacks, and the next reset clears it)
+    -- The true page reached the Press: 1 fewer Static for the finale, on top of
+    -- Hour VI's (the next reset clears it)
     local log = Board.campaignLog()
     local lv = log and guarded("log", function() return log.call("getLogValues") end)
     if type(lv) == "table" and type(lv.values) == "table" and lv.values.page_a then
-      bag.setAlmanac(true)
-      announce("The true page reached the Press: the chaos bag holds 1 fewer Static token than its band.")
+      bag.setPress(true)
+      announce("The true page reached the Press: until the finale ends, the chaos bag holds 1 fewer Static token.")
     end
     announce(string.format("The finale begins: contest progress 0 / %d. If Hour IX is reached, the finale ends "
       .. "and the contest is not reached.", CampaignState.constants().contestTarget))
@@ -5689,7 +5703,10 @@ local function setUpPlacedBox(p)
     done[#done + 1] = why
   end
   if deck then
-    if CampaignState.knows(deep) then
+    if CampaignState.inFinale() then
+      -- the finale sets every district's act deck aside, abilities unresolved
+      removeDeck("act deck set aside (the finale)")
+    elseif CampaignState.knows(deep) then
       removeDeck("act deck removed (its objectives are complete)")
     elseif CampaignState.knows(surf) then
       if not partTwo then
