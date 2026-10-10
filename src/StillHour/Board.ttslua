@@ -439,7 +439,7 @@ function Board.refreshInvestigators(applyStats)
         })
         createFitted(card, {
           click_function = "shNoop", function_owner = host, label = yearsLabel,
-          tooltip = "Years lived in the loop (Aging). Skills on the playmat tracker include the drift.",
+          tooltip = "Years lived in the loop (see Years in the guide). The playmat's skill tracker already includes the age-bracket changes.",
           position = { 0.65, 0.3, 1.25 }, rotation = { 0, 0, 0 },
           width = 0, height = 0, font_size = 90, font_color = { 0.95, 0.85, 0.6 },
         })
@@ -472,7 +472,7 @@ function Board.refreshInvestigators(applyStats)
             label = quest.unlocked and "Quest met" or string.format("Quest %d / %d", quest.tally, quest.goal),
             tooltip = "Your personal quest card's tally, kept across the campaign (the Campaign Log shows it too). "
               .. "At the goal the Control tells you: swap the quest card for its unlocked card from the Player "
-              .. "Cards bag and tick met on your log panel. Left-click +1 · Right-click -1",
+              .. "Cards bag and tick met in your panel on page 1 of the Campaign Log. Left-click +1 · Right-click -1",
             position = { 0, 0.3, 2.45 }, rotation = { 0, 0, 0 },
             width = 760, height = 180, font_size = 90,
             color = quest.unlocked and { 0.1, 0.25, 0.12 } or { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
@@ -709,7 +709,7 @@ end
 
 local STAGE_BUTTONS = {
   { fn = "shAppointedInfo", label = function() return "The Appointed: " .. Appointed.stageName() end,
-    z = 1.75, w = 1100, fs = 120, tip = "Approach stage (CO-002)" },
+    z = 1.75, w = 1100, fs = 120, tip = "The Appointed's Approach stage. The Control token moves it; you do not click this." },
   { fn = "shHoldBack", label = function() return "Hold Back (success)" end, z = 2.2, w = 1100, fs = 120,
     tip = "Click once after a Hold Back success (the walker's ring and The Hour I Learned Your Name count): it "
       .. "pushes the Approach back 1 stage and rewinds the Hour counter (not in the finale; 3 rewinds a loop). Move "

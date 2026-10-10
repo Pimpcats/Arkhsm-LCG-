@@ -396,15 +396,18 @@ function T.drawEncounter(color)
       end
     end
   end
+  -- the last card of the deck is drawn by moving that very object: follow it by identity
+  local src = T.encounterDeck()
+  local want = src and src.type == "Card" and src.getGUID() or nil
   T.click(mat, "drawEncounterCard", false, color)
   local card
   local function findDrawn()
     for _, o in ipairs(T.objects()) do
       if T.dist(o.getPosition(), pos) < 1.2 then
-        if o.type == "Card" and not before[o.getGUID()] then card = o return true end
+        if o.type == "Card" and (not before[o.getGUID()] or o.getGUID() == want) then card = o return true end
         if o.type == "Deck" then
           for _, entry in ipairs(o.getObjects()) do
-            if not before[entry.guid] then
+            if not before[entry.guid] or entry.guid == want then
               card = o.takeObject({ guid = entry.guid,
                 position = { pos.x, pos.y + 2, pos.z }, smooth = false })
               if card then return true end
@@ -416,6 +419,15 @@ function T.drawEncounter(color)
     return false
   end
   E.runUntil(findDrawn, 3)
+  if not card then
+    -- nothing arrived: when the deck runs out SCED shuffles the discard pile into a new encounter deck, and
+    -- that click can end before a card is dealt; a player waits and clicks once more, so the engine does too
+    E.run(2)
+    if T.deckCount(T.encounterDeck()) > 0 then
+      T.click(mat, "drawEncounterCard", false, color)
+      E.runUntil(findDrawn, 3)
+    end
+  end
   E.run(0.1)
   return card, reshuffled
 end

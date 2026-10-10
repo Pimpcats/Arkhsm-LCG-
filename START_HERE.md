@@ -39,6 +39,12 @@ optional; their machine-specific settings live in `rig.local.json`.
 - **Knowledge** — facts you earn that change later nights.
 - **Aging** — living the same night again has a cost.
 
+## Status (2026-10-10)
+- ✅ **Place now sets the loop up**: the district's cards go into the encounter deck, the Approach goes into play, the right act is made current and the deck is shuffled. Loop Setup in the guide is four short steps.
+- ✅ The guide's rules are front-loaded and shorter (Rules summary, then one reference section); each part starts on a clean page with a header and an edge tab; the Prologue has an opening page; button-by-button instructions moved onto the Control token's hover text.
+- ✅ Three full reads for story, flow and wording; every finding checked and applied (card text, guide, log, Control). District decks sit off the mat border. Quest cards have art.
+- These are checked offline only (tests and simulated games), **not** in Tabletop Simulator and not by a person playing.
+
 ## Status (2026-10-06)
 - ✅ The scenario boxes' **Place** was rewritten (native copy, SCED's own `takeObject`, four textures per box instead of 43-57) after Place stopped Tabletop Simulator on The First Hour. It is checked on SCED's real table headless, **not** in Tabletop Simulator: press **Place** on The First Hour; if the game stops, follow `docs/PLACE_TEST.md`.
 - ✅ New since 2026-10-02: guide contents, bookmarks and a right-click page menu on the Control token; starter decks for all five investigators; the Control's Reset Loop question and Between Loops panel; SCED's doom reset on Hour changes; audits in `docs/design/` (parity and flow, database, Place, deck building).

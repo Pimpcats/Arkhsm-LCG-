@@ -1167,7 +1167,7 @@ step("campaign log", function(go)
           local snap = ctl.call("shApiSnapshot")
           pcall(function() ctl.call("shApiUnlockFact", { id = "the-hour-was-wrong" }) end)
           local oks, r = pcall(function() return p2.call("syncFromCampaignState") end)
-          check("log syncs from the campaign-state token",
+          check("log syncs from the Control token",
             oks and type(r) == "table" and r.ok == true and (tonumber(r.updated) or 0) > 0,
             (oks and type(r) == "table") and ("updated " .. tostring(r.updated)) or tostring(r))
           local v5 = logValues(p2)

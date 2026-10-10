@@ -33,7 +33,7 @@ is believed to match TTS. Passing here is not playtest approval and not art appr
   with SCED's own `takeObject` step. Different on purpose.
 - **Scripted box contents.** Median 1 scripted object per official box (a Set Up helper in 42%,
   a difficulty tile in 70%, a reference card in 92%). Here the Control token carries the
-  scripting; the boxes hold cards only. A Set Up Loop button is designed, not built (see G5).
+  scripting; the boxes hold cards only. Place also does Loop Setup (see G5).
 - **Textures.** Official boxes use sprite sheets (median 9 textures per box, 44% are 10x7).
   Each box here now loads at most 4. Fixed.
 - **Mythos area.** SCED's agenda/act advance buttons, doom counter, scenario reference
@@ -115,7 +115,7 @@ is believed to match TTS. Passing here is not playtest approval and not art appr
 | G2 | Place chat printed every card title | Fixed: kind and GUID only |
 | G3 | Hour counter and agenda deck are double entry | Partly fixed: the Hour button runs SCED's own doom reset; moving the Hours deck stays by hand (guide) |
 | G4 | Player cards unindexed, no pre-built decks | Partly fixed: starting decks in the guide for all five; community packs are loose bags too (Different on purpose) |
-| G5 | Loop Setup is manual: shuffling each district's encounter set and the Whispers into the encounter deck, putting the Approach into play, setting the act decks | Watch: the guide lists every step (Loop Setup 1-9) and Place already lays the cards out where the steps expect them; a Set Up Loop button (marker tags on those cards, one Control button) is designed but not built. Official boxes script placement the same way; most leave the shuffling to the players (a few, such as Return to the Forgotten Age's exploration deck, have a setup helper) |
+| G5 | Loop Setup was manual: shuffling each district's encounter set and the Whispers into the encounter deck, putting the Approach into play, setting the act decks | **Built (2026-10-10).** After each Place the Control token's board sync runs `setUpPlacedBox`: the encounter set (and the Fairground's Named in Part II) into the shared encounter deck, the Approach to the mythos mat, the Whispers from Part II, the act deck set from the log (removed, 1a current or 2a current) and a shuffle. Checked in `tests/sced_real/playthrough.lua` and the play engine; not yet in Tabletop Simulator |
 | G6 | SCED's "Reset play areas" deletes investigators and decks | Fixed: warned in the guide |
 | G7 | Act clue thresholds missing, SCED's clue-spend flow never runs | Watch (acts spend clues by their own text) |
 | G9 | Per-loop investigator reset by hand | Watch (beyond official) |

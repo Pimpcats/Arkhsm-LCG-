@@ -1,6 +1,6 @@
 # Hand-off — CardForge Studio / THE STILL HOUR
 
-*Updated 2026-10-06. Spoiler-free.*
+*Updated 2026-10-10. Spoiler-free.*
 
 The current campaign handoff is [STILL_HOUR_HANDOFF.txt](STILL_HOUR_HANDOFF.txt).
 It records the finishing fixes, current verification, difficulty results and

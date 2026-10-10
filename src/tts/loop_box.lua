@@ -155,11 +155,11 @@ function createButtons()
   self.createButton({ label = "Place", click_function = "buttonClick_place", function_owner = self,
     position = { bx, by, bz }, rotation = { 0, 0, 0 }, height = 850, width = 2000,
     font_size = 350, scale = bscale, color = { 0, 0, 0 }, font_color = { 1, 1, 1 },
-    tooltip = "Lay this box out for the loop (a fresh copy every time)" })
+    tooltip = "Lay this box out and set it up for the loop. Once only: press Recall first to lay it out again." })
   self.createButton({ label = "Recall", click_function = "buttonClick_recall", function_owner = self,
     position = { -bx, by, bz }, rotation = { 0, 0, 0 }, height = 850, width = 2000,
     font_size = 350, scale = bscale, color = { 0, 0, 0 }, font_color = { 1, 1, 1 },
-    tooltip = "Remove this box's cards from the table" })
+    tooltip = "Remove this box's cards from the table." })
 end
 
 --- SCED's Token Spawn Tracker (src/tokens/TokenSpawnTracker.ttslua) remembers by

@@ -15,9 +15,9 @@ def test_every_moved_instruction_is_on_a_button():
         ("use Resolve on the token", CONTROL),                              # Dissonance
         ("Canceled Hour VIII: right-click twice", CONTROL),
         ("the Press removes it", CONTROL),                                  # [static]
-        ("The Crossing, The Debt of Hours or the finale", CONTROL),        # Appointed
+        ("The Crossing or the finale", CONTROL),        # Appointed
         ("to undo a canceled advance", CONTROL),
-        ("The House Always Wins", CONTROL),                                 # banked Memory
+        ("a card that takes it away", CONTROL),                                 # banked Memory
         ("Anchor Point's token takes one", CONTROL),
         ("click it again", CONTROL),                                        # Reset Loop
         ("Unticking a mistake takes them back", CONTROL),                   # Knowledge

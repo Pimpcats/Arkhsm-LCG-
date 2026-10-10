@@ -115,7 +115,7 @@ CHOICES = [
     ("name", "The Almanac House", "You have spoken the name", "The name is kept unspoken"),
 ]
 
-# Choices whose option carries a rule that applies from then on (guide: "Loop Setup", step 9).
+# Choices whose option carries a rule that applies from then on (guide: "Loop Setup", step 4).
 # It shows under the choice once that option is ticked, so nobody has to find it in the
 # district's resolution pages again. (choice key, option) -> the rule as the guide words it.
 STANDING = {
@@ -123,6 +123,8 @@ STANDING = {
                    "and The Reading Room places no doom.",
     ("ticket", "b"): "From the next loop: the first time a Lost Hour is drawn each loop, "
                      "cancel its revelation effect.",
+    ("page", "b"): "From the next loop: the first time Thirteen is drawn each loop, "
+                   "cancel its revelation effect.",
     ("ring", "b"): "When the Lighthouse is placed: after an investigator lights the lamp, "
                    "exhaust each Echo in the Sunken Road district.",
 }
@@ -240,7 +242,7 @@ def _pages():
     y = bm + 104
     p1.text(90, y, "Spent on:", size=24, style="bold")
     p1.line("spent_on", 210, 1190, y)
-    p1.text(90, bm + 144, "Campaign notes", size=24, style="bold")
+    p1.text(90, bm + 144, "Campaign Notes", size=24, style="bold")
     p1.line("notes1", 90, 1190, bm + 172, rows=2, row_h=30)
 
     p2 = Page(2, "Campaign Log — continued")
@@ -343,7 +345,7 @@ def _pages():
                         size=17, style="italic", fill=SOFT)
                 p3.reveal("{}_{}s".format(key, side), "{}_{}".format(key, side),
                           STANDING[(key, side)], 300, 1185, y, h=24)
-        y += 42
+        y += 40
     p3.text(90, y, "Name (Lighthouse):", size=21, style="bold")
     p3.line("ninth_signer", 330, 760, y)
     y -= 8

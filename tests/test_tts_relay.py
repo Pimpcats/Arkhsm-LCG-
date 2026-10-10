@@ -90,7 +90,7 @@ def test_relay_runs_build_in_fake_tts_and_pushes_results(tmp_path, remote):
                      "log draws its checkboxes, counters and write-in fields",
                      "clicking a checkbox and a counter records them",
                      "log survives save+reload with its fields", "page 2 draws the Knowledge Track",
-                     "log syncs from the campaign-state token",
+                     "log syncs from the Control token",
                      "page 1 kept its fields across the page turn",
                      "Recall puts everything back in the box"):
         assert expected in names, expected

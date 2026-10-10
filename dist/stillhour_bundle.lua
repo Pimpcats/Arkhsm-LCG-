@@ -1213,7 +1213,7 @@ local HOUR_HANDLERS = {
     if CampaignState.inPrologue() then
       return "Almost. Raised Dissonance by 2; each enemy gets +1 fight until the end of the Prologue. (There is no Appointed in the Prologue.)"
     end
-    return "Almost. Raise Dissonance by 2; each enemy gets +1 fight until the end of the loop; the Appointed has Arrived."
+    return "Almost. Raised Dissonance by 2; each enemy gets +1 fight until the end of the loop; the Appointed has Arrived."
   end,
 
   [9] = function(ctx)
@@ -1223,10 +1223,10 @@ local HOUR_HANDLERS = {
     end
     if CampaignState.knows("the-way-the-night-breaks") then
       if ctx and ctx.onFinaleAttemptable then ctx.onFinaleAttemptable() end
-      return "The Appointed Hour. In the finale, the finale ends (contest not reached). Otherwise the loop ends, or you may begin the finale."
+      return "The Appointed Hour. The loop ends, or you may begin the finale instead."
     end
     if ctx and ctx.onReset then ctx.onReset() end
-    return "The Appointed Hour. The loop ends: read the loop resolution, then click Reset Loop."
+    return "The Appointed Hour. The loop ends: read the loop's resolutions, then click Reset Loop."
   end,
 }
 
@@ -2507,7 +2507,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/263edff7ef5fcf2a626a2fc0e3517d0d1a9b8af5/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/367afe5db5a6b87fdae60b7e9aefb75457fe17c8/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -3319,7 +3319,7 @@ function Board.refreshInvestigators(applyStats)
         })
         createFitted(card, {
           click_function = "shNoop", function_owner = host, label = yearsLabel,
-          tooltip = "Years lived in the loop (Aging). Skills on the playmat tracker include the drift.",
+          tooltip = "Years lived in the loop (see Years in the guide). The playmat's skill tracker already includes the age-bracket changes.",
           position = { 0.65, 0.3, 1.25 }, rotation = { 0, 0, 0 },
           width = 0, height = 0, font_size = 90, font_color = { 0.95, 0.85, 0.6 },
         })
@@ -3352,7 +3352,7 @@ function Board.refreshInvestigators(applyStats)
             label = quest.unlocked and "Quest met" or string.format("Quest %d / %d", quest.tally, quest.goal),
             tooltip = "Your personal quest card's tally, kept across the campaign (the Campaign Log shows it too). "
               .. "At the goal the Control tells you: swap the quest card for its unlocked card from the Player "
-              .. "Cards bag and tick met on your log panel. Left-click +1 · Right-click -1",
+              .. "Cards bag and tick met in your panel on page 1 of the Campaign Log. Left-click +1 · Right-click -1",
             position = { 0, 0.3, 2.45 }, rotation = { 0, 0, 0 },
             width = 760, height = 180, font_size = 90,
             color = quest.unlocked and { 0.1, 0.25, 0.12 } or { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
@@ -3589,7 +3589,7 @@ end
 
 local STAGE_BUTTONS = {
   { fn = "shAppointedInfo", label = function() return "The Appointed: " .. Appointed.stageName() end,
-    z = 1.75, w = 1100, fs = 120, tip = "Approach stage (CO-002)" },
+    z = 1.75, w = 1100, fs = 120, tip = "The Appointed's Approach stage. The Control token moves it; you do not click this." },
   { fn = "shHoldBack", label = function() return "Hold Back (success)" end, z = 2.2, w = 1100, fs = 120,
     tip = "Click once after a Hold Back success (the walker's ring and The Hour I Learned Your Name count): it "
       .. "pushes the Approach back 1 stage and rewinds the Hour counter (not in the finale; 3 rewinds a loop). Move "
@@ -4008,7 +4008,9 @@ local function playCtx()
     setAlmanac = function(on) bag.setAlmanac(on ~= false) end,
     onAppointedAdvance = function() end,        -- reconciled once, after the action
     onReset = function()
-      announce("The Appointed Hour: the night ends. Resolve the reset, then click Reset Loop.")
+      announce(CampaignState.inPrologue()
+        and "The Appointed Hour: the night ends. Read the Prologue's resolutions, then click Reset Loop."
+        or "The Appointed Hour: the loop ends. Read the loop's resolutions, then click Reset Loop.")
     end,
     onFinaleAttemptable = function()
       announce("The Appointed Hour: the loop ends, unless you begin the finale instead "
@@ -4026,7 +4028,7 @@ local function announceResetReached()
     announce("Dissonance reached the reset value: the finale ends and the contest is not reached.",
       { 1, 0.4, 0.4 })
   else
-    announce("Dissonance reached the reset threshold. Resolve the reset, then click Reset Loop.",
+    announce("Dissonance reached the reset value: the loop ends. Read the loop's resolutions, then click Reset Loop.",
       { 1, 0.4, 0.4 })
   end
 end
@@ -4695,7 +4697,7 @@ local function beginNextLoop(force)
   aging = {}
   mode = "play"
   guarded("aging", Board.refreshInvestigators, true)
-  announce(string.format("A new night begins. Memory capped at %d; %d lost.",
+  announce(string.format("A new loop begins. Memory capped at %d; %d lost.",
     CampaignState.constants().memoryCap, lost))
   -- every investigator the Control can see has aged out, and nobody has taken their place
   local listed = guarded("investigators", Board.investigators) or {}
@@ -4799,7 +4801,7 @@ local function ageInvestigator(id)
     if d.startLoopMemory > 0 then parts[#parts + 1] = "begins each loop with 1 Memory" end
     if #parts > 0 then detail = " Now: " .. table.concat(parts, ", ") .. "." end
   end
-  announce(string.format("%s ages %d year(s): %d (%s)%s%s", name, r.yearsGained, r.years, r.bracket,
+  announce(string.format("%s gains %d Year(s): %d Years (%s)%s%s", name, r.yearsGained, r.years, r.bracket,
     r.agedOut and " — aged out of the campaign" or "", detail))
   return r
 end
@@ -4850,7 +4852,7 @@ local function drawPlay()
       or string.format("THE STILL HOUR · loop %d", CampaignState.getLoopsCompleted() + 1)), -2.3)
   button("shClickMemory", string.format("Memory %d / %d", CampaignState.getBankedMemory(), c.memoryCap),
     -PAIR_X, -1.7, 1000, "Banked Memory, the party's shared pool. " .. PLUS_MINUS .. ". Click when it changes "
-      .. "outside the Interlude: The House Always Wins, a finale resolution that spends it, or the first "
+      .. "outside the Interlude: a card that takes it away, a finale resolution that spends it, or the first "
       .. "Prologue ending's extra 1.")
   button("shClickInvestigators", "Investigators " .. c.investigators, PAIR_X, -1.7, 1000,
     "The number of investigators; it sets every threshold. Change it when an investigator ages out and is "
@@ -4878,7 +4880,7 @@ local function drawPlay()
         .. "Hour III's extra +1 at a Church location (click Dissonance) and The Belfry, Hour IV, Hour VII's "
         .. "exhaust, Hour VIII's +1 fight, Hour IX. After Hold Back, do not right-click: Hold Back rewinds it.")
     button("shClickAppointed", "Appointed: " .. Appointed.stageName(), PAIR_X, -0.5, 1000,
-      "Left-click once per stage when The Crossing, The Debt of Hours or the finale advances the Approach. "
+      "Left-click once per stage when The Crossing or the finale advances the Approach. "
         .. "Right-click once per stage an effect pushes it back beyond Hold Back (The Hour I Learned Your Name's "
         .. "extra stage), or to undo a canceled advance (Hour V once if it moved; Hours VII and VIII once per "
         .. "stage). Hold Back and Hunt are on its card.")
@@ -4898,7 +4900,7 @@ local function drawPlay()
   button("shReset", "Reset Loop", -ROW3_X, 2.0, 620, "When the loop ends (Between Loops). Counts once per loop. "
     .. "If it says the loop is not over by its count (every investigator defeated or resigned, or the Prologue "
     .. "ended by its act), click it again. Begin Next Loop waits for it.")
-  button("shOpenInterlude", "Interlude", 0.0, 2.0, 620, "Between Loops steps 1-3: age the investigators, bank on-card Memory, then spend it on Recollections "
+  button("shOpenInterlude", "Interlude", 0.0, 2.0, 620, "Between Loops steps 1–3: age the investigators, bank on-card Memory, then spend it on Recollections "
     .. "and upgrades.")
   button("shKnowledgeStatus", "Knowledge", ROW3_X, 2.0, 620, "List the Knowledge recorded so far. Record an entry "
     .. "(or a Victory) by ticking it on the Campaign Log token: the Control turns the locations it changes and banks "
@@ -4963,15 +4965,15 @@ local function drawInterlude()
     button("shBuyLvl" .. lvl, "Lvl " .. lvl .. " (" .. lvl .. ")", -2.4 + (lvl - 1) * 1.2, z, 520,
       "Level a card up to level " .. lvl .. " for " .. lvl .. " Memory.", 90)
   end
-  button("shBeginNextLoop", "Begin Next Loop", -0.8, z + 0.6, 1000, "Cap Memory and start the next night.")
-  button("shCloseInterlude", "Back", 1.35, z + 0.6, 620)
+  button("shBeginNextLoop", "Begin Next Loop", -0.8, z + 0.6, 1000, "Cap Memory and start the next loop.")
+  button("shCloseInterlude", "Back", 1.35, z + 0.6, 620, "Return to the main panel.")
   -- Aging + banking, in a column to the right of the token
   local onCard = 0
   for _, n in pairs(CampaignState.onCardMemoryMap()) do onCard = onCard + n end
   local X = 4.2
   header("AGING", -2.3)
   button("shBankOnCard", "Bank on-card Memory (" .. onCard .. ")", X, -1.7, 1400,
-    "Guide interlude step 2: move all Memory on cards to banked Memory.", 90)
+    "Between Loops step 2: move all Memory on cards to banked Memory.", 90)
   local danger = Interlude.loopEndedInDanger()
   button("shNoop", "Loop ended in danger: " .. (danger and "yes (+1)" or "no"), X, -1.2, 1400,
     "Decided at Reset Loop: Dissonance at the Noticed band or higher, with that loop's investigator count.", 80)
@@ -5230,6 +5232,14 @@ function shBeginFinale()
     end
     CampaignState.setFinale(true)
     CampaignState.setContest(0)
+    -- The true page reached the Press: 1 fewer Static than the band for the finale
+    -- (the same flag as Hour VI's; it never stacks, and the next reset clears it)
+    local log = Board.campaignLog()
+    local lv = log and guarded("log", function() return log.call("getLogValues") end)
+    if type(lv) == "table" and type(lv.values) == "table" and lv.values.page_a then
+      bag.setAlmanac(true)
+      announce("The true page reached the Press: the chaos bag holds 1 fewer Static token than its band.")
+    end
     announce(string.format("The finale begins: contest progress 0 / %d. If Hour IX is reached, the finale ends "
       .. "and the contest is not reached.", CampaignState.constants().contestTarget))
   end)
@@ -5806,7 +5816,7 @@ function shStatus()
   resetAsked = false
   local c = CampaignState.constants()
   print(string.format(
-    "STILL HOUR | loop %d | scar %d | %s | Memory %d/%d | Dissonance %d/%d (%s) | Hour %s | Appointed: %s | contest %d/%d | [static] %d (%s)%s",
+    "STILL HOUR | loops completed %d | scar %d | %s | Memory %d/%d | Dissonance %d/%d (%s) | Hour %s | Appointed: %s | contest %d/%d | [static] %d (%s)%s",
     CampaignState.getLoopsCompleted(), math.min(CampaignState.getLoopsCompleted(), c.scarCap),
     CampaignState.inPrologue() and "Prologue" or (CampaignState.inPartTwo() and "Part II" or "Part I"),
     CampaignState.getBankedMemory(), c.memoryCap,
@@ -5837,7 +5847,7 @@ function shClearBoard()
   resetAsked = false
   local r = guarded("clear board", clearLoopBoard) or { cards = 0, tokens = 0, stopped = 0 }
   announce(string.format("The board is cleared: %d scenario card(s) and %d token(s) removed. %s"
-    .. "Press Place on The Square's box to set up the next loop.", r.cards, r.tokens,
+    .. "Press Place on The Square (Town Hall) box to set up the next loop.", r.cards, r.tokens,
     (r.stopped or 0) > 0 and "A Place that was still running was stopped. " or ""))
   return r
 end
@@ -5950,9 +5960,9 @@ end
 -- P6: report Act/finale gates and the campaign locations on the table.
 function shKnowledgeStatus()
   resetAsked = false
-  print(string.format("Knowledge: %d surface, %d deep. Act II %s. Finale %s.",
+  print(string.format("Knowledge: %d surface, %d deep. Part II %s. Finale %s.",
     Knowledge.surfaceKnownCount(), Knowledge.deepKnownCount(),
-    Knowledge.actIIOpen() and "OPEN" or "closed",
+    CampaignState.inPartTwo() and "begun" or "not yet begun",
     Knowledge.finaleAttemptable() and "ATTEMPTABLE" or (Knowledge.canAssembleFinale() and "assemblable" or "locked")))
   local known = {}
   for id, f in pairs(Knowledge.FACTS) do

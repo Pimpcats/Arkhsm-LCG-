@@ -95,3 +95,42 @@ card/guide mismatch in the six finale resolution cards (they are short forms of 
 A typical loop reads about 450–650 words of story (loop ending, one resolution per placed district, interlude)
 plus roughly 300 more as the Hours and acts turn, against about 1,400 words of procedure (Loop Setup and
 Between Loops). The story is light; the repeated administration is what is heavy.
+
+## 4. Triple check (2026-10-10): continuity, flow and wording
+
+Three independent full reads of the guide, every card's effective text, the log and the Control token's
+tooltips and chat: story continuity (9 should-fix, 17 nits), flow and dead ends (7 story-level, 16 nits) and
+wording/rules consistency (1 blocker, 19 should-fix, 44 nits). Each finding was checked against the source
+before it was applied. Reports: `scratchpad/review/{continuity,flow,wording}.md` in the session (not committed).
+
+**Dead ends: none.** Every Knowledge entry, choice option and log record now has a reader downstream.
+The four records that were written but never read now are: You Are Unstuck (starts Part I), Prologue ended
+(the second Taken interlude reads it), Closed at the Hour (an epilogue line) and the blank ninth line (a
+Sunken Road echo). Every act back says what leaves play; every set-aside card has a release; the finale's
+"not reached" endings point to R5/R6 on the cards.
+
+Fixed (summary; the diff is the record):
+
+- **Rules/cards:** the Approach card and Appointed tooltip no longer name The Debt of Hours (it does not
+  advance the Approach); act-2a backs remove their story asset and Named enemy, and finale setup removes
+  any act-2a enemy; R5 marks the loop as its ending would (Torn/Taken/Closed), matching the Control token;
+  Who Walks Beside You takes an Echo in play if none is at The Turning; Hour IV prints its Hour Was Wrong
+  exception; The drowned heard the true hour gains a standing rule (first Thirteen each loop canceled) on
+  the log and in the engine; Begin Finale applies the Press's 1-fewer-Static itself; the Elder/Ancient start
+  Memory step restored to Loop Setup; Sync from campaign's coverage described page by page.
+- **Story:** the keeper's deaths no longer happen "by its own light"; the surface proof's struck hour cannot
+  be read; the occultation completes "at the almanac's hour, an hour after it began"; Seraphine's
+  "before Ambergrove" weeks; the ninth line "is not its to write"; R1's anchor does not come back down
+  (moved to the right branch); the Ancient epilogue no longer implies a century outside; the Prologue intro
+  no longer assumes the investigators arrived that night, with an Elias add-on; Elias's name in the ledger;
+  the Shape of the Hour no longer says the guest only now stops waiting; Wheel streets "still"; "the first
+  occultation" kept for the original night only; Fairground R3 after the Bargain; an R4 holder line; the
+  green-shawl line only when someone leaves; Cass, Ayako and The Page That Wasn't lines.
+- **Wording:** loop vs night in rules/tooltips; Act slot and set-aside pile; "reset value" everywhere;
+  Hour IX messages; tooltips for Back, Place, Recall, Years, Quest, Status, Knowledge, Bank; duplicated
+  rules removed (three-investigator note, Prologue Years, Walk It Backward parenthesis).
+
+Left as is (deliberate): the brown-ink hand stays unnamed (S6 above); "kneeling congregation" vs The
+Waiting Congregation (different words in play); Cassandra's Notebook name; the printed collector number
+(S8); the campaign box's description text; a fifth log panel (a replacement takes the replaced
+investigator's panel).

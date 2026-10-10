@@ -446,7 +446,7 @@ local DRIFT = { combat = "dcom", agility = "dagi", willpower = "dwil", intellect
 function syncFromCampaignState(st)
   if type(st) ~= "table" then st = findCampaignState() end
   if type(st) ~= "table" then
-    broadcastToAll("Campaign log: no Still Hour campaign-state token found on the table.",
+    broadcastToAll("Campaign log: no Still Hour Control token found on the table.",
       { 1, 0.6, 0.4 })
     return { ok = false, page = PAGE, updated = 0 }
   end

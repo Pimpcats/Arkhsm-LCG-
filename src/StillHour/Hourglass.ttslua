@@ -193,7 +193,7 @@ local HOUR_HANDLERS = {
     if CampaignState.inPrologue() then
       return "Almost. Raised Dissonance by 2; each enemy gets +1 fight until the end of the Prologue. (There is no Appointed in the Prologue.)"
     end
-    return "Almost. Raise Dissonance by 2; each enemy gets +1 fight until the end of the loop; the Appointed has Arrived."
+    return "Almost. Raised Dissonance by 2; each enemy gets +1 fight until the end of the loop; the Appointed has Arrived."
   end,
 
   [9] = function(ctx)
@@ -203,10 +203,10 @@ local HOUR_HANDLERS = {
     end
     if CampaignState.knows("the-way-the-night-breaks") then
       if ctx and ctx.onFinaleAttemptable then ctx.onFinaleAttemptable() end
-      return "The Appointed Hour. In the finale, the finale ends (contest not reached). Otherwise the loop ends, or you may begin the finale."
+      return "The Appointed Hour. The loop ends, or you may begin the finale instead."
     end
     if ctx and ctx.onReset then ctx.onReset() end
-    return "The Appointed Hour. The loop ends: read the loop resolution, then click Reset Loop."
+    return "The Appointed Hour. The loop ends: read the loop's resolutions, then click Reset Loop."
   end,
 }
 

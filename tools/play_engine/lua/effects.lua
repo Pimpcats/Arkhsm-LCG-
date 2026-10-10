@@ -776,6 +776,12 @@ return function(R, T)
 
   cov("sthr-thirteen")
   ENC["sthr-thirteen"] = function(inv)
+    local G = R.G
+    -- standing rule (The drowned heard the true hour): the first Thirteen each loop is canceled
+    if G.logFlags["The drowned heard the true hour"] and not G.group.drownedCount then
+      G.group.drownedCount = true
+      return "discard"
+    end
     R.placeDoom(1, "Thirteen")
     if (R.locOf(inv) or {}).district == "Church" and not FX.registerCancels() then R.raise(1, "Thirteen (Church)") end
     return "discard"

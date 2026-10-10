@@ -1,5 +1,5 @@
 # THE STILL HOUR — Master Checklist
-*Updated 2026-10-06. Spoiler-free. ✅ done · 🔶 partly done / needs your action · ⬜ not started.*
+*Updated 2026-10-10. Spoiler-free. ✅ done · 🔶 partly done / needs your action · ⬜ not started.*
 
 Current counts and test results: `campaigns/still_hour/assistant/production.json`.
 
@@ -28,7 +28,7 @@ Current counts and test results: `campaigns/still_hour/assistant/production.json
   headless on SCED's real table only
 - ✅ Guide navigation (contents, bookmarks, right-click "Guide: ..." menu on the
   Control token), starter decks for all five investigators
-- ⬜ Optional: a Set Up Loop button (designed, not built)
+- ✅ Place sets the loop up (encounter deck, Approach, act decks, shuffle); checked offline, not yet in Tabletop Simulator
 - 🔶 Real-TTS relay run on the current build — needs you (local PowerShell,
   docs/TTS_RELAY.md). The last real run passed on an older build
 - ⬜ First playtest (Prologue and Loop 1)
