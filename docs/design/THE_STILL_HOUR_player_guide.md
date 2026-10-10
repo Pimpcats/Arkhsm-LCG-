@@ -261,6 +261,8 @@ There is no Appointed in the Prologue, and no Years are gained in it: ignore any
 ### What You Saw
 
 > Salt on your tongue. The same lanterns, the same band, the same children on the same shoulders. You look at one another across the Square and see it in each other's faces: you all remember. No one else does. It does not feel like the first time this night has happened, only the first time you noticed. A woman in a green shawl asks if you are feeling well.
+>
+> At the edge of the lantern light you compare what you remember: the wrong sky, the hour, the fold. Whatever this night is, no one in Ambergrove will help you end it. Somewhere in this town is the reason the night will not finish. You will learn the night street by street, and you will end it, before it takes more years from you than you have.
 
 **The investigators must decide** (choose one):
 - **Tell the town.** Stand on the Town Hall steps and tell them what is coming, though they will not believe a word. Record in your Campaign Log: *The town was warned.*
