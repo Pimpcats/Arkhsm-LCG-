@@ -206,3 +206,12 @@ def test_the_guides_starting_decks_are_the_starter_decks_document():
         assert guide[name] == doc[name], name
         assert sum(doc[name].values()) == 30, name
         assert max(doc[name].values()) <= 2, name
+
+
+def test_no_guard_line_sits_alone_in_the_second_column(guide):
+    """A "Do not read until..." line ends what is read before it, so it sits under that text in the first
+    column, never alone at the top of the second (The Loop's page, 2026-10-10)."""
+    for i, page in enumerate(guide["doc"]):
+        for b in page.get_text("blocks"):
+            if "Do not read until" in b[4]:
+                assert b[0] < page.rect.width / 2, "page %d: the guard line sits in the second column" % (i + 1)

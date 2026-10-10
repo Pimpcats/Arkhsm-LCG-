@@ -589,21 +589,28 @@ return function(H)
       if b then districts[#districts + 1] = b end
     end
     E.run(2)
-    -- Loop Setup 5: shuffle each district's encounter set into the encounter deck
+    E.run(3)
+    -- Loop Setup is done by Place: each district's encounter set is in the shared encounter deck, its
+    -- set-aside cards in the one set-aside pile, and nothing is left on the row between the mat and the map
     local enc = encounterDeck()
-    local added = 0
-    for _, b in ipairs(districts) do
-      local set = deckNamed("Encounter Deck", b)
-      if set and enc then
-        added = added + #set.getObjects()
-        E.playerPut(enc, set)
-      end
+    local inDeck = {}
+    for _, e in ipairs(enc and enc.getObjects() or {}) do
+      for _, t in ipairs(e.tags or {}) do inDeck[t] = (inDeck[t] or 0) + 1 end
     end
-    E.run(1)
-    enc = encounterDeck()
-    if enc then enc.shuffle() end
-    check("the encounter deck holds 25 + the district sets (" .. (25 + added) .. ")", enc ~= nil and #enc.getObjects() == 25 + added,
-      enc and #enc.getObjects())
+    for _, b in ipairs(districts) do
+      check(b.getName() .. ": its encounter set is in the encounter deck", (inDeck[boxTag(b)] or 0) > 0, inDeck[boxTag(b)])
+      local left = {}
+      for _, suffix in ipairs({ "Encounter Deck", "Set Aside", "Named Enemies" }) do
+        local o = find(function(o)
+          return (o.type == "Deck" or o.type == "Card") and o.hasTag(boxTag(b)) and tostring(o.getName()):sub(-#suffix) == suffix
+        end)
+        if o then left[#left + 1] = suffix end
+      end
+      check(b.getName() .. ": no stack of it is left beside the mat", #left == 0, table.concat(left, ", "))
+    end
+    local approach = cardWithId("sthr-appointed-approach")
+    check("The Appointed's Approach is in play, face up, on the mythos mat", approach ~= nil and not approach.is_face_down
+      and dist(approach.getPosition(), mythosSpot("reference")) < 5, approach and tostring(approach.getPosition().z))
     local all = {}
     for _, b in ipairs({ square, unpack(districts) }) do
       for _, o in ipairs(placedBy(b)) do if o.type == "Card" or o.type == "Deck" then all[#all + 1] = o end end

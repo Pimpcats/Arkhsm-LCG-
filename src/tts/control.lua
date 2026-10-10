@@ -1620,6 +1620,167 @@ local function almanacActTwoAtPlace(p)
   end
 end
 
+------------------------------------------------------------ loop setup --
+-- What the guide's Loop Setup used to ask of the players, done for each box as it is laid out
+-- (guide: Loop Setup step 2): a district's encounter set goes into the shared encounter
+-- deck, its set-aside cards join the one set-aside pile on the mythos mat, its act deck is set
+-- up from the Campaign Log (The Districts: "A district's act deck"); the Square also puts The
+-- Appointed's Approach into play and, from Part II, shuffles the Whispers in.
+local MYTHOS_MAT = "9f334f"                              -- SCED's mythos area
+local MAT_ENCOUNTER = { 0.88, 0.1, 0.391 }               -- its encounter deck snap (mat-local)
+local MAT_APPROACH = { -2.2, 0.1, 0.37 }                 -- the story card spot beside the scenario card
+local DISTRICT_ACTS = {
+  district_square     = { "sthr-act-sheriffdead", "sthr-act-vote", "the-sheriff-is-already-dead", "the-vote-that-never-ends" },
+  district_church     = { "sthr-act-whythirteen", "sthr-act-hourwaswrong", "the-thirteenth-toll", "the-hour-was-wrong" },
+  district_road       = { "sthr-act-walkbackward", "sthr-act-walksbeside", "the-road-remembers", "who-walks-beside-you" },
+  district_lighthouse = { "sthr-act-lamp", "sthr-act-ninthdeath", "the-lamp-was-never-lit", "the-keepers-ninth-death" },
+  district_fairground = { "sthr-act-wheelturns", "sthr-act-bargain", "the-wheel-still-turns", "the-ticket-takers-bargain" },
+  district_almanac    = { "sthr-act-almanachid", "sthr-act-appointedname", "what-the-almanac-hid", "the-appointeds-name" },
+}
+
+local function idOf(gm)
+  local ok, md = pcall(JSON.decode, gm or "")
+  return ok and type(md) == "table" and md.id or nil
+end
+
+local function matPoint(localPos)
+  local mat = getObjectFromGUID(MYTHOS_MAT)
+  local ok, p = false, nil
+  if mat then ok, p = pcall(function() return mat.positionToWorld(localPos) end) end
+  if ok and p then return p end
+  -- SCED's mythos mat sits at (-1.31, 1.48, 0), turned 270 and scaled 6.5 (objects/MythosArea.9f334f.json)
+  return { x = -1.31 - 6.5 * localPos[3], y = 1.6, z = 6.5 * localPos[1] }
+end
+
+local function near(a, b, r) return math.abs(a.x - b.x) <= r and math.abs(a.z - b.z) <= r end
+
+--- The shared encounter deck on the mythos mat's encounter snap.
+local function sharedEncounter()
+  local at = matPoint(MAT_ENCOUNTER)
+  if not at then return nil end
+  for _, o in ipairs(getObjects()) do
+    if (o.type == "Deck" or o.type == "Card") and not o.isDestroyed() and near(o.getPosition(), at, 0.8) then return o end
+  end
+  return nil
+end
+
+--- A box's stack by the end of its nickname ("Encounter Deck", "Set Aside", ...).
+local function boxStack(tag, suffix)
+  for _, o in ipairs(getObjects()) do
+    if (o.type == "Deck" or o.type == "Card") and not o.isDestroyed() and o.hasTag(tag) then
+      local n = tostring(o.getName())
+      if n:sub(-#suffix) == suffix then return o end
+    end
+  end
+  return nil
+end
+
+--- Take the card with this id out of a stack (or the stack itself, when it is that one card).
+local function takeById(stack, id, pos)
+  if not stack then return nil end
+  if stack.type == "Card" then return idOf(stack.getGMNotes()) == id and stack or nil end
+  for _, e in ipairs(stack.getObjects() or {}) do
+    if idOf(e.gm_notes) == id then
+      local p = stack.getPosition()
+      return stack.takeObject({ guid = e.guid, position = pos or { p.x, p.y + 2, p.z }, smooth = false })
+    end
+  end
+  return nil
+end
+
+local function putInto(target, obj, faceDown)
+  if not (target and obj) or target == obj then return false end
+  if faceDown then
+    local r = target.getRotation()
+    obj.setRotation({ 0, r.y, 180 })
+  end
+  return pcall(function() target.putObject(obj) end)
+end
+
+--- Loop Setup for one laid-out box (p = { box = its id }). Returns what was done, for the chat.
+local function setUpPlacedBox(p)
+  local box = type(p) == "table" and p.box or nil
+  if not box or CampaignState.inPrologue() then return nil end
+  local acts = DISTRICT_ACTS[box]
+  if not acts then return nil end
+  local tag = "StillHourBox_" .. box
+  local done = {}
+  local enc = sharedEncounter()
+  local partTwo = CampaignState.inPartTwo()
+  local squareAside = boxStack("StillHourBox_district_square", "Set Aside")
+  if box ~= "district_square" then
+    -- its encounter set joins the shared encounter deck
+    local set = boxStack(tag, "Encounter Deck")
+    if set and enc and putInto(enc, set, true) then done[#done + 1] = "encounter set shuffled in" end
+    -- its Named enemy: shuffled in with the set where its entry says so (the Fairground, Part II),
+    -- otherwise set aside with the rest
+    local named = boxStack(tag, "Named Enemies")
+    if named then
+      if box == "district_fairground" and partTwo and enc then
+        if putInto(enc, named, true) then done[#done + 1] = "its Part II enemy shuffled in" end
+      elseif squareAside and putInto(squareAside, named, true) then
+        done[#done + 1] = "its enemy set aside"
+      end
+    end
+    -- its set-aside cards join the one set-aside pile on the mythos mat
+    local aside = boxStack(tag, "Set Aside")
+    if aside and squareAside and putInto(squareAside, aside, true) then done[#done + 1] = "set-aside cards with the others" end
+  else
+    -- the Square: the Approach beside the Hours, and from Part II the Whispers in the encounter deck
+    local spot = matPoint(MAT_APPROACH)
+    local ap = squareAside and takeById(squareAside, "sthr-appointed-approach", spot and { spot.x, spot.y + 0.3, spot.z })
+    if ap then
+      pcall(function() ap.setRotation({ 0, 270, 0 }) end)
+      done[#done + 1] = "The Appointed's Approach in play"
+    end
+    if partTwo and enc then
+      local n = 0
+      for _ = 1, 2 do
+        local w = takeById(boxStack("StillHourBox_district_square", "Set Aside"), "sthr-appointedwhisper")
+        if w and putInto(enc, w, true) then n = n + 1 end
+      end
+      if n > 0 then done[#done + 1] = "the Whispers shuffled in" end
+    end
+    local named = boxStack(tag, "Named Enemies")
+    if named and squareAside and putInto(squareAside, named, true) then done[#done + 1] = "its enemy set aside" end
+  end
+  -- its act deck, from the Campaign Log
+  local deck = boxStack(tag, "Act Deck")
+  local a1, a2, surf, deep = acts[1], acts[2], acts[3], acts[4]
+  local function removeDeck(why)
+    if deck then pcall(function() deck.destruct() end) end
+    done[#done + 1] = why
+  end
+  if deck then
+    if CampaignState.knows(deep) then
+      removeDeck("act deck removed (its objectives are complete)")
+    elseif CampaignState.knows(surf) then
+      if not partTwo then
+        removeDeck("act deck removed until Part II")
+      elseif a2 == "sthr-act-appointedname" and not (CampaignState.knows("what-the-almanac-hid")
+          and CampaignState.knows("the-vote-that-never-ends")) then
+        removeDeck("act deck removed (its second act is not open yet)")
+      else
+        local first = takeById(deck, a1)
+        if first then pcall(function() first.destruct() end) end
+        done[#done + 1] = "act 2a is current: resolve its \"When this act becomes the current act\""
+      end
+    else
+      done[#done + 1] = "act 1a is current"
+    end
+  end
+  if enc then
+    Wait.frames(function()
+      local d = sharedEncounter()
+      if d and d.type == "Deck" then pcall(function() d.shuffle() end) end
+    end, 30)
+  end
+  if #done > 0 then
+    announce(string.format("%s set up: %s.", tostring(p.name or box), table.concat(done, "; ")))
+  end
+  return done
+end
+
 --- The board sync that follows a box's Place, one step per few frames, each
 -- step announced in the chat and the log BEFORE it runs, so a crash in real
 -- Tabletop Simulator leaves the failing step on screen and in Player.log.
@@ -1640,6 +1801,7 @@ function shApiSyncBoardStaged(p)
     end
   end
   local steps = {
+    { "loop setup", function() setUpPlacedBox(p) end },
     { "locations", function() almanacActTwoAtPlace(p) ; Board.syncLocations() end },
     { "the Appointed", function() Board.syncAppointed({ log = hourLog, applyStats = true }) end },
     { "investigators", function() Board.refreshInvestigators(true) end },

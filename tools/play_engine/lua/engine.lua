@@ -176,8 +176,18 @@ return function(H)
   end
 
   local function setupAct(box, district, sc, G)
+    -- Place's loop setup (control.lua setUpPlacedBox) has already removed a finished act deck and, when act
+    -- 2a is current, act 1a; what is left on the table says which act is current
     local deck = T.deckNamed("Act Deck", box)
-    if not deck then return end
+    if not deck then
+      -- act 2a alone is left (the setup took act 1a): a loose card that no longer carries the deck's name
+      local DEEP_ACT = { Square = "sthr-act-vote", Church = "sthr-act-hourwaswrong", Road = "sthr-act-walksbeside",
+                         Lighthouse = "sthr-act-ninthdeath", Fairground = "sthr-act-bargain", Almanac = "sthr-act-appointedname" }
+      local id2 = DEEP_ACT[district]
+      local c2 = id2 and T.find(function(o) return o.type == "Card" and T.gm(o).id == id2 and o.hasTag(T.boxTag(box)) end)
+      if not c2 then return end
+      deck = c2
+    end
     local ids = {}
     if deck.type == "Deck" then
       for _, e in ipairs(deck.getObjects()) do ids[#ids + 1] = (T.decode(e.gm_notes) or {}).id end
@@ -196,8 +206,8 @@ return function(H)
     if G.knowledge[surf] then
       if sc.part ~= 2 then remove() return end
       if not R.FX.actTwoRequirements(a2) then remove() return end
-      -- act 1a leaves the game; act 2a is current
-      local c1 = T.takeCard(a1, { pos.x + 2.7, pos.y + 0.3, pos.z }, { 0, 180, 180 })
+      -- act 1a leaves the game (Place's setup already took it when only act 2a is left); act 2a is current
+      if #ids > 1 then T.takeCard(a1, { pos.x + 2.7, pos.y + 0.3, pos.z }, { 0, 180, 180 }) end
       G.acts[district] = { id = a2, district = district, pos = pos }
       G.actOrder[#G.actOrder + 1] = district
       G.pendingCurrent[#G.pendingCurrent + 1] = G.acts[district]
