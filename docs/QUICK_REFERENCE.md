@@ -14,11 +14,11 @@
 |---|---|
 | **Mythos** (from round 2) | Place 1 doom on the current **Hour**, then check its threshold. If the Hour passes: turn the Hours deck and click **Hour** on the Control token (with SCED it also removes all doom in play; take any doom off the Hours cards yourself). *Guide: Campaign Rules, The Hourglass.* |
 | **Investigation** | The first move each round along a connection between two districts places 1 doom on the current Hour (**crossing doom**). *Guide: Districts and travel.* |
-| **Enemy** | If the Appointed hunts and is ready and unengaged, click **Hunt** once. *Guide: The Control token, The Appointed.* |
+| **Enemy** | If the Appointed hunts and is ready and unengaged, click **Hunt** once. *Guide: The Appointed; hover over Hunt for when to click.* |
 | **Upkeep** | As usual. |
 
 Whenever an effect changes Dissonance, Memory on cards or Years, click the
-matching Control or investigator button (*guide: The Control token*).
+matching Control or investigator button; hover over any button to see when to click it.
 
 ## The campaign's terms
 
@@ -47,8 +47,8 @@ matching Control or investigator button (*guide: The Control token*).
 - **Static ([static]).** A chaos token: **−3, and raise Dissonance by 1** when
   revealed in a skill test. Its band decides how many are in the bag. When one
   is drawn, finish any cancel choices, then click **Resolve** on the token
-  before you continue (do not also click Dissonance). *Guide: [static]; The
-  Control token, Dissonance.*
+  before you continue (do not also click Dissonance). *Guide: The Static token; hover over
+  Resolve on the token.*
 - **Sleepwalking.** While Sleepwalking, an enemy cannot engage, attack, move or
   be attacked, evaded or targeted. Echoes are Sleepwalking only in the Calm
   band; an Echo that wakes is exhausted. *Guide: Echoes and Sleepwalking.*
@@ -59,7 +59,7 @@ matching Control or investigator button (*guide: The Control token*).
   its location while it is ready. A success exhausts it, pushes the Approach
   back 1 stage and rewinds the Hourglass 1 Hour (at most 3 rewinds a loop;
   click **Hold Back** on its card, which also rewinds the Hour counter). *Guide:
-  The Appointed; The Control token, The Appointed.*
+  The Appointed; hover over Hold Back.*
 - **Memory.** Your experience. Memory on your cards is banked into one shared
   pool at the reset and spent Between Loops on Recollections (their printed
   cost, no extra 1) and upgrades (the new card's
@@ -80,7 +80,7 @@ matching Control or investigator button (*guide: The Control token*).
   Campaign Rules, Years.*
 - **Resign.** "[action]: Resign" is on the hub Square only. You are
   eliminated for the rest of the loop, but it is not a defeat (no Year for
-  it), and Memory on your cards is still banked. *Guide: Resigning.*
+  it), and Memory on your cards is still banked. *Guide: Defeat and resigning.*
 - **Victory X.** Pays once per campaign: when you defeat an enemy with Victory
   X, or a loop ends with a Victory X location in play, revealed and with no
   clues on it, record it on the Victory list and each investigator gains X
