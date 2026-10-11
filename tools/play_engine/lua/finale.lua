@@ -255,6 +255,10 @@ return function(R, T)
     if en.form == "present" then
       R.endLoop("boss")
     end
+    -- the night loosens: rewind the Hourglass by 1 Hour
+    local rw = (R.WHATIF or {}).formRewind
+    if rw == nil then rw = 1 end
+    if rw > 0 then R.rewind(rw, "a form of the Appointed falls") end
     -- stop or press on: stop when the Hours left are unlikely to finish what remains
     local left = 0
     for _, f in ipairs(R.FORMS) do

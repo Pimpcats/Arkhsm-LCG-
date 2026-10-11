@@ -663,8 +663,13 @@ return function(R, T)
     if G.ended then return true end
     -- the finale's periods: moving in or out of either places 1 doom (their Forced)
     if a and not opts.noHour and (a.district == "Past" or a.district == "Future" or b.district == "Past" or b.district == "Future") then
-      R.placeDoom(1, "through the hours")
-      if G.ended then return true end
+      local key = "period|" .. ((a.district == "Past" or b.district == "Past") and "Past" or "Future")
+      -- the first move each round into or out of a period places 1 doom (later moves that round are free)
+      if not G.crossedThisRound[key] or (R.WHATIF or {}).periodDoomEveryMove then
+        G.crossedThisRound[key] = true
+        R.placeDoom(1, "through the hours")
+        if G.ended then return true end
+      end
     end
     -- The first move along a district connection each round places doom;
     -- free crossings do not consume that connection's first-move allowance.
