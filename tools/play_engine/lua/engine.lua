@@ -636,7 +636,7 @@ return function(H)
     for _,d in ipairs(districts) do goalsFor[#goalsFor+1]=d end
     for _,d in ipairs(goalsFor) do
       if not c.knowledge[S.SURF[d]] then sc.objectives[#sc.objectives+1]=SURFACE_ACT[d]
-      elseif c.partTwo and not c.knowledge[S.DEEP[d]] then sc.objectives[#sc.objectives+1]=DEEP_ACT[d] end
+      elseif c.partTwo and not c.knowledge[S.DEEP[d]] and pending(d) then sc.objectives[#sc.objectives+1]=DEEP_ACT[d] end
     end
     if slot==10 and not sc.finaleGoal then sc.finaleUnavailable=true end
     return sc
