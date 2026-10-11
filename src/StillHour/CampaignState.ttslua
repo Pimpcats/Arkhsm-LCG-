@@ -54,7 +54,7 @@ local function freshState(n)
     finale = false,          -- the finale (The Last Hour) is being played
     knowledgePaid = {},      -- factId -> banked Memory its first recording paid (refund on removal)
     prologue = false,        -- playing the Prologue (The First Hour): not a loop
-    contest = 0,             -- finale contest progress (Contest the Crossing)
+    contest = 0,             -- finale: forms of the Appointed defeated (0..3; was the contest)
     partTwo = false,         -- Part II (The Shape of the Hour) has begun
     pendingYears = {},       -- investigatorId -> Years a card gave this loop (added at Age)
     holdBackRewinds = 0,     -- Hold Back rewinds this loop (at most Constants.HOLD_BACK_REWINDS_PER_LOOP)
@@ -625,7 +625,7 @@ function CampaignState.reset()
   return state
 end
 
---- Finale contest progress (guide: Contest the Crossing), 0..99. It lasts
+--- Finale progress: forms of the Appointed defeated (Control "Forms defeated n / 3"; the field keeps its old name), 0..99. It lasts
 -- only for the finale being played; a reset clears it.
 function CampaignState.getContest()
   return state.contest or 0
