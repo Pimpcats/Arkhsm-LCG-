@@ -151,7 +151,9 @@ class ScenarioContentTests(unittest.TestCase):
         self.assertEqual(edges, {frozenset(p) for p in [
             ("district_square", "district_fairground"), ("district_square", "district_church"),
             ("district_square", "district_almanac"), ("district_square", "district_road"),
-            ("district_road", "district_lighthouse")]})
+            ("district_road", "district_lighthouse"),
+            # the finale's two periods: the Past beside The Square, the Future beside The Town Hall Steps
+            ("district_square", "finale")]})
 
     def test_encounter_quantities(self):
         spine = collections.Counter(ASSIGN["prologue"]["encounter"])
@@ -201,7 +203,7 @@ class ScenarioContentTests(unittest.TestCase):
             self.assertEqual(len(state["ml"]), len(b["ContainedObjects"]))
             for o in b["ContainedObjects"]:
                 walk(o, b)
-        self.assertEqual(seen["Location"], 23)
+        self.assertEqual(seen["Location"], 25)   # + the finale's two periods
         self.assertEqual(seen["Act"], 14)
         self.assertEqual(seen["Agenda"], 18)
         # one reference per board: the Prologue's and the Square's (every box
@@ -299,18 +301,22 @@ class ContentGapTests(unittest.TestCase):
         self.assertTrue(any("almanachid" in m for _, m in probs), probs)
         self.assertEqual(SC.objective_feasibility(cards, ASSIGN, MANIFEST, 3), [])
 
-    def test_contest_target_matches_the_engine(self):
-        lua = open(os.path.join(ROOT, "src", "StillHour", "Constants.ttslua"),
-                   encoding="utf-8").read()
-        self.assertIn("contestTarget = (n == 1) and 5 or ((n >= 4) and 7 or 6),", lua)
+    def test_boss_finale_matches_the_cards(self):
+        """The finale is the three-form fight: each form's health is per investigator, the Present form
+        waits for the other two, and the act tells the table how the night ends."""
         need = next(a for s in MANIFEST["scenarios"] if s["id"] == "finale"
-                    for a in s["stacks"]["act_deck"]["cards"])["needs"]["contest"]
-        self.assertEqual((need["target"], need["target_one_investigator"], need["target_two_investigators"],
-                          need["target_four_investigators"]), (6, 5, 6, 7))
+                    for a in s["stacks"]["act_deck"]["cards"])["needs"]["boss"]
+        forms = ["sthr-form-past", "sthr-form-future", "sthr-form-present"]
+        self.assertEqual(need["forms"], forms)
+        self.assertEqual(need["present_vulnerable_after"], forms[:2])
+        for cid in forms:
+            self.assertEqual(CARDS[cid]["type"], "Enemy", cid)
+            self.assertIn("[perinv]", str(CARDS[cid].get("health")), cid)
+            self.assertIn(cid, ASSIGN["finale"]["setup_aside"])
+        self.assertIn("cannot be damaged", CARDS["sthr-form-present"]["text"])
         act = CARDS["sthr-act-lasthour"]
         text = act["text"] + "\n" + act["back_text"]    # b side: the resolutions
-        for part in ("reaches 6 (5 with one investigator, 7 with four)", "Hold Back", "deep Knowledge entry", "Hour IX",
-                     "R1b"):
+        for part in ("deep Knowledge entry", "Hour IX", "As It Is is defeated", "R1b", "R5 or R6"):
             self.assertIn(part, text)
 
     def test_sced_draws_only_the_printed_lines(self):
@@ -357,7 +363,7 @@ class ContentGapTests(unittest.TestCase):
     def test_resolutions_complete_and_in_order(self):
         order = [r["card"] for r in MANIFEST["campaign"]["resolutions"]]
         self.assertEqual([r["id"] for r in MANIFEST["campaign"]["resolutions"]],
-                         ["R1", "R1b", "R2", "R3", "R4", "R5", "R6"])
+                         ["R1", "R1b", "R2", "R3", "R4", "R5", "R6", "R7", "R8"])
         aside = [c for c in ASSIGN["finale"]["setup_aside"] if c in order]
         self.assertEqual(aside, order)
         self.assertIn("Who Walks Beside You", CARDS["sthr-res-1"]["text"])
@@ -365,7 +371,8 @@ class ContentGapTests(unittest.TestCase):
         self.assertIn("The Ticket-Taker's Bargain", CARDS["sthr-res-bargain"]["text"])
         for cid in order:
             # every row opens with the condition it is checked against
-            self.assertTrue(CARDS[cid]["text"].startswith("Contest "), cid)
+            self.assertTrue(CARDS[cid]["text"].startswith(
+                ("The Appointed defeated", "As It Is not defeated", "The investigators stopped")), cid)
 
     def test_hold_is_defined_where_it_is_used(self):
         text = CARDS["sthr-act-walksbeside"]["text"]

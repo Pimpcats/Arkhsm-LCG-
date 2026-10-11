@@ -491,6 +491,18 @@
         "card": "sthr-res-6",
         "source": "campaign guide §9",
         "name": "The Loop Wins"
+      },
+      {
+        "id": "R7",
+        "card": "sthr-res-7",
+        "source": "campaign guide §9 (boss finale)",
+        "name": "Stranded Before"
+      },
+      {
+        "id": "R8",
+        "card": "sthr-res-8",
+        "source": "campaign guide §9 (boss finale)",
+        "name": "Stranded After"
       }
     ],
     "campaign_log": {
@@ -1633,16 +1645,6 @@
               "id": "sthr-form-present",
               "name": "As It Is",
               "role": "the Appointed in the Present, replaces The Appointed at finale setup"
-            },
-            {
-              "id": "sthr-res-7",
-              "name": "Stranded Before",
-              "role": "resolution card"
-            },
-            {
-              "id": "sthr-res-8",
-              "name": "Stranded After",
-              "role": "resolution card"
             }
           ]
         },
