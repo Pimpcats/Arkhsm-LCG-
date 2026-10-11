@@ -23,7 +23,8 @@ def campaign_id(argv=None):
     else the reference campaign."""
     argv = sys.argv if argv is None else argv
     for i, a in enumerate(argv):
-        if a == "--campaign" and i + 1 < len(argv):
+        # a following option is not an id (the play engine's --campaign is a switch)
+        if a == "--campaign" and i + 1 < len(argv) and not argv[i + 1].startswith("-"):
             return argv[i + 1]
         if a.startswith("--campaign="):
             return a.split("=", 1)[1]
