@@ -85,7 +85,8 @@ def summarize(task, result):
         summary["spent"] = sum(g.get("spent", 0) for g in games)
         summary["carry_lost"] = sum(g.get("carry_lost", 0) for g in games)
         summary["finale_attempts"] = sum(bool(g["metrics"].get("finale_began")) for g in games)
-        summary["finale_wins"] = sum(g["ended"] == "contest" for g in games)
+        summary["finale_wins"] = sum(g["ended"] in ("boss", "contest") for g in games)
+        summary["finale_stranded"] = sum(g["ended"] == "stranded" for g in games)
         for seed in summary["campaign_seeds"]:
             chain = sorted((g for g in games if g["campaign_seed"] == seed), key=lambda g: g["slot"])
             initial = chain[0]["metrics"].get("weakness")

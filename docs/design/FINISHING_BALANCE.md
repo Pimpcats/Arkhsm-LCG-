@@ -249,3 +249,18 @@ one-district night picks a district with something left to do), finale deep entr
 Mean Prologue–Night 8 65.2% (curve 62.2%). Memory per investigator 43.6 (35.3–49.0). Finale R3 22, R2 2, R5 6.
 Fast routes used 0.34 times a slot. The cap alone leaves the carried finale at 80%: superseded by the boss
 redesign (FINALE_REDESIGN.md). Night 4/6 high and 7/8 low are route effects at n=30 (±17 points).
+
+### The boss finale (2026-10-11)
+
+The Last Hour is now the three-form boss fight (FINALE_REDESIGN.md). Same method, 27 campaigns (seeds
+5000/6000/7000, 9 each), health 2 [perinv] per form, As It Is 2 damage / 1 horror:
+
+| slot | Prologue | N1 | N2 | N3 | N4 | N5 | N6 | N7 | N8 | Finale (home) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| target | 80 | 80 | 70 | 70 | 60 | 60 | 50 | 50 | 40 | 40 |
+| boss build | 93 | 67 | 70 | 89 | 78 | 52 | 74 | 63 | 19 | 41 |
+
+Mean Prologue–Night 8 67.1% (curve 62.2%). Memory per investigator 44.3 (33.3–49.0). Finale endings: home 41%,
+stranded 22%, not ended 37%. Night 8 low (19%, was 30–43% in earlier runs) is within noise at n=27 (±18 points)
+but is the slot to watch. `campaign_summary.py` now counts the finale as met only for a full victory and reports
+the stranded share separately.

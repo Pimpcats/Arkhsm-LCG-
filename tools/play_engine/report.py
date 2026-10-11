@@ -163,6 +163,8 @@ def summarize(name, players, games):
         s["two_or_more"] = sum(v for k, v in s["objectives_per_loop"].items() if k >= 2)
     if name.startswith("finale"):
         s["contest_reached"] = sum(1 for g in games if g.get("ended") == "contest") / n
+        s["boss_home"] = sum(1 for g in games if g.get("ended") == "boss") / n
+        s["boss_stranded"] = sum(1 for g in games if g.get("ended") == "stranded") / n
         s["contest_mean"] = mean([g.get("contest", 0) for g in games])
         src = collections.Counter()
         for m in ms:

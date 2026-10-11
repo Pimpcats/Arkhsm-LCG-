@@ -37,7 +37,8 @@ def slot_won(g):
     """The slot's goal was met."""
     if g.get("scenario") == "prologue":
         return report.act_done(g, "sthr-act-firsthour") is not None and bool(report.act_done(g, "sthr-act-firsthour"))
-    if g.get("ended") == "contest":
+    if g.get("ended") in ("boss", "contest"):
+        # the finale: As It Is defeated, home in the Present (stranded endings are reported apart)
         return True
     goals = g.get("goals")
     if isinstance(goals, list) and goals:
@@ -105,8 +106,11 @@ def summarize(games):
         wins = sum(1 for g in slot_games.get(slot, []) if slot_won(g))
         per_slot.append(wins / campaigns)
     out["mean_rate_all_slots"] = statistics.mean(per_slot)
-    # the headline: Prologue to Night 8. The Finale slot only records reaching the contest, so it is
-    # shown but kept out of the mean (as in FINISHING_BALANCE.md's earlier whole-campaign table)
+    finale = slot_games.get(10, [])
+    out["finale_endings"] = {k: sum(1 for g in finale if g.get("ended") == k) / campaigns
+                             for k in ("boss", "stranded", "defeat")}
+    # the headline: Prologue to Night 8. The Finale slot (full victory only) is shown but kept out
+    # of the mean (as in FINISHING_BALANCE.md's earlier whole-campaign table)
     out["mean_rate_nine"] = statistics.mean(per_slot[:9])
     out["target_mean_nine"] = statistics.mean(CURVE[:9]) / 100
     out["xp"] = {"mean": statistics.mean(xp), "min": min(xp), "max": max(xp),
@@ -123,6 +127,10 @@ def render(s, title=""):
                      (r["name"], 100 * r["reached"], 100 * met, 100 * r["rate"], 100 * r["target"]))
     lines.append("mean goal-met rate, Prologue to Night 8 (target curve mean %.1f%%, design target about 60%%): %.1f%%" %
                  (100 * s["target_mean_nine"], 100 * s["mean_rate_nine"]))
+    fe = s.get("finale_endings")
+    if fe:
+        lines.append("Finale endings: home %.0f%%, stranded %.0f%%, not ended %.0f%% (of all campaigns)" %
+                     (100 * fe["boss"], 100 * fe["stranded"], 100 * fe["defeat"]))
     x = s["xp"]
     lines.append("Memory banked per investigator over the campaign: mean %.1f, range %.1f-%.1f (official 35-45)" %
                  (x["mean"], x["min"], x["max"]))

@@ -113,3 +113,11 @@ What changed from the plan while building and simulating (carried campaigns, `go
 | 2/2/2 + Massive | 9 | 3 | 0 | 6 |
 | 2/2/2 + Massive + cautious stop, two seeds | 18 | 5 | 4 | 9 |
 | 2/2/3 + Massive + cautious stop | 9 | 0 | 4 | 5 |
+| 2/2/2 + Massive + cautious stop, As It Is attack 2/2, three seeds | 27 | 8 (30%) | 4 | 15 |
+| same, As It Is attack 1/1 | 27 | 14 (52%) | 5 | 8 |
+| same, As It Is attack 1/2 | 27 | 8 (30%) | 7 | 12 |
+| **same, As It Is attack 2/1 (chosen)** | 27 | **11 (41%)** | 6 | 10 |
+
+**Chosen:** health 2 [perinv] for all three forms; As It Is deals 2 damage and 1 horror. Over 27 carried campaigns
+(seeds 5000/6000/7000): home 41%, stranded 22% (R7 4%, R8 19%), not ended 37%. Prologue to Night 8 in the same runs:
+93/67/70/89/78/52/74/63/19 (mean 67.1%); Memory 44.3 per investigator. This is the simulation, not a playtest.
