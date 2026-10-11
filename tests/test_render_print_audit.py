@@ -24,7 +24,7 @@ import render_placeholders as rp  # noqa: E402
 # Faces whose flavour text is left off because their rules are too dense to keep it at 27px+
 # (official faces do the same). Dense rules text is the cause; shortening the rules brings it back.
 FLAVOUR_DROPPED_OK = {
-    "sthr-appointed", "sthr-appointed-approach", "sthr-bellringer", "sthr-borrowedtime",
+    "sthr-appointed", "sthr-appointed-approach", "sthr-form-present", "sthr-bellringer", "sthr-borrowedtime",
     "sthr-hourlearnedname", "sthr-item-almanac", "sthr-item-drownedpage", "sthr-item-ledger",
     "sthr-item-logbook", "sthr-item-register", "sthr-loc-hubsquare", "sthr-loc-lanternroom",
     "sthr-onewhorides", "sthr-quest-ayako", "sthr-quest-cass", "sthr-questdone-ayako",

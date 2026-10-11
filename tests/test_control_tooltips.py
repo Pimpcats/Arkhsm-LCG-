@@ -21,7 +21,7 @@ def test_every_moved_instruction_is_on_a_button():
         ("Anchor Point's token takes one", CONTROL),
         ("click it again", CONTROL),                                        # Reset Loop
         ("Unticking a mistake takes them back", CONTROL),                   # Knowledge
-        ("none is automatic", CONTROL),                                     # Contest
+        ("click when a form of the Appointed is defeated", CONTROL),        # Forms defeated
         ("clicked before choosing, Age asks", CONTROL),                     # Age
         ("do not also \"\n          .. \"click Dissonance", CONTROL),       # Static token Resolve
         ("The Turning: one click here, two on Dissonance", BOARD),          # Dissonance raised

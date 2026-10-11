@@ -845,7 +845,7 @@ return function(H)
 
   ------------------------------------------------------------ finale --
 
-  step("Finale: record the entries, Begin Finale, the contest counter", function()
+  step("Finale: record the entries, Begin Finale, the Forms defeated counter", function()
     for _, k in ipairs({ "k:the-vote-that-never-ends", "k:what-the-almanac-hid", "k:the-appointeds-name", "k:the-hour-was-wrong" }) do
       tickLog(k)
     end
@@ -861,10 +861,10 @@ return function(H)
     click(control(), "Begin Finale")
     E.run(1)
     check("Begin Finale starts the finale", st().finale == true, J.encode(st()))
-    check("the Contest counter shows", hasLabel(control(), "Contest 0"), labels(control()))
-    click(control(), "Contest")
-    click(control(), "Contest")
-    check("the contest counter counts", hasLabel(control(), "Contest 2"), labels(control()))
+    check("the Forms defeated counter shows", hasLabel(control(), "Forms defeated 0 / 3"), labels(control()))
+    click(control(), "Forms defeated")
+    click(control(), "Forms defeated")
+    check("the Forms defeated counter counts", hasLabel(control(), "Forms defeated 2 / 3"), labels(control()))
     fellMark = #(E.fellInto or {})
     local bagBefore = chaosBag() and #chaosBag().getObjects()
     local fin = placeBox("finale")

@@ -265,6 +265,8 @@ return function(R, T)
 
   cov("sthr-loc-square") ; cov("sthr-loc-almanacsteps") ; cov("sthr-loc-hubsquare")
   cov("sthr-loc-townhallsteps", "full; the calm side's ability names the next Hour that has a harmful When reached")
+  cov("sthr-loc-firstoccultation", "full; period travel doom and the end-of-round horror run in rules/effects")
+  cov("sthr-loc-morningafter", "full; period travel doom and the -1 [agi]/[com] run in rules (skillBase)")
   cov("sthr-loc-recordsoffice") ; cov("sthr-loc-well") ; cov("sthr-loc-nave") ; cov("sthr-loc-belfry")
   cov("sthr-loc-floodedcrypt") ; cov("sthr-loc-vestry") ; cov("sthr-loc-milestones") ; cov("sthr-loc-lowbridge")
   cov("sthr-loc-turning") ; cov("sthr-loc-lanternroom") ; cov("sthr-loc-windingstair") ; cov("sthr-loc-keepersquarters")
@@ -928,6 +930,9 @@ return function(R, T)
                         "sthr-minutehand", "sthr-bandonsteps", "sthr-somethingonstair", "sthr-drownedverger",
                         "sthr-milecounter", "sthr-barker", "sthr-compositor", "sthr-bellringer", "sthr-wearssheriff",
                         "sthr-onewhorides", "sthr-uninvited" }) do cov(id) end
+  for _, id in ipairs({ "sthr-form-past", "sthr-form-future", "sthr-form-present" }) do
+    cov(id, "full; spawned by beginFinale, deep entries and the Uninvited damage them, the Present waits aloof (finale.lua)")
+  end
   cov("sthr-appointed", "full; its movement, manifesting and Hold Back run on the Control token (Board/Appointed modules); the engine adds engagement and attacks")
   cov("sthr-appointed-approach")
 
@@ -1076,7 +1081,7 @@ return function(R, T)
 
   for _, id in ipairs({ "sthr-story-firstdark", "sthr-story-firstreset", "sthr-story-actii", "sthr-story-beforefinale",
                         "sthr-res-1", "sthr-res-2", "sthr-res-3", "sthr-res-4", "sthr-res-5", "sthr-res-6",
-                        "sthr-res-bargain" }) do
+                        "sthr-res-7", "sthr-res-8", "sthr-res-bargain" }) do
     cov(id, "full (read at a loop's end; the engine picks the resolution by its condition)")
   end
 

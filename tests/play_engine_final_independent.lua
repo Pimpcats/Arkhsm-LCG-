@@ -319,6 +319,12 @@ end)
 -- Finale eligibility comes from guide622/662: took part at the start, including
 -- a participant defeated later; ending Years include pending Years. These
 -- cases execute the actual setup and resolution functions without copying them.
+-- the boss finale: the home endings need As It Is defeated
+local function defeatPresent(R)
+  R.G.boss=R.G.boss or {defeated={}}
+  R.G.boss.defeated=R.G.boss.defeated or {}
+  R.G.boss.defeated.past,R.G.boss.defeated.future,R.G.boss.defeated.present=true,true,true
+end
 local function endingFixture()
   local R,P,FX,AI,T,st,new=fixture()
   dofile("tools/play_engine/lua/finale.lua")(R,T)
@@ -328,6 +334,8 @@ local function endingFixture()
   T.cardWithId=function() return nil end
   T.placeBox=function() return {} end
   T.takeCard=function() return nil end
+  T.findAll=function() return {} end
+  R.G.metrics=R.G.metrics or {};R.G.metrics.bad_spawns=R.G.metrics.bad_spawns or {}
   local lead,other,prior=new("lead"),new("other"),new("prior")
   for _,i in ipairs(R.G.inv) do i.years,i.pendingYears,i.bracket=0,0,"Prime" end
   prior.defeated=true
@@ -338,7 +346,7 @@ case("finale participation survives later defeat",function()
   lead.years,lead.bracket=15,"Ancient"
   R.beginFinale(other,false)
   lead.defeated=true
-  R.G.contest=R.consts().contest
+  defeatPresent(R)
   expect("defeated finale participant still eligible",R.finaleResolution()=="R1")
   expect("participation capture excludes pre-finale defeat",R.G.finaleParticipants.lead and R.G.finaleParticipants.other and not R.G.finaleParticipants.prior)
   R.beginFinale(other,false)
@@ -347,7 +355,7 @@ end)
 case("pre-finale defeat does not qualify",function()
   local R,P,T,st,lead,other,prior=endingFixture()
   prior.years,prior.bracket=15,"Ancient"
-  R.beginFinale(lead,false);R.G.contest=R.consts().contest
+  R.beginFinale(lead,false);defeatPresent(R)
   expect("absent Ancient does not supply ending condition",R.finaleResolution()=="R4")
 end)
 for _,v in ipairs({{14,0,"Elder","R4"},{14,1,"Elder","R1"},{10,4,"Elder","R4"},
@@ -355,7 +363,7 @@ for _,v in ipairs({{14,0,"Elder","R4"},{14,1,"Elder","R1"},{10,4,"Elder","R4"},
   case("recorded plus pending ending threshold "..v[1].."+"..v[2],function()
     local R,P,T,st,lead,other,prior=endingFixture()
     lead.years,lead.pendingYears,lead.bracket=v[1],v[2],v[3]
-    R.beginFinale(lead,false);R.G.contest=R.consts().contest
+    R.beginFinale(lead,false);defeatPresent(R)
     expect("recorded plus pending classification "..v[1].."+"..v[2],R.finaleResolution()==v[4])
     expect("classification preserves recorded/pending/stat bracket "..v[1].."+"..v[2],lead.years==v[1] and lead.pendingYears==v[2] and lead.bracket==v[3])
   end)
@@ -365,19 +373,19 @@ case("pending Years gained during finale count after defeat",function()
   lead.years,lead.bracket=14,"Elder"
   R.beginFinale(lead,false)
   R.pendingYear(lead,1,"independent ending probe")
-  lead.defeated=true;R.G.contest=R.consts().contest
+  lead.defeated=true;defeatPresent(R)
   expect("new pending Year and subsequent defeat retain eligibility",R.finaleResolution()=="R1")
   expect("pending Year does not prematurely age the stat line",lead.years==14 and lead.pendingYears==1 and lead.bracket=="Elder")
 end)
 case("legacy isolated ending fixture fallback",function()
   local R,P,T,st,lead=endingFixture()
   lead.years=nil;lead.bracket="Ancient"
-  R.beginFinale(lead,false);R.G.contest=R.consts().contest
+  R.beginFinale(lead,false);defeatPresent(R)
   expect("absent recorded Years retains legacy bracket fallback",R.finaleResolution()=="R1")
 end)
 case("ending priority chooses a guide-eligible result",function()
   local R,P,T,st,lead=endingFixture();lead.years=15
-  R.beginFinale(lead,false);R.G.contest=R.consts().contest
+  R.beginFinale(lead,false);defeatPresent(R)
   R.G.knowledge["the-vote-that-never-ends"]=true;R.G.knowledge["the-appointeds-name"]=true
   R.G.logFlags["The vote still stands"]=true
   expect("declared policy selects eligible Vote ending",R.finaleResolution()=="R2")
@@ -455,14 +463,15 @@ local function finishFixture()
   local lead={id="lead",years=14,pendingYears=1,bracket="Elder",memory=2}
   local other={id="other",years=3,pendingYears=0,bracket="Prime",memory=3,defeated=true}
   local G={name="independent accounting",seed=1,n=2,round=8,cfg={boxes={}},locList={},actOrder={},acts={},knowledge={},logFlags={},
-    inv={lead,other},finaleParticipants={lead=true,other=true},contest=6,
-    ended={reason="contest",round=8,hour=7,dissonance=4},trace={},
+    inv={lead,other},finaleParticipants={lead=true,other=true},
+    boss={defeated={past=true,future=true,present=true}},
+    ended={reason="boss",round=8,hour=7,dissonance=4},trace={},
     metrics={victory={},start={memory=8},defeated={other=true},stage_max=3,acts_completed={},knowledge={},card_years=1}}
   captured.G=G
   local function count(name) local n=0;for _,v in ipairs(calls) do if v.name==name then n=n+1 end end;return n end
   return finish,captured,T,state,G,calls,count
 end
-for _,target in ipairs({"R1","R1b","R2","R3","R4","R5","R6"}) do
+for _,target in ipairs({"R1","R1b","R2","R3","R4","R5","R6","R7","R8"}) do
   case("finale finish stopping boundary "..target,function()
     local finish,R,T,state,G,calls,count=finishFixture()
     G.finale=true
@@ -472,7 +481,9 @@ for _,target in ipairs({"R1","R1b","R2","R3","R4","R5","R6"}) do
       G.knowledge["the-vote-that-never-ends"]=true;G.knowledge["the-appointeds-name"]=true;G.logFlags["The vote still stands"]=true
     elseif target=="R3" then G.knowledge["the-keepers-ninth-death"]=true
     elseif target=="R4" then G.inv[1].pendingYears=0;state.pending.lead=0
-    elseif target=="R5" or target=="R6" then G.contest=0 end
+    elseif target=="R5" or target=="R6" then G.boss.defeated.present=false
+    elseif target=="R7" then G.boss.defeated={past=true};G.boss.stoppedAt="past"
+    elseif target=="R8" then G.boss.defeated={future=true};G.boss.stoppedAt="future" end
     if target=="R6" then state.memory=7 end
     local before=state.memory
     local out=finish(G)
@@ -487,7 +498,7 @@ for _,target in ipairs({"R1","R1b","R2","R3","R4","R5","R6"}) do
 end
 case("finale finish still claims Victory before classifying",function()
   local finish,R,T,state,G,calls,count=finishFixture()
-  G.finale=true;G.contest=0;state.memory=7
+  G.finale=true;G.boss.defeated.present=false;state.memory=7
   G.locList={{id="victory-probe",def={victory=1},revealed=true,closed=false,obj={}}}
   R.clues=function() return 0 end
   local out=finish(G)
