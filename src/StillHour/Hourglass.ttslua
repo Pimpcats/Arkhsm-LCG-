@@ -200,7 +200,7 @@ local HOUR_HANDLERS = {
   [9] = function(ctx)
     if CampaignState.inFinale() then
       if ctx and ctx.onFinaleEnds then ctx.onFinaleEnds() end
-      return "The Appointed Hour. In the finale: the finale ends and the contest is not reached."
+      return "The Appointed Hour. In the finale: the finale ends with As It Is standing (Resolution 5 or 6)."
     end
     if CampaignState.knows("the-way-the-night-breaks") then
       if ctx and ctx.onFinaleAttemptable then ctx.onFinaleAttemptable() end

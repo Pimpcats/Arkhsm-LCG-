@@ -716,74 +716,69 @@ Before the finale begins: if you have not yet read **Before the finale** (Betwee
 >
 > You feel the loops in your body now. In the joints of your hands, in the way the Town Hall steps seem steeper each night. The town has not aged a single night. You have aged all of them.
 >
-> Out on the hill, the guest has stopped being polite. All that is left is to keep the appointment, and to decide what you are willing to spend.
+> Out on the hill, the guest has stopped being polite. Tonight you will not be early. You will meet it in the hour it was invited, in the hour it means to keep, and in the hour where it stands, and you will decide what you are willing to spend.
 
 **Setup**
-1. Press **Place** on **The Last Hour** box. **Contest the Crossing** (only a name; it has nothing to do with district crossings) becomes the current act, in the **Act** slot of the mythos mat. Set every district's act deck aside, and remove from the game any enemy a district's act 2a spawned: no district objective can be completed during the finale. The box also lays out a face-down set-aside pile in the mythos area's lower corner. Take **The Uninvited** (an enemy) from it without looking at the other cards, and leave the rest face down: they are this finale's story and resolution cards, with the same text as this guide.
-2. Advance the Appointed's Approach to **Arrived** (click **Appointed** on the Control token until it shows Arrived). If it is set aside, it manifests. Dissonance keeps its current value. **Begin Finale** itself moves nothing, so set the Hourglass now by the Hour the finale began at:
+1. Press **Place** on **The Last Hour** box. **Through the Hours** becomes the current act, in the **Act** slot of the mythos mat, and two periods join the map: **The First Occultation** (the Past, beside The Square) and **The Morning After** (the Future, beside The Town Hall Steps). Set every district's act deck aside, and remove from the game any enemy a district's act 2a spawned: no district objective can be completed during the finale. The box also lays out a face-down set-aside pile in the mythos area's lower corner. Take **The Uninvited** and the three forms of the Appointed (**As It Was**, **As It Will Be**, **As It Is**) from it without looking at the other cards, and leave the rest face down: they are this finale's story and resolution cards, with the same text as this guide.
+2. Set the Hourglass by the Hour the finale began at. Dissonance keeps its current value.
    - *At Hour IX:* put Hours IX, VIII, VII and VI back on the Hours deck in that order (Hour VI on top) and make Hour V the current agenda. No Hour resolves: right-click **Hour** four times. Hours VII and VIII resolve again when they are reached (Hour VIII raises Dissonance by 2 again); Hour VI does not stack.
    - *At Hours V to VIII:* leave the Hourglass as it is. No Hour resolves again, and the Control token keeps its Hour.
    - *Before Hour V:* advance the Hourglass to Hour V (a Skip: each Hour resolves; click **Hour** until the Control token shows Hour V).
-
-   Then spawn the set-aside **Uninvited** where the Appointed would manifest (see **The Appointed**).
-3. On the Control token, click **Begin Finale**: the **Contest** counter appears at 0. Then apply each of these your Campaign Log records:
-   - *You have spoken the name:* gain 1 contest progress (click **Contest** once). It already knows that you know.
+3. On the Control token, click **Begin Finale**. The Appointed is set aside (its Approach goes back to Unseen), and nothing moves its Approach for the rest of the finale: its forms take its place. Spawn **As It Was** at The First Occultation, **As It Will Be** at The Morning After, **As It Is** at The Square, and **The Uninvited** at the revealed location farthest from all investigators. Then apply each of these your Campaign Log records:
+   - *You have spoken the name:* deal 1 damage to As It Was. It already knows that you know.
    - *The drowned heard the true hour:* rewind the Hourglass by 1 Hour (right-click **Hour** once). Below the church, a congregation is keeping time for you.
    - *The true page reached the Press:* until the finale ends, the chaos bag holds 1 fewer Static token than it otherwise would (never fewer than 0); this adds to Hour VI's "1 fewer" (What the Almanac Hid). Every almanac in town now carries the true hour, and the sky is a little less wrong. **Begin Finale** applies it for you.
    - *You refused the ticket:* the fair's clock stops for you once more. Cancel the revelation effect of the first Lost Hour drawn during the finale, even if one was canceled earlier this loop.
 
-**Contest progress.** Gain 1 contest progress:
-- each time an investigator succeeds at Hold Back;
-- when the Uninvited is defeated (its card says so);
-- each time a deep Knowledge entry is spent with the [action] on Contest the Crossing. Each entry can be spent once per finale. Note it on the Finale Record; it stays recorded for every other purpose, including the resolutions. Read its line aloud when you spend it:
-  - *The Keeper's Ninth Death:* "Eight times the keeper walked out along the beam and died. You tell it the ninth line is not its to write."
-  - *The Hour Was Wrong:* "You tell it the true hour. It has been keeping the wrong one."
-  - *Who Walks Beside You:* "On the road behind you the walkers stop, and turn, and wait with you."
-  - *The Vote That Never Ends:* "You read it the minutes. It knows them better than you, but it listens." (If the vote was torn out: "You recite the minutes from memory. The torn page is not there to argue.")
-  - *The Ticket-Taker's Bargain:* "Far off, a ticket is punched. On the hill, something checks its fare."
-  - *The Appointed's Name:* "You do not say it. You let it see that you could."
+**The fight.** The Appointed has a form in each period, each an Elite enemy whose health is per investigator. **As It Is** cannot be damaged until As It Was and As It Will Be have both been defeated, and it never leaves the Present. Moving into or out of The First Occultation or The Morning After places 1 doom on the current Hour (their cards say so), so every trip through the hours costs time.
+- **What you carry.** Each deep Knowledge entry your log records can be spent once, as an [action] on Through the Hours while you are in its period, to deal 2 damage to the form there. It stays recorded for every other purpose, including the resolutions; note it on the Finale Record. Read its line aloud when you spend it:
+  - *The Past.* The Vote That Never Ends: "You read it the minutes. It knows them better than you, but it listens." (If the vote was torn out: "You recite the minutes from memory. The torn page is not there to argue.") The Hour Was Wrong: "You tell it the true hour. It has been keeping the wrong one." The Appointed's Name: "You do not say it. You let it see that you could."
+  - *The Future.* Who Walks Beside You: "On the road behind you the walkers stop, and turn, and wait with you." The Keeper's Ninth Death: "Eight times the keeper walked out along the beam and died. You tell it the ninth line is not its to write." The Ticket-Taker's Bargain: "Far off, a ticket is punched. Here, something checks its fare."
+- **The Uninvited** hunts you through the night. Defeating it deals 2 damage to a form of the Appointed that can be damaged.
+- **Hold Back** works only on As It Is: it disengages and exhausts it, and never rewinds the Hourglass in the finale.
 
-When contest progress reaches **6** (**5** with one investigator, **7** with four), advance Contest the Crossing: the contest is reached. Deep entries you carry into the finale give at most half the progress needed, rounded down (3 of 6 at three investigators); the rest must be won on the hill. During the finale, a Hold Back success does not rewind the Hourglass (the Control token knows this). The finale also ends, with the contest **not** reached, when Hour IX is reached, when every investigator has been defeated, or when Dissonance reaches the reset value.
+**Stop or press on.** When As It Was or As It Will Be is defeated, decide at once. You may end the finale there, stranded in that period (Resolution 7 for the Past, 8 for the Future). If you press on and the finale ends before As It Is is defeated, the night takes you back: read Resolution 5 or 6. The finale ends when As It Is is defeated, when you stop, or when Hour IX is reached, every investigator has been defeated, or Dissonance reaches the reset value.
 
 During the finale, if your log records:
-- *You carry the walker's ring:* once during the finale, when an investigator takes the Hold Back action, they may resolve it without a skill test: push the Appointed's Approach back 1 stage, disengage and exhaust the Appointed. This counts as succeeding at Hold Back. Read aloud: *The ring turns cold on your finger. For one step someone stands beside you on the hill, keeping exact time with you, and the thing in front of you stops.*
+- *You carry the walker's ring:* once during the finale, when an investigator Holds Back As It Is, they may do so without a skill test. Read aloud: *The ring turns cold on your finger. For one step someone stands beside you, keeping exact time with you, and the thing in front of you stops.*
 - *The name is kept unspoken:* once during the finale, after setup, when the Hourglass would advance for any reason, the investigators may speak the name to cancel that entire advance (remove all doom from the current Hour). Read aloud: *You say it once, aloud, at last. Every clock in Ambergrove holds its breath, and the hand does not move.*
 
-> **Halfway.** The first time your contest progress reaches half its target, rounded up, read aloud: *Every clock in Ambergrove stops, then starts again, ticking backward. For one breath you are all the ages you have ever been at once: young and tired and old, standing on every step of every stair you ever climbed in this town. Then the moment passes, and the thing on the hill is closer, and so is the dawn.*
+> **The first form falls.** The first time a form of the Appointed is defeated, read aloud: *Every clock in Ambergrove stops, then starts again, ticking backward. For one breath you are all the ages you have ever been at once: young and tired and old, standing on every step of every stair you ever climbed in this town. Then the moment passes, and the hours close around you again, and somewhere in them the rest of it is waiting.*
 
 **Do not read until the end of the finale.**
 
 An investigator is **present** if they took part in the finale, even if they were defeated during it. After Resolutions 1–4 no investigator ages out (there is no Between Loops), except as Resolution 4 says.
 
 When the finale ends, find where you stand:
-- **If the contest was reached**, the night can be ended. **The investigators must decide how.** Choose **one** of Resolutions 1, 1b, 2, 3 or 4 whose condition you meet and read it. Resolution 4 is always available.
-- **If the contest was not reached**, read Resolution 5 if banked Memory is at least 4 per investigator (12 at three investigators); otherwise read Resolution 6.
+- **If As It Is was defeated**, you are home, in the Present, and the night can be ended. **The investigators must decide how.** Choose **one** of Resolutions 1, 1b, 2, 3 or 4 whose condition you meet and read it. Resolution 4 is always available.
+- **If you stopped after defeating As It Was or As It Will Be**, read Resolution 7 (the Past) or Resolution 8 (the Future).
+- **Otherwise**, read Resolution 5 if banked Memory is at least 4 per investigator (12 at three investigators); otherwise read Resolution 6.
 
-After Resolutions 1–4 (including 1b), read **Epilogue — What the Years Took.**
+After Resolutions 1–4 (including 1b), read **Epilogue — What the Years Took.** Resolutions 7 and 8 have their own epilogue.
 
-```resolution Resolution 1 — Take Its Place (contest reached, and an Ancient investigator, or the investigator who signed the ninth line, is present)
-> Someone has to hold the night's crease closed from the inside. The one the night has marked knows it before anyone speaks. They take the lamp, or the pen, or simply each of your hands in turn, and they walk out onto the hill to meet the guest.
+```resolution Resolution 1 — Take Its Place (As It Is defeated, and an Ancient investigator, or the investigator who signed the ninth line, is present)
+> Someone has to hold the night's crease closed from the inside. The one the night has marked knows it before anyone speaks. They take the lamp, or the pen, or simply each of your hands in turn, and they walk out onto the hill to stand where the guest stood.
 - The investigators choose one present investigator who is Ancient or who signed the ninth line. That investigator becomes the night's new anchor: kept behind, decades older, so that the loop ends for everyone else. They do not come back down. Mark them **kept as anchor** under **Those Who Left the Loop**. Far down the Sunken Road, the walker with the worn ring stops at last and sits down at the roadside to rest.
 - If your log records **Who Walks Beside You**, instead: the ones who walk the Sunken Road come up the hill and take the anchor's weight with you. At dawn the anchor walks out with the others, free and not kept, but **3 Years** older. If your log also records *The walkers keep their ring*, the walkers carry the anchor almost the whole way: **1 Year** older instead of 3.
 - If the anchor signed the ninth line, add: *The keeper's book has its ninth line now, in a hand that chose it.*
 - The town wakes for the first time in a hundred years. The campaign is over.
 ```
 
-```resolution Resolution 1b — Let It In, On Your Terms (contest reached, your log records The Ticket-Taker's Bargain and You hold the ticket, and banked Memory is at least 4 per investigator, or 3 per investigator if you kept the night to yourselves)
-> He punches your ticket without looking. He has been expecting you for a very long time. The door opens, not the way the town opened it, begging, but the way you open a door to a guest you have decided to receive. It comes in. It sits down at the edge of the Square in the lantern light, and it is smaller than you feared, and it is very, very old.
+```resolution Resolution 1b — Let It In, On Your Terms (As It Is defeated, your log records The Ticket-Taker's Bargain and You hold the ticket, and banked Memory is at least 4 per investigator, or 3 per investigator if you kept the night to yourselves)
+> He punches your ticket without looking. He has been expecting you for a very long time. The door opens, not the way the town opened it, begging, but the way you open a door to a guest you have decided to receive. What is left of it comes in. It sits down at the edge of the Square in the lantern light, and it is smaller than you feared, and it is very, very old.
 - If your log records *You kept the night to yourselves*, add: *As the door swings open he touches one finger to the side of his nose. A man who keeps a secret knows what one is worth.*
 - The door opens on your terms, not the town's, and the night finally ends.
 - The fare is everything you carried: banked Memory drops to **0**, and each present investigator gains **2 Years**.
 - Ambergrove wakes to a morning with one more guest in it. The campaign is over.
 ```
 
-```resolution Resolution 2 — Close the Door (contest reached, and your log records The vote still stands)
+```resolution Resolution 2 — Close the Door (As It Is defeated, and your log records The vote still stands)
 > You pay the price the town agreed to and never paid. It is paid in years, as every price here is. You feel them go, all at once, like stepping off a stair that is not there. When you look up the sky has an edge again, and the edge is the dawn.
 - Each present investigator gains **3 Years** at once, and the door closes. If your log records *The town was warned*, Ambergrove remembers just enough to share the cost: **2 Years** each instead.
 - The debt is paid, and the door stays shut. The campaign is over.
 ```
 
-```resolution Resolution 3 — Break Through (contest reached, and your log records The Keeper's Ninth Death)
+```resolution Resolution 3 — Break Through (As It Is defeated, and your log records The Keeper's Ninth Death)
 > You go the way the keeper tried eight times, along the beam and out over the water, and this time no one falls. You force the night open, and every present investigator runs through before it can close. Behind you the Square, the band, the lanterns, the sheriff on his steps, all fold away like a stage set in the rain.
 - Every present investigator escapes, and each gains **2 Years**: the night closes on your heels. The campaign is over.
 - But the loop is only paused. Somewhere, some night, an almanac will be printed with the wrong hour again. Was it really ended?
@@ -791,21 +786,35 @@ After Resolutions 1–4 (including 1b), read **Epilogue — What the Years Took.
 - If an investigator signed the ninth line, add: *Somewhere in the keeper's book a name is waiting. One night, the book may call it.*
 ```
 
-```resolution Resolution 4 — Seal by Force (contest reached)
+```resolution Resolution 4 — Seal by Force (As It Is defeated)
 > The door is sealed, but not closed. Someone has to lean against it until the dawn comes, and the dawn is a long way off.
 - The investigators choose one present investigator. They age out holding the door shut: write them under **Those Who Left the Loop** as aged out. The campaign is over.
 - If your log records *The vote was torn out*, no debt is owed behind that door, and it pushes back with nothing but its own weight. The chosen investigator holds it until morning and walks away **3 Years** older instead of aging out.
 ```
 
-```resolution Resolution 5 — Next Time (contest not reached, banked Memory at least 4 per investigator)
+```resolution Resolution 5 — Next Time (no form defeated, or you pressed on and As It Is stands; banked Memory at least 4 per investigator)
 > The loop wins tonight. The guest keeps its appointment, and the night folds along its old crease. But you have carried so much of it now that the fold does not quite close over you. You wake at First Dark closer than ever, older than ever, and certain.
 - The loop ends. Mark it as its ending would: **Torn** if Dissonance reached the reset value (with that ending's chaos-bag change and interlude story), **Taken** if every investigator was defeated (with that ending's interlude story), otherwise **Closed at the Hour**. Read each placed district's resolution (a district whose resolution you read before the finale reads nothing more), and proceed to **Between Loops**. You may attempt the finale again. At the next attempt, fill in the Finale Record again.
 - Do not read the epilogue yet.
 ```
 
-```resolution Resolution 6 — The Loop Wins (contest not reached, banked Memory below 4 per investigator)
+```resolution Resolution 6 — The Loop Wins (no form defeated, or you pressed on and As It Is stands; banked Memory below 4 per investigator)
 > The night takes you. The town keeps repeating, and somewhere on the Sunken Road, walking the same direction and never arriving, there are new faces beneath the hoods.
 - The campaign ends. Do not read the epilogue.
+```
+
+```resolution Resolution 7 — Stranded Before (you stopped after defeating As It Was)
+> You strike it down in the hour it was invited, and that hour closes around you like a door. When the lanterns are lit again they are new, and the band has not learned the tune. The clerk on the Town Hall steps is counting hands. You are in Ambergrove decades before you were born, and the night goes on, and in the morning there is a morning.
+- The campaign is over. Read the epilogue below instead of **Epilogue — What the Years Took**.
+- *You live out your lives in the old town. You know what it will vote for, and when, and what it will cost. Some of you try to stop it. Some of you only watch the young faces in the Square and remember them old. None of you ever buys an almanac.*
+- If your Campaign Log records *The town was warned*, add: *One night, years on, a girl in a green shawl stops you in the street and asks if she knows you. You tell her not yet.*
+```
+
+```resolution Resolution 8 — Stranded After (you stopped after defeating As It Will Be)
+> You strike it down in the hour it meant to keep, and that hour holds you. When you look up, the Square is gray with morning. The bunting has rotted on its strings. The shore road is empty: whoever walked it has finished walking. The night is over, and it has been over for a long time.
+- The campaign is over. Read the epilogue below instead of **Epilogue — What the Years Took**.
+- *You come out into a world that went on without you. The almanac is out of print. No one in the new houses has heard of the occultation. Each of you finds a way to live in the years you were given, and on clear nights you look up, and the stars stay where they are.*
+- If your Campaign Log records *Who Walks Beside You*, add: *At the end of the shore road someone has built a bench. On it, worn smooth, is a ring.*
 ```
 
 **Epilogue — What the Years Took.** First, the dawn. Read once: *At midnight the church bell strikes twelve, and stops.* Then add each of these your Campaign Log records:

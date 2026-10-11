@@ -744,6 +744,8 @@ return function(R, T)
   end
   function R.isAloof(en)
     if R.onlyPrey(en) then return false end
+    -- As It Is looms over the Square, aloof and still, until the Past and the Future fall
+    if R.FX.cannotBeDamaged and R.FX.cannotBeDamaged(en) then return true end
     if en.id == "sthr-wearssheriff" then return true end         -- giving the speech: aloof, does not move
     return R.textHas(en.def, "Aloof.")
   end

@@ -1014,7 +1014,7 @@
   },
   "sthr-act-lasthour": {
     "name": "Through the Hours",
-    "text": "The First Occultation (the Past) connects to The Square and The Morning After (the Future) to The Town Hall Steps; moving in or out of either places 1 doom on the current Hour.\n[action] At The First Occultation or The Morning After: Spend a deep Knowledge entry of that period (see the Campaign Guide; each once per finale): Deal 2 damage to the form of The Appointed there.\nObjective – When As It Is is defeated, advance.\nIf Hour IX is reached, every investigator is defeated, or Dissonance reaches the reset value, the finale ends (→R7 or R8 if a form was defeated, otherwise R5 or R6).",
+    "text": "The First Occultation (the Past) connects to The Square and The Morning After (the Future) to The Town Hall Steps; moving in or out of either places 1 doom on the current Hour.\n[action] At The First Occultation or The Morning After: Spend a deep Knowledge entry of that period (see the Campaign Guide; each once per finale): Deal 2 damage to the form of The Appointed there.\nObjective – When As It Is is defeated, advance.\nIf Hour IX is reached, every investigator is defeated, or Dissonance reaches the reset value, the finale ends (→R5 or R6).",
     "flavor": "It was never late. Tonight, neither are you.",
     "deck": 95114,
     "index": "1a",
@@ -1048,13 +1048,13 @@
   "sthr-res-5": {
     "name": "Next Time",
     "traits": "Resolution 5.",
-    "text": "No form of The Appointed defeated, and banked Memory is at least 4 per investigator.\nMark this loop as its ending would (Torn, with its chaos-bag change; Taken; or Closed at the Hour), read each placed district's resolution (except one whose resolution you read before the finale), and proceed to Between Loops; the finale may be begun again.",
+    "text": "As It Is not defeated and the investigators did not stop after an earlier form, and banked Memory is at least 4 per investigator.\nMark this loop as its ending would (Torn, with its chaos-bag change; Taken; or Closed at the Hour), read each placed district's resolution (except one whose resolution you read before the finale), and proceed to Between Loops; the finale may be begun again.",
     "deck": 95119
   },
   "sthr-res-6": {
     "name": "The Loop Wins",
     "traits": "Resolution 6.",
-    "text": "No form of The Appointed defeated, and banked Memory is below 4 per investigator.\nThe night takes you. The campaign ends.",
+    "text": "As It Is not defeated and the investigators did not stop after an earlier form, and banked Memory is below 4 per investigator.\nThe night takes you. The campaign ends.",
     "flavor": "The town keeps repeating, and somewhere on the Sunken Road, walking the same direction and never arriving, there are new faces beneath the hoods.",
     "deck": 95120
   },
@@ -1475,7 +1475,7 @@
     "damage": 1,
     "horror": 1,
     "quantity": 1,
-    "text": "Cannot move.\nForced – At the end of the round: Each investigator at The First Occultation takes 1 horror.\nForced – When As It Was is defeated: Record it on the Control token. The investigators may end the finale here (→R7).",
+    "text": "Cannot move.\nForced – At the end of the round: Each investigator at The First Occultation takes 1 horror.\nForced – When As It Was is defeated: The investigators may end the finale here (→R7). If they press on, the finale can end only with As It Is defeated or (→R5 or R6).",
     "flavor": "Invited, in ink, by every hand in the town."
   },
   "sthr-form-future": {
@@ -1488,7 +1488,7 @@
     "damage": 2,
     "horror": 0,
     "quantity": 1,
-    "text": "Cannot move.\nForced – When As It Will Be is defeated: Record it on the Control token. The investigators may end the finale here (→R8).",
+    "text": "Cannot move.\nForced – When As It Will Be is defeated: The investigators may end the finale here (→R8). If they press on, the finale can end only with As It Is defeated or (→R5 or R6).",
     "flavor": "Patient as a debt. It has already counted the Years you have left."
   },
   "sthr-form-present": {
@@ -1501,19 +1501,19 @@
     "damage": 2,
     "horror": 2,
     "quantity": 1,
-    "text": "Massive. Hunter. Prey – Most Memory on their cards. It cannot enter The First Occultation or The Morning After.\nAs It Is cannot be damaged while As It Was or As It Will Be is in play.\n[action] Hold Back. Test [wil] or [com] (4). If you succeed, disengage and exhaust As It Is.\nForced – When As It Is is defeated: Advance Through the Hours.",
+    "text": "Massive. Hunter. Prey – Most Memory on their cards. It cannot enter The First Occultation or The Morning After.\nWhile As It Was or As It Will Be is in play, As It Is is aloof, cannot move or attack, and cannot be damaged.\n[action] Hold Back. Test [wil] or [com] (4). If you succeed, disengage and exhaust As It Is.\nForced – When As It Is is defeated: Advance Through the Hours.",
     "flavor": "It is not early. Neither are you."
   },
   "sthr-res-7": {
     "name": "Stranded Before",
     "traits": "Resolution 7.",
-    "text": "The finale ended after As It Was was the last form of The Appointed defeated.\nThe investigators end in the Past, decades before they were born. The campaign is over.",
+    "text": "The investigators stopped after defeating As It Was.\nThey end in the Past, decades before they were born. The campaign is over.",
     "flavor": "The lanterns are new, and they stay new."
   },
   "sthr-res-8": {
     "name": "Stranded After",
     "traits": "Resolution 8.",
-    "text": "The finale ended after As It Will Be was the last form of The Appointed defeated.\nThe investigators end in the Future, on a morning the town never reached. The campaign is over.",
+    "text": "The investigators stopped after defeating As It Will Be.\nThey end in the Future, on a morning the town never reached. The campaign is over.",
     "flavor": "It is morning. It is only morning."
   }
 }

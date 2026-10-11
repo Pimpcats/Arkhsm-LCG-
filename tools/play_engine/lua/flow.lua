@@ -806,6 +806,7 @@ return function(R, T)
             local step = R.route(here, target, { enemy = true })
             -- As It Is never leaves the Present
             if step and en.id == "sthr-form-present" and (step.district == "Past" or step.district == "Future") then step = nil end
+            if step and R.FX.cannotBeDamaged and R.FX.cannotBeDamaged(en) then step = nil end
             if step then
               en.loc = step.guid
               R.placeEnemy(en)

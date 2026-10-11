@@ -90,7 +90,7 @@ local function playCtx()
         .. "(then click Begin Finale on the Control token).")
     end,
     onFinaleEnds = function()
-      announce("The Appointed Hour: the finale ends and the contest is not reached.", { 1, 0.4, 0.4 })
+      announce("The Appointed Hour: the finale ends with As It Is standing. Read Resolution 5 or 6.", { 1, 0.4, 0.4 })
     end,
   })
 end
@@ -98,7 +98,7 @@ end
 --- What to tell the table when Dissonance reaches the reset value.
 local function announceResetReached()
   if CampaignState.inFinale() then
-    announce("Dissonance reached the reset value: the finale ends and the contest is not reached.",
+    announce("Dissonance reached the reset value: the finale ends with As It Is standing. Read Resolution 5 or 6.",
       { 1, 0.4, 0.4 })
   elseif CampaignState.inPrologue() then
     announce("Dissonance reached the reset value: the night ends. Read the Prologue's resolutions, then click Reset Loop.",
@@ -994,10 +994,9 @@ local function drawPlay()
         .. "Right-click takes the reward back.", 2 * n, n), 85)
   end
   if CampaignState.inFinale() then
-    button("shClickContest", string.format("Contest %d / %d", CampaignState.getContest(), c.contestTarget),
-      0.0, 2.6, 620, "The Last Hour: click once for every source of contest progress (each Hold Back success, "
-        .. "the Uninvited's defeat, each deep entry spent, You have spoken the name); none is automatic. "
-        .. PLUS_MINUS .. ". Right-click at 0: the finale was not begun after all.")
+    button("shClickContest", string.format("Forms defeated %d / 3", math.min(3, CampaignState.getContest())),
+      0.0, 2.6, 620, "The Last Hour: click when a form of the Appointed is defeated (As It Was, As It Will Be, "
+        .. "As It Is). " .. PLUS_MINUS .. ". Right-click at 0: the finale was not begun after all.")
   elseif CampaignState.knows("the-way-the-night-breaks") and not CampaignState.isLoopEnded()
       and not CampaignState.inPrologue() then
     -- the finale begins during a loop, never Between Loops (after Reset Loop) or in the Prologue
@@ -1324,8 +1323,8 @@ function shBeginFinale()
       bag.setPress(true)
       announce("The true page reached the Press: until the finale ends, the chaos bag holds 1 fewer Static token.")
     end
-    announce(string.format("The finale begins: contest progress 0 / %d. If Hour IX is reached, the finale ends "
-      .. "and the contest is not reached.", CampaignState.constants().contestTarget))
+    announce("The finale begins: the Appointed is set aside. Spawn As It Was, As It Will Be and As It Is. "
+      .. "If Hour IX is reached before As It Is is defeated, the finale ends (Resolution 5 or 6).")
   end)
   afterChange()
 end
@@ -1903,13 +1902,13 @@ function shStatus()
   resetAsked = false
   local c = CampaignState.constants()
   print(string.format(
-    "STILL HOUR | loops completed %d | scar %d | %s | Memory %d/%d | Dissonance %d/%d (%s) | Hour %s | Appointed: %s | contest %d/%d | [static] %d (%s)%s",
+    "STILL HOUR | loops completed %d | scar %d | %s | Memory %d/%d | Dissonance %d/%d (%s) | Hour %s | Appointed: %s | forms %d/3 | [static] %d (%s)%s",
     CampaignState.getLoopsCompleted(), math.min(CampaignState.getLoopsCompleted(), c.scarCap),
     CampaignState.inPrologue() and "Prologue" or (CampaignState.inPartTwo() and "Part II" or "Part I"),
     CampaignState.getBankedMemory(), c.memoryCap,
     CampaignState.getDissonance(), c.resetThreshold, CampaignState.band(),
     Hourglass.HOUR_NAMES[CampaignState.getHour()] or "?", Appointed.stageName(),
-    CampaignState.getContest(), c.contestTarget,
+    math.min(3, CampaignState.getContest()),
     bag.target(), bag.describe().mode, SCED.isPresent() and (" | SCED " .. tostring(SCED.version())) or ""))
 end
 
@@ -1988,10 +1987,14 @@ function shClickContest(_, _, alt)
     afterChange()
     return
   end
-  CampaignState.setContest(CampaignState.getContest() + (alt and -1 or 1))
-  local c = CampaignState.constants()
-  if CampaignState.getContest() >= c.contestTarget then
-    announce("The contest is reached: advance Contest the Crossing.")
+  CampaignState.setContest(math.min(3, CampaignState.getContest() + (alt and -1 or 1)))
+  local n = CampaignState.getContest()
+  if not alt and n == 1 then
+    announce("A form of the Appointed falls. Stop here (Resolution 7 for the Past, 8 for the Future) or press on.")
+  elseif not alt and n == 2 then
+    announce("As It Was and As It Will Be are defeated: As It Is can now be damaged.")
+  elseif not alt and n == 3 then
+    announce("As It Is is defeated: advance Through the Hours.")
   end
   afterChange()
 end

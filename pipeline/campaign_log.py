@@ -354,7 +354,7 @@ def _pages():
     y += 108
     p3.text(90, y, "Attempted on loop:", size=24, style="bold")
     p3.line("finale_loop", 300, 400, y)
-    p3.text(440, y, "Contest reached:", size=24, style="bold")
+    p3.text(440, y, "As It Is defeated:", size=24, style="bold")
     x = p3.checkbox("contest_yes", 630, y, "yes", group="contest")
     p3.checkbox("contest_no", x, y, "no", group="contest")
     p3.text(880, y, "Banked Memory:", size=24, style="bold")
@@ -364,7 +364,7 @@ def _pages():
     y += 44
     x = 110
     for key, label in (("r1", "R1"), ("r1b", "R1b"), ("r2", "R2"), ("r3", "R3"),
-                       ("r4", "R4"), ("r5", "R5"), ("r6", "R6")):
+                       ("r4", "R4"), ("r5", "R5"), ("r6", "R6"), ("r7", "R7"), ("r8", "R8")):
         x = p3.checkbox(key, x, y, label, group="res")
     y += 50
     p3.text(90, y, "Deep entries spent this finale:", size=22, style="bold")

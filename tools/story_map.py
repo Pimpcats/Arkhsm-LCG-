@@ -276,7 +276,7 @@ class Map:
     # -------------------------------------------------------------- E ----
     def check_endings(self):
         r = resolutions(self.section("FINALE — THE LAST HOUR"))
-        need = {"R1", "R1b", "R2", "R3", "R4", "R5", "R6"}
+        need = {"R1", "R1b", "R2", "R3", "R4", "R5", "R6", "R7", "R8"}
         if need - set(r):
             self.fail("E", "finale resolutions missing: %s" % sorted(need - set(r)))
         choice_opts = [(k, a, b) for k, _d, a, b in self.log.CHOICES]
@@ -310,7 +310,7 @@ class Map:
                 o = open_endings(pick, nd, bg, an, mem)
                 seen.add(o)
                 reach |= o
-        reach |= {"R5", "R6"}                              # contest not reached, by banked Memory
+        reach |= {"R5", "R6", "R7", "R8"}                  # not won (by banked Memory), or stranded after one form
         self.rows["E endings"] = {"defined": sorted(r), "reachable": sorted(reach),
                                   "distinct_open_sets": len(seen)}
         if need - reach:
@@ -319,7 +319,8 @@ class Map:
             self.fail("E", "the open endings barely depend on the story (%d distinct sets)" % len(seen))
         # the conditions the model uses must match the guide's headings
         for k, words in (("R1", "ninth line"), ("R1b", "you hold the ticket"), ("R2", "the vote still stands"),
-                         ("R3", "the keeper's ninth death"), ("R4", "contest reached")):
+                         ("R3", "the keeper's ninth death"), ("R4", "as it is defeated"),
+                         ("R7", "as it was"), ("R8", "as it will be")):
             if words not in conds.get(k, ""):
                 self.fail("E", "%s's heading no longer says '%s': update the ending model" % (k, words))
 
