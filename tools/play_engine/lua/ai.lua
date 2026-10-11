@@ -607,8 +607,13 @@ return function(R, T)
       if (inv.health - inv.damage) <= (en.def.damage or 0) + 1 then fightScore = fightScore * 0.7 end
       if inv.id == "sthrelias" or inv.id == "sthrseraphine" and weapon then fightScore = fightScore * 1.3 end
       if wantEvade then evadeScore = evadeScore + 50 end
-      -- the finale: the Uninvited's defeat is contest progress
+      -- the finale: the Uninvited's defeat damages a form
       if G.finale and en.id == "sthr-uninvited" then fightScore = fightScore * 1.6 end
+      -- a form of the Appointed is the night's whole objective: every hit counts, never evade it
+      if en.form and not FX.cannotBeDamaged(en) then
+        fightScore = (40 + threat) * pf
+        evadeScore = 0
+      end
       add(fightScore, "fight", function() R.ACT.fight(inv, en, weapon) end, { provokes = false })
       add(evadeScore, "evade", function() R.ACT.evade(inv, en) end, { provokes = false })
     end
