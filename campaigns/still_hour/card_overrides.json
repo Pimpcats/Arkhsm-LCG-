@@ -1014,7 +1014,7 @@
   },
   "sthr-act-lasthour": {
     "name": "Through the Hours",
-    "text": "The First Occultation (the Past) connects to The Square and The Morning After (the Future) to The Town Hall Steps; moving in or out of either places 1 doom on the current Hour.\n[action] At The First Occultation or The Morning After: Spend a deep Knowledge entry of that period (see the Campaign Guide; each once per finale): Deal 2 damage to the form of The Appointed there.\nObjective – When As It Is is defeated, advance.\nIf Hour IX is reached, every investigator is defeated, or Dissonance reaches the reset value, the finale ends (→R5 or R6).",
+    "text": "The First Occultation (the Past) connects to The Square and The Morning After (the Future) to The Town Hall Steps; the first move each round in or out of either places 1 doom on the current Hour.\n[action] At The First Occultation or The Morning After: Spend a deep Knowledge entry of that period (see the Campaign Guide; each once per finale): Deal 2 damage to the form of The Appointed there.\nObjective – When As It Is is defeated, advance.\nIf Hour IX is reached, every investigator is defeated, or Dissonance reaches the reset value, the finale ends (→R5 or R6).",
     "flavor": "It was never late. Tonight, neither are you.",
     "deck": 95114,
     "index": "1a",
@@ -1446,7 +1446,7 @@
         "color": "#1a605e"
       }
     ],
-    "text": "Forced – After an investigator enters or leaves The First Occultation: Place 1 doom on the current Hour.",
+    "text": "Forced – After the first move each round into or out of The First Occultation: Place 1 doom on the current Hour.",
     "flavor": "The lanterns are new. The band has not learned the tune yet. On the Town Hall steps a clerk is counting hands."
   },
   "sthr-loc-morningafter": {
@@ -1462,7 +1462,7 @@
         "color": "#2c4a7c"
       }
     ],
-    "text": "Investigators here get −1 [agi] and −1 [com].\nForced – After an investigator enters or leaves The Morning After: Place 1 doom on the current Hour.",
+    "text": "Investigators here get −1 [agi] and −1 [com].\nForced – After the first move each round into or out of The Morning After: Place 1 doom on the current Hour.",
     "flavor": "Gray light on an empty square. The bunting has rotted on its strings. Out on the shore road, no one is walking."
   },
   "sthr-form-past": {

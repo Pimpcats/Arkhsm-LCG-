@@ -754,6 +754,13 @@ return function(R, T)
     if en.id == "sthr-wearssheriff" then return true end         -- giving the speech: aloof, does not move
     return R.textHas(en.def, "Aloof.")
   end
+  --- Massive: engaged with each investigator at its location (RR), once it is not aloof.
+  function R.isMassive(en)
+    return R.textHas(en.def, "Massive.") and not R.isAloof(en)
+  end
+  function R.massiveWith(en, inv)
+    return R.isMassive(en) and en.loc ~= nil and en.loc == inv.loc and not R.sleepwalking(en)
+  end
   function R.hasRetaliate(en)
     if R.textHas(en.def, "Retaliate.") then return true end
     if en.id == "sthr-lamplighterecho" and R.P.lampInPlay() then return true end

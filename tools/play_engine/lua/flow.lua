@@ -833,9 +833,15 @@ return function(R, T)
     R.playerWindow("hunters complete")
     -- RR 3.3: each investigator resolves their complete batch of attacks,
     -- with a player window between investigators rather than between enemies.
+    local massive = {}
     for _, inv in ipairs(R.aliveInvs()) do
       for _, en in ipairs(copyList(G.enemies)) do
-        if not en.dead and en.engaged == inv and not en.exhausted and not R.sleepwalking(en) then
+        if not en.dead and not en.exhausted and R.massiveWith(en, inv) then
+          -- Massive: it attacks each investigator at its location, then exhausts
+          R.enemyAttack(en, inv, "enemy phase")
+          massive[en] = true
+          if G.ended then return end
+        elseif not en.dead and en.engaged == inv and not en.exhausted and not R.sleepwalking(en) then
           R.enemyAttack(en, inv, "enemy phase")
           en.exhausted = true
           if G.ended then return end
@@ -847,6 +853,7 @@ return function(R, T)
       end
       R.playerWindow("investigator attacks complete")
     end
+    for en in pairs(massive) do en.exhausted = true end
   end
 
   function R.upkeep()

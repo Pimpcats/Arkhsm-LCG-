@@ -518,7 +518,7 @@ return function(R, T)
   local function engagedWith(inv)
     local l = {}
     for _, en in ipairs(R.G.enemies) do
-      if en.engaged == inv and not R.sleepwalking(en) then l[#l + 1] = en end
+      if (en.engaged == inv and not R.sleepwalking(en)) or R.massiveWith(en, inv) then l[#l + 1] = en end
     end
     return l
   end
