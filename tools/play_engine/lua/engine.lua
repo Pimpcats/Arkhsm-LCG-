@@ -607,7 +607,7 @@ return function(H)
     if cfg.goalsPerNight then
       perNight=math.max(1,cfg.goalsPerNight-(pending("Square") and 1 or 0))
     end
-    if perNight>1 then
+    if perNight>1 or cfg.goalsPerNight then
       districts={}
       local start=((slot-2)*(cfg.goalsPerNight and 1 or perNight))%#ROUTE
       for i=0,#ROUTE-1 do
