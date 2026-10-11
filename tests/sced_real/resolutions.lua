@@ -830,15 +830,10 @@ return function(H)
       times(4, function() ctl("shClickHour", true) end)
       check("Setup 2: four right-clicks put Hour V back as the current Hour", st().hour == 5, st().hour)
     end
-    for _ = 1, 3 do if st().stage < 3 then ctl("shClickAppointed") end end
     ctl("shBeginFinale")
     local s = st()
-    check("Setup 2-3: the Appointed Arrived, Begin Finale shows Contest 0 / 6", s.finale and s.stage == 3
-      and hasLabel(control(), "Contest 0 / 6"), list(s))
-    if logVal("name_a") then
-      ctl("shClickContest")
-      check("You have spoken the name: 1 contest progress", hasLabel(control(), "Contest 1 / 6"), labels(control()))
-    end
+    check("Setup 3: Begin Finale sets the Appointed aside (Unseen) and shows Forms defeated 0 / 3",
+      s.finale and s.stage == 0 and hasLabel(control(), "Forms defeated 0 / 3"), list(s))
     if logVal("page_b") then
       local h = st().hour
       ctl("shClickHour", true)
@@ -848,11 +843,13 @@ return function(H)
   end
   local function reachContest()
     local mark = chatMark()
-    for _ = 1, 20 do
-      if hasLabel(control(), "Contest 6 / 6") then break end
-      ctl("shClickContest")
-    end
-    check("the contest is reached at 6 (5 solo)", chatHas(mark, "The contest is reached"))
+    ctl("shClickContest")
+    check("the first form falls: stop or press on", chatHas(mark, "Stop here"))
+    ctl("shClickContest")
+    check("the Past and the Future fall: As It Is can be damaged", chatHas(mark, "As It Is can now be damaged"))
+    ctl("shClickContest")
+    check("As It Is is defeated: Forms defeated 3 / 3", chatHas(mark, "As It Is is defeated")
+      and hasLabel(control(), "Forms defeated 3 / 3"), labels(control()))
     logTick("contest_yes") ; logType("finale_loop", tostring(st().loops + 1))
     logCount("finale_memory", st().memory)
   end
@@ -878,7 +875,7 @@ return function(H)
     logTick("name_a") ; logTick("page_b")
     local d0 = st().dissonance
     beginFinale({ atHourNine = true })
-    check("contest is reset to 1 by the spoken name, not carried", hasLabel(control(), "Contest 1 / 6"))
+    check("the forms counter starts at 0, not carried", hasLabel(control(), "Forms defeated 0 / 3"))
     local s0 = st()
     local mark = chatMark()
     local static0 = st().static.extra
@@ -1014,7 +1011,7 @@ return function(H)
   step("finale R5 (Next Time): contest not reached, 12+ banked; the loop ends; the finale again", function()
     restore("finaleBase")
     beginFinale()
-    times(5, function() ctl("shClickContest") end)
+    ctl("shClickContest")
     setMemory(12)
     local mark = chatMark()
     for _ = 1, 9 do if st().hour < 9 then ctl("shClickHour") end end
@@ -1027,14 +1024,14 @@ return function(H)
     endLoop()
     local s = st()
     check("Reset Loop ends the loop and the finale: contest cleared", s.loops == loops0 + 1 and not s.finale
-      and s.loopEnded and not hasLabel(control(), "Contest"), list(s))
+      and s.loopEnded and not hasLabel(control(), "Forms defeated"), list(s))
     local y0 = years("sthrelias")
     for _, id in ipairs(PARTY) do age(id) end
     check("R5 is a loop end: reset Years are gained", years("sthrelias") > y0, y0 .. " -> " .. years("sthrelias"))
     ctl("shBeginNextLoop")
     check("the next loop offers Begin Finale again", hasLabel(control(), "Begin Finale"), labels(control()))
     ctl("shBeginFinale")
-    check("a second finale starts from Contest 0", st().finale and hasLabel(control(), "Contest 0 / 6"), labels(control()))
+    check("a second finale starts from Forms defeated 0", st().finale and hasLabel(control(), "Forms defeated 0 / 3"), labels(control()))
   end)
 
   step("finale R5/R6 by Dissonance and by defeat; R6 (The Loop Wins) below 12 banked", function()
@@ -1053,16 +1050,11 @@ return function(H)
     check("Memory on cards does not count toward R5/R1b (still R6)", same(ORACLE.finale({ contest = false }), { "R6" }))
   end)
 
-  step("walker's ring: a Hold Back without a test pushes back and rewinds (contest +1 by hand)", function()
+  step("in the finale the Appointed stays set aside: the Hours do not move its Approach", function()
     restore("finaleBase")
-    logTick("ring_a")
     beginFinale()
-    local h = st().hour
-    control().call("shApiHoldBack")
-    ctl("shClickContest")
-    check("Hold Back in the finale: Arrived -> Emerging, the Hourglass does not rewind", st().stage == 2 and st().hour == h,
-      list(st()))
-    check("contest +1 for the Hold Back success", hasLabel(control(), "Contest 1 / 6"), labels(control()))
+    for _ = 1, 3 do if st().hour < 8 then ctl("shClickHour") end end
+    check("Hours V to VIII leave the Approach at Unseen in the finale", st().stage == 0, list(st()))
   end)
 
   ------------------------------------------------------ epilogue inputs --

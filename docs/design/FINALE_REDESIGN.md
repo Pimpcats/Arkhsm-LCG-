@@ -88,3 +88,28 @@ Art: five new illustrations (two places, three forms) through the existing pipel
 1. Owner approval of this structure (spoiler-free summary).
 2. Engine model + tuning runs (30 carried campaigns per arm) before card text is final.
 3. Cards, art, guide chapter, log, Control; story map test extended (forms, R7, R8); full test suite; publish.
+
+## Built and tuned (2026-10-11)
+
+What changed from the plan while building and simulating (carried campaigns, `goalsPerNight 2`, 3 investigators):
+
+- **Stop or press on is a real gamble.** Stopping after As It Was / As It Will Be is the stranded ending (R7 / R8).
+  Pressing on and failing (Hour IX, all defeated, reset value) is R5 / R6, not stranded: otherwise there would be no
+  reason ever to stop.
+- **As It Is waits.** While either other form is in play it is aloof, cannot move, attack or be damaged; it never
+  enters the periods. Without this it engaged the party crossing the Square and won before it could be hurt
+  (15 campaigns: 0 home, 10 party defeats).
+- **Massive** is modelled (engaged with everyone at its location; attacks each). Without it only the engaged
+  investigator ever attacked the boss.
+- **Pacing.** The finale runs Hour V→IX, about five rounds; three fights did not fit. The first move each round into
+  or out of a period places 1 doom (not every move), and each fallen Past/Future form rewinds the Hourglass 1 Hour.
+- **The Future** now connects to The Town Hall Steps (The Square already prints six connection symbols).
+- **Health** per investigator, tuned down from 3/3/4.
+
+| setting (Past/Future/Present health per inv.) | campaigns | home | stranded | not ended |
+|---|---|---|---|---|
+| 3/3/4, first build | 15 | 0 | 3 | 12 |
+| 2/2/3 + pacing, no Massive | 9 | 0 | 0 | 9 |
+| 2/2/2 + Massive | 9 | 3 | 0 | 6 |
+| 2/2/2 + Massive + cautious stop, two seeds | 18 | 5 | 4 | 9 |
+| 2/2/3 + Massive + cautious stop | 9 | 0 | 4 | 5 |

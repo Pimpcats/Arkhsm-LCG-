@@ -1586,9 +1586,9 @@
                     "sthr-form-future"
                   ],
                   "health_per_investigator": {
-                    "sthr-form-past": 3,
-                    "sthr-form-future": 3,
-                    "sthr-form-present": 4
+                    "sthr-form-past": 2,
+                    "sthr-form-future": 2,
+                    "sthr-form-present": 2
                   }
                 }
               }

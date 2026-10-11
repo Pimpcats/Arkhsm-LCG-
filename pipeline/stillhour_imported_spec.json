@@ -772,7 +772,7 @@
     "class": "Mythos",
     "name": "As It Was",
     "traits": "Monster. Elite. Past.",
-    "health": 3
+    "health": 2
   },
   {
     "id": "sthr-form-future",
@@ -780,7 +780,7 @@
     "class": "Mythos",
     "name": "As It Will Be",
     "traits": "Monster. Elite. Future.",
-    "health": 3
+    "health": 2
   },
   {
     "id": "sthr-form-present",
@@ -788,7 +788,7 @@
     "class": "Mythos",
     "name": "As It Is",
     "traits": "Monster. Elite.",
-    "health": 4
+    "health": 2
   },
   {
     "id": "sthr-res-7",
