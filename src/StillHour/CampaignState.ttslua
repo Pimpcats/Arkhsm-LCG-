@@ -494,8 +494,9 @@ end
 -- the stage — a driver can only raise it, so calling with a lower value is a
 -- no-op. Returns the resulting stage.
 function CampaignState.advanceAppointed(driverStage)
-  -- the Prologue has no Appointed (guide: The First Hour): nothing drives it
-  if state.prologue then return state.appointedStage end
+  -- the Prologue has no Appointed (guide: The First Hour): nothing drives it;
+  -- in the finale it is set aside and its forms take its place (guide: The Last Hour)
+  if state.prologue or state.finale then return state.appointedStage end
   local target = math.max(0, math.min(3, math.floor(driverStage or 0)))
   if target > state.appointedStage then
     state.appointedStage = target

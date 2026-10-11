@@ -1308,6 +1308,14 @@ function shBeginFinale()
     end
     CampaignState.setFinale(true)
     CampaignState.setContest(0)
+    -- The Appointed is set aside: its three forms take its place, and nothing
+    -- moves its Approach during the finale (CampaignState.advanceAppointed)
+    local guard = 0
+    while CampaignState.getAppointedStage() > 0 and guard < 4 do
+      guard = guard + 1
+      CampaignState.pushBackAppointed()
+    end
+    guarded("Appointed", Board.syncAppointed, { log = hourLog })
     -- The true page reached the Press: 1 fewer Static for the finale, on top of
     -- Hour VI's (the next reset clears it)
     local log = Board.campaignLog()

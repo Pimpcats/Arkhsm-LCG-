@@ -120,41 +120,53 @@ return function(R, T)
   local DEEP = { "the-keepers-ninth-death", "the-hour-was-wrong", "who-walks-beside-you", "the-vote-that-never-ends",
                  "the-ticket-takers-bargain", "the-appointeds-name" }
 
+  --- The finale's three forms of the Appointed (guide: The Last Hour).
+  R.FORMS = {
+    { key = "past", id = "sthr-form-past", at = "sthr-loc-firstoccultation", stranded = "R7" },
+    { key = "future", id = "sthr-form-future", at = "sthr-loc-morningafter", stranded = "R8" },
+    { key = "present", id = "sthr-form-present", at = "sthr-loc-hubsquare" },
+  }
+  -- the deep entries each period's form can be dealt damage with
+  R.DEEP_PERIOD = {
+    past = { "the-vote-that-never-ends", "the-hour-was-wrong", "the-appointeds-name" },
+    future = { "who-walks-beside-you", "the-keepers-ninth-death", "the-ticket-takers-bargain" },
+  }
+  R.PERIOD_AT = { ["sthr-loc-firstoccultation"] = "past", ["sthr-loc-morningafter"] = "future" }
+
+  function R.form(key)
+    local B = R.G.boss
+    return B and B.en[key]
+  end
+  local function alive(en) return en and not en.dead end
+  --- As It Is cannot be damaged while As It Was or As It Will Be is in play.
+  function FX.cannotBeDamaged(en)
+    local B = R.G.boss
+    if not B or en.id ~= "sthr-form-present" then return false end
+    return alive(B.en.past) or alive(B.en.future)
+  end
+
   --- [free] at the Sealed Study: begin the finale (guide: The Last Hour, Setup).
   function R.beginFinale(inv, atNine)
     local G = R.G
     if G.finale then return end
     G.finale = true
-    -- Participation is fixed when the finale starts. Later defeat does not
-    -- remove an investigator from its resolution (player guide, The Last Hour).
     G.finaleParticipants = {}
     for _, x in ipairs(R.aliveInvs()) do G.finaleParticipants[x.id] = true end
     G.metrics.finale_began = { round = G.round, hour = R.hour(), dissonance = R.dissonance(), atNine = atNine and true or false }
     R.log("THE FINALE BEGINS (Hour %d, Dissonance %d)", R.hour(), R.dissonance())
-    -- 1. Place The Last Hour; district act decks are set aside
+    -- 1. Place The Last Hour (its two periods join the map); district act decks are set aside
     for d, act in pairs(G.acts) do
       local c = T.cardWithId(act.id)
       if c then c.setPosition({ -60, 2, -12 }) end
     end
     G.actsBeforeFinale = G.acts
     G.acts, G.actOrder = {}, {}
-    local box = T.placeBox("finale")
+    T.placeBox("finale")
     E.run(1)
-    local unv = T.takeCard("sthr-uninvited")
-    -- 2. the Approach advances to Arrived (it manifests if set aside)
-    local guard = 0
-    while R.stage() < 3 and guard < 4 do
-      guard = guard + 1
-      T.ctl("Appointed")
-      E.run(0.3)
-      R.touch()
-    end
-    R.syncAppointedArrival()
-    -- begun at Hour IX: Hours IX to VI go back on the deck, Hour V is current,
-    -- no Hour resolves (right-click Hour four times)
+    R.scanLocations()
+    -- the Hourglass: begun at Hour IX, Hours IX to VI go back (no Hour resolves);
+    -- begun before Hour V, it skips to Hour V (each Hour resolves)
     if atNine then R.rewind(4, "the finale begins at Hour IX") end
-    -- a finale begun before Hour V skips to Hour V (each Hour resolves):
-    -- advance until Hour V is current rather than a fixed number of clicks.
     local fromHour = (R.WHATIF or {}).finaleFrom or 5
     if not atNine then
       local guard = 0
@@ -163,11 +175,31 @@ return function(R, T)
         R.advance(1, "the finale begins")
       end
     end
-    -- the Uninvited at the revealed location farthest from all investigators, not closed
+    -- 2. Begin Finale on the Control: The Appointed is set aside; its forms take its place
+    T.ctl("Begin Finale")
+    E.run(0.3)
+    R.touch()
+    G.boss = { en = {}, defeated = {}, last = nil, deep = {} }
+    local fh = (R.WHATIF or {}).formHealth or {}
+    for _, f in ipairs(R.FORMS) do
+      local c = T.takeCard(f.id)
+      local L = R.locById(f.at)
+      if c and L then
+        local en = R.spawnEnemy(c, L, nil, { want = L.name })
+        local base = fh[f.key]
+        if base then en.maxHealth = base * G.n end
+        en.form = f.key
+        G.boss.en[f.key] = en
+      else
+        G.metrics.bad_spawns[#G.metrics.bad_spawns + 1] = { id = f.id, want = f.at, used = "none", note = "form or its location missing" }
+      end
+    end
+    -- the Uninvited at the revealed location farthest from all investigators
+    local unv = T.takeCard("sthr-uninvited")
     if unv then
       local far, fd
       for _, L in ipairs(G.locList) do
-        if L.revealed and not L.closed then
+        if L.revealed and not L.closed and not R.PERIOD_AT[L.id] then
           local d = 99
           for _, x in ipairs(R.aliveInvs()) do
             local dist = R.paths(R.locOf(x), { enemy = true })[L.guid] or 99
@@ -176,53 +208,65 @@ return function(R, T)
           if fd == nil or d > fd then far, fd = L, d end
         end
       end
-      if R.FINALE_SPAWN_AT then far = R.locById(R.FINALE_SPAWN_AT) or far end     -- what-if only
       if (R.WHATIF or {}).uninvitedAt then far = R.locById(R.WHATIF.uninvitedAt) or far end   -- what-if only
       R.spawnEnemy(unv, far, nil, { want = "the revealed location farthest from all investigators" })
     end
-    -- 3. Begin Finale on the Control: the Contest counter
-    T.ctl("Begin Finale")
-    E.run(0.3)
-    R.touch()
-    if R.FINALE_SPAWN_AT or (R.WHATIF or {}).finaleAppointedAt then      -- what-if only
-      local L = R.locById(R.FINALE_SPAWN_AT or R.WHATIF.finaleAppointedAt)
-      if L then R.placeAppointed(L) end
+    -- 3. what the log records
+    if G.logFlags["You have spoken the name"] and G.boss.en.past then
+      R.damageEnemy(G.boss.en.past, (R.WHATIF or {}).spokenValue or 1, nil, "You have spoken the name")
     end
-    local AL = R.appointedLoc()
-    G.metrics.finale_appointed_at = AL and AL.id or "?"
-    R.log("The Appointed is at %s at the start of the finale", AL and AL.name or "?")
-    if G.logFlags["You have spoken the name"] then R.contest((R.WHATIF or {}).spokenValue or 1, "You have spoken the name") end
     if G.logFlags["The drowned heard the true hour"] then R.rewind(1, "The drowned heard the true hour") end
     G.nameUnspoken = G.logFlags["The name is kept unspoken"]
-    -- what-if: each investigator heals when the finale begins ({damage, horror})
-    local fh = (R.WHATIF or {}).finaleHeal
-    if fh then
-      for _, x in ipairs(R.aliveInvs()) do
-        R.heal(x, math.min(fh[1] or 0, x.damage), math.min(fh[2] or 0, x.horror))
-      end
+    for key, list in pairs(R.DEEP_PERIOD) do
+      G.boss.deep[key] = {}
+      for _, f in ipairs(list) do if R.knows(f) then table.insert(G.boss.deep[key], f) end end
     end
-    G.deepToSpend = {}
-    for _, f in ipairs(DEEP) do if R.knows(f) then G.deepToSpend[#G.deepToSpend + 1] = f end end
-    -- spent entries give at most half the progress needed, rounded down
-    local cap = (R.WHATIF or {}).deepCap or math.floor(R.consts().contest / 2)
-    while #G.deepToSpend > cap do table.remove(G.deepToSpend) end
-    -- the first time each investigator is at the Sealed Study (those already there gain it now)
-    local study = R.locById("sthr-loc-sealedstudy")
-    for _, x in ipairs(R.aliveInvs()) do
-      if study and x.loc == study.guid and not G.studyVisited[x.id] and (R.WHATIF or {}).studyVisits then
-        G.studyVisited[x.id] = true
-        R.contest(1, "first time at the Sealed Study")
-      end
-    end
+    G.deepToSpend = nil
   end
 
-  --- [action] on Contest the Crossing: spend a deep Knowledge entry.
+  --- [action] at a period: spend one of its deep entries, 2 damage to its form.
   function R.spendDeep(inv)
     local G = R.G
-    local f = table.remove(G.deepToSpend, 1)
-    if f then
-      G.metrics.deep_spent = (G.metrics.deep_spent or 0) + 1
-      R.contest(1, "deep entry spent: " .. f)
+    local L = R.locOf(inv)
+    local key = L and R.PERIOD_AT[L.id]
+    local B = G.boss
+    if not (B and key and alive(B.en[key]) and #B.deep[key] > 0) then return end
+    local f = table.remove(B.deep[key], 1)
+    G.metrics.deep_spent = (G.metrics.deep_spent or 0) + 1
+    R.damageEnemy(B.en[key], (R.WHATIF or {}).deepDamage or 2, inv, "deep entry spent: " .. f)
+  end
+  function R.deepAvailableHere(inv)
+    local B = R.G.boss
+    local L = R.locOf(inv)
+    local key = L and R.PERIOD_AT[L.id]
+    return B and key and alive(B.en[key]) and #B.deep[key] > 0
+  end
+
+  --- A form falls. The Past or the Future: the investigators may end the finale
+  -- there (stranded) or go on; the Present: the night is won.
+  function R.formDefeated(en)
+    local G = R.G
+    local B = G.boss
+    B.defeated[en.form] = true
+    B.last = en.form
+    G.metrics.forms_defeated = G.metrics.forms_defeated or {}
+    table.insert(G.metrics.forms_defeated, { form = en.form, round = G.round, hour = R.hour() })
+    R.log("THE APPOINTED FALLS IN THE %s", en.form:upper())
+    if en.form == "present" then
+      R.endLoop("boss")
+    end
+    -- stop or press on: stop when the Hours left are unlikely to finish what remains
+    local left = 0
+    for _, f in ipairs(R.FORMS) do
+      local x = B.en[f.key]
+      if alive(x) then left = left + R.enemyHealth(x) - x.damage end
+    end
+    local hoursLeft = 9 - R.hour()
+    local perHour = (R.WHATIF or {}).stopPerHour or 6
+    if (R.WHATIF or {}).neverStop then return end
+    if hoursLeft * perHour < left then
+      B.stoppedAt = en.form
+      R.endLoop("stranded", en.form)
     end
   end
 
@@ -230,8 +274,12 @@ return function(R, T)
   function R.finaleResolution()
     local G = R.G
     local n = G.n
-    local reached = G.contest >= R.consts().contest
+    local B = G.boss
     local banked = T.st().memory or 0
+    if B and B.stoppedAt then
+      return B.stoppedAt == "past" and "R7" or "R8"
+    end
+    local reached = B and B.defeated.present
     if not reached then
       return banked >= 4 * n and "R5" or "R6"
     end

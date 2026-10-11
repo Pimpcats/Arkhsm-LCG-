@@ -468,7 +468,7 @@ return function(R, T)
     local best, bv
     for _, en in ipairs(R.G.enemies) do
       if en.loc == inv.loc and not en.dead then
-        local v = (en.engaged == inv and 100 or 0) + ((en.def.health or 1) - en.damage) - 20 * math.min(en.translation or 0, 1)
+        local v = (en.engaged == inv and 100 or 0) + (R.enemyHealth(en) - en.damage) - 20 * math.min(en.translation or 0, 1)
         if bv == nil or v > bv then best, bv = en, v end
       end
     end

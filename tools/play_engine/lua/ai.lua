@@ -142,7 +142,7 @@ return function(R, T)
     local best
     for _, en in ipairs(R.G.enemies) do
       if en.loc == inv.loc and not en.dead and (not pred or pred(en)) then
-        if not best or (en.def.health or 1) - en.damage < (best.def.health or 1) - best.damage then best = en end
+        if not best or R.enemyHealth(en) - en.damage < R.enemyHealth(best) - best.damage then best = en end
       end
     end
     return best
@@ -268,6 +268,18 @@ return function(R, T)
   function A.targetFor(inv)
     local G = R.G
     local here = R.locOf(inv)
+    if G.finale and G.boss then
+      -- the party goes through the hours together: the Past and the Future
+      -- (the one with more deep entries to spend first), then the Present
+      local B = G.boss
+      local order = { "past", "future" }
+      if #(B.deep.future or {}) > #(B.deep.past or {}) then order = { "future", "past" } end
+      order[#order + 1] = "present"
+      for _, k in ipairs(order) do
+        local en = B.en[k]
+        if en and not en.dead then return R.G.locs[en.loc], "finale" end
+      end
+    end
     if G.finale then
       -- the party holds the Sealed Study and lets the Appointed come to it;
       -- it steps out only for a Hold Back one move away inside the district
@@ -584,7 +596,7 @@ return function(R, T)
       local skill = weapon and (P.WEAPON[weapon.name][4] or "com") or "com"
       local pf = R.prob(inv, R.skillBase(inv, skill, { enemy = en }) + P.staticBonus(inv, skill, { kind = "fight", weapon = weapon }) - R.enemyFight(en) + 1)
       local pe = R.prob(inv, R.skillBase(inv, "agi", { enemy = en }) + P.staticBonus(inv, "agi", { kind = "evade" }) - R.enemyEvade(en) + 1)
-      local left = (en.def.health or 1) - en.damage
+      local left = R.enemyHealth(en) - en.damage
       local per = 1 + ((weapon and P.WEAPON[weapon.name][2]) or 0)
       local hits = math.ceil(left / per)
       local wantEvade = (en.id == "sthr-onewhorides" and not en.exhausted)
@@ -696,6 +708,22 @@ return function(R, T)
           if ab.kind == "lamp" then add(58, "ability", ab.fn) end
         end
       end
+    end
+    if G.finale and R.deepAvailableHere and R.deepAvailableHere(inv) then
+      add(52, "objective", function() R.spendDeep(inv) end)
+    end
+    -- As It Is: Hold Back (test [wil]/[com] 4: disengage and exhaust it)
+    local present = G.boss and G.boss.en.present
+    if present and not present.dead and present.engaged == inv and not present.exhausted then
+      local skill = (R.skillBase(inv, "wil") >= R.skillBase(inv, "com")) and "wil" or "com"
+      local p = R.prob(inv, R.skillBase(inv, skill) + P.staticBonus(inv, skill, {}) - 4 + 1)
+      local s = FX.cannotBeDamaged(present) and 40 * p or 14 * p
+      if p >= 0.3 then add(s, "holdback", function()
+        if R.test(inv, skill, 4, { kind = "holdback", important = true }) then
+          present.exhausted = true ; present.engaged = nil ; R.placeEnemy(present)
+          R.log("%s holds As It Is back", inv.name)
+        end
+      end) end
     end
     if G.finale and G.deepToSpend and #G.deepToSpend > 0 then
       -- no hurry: spent while nothing is engaged with you

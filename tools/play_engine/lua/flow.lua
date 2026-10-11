@@ -255,7 +255,7 @@ return function(R, T)
 
   function R.contest(n, why)
     local G = R.G
-    if not G.finale then return end
+    if not G.finale or G.boss then return end
     for _ = 1, n do T.ctl("Contest") end
     G.contest = G.contest + n
     G.metrics.contest_sources[why] = (G.metrics.contest_sources[why] or 0) + n
@@ -804,6 +804,8 @@ return function(R, T)
           local target = R.AI.huntTarget(en)
           if target then
             local step = R.route(here, target, { enemy = true })
+            -- As It Is never leaves the Present
+            if step and en.id == "sthr-form-present" and (step.district == "Past" or step.district == "Future") then step = nil end
             if step then
               en.loc = step.guid
               R.placeEnemy(en)

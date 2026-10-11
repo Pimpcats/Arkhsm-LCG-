@@ -338,6 +338,7 @@ return function(R, T)
     ["sthr-loc-lanternroom"] = "Lighthouse", ["sthr-loc-windingstair"] = "Lighthouse", ["sthr-loc-keepersquarters"] = "Lighthouse",
     ["sthr-loc-wheel"] = "Fairground", ["sthr-loc-hallofmirrors"] = "Fairground", ["sthr-loc-ticketbooth"] = "Fairground",
     ["sthr-loc-readingroom"] = "Almanac", ["sthr-loc-press"] = "Almanac", ["sthr-loc-sealedstudy"] = "Almanac",
+    ["sthr-loc-firstoccultation"] = "Past", ["sthr-loc-morningafter"] = "Future",
   }
   -- locations whose back is a revealed calm side (a Knowledge entry flips them)
   R.CALM_BACK = { ["sthr-loc-townhallsteps"] = "the-sheriff-is-already-dead", ["sthr-loc-lanternroom"] = "the-lamp-was-never-lit" }
@@ -417,6 +418,8 @@ return function(R, T)
 
   function R.isCrossing(a, b)
     if a.district == b.district or a.district == "Prologue" or b.district == "Prologue" then return false end
+    -- the finale's periods: every move in or out places doom by their own Forced, not as a crossing
+    if a.district == "Past" or a.district == "Future" or b.district == "Past" or b.district == "Future" then return false end
     -- the Lighthouse stands at the end of the Sunken Road: the Turning - the
     -- Winding Stair joins two districts but is not a district connection
     -- (guide: Districts and travel), unless a what-if puts the old rule back
@@ -491,6 +494,9 @@ return function(R, T)
 
   function R.skillBase(inv, skill, opts)
     local v = inv.stats[skill] or 1
+    -- The Morning After: investigators there get -1 [agi] and -1 [com]
+    local here = R.G.locs and R.G.locs[inv.loc]
+    if here and here.id == "sthr-loc-morningafter" and (skill == "agi" or skill == "com") then v = v - 1 end
     -- persistent weaknesses and effects
     if inv.threat and inv.threat["Haunted"] then v = v - 1 end
     if inv.mindOverMatter and (skill == "com" or skill == "agi") then v = math.max(v, inv.stats.int) end
@@ -655,6 +661,11 @@ return function(R, T)
     R.FX.onEnter(inv, b)
     R.engageAt(b)
     if G.ended then return true end
+    -- the finale's periods: moving in or out of either places 1 doom (their Forced)
+    if a and not opts.noHour and (a.district == "Past" or a.district == "Future" or b.district == "Past" or b.district == "Future") then
+      R.placeDoom(1, "through the hours")
+      if G.ended then return true end
+    end
     -- The first move along a district connection each round places doom;
     -- free crossings do not consume that connection's first-move allowance.
     if a and not opts.teleport and R.isCrossing(a, b) then
@@ -683,6 +694,18 @@ return function(R, T)
   ------------------------------------------------------------ enemies --
 
   function R.enemyDef(id) return R.card(id) end
+  --- An enemy's health: per investigator when printed "X[perinv]" (the finale's forms).
+  function R.enemyHealth(en)
+    if en.maxHealth then return en.maxHealth end
+    local h = en.def.health
+    if type(h) == "string" then
+      local n = tonumber(h:match("^(%d+)"))
+      if h:lower():find("perinv", 1, true) then n = (n or 1) * R.G.n end
+      h = n
+    end
+    en.maxHealth = h or 1
+    return en.maxHealth
+  end
 
   --- Is this enemy Sleepwalking right now? (Echo keyword, guide: Echoes and Sleepwalking)
   function R.sleepwalking(en)
@@ -826,8 +849,12 @@ return function(R, T)
       return
     end
     if R.sleepwalking(en) then return end
+    if R.FX.cannotBeDamaged and R.FX.cannotBeDamaged(en) then
+      R.log("%s cannot be damaged yet", en.name)
+      return
+    end
     en.damage = en.damage + n
-    local hp = en.def.health or 1
+    local hp = R.enemyHealth(en)
     R.log("%s deals %d damage to %s (%s): %d/%d", inv and inv.name or "?", n, en.name, why or "?", en.damage, hp)
     if en.damage >= hp then R.defeatEnemy(en, inv) end
   end

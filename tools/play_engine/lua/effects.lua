@@ -81,6 +81,14 @@ return function(R, T)
 
   function FX.endOfRound()
     if R.G.walksBesideCurrent then FX.walkerToTurning() end
+    -- As It Was: each investigator at The First Occultation takes 1 horror
+    local past = R.G.boss and R.G.boss.en.past
+    if past and not past.dead then
+      for _, inv in ipairs(R.investigatorsAt(R.G.locs[past.loc])) do
+        R.hurt(inv, 0, 1, "As It Was")
+        if R.G.ended then return end
+      end
+    end
     local crypt = R.locById("sthr-loc-floodedcrypt")
     if crypt and crypt.revealed and not crypt.closed then
       for _, inv in ipairs(R.investigatorsAt(crypt)) do
@@ -978,7 +986,18 @@ return function(R, T)
   function FX.onEnemyDefeated(en, inv)
     local G = R.G
     if en.id == "sthr-familiarface" and inv then R.addMemory(inv, 1, "Familiar Face") end
-    if en.id == "sthr-uninvited" then R.contest(1, "the Uninvited defeated") end
+    if en.id == "sthr-uninvited" and G.boss then
+      -- 2 damage to a form that can be damaged: the Present once it is vulnerable, else the weaker of the others
+      local pick
+      for _, f in ipairs(R.FORMS) do
+        local x = G.boss.en[f.key]
+        if x and not x.dead and not FX.cannotBeDamaged(x) then
+          if not pick or (f.key == "present") or (R.enemyHealth(x) - x.damage) < (R.enemyHealth(pick) - pick.damage) then pick = x end
+        end
+      end
+      if pick then R.damageEnemy(pick, 2, inv, "the Uninvited defeated") end
+    end
+    if en.form then R.formDefeated(en) end
     if en.id == "sthr-milecounter" then en.res = 0 end
     if en.id == "sthr-bellringer" then G.bellDefeated = true end      -- Hour III no longer resolves this loop
     if en.id == "sthr-onewhorides" then G.riderDefeated = true end    -- the Wheel's Forced no longer resolves
