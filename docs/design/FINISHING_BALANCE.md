@@ -212,3 +212,24 @@ quest is met is slot 6, in every campaign.
 | Ayako's kill rate, Birdie's "Look what I found!" clue rate, Cass's token control | Not measured: the simulation's decks do not include those cards or policies | Watch (playtest) |
 | Seeds and sample size | n = 20 and 12 campaigns; a screen, not certification | Watch |
 | Human playtest | Nothing here replaces one | Open |
+
+## Whole-campaign re-measure after the scenario review (2026-10-11)
+
+Designer-facing; spoilers. Build 3300f93 + the campaign-id fix (80e38a1), 30 carried campaigns, Elias/Ayako/Cass,
+3 players, Standard, seed 5000, `goalsPerNight 2` (the method the targets use; same seeds as 2026-10-06).
+
+| slot | Prologue | N1 | N2 | N3 | N4 | N5 | N6 | N7 | N8 | Finale |
+|---|---|---|---|---|---|---|---|---|---|---|
+| target | 80 | 80 | 70 | 70 | 60 | 60 | 50 | 50 | 40 | 40 |
+| 2026-10-11 (n=30) | 77 | 73 | 63 | 30 | 87 | 13 | 70 | 50 | 43 | 100 |
+| 2026-10-06 (n=20) | 90 | 65 | 80 | 15 | 60 | 25 | 65 | 50 | 55 | 95 |
+
+Mean Prologue–Night 8: 56.3% (curve mean 62.2%); 2026-10-06 was 56.1%. Memory per investigator 42.9 (30.7–49.0).
+Quest cards met in 30/30 campaigns. No engine errors.
+
+Reading: the overall level is unchanged by the review's rules fixes. The two dips are route pairings, not single
+acts: Night 3 pairs the Vote with the Appointed's Name (the Name done 2/19 when both are goals that night);
+Night 5 pairs the Keeper's Ninth Death with The Hour Was Wrong (the latter 3/22 there, 18/20 on Night 7 beside the
+Bargain). The carried finale is far easier than its 40% target (100%: R3 26, R2 4) because a carried party
+arrives with most deep entries to spend; the prepared-state finale (32%) does not reflect that.
+The default carried run (one goal a night) gives 90% mean and 87% finale, and is not the target method.
