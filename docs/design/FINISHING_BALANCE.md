@@ -233,3 +233,19 @@ Night 5 pairs the Keeper's Ninth Death with The Hour Was Wrong (the latter 3/22 
 Bargain). The carried finale is far easier than its 40% target (100%: R3 26, R2 4) because a carried party
 arrives with most deep entries to spend; the prepared-state finale (32%) does not reflect that.
 The default carried run (one goal a night) gives 90% mean and 87% finale, and is not the target method.
+
+### After the three fixes (2026-10-11, build 7f860e3 / 622b4e5)
+
+Same method and seeds (30 campaigns, seed 5000, `goalsPerNight 2`). Fast routes (Low Bridge / Winding Stair ↔
+Square), one path a loop (the engine no longer plans an objective whose prerequisite is unrecorded, and a
+one-district night picks a district with something left to do), finale deep entries capped at half the target.
+
+| slot | Prologue | N1 | N2 | N3 | N4 | N5 | N6 | N7 | N8 | Finale |
+|---|---|---|---|---|---|---|---|---|---|---|
+| target | 80 | 80 | 70 | 70 | 60 | 60 | 50 | 50 | 40 | 40 |
+| before | 77 | 73 | 63 | 30 | 87 | 13 | 70 | 50 | 43 | 100 |
+| after | 80 | 67 | 67 | 87 | 87 | 50 | 80 | 40 | 30 | 80 |
+
+Mean Prologue–Night 8 65.2% (curve 62.2%). Memory per investigator 43.6 (35.3–49.0). Finale R3 22, R2 2, R5 6.
+Fast routes used 0.34 times a slot. The cap alone leaves the carried finale at 80%: superseded by the boss
+redesign (FINALE_REDESIGN.md). Night 4/6 high and 7/8 low are route effects at n=30 (±17 points).
