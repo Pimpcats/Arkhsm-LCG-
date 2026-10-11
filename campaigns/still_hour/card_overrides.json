@@ -570,6 +570,10 @@
       {
         "symbol": "star",
         "color": "#1a605e"
+      },
+      {
+        "symbol": "slash",
+        "color": "#3e5566"
       }
     ],
     "back_shroud": 2,
@@ -824,6 +828,10 @@
       {
         "symbol": "diamond",
         "color": "#2a5c7c"
+      },
+      {
+        "symbol": "triangle",
+        "color": "#8a6a2a"
       }
     ],
     "deck": 95100
@@ -1005,48 +1013,48 @@
     "clues_per_investigator": true
   },
   "sthr-act-lasthour": {
-    "name": "Contest the Crossing",
-    "text": "Objective – Gain 1 contest progress each time an investigator succeeds at Hold Back or spends a deep Knowledge entry. Other sources are in the Campaign Guide. When progress reaches 6 (5 with one investigator, 7 with four), advance.\n[action]: Spend a deep Knowledge entry your Campaign Log records (each entry once per finale). Spent entries give at most half the progress needed, rounded down.\nIf Hour IX is reached, every investigator is defeated, or Dissonance reaches the reset value, the finale ends and the contest is not reached (→R5 or R6).",
-    "flavor": "An appointment made in ink and never kept.",
+    "name": "Through the Hours",
+    "text": "The First Occultation (the Past) connects to The Square and The Morning After (the Future) to The Town Hall Steps; moving in or out of either places 1 doom on the current Hour.\n[action] At The First Occultation or The Morning After: Spend a deep Knowledge entry of that period (see the Campaign Guide; each once per finale): Deal 2 damage to the form of The Appointed there.\nObjective – When As It Is is defeated, advance.\nIf Hour IX is reached, every investigator is defeated, or Dissonance reaches the reset value, the finale ends (→R7 or R8 if a form was defeated, otherwise R5 or R6).",
+    "flavor": "It was never late. Tonight, neither are you.",
     "deck": 95114,
     "index": "1a",
-    "back_flavor": "The crossing holds. For one long breath the night stops pressing, and every clock in Ambergrove agrees on the time.",
-    "back_text": "The contest is reached. The investigators must decide how to end the night: turn to The Last Hour's resolutions in the Campaign Guide and choose one resolution from R1, R1b, R2, R3 or R4 whose condition you meet (R4 is always available)."
+    "back_flavor": "Past, future and present close like a hand. For one breath, in every hour at once, every clock in Ambergrove agrees.",
+    "back_text": "The Appointed is defeated in the Present. The investigators must decide how to end the night: turn to The Last Hour's resolutions in the Campaign Guide and choose one resolution from R1, R1b, R2, R3 or R4 whose condition you meet (R4 is always available)."
   },
   "sthr-res-1": {
     "name": "Take Its Place",
     "traits": "Resolution 1.",
-    "text": "Contest reached, and an Ancient investigator, or the investigator who signed the ninth line, is present.\nChoose one such present investigator: they become the night's new anchor, kept behind, decades older, so the loop ends for everyone else. Mark them kept as anchor.\nIf your Campaign Log records Who Walks Beside You, instead: at dawn the anchor walks out with the others, free and not kept, 3 Years older (1 Year if the walkers keep their ring).",
+    "text": "The Appointed defeated in the Present, and an Ancient investigator, or the investigator who signed the ninth line, is present.\nChoose one such present investigator: they become the night's new anchor, kept behind, decades older, so the loop ends for everyone else. Mark them kept as anchor.\nIf your Campaign Log records Who Walks Beside You, instead: at dawn the anchor walks out with the others, free and not kept, 3 Years older (1 Year if the walkers keep their ring).",
     "deck": 95115
   },
   "sthr-res-2": {
     "name": "Close the Door",
     "traits": "Resolution 2.",
-    "text": "Contest reached, and your Campaign Log records The vote still stands.\nYou pay the price the town agreed to and never paid: each present investigator gains 3 Years (2 if the town was warned), and the door closes.",
+    "text": "The Appointed defeated in the Present, and your Campaign Log records The vote still stands.\nYou pay the price the town agreed to and never paid: each present investigator gains 3 Years (2 if the town was warned), and the door closes.",
     "deck": 95116
   },
   "sthr-res-3": {
     "name": "Break Through",
     "traits": "Resolution 3.",
-    "text": "Contest reached, and your Campaign Log records The Keeper's Ninth Death.\nEvery present investigator escapes along the keeper's path and gains 2 Years. Unless the ninth line was left blank, the loop is only paused.",
+    "text": "The Appointed defeated in the Present, and your Campaign Log records The Keeper's Ninth Death.\nEvery present investigator escapes along the keeper's path and gains 2 Years. Unless the ninth line was left blank, the loop is only paused.",
     "deck": 95117
   },
   "sthr-res-4": {
     "name": "Seal by Force",
     "traits": "Resolution 4.",
-    "text": "Contest reached.\nThe investigators choose one present investigator: they age out holding the door shut. If the vote was torn out, they instead gain 3 Years and walk away.",
+    "text": "The Appointed defeated in the Present.\nThe investigators choose one present investigator: they age out holding the door shut. If the vote was torn out, they instead gain 3 Years and walk away.",
     "deck": 95118
   },
   "sthr-res-5": {
     "name": "Next Time",
     "traits": "Resolution 5.",
-    "text": "Contest not reached, and banked Memory is at least 4 per investigator.\nMark this loop as its ending would (Torn, with its chaos-bag change; Taken; or Closed at the Hour), read each placed district's resolution (except one whose resolution you read before the finale), and proceed to Between Loops; the finale may be begun again.",
+    "text": "No form of The Appointed defeated, and banked Memory is at least 4 per investigator.\nMark this loop as its ending would (Torn, with its chaos-bag change; Taken; or Closed at the Hour), read each placed district's resolution (except one whose resolution you read before the finale), and proceed to Between Loops; the finale may be begun again.",
     "deck": 95119
   },
   "sthr-res-6": {
     "name": "The Loop Wins",
     "traits": "Resolution 6.",
-    "text": "Contest not reached, and banked Memory is below 4 per investigator.\nThe night takes you. The campaign ends.",
+    "text": "No form of The Appointed defeated, and banked Memory is below 4 per investigator.\nThe night takes you. The campaign ends.",
     "flavor": "The town keeps repeating, and somewhere on the Sunken Road, walking the same direction and never arriving, there are new faces beneath the hoods.",
     "deck": 95120
   },
@@ -1066,7 +1074,7 @@
   "sthr-res-bargain": {
     "name": "Let It In, On Your Terms",
     "traits": "Resolution 1b.",
-    "text": "Contest reached, your Campaign Log records The Ticket-Taker's Bargain and You hold the ticket, and banked Memory is at least 4 per investigator (3 per investigator if you kept the night to yourselves).\nThe door opens on your terms and the night finally ends. Banked Memory drops to 0, and each present investigator gains 2 Years.",
+    "text": "The Appointed defeated in the Present, your Campaign Log records The Ticket-Taker's Bargain and You hold the ticket, and banked Memory is at least 4 per investigator (3 per investigator if you kept the night to yourselves).\nThe door opens on your terms and the night finally ends. Banked Memory drops to 0, and each present investigator gains 2 Years.",
     "flavor": "He punches your ticket without looking. He has been expecting you for a very long time.",
     "deck": 95123
   },
@@ -1137,7 +1145,7 @@
     "name": "The Uninvited",
     "traits": "Monster.",
     "health": 4,
-    "text": "Hunter.\nPrey – Most Memory on their cards.\nForced – After The Uninvited is defeated: Gain 1 contest progress. Remove it from the game.",
+    "text": "Hunter.\nPrey – Most Memory on their cards.\nForced – After The Uninvited is defeated: Deal 2 damage to a form of The Appointed that can be damaged. Remove it from the game.",
     "fight": 2,
     "evade": 2,
     "damage": 1,
@@ -1424,5 +1432,88 @@
   },
   "sthr-questdone-birdie": {
     "text": "Permanent. Bonded (Somewhere to Be).\n[reaction] After you fail a skill test by 2 or more: Place 1 Memory on \"Birdie\" Okonkwo. (Limit three times per game.)\nLucky Compass's second ability may remove 1 Memory from it instead of spending 2 resources.\nWhen you play I Get Out while you control Lucky Compass, place 1 Memory on Lucky Compass."
+  },
+  "sthr-loc-firstoccultation": {
+    "name": "The First Occultation",
+    "traits": "Ambergrove. Past.",
+    "shroud": 3,
+    "clues": 0,
+    "icons": "triangle",
+    "color": "#8a6a2a",
+    "connections": [
+      {
+        "symbol": "star",
+        "color": "#1a605e"
+      }
+    ],
+    "text": "Forced – After an investigator enters or leaves The First Occultation: Place 1 doom on the current Hour.",
+    "flavor": "The lanterns are new. The band has not learned the tune yet. On the Town Hall steps a clerk is counting hands."
+  },
+  "sthr-loc-morningafter": {
+    "name": "The Morning After",
+    "traits": "Ambergrove. Future.",
+    "shroud": 3,
+    "clues": 0,
+    "icons": "slash",
+    "color": "#3e5566",
+    "connections": [
+      {
+        "symbol": "t",
+        "color": "#2c4a7c"
+      }
+    ],
+    "text": "Investigators here get −1 [agi] and −1 [com].\nForced – After an investigator enters or leaves The Morning After: Place 1 doom on the current Hour.",
+    "flavor": "Gray light on an empty square. The bunting has rotted on its strings. Out on the shore road, no one is walking."
+  },
+  "sthr-form-past": {
+    "name": "As It Was",
+    "subtitle": "The Appointed",
+    "traits": "Monster. Elite. Past.",
+    "health": "3[perinv]",
+    "fight": 4,
+    "evade": 3,
+    "damage": 1,
+    "horror": 1,
+    "quantity": 1,
+    "text": "Cannot move.\nForced – At the end of the round: Each investigator at The First Occultation takes 1 horror.\nForced – When As It Was is defeated: Record it on the Control token. The investigators may end the finale here (→R7).",
+    "flavor": "Invited, in ink, by every hand in the town."
+  },
+  "sthr-form-future": {
+    "name": "As It Will Be",
+    "subtitle": "The Appointed",
+    "traits": "Monster. Elite. Future.",
+    "health": "3[perinv]",
+    "fight": 3,
+    "evade": 4,
+    "damage": 2,
+    "horror": 0,
+    "quantity": 1,
+    "text": "Cannot move.\nForced – When As It Will Be is defeated: Record it on the Control token. The investigators may end the finale here (→R8).",
+    "flavor": "Patient as a debt. It has already counted the Years you have left."
+  },
+  "sthr-form-present": {
+    "name": "As It Is",
+    "subtitle": "The Appointed",
+    "traits": "Monster. Elite.",
+    "health": "4[perinv]",
+    "fight": 5,
+    "evade": 4,
+    "damage": 2,
+    "horror": 2,
+    "quantity": 1,
+    "text": "Massive. Hunter. Prey – Most Memory on their cards.\nAs It Is cannot be damaged while As It Was or As It Will Be is in play.\n[action] Hold Back. Test [wil] or [com] (4). If you succeed, disengage and exhaust As It Is.\nForced – When As It Is is defeated: Advance Through the Hours.",
+    "flavor": "It is not early. Neither are you."
+  },
+  "sthr-res-7": {
+    "name": "Stranded Before",
+    "traits": "Resolution 7.",
+    "text": "The finale ended after As It Was was the last form of The Appointed defeated.\nThe investigators end in the Past, decades before they were born. The campaign is over.",
+    "flavor": "The lanterns are new, and they stay new."
+  },
+  "sthr-res-8": {
+    "name": "Stranded After",
+    "traits": "Resolution 8.",
+    "text": "The finale ended after As It Will Be was the last form of The Appointed defeated.\nThe investigators end in the Future, on a morning the town never reached. The campaign is over.",
+    "flavor": "It is morning. It is only morning."
   }
 }

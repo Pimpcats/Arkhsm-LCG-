@@ -356,8 +356,27 @@
       "sthr-res-4",
       "sthr-res-5",
       "sthr-res-6",
-      "sthr-uninvited"
+      "sthr-uninvited",
+      "sthr-form-past",
+      "sthr-form-future",
+      "sthr-form-present",
+      "sthr-res-7",
+      "sthr-res-8"
     ],
-    "_locked": true
+    "_locked": true,
+    "locations": [
+      "sthr-loc-firstoccultation",
+      "sthr-loc-morningafter"
+    ],
+    "_map": {
+      "sthr-loc-firstoccultation": [
+        0,
+        0
+      ],
+      "sthr-loc-morningafter": [
+        4,
+        0
+      ]
+    }
   }
 }

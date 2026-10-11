@@ -749,5 +749,57 @@
     "name": "The Minute Hand",
     "traits": "Monster.",
     "health": 2
+  },
+  {
+    "id": "sthr-loc-firstoccultation",
+    "type": "Location",
+    "name": "The First Occultation",
+    "traits": "Ambergrove. Past.",
+    "shroud": 3,
+    "clues": 0
+  },
+  {
+    "id": "sthr-loc-morningafter",
+    "type": "Location",
+    "name": "The Morning After",
+    "traits": "Ambergrove. Future.",
+    "shroud": 3,
+    "clues": 0
+  },
+  {
+    "id": "sthr-form-past",
+    "type": "Enemy",
+    "class": "Mythos",
+    "name": "As It Was",
+    "traits": "Monster. Elite. Past.",
+    "health": 3
+  },
+  {
+    "id": "sthr-form-future",
+    "type": "Enemy",
+    "class": "Mythos",
+    "name": "As It Will Be",
+    "traits": "Monster. Elite. Future.",
+    "health": 3
+  },
+  {
+    "id": "sthr-form-present",
+    "type": "Enemy",
+    "class": "Mythos",
+    "name": "As It Is",
+    "traits": "Monster. Elite.",
+    "health": 4
+  },
+  {
+    "id": "sthr-res-7",
+    "type": "Story",
+    "name": "Stranded Before",
+    "traits": "Resolution 7."
+  },
+  {
+    "id": "sthr-res-8",
+    "type": "Story",
+    "name": "Stranded After",
+    "traits": "Resolution 8."
   }
 ]

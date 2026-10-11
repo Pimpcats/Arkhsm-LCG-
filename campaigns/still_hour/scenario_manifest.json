@@ -1573,18 +1573,23 @@
           "cards": [
             {
               "id": "sthr-act-lasthour",
-              "name": "Contest the Crossing",
+              "name": "Through the Hours",
               "needs": {
-                "contest": {
-                  "target": 6,
-                  "target_one_investigator": 5,
-                  "target_two_investigators": 6,
-                  "target_four_investigators": 7,
-                  "sources": [
-                    "Hold Back success (repeatable)",
-                    "deep fact spent (max 6)",
-                    "the Uninvited defeated (once)"
-                  ]
+                "boss": {
+                  "forms": [
+                    "sthr-form-past",
+                    "sthr-form-future",
+                    "sthr-form-present"
+                  ],
+                  "present_vulnerable_after": [
+                    "sthr-form-past",
+                    "sthr-form-future"
+                  ],
+                  "health_per_investigator": {
+                    "sthr-form-past": 3,
+                    "sthr-form-future": 3,
+                    "sthr-form-present": 4
+                  }
                 }
               }
             }
@@ -1613,12 +1618,53 @@
               "id": "sthr-uninvited",
               "name": "The Uninvited",
               "role": "finale enemy, spawned at finale setup"
+            },
+            {
+              "id": "sthr-form-past",
+              "name": "As It Was",
+              "role": "the Appointed in the Past, spawned at finale setup"
+            },
+            {
+              "id": "sthr-form-future",
+              "name": "As It Will Be",
+              "role": "the Appointed in the Future, spawned at finale setup"
+            },
+            {
+              "id": "sthr-form-present",
+              "name": "As It Is",
+              "role": "the Appointed in the Present, replaces The Appointed at finale setup"
+            },
+            {
+              "id": "sthr-res-7",
+              "name": "Stranded Before",
+              "role": "resolution card"
+            },
+            {
+              "id": "sthr-res-8",
+              "name": "Stranded After",
+              "role": "resolution card"
+            }
+          ]
+        },
+        "locations": {
+          "template": "Location",
+          "status": "authored",
+          "cards": [
+            {
+              "id": "sthr-loc-firstoccultation",
+              "name": "The First Occultation",
+              "role": "the Past"
+            },
+            {
+              "id": "sthr-loc-morningafter",
+              "name": "The Morning After",
+              "role": "the Future"
             }
           ]
         }
       },
       "setup": {
-        "note": "Dissonance does not reset; reach the effective Contest the Crossing threshold before Hour IX (5 solo, 6 with two or three investigators, 7 with four)",
+        "note": "Dissonance does not reset; defeat The Appointed in the Past and the Future to make it vulnerable in the Present, before Hour IX",
         "chaos_bag": "per campaign log",
         "requires_fact": "The Way the Night Breaks"
       },
@@ -1626,43 +1672,55 @@
         {
           "id": "R1",
           "name": "Take Its Place",
-          "condition": "contest reached, and an Ancient investigator, or the investigator who signed the ninth line, is present",
+          "condition": "The Appointed defeated in the Present, and an Ancient investigator, or the investigator who signed the ninth line, is present",
           "source": "player guide"
         },
         {
           "id": "R1b",
           "name": "Let It In, On Your Terms",
-          "condition": "contest reached, your log records The Ticket-Taker's Bargain and You hold the ticket, and banked Memory is at least 4 per investigator, or 3 per investigator if you kept the night to yourselves",
+          "condition": "The Appointed defeated in the Present, your log records The Ticket-Taker's Bargain and You hold the ticket, and banked Memory is at least 4 per investigator, or 3 per investigator if you kept the night to yourselves",
           "source": "player guide"
         },
         {
           "id": "R2",
           "name": "Close the Door",
-          "condition": "contest reached, and your log records The vote still stands",
+          "condition": "The Appointed defeated in the Present, and your log records The vote still stands",
           "source": "player guide"
         },
         {
           "id": "R3",
           "name": "Break Through",
-          "condition": "contest reached, and your log records The Keeper's Ninth Death",
+          "condition": "The Appointed defeated in the Present, and your log records The Keeper's Ninth Death",
           "source": "player guide"
         },
         {
           "id": "R4",
           "name": "Seal by Force",
-          "condition": "contest reached",
+          "condition": "The Appointed defeated in the Present",
           "source": "player guide"
         },
         {
           "id": "R5",
           "name": "Next Time",
-          "condition": "contest not reached, banked Memory at least 4 per investigator",
+          "condition": "no form of The Appointed defeated, banked Memory at least 4 per investigator",
           "source": "player guide"
         },
         {
           "id": "R6",
           "name": "The Loop Wins",
-          "condition": "contest not reached, banked Memory below 4 per investigator",
+          "condition": "no form of The Appointed defeated, banked Memory below 4 per investigator",
+          "source": "player guide"
+        },
+        {
+          "id": "R7",
+          "name": "Stranded Before",
+          "condition": "the finale ended with As It Was the last form defeated (or the investigators ended it there)",
+          "source": "player guide"
+        },
+        {
+          "id": "R8",
+          "name": "Stranded After",
+          "condition": "the finale ended with As It Will Be the last form defeated (or the investigators ended it there)",
           "source": "player guide"
         }
       ]

@@ -220,6 +220,66 @@
     "seed": 6716
   },
   {
+    "id": "sthr-quest-elias",
+    "art_type": "asset",
+    "scene": "a brass key and a heavy ledger on a lighthouse keeper's desk, the lamp guttering, a second shadow thrown behind the empty chair",
+    "seed": 3489
+  },
+  {
+    "id": "sthr-questdone-elias",
+    "art_type": "asset",
+    "scene": "the same ledger lying open to ruled lines in one careful hand, the lamp steady now, salt crusting the cover",
+    "seed": 6443
+  },
+  {
+    "id": "sthr-quest-ayako",
+    "art_type": "asset",
+    "scene": "a stack of annotated manuscripts and a brass pen, a half-translated page under a green-shaded lamp, the last line smudged",
+    "seed": 3538
+  },
+  {
+    "id": "sthr-questdone-ayako",
+    "art_type": "asset",
+    "scene": "the same page finished, the final word covered by a trembling hand, lamplight pooling on the paper",
+    "seed": 6492
+  },
+  {
+    "id": "sthr-quest-cass",
+    "art_type": "asset",
+    "scene": "a worn deck of cards fanned on green baize, one card face down, a thin curl of cigarette smoke",
+    "seed": 2789
+  },
+  {
+    "id": "sthr-questdone-cass",
+    "art_type": "asset",
+    "scene": "the same deck squared and left at an empty chair, a crowd of shadows watching from the walls of a back room",
+    "seed": 5743
+  },
+  {
+    "id": "sthr-quest-seraphine",
+    "art_type": "asset",
+    "scene": "a tarnished coin and a small bell on a dark cloth, a candle burning low, one thread of silver light",
+    "seed": 6520
+  },
+  {
+    "id": "sthr-questdone-seraphine",
+    "art_type": "asset",
+    "scene": "the same bell silent on the cloth, a long column of tally marks scratched into the table beside it",
+    "seed": 1474
+  },
+  {
+    "id": "sthr-quest-birdie",
+    "art_type": "asset",
+    "scene": "a battered duffel and a bus-stop sign at dusk, an empty road bending away into fog",
+    "seed": 4168
+  },
+  {
+    "id": "sthr-questdone-birdie",
+    "art_type": "asset",
+    "scene": "the same road at first light, the duffel set down, footprints leading back toward the town",
+    "seed": 7122
+  },
+  {
     "id": "sthr-appointed",
     "art_type": "enemy",
     "scene": "a tall wrong silhouette at the far end of an empty street, too many angles, not quite arriving, featureless, dread, negative space",
@@ -840,63 +900,45 @@
     "seed": 3041
   },
   {
-    "id": "sthr-quest-elias",
-    "art_type": "asset",
-    "scene": "a brass key and a heavy ledger on a lighthouse keeper's desk, the lamp guttering, a second shadow thrown behind the empty chair",
-    "seed": 9106
+    "id": "sthr-loc-firstoccultation",
+    "art_type": "location",
+    "scene": "the same town square long ago, brand-new lanterns and bunting, townsfolk in older fashions raising their hands in a vote on the Town Hall steps, sepia lamplight",
+    "seed": 2286
   },
   {
-    "id": "sthr-questdone-elias",
-    "art_type": "asset",
-    "scene": "the same ledger lying open to ruled lines in one careful hand, the lamp steady now, salt crusting the cover",
-    "seed": 2332
+    "id": "sthr-loc-morningafter",
+    "art_type": "location",
+    "scene": "the same town square in cold grey dawn, empty and abandoned, rotted bunting on its strings, fog on the shore road, no one walking",
+    "seed": 7143
   },
   {
-    "id": "sthr-quest-ayako",
-    "art_type": "asset",
-    "scene": "a stack of annotated manuscripts and a brass pen, a half-translated page under a green-shaded lamp, the last line smudged",
-    "seed": 5695
+    "id": "sthr-form-past",
+    "art_type": "enemy",
+    "scene": "a tall wrong silhouette standing among a crowd of raised hands on old Town Hall steps, lanterns new and bright, sepia, dread",
+    "seed": 2005
   },
   {
-    "id": "sthr-questdone-ayako",
-    "art_type": "asset",
-    "scene": "the same page finished, the final word covered by a trembling hand, lamplight pooling on the paper",
-    "seed": 5729
+    "id": "sthr-form-future",
+    "art_type": "enemy",
+    "scene": "a tall wrong silhouette waiting in an empty grey dawn square, patient, the town decayed around it, cold light",
+    "seed": 3594
   },
   {
-    "id": "sthr-quest-cass",
-    "art_type": "asset",
-    "scene": "a worn deck of cards fanned on green baize, one card face down, a thin curl of cigarette smoke",
-    "seed": 9352
+    "id": "sthr-form-present",
+    "art_type": "enemy",
+    "scene": "a tall wrong silhouette filling the lantern-lit square at eleven o'clock, too many angles, the stars sliding behind it, confrontation",
+    "seed": 4308
   },
   {
-    "id": "sthr-questdone-cass",
-    "art_type": "asset",
-    "scene": "the same deck squared and left at an empty chair, a crowd of shadows watching from the walls of a back room",
-    "seed": 4229
+    "id": "sthr-res-7",
+    "art_type": "story",
+    "scene": "investigators in old-fashioned clothes watching new lanterns being lit in the town square long ago, warm and bittersweet",
+    "seed": 6568
   },
   {
-    "id": "sthr-quest-seraphine",
-    "art_type": "asset",
-    "scene": "a tarnished coin and a small bell on a dark cloth, a candle burning low, one thread of silver light",
-    "seed": 4820
-  },
-  {
-    "id": "sthr-questdone-seraphine",
-    "art_type": "asset",
-    "scene": "the same bell silent on the cloth, a long column of tally marks scratched into the table beside it",
-    "seed": 9577
-  },
-  {
-    "id": "sthr-quest-birdie",
-    "art_type": "asset",
-    "scene": "a battered duffel and a bus-stop sign at dusk, an empty road bending away into fog",
-    "seed": 9597
-  },
-  {
-    "id": "sthr-questdone-birdie",
-    "art_type": "asset",
-    "scene": "the same road at first light, the duffel set down, footprints leading back toward the town",
-    "seed": 9927
+    "id": "sthr-res-8",
+    "art_type": "story",
+    "scene": "investigators standing in an empty town square at grey dawn, years later, the lanterns long dark, quiet and bittersweet",
+    "seed": 6575
   }
 ]

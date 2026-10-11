@@ -2675,6 +2675,19 @@ def s_enemy(c, pt, dest, art_path=None, placement=None):
                           ("Health", "health", pt.get("health")),
                           ("Evade", "evade", pt.get("evade"))):
         blank = val in (None, "", "None")     # Bolton has no em dash
+        if not blank and "[perinv]" in str(val).lower():
+            # health per investigator (official boss enemies): the number left of
+            # centre and the per-investigator mark beside it, as on a clue disc
+            num = str(val).lower().replace("[perinv]", "").strip()
+            x0, y0, x1, y1 = se_reg("Enemy", key)
+            w, h = x1 - x0, y1 - y0
+            _box_text(d, num, (x0 - int(w * 0.30), y0 + int(h * 0.08), x1 - int(w * 0.30), y1 - int(h * 0.08)),
+                      stat=True, grow=1.0, fill=(238, 232, 216), pos_key=fld)
+            hat = _tint_icon(_se_img("icons", "AHLCG-PerInvestigator"), (238, 232, 216))
+            cx, cy = (x0 + x1) // 2 + int(w * 0.30), (y0 + y1) // 2 - int(h * 0.04)
+            hw, hh = int(w * 0.30), int(h * 0.34)
+            _paste_icon_fit(d._image, hat, (cx - hw, cy - hh, cx + hw, cy + hh))
+            continue
         _box_text(d, "—" if blank else str(val),
                   se_reg("Enemy", key), stat=not blank, bold=blank, grow=1.0,
                   fill=(238, 232, 216), pos_key=fld)

@@ -284,6 +284,12 @@ def objective_feasibility(cards, assign, manifest, n):
                 con = need["contest"]
                 if not any("repeatable" in s for s in con.get("sources", [])):
                     out.append((sid, "{}: the contest has no repeatable source".format(label)))
+            elif "boss" in need:
+                # a boss act: every form is a card set aside in this scenario's box
+                aside = set(assign.get(sid, {}).get("setup_aside", []))
+                for form in need["boss"].get("forms", []):
+                    if form not in aside:
+                        out.append((sid, "{}: boss form {} is not set aside in the box".format(label, form)))
             elif "test" not in need:
                 out.append((sid, "act {}: unknown need {}".format(a["id"], need)))
     return out
