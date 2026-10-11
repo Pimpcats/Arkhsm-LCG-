@@ -449,7 +449,7 @@ do
   check("the finale begins", T.st().finale == true)
   T.clear()
   T.untick("the-way-the-night-breaks")
-  check("un-ticking the entry keeps the finale running", T.st().finale == true and T.has("Contest") ~= nil, state(T))
+  check("un-ticking the entry keeps the finale running", T.st().finale == true and T.has("Forms defeated") ~= nil, state(T))
   check("...and says so in one sentence", T.count("The finale carries on") + T.count("the finale carries on") == 1,
     table.concat(T.say, " | "))
   -- a prerequisite un-ticked during the finale: the cascade must not remove it
