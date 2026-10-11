@@ -381,6 +381,34 @@ return function(R, T)
     return ok
   end
 
+  --- Fast routes: The Square <-> The Low Bridge / The Winding Stair, [action] and
+  -- 1 Dissonance, not along a connection (no doom). The partner worth taking to
+  -- reach target, when it saves 2 or more actions and Dissonance is not near the reset.
+  local FAST = { ["sthr-loc-hubsquare"] = { "sthr-loc-lowbridge", "sthr-loc-windingstair" },
+                 ["sthr-loc-lowbridge"] = { "sthr-loc-hubsquare" }, ["sthr-loc-windingstair"] = { "sthr-loc-hubsquare" } }
+  function FX.fastRoute(inv, L, target)
+    local G = R.G
+    if (R.WHATIF or {}).noFastRoutes or not FAST[L.id] then return nil end
+    if R.dissonance() >= R.consts().reset - 3 then return nil end
+    local dist = R.paths(L)
+    local normal = dist[target.guid] or 99
+    local best, bestD
+    for _, id in ipairs(FAST[L.id]) do
+      local P = R.locById(id)
+      if P and not P.closed and G.impassable ~= P.guid then
+        local d = (P == target) and 1 or ((R.paths(P)[target.guid] or 99) + 1)
+        if normal - d >= 2 and (bestD == nil or d < bestD) then best, bestD = P, d end
+      end
+    end
+    return best
+  end
+  function FX.useFastRoute(inv, P)
+    R.raise(1, "fast route", inv)
+    if R.G.ended then return end
+    R.G.metrics.fast_routes = (R.G.metrics.fast_routes or 0) + 1
+    R.moveInv(inv, P, { teleport = true })
+  end
+
   --- Would this crossing be free (a group-limit ability still unused)? (no side effects)
   function FX.freeCrossingAvailable(a, b)
     local G = R.G

@@ -203,6 +203,9 @@ return function(R, T)
     end
     G.deepToSpend = {}
     for _, f in ipairs(DEEP) do if R.knows(f) then G.deepToSpend[#G.deepToSpend + 1] = f end end
+    -- spent entries give at most half the progress needed, rounded down
+    local cap = (R.WHATIF or {}).deepCap or math.floor(R.consts().contest / 2)
+    while #G.deepToSpend > cap do table.remove(G.deepToSpend) end
     -- the first time each investigator is at the Sealed Study (those already there gain it now)
     local study = R.locById("sthr-loc-sealedstudy")
     for _, x in ipairs(R.aliveInvs()) do

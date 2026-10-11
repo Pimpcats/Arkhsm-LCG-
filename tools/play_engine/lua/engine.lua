@@ -593,6 +593,11 @@ return function(H)
     -- (in route order) that still have an act to play this Part, so a night's
     -- goal is two district acts plus the Square's current act
     local function pending(d)
+      -- choose one path and follow it (the guide's advice): the Almanac House's
+      -- second act waits for the Square's deep entry, so it is not planned before then
+      if d == "Almanac" and c.partTwo and c.knowledge[S.SURF[d]] and not c.knowledge["the-vote-that-never-ends"] then
+        return false
+      end
       return not c.knowledge[S.SURF[d]] or (c.partTwo and not c.knowledge[S.DEEP[d]])
     end
     local perNight=(cfg.districtsPerNight or 1)

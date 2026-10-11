@@ -782,6 +782,9 @@ return function(R, T)
             end
           end
           add(s, "move", function() R.moveInv(inv, step) end, { provokes = true })
+          -- a fast route (The Square / The Low Bridge / The Winding Stair) when it saves 2 or more actions
+          local fast = FX.fastRoute(inv, L, target)
+          if fast then add(s + 3, "move", function() FX.useFastRoute(inv, fast) end, { provokes = true }) end
         elseif L.id == "sthr-loc-windingstair" then
           -- the path runs up the stair
           local _, _, _, path = R.route(L, target)

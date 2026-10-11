@@ -328,7 +328,7 @@
         "color": "#8a5a2e"
       }
     ],
-    "text": "Investigators cannot move into The Lantern Room except with the ability below.\n[action]: Test [agi] (2). If you succeed, move to The Lantern Room. If you fail, take 1 damage.",
+    "text": "Only the first ability below moves an investigator into The Lantern Room.\n[action]: Test [agi] (2). If you succeed, move to The Lantern Room. If you fail, take 1 damage.\n[action] Raise Dissonance by 1: Move to The Square (no doom).",
     "unrevealed": true,
     "unrevealed_flavor": "Iron steps spiral up into the dark. You can hear them ring under feet that are not yours.",
     "unrevealed_text": "Investigators cannot move into The Lantern Room except with The Winding Stair's [action] ability."
@@ -518,7 +518,7 @@
     "flavor": "The water never quite reaches the top. It never quite goes down.",
     "unrevealed": true,
     "unrevealed_flavor": "A humpbacked bridge over a stream that should not be this deep.",
-    "text": "Forced – After you enter The Low Bridge: Test [agi] (2). If you fail, take 1 damage."
+    "text": "Forced – After you enter The Low Bridge: Test [agi] (2). If you fail, take 1 damage.\n[action] Raise Dissonance by 1: Move to The Square (no doom)."
   },
   "sthr-loc-turning": {
     "name": "The Turning",
@@ -799,7 +799,7 @@
     "traits": "Ambergrove. Central.",
     "shroud": 1,
     "clues": 1,
-    "text": "Each loop begins here.\nForced – After an investigator moves along a connection between The Square and a location in another district, if it is the first time an investigator has moved along that connection this round: Place 1 doom on the current Hour.\n[action]: Resign. You cannot resign during the finale.",
+    "text": "Each loop begins here.\nForced – After the first move this round along a connection between The Square and another district: Place 1 doom on the current Hour.\n[action] Raise Dissonance by 1: Move to The Low Bridge or The Winding Stair, if in play (no doom).\n[action]: Resign. You cannot resign during the finale.",
     "flavor": "Everyone is out for the occultation. Hardly anyone looks at you twice, and those who do forget you by midnight.",
     "icons": "star",
     "color": "#1a605e",
@@ -1006,7 +1006,7 @@
   },
   "sthr-act-lasthour": {
     "name": "Contest the Crossing",
-    "text": "Objective – Gain 1 contest progress each time an investigator succeeds at Hold Back or spends a deep Knowledge entry. Other sources are in the Campaign Guide. When progress reaches 6 (5 with one investigator, 7 with four), advance.\n[action]: Spend a deep Knowledge entry your Campaign Log records (each entry once per finale).\nIf Hour IX is reached, every investigator is defeated, or Dissonance reaches the reset value, the finale ends and the contest is not reached (→R5 or R6).",
+    "text": "Objective – Gain 1 contest progress each time an investigator succeeds at Hold Back or spends a deep Knowledge entry. Other sources are in the Campaign Guide. When progress reaches 6 (5 with one investigator, 7 with four), advance.\n[action]: Spend a deep Knowledge entry your Campaign Log records (each entry once per finale). Spent entries give at most half the progress needed, rounded down.\nIf Hour IX is reached, every investigator is defeated, or Dissonance reaches the reset value, the finale ends and the contest is not reached (→R5 or R6).",
     "flavor": "An appointment made in ink and never kept.",
     "deck": 95114,
     "index": "1a",
