@@ -268,7 +268,15 @@ return function(R, T)
     local hoursLeft = 9 - R.hour()
     local perHour = (R.WHATIF or {}).stopPerHour or 6
     if (R.WHATIF or {}).neverStop then return end
-    if hoursLeft * perHour < left then
+    -- a cautious table also stops when it is worn down: someone defeated, or the
+    -- party's remaining health and sanity low against what As It Is will deal
+    local worn = #R.aliveInvs() < G.n
+    if not worn then
+      local spare = 0
+      for _, x in ipairs(R.aliveInvs()) do spare = spare + (x.health - x.damage) + (x.sanity - x.horror) end
+      worn = spare / #R.aliveInvs() < ((R.WHATIF or {}).stopSpare or 7)
+    end
+    if hoursLeft * perHour < left or worn then
       B.stoppedAt = en.form
       R.endLoop("stranded", en.form)
     end

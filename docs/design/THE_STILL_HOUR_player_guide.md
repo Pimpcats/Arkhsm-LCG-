@@ -737,7 +737,7 @@ Before the finale begins: if you have not yet read **Before the finale** (Betwee
 - **The Uninvited** hunts you through the night. Defeating it deals 2 damage to a form of the Appointed that can be damaged.
 - **Hold Back** works only on As It Is: it disengages and exhausts it, and never rewinds the Hourglass in the finale.
 
-**Stop or press on.** When As It Was or As It Will Be is defeated, decide at once. You may end the finale there, stranded in that period (Resolution 7 for the Past, 8 for the Future). If you press on and the finale ends before As It Is is defeated, the night takes you back: read Resolution 5 or 6. The finale ends when As It Is is defeated, when you stop, or when Hour IX is reached, every investigator has been defeated, or Dissonance reaches the reset value.
+**Stop or press on.** When As It Was or As It Will Be is defeated, the night loosens: rewind the Hourglass by 1 Hour (right-click **Hour** once). Then decide at once. You may end the finale there, stranded in that period (Resolution 7 for the Past, 8 for the Future). If you press on and the finale ends before As It Is is defeated, the night takes you back: read Resolution 5 or 6. The finale ends when As It Is is defeated, when you stop, or when Hour IX is reached, every investigator has been defeated, or Dissonance reaches the reset value.
 
 During the finale, if your log records:
 - *You carry the walker's ring:* once during the finale, when an investigator Holds Back As It Is, they may do so without a skill test. Read aloud: *The ring turns cold on your finger. For one step someone stands beside you, keeping exact time with you, and the thing in front of you stops.*
