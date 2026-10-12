@@ -643,9 +643,16 @@ return function(H)
     if perNight>1 or cfg.goalsPerNight then
       districts={}
       local start=((slot-2)*(cfg.goalsPerNight and 1 or perNight))%#ROUTE
-      for i=0,#ROUTE-1 do
-        local d=ROUTE[((start+i)%#ROUTE)+1]
-        if pending(d) and #districts<perNight then districts[#districts+1]=d end
+      -- surface and deep objectives first (they open Part II and the finale, and a deep entry is worth
+      -- more in it), then the late ones (act 3a)
+      local function late(d) return c.knowledge[S.DEEP[d]] and not c.knowledge[S.LATE[d]] end
+      for pass=1,2 do
+        for i=0,#ROUTE-1 do
+          local d=ROUTE[((start+i)%#ROUTE)+1]
+          local dup=false
+          for _,x in ipairs(districts) do if x==d then dup=true end end
+          if not dup and pending(d) and (pass==2 or not late(d)) and #districts<perNight then districts[#districts+1]=d end
+        end
       end
       for i=0,#ROUTE-1 do
         local d=ROUTE[((start+i)%#ROUTE)+1]
