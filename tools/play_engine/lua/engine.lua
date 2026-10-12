@@ -294,7 +294,10 @@ return function(H)
     local restored = carried and T.decode(J.encode(carried)) or campaignFor(sc)
     if carried then restored.campaign.onCardMemory = {} end -- re-created on actual card sources below
     T.api("shApiRestore", { blob = J.encode(restored) })
-    E.run(0.5)
+    -- the restore starts the Control's staged board sync (six steps, ~3 s); a Clear Board before it ends
+    -- leaves what the sync brings back afterwards (the Appointed set aside beside the Control) on the table,
+    -- and the Square's next Place is refused as "already laid out"
+    E.run(4)
     -- the campaign log shows the same entries
     local vals = T.logValues()
     for k, v in pairs(vals) do
@@ -724,7 +727,9 @@ return function(H)
           end
           local agedOut=false
           for _,id in ipairs(party) do if (out.campaign_state.campaign.years[id] or 0)>=18 then agedOut=true end end
-          if slot<10 and not out.engine_error and not agedOut then purchaseAfter(out) end
+          -- no Between Loops after a finale (an early one, when every late record forced it, ends the campaign)
+          local finaleSlot = S[name] and S[name].finaleGoal
+          if slot<10 and not out.engine_error and not agedOut and not finaleSlot then purchaseAfter(out) end
           total=total+1 ; emit("GAME",out)
           -- a finale played ends the campaign (the Last Hour's endings; Resolution 5 is not replayed here)
           if out.engine_error or agedOut or out.ended=="contest" or (S[name] and S[name].finaleGoal) then break end
