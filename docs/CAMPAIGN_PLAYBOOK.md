@@ -359,6 +359,13 @@ check misses text that runs under frame art. Known trouble spots:
   from the state, decks and XP the earlier ones produced), not only with
   single-scenario presets. Single-night presets hid that later nights had
   only one objective each.
+- A looping or open-ended campaign must never run out of things to do. Count
+  the objectives against the expected number of nights; when strong parties
+  finish them early, add late objectives that pay into the finale and a rule
+  that starts the finale once they are done. The Still Hour's Night 8 was an
+  empty night in 18 of 27 carried campaigns before each district got an
+  act 3a (docs/design/LATE_OBJECTIVES.md). Score a night with no goal left as
+  "nothing to do", never as a loss.
 
 ## Definition of done (per campaign)
 
