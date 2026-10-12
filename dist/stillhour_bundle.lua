@@ -2535,7 +2535,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/4603082a3b5a8f0c7532f49f6b3ba3fa1475a5ff/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/8b3f9e842d9756f456742daa1e4297a3aebcd387/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -2965,6 +2965,10 @@ local st = {
 }
 local restoreScheduled = false
 local restoreData = nil
+-- Clear Board takes every scenario card, the Appointed's included: while it runs the
+-- "cannot be defeated" guard stands down (TTS reports a destroy at the end of the frame,
+-- so the guard stays down for a few frames after the clear)
+local guardDown = false
 
 ------------------------------------------------------------------ utilities --
 
@@ -3844,9 +3848,24 @@ function Board.forgetGuids(list)
   for _, g in ipairs(type(list) == "table" and list or {}) do Board.forgetGuid(g) end
 end
 
+--- Run fn (Clear Board) with the Appointed's guard down: a card it destroys is off the
+-- board, not defeated, and the next Place's board sync manifests it again from the box.
+function Board.withoutAppointedGuard(fn)
+  guardDown = true
+  local ok, res = pcall(fn)
+  st.appointed.placed = false
+  st.appointed.guid = nil
+  st.appointed.engagedAt = nil
+  restoreData = nil
+  local up = function() guardDown = false end
+  if not pcall(function() Wait.frames(up, 5) end) then up() end
+  if not ok then error(res) end
+  return res
+end
+
 function Board.onDestroy(obj)
   Board.forgetGuid(guidOf(obj))
-  if Board.isAppointedObject(obj) and Appointed.isManifest() then
+  if not guardDown and Board.isAppointedObject(obj) and Appointed.isManifest() then
     restoreData = safe(function() return obj.getData() end)
     Appointed.onRemovalAttempt(Board.appointedCtx())
   end
@@ -5921,14 +5940,15 @@ end
 
 function shClearBoard()
   resetAsked = false
-  local r = guarded("clear board", clearLoopBoard) or { cards = 0, tokens = 0, stopped = 0 }
+  local r = guarded("clear board", function() return Board.withoutAppointedGuard(clearLoopBoard) end)
+    or { cards = 0, tokens = 0, stopped = 0 }
   announce(string.format("The board is cleared: %d scenario card(s) and %d token(s) removed. %s"
     .. "Press Place on The Square (Town Hall) box to set up the next loop.", r.cards, r.tokens,
     (r.stopped or 0) > 0 and "A Place that was still running was stopped. " or ""))
   return r
 end
 
-function shApiClearBoard() return guarded("clear board", clearLoopBoard) end
+function shApiClearBoard() return guarded("clear board", function() return Board.withoutAppointedGuard(clearLoopBoard) end) end
 function shApiSetPartTwo(p)
   CampaignState.setPartTwo(p == nil or p.on ~= false)
   local rep = guarded("locations", Board.syncLocations)
@@ -5979,10 +5999,15 @@ function shClickContest(_, _, alt)
   end
   CampaignState.setContest(math.min(3, CampaignState.getContest() + (alt and -1 or 1)))
   local n = CampaignState.getContest()
+  -- a fallen Past or Future form rewinds the Hourglass (2 Hours with one investigator)
+  local rw = (CampaignState.constants().investigators == 1) and "2 Hours (right-click Hour twice)"
+    or "1 Hour (right-click Hour once)"
   if not alt and n == 1 then
-    announce("A form of the Appointed falls. Stop here (Resolution 7 for the Past, 8 for the Future) or press on.")
+    announce("A form of the Appointed falls: rewind the Hourglass by " .. rw .. ". Stop here (Resolution 7 for the "
+      .. "Past, 8 for the Future) or press on.")
   elseif not alt and n == 2 then
-    announce("As It Was and As It Will Be are defeated: As It Is can now be damaged.")
+    announce("As It Was and As It Will Be are defeated: rewind the Hourglass by " .. rw .. ". Stop here, or press "
+      .. "on: As It Is can now be damaged.")
   elseif not alt and n == 3 then
     announce("As It Is is defeated: advance Through the Hours.")
   end
