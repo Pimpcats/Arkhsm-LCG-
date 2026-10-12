@@ -79,16 +79,25 @@ def style_block(camp):
             "AVOID: " + camp["style_negative"] + ".")
 
 
+def aspect_of(brief_text):
+    """The aspect named on a brief's first line ("#026 · landscape 3:2")."""
+    first = brief_text.split("\n", 1)[0]
+    return first.split("·", 1)[1].strip() if "·" in first else ""
+
+
 def standalone_prompt(camp, chars, job, brief_text):
     """One complete prompt per card, for a fresh chat each: the owner runs many
     chats in parallel, so nothing may depend on an earlier message. Only the
     investigator on this card is described (none on the others), so a chat
     never mixes in a face that isn't there. No reference images: the owner
     found ChatGPT stalls on them."""
+    size = {"landscape 3:2": "1536 x 1024 pixels, landscape", "portrait 2:3": "1024 x 1536 pixels, portrait",
+            "square 1:1": "1024 x 1024 pixels, square"}.get(aspect_of(brief_text), "")
     head = ("Generate exactly ONE image now: an illustration for a custom Arkham "
             "Horror: The Card Game campaign, \"" + CFG.name + "\" (" + CFG.art_setting + "). Don't ask "
             "questions and don't offer variations. Never add text, letters, numbers, "
-            "captions, borders or frames to the image.")
+            "captions, borders or frames to the image. One single full-frame picture: never a grid, "
+            "collage, contact sheet or set of panels." + (" Size: " + size + "." if size else ""))
     return head + "\n\n" + style_block(camp) + "\n\nCARD BRIEF\n" + brief_text
 
 

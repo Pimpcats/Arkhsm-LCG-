@@ -127,19 +127,19 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 058)
 Aspect ratio: 3:2 (landscape)
-Scene: a tall wrong figure in an old-fashioned frock coat, too tall and too still, standing among a crowd of raised hands on the Town Hall steps long ago, bright new lanterns, sepia, dread.
+Scene: the same tall faceless figure as the Appointed (a peaked hood with no face inside, a long narrow robe, arms too long with angular joints; no antlers, no horns), standing among a crowd of raised hands on the Town Hall steps long ago, bright new lanterns and bunting, sepia, dread.
 Framing: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.
 Character: none
 
 IMAGE 2 (save as 059)
 Aspect ratio: 3:2 (landscape)
-Scene: a gaunt, patient, too-tall figure waiting alone in the empty town square at grey dawn, rotted bunting on its strings, fog on the shore road, the town decayed around it, cold light.
+Scene: the same tall faceless figure as the Appointed (a peaked hood with no face inside, a long narrow robe, arms too long with angular joints; no antlers, no horns), gaunt and patient, waiting alone in the empty town square at grey dawn, rotted bunting on its strings, fog on the shore road, the town decayed around it, cold light.
 Framing: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.
 Character: none
 
 IMAGE 3 (save as 060)
 Aspect ratio: 3:2 (landscape)
-Scene: a vast wrong figure filling the lantern-lit town square at night, its outline made of too many angles, the stars sliding behind it, a few small investigators facing it.
+Scene: the same tall faceless figure as the Appointed (a peaked hood with no face inside, a long narrow robe, arms too long with angular joints; no antlers, no horns), vast, filling the lantern-lit town square at night, its outline breaking into too many angles, the stars sliding behind it, a few small investigators facing it.
 Framing: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.
 Character: none
 
@@ -1025,13 +1025,13 @@ Character: none
 
 IMAGE 3 (save as 058)
 Aspect ratio: 3:2 (landscape)
-Scene: a tall wrong figure in an old-fashioned frock coat, too tall and too still, standing among a crowd of raised hands on the Town Hall steps long ago, bright new lanterns, sepia, dread.
+Scene: the same tall faceless figure as the Appointed (a peaked hood with no face inside, a long narrow robe, arms too long with angular joints; no antlers, no horns), standing among a crowd of raised hands on the Town Hall steps long ago, bright new lanterns and bunting, sepia, dread.
 Framing: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.
 Character: none
 
 IMAGE 4 (save as 059)
 Aspect ratio: 3:2 (landscape)
-Scene: a gaunt, patient, too-tall figure waiting alone in the empty town square at grey dawn, rotted bunting on its strings, fog on the shore road, the town decayed around it, cold light.
+Scene: the same tall faceless figure as the Appointed (a peaked hood with no face inside, a long narrow robe, arms too long with angular joints; no antlers, no horns), gaunt and patient, waiting alone in the empty town square at grey dawn, rotted bunting on its strings, fog on the shore road, the town decayed around it, cold light.
 Framing: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.
 Character: none
 ```
@@ -1066,7 +1066,7 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 060)
 Aspect ratio: 3:2 (landscape)
-Scene: a vast wrong figure filling the lantern-lit town square at night, its outline made of too many angles, the stars sliding behind it, a few small investigators facing it.
+Scene: the same tall faceless figure as the Appointed (a peaked hood with no face inside, a long narrow robe, arms too long with angular joints; no antlers, no horns), vast, filling the lantern-lit town square at night, its outline breaking into too many angles, the stars sliding behind it, a few small investigators facing it.
 Framing: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.
 Character: none
 
