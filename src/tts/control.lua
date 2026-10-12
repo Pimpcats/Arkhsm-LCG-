@@ -1957,14 +1957,15 @@ end
 
 function shClearBoard()
   resetAsked = false
-  local r = guarded("clear board", clearLoopBoard) or { cards = 0, tokens = 0, stopped = 0 }
+  local r = guarded("clear board", function() return Board.withoutAppointedGuard(clearLoopBoard) end)
+    or { cards = 0, tokens = 0, stopped = 0 }
   announce(string.format("The board is cleared: %d scenario card(s) and %d token(s) removed. %s"
     .. "Press Place on The Square (Town Hall) box to set up the next loop.", r.cards, r.tokens,
     (r.stopped or 0) > 0 and "A Place that was still running was stopped. " or ""))
   return r
 end
 
-function shApiClearBoard() return guarded("clear board", clearLoopBoard) end
+function shApiClearBoard() return guarded("clear board", function() return Board.withoutAppointedGuard(clearLoopBoard) end) end
 function shApiSetPartTwo(p)
   CampaignState.setPartTwo(p == nil or p.on ~= false)
   local rep = guarded("locations", Board.syncLocations)

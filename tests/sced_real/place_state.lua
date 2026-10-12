@@ -490,6 +490,28 @@ return function(H)
     control().call("shApiRestore", { blob = before }); E.run(1)
   end)
 
+  step("A-3: Clear Board while the Appointed is out takes it too, and the Square lays out again", function()
+    click(control(), "Clear Board"); E.run(0.5)
+    local before = control().call("shApiSnapshot")
+    local blob = decode(before)
+    blob.campaign.prologue = false
+    blob.campaign.appointedStage = 1                     -- Sensed: it manifests at the next board sync
+    control().call("shApiRestore", { blob = J.encode(blob) }); E.run(6)
+    local _, mark = place("district_square", true)
+    check("the Appointed manifests with the Square", looseCard("sthr-appointed") ~= nil, tail(mark))
+    local mark2 = chatMark()
+    click(control(), "Clear Board"); E.run(2)
+    check("Clear Board takes the Appointed's card (it is not put back as undefeatable)",
+      looseCard("sthr-appointed") == nil and not saw(mark2, "cannot be defeated"), chatSince(mark2):sub(1, 400))
+    local _, mark3 = place("district_square", true)
+    check("...and the Square lays out again", not saw(mark3, "already laid out")
+      and (looseCard("sthr-loc-hubsquare") ~= nil or looseCard("sthr-loc-square") ~= nil),
+      tail(mark3))
+    check("...with the Appointed manifesting again", looseCard("sthr-appointed") ~= nil, tail(mark3))
+    click(control(), "Clear Board"); E.run(2)
+    control().call("shApiRestore", { blob = before }); E.run(6)
+  end)
+
   ----------------------------------------------------------- N-6 --
 
   step("N-6: a save taken during a Place leaves no second box behind", function()

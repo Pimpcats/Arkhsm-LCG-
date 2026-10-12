@@ -48,6 +48,10 @@ local st = {
 }
 local restoreScheduled = false
 local restoreData = nil
+-- Clear Board takes every scenario card, the Appointed's included: while it runs the
+-- "cannot be defeated" guard stands down (TTS reports a destroy at the end of the frame,
+-- so the guard stays down for a few frames after the clear)
+local guardDown = false
 
 ------------------------------------------------------------------ utilities --
 
@@ -927,9 +931,24 @@ function Board.forgetGuids(list)
   for _, g in ipairs(type(list) == "table" and list or {}) do Board.forgetGuid(g) end
 end
 
+--- Run fn (Clear Board) with the Appointed's guard down: a card it destroys is off the
+-- board, not defeated, and the next Place's board sync manifests it again from the box.
+function Board.withoutAppointedGuard(fn)
+  guardDown = true
+  local ok, res = pcall(fn)
+  st.appointed.placed = false
+  st.appointed.guid = nil
+  st.appointed.engagedAt = nil
+  restoreData = nil
+  local up = function() guardDown = false end
+  if not pcall(function() Wait.frames(up, 5) end) then up() end
+  if not ok then error(res) end
+  return res
+end
+
 function Board.onDestroy(obj)
   Board.forgetGuid(guidOf(obj))
-  if Board.isAppointedObject(obj) and Appointed.isManifest() then
+  if not guardDown and Board.isAppointedObject(obj) and Appointed.isManifest() then
     restoreData = safe(function() return obj.getData() end)
     Appointed.onRemovalAttempt(Board.appointedCtx())
   end
