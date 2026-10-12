@@ -49,3 +49,15 @@ first resolution that applies. NR is unchanged.
 
 The finale gets up to 3 damage on each period form before the fight; the finale is re-tuned to keep full victory near
 40% (see FINALE_REDESIGN.md, "Late objectives" rows).
+
+## Measurements (carried campaigns, 3 investigators, `goalsPerNight 2`, seeds 5000/6000/7000 × 9)
+
+| build | Night 7 | Night 8 | finale home | stranded | not ended / unavailable | deep entries at finale | late records | Memory / inv. |
+|---|---|---|---|---|---|---|---|---|
+| before late objectives (boss finale tuned) | 63% | 19% (18 of 27 nights had no goal) | 41% | 22% | 37% / 0 | mostly 6 | – | 44.3 |
+| late objectives, planner treats all pending alike | 78% | 59% | 22% | 33% | 33% / 11% | mostly 4–5 | 2–5 | 39.5 |
+
+The second row's planner spent nights on late objectives while deep ones were still open, so parties reached the
+finale with fewer deep entries (2 damage each, and the Name and the Vote open the finale): three campaigns never
+opened it. A table would finish the deep objectives first; the planner now does (surface and deep before late).
+No campaign recorded all six late records, so the forced finale did not fire.
