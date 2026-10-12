@@ -731,9 +731,14 @@ return function(R, T)
     local f = en.def.fight or 0
     if R.G.hourEightFight then f = f + 1 end
     if R.knows("who-walks-beside-you") and R.hasTrait(en.def, "Echo") then f = f - 1 end
+    if en.form and R.G.n == 1 then f = f - 1 end      -- solo: the forms of the Appointed get -1 fight
     return math.max(0, f)
   end
-  function R.enemyEvade(en) return en.def.evade or 0 end
+  function R.enemyEvade(en)
+    local e = en.def.evade or 0
+    if en.form and R.G.n == 1 then e = e - 1 end      -- solo: and -1 evade
+    return math.max(0, e)
+  end
   --- Enemies that hunt one story asset's holder only (What Wears the Sheriff:
   -- Town Ledger; The Drowned Verger: Parish Register): that holder, or nil.
   local ONLY = { ["sthr-wearssheriff"] = "sthr-item-ledger", ["sthr-drownedverger"] = "sthr-item-register" }

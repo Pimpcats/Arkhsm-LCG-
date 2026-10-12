@@ -271,7 +271,7 @@ return function(R, T)
     end
     -- the night loosens: rewind the Hourglass by 1 Hour
     local rw = (R.WHATIF or {}).formRewind
-    if rw == nil then rw = 1 end
+    if rw == nil then rw = (G.n == 1) and 2 or 1 end    -- solo: 2 Hours
     if rw > 0 then R.rewind(rw, "a form of the Appointed falls") end
     -- stop or press on: stop when the Hours left are unlikely to finish what remains
     local left = 0
