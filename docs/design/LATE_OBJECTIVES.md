@@ -71,3 +71,7 @@ Second seeds (8000/9000/10000, Stop the Wheel at 1 [perinv]): Night 7 74%, Night
 Stop the Wheel met 7 of 8 times. Pooled with the first set (54 campaigns): Prologue–Night 8 87/69/65/91/91/48/78/50/80
 (mean 73%), finale home 30%, stranded 35%, not ended 35%, Memory 43.1 per investigator. Finale full victory sits
 below the 40% target on both seed sets, so the finale is tuned next (As It Is's attack).
+
+**Chosen:** As It Is deals 1 damage (was 2). 54 campaigns (both seed sets): finale home 43%, stranded 24%, not ended
+33%; Prologue–Night 8 87/69/63/91/89/41/76/56/78; no night without a goal; Memory 43.0 per investigator. The
+validation run (seeds 5000–7000 with the engine's Hour IX fallback) gave home 37%, in line. Every finale was played.
