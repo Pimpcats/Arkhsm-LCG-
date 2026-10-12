@@ -56,12 +56,28 @@ def resolve(name, ids, numbers):
     raise SystemExit("unknown card '{}': not a card id or art pack number".format(name))
 
 
+MIN_SIDE_STORY = 360
+
+
+def art_type(card):
+    """The card's art type from the art manifest ("story", "act", ...), or None."""
+    path = os.path.join(ROOT, "pipeline", "art_manifest.json")
+    if not os.path.exists(path):
+        return None
+    for job in json.load(open(path, encoding="utf-8")):
+        if job.get("id") == card:
+            return job.get("art_type")
+    return None
+
+
 def import_one(src, card):
     im = Image.open(src)
     im.load()
     # the largest art windows are ~750x600 (render_placeholders.art_box), so a
     # 3:2 image down to ~760x500 still covers them at <=1.2x
-    if min(im.width, im.height) < MIN_SIDE:
+    # a story card's window is short and wide (~630x340 on the face): a banner covers it
+    floor = MIN_SIDE_STORY if art_type(card) == "story" else MIN_SIDE
+    if min(im.width, im.height) < floor:
         raise SystemExit("{}: {}x{} is too small for a card".format(src, im.width, im.height))
     im = im.convert("RGB")
     im.thumbnail((MAX_SIDE, MAX_SIDE), Image.LANCZOS)

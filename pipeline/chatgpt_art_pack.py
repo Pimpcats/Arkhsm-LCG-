@@ -152,6 +152,41 @@ def provisional(art_dir):
 CAMPAIGN_PREFIX = "sthr-"
 
 
+# ChatGPT's image sizes; a card's art window is cut from the middle of one of these
+CHAT_SIZE = {"landscape 3:2": ("landscape (wider than tall)", "1536 x 1024", "3:2"),
+             "portrait 2:3": ("portrait (taller than wide)", "1024 x 1536", "2:3"),
+             "square 1:1": ("square", "1024 x 1024", "1:1")}
+CHAT_STYLE = ("A hand-painted oil illustration in the manner of a 1930s weird-fiction pulp magazine: broad, "
+              "economical brushwork, large calm areas of thin paint, bold simple shapes of light and dark, crisp "
+              "detail only at the focal point, edges and background left loose and partly unfinished. Restrained, "
+              "muted, desaturated colour; lamplight is the only warm note. Setting: a 1920s New England coastal "
+              "town. Mood: uncanny, quiet dread, never gore.")
+
+
+def chat_prompt(job, prof, chars):
+    """One short ChatGPT message for one image (owner, 2026-10-12: the long batch requests came back
+    as collages and banner strips). The format goes first and again last; the scene stays short; the
+    style is a few concrete sentences; what to keep out is one plain line."""
+    orient, px, ratio = CHAT_SIZE[aspect(prof)]
+    lines = ["Please create ONE painting as a single image.", "",
+             "FORMAT (most important): a {} image, {} pixels ({}). The painting fills the whole canvas, "
+             "edge to edge: no border, frame, white margin, letterbox bars, panels, grid, collage, strip or "
+             "banner.".format(orient, px, ratio), "",
+             "WHAT TO PAINT: " + scene_text(job)]
+    if job.get("character") and prof.get("allow_character"):
+        who = NAMES.get(job["character"], job["character"])
+        lines.append("WHO: {} - {}. Paint them exactly as described.".format(
+            who, chars[job["character"]]["description"]))
+    lines += ["COMPOSITION: " + framing(prof) + ". Keep the main subject well inside the frame: the card "
+              "frame crops about a tenth off each side.", "",
+              "STYLE: " + CHAT_STYLE, "",
+              "KEEP OUT: any text, letters, numbers or signatures (writing only as unreadable marks); a "
+              "photographic, 3D-rendered or glossy digital look; identical repeated figures or patterns; "
+              "modern objects.", "",
+              "FORMAT AGAIN: one {} image, {} pixels, filling the whole frame.".format(orient.split(" (")[0], px)]
+    return "\n".join(lines)
+
+
 def request_prompt(camp, chars, cards, jobs_by_id, profiles):
     """The owner's batch format: up to PER_REQUEST separate images in one
     message, house style pasted once, one block per image. No reference line —
@@ -219,7 +254,8 @@ def build():
         cards.append({"n": n, "id": job["id"], "art_type": job["art_type"],
                       "aspect": aspect(prof), "character": job.get("character"),
                       "brief": text,
-                      "prompt": standalone_prompt(camp, chars, job, text)})
+                      "prompt": standalone_prompt(camp, chars, job, text),
+                      "chat": chat_prompt(job, prof, chars)})
     # batch 1 is the investigator portraits alone: approved before anything else
     inv = [c for c in cards if c["art_type"] == "investigator_portrait"]
     rest = [c for c in cards if c["art_type"] != "investigator_portrait"]
@@ -248,7 +284,8 @@ def build():
         if os.path.isdir(art_dir) else set()
     # stand-in crops (listed in the art folder's *_SOURCES.md tables) still need a painting
     have -= provisional(art_dir)
-    todo = [c for c in cards if c["id"] not in have]
+    # story cards print without an art window (the official layout), so they are never asked for
+    todo = [c for c in cards if c["id"] not in have and c["art_type"] != "story"]
     remaining = [{"cards": [c["n"] for c in todo[i:i + REMAINING_PER_REQUEST]],
                   "prompt": request_prompt(camp, chars,
                                            todo[i:i + REMAINING_PER_REQUEST],
@@ -276,11 +313,13 @@ def write_md(pack):
     if pack["remaining"]:
         n = sum(len(r["cards"]) for r in pack["remaining"])
         out += ["## Still to paint ({} images)".format(n), "",
-                "Cards whose art is missing or a stand-in. One request per new chat; save each "
-                "image under its number and import with `python3 pipeline/import_art.py`.", ""]
+                "Cards whose art is missing or a stand-in. **One image per new ChatGPT chat** (batched "
+                "requests come back as one collage); save it full size under its number and import with "
+                "`python3 pipeline/import_art.py`.", ""]
+        by_n = {c["n"]: c for c in pack["cards"]}
         for r in pack["remaining"]:
-            out += ["### #{}".format(", #".join("{:03d}".format(x) for x in r["cards"])), "",
-                    "```", r["prompt"], "```", ""]
+            for x in r["cards"]:
+                out += ["### #{:03d}".format(x), "", "```", by_n[x]["chat"], "```", ""]
     for bi in range(1, len(pack["batches"]) + 1):
         out += ["## Batch {}".format(bi), ""]
         for r in (r for r in pack["requests"] if r["batch"] == bi):

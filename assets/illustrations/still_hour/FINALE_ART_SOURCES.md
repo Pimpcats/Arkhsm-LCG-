@@ -13,8 +13,6 @@ illustration of the same id when one is made.
 | sthr-form-past | sthr-appointed | 228, 120 | sepia |
 | sthr-form-future | sthr-appointed | 100, 260 | cold |
 | sthr-form-present | sthr-appointed | 380, 200 | full colour, +15% contrast |
-| sthr-res-7 | sthr-loc-square | 0, 120 | sepia (0.75) |
-| sthr-res-8 | sthr-loc-square | 228, 200 | cold (0.85) |
 
 ## Late objectives (act 3a, 2026-10-12, provisional)
 
@@ -28,4 +26,8 @@ wash (35%) that marks the late acts. Briefs are in pipeline/build_art_manifest.p
 | sthr-act-lastmilestone | sthr-act-walkbackward | 0, 384 |
 | sthr-act-calltheroll | sthr-act-vote | 256, 300 |
 | sthr-act-stopwheel | sthr-act-wheelturns | 128, 96 |
-| sthr-act-hourright | sthr-act-almanachid | 200, 200 |
+
+## Painted (ChatGPT, 2026-10-12)
+
+Replaced their stand-in crops: Set the Hour Right (pack #140, cut to portrait from the landscape image), Stranded
+Before (#153) and Stranded After (#154), both trimmed of the cut line and fitted to the story window.
