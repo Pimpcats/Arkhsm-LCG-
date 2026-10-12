@@ -445,6 +445,51 @@ return function(H)
     check("Clear Board takes both act decks", actDeck("The Square") == nil and actDeck("The Lighthouse") == nil)
   end)
 
+  step("A-2: Place sets a district's act deck up from the log: act 3a once the deep entry is in, none once the late record is", function()
+    local function knowing(facts)
+      local blob = decode(control().call("shApiSnapshot"))
+      blob.campaign.partTwo = true
+      blob.campaign.prologue = false
+      for _, f in ipairs(facts) do blob.campaign.knowledge[f] = true end
+      control().call("shApiRestore", { blob = J.encode(blob) }); E.run(6)   -- its board sync finishes first
+    end
+    local function onTable(id) return looseCard(id) ~= nil or find(function(o)
+      if o.type ~= "Deck" then return false end
+      for _, e in ipairs(o.getObjects()) do if (decode(e.gm_notes) or {}).id == id then return true end end
+      return false
+    end) ~= nil end
+    click(control(), "Clear Board"); E.run(0.5)
+    local before = control().call("shApiSnapshot")
+    knowing({ "the-lamp-was-never-lit", "the-keepers-ninth-death" })
+    local _, mark = place("district_lighthouse", true)
+    check("deep entry recorded: act 3a is the Lighthouse's current act", onTable("sthr-act-keeplight")
+      and not onTable("sthr-act-lamp") and not onTable("sthr-act-ninthdeath"),
+      (function()
+        local out = {}
+        for _, o in ipairs(objects()) do
+          local ids = {}
+          if o.type == "Deck" then for _, e in ipairs(o.getObjects()) do ids[#ids + 1] = (decode(e.gm_notes) or {}).id end
+          elseif o.type == "Card" then ids[1] = gm(o).id end
+          local hit = false
+          for _, i in ipairs(ids) do if tostring(i):find("act%-") then hit = true end end
+          if hit then
+            local q = o.getPosition()
+            out[#out + 1] = string.format("%s %s [%s] at %.1f,%.1f,%.1f tags %s", o.type, o.getName(), table.concat(ids, ","),
+              q.x, q.y, q.z, table.concat(o.getTags and o.getTags() or {}, ";"))
+          end
+        end
+        return table.concat(out, " | ")
+      end)())
+    check("...and the chat says so", saw(mark, "act 3a is current"), chatSince(mark):sub(1, 1200))
+    click(control(), "Clear Board"); E.run(0.5)
+    knowing({ "the-light-is-kept" })
+    local _, mark2 = place("district_lighthouse", true)
+    check("late record recorded: the act deck is removed", not onTable("sthr-act-keeplight"), tail(mark2))
+    check("...its objectives are complete", saw(mark2, "its objectives are complete"), tail(mark2))
+    click(control(), "Clear Board"); E.run(0.5)
+    control().call("shApiRestore", { blob = before }); E.run(1)
+  end)
+
   ----------------------------------------------------------- N-6 --
 
   step("N-6: a save taken during a Place leaves no second box behind", function()
