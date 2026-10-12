@@ -1028,9 +1028,9 @@
   },
   "sthr-act-stopwheel": {
     "name": "Stop the Wheel",
-    "clues": 2,
+    "clues": 1,
     "clues_per_investigator": true,
-    "text": "Part II only.\nObjective – [action] Investigators at The Wheel spend 2 [perinv] clues, as a group: Jam the gears. Test [com] or [agi] (3). Only an investigator at The Wheel may trigger this ability. If you succeed, advance. If you fail, place the spent clues on The Wheel.",
+    "text": "Part II only.\nObjective – [action] Investigators at The Wheel spend 1 [perinv] clues, as a group: Jam the gears. Test [com] or [agi] (3). Only an investigator at The Wheel may trigger this ability. If you succeed, advance. If you fail, place the spent clues on The Wheel.",
     "flavor": "It turns because the night turns. Make it stop.",
     "index": "3a",
     "back_flavor": "The gears scream and catch, and the wheel stops with its top car against the wrong sky. For as long as it holds, the fair falls silent, and from up there you can see what the night looks like when nothing is moving it along.",

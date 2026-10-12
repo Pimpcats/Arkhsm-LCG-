@@ -33,7 +33,7 @@ empty loop: nothing to find, only Years to pay.
 | Drowned Church | Toll the True Hour | Hour VI or later; group spend at The Belfry | The True Hour Tolled | Past |
 | Sunken Road | The Last Milestone | group spend at The Milestones | The Road Has an End | Future |
 | Square | Call the Roll | [action] at The Town Hall Steps, test [wil]/[int] (3); fail: clues to the location | Every Name Was Read | Past |
-| Fairground | Stop the Wheel | [action] at The Wheel, test [com]/[agi] (3); fail: clues to the location | The Wheel Stands Still | Future |
+| Fairground | Stop the Wheel | [action] at The Wheel, 1 [perinv] only, test [com]/[agi] (3); fail: clues to the location | The Wheel Stands Still | Future |
 | Almanac House | Set the Hour Right | [action] at The Press, +1 doom on the current Hour | The Hour Is Set Right | Past |
 
 Each uses an objective shape the table and the engine already run (lamp, minimum Hour, plain group spend, [action]

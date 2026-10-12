@@ -663,8 +663,8 @@
     "id": "sthr-act-stopwheel",
     "type": "Act",
     "name": "Stop the Wheel",
-    "clues": 2,
-    "text": "Part II only.\nObjective – [action] Investigators at The Wheel spend 2 [perinv] clues, as a group: Jam the gears. Test [com] or [agi] (3). Only an investigator at The Wheel may trigger this ability. If you succeed, advance. If you fail, place the spent clues on The Wheel.",
+    "clues": 1,
+    "text": "Part II only.\nObjective – [action] Investigators at The Wheel spend 1 [perinv] clues, as a group: Jam the gears. Test [com] or [agi] (3). Only an investigator at The Wheel may trigger this ability. If you succeed, advance. If you fail, place the spent clues on The Wheel.",
     "flavor": "It turns because the night turns. Make it stop.",
     "index": "3a",
     "number": "3/3"
