@@ -280,3 +280,21 @@ No night in 54 campaigns was left without a goal (before: 18 of 27 Night 8s). Fi
 43%, stranded 24%, not ended 33%. Memory 43.0 per investigator (28.0–50.0). Prologue–Night 8 mean 72% against the
 62% curve: the middle nights (3, 4, 6) run easy and Night 5 hard, as in every run since the route rotation; they are
 route effects at this sample size (±13 points at 54).
+
+### Party sizes with the boss finale (2026-10-12)
+
+Carried campaigns, `goalsPerNight 2`, the late-objectives build (As It Is 1 damage). Finale endings, of all campaigns:
+
+| investigators | campaigns | home | stranded | not ended | any win |
+|---|---|---|---|---|---|
+| 1 | 18 | 11% | 0% | 89% | 11% |
+| 2 | 18 | 72% | 0% | 28% | 72% |
+| 3 | 54 | 43% | 24% | 33% | 67% |
+| 4 | 18 | 22% | 44% | 33% | 66% |
+
+Two, three and four investigators win about equally often; how the win splits between home and stranded follows the
+engine's stop rule (it stops when the party is worn: someone defeated or little health and sanity to spare), which
+fires more at four and never at two (their +2 health and sanity). Solo fell short: the lone investigator beat the
+Past and the Future by about Hour VI–VII, then ran out of time (12 of 18) or fell to As It Is. **Solo rules** (guide,
+Difficulty and player count; the form cards): each form gets −1 fight and −1 evade, and a fallen form rewinds the
+Hourglass by 2 Hours. Solo with both, 27 campaigns: home 30%, not ended 67% (a fallen form rewinding 2 alone: 22%).
