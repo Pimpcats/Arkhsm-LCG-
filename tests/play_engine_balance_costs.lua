@@ -61,14 +61,14 @@ local function fixture(n,id)
   return R,FX,AI,st,act,R.G.inv[1],function() return tests,returned end
 end
 for _,id in ipairs({'sthr-act-whythirteen','sthr-act-hourwaswrong','sthr-act-walksbeside'}) do
-  local expected=id=='sthr-act-walksbeside' and 3 or (id=='sthr-act-hourwaswrong' and 2 or 3)
+  local expected=id=='sthr-act-walksbeside' and 3 or 2   -- Why Thirteen? 2 [perinv] since 2026-10-12 (Night 1)
   expect(id..' effective metadata has intended per-investigator cost',OV[id].clues==expected and OV[id].clues_per_investigator)
   local count=0;for _ in OV[id].text:gmatch(expected..' %[%s*perinv%s*%] clues') do count=count+1 end
   expect(id..' printed payment routes match metadata',count==(id=='sthr-act-walksbeside' and 2 or 1))
 end
 for n=1,4 do
  for _,id in ipairs({'sthr-act-whythirteen','sthr-act-hourwaswrong'}) do
-  local C=(id=='sthr-act-hourwaswrong') and 2 or 3
+  local C=2
   case(id..' full cost '..n,function()
     local R,FX,AI,st,act,i=fixture(n,id)
     expect(id..' scaled cost '..n,FX.actNeed(id)==C*n)
@@ -115,7 +115,7 @@ for n=1,4 do
 end
 case('Church payer scope',function()
  local R,FX,AI,st,act,i=fixture(2,'sthr-act-whythirteen');i.clues=3;R.G.inv[2].clues=3;R.G.inv[2].loc='hub'
- expect('surface accepts remote group contribution',R.takeStory(i,act) and R.G.metrics.clues_spent==6)
+ expect('surface accepts remote group contribution',R.takeStory(i,act) and R.G.metrics.clues_spent==4)
  R,FX,AI,st,act,i=fixture(2,'sthr-act-hourwaswrong');i.clues=3;R.G.inv[2].clues=3;R.G.inv[2].loc='hub'
  local choice=AI.choose(i)
  expect('deep AI rejects remote-only affordability',not choice or choice.kind~='objective')
@@ -129,12 +129,12 @@ case('carry pickup legality and drop',function()
  R.G.locs.vestry.closed=false;i.defeated=true
  expect('eliminated actor rejected without spending',not R.takeStory(i,act) and i.clues==3 and not act.holder)
  i.defeated=false;R.G.impassable='vestry'
- expect('already occupied impassable location permits ability',R.takeStory(i,act) and R.G.metrics.clues_spent==3)
- expect('held story cannot be acquired twice',not R.takeStory(i,act) and R.G.metrics.clues_spent==3)
+ expect('already occupied impassable location permits ability',R.takeStory(i,act) and R.G.metrics.clues_spent==2)
+ expect('held story cannot be acquired twice',not R.takeStory(i,act) and R.G.metrics.clues_spent==2)
  FX.dropStory(i,R.G.locs.belfry);i.loc='vestry'
  expect('dropped story requires actual dropped location',not R.takeStory(i,act) and act.dropped=='belfry')
  i.loc='belfry'
- expect('dropped story pickup pays no second fare',R.takeStory(i,act) and act.dropped==nil and R.G.metrics.clues_spent==3)
+ expect('dropped story pickup pays no second fare',R.takeStory(i,act) and act.dropped==nil and R.G.metrics.clues_spent==2)
 end)
 case('unchanged timed delivery',function()
  local R,FX,AI,st,act,i=fixture(1,'sthr-act-whythirteen');i.clues=3;assert(R.takeStory(i,act));i.loc='belfry'

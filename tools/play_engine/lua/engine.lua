@@ -646,12 +646,17 @@ return function(H)
       -- surface and deep objectives first (they open Part II and the finale, and a deep entry is worth
       -- more in it), then the late ones (act 3a)
       local function late(d) return c.knowledge[S.DEEP[d]] and not c.knowledge[S.LATE[d]] end
+      local used=0
       for pass=1,2 do
         for i=0,#ROUTE-1 do
           local d=ROUTE[((start+i)%#ROUTE)+1]
           local dup=false
           for _,x in ipairs(districts) do if x==d then dup=true end end
-          if not dup and pending(d) and (pass==2 or not late(d)) and #districts<perNight then districts[#districts+1]=d end
+          -- a Lighthouse trip places the Sunken Road too: it takes two of the night's slots (unless it is the first pick)
+          local cost=(d=="Lighthouse") and 2 or 1
+          if not dup and pending(d) and (pass==2 or not late(d)) and (#districts==0 or used+cost<=perNight) then
+            districts[#districts+1]=d ; used=used+cost
+          end
         end
       end
       for i=0,#ROUTE-1 do
