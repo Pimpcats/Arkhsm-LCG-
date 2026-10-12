@@ -620,6 +620,66 @@
     "number": "1/1"
   },
   {
+    "id": "sthr-act-keeplight",
+    "type": "Act",
+    "name": "Keep the Light",
+    "clues": 2,
+    "text": "Part II only.\nObjective – If The Lantern Room's lamp is lit, investigators at The Lantern Room may, as a group, spend 2 [perinv] clues to advance.",
+    "flavor": "Eight keepers let it go out. Someone has to stay with it until morning.",
+    "index": "3a",
+    "number": "3/3"
+  },
+  {
+    "id": "sthr-act-truehour",
+    "type": "Act",
+    "name": "Toll the True Hour",
+    "clues": 2,
+    "text": "Part II only.\nObjective – Once the Hourglass has reached Hour VI, investigators at The Belfry may, as a group, spend 2 [perinv] clues to advance.",
+    "flavor": "The drowned page gave the true hour. The bell has never once rung it.",
+    "index": "3a",
+    "number": "3/3"
+  },
+  {
+    "id": "sthr-act-lastmilestone",
+    "type": "Act",
+    "name": "The Last Milestone",
+    "clues": 2,
+    "text": "Part II only.\nObjective – Investigators at The Milestones may, as a group, spend 2 [perinv] clues to advance.",
+    "flavor": "Every milestone counts the way back to town. None of them counts the way out.",
+    "index": "3a",
+    "number": "3/3"
+  },
+  {
+    "id": "sthr-act-calltheroll",
+    "type": "Act",
+    "name": "Call the Roll",
+    "clues": 2,
+    "text": "Part II only.\nObjective – [action] Investigators at The Town Hall Steps spend 2 [perinv] clues, as a group: Read the roll aloud. Test [wil] or [int] (3). Only an investigator at The Town Hall Steps may trigger this ability. If you succeed, advance. If you fail, place the spent clues on The Town Hall Steps.",
+    "flavor": "Every name in the town, each in its own hand. Someone should read them out.",
+    "index": "3a",
+    "number": "3/3"
+  },
+  {
+    "id": "sthr-act-stopwheel",
+    "type": "Act",
+    "name": "Stop the Wheel",
+    "clues": 2,
+    "text": "Part II only.\nObjective – [action] Investigators at The Wheel spend 2 [perinv] clues, as a group: Jam the gears. Test [com] or [agi] (3). Only an investigator at The Wheel may trigger this ability. If you succeed, advance. If you fail, place the spent clues on The Wheel.",
+    "flavor": "It turns because the night turns. Make it stop.",
+    "index": "3a",
+    "number": "3/3"
+  },
+  {
+    "id": "sthr-act-hourright",
+    "type": "Act",
+    "name": "Set the Hour Right",
+    "clues": 2,
+    "text": "Part II only.\nObjective – [action] Investigators at The Press spend 2 [perinv] clues, as a group, and place 1 doom on the current Hour: Reset the type. Advance. Only an investigator at The Press may trigger this ability.",
+    "flavor": "The hour was printed one late. The type is still set.",
+    "index": "3a",
+    "number": "3/3"
+  },
+  {
     "id": "sthr-res-1",
     "type": "Story",
     "name": "Take Its Place",

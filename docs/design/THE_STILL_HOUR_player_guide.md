@@ -21,7 +21,7 @@ Read this aloud before the Prologue. It is the whole idea in plain terms. **Camp
 
 **The Hourglass is the clock.** The agenda deck is nine **Hours**. Each Mythos phase from the second round places 1 doom on the current Hour, so an Hour passes about every second round. When the ninth Hour arrives, the loop ends. Each time an Hour passes, each investigator heals 1 damage and 1 horror.
 
-**The town is split into districts.** The Square is always in play. Each loop you choose which other districts to visit and lay them out from their boxes. Crossing between districts costs time: the first crossing along each connection each round places 1 doom on the current Hour. You will usually finish work in two or three districts, so choosing where to go is your biggest decision: choose one path each loop and follow it through. Each district has an act deck: a first objective you can finish from the start, and a second, deeper one that opens in Part II.
+**The town is split into districts.** The Square is always in play. Each loop you choose which other districts to visit and lay them out from their boxes. Crossing between districts costs time: the first crossing along each connection each round places 1 doom on the current Hour. You will usually finish work in two or three districts, so choosing where to go is your biggest decision: choose one path each loop and follow it through. Each district has an act deck: a first objective you can finish from the start, a second, deeper one that opens in Part II, and a last one that readies you for the finale.
 
 **Dissonance is how much the night has noticed you.** It is one shared number from 0 to 24 that changes only when an effect says so. Each loop starts it at the number of loops you have completed, up to 6.
 
@@ -60,7 +60,7 @@ The **Static token** is a new chaos token: **−3, and raise Dissonance by 1**.
 
 **Parts of the campaign.** The campaign has three parts. They are not act cards.
 - **Part I — Learning the Rules.** It begins when your log records **You Are Unstuck**. Only each district's first objective (act 1a) can be completed.
-- **Part II — The Shape of the Hour.** It begins at **Between Loops** step 5. Each district's second objective (act 2a) opens, the Appointed's Whispers join the encounter deck, and the Named enter the night.
+- **Part II — The Shape of the Hour.** It begins at **Between Loops** step 5. Each district's second objective (act 2a) opens, and its last (act 3a) after it; the Appointed's Whispers join the encounter deck, and the Named enter the night.
 - **The Last Hour.** The finale, once your Campaign Log records **The Way the Night Breaks**.
 
 **The Hourglass.** The Hours (I–IX) are the agenda deck; "the Hourglass" is that deck and the current Hour is the current agenda. Hour I has a doom threshold of 3, Hours II–VIII of 2. From the second round on, the Mythos phase places 1 doom on the current Hour (step 1.2) and then checks the doom in play against its threshold (step 1.3), as the Rules Reference counts it.
@@ -363,16 +363,17 @@ Run this after every reset, and once after the Prologue. First, if you have not 
 
 ## THE DISTRICTS
 
-Read a district's entry the first time you enter it in a loop (The Square's during Loop Setup). Its objectives are printed on its act deck: act 1a (a surface objective) can be completed in either part, act 2a (a deep objective) only in Part II. When an act tells you to record something in your Campaign Log, do so at once. It lasts through every reset.
+Read a district's entry the first time you enter it in a loop (The Square's during Loop Setup). Its objectives are printed on its act deck: act 1a (a surface objective) can be completed in either part; act 2a (a deep objective) and act 3a (a late objective, which readies you for the finale) only in Part II. When an act tells you to record something in your Campaign Log, do so at once. It lasts through every reset.
 
 **A district's act deck.** Each placed district has its own current act. The first act deck laid out in a loop takes the **Act** slot of the mythos mat; each further one sits in its own place in the row just below the mat. Place sets each act deck up from your Campaign Log and says in the chat which act is current:
-- If your Campaign Log records its deep (act 2a) entry, remove its act deck from the game: its objectives are complete.
+- If your Campaign Log records its late (act 3a) record, remove its act deck from the game: its objectives are complete.
+- Otherwise, if your log records its deep (act 2a) entry: remove acts 1a and 2a from the game; act 3a is the district's current act.
 - Otherwise, if your log records its surface (act 1a) entry: in Part I, remove the act deck from the game. In Part II, remove act 1a from the game; then, if act 2a's requirements are met, act 2a becomes the district's current act (resolve its "When this act becomes the current act" ability now); if they are not, remove the act deck from the game.
 - Otherwise, act 1a is the district's current act.
 
 If act 1a would advance to an act 2a whose requirements are not met, remove the act deck from the game instead.
 
-**District resolutions.** When a loop ends, after its loop resolution, read one resolution for **each district whose box you placed this loop** (always including The Square). Check each district's resolutions **top to bottom** and read the first that applies. They tell what the night did with what you found there; anything they describe was already recorded on the act's back when you completed it, so they add nothing further to the log unless they say so. If you defeated a district's Named enemy this loop, read the Named add-on in that district's Resolution 1 whichever of its resolutions you read. Read that add-on only once; if the chosen resolution tells you to read it instead of its story, follow that instruction.
+**District resolutions.** When a loop ends, after its loop resolution, read one resolution for **each district whose box you placed this loop** (always including The Square). Check each district's resolutions **top to bottom** and read the first that applies; if you completed its act 3a this loop, also read its **Resolution 4**. They tell what the night did with what you found there; anything they describe was already recorded on the act's back when you completed it, so they add nothing further to the log unless they say so. If you defeated a district's Named enemy this loop, read the Named add-on in that district's Resolution 1 whichever of its resolutions you read. Read that add-on only once; if the chosen resolution tells you to read it instead of its story, follow that instruction.
 
 **Choices.** The first time you complete a district's deep objective, its resolution asks the investigators to decide between two courses. Record the choice in your Campaign Log (**Choices**). Every choice echoes somewhere else in Ambergrove, and every one of them is waiting for you in **The Last Hour**.
 
@@ -404,7 +405,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > From the gallery the fair is small and bright, the wheel turning against the wrong sky. You have looked at this tower from the top of that wheel. Up here it is easy to believe that, all night, every night, the tower has been looking back.
 
-**When you Place this box:** The Lighthouse is reached only through the Sunken Road, so Place the Sunken Road's box too. The Lantern Room (revealed), The Winding Stair and The Keeper's Quarters join the map. Encounter set: [set:node_lighthouse] The Dark That Waits, Something on the Stair. Act deck: **Light the Lamp** (1a), then 2a in Part II. Its story asset is set aside.
+**When you Place this box:** The Lighthouse is reached only through the Sunken Road, so Place the Sunken Road's box too. The Lantern Room (revealed), The Winding Stair and The Keeper's Quarters join the map. Encounter set: [set:node_lighthouse] The Dark That Waits, Something on the Stair. Act deck: **Light the Lamp** (1a), then 2a and 3a in Part II. Its story asset is set aside.
 
 **Do not read until the loop ends.**
 
@@ -421,9 +422,13 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 - If **Elias Warde** is one of your investigators, add: *Elias kept his hand on the lamp's brass until the last second. He still cannot remember why he left it dark. He is beginning to suspect that he was never given the chance.*
 ```
 
-```resolution Resolution 3 — The Keeper's Round (you completed no act here this loop, and your Campaign Log records at least one of this district's Knowledge entries)
+```resolution Resolution 3 — The Keeper's Round (you completed neither Light the Lamp nor The Keeper's Ninth Death this loop, and your Campaign Log records at least one of this district's Knowledge entries)
 > The stair is the same: the same smell of oil, the same cold glass, the same dark water. There is a kind of comfort in it now. Whatever the Lighthouse still has to tell you, it will keep until you come back for it.
 - If your Campaign Log records The Keeper's Ninth Death, read this instead: *The stair is the same: the same smell of oil, the same cold glass, the same dark water. The keeper's book has nothing left to tell you. You climb anyway, out of habit, and the tower lets you.*
+```
+
+```resolution Resolution 4 — Until Morning (you completed Keep the Light this loop; read in addition to the first resolution that applies)
+> You stayed with it. All night the beam went out across the water and came back, and nothing on the stair could put it out while someone sat beside the lamp. When the night folded, the light folded with it, but the tower remembers now what it is like to be kept. Somewhere past the loop, a morning is waiting for it.
 ```
 
 ```resolution No Resolution — The Dark Keeps Its Lamp (your Campaign Log records none of this district's Knowledge entries)
@@ -454,7 +459,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > At the end of the front pew one place is empty, a hat floating on the black water where a man would kneel. No one in the congregation looks at it.
 
-**When you Place this box:** The Nave, The Belfry, The Vestry and The Flooded Crypt join the map. The Flooded Crypt enters play closed; the district's second act (2a) opens it, and it enters play open (revealed) in every loop once your Campaign Log records that act's deep entry. Encounter set: [set:node_church] The Drowned Choir, The Drowned Verger, Thirteen, Rising Water. Act deck: **Why Thirteen?** (1a), then 2a in Part II. Its story assets are set aside. **Part II:** a new enemy joins this district, set aside until the second act spawns it.
+**When you Place this box:** The Nave, The Belfry, The Vestry and The Flooded Crypt join the map. The Flooded Crypt enters play closed; the district's second act (2a) opens it, and it enters play open (revealed) in every loop once your Campaign Log records that act's deep entry. Encounter set: [set:node_church] The Drowned Choir, The Drowned Verger, Thirteen, Rising Water. Act deck: **Why Thirteen?** (1a), then 2a and 3a in Part II. Its story assets are set aside. **Part II:** a new enemy joins this district, set aside until the second act spawns it.
 
 **Do not read until the loop ends.**
 
@@ -473,10 +478,14 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 - If **Seraphine Vale** is one of your investigators, add: *Seraphine does not look at the belfry for the rest of the night. When you ask why, she says only that she has heard that bell before, and not in this town.*
 ```
 
-```resolution Resolution 3 — Kneeling Water (you completed no act here this loop, and your Campaign Log records at least one of this district's Knowledge entries)
+```resolution Resolution 3 — Kneeling Water (you completed neither Why Thirteen? nor The Hour Was Wrong this loop, and your Campaign Log records at least one of this district's Knowledge entries)
 > The church kept its secrets tonight, and kept its congregation, kneeling and patient in the black water. You know more of it than they do. It is less comforting than it should be.
 - If your Campaign Log records The Hour Was Wrong, read this instead: *The congregation knelt in the black water and the bell counted past twelve, as it always will. You have already carried up the one thing the church was keeping. Below the flooded steps there is nothing left but the cold.*
 - If you defeated **The Bell-Ringer Beneath** this loop, read Resolution 1's first add-on instead of this resolution's story.
+```
+
+```resolution Resolution 4 — The Hour It Should Have Kept (you completed Toll the True Hour this loop; read in addition to the first resolution that applies)
+> For one stroke the bell told the truth. Down in the crypt the water went still, and every clock in Ambergrove, for the length of the note, agreed with it. Then the night went back to its own hour. But you heard the true one, and so did the thing on the hill: it was invited for that hour, and that hour has been rung.
 ```
 
 ```resolution No Resolution — The Count Goes On (your Campaign Log records none of this district's Knowledge entries)
@@ -515,7 +524,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > Once, as you pass, every walker on the road stops mid-stride and turns toward the dark tower, as if somewhere up there a match had been struck. Then, together, they walk on.
 
-**When you Place this box:** The Milestones, The Low Bridge and The Turning join the map. Encounter set: [set:node_road] The Waiting Congregation, The Mile-Counter, The Bridge Remembers. Act deck: **Walk It Backward** (1a), then 2a in Part II.
+**When you Place this box:** The Milestones, The Low Bridge and The Turning join the map. Encounter set: [set:node_road] The Waiting Congregation, The Mile-Counter, The Bridge Remembers. Act deck: **Walk It Backward** (1a), then 2a and 3a in Part II.
 
 **Do not read until the loop ends.**
 
@@ -532,9 +541,13 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 - If **"Birdie" Okonkwo** is one of your investigators, add: *"I came in on this road," Birdie says. "The wrong night. I remember the milestones counting down." No one asks her what they were counting down to.*
 ```
 
-```resolution Resolution 3 — Same Direction (you completed no act here this loop, and your Campaign Log records at least one of this district's Knowledge entries)
+```resolution Resolution 3 — Same Direction (you completed neither Walk It Backward nor Who Walks Beside You this loop, and your Campaign Log records at least one of this district's Knowledge entries)
 > The walkers went the way they always go, and so did the night. Along the milestones, none of them arrived. None of them ever will, unless someone changes the road.
 - If your Campaign Log records Who Walks Beside You, read this instead: *The walkers went the way they always go, and so did the night. You know one face among them now. It does not make the road any shorter.*
+```
+
+```resolution Resolution 4 — Miles to Morning (you completed The Last Milestone this loop; read in addition to the first resolution that applies)
+> The new stone stands at the edge of the fog with its impossible number cut into it. You do not know if anyone will ever walk that far. But the road has an end now, written down, and a road with an end is a road somebody can finish. The walkers have stopped circling. They are waiting to see who goes first.
 ```
 
 ```resolution No Resolution — Hoods Up (your Campaign Log records none of this district's Knowledge entries)
@@ -565,7 +578,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > The applause comes exactly on cue, every hand at once.
 
-**Every loop:** the Square's box is placed in Loop Setup. It lays out the Hours as the agenda deck and the loop's encounter deck (the five shared sets plus its own, [set:node_square] The Crossing, The Band on the Steps, The Same Speech, The Crowd Turns); The Square and The Town Hall Steps enter play revealed, The Well and The Records Office unrevealed. The Appointed's Approach goes into play beside the Hours, and The Appointed starts the set-aside pile; from Part II the Appointed's Whispers join the encounter deck. Act deck: **The Sheriff Is Already Dead** (1a), then 2a in Part II, set up from your Campaign Log like any district's. Its story asset is in the set-aside pile. **Part II:** a new enemy joins this district, set aside until the second act spawns it.
+**Every loop:** the Square's box is placed in Loop Setup. It lays out the Hours as the agenda deck and the loop's encounter deck (the five shared sets plus its own, [set:node_square] The Crossing, The Band on the Steps, The Same Speech, The Crowd Turns); The Square and The Town Hall Steps enter play revealed, The Well and The Records Office unrevealed. The Appointed's Approach goes into play beside the Hours, and The Appointed starts the set-aside pile; from Part II the Appointed's Whispers join the encounter deck. Act deck: **The Sheriff Is Already Dead** (1a), then 2a and 3a in Part II, set up from your Campaign Log like any district's. Its story asset is in the set-aside pile. **Part II:** a new enemy joins this district, set aside until the second act spawns it.
 
 **Do not read until the loop ends.**
 
@@ -584,10 +597,14 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 > You looked down the Well and saw him, and then looked up at the steps and saw him again, giving his speech to the lanterns. The town is not just repeating. Something is wearing it, the way a hand wears a glove. You spend the rest of the night studying faces and trying not to wonder which of them are still their own.
 ```
 
-```resolution Resolution 3 — The Same Speech (you completed no act here this loop, and your Campaign Log records at least one of this district's Knowledge entries)
+```resolution Resolution 3 — The Same Speech (you completed neither The Sheriff Is Already Dead nor The Vote That Never Ends this loop, and your Campaign Log records at least one of this district's Knowledge entries)
 > The speech ended the way it always ends, and the crowd answered it. You stood at the back and knew what they did not, and the knowing sat in you like a stone.
 - If your Campaign Log records The Vote That Never Ends, read this instead: *The speech ended the way it always ends, and the crowd answered it. You know the minutes now. You stood at the back and kept your hands still.*
 - If you defeated **What Wears the Sheriff** this loop, read Resolution 1's first add-on instead of this resolution's story.
+```
+
+```resolution Resolution 4 — The Roll (you completed Call the Roll this loop; read in addition to the first resolution that applies)
+> You read every name. Some of the crowd wept; some only listened, as if hearing a song they had forgotten writing. When you finished, nobody gave the speech. For one night the town stood in its own Square and knew what it had agreed to, and who had agreed. The Past remembers being read aloud.
 ```
 
 ```resolution No Resolution — Eleven O'Clock (your Campaign Log records none of this district's Knowledge entries)
@@ -622,7 +639,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > The ticket-taker counts you as you pass, and frowns at the total, as if it never quite comes out right.
 
-**When you Place this box:** The Wheel, The Hall of Mirrors and The Ticket Booth join the map. Encounter set: [set:node_fairground] The Barker, The Wheel's Turn, Your Reflection Lies. Act deck: **The Wheel Still Turns** (1a), then 2a in Part II. **Part II:** a new enemy joins this district's encounter set; it spawns at **The Wheel** when drawn.
+**When you Place this box:** The Wheel, The Hall of Mirrors and The Ticket Booth join the map. Encounter set: [set:node_fairground] The Barker, The Wheel's Turn, Your Reflection Lies. Act deck: **The Wheel Still Turns** (1a), then 2a and 3a in Part II. **Part II:** a new enemy joins this district's encounter set; it spawns at **The Wheel** when drawn.
 
 **Do not read until the loop ends.**
 
@@ -640,10 +657,14 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 - If **Cass Lindqvist** is one of your investigators, add: *Cass counted the town from up there the way she counts a deck. "Somebody's dealing," she says afterward. "I just can't see the hand."*
 ```
 
-```resolution Resolution 3 — One More Ride (you completed no act here this loop, and your Campaign Log records at least one of this district's Knowledge entries)
+```resolution Resolution 3 — One More Ride (you completed neither The Wheel Still Turns nor The Ticket-Taker's Bargain this loop, and your Campaign Log records at least one of this district's Knowledge entries)
 > The fair went on without you, as it always does, and the tune got no further than it ever gets. The ticket-taker went on waiting. He did not seem disappointed. He seems to have all the time in the world.
 - If your Campaign Log records The Ticket-Taker's Bargain, read this instead: *The fair went on without you, and the tune got no further than it ever gets. The ticket-taker lifted his hat as you passed, the way a man greets a customer whose fare is already settled.*
 - If you defeated **The One Who Rides Forever** this loop, read Resolution 1's first add-on instead of this resolution's story.
+```
+
+```resolution Resolution 4 — Standing Still (you completed Stop the Wheel this loop; read in addition to the first resolution that applies)
+> The wheel held until the night folded, its top car hanging against the wrong sky. For all that time nothing at the fair turned, and nothing at the fair could pretend the night was going anywhere. Whatever is coming for the town has to come the long way now, through a morning that has not happened yet.
 ```
 
 ```resolution No Resolution — The Tune That Doesn't End (your Campaign Log records none of this district's Knowledge entries)
@@ -670,7 +691,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 > Under the floorboards, faint as water moving in a pipe, a murmur of voices is counting, and they are not counting the hour on the page.
 
-**When you Place this box:** The Reading Room, The Press and The Sealed Study join the map. The Sealed Study enters play closed; the district's second act (2a) opens it, and it enters play open (revealed) in every loop once your Campaign Log records that act's deep entry. Encounter set: [set:node_almanac] The Compositor, The Page That Wasn't, Ink Runs Backward, The Study Door. Act deck: **What the Almanac Hid** (1a), then 2a in Part II once your Campaign Log also records the Square's deep entry; until it does, Place removes this act deck once act 1a is complete. Its story asset is set aside.
+**When you Place this box:** The Reading Room, The Press and The Sealed Study join the map. The Sealed Study enters play closed; the district's second act (2a) opens it, and it enters play open (revealed) in every loop once your Campaign Log records that act's deep entry. Encounter set: [set:node_almanac] The Compositor, The Page That Wasn't, Ink Runs Backward, The Study Door. Act deck: **What the Almanac Hid** (1a), then 2a and 3a in Part II (2a once your Campaign Log also records the Square's deep entry); until it does, Place removes this act deck once act 1a is complete. Its story asset is set aside.
 
 **Do not read until the loop ends.**
 
@@ -689,9 +710,13 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 - If **Dr. Ayako Sōma** is one of your investigators, add: *In the margin of the reprint, in a hand she recognizes as her own, is a translation note Ayako does not remember writing. It is one word. The word is "wait."*
 ```
 
-```resolution Resolution 3 — Fresh Black Type (you completed no act here this loop, and your Campaign Log records at least one of this district's Knowledge entries)
+```resolution Resolution 3 — Fresh Black Type (you completed neither What the Almanac Hid nor The Appointed's Name this loop, and your Campaign Log records at least one of this district's Knowledge entries)
 > The stacks were bound and dated. The press was set. There was still more to read, and at the back of the house the study kept whatever secrets it still had.
 - If your Campaign Log records The Appointed's Name, read this instead: *The stacks were bound and dated. The press was set. The study at the back stands open, and there is nothing left in it that you did not carry out.*
+```
+
+```resolution Resolution 4 — Corrected Proof (you completed Set the Hour Right this loop; read in addition to the first resolution that applies)
+> One clean sheet, the ink still wet, the true hour printed where the brown ink lied. By morning the night had unmade it, as it unmakes everything. But a thing that has been printed correctly once can be proved, and the hour the town was promised to has been set right, if only on paper. Paper is where the promise was made.
 ```
 
 ```resolution No Resolution — Bound and Dated (your Campaign Log records none of this district's Knowledge entries)
@@ -704,6 +729,8 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 ## FINALE — THE LAST HOUR
 
 **Only once your Campaign Log records The Way the Night Breaks.** During any loop from then on, an investigator at **The Sealed Study** may begin the finale as a [free] ability during their turn. Or, when Hour IX is reached while your log records The Way the Night Breaks, you may begin the finale instead of ending the loop.
+
+**The night will not wait.** Once your Campaign Log records all six late records, the next loop is the finale: after Loop Setup, begin it at once, wherever the investigators are (Setup step 2, *Before Hour V*; the Control token says so when the loop begins).
 
 **When to begin.** Beginning the finale at Hour IX gives you the most time: the Hourglass goes back to Hour V (Setup, step 2). Beginning at Hours V to VIII leaves the Hourglass where it is, with fewer Hours before Hour IX ends the finale.
 
@@ -728,6 +755,7 @@ Before the finale begins: if you have not yet read **Before the finale** (Betwee
    - *The drowned heard the true hour:* rewind the Hourglass by 1 Hour (right-click **Hour** once). Below the church, a congregation is keeping time for you.
    - *The true page reached the Press:* until the finale ends, the chaos bag holds 1 fewer Static token than it otherwise would (never fewer than 0); this adds to Hour VI's "1 fewer" (What the Almanac Hid). Every almanac in town now carries the true hour, and the sky is a little less wrong. **Begin Finale** applies it for you.
    - *You refused the ticket:* the fair's clock stops for you once more. Cancel the revelation effect of the first Lost Hour drawn during the finale, even if one was canceled earlier this loop.
+   - *Each late record* (a district's act 3a, under **Before the Last Hour** on your log): deal 1 damage to the form of its period. **As It Was** (the Past): Every Name Was Read, The Bell Rang True, The Hour Is Set Right. **As It Will Be** (the Future): The Light Is Kept, The Road Has an End, The Wheel Stands Still. What you set right in the town, you set right in its hours.
 
 **The fight.** The Appointed has a form in each period, each an Elite enemy whose health is per investigator. **As It Is** cannot be damaged until As It Was and As It Will Be have both been defeated, and it never leaves the Present. The first move each round into or out of The First Occultation, and the first into or out of The Morning After, places 1 doom on the current Hour (their cards say so), so every trip through the hours costs time; the rest of the party can follow that round for free.
 - **What you carry.** Each deep Knowledge entry your log records can be spent once, as an [action] on Through the Hours while you are in its period, to deal 2 damage to the form there. It stays recorded for every other purpose, including the resolutions; note it on the Finale Record. Read its line aloud when you spend it:

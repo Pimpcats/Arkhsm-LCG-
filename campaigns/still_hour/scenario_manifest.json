@@ -752,6 +752,28 @@
                 "take_at": "The Keeper's Quarters",
                 "deliver_to": "The Lantern Room"
               }
+            },
+            {
+              "id": "sthr-act-keeplight",
+              "name": "Keep the Light",
+              "act": "III",
+              "at": "The Lantern Room",
+              "needs": {
+                "clues": "card",
+                "from": [
+                  "The Keeper's Quarters",
+                  "The Winding Stair",
+                  "The Lantern Room",
+                  "The Turning",
+                  "The Low Bridge",
+                  "The Milestones",
+                  "The Square",
+                  "The Town Hall Steps",
+                  "The Records Office",
+                  "The Well"
+                ],
+                "note": "the lamp is lit by Light the Lamp this loop or by The Lantern Room's calm-side [action]"
+              }
             }
           ]
         },
@@ -786,7 +808,8 @@
       },
       "grants": [
         "The Lamp Remembers",
-        "The Keeper's Ninth Death"
+        "The Keeper's Ninth Death",
+        "The Light Is Kept"
       ],
       "resolutions": [
         {
@@ -804,7 +827,13 @@
         {
           "id": "R3",
           "name": "The Keeper's Round",
-          "condition": "you completed no act here this loop, and your Campaign Log records at least one of this district's Knowledge entries",
+          "condition": "you completed neither Light the Lamp nor The Keeper's Ninth Death this loop, and your Campaign Log records at least one of this district's Knowledge entries",
+          "source": "player guide"
+        },
+        {
+          "id": "R4",
+          "name": "Until Morning",
+          "condition": "you completed Keep the Light this loop (read in addition to the first resolution that applies)",
           "source": "player guide"
         },
         {
@@ -905,6 +934,22 @@
                 "take_at": "The Flooded Crypt",
                 "deliver_to": "The Vestry"
               }
+            },
+            {
+              "id": "sthr-act-truehour",
+              "name": "Toll the True Hour",
+              "act": "III",
+              "at": "The Belfry",
+              "needs": {
+                "clues": "card",
+                "from": [
+                  "The Flooded Crypt",
+                  "The Nave",
+                  "The Belfry",
+                  "The Vestry"
+                ],
+                "note": "Hour VI or later"
+              }
             }
           ]
         },
@@ -951,7 +996,8 @@
       },
       "grants": [
         "The Thirteenth Toll",
-        "The Hour Was Wrong"
+        "The Hour Was Wrong",
+        "The Bell Rang True"
       ],
       "resolutions": [
         {
@@ -969,7 +1015,13 @@
         {
           "id": "R3",
           "name": "Kneeling Water",
-          "condition": "you completed no act here this loop, and your Campaign Log records at least one of this district's Knowledge entries",
+          "condition": "you completed neither Why Thirteen? nor The Hour Was Wrong this loop, and your Campaign Log records at least one of this district's Knowledge entries",
+          "source": "player guide"
+        },
+        {
+          "id": "R4",
+          "name": "The Hour It Should Have Kept",
+          "condition": "you completed Toll the True Hour this loop (read in addition to the first resolution that applies)",
           "source": "player guide"
         },
         {
@@ -1070,6 +1122,20 @@
                 ],
                 "test": "evade or Stand Firm against a ready Echo at The Turning"
               }
+            },
+            {
+              "id": "sthr-act-lastmilestone",
+              "name": "The Last Milestone",
+              "act": "III",
+              "at": "The Milestones",
+              "needs": {
+                "clues": "card",
+                "from": [
+                  "The Milestones",
+                  "The Low Bridge",
+                  "The Turning"
+                ]
+              }
             }
           ]
         },
@@ -1093,7 +1159,8 @@
       },
       "grants": [
         "The Road Remembers",
-        "Who Walks Beside You"
+        "Who Walks Beside You",
+        "The Road Has an End"
       ],
       "resolutions": [
         {
@@ -1111,7 +1178,13 @@
         {
           "id": "R3",
           "name": "Same Direction",
-          "condition": "you completed no act here this loop, and your Campaign Log records at least one of this district's Knowledge entries",
+          "condition": "you completed neither Walk It Backward nor Who Walks Beside You this loop, and your Campaign Log records at least one of this district's Knowledge entries",
+          "source": "player guide"
+        },
+        {
+          "id": "R4",
+          "name": "Miles to Morning",
+          "condition": "you completed The Last Milestone this loop (read in addition to the first resolution that applies)",
           "source": "player guide"
         },
         {
@@ -1212,6 +1285,22 @@
                 "take_at": "The Records Office",
                 "deliver_to": "The Town Hall Steps"
               }
+            },
+            {
+              "id": "sthr-act-calltheroll",
+              "name": "Call the Roll",
+              "act": "III",
+              "at": "The Town Hall Steps",
+              "needs": {
+                "clues": "card",
+                "from": [
+                  "The Records Office",
+                  "The Square",
+                  "The Town Hall Steps",
+                  "The Well"
+                ],
+                "note": "[action] with a test (3); a failure places the spent clues on the location"
+              }
             }
           ]
         },
@@ -1264,7 +1353,8 @@
       },
       "grants": [
         "The Sheriff Is Already Dead",
-        "The Vote That Never Ends"
+        "The Vote That Never Ends",
+        "Every Name Was Read"
       ],
       "resolutions": [
         {
@@ -1282,7 +1372,13 @@
         {
           "id": "R3",
           "name": "The Same Speech",
-          "condition": "you completed no act here this loop, and your Campaign Log records at least one of this district's Knowledge entries",
+          "condition": "you completed neither The Sheriff Is Already Dead nor The Vote That Never Ends this loop, and your Campaign Log records at least one of this district's Knowledge entries",
+          "source": "player guide"
+        },
+        {
+          "id": "R4",
+          "name": "The Roll",
+          "condition": "you completed Call the Roll this loop (read in addition to the first resolution that applies)",
           "source": "player guide"
         },
         {
@@ -1364,6 +1460,25 @@
                 ],
                 "note": "clues are portable: the Square is always in play, so its clues count toward this act"
               }
+            },
+            {
+              "id": "sthr-act-stopwheel",
+              "name": "Stop the Wheel",
+              "act": "III",
+              "at": "The Wheel",
+              "needs": {
+                "clues": "card",
+                "from": [
+                  "The Wheel",
+                  "The Hall of Mirrors",
+                  "The Ticket Booth",
+                  "The Square",
+                  "The Town Hall Steps",
+                  "The Records Office",
+                  "The Well"
+                ],
+                "note": "[action] with a test (3); a failure places the spent clues on the location"
+              }
             }
           ]
         },
@@ -1396,7 +1511,8 @@
       },
       "grants": [
         "The Wheel Still Turns",
-        "The Ticket-Taker's Bargain"
+        "The Ticket-Taker's Bargain",
+        "The Wheel Stands Still"
       ],
       "resolutions": [
         {
@@ -1414,7 +1530,13 @@
         {
           "id": "R3",
           "name": "One More Ride",
-          "condition": "you completed no act here this loop, and your Campaign Log records at least one of this district's Knowledge entries",
+          "condition": "you completed neither The Wheel Still Turns nor The Ticket-Taker's Bargain this loop, and your Campaign Log records at least one of this district's Knowledge entries",
+          "source": "player guide"
+        },
+        {
+          "id": "R4",
+          "name": "Standing Still",
+          "condition": "you completed Stop the Wheel this loop (read in addition to the first resolution that applies)",
           "source": "player guide"
         },
         {
@@ -1506,6 +1628,21 @@
                 ],
                 "note": "clues are portable: the district's clues pay for its deep act (12-round loops)"
               }
+            },
+            {
+              "id": "sthr-act-hourright",
+              "name": "Set the Hour Right",
+              "act": "III",
+              "at": "The Press",
+              "needs": {
+                "clues": "card",
+                "from": [
+                  "The Sealed Study",
+                  "The Reading Room",
+                  "The Press"
+                ],
+                "note": "also places 1 doom on the current Hour"
+              }
             }
           ]
         },
@@ -1539,7 +1676,8 @@
       "grants": [
         "What the Almanac Hid",
         "The Appointed's Name",
-        "The Way the Night Breaks"
+        "The Way the Night Breaks",
+        "The Hour Is Set Right"
       ],
       "resolutions": [
         {
@@ -1557,7 +1695,13 @@
         {
           "id": "R3",
           "name": "Fresh Black Type",
-          "condition": "you completed no act here this loop, and your Campaign Log records at least one of this district's Knowledge entries",
+          "condition": "you completed neither What the Almanac Hid nor The Appointed's Name this loop, and your Campaign Log records at least one of this district's Knowledge entries",
+          "source": "player guide"
+        },
+        {
+          "id": "R4",
+          "name": "Corrected Proof",
+          "condition": "you completed Set the Hour Right this loop (read in addition to the first resolution that applies)",
           "source": "player guide"
         },
         {

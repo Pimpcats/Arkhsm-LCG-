@@ -79,6 +79,13 @@ FACTS = [
      "Hour VII: exhaust The Appointed. Bag: −1 Tablet. Seraphine's thread: known (if she was there)."),
     ("the-way-the-night-breaks", "The Way the Night Breaks", "assembled", "assembled",
      "The finale may be begun."),
+    # late records (each district's act 3a): Before the Last Hour, read by the finale's Setup
+    ("the-light-is-kept", "The Light Is Kept", "Lighthouse", "late", "Finale: 1 damage to As It Will Be."),
+    ("the-bell-rang-true", "The Bell Rang True", "Church", "late", "Finale: 1 damage to As It Was."),
+    ("the-road-has-an-end", "The Road Has an End", "Sunken Road", "late", "Finale: 1 damage to As It Will Be."),
+    ("every-name-was-read", "Every Name Was Read", "Square", "late", "Finale: 1 damage to As It Was."),
+    ("the-wheel-stands-still", "The Wheel Stands Still", "Fairground", "late", "Finale: 1 damage to As It Will Be."),
+    ("the-hour-is-set-right", "The Hour Is Set Right", "Almanac", "late", "Finale: 1 damage to As It Was."),
 ]
 
 # Victory — the Named (ids = the encounter cards' ids; CampaignState.victoryLog keys)
@@ -256,12 +263,14 @@ def _pages():
             size=18, style="italic", fill=SOFT, anchor="ms")
     y = 212
     for fid, name, district, layer, summary in FACTS:
+        if layer == "late":
+            continue
         p2.checkbox("k:" + fid, 88, y)
         where = {"prologue": "Prologue", "assembled": "Assembled"}.get(
             layer, "{} — {}".format(district, layer))
         p2.text(128, y, where, size=21, style="bold")
         p2.reveal("kr:" + fid, "k:" + fid, "{}: {}".format(name, summary), 440, 1185, y, h=34)
-        y += 52
+        y += 40
     y += 6
     p2.text(90, y, "Surface entries recorded:", size=22, style="bold")
     p2.counter("surface_held", 380, y - 9, derived="surface")
@@ -270,8 +279,21 @@ def _pages():
     p2.counter("deep_held", 960, y - 9, derived="deep")
     p2.text(1000, y, "/ 6", size=20, style="italic", fill=SOFT)
 
-    p2.header(y + 70, "Victory")
-    y += 140
+    # each district's act 3a: two columns; all six recorded = the next loop is the finale
+    p2.header(y + 62, "Before the Last Hour")
+    y += 120
+    late = [f for f in FACTS if f[3] == "late"]
+    for i, (fid, name, district, layer, summary) in enumerate(late):
+        cx, cy = (88 if i % 2 == 0 else 640), y + (i // 2) * 40
+        p2.checkbox("k:" + fid, cx, cy)
+        p2.text(cx + 40, cy, district, size=20, style="bold")
+        p2.reveal("kr:" + fid, "k:" + fid, name, cx + 200, cx + 545, cy, h=30)
+    y += 3 * 40 - 8
+    p2.text(PAGE_W // 2, y, "All six recorded: the next loop is the finale (The Night Will Not Wait).",
+            size=18, style="italic", fill=SOFT, anchor="ms")
+
+    p2.header(y + 46, "Victory")
+    y += 112
     p2.text(760, y - 34, "claimed", size=18, style="italic", fill=SOFT)
     p2.text(900, y - 34, "Memory banked", size=18, style="italic", fill=SOFT)
     for eid, name, where, vic in NAMED:
@@ -280,19 +302,19 @@ def _pages():
         p2.reveal("vr:" + eid, "v:" + eid, name, 420, 750, y, h=30)
         p2.checkbox("v:" + eid, 780, y)
         p2.checkbox("vb:" + eid, 940, y)
-        y += 34
+        y += 31
     for eid, name, where, vic in VICTORY_ENEMIES:
         p2.text(90, y, "{} — monster (Victory {})".format(where, vic), size=20, style="bold")
         p2.reveal("vr:" + eid, "v:" + eid, name, 420, 750, y, h=30)
         p2.checkbox("v:" + eid, 780, y)
         p2.checkbox("vb:" + eid, 940, y)
-        y += 34
+        y += 31
     for eid, name, where, vic in VICTORY_LOCATIONS:
         p2.text(90, y, "{} — location (Victory {})".format(where, vic), size=20, style="bold")
         p2.reveal("vr:" + eid, "v:" + eid, name, 420, 750, y, h=30)
         p2.checkbox("v:" + eid, 780, y)
         p2.checkbox("vb:" + eid, 940, y)
-        y += 34
+        y += 31
 
     p2.header(y + 26, "Threads")
     y += 84

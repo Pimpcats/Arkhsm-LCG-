@@ -775,6 +775,10 @@ local function beginNextLoop(force)
   guarded("aging", Board.refreshInvestigators, true)
   announce(string.format("A new loop begins. Memory capped at %d; %d lost.",
     CampaignState.constants().memoryCap, lost))
+  if Knowledge.finaleForced() then
+    announce("The night will not wait: your log records all six late records. After Loop Setup, begin the finale at once "
+      .. "(Begin Finale), wherever the investigators are.", { 1, 0.7, 0.4 })
+  end
   -- every investigator the Control can see has aged out, and nobody has taken their place
   local listed = guarded("investigators", Board.investigators) or {}
   local anyone = false
@@ -1325,6 +1329,12 @@ function shBeginFinale()
     end
     announce("The finale begins: the Appointed is set aside. Spawn As It Was, As It Will Be and As It Is. "
       .. "If Hour IX is reached before As It Is is defeated, the finale ends (Resolution 5 or 6).")
+    -- late records (each district's act 3a): 1 damage each on the form of its period
+    local nLate, by = Knowledge.lateKnown()
+    if nLate > 0 then
+      announce(string.format("Before the Last Hour: deal %d damage to As It Was and %d to As It Will Be (your late records).",
+        by.past, by.future))
+    end
   end)
   afterChange()
 end
@@ -1649,13 +1659,20 @@ end
 local MYTHOS_MAT = "9f334f"                              -- SCED's mythos area
 local MAT_ENCOUNTER = { 0.88, 0.1, 0.391 }               -- its encounter deck snap (mat-local)
 local MAT_APPROACH = { -2.2, 0.1, 0.37 }                 -- the story card spot beside the scenario card
+-- { act 1a, act 2a, surface entry, deep entry, act 3a, late record }
 local DISTRICT_ACTS = {
-  district_square     = { "sthr-act-sheriffdead", "sthr-act-vote", "the-sheriff-is-already-dead", "the-vote-that-never-ends" },
-  district_church     = { "sthr-act-whythirteen", "sthr-act-hourwaswrong", "the-thirteenth-toll", "the-hour-was-wrong" },
-  district_road       = { "sthr-act-walkbackward", "sthr-act-walksbeside", "the-road-remembers", "who-walks-beside-you" },
-  district_lighthouse = { "sthr-act-lamp", "sthr-act-ninthdeath", "the-lamp-was-never-lit", "the-keepers-ninth-death" },
-  district_fairground = { "sthr-act-wheelturns", "sthr-act-bargain", "the-wheel-still-turns", "the-ticket-takers-bargain" },
-  district_almanac    = { "sthr-act-almanachid", "sthr-act-appointedname", "what-the-almanac-hid", "the-appointeds-name" },
+  district_square     = { "sthr-act-sheriffdead", "sthr-act-vote", "the-sheriff-is-already-dead", "the-vote-that-never-ends",
+                          "sthr-act-calltheroll", "every-name-was-read" },
+  district_church     = { "sthr-act-whythirteen", "sthr-act-hourwaswrong", "the-thirteenth-toll", "the-hour-was-wrong",
+                          "sthr-act-truehour", "the-bell-rang-true" },
+  district_road       = { "sthr-act-walkbackward", "sthr-act-walksbeside", "the-road-remembers", "who-walks-beside-you",
+                          "sthr-act-lastmilestone", "the-road-has-an-end" },
+  district_lighthouse = { "sthr-act-lamp", "sthr-act-ninthdeath", "the-lamp-was-never-lit", "the-keepers-ninth-death",
+                          "sthr-act-keeplight", "the-light-is-kept" },
+  district_fairground = { "sthr-act-wheelturns", "sthr-act-bargain", "the-wheel-still-turns", "the-ticket-takers-bargain",
+                          "sthr-act-stopwheel", "the-wheel-stands-still" },
+  district_almanac    = { "sthr-act-almanachid", "sthr-act-appointedname", "what-the-almanac-hid", "the-appointeds-name",
+                          "sthr-act-hourright", "the-hour-is-set-right" },
 }
 
 local function idOf(gm)
@@ -1766,7 +1783,7 @@ local function setUpPlacedBox(p)
   end
   -- its act deck, from the Campaign Log
   local deck = boxStack(tag, "Act Deck")
-  local a1, a2, surf, deep = acts[1], acts[2], acts[3], acts[4]
+  local a1, a2, surf, deep, late = acts[1], acts[2], acts[3], acts[4], acts[6]
   local function removeDeck(why)
     if deck then pcall(function() deck.destruct() end) end
     done[#done + 1] = why
@@ -1775,8 +1792,15 @@ local function setUpPlacedBox(p)
     if CampaignState.inFinale() then
       -- the finale sets every district's act deck aside, abilities unresolved
       removeDeck("act deck set aside (the finale)")
-    elseif CampaignState.knows(deep) then
+    elseif CampaignState.knows(late) then
       removeDeck("act deck removed (its objectives are complete)")
+    elseif CampaignState.knows(deep) then
+      -- acts 1a and 2a leave the game; act 3a (the late objective) is current
+      for _, id in ipairs({ a1, a2 }) do
+        local c = takeById(deck, id)
+        if c then pcall(function() c.destruct() end) end
+      end
+      done[#done + 1] = "act 3a is current"
     elseif CampaignState.knows(surf) then
       if not partTwo then
         removeDeck("act deck removed until Part II")

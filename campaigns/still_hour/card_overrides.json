@@ -871,7 +871,7 @@
     "index": "2a",
     "flavor": "A keeper writes his log at the lamp, by its light. Every line in this one was written in the dark.",
     "back_flavor": "Eight deaths in the keeper's own careful hand, each one dated tonight. Each line records where he fell, each a little farther out along the path the beam would sweep across the water, if it were ever lit: eight tries to walk out of the night by a light that never came. The ninth line is ruled and waiting.",
-    "back_text": "Record in your Campaign Log: The Keeper's Ninth Death.\nRemove Keeper's Logbook from the game.\nFrom now on, when an investigator is defeated, they first place 1 Memory on their investigator card: every death is written down.\nFrom now on, when Elias Warde's [elder] effect heals damage from an investigator, it also heals 1 horror from that investigator.\nThe Lighthouse's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "back_text": "Record in your Campaign Log: The Keeper's Ninth Death.\nRemove Keeper's Logbook from the game.\nFrom now on, when an investigator is defeated, they first place 1 Memory on their investigator card: every death is written down.\nFrom now on, when Elias Warde's [elder] effect heals damage from an investigator, it also heals 1 horror from that investigator.\nAdvance to act 3a.",
     "clues_per_investigator": true,
     "take": {
       "asset": "sthr-item-logbook",
@@ -879,6 +879,16 @@
       "deliver": "The Lantern Room"
     },
     "name": "The Keeper's Ninth Death"
+  },
+  "sthr-act-keeplight": {
+    "name": "Keep the Light",
+    "clues": 2,
+    "clues_per_investigator": true,
+    "text": "Part II only.\nObjective – If The Lantern Room's lamp is lit, investigators at The Lantern Room may, as a group, spend 2 [perinv] clues to advance.",
+    "flavor": "Eight keepers let it go out. Someone has to stay with it until morning.",
+    "index": "3a",
+    "back_flavor": "You trim the wick and feed the flame and do not leave it, and for once the night has to go around the light instead of through it. Out on the water the beam reaches farther than it ever has, toward a morning the loop has never let anyone see.",
+    "back_text": "Record in your Campaign Log: The Light Is Kept.\nThe Last Hour's Setup reads this record.\nThe Lighthouse's objectives are complete. From now on, do not use this act deck when you Place this box."
   },
   "sthr-act-whythirteen": {
     "name": "Why Thirteen?",
@@ -904,13 +914,23 @@
     "index": "2a",
     "flavor": "Below the bell, below the water, the church keeps what it was told to keep. Bring it up to the Vestry and read it against the register before the water takes the ink.",
     "back_flavor": "The page is soft as wet cloth, but the ink held. The same almanac, the same night, and a different hour. Someone set the occultation an hour wrong, and the town has been standing in the gap ever since.",
-    "back_text": "Record in your Campaign Log: The Hour Was Wrong.\nRemove Drowned Page and The Bell-Ringer Beneath from the game.\nRemove 1 [elderthing] token from the chaos bag for the rest of the campaign.\nFrom now on, Hour IV's Forced ability does not resolve: the road no longer gives way.\nThe Drowned Church's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "back_text": "Record in your Campaign Log: The Hour Was Wrong.\nRemove Drowned Page and The Bell-Ringer Beneath from the game.\nRemove 1 [elderthing] token from the chaos bag for the rest of the campaign.\nFrom now on, Hour IV's Forced ability does not resolve: the road no longer gives way.\nAdvance to act 3a.",
     "clues_per_investigator": true,
     "take": {
       "asset": "sthr-item-drownedpage",
       "at": "The Flooded Crypt",
       "deliver": "The Vestry"
     }
+  },
+  "sthr-act-truehour": {
+    "name": "Toll the True Hour",
+    "clues": 2,
+    "clues_per_investigator": true,
+    "text": "Part II only.\nObjective – Once the Hourglass has reached Hour VI, investigators at The Belfry may, as a group, spend 2 [perinv] clues to advance.",
+    "flavor": "The drowned page gave the true hour. The bell has never once rung it.",
+    "index": "3a",
+    "back_flavor": "You ring it at the hour the page gave, an hour early by every clock in Ambergrove. The note goes out over the water and down into the crypt, and for a moment the whole town hears the hour it should have kept.",
+    "back_text": "Record in your Campaign Log: The Bell Rang True.\nThe Last Hour's Setup reads this record.\nThe Drowned Church's objectives are complete. From now on, do not use this act deck when you Place this box."
   },
   "sthr-act-walkbackward": {
     "name": "Walk It Backward",
@@ -929,10 +949,20 @@
     "deck": 95107,
     "index": "2a",
     "back_flavor": "The face under the hood is worn almost smooth, like a step a thousand feet have climbed. You know the coat. You know the ring on the hand that lifts to stop you, worn thin on the inside like an anchor's ring, as if it had held against the pull of a thousand nights. They were here before you, and they looped until there was nothing left to loop.",
-    "back_text": "Record in your Campaign Log: Who Walks Beside You.\nAny Waiting Congregation this act spawned stays on the road as an ordinary Echo.\nRemove 1 [cultist] token from the chaos bag for the rest of the campaign.\nWhile your Campaign Log records Who Walks Beside You, each Echo gets −1 fight.\nThe Sunken Road's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "back_text": "Record in your Campaign Log: Who Walks Beside You.\nAny Waiting Congregation this act spawned stays on the road as an ordinary Echo.\nRemove 1 [cultist] token from the chaos bag for the rest of the campaign.\nWhile your Campaign Log records Who Walks Beside You, each Echo gets −1 fight.\nAdvance to act 3a.",
     "clues": 3,
     "clues_per_investigator": true,
     "no_threshold": true
+  },
+  "sthr-act-lastmilestone": {
+    "name": "The Last Milestone",
+    "clues": 2,
+    "clues_per_investigator": true,
+    "text": "Part II only.\nObjective – Investigators at The Milestones may, as a group, spend 2 [perinv] clues to advance.",
+    "flavor": "Every milestone counts the way back to town. None of them counts the way out.",
+    "index": "3a",
+    "back_flavor": "You set a last stone at the road's far edge, where the fog begins, and on it you cut a number nobody has ever reached: the miles to morning. Behind you, one by one, the walkers stop and read it.",
+    "back_text": "Record in your Campaign Log: The Road Has an End.\nThe Last Hour's Setup reads this record.\nThe Sunken Road's objectives are complete. From now on, do not use this act deck when you Place this box."
   },
   "sthr-act-sheriffdead": {
     "name": "The Sheriff Is Already Dead",
@@ -953,13 +983,24 @@
     "deck": 95109,
     "index": "2a",
     "back_flavor": "The minutes are dated the night of the first occultation. A motion to open the door, that Ambergrove should never be forgotten. Every name in the town, each in its own hand. Carried, unanimous. Under the tally the clerk has written: the cost to be settled at the appointed hour. Beneath it, in another hand and a brown ink: and the hour to be printed one late. The name of what they invited, the minutes say, is kept in the Almanac House, in the study, under seal.",
-    "back_text": "Record in your Campaign Log: The Vote That Never Ends. If Seraphine Vale controls Town Ledger or is at The Town Hall Steps, mark Seraphine's thread “suspected.”\nRemove Town Ledger and What Wears the Sheriff from the game.\nFrom now on, The Same Speech deals no extra horror for completed loops: you know what the speech is asking for.\nThe Square's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "back_text": "Record in your Campaign Log: The Vote That Never Ends. If Seraphine Vale controls Town Ledger or is at The Town Hall Steps, mark Seraphine's thread “suspected.”\nRemove Town Ledger and What Wears the Sheriff from the game.\nFrom now on, The Same Speech deals no extra horror for completed loops: you know what the speech is asking for.\nAdvance to act 3a.",
     "clues_per_investigator": true,
     "take": {
       "asset": "sthr-item-ledger",
       "at": "The Records Office",
       "deliver": "The Town Hall Steps"
     }
+  },
+  "sthr-act-calltheroll": {
+    "name": "Call the Roll",
+    "clues": 2,
+    "clues_per_investigator": true,
+    "text": "Part II only.\nObjective – [action] Investigators at The Town Hall Steps spend 2 [perinv] clues, as a group: Read the roll aloud. Test [wil] or [int] (3). Only an investigator at The Town Hall Steps may trigger this ability. If you succeed, advance. If you fail, place the spent clues on The Town Hall Steps.",
+    "flavor": "Every name in the town, each in its own hand. Someone should read them out.",
+    "index": "3a",
+    "back_flavor": "You stand where the speech is given and read the minutes' names into the dark, every one, until the crowd in the Square falls quiet and listens to itself. They agreed to this. They should at least hear who they were.",
+    "back_text": "Record in your Campaign Log: Every Name Was Read.\nThe Last Hour's Setup reads this record.\nThe Square's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "no_threshold": true
   },
   "sthr-act-wheelturns": {
     "name": "The Wheel Still Turns",
@@ -980,9 +1021,20 @@
     "deck": 95111,
     "index": "2a",
     "back_flavor": "He does not ask your name. He tells you there is a way out of the night, that the fare is steep, and that he has waited a very long time for someone who could afford it.",
-    "back_text": "Record in your Campaign Log: The Ticket-Taker's Bargain.\nThe Fairground's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "back_text": "Record in your Campaign Log: The Ticket-Taker's Bargain.\nAdvance to act 3a.",
     "clues": 3,
     "clues_per_investigator": true,
+    "no_threshold": true
+  },
+  "sthr-act-stopwheel": {
+    "name": "Stop the Wheel",
+    "clues": 2,
+    "clues_per_investigator": true,
+    "text": "Part II only.\nObjective – [action] Investigators at The Wheel spend 2 [perinv] clues, as a group: Jam the gears. Test [com] or [agi] (3). Only an investigator at The Wheel may trigger this ability. If you succeed, advance. If you fail, place the spent clues on The Wheel.",
+    "flavor": "It turns because the night turns. Make it stop.",
+    "index": "3a",
+    "back_flavor": "The gears scream and catch, and the wheel stops with its top car against the wrong sky. For as long as it holds, the fair falls silent, and from up there you can see what the night looks like when nothing is moving it along.",
+    "back_text": "Record in your Campaign Log: The Wheel Stands Still.\nThe Last Hour's Setup reads this record.\nThe Fairground's objectives are complete. From now on, do not use this act deck when you Place this box.",
     "no_threshold": true
   },
   "sthr-act-almanachid": {
@@ -1009,8 +1061,19 @@
     "deck": 95113,
     "index": "2a",
     "back_flavor": "It is written once, in the middle of an otherwise blank page. You read it. You do not say it aloud. Somewhere on the hill, something pauses mid-step.",
-    "back_text": "Record in your Campaign Log: The Appointed's Name. If Seraphine Vale is at The Sealed Study, mark Seraphine's thread “known.”\nRemove 1 [tablet] token from the chaos bag for the rest of the campaign.\nFrom now on, when the Hourglass advances to Hour VII, exhaust The Appointed.\nAlso record The Way the Night Breaks: the finale may now be begun.\nThe Almanac House's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "back_text": "Record in your Campaign Log: The Appointed's Name. If Seraphine Vale is at The Sealed Study, mark Seraphine's thread “known.”\nRemove 1 [tablet] token from the chaos bag for the rest of the campaign.\nFrom now on, when the Hourglass advances to Hour VII, exhaust The Appointed.\nAlso record The Way the Night Breaks: the finale may now be begun.\nAdvance to act 3a.",
     "clues_per_investigator": true
+  },
+  "sthr-act-hourright": {
+    "name": "Set the Hour Right",
+    "clues": 2,
+    "clues_per_investigator": true,
+    "text": "Part II only.\nObjective – [action] Investigators at The Press spend 2 [perinv] clues, as a group, and place 1 doom on the current Hour: Reset the type. Advance. Only an investigator at The Press may trigger this ability.",
+    "flavor": "The hour was printed one late. The type is still set.",
+    "index": "3a",
+    "back_flavor": "You pick the brown-inked line apart letter by letter, set the true hour in its place, and run one clean sheet through the press. The ink is wet. The almanac on the sheet is right at last. Somewhere on the hill, something checks the time.",
+    "back_text": "Record in your Campaign Log: The Hour Is Set Right.\nThe Last Hour's Setup reads this record.\nThe Almanac House's objectives are complete. From now on, do not use this act deck when you Place this box.",
+    "no_threshold": true
   },
   "sthr-act-lasthour": {
     "name": "Through the Hours",

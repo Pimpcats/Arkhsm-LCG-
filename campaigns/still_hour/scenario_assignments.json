@@ -70,7 +70,8 @@
     ],
     "act_deck": [
       "sthr-act-lamp",
-      "sthr-act-ninthdeath"
+      "sthr-act-ninthdeath",
+      "sthr-act-keeplight"
     ],
     "locations": [
       "sthr-loc-lanternroom",
@@ -106,7 +107,8 @@
     ],
     "act_deck": [
       "sthr-act-whythirteen",
-      "sthr-act-hourwaswrong"
+      "sthr-act-hourwaswrong",
+      "sthr-act-truehour"
     ],
     "locations": [
       "sthr-loc-nave",
@@ -153,7 +155,8 @@
     ],
     "act_deck": [
       "sthr-act-walkbackward",
-      "sthr-act-walksbeside"
+      "sthr-act-walksbeside",
+      "sthr-act-lastmilestone"
     ],
     "locations": [
       "sthr-loc-milestones",
@@ -198,7 +201,8 @@
     ],
     "act_deck": [
       "sthr-act-sheriffdead",
-      "sthr-act-vote"
+      "sthr-act-vote",
+      "sthr-act-calltheroll"
     ],
     "locations": [
       "sthr-loc-hubsquare",
@@ -271,7 +275,8 @@
     ],
     "act_deck": [
       "sthr-act-wheelturns",
-      "sthr-act-bargain"
+      "sthr-act-bargain",
+      "sthr-act-stopwheel"
     ],
     "locations": [
       "sthr-loc-wheel",
@@ -308,7 +313,8 @@
     ],
     "act_deck": [
       "sthr-act-almanachid",
-      "sthr-act-appointedname"
+      "sthr-act-appointedname",
+      "sthr-act-hourright"
     ],
     "locations": [
       "sthr-loc-readingroom",

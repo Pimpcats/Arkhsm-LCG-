@@ -11,7 +11,7 @@ local CampaignState = require("StillHour/CampaignState")
 
 local Knowledge = {}
 
--- id -> { name, district, layer = "prologue"|"surface"|"deep"|"assembled" }
+-- id -> { name, district, layer = "prologue"|"surface"|"deep"|"assembled"|"late" }
 Knowledge.FACTS = {
   ["you-are-unstuck"]          = { name = "You Are Unstuck",           district = "Prologue",    layer = "prologue" },
   ["the-lamp-was-never-lit"]   = { name = "The Lamp Remembers",        district = "Lighthouse",  layer = "surface" },
@@ -27,13 +27,21 @@ Knowledge.FACTS = {
   ["what-the-almanac-hid"]     = { name = "What the Almanac Hid",      district = "Almanac",     layer = "surface" },
   ["the-appointeds-name"]      = { name = "The Appointed's Name",      district = "Almanac",     layer = "deep" },
   ["the-way-the-night-breaks"] = { name = "The Way the Night Breaks",  district = "(assembled)", layer = "assembled" },
+  -- late records: each district's act 3a (Before the Last Hour); the finale's Setup reads them
+  ["the-light-is-kept"]        = { name = "The Light Is Kept",         district = "Lighthouse",  layer = "late", period = "future" },
+  ["the-bell-rang-true"]       = { name = "The Bell Rang True",        district = "Church",      layer = "late", period = "past" },
+  ["the-road-has-an-end"]      = { name = "The Road Has an End",       district = "Sunken Road", layer = "late", period = "future" },
+  ["every-name-was-read"]      = { name = "Every Name Was Read",       district = "Square",      layer = "late", period = "past" },
+  ["the-wheel-stands-still"]   = { name = "The Wheel Stands Still",    district = "Fairground",  layer = "late", period = "future" },
+  ["the-hour-is-set-right"]    = { name = "The Hour Is Set Right",     district = "Almanac",     layer = "late", period = "past" },
 }
 
 -- Knowledge pays Memory: the first time an entry is recorded in the campaign
 -- it adds banked Memory, per investigator (current count), by layer.
 -- (official XP per campaign, about 35-45 per investigator: surface entries pay 1,
 -- deep entries 3; Victory also pays each investigator)
-Knowledge.MEMORY_PER_INVESTIGATOR = { prologue = 0, surface = 1, deep = 3, assembled = 0 }
+-- Late records pay nothing: their reward is in the finale's Setup.
+Knowledge.MEMORY_PER_INVESTIGATOR = { prologue = 0, surface = 1, deep = 3, assembled = 0, late = 0 }
 
 function Knowledge.knows(factId)
   return CampaignState.knows(factId)
@@ -125,6 +133,23 @@ function Knowledge.assembleFinale()
     return CampaignState.unlockFact("the-way-the-night-breaks")
   end
   return false
+end
+
+--- Late records known, and how many fall on each period's form ({ past = n, future = n }).
+function Knowledge.lateKnown()
+  local n, by = 0, { past = 0, future = 0 }
+  for id, f in pairs(Knowledge.FACTS) do
+    if f.layer == "late" and CampaignState.knows(id) then
+      n = n + 1
+      by[f.period] = by[f.period] + 1
+    end
+  end
+  return n, by
+end
+
+--- The night will not wait: every late record is known, so the next loop is the finale.
+function Knowledge.finaleForced()
+  return (Knowledge.lateKnown()) >= 6
 end
 
 --- The finale may be attempted once the assembled fact is known.

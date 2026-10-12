@@ -199,6 +199,12 @@ SCENES.update({
     "sthr-act-bargain": "a fairground ticket held out through a booth window by a gloved hand, the face behind it in shadow",
     "sthr-act-almanachid": "a printing press mid-stroke, a fresh almanac sheet coming off it with a different time printed",
     "sthr-act-appointedname": "a study desk with a single word written again and again on every paper, the word itself illegible",
+    "sthr-act-keeplight": "a lighthouse keeper's chair drawn up beside the lit lamp, the beam reaching far out over water toward a faint pale horizon",
+    "sthr-act-truehour": "a bell rope pulled taut in a flooded church tower, the bell mid-swing, the water below gone perfectly still",
+    "sthr-act-lastmilestone": "a freshly cut milestone at the edge of fog on a sunken road, a number carved on it, hooded walkers stopped behind",
+    "sthr-act-calltheroll": "a figure on the town hall steps reading a long ledger aloud to a silent lamplit crowd",
+    "sthr-act-stopwheel": "a Ferris wheel halted with its top car against a strange sky, the fairground below fallen silent",
+    "sthr-act-hourright": "type being reset by hand in a printing press, one clean almanac sheet with the true hour, ink still wet",
     "sthr-act-lasthour": "the town square at the edge of midnight, a freestanding doorway at its centre, figures holding it shut against the dark",
     # the ending beats and interludes (stories)
     "sthr-story-firstreset": "dawn that is not dawn over the town square, lanterns relit, the night folding back into eleven o'clock",

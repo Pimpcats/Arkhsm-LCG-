@@ -804,6 +804,42 @@
     "seed": 4231
   },
   {
+    "id": "sthr-act-keeplight",
+    "art_type": "act",
+    "scene": "a lighthouse keeper's chair drawn up beside the lit lamp, the beam reaching far out over water toward a faint pale horizon",
+    "seed": 4756
+  },
+  {
+    "id": "sthr-act-truehour",
+    "art_type": "act",
+    "scene": "a bell rope pulled taut in a flooded church tower, the bell mid-swing, the water below gone perfectly still",
+    "seed": 4315
+  },
+  {
+    "id": "sthr-act-lastmilestone",
+    "art_type": "act",
+    "scene": "a freshly cut milestone at the edge of fog on a sunken road, a number carved on it, hooded walkers stopped behind",
+    "seed": 7941
+  },
+  {
+    "id": "sthr-act-calltheroll",
+    "art_type": "act",
+    "scene": "a figure on the town hall steps reading a long ledger aloud to a silent lamplit crowd",
+    "seed": 6275
+  },
+  {
+    "id": "sthr-act-stopwheel",
+    "art_type": "act",
+    "scene": "a Ferris wheel halted with its top car against a strange sky, the fairground below fallen silent",
+    "seed": 4966
+  },
+  {
+    "id": "sthr-act-hourright",
+    "art_type": "act",
+    "scene": "type being reset by hand in a printing press, one clean almanac sheet with the true hour, ink still wet",
+    "seed": 4973
+  },
+  {
     "id": "sthr-res-1",
     "art_type": "story",
     "scene": "a lone lit window in a lighthouse at dawn, the town below waking, one figure keeping watch",

@@ -15,3 +15,17 @@ illustration of the same id when one is made.
 | sthr-form-present | sthr-appointed | 380, 200 | full colour, +15% contrast |
 | sthr-res-7 | sthr-loc-square | 0, 120 | sepia (0.75) |
 | sthr-res-8 | sthr-loc-square | 228, 200 | cold (0.85) |
+
+## Late objectives (act 3a, 2026-10-12, provisional)
+
+Portrait crops (768 x 1152, scaled to 1024 x 1536) of the matching approved act illustrations, with a pale dawn
+wash (35%) that marks the late acts. Briefs are in pipeline/build_art_manifest.py.
+
+| Card | Source illustration | Crop origin (x, y) |
+|---|---|---|
+| sthr-act-keeplight | sthr-act-lamp | 128, 0 |
+| sthr-act-truehour | sthr-act-whythirteen | 256, 192 |
+| sthr-act-lastmilestone | sthr-act-walkbackward | 0, 384 |
+| sthr-act-calltheroll | sthr-act-vote | 256, 300 |
+| sthr-act-stopwheel | sthr-act-wheelturns | 128, 96 |
+| sthr-act-hourright | sthr-act-almanachid | 200, 200 |
