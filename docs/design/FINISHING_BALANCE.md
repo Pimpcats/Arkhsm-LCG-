@@ -298,3 +298,25 @@ fires more at four and never at two (their +2 health and sanity). Solo fell shor
 Past and the Future by about Hour VI–VII, then ran out of time (12 of 18) or fell to As It Is. **Solo rules** (guide,
 Difficulty and player count; the form cards): each form gets −1 fight and −1 evade, and a fallen form rewinds the
 Hourglass by 2 Hours. Solo with both, 27 campaigns: home 30%, not ended 67% (a fallen form rewinding 2 alone: 22%).
+
+### Night evenness (2026-10-12)
+
+Changes: Why Thirteen? 3 → 2 [perinv] (Night 1 was 69%); The Vote That Never Ends and Call the Roll 2 → 3 [perinv]
+(the Square's acts were met 98–100%: the Square is always placed). The engine planner counts a Lighthouse trip as two
+districts (it places the Sunken Road too, whose objective now comes along) instead of adding a third district to the
+night: Night 5's dip came from Lighthouse + Road + Church at once (The Hour Was Wrong met 13 of 36 there, 29 of 29
+elsewhere). Tried and reverted: What the Almanac Hid at 2 (Night 2 100%), The Appointed's Name at 3 (Night 7 37%,
+fewer deep entries at the finale). Engine fixes found on the way: no Between Loops after a finale slot; a restored
+state waits for its board sync; and a table bug, Clear Board with the Appointed out brought its card back as
+"undefeatable" so the Square's next Place was refused (fixed in Board/Control, test A-3).
+
+| slot | Prologue | N1 | N2 | N3 | N4 | N5 | N6 | N7 | N8 | Finale (home) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| target | 80 | 80 | 70 | 70 | 60 | 60 | 50 | 50 | 40 | 40 |
+| late objectives (54, before) | 87 | 69 | 63 | 91 | 89 | 41 | 76 | 56 | 78 | 43 |
+| night evenness (27) | 93 | 89 | 74 | 93 | 74 | 78 | 63 | 59 | 85 | 52 |
+
+Every night is now at or above its target (no dips); finale home 52%, stranded 22%, not ended 26%; six deep entries
+at the finale in 15 of 27; Memory 42.1 per investigator; no night without a goal. Night 3 and Night 8 run easy and the
+campaign as a whole sits above the curve (mean 79% against 62%): at 27 campaigns (±18 points per night) this is where
+further tuning should wait for real play.

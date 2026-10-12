@@ -4,6 +4,9 @@ Updated 2026-10-12. Spoiler-free.
 Repository: https://github.com/Pimpcats/Arkhsm-LCG-
 Working branch: main.
 
+STATUS 2026-10-12 (later)
+Balance across party sizes and nights: two, three and four investigators win the finale about equally often; solo was far too hard and now has two solo finale rules (the boss forms get -1 fight and -1 evade, and a fallen form turns the clock back 2 Hours). Night costs adjusted so no night dips below its target. Fixed a table bug: Clear Board while the Appointed was out left its card behind and blocked the Square's next Place. Art: three new paintings imported; 20 still to paint from the art request page. Simulation, not a playtest.
+
 STATUS 2026-10-12
 Every night now has something to do: each district has a third, late objective that helps in the finale, and once all six are done the next loop is the finale. In 54 simulated carried campaigns no night was left without a goal (before: 18 of 27 campaigns had an empty Night 8). Night 8 now meets its goal 78% (target 40%).
 Finale after a small retune: full victory 43% (target 40%), stranded 24%, not ended 33%; Memory 43 per investigator. Simulation, not a playtest. New card art is provisional (crops of approved art).
