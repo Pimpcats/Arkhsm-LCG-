@@ -127,10 +127,12 @@ What changed from the plan while building and simulating (carried campaigns, `go
 Each district's act 3a (LATE_OBJECTIVES.md) puts up to 3 damage on As It Was and As It Will Be at setup (never more
 than half a form's health). Same method, `goalsPerNight 2`, 3 investigators:
 
-| setting | campaigns | home | stranded | not ended | finale never begun |
-|---|---|---|---|---|---|
-| As It Is 2 damage / 1 horror (as tuned above) | 54 | 30% | 35% | 28% | 7% |
-| **As It Is 1 damage / 1 horror (chosen)** | 54 | **43%** | 24% | 19% | 14% |
+| setting | campaigns | home | stranded | not ended |
+|---|---|---|---|---|
+| As It Is 2 damage / 1 horror (as tuned above) | 54 | 30% | 35% | 35% |
+| **As It Is 1 damage / 1 horror (chosen)** | 54 | **43%** | 24% | 33% |
 
-"Finale never begun" was an engine gap (the party never reached The Sealed Study on the finale night); the engine
-now takes the guide's Hour IX way in instead, and the final validation run below includes it.
+Every campaign played its finale (an earlier count filed finales that ran out at Hour IX as "never begun"; the
+summary now counts them as not ended). The engine also takes the guide's Hour IX way in when a finale night's party
+never reaches The Sealed Study. Validation run with it (seeds 5000/6000/7000, 27 campaigns): home 37%, stranded 15%,
+not ended 48%; no night without a goal; Prologue–Night 8 93/67/70/89/93/52/78/48/70, Memory 42.5 per investigator.

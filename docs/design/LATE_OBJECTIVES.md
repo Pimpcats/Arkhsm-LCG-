@@ -52,15 +52,14 @@ The finale gets up to 3 damage on each period form before the fight; the finale 
 
 ## Measurements (carried campaigns, 3 investigators, `goalsPerNight 2`, seeds 5000/6000/7000 × 9)
 
-| build | Night 7 | Night 8 | finale home | stranded | not ended / unavailable | deep entries at finale | late records | Memory / inv. |
+| build | Night 7 | Night 8 | finale home | stranded | not ended | deep entries at finale | late records | Memory / inv. |
 |---|---|---|---|---|---|---|---|---|
-| before late objectives (boss finale tuned) | 63% | 19% (18 of 27 nights had no goal) | 41% | 22% | 37% / 0 | mostly 6 | – | 44.3 |
-| late objectives, planner treats all pending alike | 78% | 59% | 22% | 33% | 33% / 11% | mostly 4–5 | 2–5 | 39.5 |
-| late objectives, surface/deep first | 26% | 78% | 30% | 33% | 33% / 4% | 6 in 19 of 27 | 1–4 | 42.8 |
+| before late objectives (boss finale tuned) | 63% | 19% (18 of 27 nights had no goal) | 41% | 22% | 37% | mostly 6 | – | 44.3 |
+| late objectives, planner treats all pending alike | 78% | 59% | 22% | 33% | 44% | mostly 4–5 | 2–5 | 39.5 |
+| late objectives, surface/deep first | 26% | 78% | 30% | 33% | 37% | 6 in 19 of 27 | 1–4 | 42.8 |
 
 The second row's planner spent nights on late objectives while deep ones were still open, so parties reached the
-finale with fewer deep entries (2 damage each, and the Name and the Vote open the finale): three campaigns never
-opened it. A table would finish the deep objectives first; the planner now does (surface and deep before late).
+finale with fewer deep entries (2 damage each in the finale). A table would finish the deep objectives first; the planner now does (surface and deep before late).
 No campaign recorded all six late records, so the forced finale did not fire.
 
 With the planner fixed, no night in 27 campaigns was without a goal. Night 7's low rate came mostly from Stop the
@@ -70,5 +69,5 @@ target (about ±18 points); a second set of seeds (8000/9000/10000) decides whet
 
 Second seeds (8000/9000/10000, Stop the Wheel at 1 [perinv]): Night 7 74%, Night 8 81%, no night without a goal,
 Stop the Wheel met 7 of 8 times. Pooled with the first set (54 campaigns): Prologue–Night 8 87/69/65/91/91/48/78/50/80
-(mean 73%), finale home 30%, stranded 35%, not ended 28%, Memory 43.1 per investigator. Finale full victory sits
+(mean 73%), finale home 30%, stranded 35%, not ended 35%, Memory 43.1 per investigator. Finale full victory sits
 below the 40% target on both seed sets, so the finale is tuned next (As It Is's attack).

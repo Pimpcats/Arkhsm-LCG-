@@ -115,8 +115,11 @@ def summarize(games):
         per_slot.append(wins / campaigns)
     out["mean_rate_all_slots"] = statistics.mean(per_slot)
     finale = slot_games.get(10, [])
-    out["finale_endings"] = {k: sum(1 for g in finale if g.get("ended") == k) / campaigns
-                             for k in ("boss", "stranded", "defeat")}
+    played = [g for g in finale if is_finale(g)]
+    out["finale_endings"] = {k: sum(1 for g in played if g.get("ended") == k) / campaigns for k in ("boss", "stranded")}
+    # not ended: the finale was played and ran out (Hour IX, every investigator defeated, the reset value)
+    out["finale_endings"]["defeat"] = sum(1 for g in played if g.get("ended") not in ("boss", "stranded")) / campaigns
+    out["finale_endings"]["unplayed"] = (campaigns - len(played)) / campaigns
     # the headline: Prologue to Night 8. The Finale slot (full victory only) is shown but kept out
     # of the mean (as in FINISHING_BALANCE.md's earlier whole-campaign table)
     out["mean_rate_nine"] = statistics.mean(per_slot[:9])
@@ -137,8 +140,8 @@ def render(s, title=""):
                  (100 * s["target_mean_nine"], 100 * s["mean_rate_nine"]))
     fe = s.get("finale_endings")
     if fe:
-        lines.append("Finale endings: home %.0f%%, stranded %.0f%%, not ended %.0f%% (of all campaigns)" %
-                     (100 * fe["boss"], 100 * fe["stranded"], 100 * fe["defeat"]))
+        lines.append("Finale endings: home %.0f%%, stranded %.0f%%, not ended %.0f%%, never begun %.0f%% (of all campaigns)" %
+                     (100 * fe["boss"], 100 * fe["stranded"], 100 * fe["defeat"], 100 * fe["unplayed"]))
     x = s["xp"]
     lines.append("Memory banked per investigator over the campaign: mean %.1f, range %.1f-%.1f (official 35-45)" %
                  (x["mean"], x["min"], x["max"]))
