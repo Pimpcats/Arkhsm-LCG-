@@ -818,13 +818,13 @@
   {
     "id": "sthr-act-lastmilestone",
     "art_type": "act",
-    "scene": "a freshly cut milestone at the edge of fog on a sunken road, a number carved on it, hooded walkers stopped behind",
+    "scene": "a freshly cut stone milestone at the edge of fog on a sunken road, its face carved with worn abstract marks, hooded walkers stopped behind it, looking at it",
     "seed": 7941
   },
   {
     "id": "sthr-act-calltheroll",
     "art_type": "act",
-    "scene": "a figure on the town hall steps reading a long ledger aloud to a silent lamplit crowd",
+    "scene": "a figure on the town hall steps reading aloud from an open ledger to a silent lamplit crowd, the pages only faint marks",
     "seed": 6275
   },
   {
@@ -836,7 +836,7 @@
   {
     "id": "sthr-act-hourright",
     "art_type": "act",
-    "scene": "type being reset by hand in a printing press, one clean almanac sheet with the true hour, ink still wet",
+    "scene": "hands resetting lead type in a printing press, one clean freshly printed sheet hanging beside it with a large moon-and-clock emblem and bands of abstract ornament, ink still wet",
     "seed": 4973
   },
   {
@@ -950,19 +950,19 @@
   {
     "id": "sthr-form-past",
     "art_type": "enemy",
-    "scene": "a tall wrong silhouette standing among a crowd of raised hands on old Town Hall steps, lanterns new and bright, sepia, dread",
+    "scene": "a tall wrong figure in an old-fashioned frock coat, too tall and too still, standing among a crowd of raised hands on the Town Hall steps long ago, bright new lanterns, sepia, dread",
     "seed": 2005
   },
   {
     "id": "sthr-form-future",
     "art_type": "enemy",
-    "scene": "a tall wrong silhouette waiting in an empty grey dawn square, patient, the town decayed around it, cold light",
+    "scene": "a gaunt, patient, too-tall figure waiting alone in the empty town square at grey dawn, rotted bunting on its strings, fog on the shore road, the town decayed around it, cold light",
     "seed": 3594
   },
   {
     "id": "sthr-form-present",
     "art_type": "enemy",
-    "scene": "a tall wrong silhouette filling the lantern-lit square at eleven o'clock, too many angles, the stars sliding behind it, confrontation",
+    "scene": "a vast wrong figure filling the lantern-lit town square at night, its outline made of too many angles, the stars sliding behind it, a few small investigators facing it",
     "seed": 4308
   },
   {

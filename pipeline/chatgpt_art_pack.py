@@ -125,6 +125,24 @@ def scene_text(job):
     return text + "."
 
 
+def provisional(art_dir):
+    """Card ids whose committed art is a stand-in crop: the first column of the
+    tables in the art folder's *_SOURCES.md files (FINALE_ and QUEST_ART_SOURCES.md)."""
+    out = set()
+    if not os.path.isdir(art_dir):
+        return out
+    for f in os.listdir(art_dir):
+        if f.endswith("_SOURCES.md"):
+            for line in open(os.path.join(art_dir, f), encoding="utf-8"):
+                cells = [c.strip() for c in line.split("|")]
+                if len(cells) > 2 and cells[1].startswith(CAMPAIGN_PREFIX):
+                    out.add(cells[1])
+    return out
+
+
+CAMPAIGN_PREFIX = "sthr-"
+
+
 def request_prompt(camp, chars, cards, jobs_by_id, profiles):
     """The owner's batch format: up to PER_REQUEST separate images in one
     message, house style pasted once, one block per image. No reference line —
@@ -219,6 +237,8 @@ def build():
     art_dir = CFG.path("illustrations")
     have = {os.path.splitext(f)[0] for f in os.listdir(art_dir)} \
         if os.path.isdir(art_dir) else set()
+    # stand-in crops (listed in the art folder's *_SOURCES.md tables) still need a painting
+    have -= provisional(art_dir)
     todo = [c for c in cards if c["id"] not in have]
     remaining = [{"cards": [c["n"] for c in todo[i:i + REMAINING_PER_REQUEST]],
                   "prompt": request_prompt(camp, chars,
@@ -244,6 +264,14 @@ def write_md(pack):
            "included. Run as many chats at once as you like; no attachments. Save "
            "each image under the number in its `save as` line (e.g. `016.png`)."
            .format(PER_REQUEST), ""]
+    if pack["remaining"]:
+        n = sum(len(r["cards"]) for r in pack["remaining"])
+        out += ["## Still to paint ({} images)".format(n), "",
+                "Cards whose art is missing or a stand-in. One request per new chat; save each "
+                "image under its number and import with `python3 pipeline/import_art.py`.", ""]
+        for r in pack["remaining"]:
+            out += ["### #{}".format(", #".join("{:03d}".format(x) for x in r["cards"])), "",
+                    "```", r["prompt"], "```", ""]
     for bi in range(1, len(pack["batches"]) + 1):
         out += ["## Batch {}".format(bi), ""]
         for r in (r for r in pack["requests"] if r["batch"] == bi):
