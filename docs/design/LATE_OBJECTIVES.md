@@ -56,8 +56,14 @@ The finale gets up to 3 damage on each period form before the fight; the finale 
 |---|---|---|---|---|---|---|---|---|
 | before late objectives (boss finale tuned) | 63% | 19% (18 of 27 nights had no goal) | 41% | 22% | 37% / 0 | mostly 6 | – | 44.3 |
 | late objectives, planner treats all pending alike | 78% | 59% | 22% | 33% | 33% / 11% | mostly 4–5 | 2–5 | 39.5 |
+| late objectives, surface/deep first | 26% | 78% | 30% | 33% | 33% / 4% | 6 in 19 of 27 | 1–4 | 42.8 |
 
 The second row's planner spent nights on late objectives while deep ones were still open, so parties reached the
 finale with fewer deep entries (2 damage each, and the Name and the Vote open the finale): three campaigns never
 opened it. A table would finish the deep objectives first; the planner now does (surface and deep before late).
 No campaign recorded all six late records, so the forced finale did not fire.
+
+With the planner fixed, no night in 27 campaigns was without a goal. Night 7's low rate came mostly from Stop the
+Wheel (met 1 of 7 times: time ran out, or the party fell at The Wheel; every other late act was met 83–100%), so it
+now costs 1 [perinv] clues instead of 2. Finale full victory (30%) is within the noise of 27 campaigns of the 40%
+target (about ±18 points); a second set of seeds (8000/9000/10000) decides whether the finale needs tuning.
