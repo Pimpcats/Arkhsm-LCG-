@@ -1538,7 +1538,7 @@
     "damage": 1,
     "horror": 1,
     "quantity": 1,
-    "text": "Cannot move.\nForced – At the end of the round: Each investigator at The First Occultation takes 1 horror.\nForced – When As It Was is defeated: Rewind the Hourglass by 1 Hour. The investigators may end the finale here (→R7). If they press on, the finale can end only with As It Is defeated or (→R5 or R6).",
+    "text": "Cannot move.\nForced – At the end of the round: Each investigator at The First Occultation takes 1 horror.\nForced – When As It Was is defeated: Rewind the Hourglass by 1 Hour (2 with one investigator). The investigators may end the finale here (→R7). If they press on, the finale can end only with As It Is defeated or (→R5 or R6).",
     "flavor": "Invited, in ink, by every hand in the town."
   },
   "sthr-form-future": {
@@ -1551,7 +1551,7 @@
     "damage": 2,
     "horror": 0,
     "quantity": 1,
-    "text": "Cannot move.\nForced – When As It Will Be is defeated: Rewind the Hourglass by 1 Hour. The investigators may end the finale here (→R8). If they press on, the finale can end only with As It Is defeated or (→R5 or R6).",
+    "text": "Cannot move.\nForced – When As It Will Be is defeated: Rewind the Hourglass by 1 Hour (2 with one investigator). The investigators may end the finale here (→R8). If they press on, the finale can end only with As It Is defeated or (→R5 or R6).",
     "flavor": "Patient as a debt. It has already counted the Years you have left."
   },
   "sthr-form-present": {

@@ -2015,10 +2015,15 @@ function shClickContest(_, _, alt)
   end
   CampaignState.setContest(math.min(3, CampaignState.getContest() + (alt and -1 or 1)))
   local n = CampaignState.getContest()
+  -- a fallen Past or Future form rewinds the Hourglass (2 Hours with one investigator)
+  local rw = (CampaignState.constants().investigators == 1) and "2 Hours (right-click Hour twice)"
+    or "1 Hour (right-click Hour once)"
   if not alt and n == 1 then
-    announce("A form of the Appointed falls. Stop here (Resolution 7 for the Past, 8 for the Future) or press on.")
+    announce("A form of the Appointed falls: rewind the Hourglass by " .. rw .. ". Stop here (Resolution 7 for the "
+      .. "Past, 8 for the Future) or press on.")
   elseif not alt and n == 2 then
-    announce("As It Was and As It Will Be are defeated: As It Is can now be damaged.")
+    announce("As It Was and As It Will Be are defeated: rewind the Hourglass by " .. rw .. ". Stop here, or press "
+      .. "on: As It Is can now be damaged.")
   elseif not alt and n == 3 then
     announce("As It Is is defeated: advance Through the Hours.")
   end
