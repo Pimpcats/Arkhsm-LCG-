@@ -1039,8 +1039,8 @@
   },
   "sthr-act-almanachid": {
     "name": "What the Almanac Hid",
-    "clues": 2,
-    "text": "[action] Investigators spend 2 [perinv] clues, as a group: Take control of the set-aside Bound Almanac asset. Only an investigator at The Reading Room may trigger this ability.\nObjective – If the investigator who controls Bound Almanac is at The Press, advance.",
+    "clues": 3,
+    "text": "[action] Investigators spend 3 [perinv] clues, as a group: Take control of the set-aside Bound Almanac asset. Only an investigator at The Reading Room may trigger this ability.\nObjective – If the investigator who controls Bound Almanac is at The Press, advance.",
     "flavor": "A hundred copies, every one open at the same page. One is not like the others.",
     "deck": 95112,
     "index": "1a",

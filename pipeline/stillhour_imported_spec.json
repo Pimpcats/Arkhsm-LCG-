@@ -591,7 +591,7 @@
     "id": "sthr-act-almanachid",
     "type": "Act",
     "name": "What the Almanac Hid",
-    "clues": 2,
+    "clues": 3,
     "text": "Objective — Once 6 clues have been discovered in the Almanac House, an investigator at the Press may set it to reprint the true occultation time. Record \"What the Almanac Hid.\"\nAt Hour VI, investigators remove a Static token instead of adding one.",
     "flavor": "Where the wrong almanac was printed.",
     "deck": 95112,

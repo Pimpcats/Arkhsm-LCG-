@@ -659,11 +659,16 @@ return function(H)
           end
         end
       end
+      -- the Sunken Road is placed for a Lighthouse trip anyway: its own objective comes along
+      local hasL, hasR = false, false
+      for _,x in ipairs(districts) do if x=="Lighthouse" then hasL=true elseif x=="Road" then hasR=true end end
+      if hasL and not hasR and pending("Road") then districts[#districts+1]="Road" ; used=used+1 end
       for i=0,#ROUTE-1 do
         local d=ROUTE[((start+i)%#ROUTE)+1]
         local dup=false
         for _,x in ipairs(districts) do if x==d then dup=true end end
-        if #districts<perNight and not dup then districts[#districts+1]=d end
+        local cost=(d=="Lighthouse") and 2 or 1
+        if used+cost<=perNight and not dup then districts[#districts+1]=d ; used=used+cost end
       end
     end
     if slot==10 and c.knowledge["the-way-the-night-breaks"] then
