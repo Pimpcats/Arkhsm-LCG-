@@ -190,7 +190,9 @@ return function(R, T)
       if G.finale then R.endLoop("hour9") end
       -- "when Hour IX is reached while your log records The Way the Night
       -- Breaks, you may begin the finale instead of ending the loop"
-      if G.cfg.finaleAtNine and R.knows("the-way-the-night-breaks") then
+      -- (also a night planned for the finale whose party never reached The Sealed Study: the table takes
+      -- the Hour IX way in rather than lose the night)
+      if (G.cfg.finaleAtNine or G.cfg.finaleGoal) and R.knows("the-way-the-night-breaks") then
         R.beginFinale(R.aliveInvs()[1], true)
         return
       end
