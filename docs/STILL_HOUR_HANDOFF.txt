@@ -1,8 +1,12 @@
 THE STILL HOUR — HANDOFF
-Updated 2026-10-11. Spoiler-free.
+Updated 2026-10-12. Spoiler-free.
 
 Repository: https://github.com/Pimpcats/Arkhsm-LCG-
 Working branch: main.
+
+STATUS 2026-10-12
+Every night now has something to do: each district has a third, late objective that helps in the finale, and once all six are done the next loop is the finale. In 54 simulated carried campaigns no night was left without a goal (before: 18 of 27 campaigns had an empty Night 8). Night 8 now meets its goal 78% (target 40%).
+Finale after a small retune: full victory 43% (target 40%), stranded 24%, not ended 33%; Memory 43 per investigator. Simulation, not a playtest. New card art is provisional (crops of approved art).
 
 STATUS 2026-10-11
 The finale is rebuilt as the boss fight the owner asked for: the Appointed can be fought and defeated across three times, health scales with the party, and where it is finished decides where the investigators end up (more endings, including two bittersweet stranded wins). Cards, art (provisional), guide chapter, Campaign Log, Control token, engine and story-map test are updated; work is on branch claude/loving-bohr-n7ixl4 (not yet merged to main).

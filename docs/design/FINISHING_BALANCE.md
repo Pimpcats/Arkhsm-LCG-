@@ -264,3 +264,19 @@ Mean Prologue–Night 8 67.1% (curve 62.2%). Memory per investigator 44.3 (33.3�
 stranded 22%, not ended 37%. Night 8 low (19%, was 30–43% in earlier runs) is within noise at n=27 (±18 points)
 but is the slot to watch. `campaign_summary.py` now counts the finale as met only for a full victory and reports
 the stranded share separately.
+
+### Late objectives (2026-10-12)
+
+Each district gained an act 3a (LATE_OBJECTIVES.md) and As It Is now deals 1 damage. Same method, 3 investigators,
+`goalsPerNight 2`; the planner works surface and deep objectives before late ones.
+
+| slot | Prologue | N1 | N2 | N3 | N4 | N5 | N6 | N7 | N8 | Finale (home) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| target | 80 | 80 | 70 | 70 | 60 | 60 | 50 | 50 | 40 | 40 |
+| boss build (27, before) | 93 | 67 | 70 | 89 | 78 | 52 | 74 | 63 | 19 | 41 |
+| late objectives (54) | 87 | 69 | 63 | 91 | 89 | 41 | 76 | 56 | 78 | 43 |
+
+No night in 54 campaigns was left without a goal (before: 18 of 27 Night 8s). Finale endings over the same 54: home
+43%, stranded 24%, not ended 33%. Memory 43.0 per investigator (28.0–50.0). Prologue–Night 8 mean 72% against the
+62% curve: the middle nights (3, 4, 6) run easy and Night 5 hard, as in every run since the route rotation; they are
+route effects at this sample size (±13 points at 54).
