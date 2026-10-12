@@ -67,3 +67,8 @@ With the planner fixed, no night in 27 campaigns was without a goal. Night 7's l
 Wheel (met 1 of 7 times: time ran out, or the party fell at The Wheel; every other late act was met 83–100%), so it
 now costs 1 [perinv] clues instead of 2. Finale full victory (30%) is within the noise of 27 campaigns of the 40%
 target (about ±18 points); a second set of seeds (8000/9000/10000) decides whether the finale needs tuning.
+
+Second seeds (8000/9000/10000, Stop the Wheel at 1 [perinv]): Night 7 74%, Night 8 81%, no night without a goal,
+Stop the Wheel met 7 of 8 times. Pooled with the first set (54 campaigns): Prologue–Night 8 87/69/65/91/91/48/78/50/80
+(mean 73%), finale home 30%, stranded 35%, not ended 28%, Memory 43.1 per investigator. Finale full victory sits
+below the 40% target on both seed sets, so the finale is tuned next (As It Is's attack).
