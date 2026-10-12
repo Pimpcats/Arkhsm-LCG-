@@ -602,7 +602,7 @@
     "id": "sthr-act-appointedname",
     "type": "Act",
     "name": "The Appointed's Name",
-    "clues": 3,
+    "clues": 2,
     "text": "Act II only, once the log shows \"What the Almanac Hid\" and \"The Vote That Never Ends.\" The Sealed Study opens.\nObjective — Recover the name inside the Sealed Study (3 clues there). Record \"The Appointed's Name\"; this completes \"Who Opened the Door.\" The Appointed now arrives exhausted at Hour VII.\nOnce you know \"The Appointed's Name,\" \"The Vote That Never Ends,\" and any one other deep fact, record \"The Way the Night Breaks.\" The finale may now be attempted.",
     "flavor": "Inside is the name the town spoke to call the thing through.",
     "deck": 95113,

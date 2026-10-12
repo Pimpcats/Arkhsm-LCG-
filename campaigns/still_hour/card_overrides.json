@@ -1055,8 +1055,8 @@
   },
   "sthr-act-appointedname": {
     "name": "The Appointed's Name",
-    "clues": 3,
-    "text": "Part II only, once your Campaign Log records What the Almanac Hid and The Vote That Never Ends.\nForced – When this act becomes the current act: The Sealed Study opens.\nObjective – While The Appointed's Approach is Emerging or Arrived, investigators at The Sealed Study may, as a group, spend 3 [perinv] clues to advance.",
+    "clues": 2,
+    "text": "Part II only, once your Campaign Log records What the Almanac Hid and The Vote That Never Ends.\nForced – When this act becomes the current act: The Sealed Study opens.\nObjective – While The Appointed's Approach is Emerging or Arrived, investigators at The Sealed Study may, as a group, spend 2 [perinv] clues to advance.",
     "flavor": "The minutes said where the name was kept. The page is blank until its owner is near.",
     "deck": 95113,
     "index": "2a",
