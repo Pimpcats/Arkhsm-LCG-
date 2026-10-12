@@ -121,3 +121,16 @@ What changed from the plan while building and simulating (carried campaigns, `go
 **Chosen:** health 2 [perinv] for all three forms; As It Is deals 2 damage and 1 horror. Over 27 carried campaigns
 (seeds 5000/6000/7000): home 41%, stranded 22% (R7 4%, R8 19%), not ended 37%. Prologue to Night 8 in the same runs:
 93/67/70/89/78/52/74/63/19 (mean 67.1%); Memory 44.3 per investigator. This is the simulation, not a playtest.
+
+### With the late objectives (2026-10-12)
+
+Each district's act 3a (LATE_OBJECTIVES.md) puts up to 3 damage on As It Was and As It Will Be at setup (never more
+than half a form's health). Same method, `goalsPerNight 2`, 3 investigators:
+
+| setting | campaigns | home | stranded | not ended | finale never begun |
+|---|---|---|---|---|---|
+| As It Is 2 damage / 1 horror (as tuned above) | 54 | 30% | 35% | 28% | 7% |
+| **As It Is 1 damage / 1 horror (chosen)** | 54 | **43%** | 24% | 19% | 14% |
+
+"Finale never begun" was an engine gap (the party never reached The Sealed Study on the finale night); the engine
+now takes the guide's Hour IX way in instead, and the final validation run below includes it.
