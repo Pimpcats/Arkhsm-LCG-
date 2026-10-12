@@ -33,8 +33,15 @@ SLOT_NAMES = ["Prologue", "Night 1", "Night 2", "Night 3", "Night 4", "Night 5",
 XP_RANGE = (35, 45)
 
 
+def is_finale(g):
+    """The finale was played in this game (at slot 10, or earlier when every late record forced it)."""
+    return bool((g.get("metrics") or {}).get("finale_began")) or g.get("ended") in ("boss", "stranded")
+
+
 def slot_won(g):
-    """The slot's goal was met."""
+    """The slot's goal was met. The finale's goal is a full victory (stranded is reported apart)."""
+    if is_finale(g) or g.get("slot") == 10:
+        return g.get("ended") in ("boss", "contest")
     if g.get("scenario") == "prologue":
         return report.act_done(g, "sthr-act-firsthour") is not None and bool(report.act_done(g, "sthr-act-firsthour"))
     if g.get("ended") in ("boss", "contest"):
@@ -66,11 +73,12 @@ def summarize(games):
     for seed, slots in by.items():
         slots.sort(key=lambda g: g["slot"])
         for g in slots:
-            slot_games[g["slot"]].append(g)
+            # a finale begun early (the night will not wait) is reported in the Finale column
+            slot_games[10 if is_finale(g) else g["slot"]].append(g)
             out["players"] = g["players"]
         gain = 0
         for g in slots:
-            if g["slot"] < 10:
+            if g["slot"] < 10 and not is_finale(g):
                 gain += (g.get("memory_bank_end") or 0) - (g.get("memory_bank_start") or 0)
         n = slots[0]["players"]
         xp.append(gain / n)

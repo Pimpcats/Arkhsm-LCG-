@@ -19,7 +19,7 @@ empty loop: nothing to find, only Years to pay.
   (experience stays in the official 35–45 band); their reward is in the finale.
 - **In The Last Hour's setup**, each late record of a Past district (The Square, The Drowned Church, The Almanac
   House) places 1 damage on As It Was; each of a Future district (The Lighthouse, The Sunken Road, The Fairground)
-  places 1 damage on As It Will Be. Same periods as the deep entries spent in the finale.
+  places 1 damage on As It Will Be, never more than half a form's health (so at most 1 at one investigator, 2 at two). Same periods as the deep entries spent in the finale.
 - **The night will not wait (safety):** when the log records all six late records, the next loop is the finale:
   after Loop Setup, begin the finale at once (Control: Begin Finale), wherever the investigators are.
 - So a loop always has an objective: a surface, deep or late act is left somewhere (late acts have no requirement

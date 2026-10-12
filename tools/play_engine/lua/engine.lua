@@ -176,45 +176,68 @@ return function(H)
   end
 
   local function setupAct(box, district, sc, G)
-    -- Place's loop setup (control.lua setUpPlacedBox) has already removed a finished act deck and, when act
-    -- 2a is current, act 1a; what is left on the table says which act is current
+    -- Place's loop setup (control.lua setUpPlacedBox) has already removed a finished act deck and the acts
+    -- before the current one; what is left on the table (a deck or loose cards of this box) says which is current
+    local ACTS3 = {
+      Square = { "sthr-act-sheriffdead", "sthr-act-vote", "sthr-act-calltheroll" },
+      Church = { "sthr-act-whythirteen", "sthr-act-hourwaswrong", "sthr-act-truehour" },
+      Road = { "sthr-act-walkbackward", "sthr-act-walksbeside", "sthr-act-lastmilestone" },
+      Lighthouse = { "sthr-act-lamp", "sthr-act-ninthdeath", "sthr-act-keeplight" },
+      Fairground = { "sthr-act-wheelturns", "sthr-act-bargain", "sthr-act-stopwheel" },
+      Almanac = { "sthr-act-almanachid", "sthr-act-appointedname", "sthr-act-hourright" } }
+    local a1, a2, a3 = ACTS3[district][1], ACTS3[district][2], ACTS3[district][3]
     local deck = T.deckNamed("Act Deck", box)
-    if not deck then
-      -- act 2a alone is left (the setup took act 1a): a loose card that no longer carries the deck's name
-      local DEEP_ACT = { Square = "sthr-act-vote", Church = "sthr-act-hourwaswrong", Road = "sthr-act-walksbeside",
-                         Lighthouse = "sthr-act-ninthdeath", Fairground = "sthr-act-bargain", Almanac = "sthr-act-appointedname" }
-      local id2 = DEEP_ACT[district]
-      local c2 = id2 and T.find(function(o) return o.type == "Card" and T.gm(o).id == id2 and o.hasTag(T.boxTag(box)) end)
-      if not c2 then return end
-      deck = c2
+    local present, pos = {}, nil
+    local function note(o)
+      if o.type == "Deck" then
+        for _, e in ipairs(o.getObjects()) do present[(T.decode(e.gm_notes) or {}).id or "?"] = o end
+      else
+        present[T.gm(o).id or "?"] = o
+      end
+      pos = pos or o.getPosition()
     end
-    local ids = {}
-    if deck.type == "Deck" then
-      for _, e in ipairs(deck.getObjects()) do ids[#ids + 1] = (T.decode(e.gm_notes) or {}).id end
-    else
-      ids = { T.gm(deck).id }
+    if deck then note(deck) end
+    for _, id in ipairs({ a1, a2, a3 }) do
+      if not present[id] then
+        local c = T.find(function(o) return o.type == "Card" and T.gm(o).id == id and o.hasTag(T.boxTag(box)) end)
+        if c then note(c) end
+      end
     end
-    -- the face-up deck shows its last entry: act 1a on top, 2a under it
-    local a1, a2 = ids[#ids], ids[1]
-    local pos = deck.getPosition()
-    local deep, surf = S.DEEP[district], S.SURF[district]
+    if not pos then return end
+    local deep, surf, late = S.DEEP[district], S.SURF[district], S.LATE[district]
     local function remove()
       G.removedDecks = (G.removedDecks or 0) + 1
-      deck.setPosition({ AWAY.x, AWAY.y, AWAY.z - 6 - 4 * G.removedDecks })
+      local seen = {}
+      for _, o in pairs(present) do
+        if not seen[o] then
+          seen[o] = true
+          o.setPosition({ AWAY.x, AWAY.y, AWAY.z - 6 - 4 * G.removedDecks })
+        end
+      end
     end
-    if G.knowledge[deep] then remove() return end
+    local function current(id, nextId)
+      G.acts[district] = { id = id, district = district, pos = pos, next = nextId }
+      G.actOrder[#G.actOrder + 1] = district
+    end
+    if G.knowledge[late] then remove() return end
+    if G.knowledge[deep] then
+      -- acts 1a and 2a leave the game (Place's setup already took them); act 3a is current
+      for _, id in ipairs({ a1, a2 }) do
+        if present[id] then T.takeCard(id, { pos.x + 2.7, pos.y + 0.3, pos.z }, { 0, 180, 180 }) end
+      end
+      current(a3)
+      return
+    end
     if G.knowledge[surf] then
       if sc.part ~= 2 then remove() return end
       if not R.FX.actTwoRequirements(a2) then remove() return end
-      -- act 1a leaves the game (Place's setup already took it when only act 2a is left); act 2a is current
-      if #ids > 1 then T.takeCard(a1, { pos.x + 2.7, pos.y + 0.3, pos.z }, { 0, 180, 180 }) end
-      G.acts[district] = { id = a2, district = district, pos = pos }
-      G.actOrder[#G.actOrder + 1] = district
+      -- act 1a leaves the game (Place's setup already took it); act 2a is current
+      if present[a1] then T.takeCard(a1, { pos.x + 2.7, pos.y + 0.3, pos.z }, { 0, 180, 180 }) end
+      current(a2, a3)
       G.pendingCurrent[#G.pendingCurrent + 1] = G.acts[district]
       return
     end
-    G.acts[district] = { id = a1, district = district, pos = pos, next = a2 }
-    G.actOrder[#G.actOrder + 1] = district
+    current(a1, a2)
   end
 
   local function placementChecks(G, boxes)
@@ -400,6 +423,8 @@ return function(H)
     G.metrics.start = { dissonance = R.dissonance(), hour = R.hour(), memory = R.state().memory }
     -- Part II acts that are current from the start resolve "When this act becomes the current act"
     for _, act in ipairs(G.pendingCurrent) do R.FX.actBecomesCurrent(act) end
+    -- the night will not wait: every late record is known, so the finale begins after Loop Setup
+    if G.cfg.finaleNow and R.knows("the-way-the-night-breaks") then R.beginFinale(R.aliveInvs()[1], false) end
     return G, errMark
   end
 
@@ -532,6 +557,8 @@ return function(H)
     Lighthouse="sthr-act-lamp",Fairground="sthr-act-wheelturns",Almanac="sthr-act-almanachid"}
   local DEEP_ACT={Square="sthr-act-vote",Church="sthr-act-hourwaswrong",Road="sthr-act-walksbeside",
     Lighthouse="sthr-act-ninthdeath",Fairground="sthr-act-bargain",Almanac="sthr-act-appointedname"}
+  local LATE_ACT={Square="sthr-act-calltheroll",Church="sthr-act-truehour",Road="sthr-act-lastmilestone",
+    Lighthouse="sthr-act-keeplight",Fairground="sthr-act-stopwheel",Almanac="sthr-act-hourright"}
   local ROUTE={"Church","Fairground","Almanac","Road","Lighthouse"}
   local BOX={Church="district_church",Fairground="district_fairground",Almanac="district_almanac",Road="district_road",Lighthouse="district_lighthouse"}
   local function purchaseAfter(out)
@@ -599,6 +626,12 @@ return function(H)
         return false
       end
       return not c.knowledge[S.SURF[d]] or (c.partTwo and not c.knowledge[S.DEEP[d]])
+        or (c.partTwo and c.knowledge[S.DEEP[d]] and not c.knowledge[S.LATE[d]])
+    end
+    -- the night will not wait: all six late records known, so this loop is the finale
+    local lateAll=true
+    for _,d in pairs({"Square","Church","Road","Lighthouse","Fairground","Almanac"}) do
+      if not c.knowledge[S.LATE[d]] then lateAll=false end
     end
     local perNight=(cfg.districtsPerNight or 1)
     -- what-if goalsPerNight = N: every night's goal is N acts (the Square's
@@ -624,6 +657,9 @@ return function(H)
     if slot==10 and c.knowledge["the-way-the-night-breaks"] then
       districts={"Almanac"} ; sc.finaleGoal=true
     end
+    if lateAll and c.knowledge["the-way-the-night-breaks"] then
+      districts={"Almanac"} ; sc.finaleGoal=true ; sc.finaleNow=true
+    end
     local placed={}
     local function add(d)
       if not placed[d] then placed[d]=true ; sc.boxes[#sc.boxes+1]=BOX[d] end
@@ -636,7 +672,8 @@ return function(H)
     for _,d in ipairs(districts) do goalsFor[#goalsFor+1]=d end
     for _,d in ipairs(goalsFor) do
       if not c.knowledge[S.SURF[d]] then sc.objectives[#sc.objectives+1]=SURFACE_ACT[d]
-      elseif c.partTwo and not c.knowledge[S.DEEP[d]] and pending(d) then sc.objectives[#sc.objectives+1]=DEEP_ACT[d] end
+      elseif c.partTwo and not c.knowledge[S.DEEP[d]] and pending(d) then sc.objectives[#sc.objectives+1]=DEEP_ACT[d]
+      elseif c.partTwo and c.knowledge[S.DEEP[d]] and not c.knowledge[S.LATE[d]] then sc.objectives[#sc.objectives+1]=LATE_ACT[d] end
     end
     if slot==10 and not sc.finaleGoal then sc.finaleUnavailable=true end
     return sc
@@ -672,7 +709,8 @@ return function(H)
           for _,id in ipairs(party) do if (out.campaign_state.campaign.years[id] or 0)>=18 then agedOut=true end end
           if slot<10 and not out.engine_error and not agedOut then purchaseAfter(out) end
           total=total+1 ; emit("GAME",out)
-          if out.engine_error or agedOut or out.ended=="contest" then break end
+          -- a finale played ends the campaign (the Last Hour's endings; Resolution 5 is not replayed here)
+          if out.engine_error or agedOut or out.ended=="contest" or (S[name] and S[name].finaleGoal) then break end
         end
         carried,campaignDecks,campaignWeaknesses,campaignFlags=nil,nil,nil,nil
       else

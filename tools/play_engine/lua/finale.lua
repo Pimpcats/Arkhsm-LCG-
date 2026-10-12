@@ -215,6 +215,20 @@ return function(R, T)
     if G.logFlags["You have spoken the name"] and G.boss.en.past then
       R.damageEnemy(G.boss.en.past, (R.WHATIF or {}).spokenValue or 1, nil, "You have spoken the name")
     end
+    -- each late record (a district's act 3a): 1 damage on the form of its period (what-if lateValue),
+    -- never more than half that form's health
+    local lateDealt = {}
+    for fact, key in pairs((R.SCEN or {}).LATE_PERIOD or {}) do
+      local en = G.boss.en[key]
+      if R.knows(fact) and en then
+        local cap = math.floor(R.enemyHealth(en) / 2)
+        local n = math.min((R.WHATIF or {}).lateValue or 1, cap - (lateDealt[key] or 0))
+        if n > 0 then
+          lateDealt[key] = (lateDealt[key] or 0) + n
+          R.damageEnemy(en, n, nil, fact)
+        end
+      end
+    end
     if G.logFlags["The drowned heard the true hour"] then R.rewind(1, "The drowned heard the true hour") end
     G.nameUnspoken = G.logFlags["The name is kept unspoken"]
     for key, list in pairs(R.DEEP_PERIOD) do

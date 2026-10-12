@@ -128,6 +128,11 @@ return function(R, T)
   S.SURFACE = SURFACE
   S.DEEP = { Square = "the-vote-that-never-ends", Church = "the-hour-was-wrong", Road = "who-walks-beside-you",
              Lighthouse = "the-keepers-ninth-death", Fairground = "the-ticket-takers-bargain", Almanac = "the-appointeds-name" }
+  -- late records (each district's act 3a) and the period whose form each wounds at finale setup
+  S.LATE = { Square = "every-name-was-read", Church = "the-bell-rang-true", Road = "the-road-has-an-end",
+             Lighthouse = "the-light-is-kept", Fairground = "the-wheel-stands-still", Almanac = "the-hour-is-set-right" }
+  S.LATE_PERIOD = { ["every-name-was-read"] = "past", ["the-bell-rang-true"] = "past", ["the-hour-is-set-right"] = "past",
+                    ["the-light-is-kept"] = "future", ["the-road-has-an-end"] = "future", ["the-wheel-stands-still"] = "future" }
   S.SURF = { Square = SURFACE.square, Church = SURFACE.church, Road = SURFACE.road, Lighthouse = SURFACE.lighthouse,
              Fairground = SURFACE.fairground, Almanac = SURFACE.almanac }
 

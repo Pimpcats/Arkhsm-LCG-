@@ -204,7 +204,7 @@ class ScenarioContentTests(unittest.TestCase):
             for o in b["ContainedObjects"]:
                 walk(o, b)
         self.assertEqual(seen["Location"], 25)   # + the finale's two periods
-        self.assertEqual(seen["Act"], 14)
+        self.assertEqual(seen["Act"], 20)    # + one late act (3a) per district
         self.assertEqual(seen["Agenda"], 18)
         # one reference per board: the Prologue's and the Square's (every box
         # that shares the Square's board uses its card instead of a duplicate)
@@ -291,7 +291,7 @@ class ContentGapTests(unittest.TestCase):
                 self.assertEqual(SC.objective_feasibility(CARDS, ASSIGN, MANIFEST, n), [])
         acts = [a for s in MANIFEST["scenarios"]
                 for a in (s.get("stacks", {}).get("act_deck") or {}).get("cards", [])]
-        self.assertEqual(len(acts), 14)
+        self.assertEqual(len(acts), 20)
         self.assertTrue(all(a.get("needs") for a in acts))
 
     def test_feasibility_catches_a_solo_dead_end(self):

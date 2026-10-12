@@ -730,7 +730,7 @@ If act 1a would advance to an act 2a whose requirements are not met, remove the 
 
 **Only once your Campaign Log records The Way the Night Breaks.** During any loop from then on, an investigator at **The Sealed Study** may begin the finale as a [free] ability during their turn. Or, when Hour IX is reached while your log records The Way the Night Breaks, you may begin the finale instead of ending the loop.
 
-**The night will not wait.** Once your Campaign Log records all six late records, the next loop is the finale: after Loop Setup, begin it at once, wherever the investigators are (Setup step 2, *Before Hour V*; the Control token says so when the loop begins).
+**The night will not wait.** Once your log records all six late records, the next loop is the finale: begin it right after Loop Setup, wherever you are (Setup step 2, *Before Hour V*).
 
 **When to begin.** Beginning the finale at Hour IX gives you the most time: the Hourglass goes back to Hour V (Setup, step 2). Beginning at Hours V to VIII leaves the Hourglass where it is, with fewer Hours before Hour IX ends the finale.
 
@@ -755,7 +755,7 @@ Before the finale begins: if you have not yet read **Before the finale** (Betwee
    - *The drowned heard the true hour:* rewind the Hourglass by 1 Hour (right-click **Hour** once). Below the church, a congregation is keeping time for you.
    - *The true page reached the Press:* until the finale ends, the chaos bag holds 1 fewer Static token than it otherwise would (never fewer than 0); this adds to Hour VI's "1 fewer" (What the Almanac Hid). Every almanac in town now carries the true hour, and the sky is a little less wrong. **Begin Finale** applies it for you.
    - *You refused the ticket:* the fair's clock stops for you once more. Cancel the revelation effect of the first Lost Hour drawn during the finale, even if one was canceled earlier this loop.
-   - *Each late record* (a district's act 3a, under **Before the Last Hour** on your log): deal 1 damage to the form of its period. **As It Was** (the Past): Every Name Was Read, The Bell Rang True, The Hour Is Set Right. **As It Will Be** (the Future): The Light Is Kept, The Road Has an End, The Wheel Stands Still. What you set right in the town, you set right in its hours.
+   - *Each late record* (**Before the Last Hour** on your log): 1 damage to the form of its period, never more than half its health in all. **As It Was:** Every Name Was Read, The Bell Rang True, The Hour Is Set Right. **As It Will Be:** The Light Is Kept, The Road Has an End, The Wheel Stands Still.
 
 **The fight.** The Appointed has a form in each period, each an Elite enemy whose health is per investigator. **As It Is** cannot be damaged until As It Was and As It Will Be have both been defeated, and it never leaves the Present. The first move each round into or out of The First Occultation, and the first into or out of The Morning After, places 1 doom on the current Hour (their cards say so), so every trip through the hours costs time; the rest of the party can follow that round for free.
 - **What you carry.** Each deep Knowledge entry your log records can be spent once, as an [action] on Through the Hours while you are in its period, to deal 2 damage to the form there. It stays recorded for every other purpose, including the resolutions; note it on the Finale Record. Read its line aloud when you spend it:

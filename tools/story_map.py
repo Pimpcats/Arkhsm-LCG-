@@ -134,7 +134,7 @@ class Map:
         for fid, name, district, layer in facts:
             writers = [cid for cid, c in self.cards.items()
                        if norm("Record in your Campaign Log: " + name) in norm(c.get("back_text") or c.get("text"))]
-            if layer in ("surface", "deep") and len(writers) != 1:
+            if layer in ("surface", "deep", "late") and len(writers) != 1:
                 self.fail("K", "%s: written by %d act(s) %s (want exactly 1)" % (name, len(writers), writers))
             own = {"card: " + w for w in writers}
             scn = "district_" + district.lower().replace("sunken ", "").replace(" ", "")
@@ -148,6 +148,9 @@ class Map:
                                       "beyond": beyond}
             if layer in ("surface", "deep") and not beyond:
                 self.fail("K", "%s: nothing outside its own district reads it" % name)
+            # a late record (act 3a) is read by the finale's Setup
+            if layer == "late" and norm(name) not in norm(self.section("FINALE — THE LAST HOUR")):
+                self.fail("K", "%s: the finale's Setup does not read this late record" % name)
 
     # -------------------------------------------------------------- C ----
     def check_choices(self):
@@ -249,14 +252,19 @@ class Map:
             sec = DISTRICT_SECTIONS.get(scn)
             if sec:
                 r = resolutions(self.section(sec))
-                missing = {"R1", "R2", "R3", "NR"} - set(r)
+                missing = {"R1", "R2", "R3", "R4", "NR"} - set(r)
                 if missing:
                     self.fail("A", "%s: missing resolutions %s" % (sec, sorted(missing)))
                 names = {norm(self.cards[x]["name"]) for x in acts if x in self.cards}
                 for k, cond in r.items():
                     m = re.search(r"you completed (.+?) this loop", cond)
-                    if m and m.group(1) != "no act here" and norm(m.group(1)) not in names:
-                        self.fail("A", "%s %s: names act '%s', not one of %s" % (sec, k, m.group(1), sorted(names)))
+                    if not m or m.group(1) == "no act here":
+                        continue
+                    # "neither X nor Y" names two acts
+                    named = re.split(r"\s+nor\s+", re.sub(r"^neither\s+", "", m.group(1)))
+                    for n in named:
+                        if norm(n) not in names:
+                            self.fail("A", "%s %s: names act '%s', not one of %s" % (sec, k, n, sorted(names)))
                 self.rows["A " + sec] = {"acts": [self.cards[x]["name"] for x in acts if x in self.cards],
                                          "resolutions": sorted(r)}
 

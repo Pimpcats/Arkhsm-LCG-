@@ -1332,8 +1332,10 @@ function shBeginFinale()
     -- late records (each district's act 3a): 1 damage each on the form of its period
     local nLate, by = Knowledge.lateKnown()
     if nLate > 0 then
+      -- never more than half a form's health (2 [perinv])
+      local half = CampaignState.constants().investigators
       announce(string.format("Before the Last Hour: deal %d damage to As It Was and %d to As It Will Be (your late records).",
-        by.past, by.future))
+        math.min(by.past, half), math.min(by.future, half)))
     end
   end)
   afterChange()

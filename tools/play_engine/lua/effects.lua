@@ -485,6 +485,21 @@ return function(R, T)
   ACTS["sthr-act-walkbackward"] = { sequence = { "sthr-loc-turning", "sthr-loc-lowbridge", "sthr-loc-milestones" },
                                     fact = "the-road-remembers" }
   ACTS["sthr-act-walksbeside"] = { at = "sthr-loc-turning", standFirm = true, fact = "who-walks-beside-you" }
+  -- the late objectives (act 3a, Part II, after each district's act 2a)
+  ACTS["sthr-act-keeplight"] = { at = "sthr-loc-lanternroom", contrib = true, fact = "the-light-is-kept", spend = true,
+                                 needLamp = true }
+  ACTS["sthr-act-truehour"] = { at = "sthr-loc-belfry", contrib = true, fact = "the-bell-rang-true", spend = true, minHour = 6 }
+  ACTS["sthr-act-lastmilestone"] = { at = "sthr-loc-milestones", contrib = true, fact = "the-road-has-an-end", spend = true }
+  ACTS["sthr-act-calltheroll"] = { at = "sthr-loc-townhallsteps", contrib = true, fact = "every-name-was-read", action = true,
+                                   test = { "wil", "int" }, diff = 3, failClues = true }
+  ACTS["sthr-act-stopwheel"] = { at = "sthr-loc-wheel", contrib = true, fact = "the-wheel-stands-still", action = true,
+                                 test = { "com", "agi" }, diff = 3, failClues = true }
+  ACTS["sthr-act-hourright"] = { at = "sthr-loc-press", contrib = true, fact = "the-hour-is-set-right", action = true,
+                                 doomCost = 1 }
+  -- act 2a's back: "Advance to act 3a."
+  FX.LATE_NEXT = { ["sthr-act-vote"] = "sthr-act-calltheroll", ["sthr-act-hourwaswrong"] = "sthr-act-truehour",
+                   ["sthr-act-walksbeside"] = "sthr-act-lastmilestone", ["sthr-act-ninthdeath"] = "sthr-act-keeplight",
+                   ["sthr-act-bargain"] = "sthr-act-stopwheel", ["sthr-act-appointedname"] = "sthr-act-hourright" }
   ACTS["sthr-act-lasthour"] = { contest = true }
   for id in pairs(ACTS) do cov(id) end
   cov("sthr-act-lasthour", "full; the [action] spends one recorded deep entry per action, in the order they were recorded")
@@ -641,7 +656,7 @@ return function(R, T)
     -- Part II: the district's act 2a becomes current if its requirements are met
     local nextId = act.next
     if nextId and G.partTwo and FX.actTwoRequirements(nextId) then
-      local n = { id = nextId, district = act.district, pos = act.pos }
+      local n = { id = nextId, district = act.district, pos = act.pos, next = FX.LATE_NEXT[nextId] }
       G.acts[act.district] = n
       FX.actBecomesCurrent(n)
     else
