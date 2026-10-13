@@ -120,6 +120,13 @@ REDO_SCENES = {
     "sthr-act-almanachid": "a printing press mid-stroke, a fresh sheet coming off it printed "
         "with a large moon-and-clock emblem and bands of abstract ornament (no letters, no "
         "digits, no calendar grid)",
+    # 2026-10-13: "resetting lead type" drew a case of legible type and a printed sheet of repeated
+    # emblem bands; the hands and the single sheet now carry it, no type face or emblem in view
+    "sthr-act-hourright": "close on two ink-stained hands at a dark iron hand press, one hand lifting "
+        "a single small plain metal block out of the press bed between finger and thumb, its face turned "
+        "away so nothing on it shows, the rest of the press bed lost in shadow; above, one clean sheet "
+        "hangs drying on a cord in the lamplight, seen from behind as a pale glowing rectangle with only "
+        "a faint round shadow showing through; through a small high window, one far light on a dark hill",
 }
 # a campaign other than The Still Hour keeps its re-shoots with its scenes
 # (art_scenes.json "redo": {card id: rewritten scene})

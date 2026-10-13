@@ -31,3 +31,12 @@ wash (35%) that marks the late acts. Briefs are in pipeline/build_art_manifest.p
 
 Replaced their stand-in crops: Set the Hour Right (pack #140, cut to portrait from the landscape image), Stranded
 Before (#153) and Stranded After (#154), both trimmed of the cut line and fitted to the story window.
+
+## Rejected in review (repaint, 2026-10-13)
+
+The painting stays on the card until its replacement is imported; then remove its row. The rewritten scene is in
+REDO_SCENES (pipeline/chatgpt_art_pack.py).
+
+| Card | Painted | Why |
+|---|---|---|
+| sthr-act-hourright | ChatGPT, 2026-10-12 (pack #140) | legible lead type in the case, a sheet of repeated emblem bands, glossy finish, cut down from a landscape image |
