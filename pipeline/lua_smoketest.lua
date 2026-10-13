@@ -226,7 +226,8 @@ do
   check("Hold Back: a reset gives the rewinds back", CampaignState.getHoldBackRewinds() == 0)
   -- Worst case: a party that succeeds at Hold Back every round against an
   -- Arrived Appointed. One doom a Mythos phase (Hour I 3 doom, the others 2):
-  -- the loop still reaches Hour IX, at most 3 rewinds (6 rounds) late.
+  -- the loop still reaches Hour IX, at most 3 rewinds late. Hold Back never
+  -- rewinds at Hour I, so a rewind can land back in Hour I: 3 rounds each.
   local doom, round = 0, 0
   while CampaignState.getHour() < Constants.HOUR_LAST and round < 60 do
     round = round + 1
@@ -235,7 +236,7 @@ do
     if doom >= (CampaignState.getHour() == 1 and 3 or 2) then doom = 0 ; Hourglass.advance(1, {}) end
   end
   check("Hold Back every round: the loop still ends at Hour IX (round " .. round .. ")",
-    CampaignState.getHour() == Constants.HOUR_LAST and round <= 3 + 2 * 7 + 2 * Constants.HOLD_BACK_REWINDS_PER_LOOP)
+    CampaignState.getHour() == Constants.HOUR_LAST and round <= 3 + 2 * 7 + 3 * Constants.HOLD_BACK_REWINDS_PER_LOOP)
   CampaignState.reset()
   CampaignState.setHour(saved)
 end
@@ -890,9 +891,9 @@ do
   C.shSyncBoard()
   check("with The Way the Night Breaks the Control offers Begin Finale", C.label("Begin Finale") ~= nil)
   C.shBeginFinale()
-  check("Begin Finale switches to the contest", C.shApiState().finale == true and C.label("Contest 0 /") ~= nil)
+  check("Begin Finale switches to the forms count", C.shApiState().finale == true and C.label("Forms defeated 0 / 3") ~= nil)
   C.shClickContest(nil, "White", true)
-  check("right-click Contest at 0 takes Begin Finale back", C.shApiState().finale == false)
+  check("right-click Forms defeated at 0 takes Begin Finale back", C.shApiState().finale == false)
   C.shApiSetFinale({ on = true })
   CampaignState.setHour(8)
   C.shClickHour(nil, "White", false)

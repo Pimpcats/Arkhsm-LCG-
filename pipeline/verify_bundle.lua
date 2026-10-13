@@ -35,6 +35,7 @@ local selfObj = {
   createButton = function(def) buttons[#buttons + 1] = def ; return true end,
   clearButtons = function() buttons = {} ; return true end,
   getPosition = function() return { x = 3, y = 1, z = 0 } end,
+  addContextMenuItem = function() return true end, -- every TTS object has a right-click menu
 }
 encodeJSON = encode
 local env = setmetatable({
@@ -278,7 +279,8 @@ expect("the card shows the new bracket", cardLabel(birdie, "Years 6 · Weathered
 -- a fresh control token adopts the newer state from the campaign log (SCED export/import path)
 local before2 = env.shApiState()
 local env2 = setmetatable({ self = { createButton = function() return true end, clearButtons = function() return true end,
-  getPosition = function() return { x = 3, y = 1, z = 0 } end } }, { __index = env })
+  getPosition = function() return { x = 3, y = 1, z = 0 } end,
+  addContextMenuItem = function() return true end } }, { __index = env })
 local chunk2 = assert(loadfile("dist/stillhour_bundle.lua", "t", env2))
 chunk2()
 env2.onLoad("")
@@ -317,7 +319,8 @@ local buttons3 = {}
 local env3 = setmetatable({
   self = { createButton = function(def) buttons3[#buttons3 + 1] = def ; return true end,
            clearButtons = function() buttons3 = {} ; return true end,
-           getPosition = function() return { x = 3, y = 1, z = 0 } end },
+           getPosition = function() return { x = 3, y = 1, z = 0 } end,
+           addContextMenuItem = function() return true end },
   getObjectsWithTag = function() return {} end,       -- no campaign log: a new campaign
 }, { __index = env })
 local last3 = ""

@@ -29,4 +29,6 @@ main is the working branch (owner decision, 2026-09-22): every earlier branch
 (codex/campaign-assistant-bridge, claude/new-session-r230bz,
 claude/card-editor-campaign-setup-11fij3, claude/campaign-art-tts-testing-w2yabf)
 was fast-forwarded into main with nothing lost, then deleted. Build from main.
+On 2026-10-13 claude/loving-bohr-n7ixl4 (132 commits) was fast-forwarded into
+main the same way.
 Inspect current branch heads and changes before resuming work.
