@@ -49,6 +49,18 @@ CHARACTER = {
     "sthrbirdie": "birdie", "sthr-igetout": "birdie",
 }
 
+# the personal quest cards show their investigator in the moment (owner, 2026-10-13: the
+# character-led event prompts read better than object still-lifes): a per-job profile override
+QUEST_ART = {}
+for _who, _ids in {"elias": "elias", "ayako": "ayako", "cass": "cass", "sera": "seraphine",
+                   "birdie": "birdie"}.items():
+    for _cid in ("sthr-quest-" + _ids, "sthr-questdone-" + _ids):
+        CHARACTER[_cid] = _who
+        QUEST_ART[_cid] = {"allow_character": True,
+                           "type_positive": "the investigator in a defining moment of their own story, the key "
+                           "object in hand or close by, close composition, tension in the pose, detail "
+                           "concentrated on the focal point"}
+
 # ---- the scenes (subject only — style/type framing is CardForge's job) ----
 SCENES = {
     # investigators
@@ -239,16 +251,16 @@ CARD_SPECS = tuple(CFG.path("specs"))
 # the ten personal quest cards (a quest card and its bonded unlocked card per investigator);
 # briefs written with the cards (2026-10-06), no art generated yet
 SCENES.update({
-    "sthr-quest-elias": "a brass key and a heavy ledger on a lighthouse keeper's desk, the lamp guttering, a second shadow thrown behind the empty chair",
-    "sthr-questdone-elias": "the same ledger lying open to ruled lines in one careful hand, the lamp steady now, salt crusting the cover",
-    "sthr-quest-ayako": "a stack of annotated manuscripts and a brass pen, a half-translated page under a green-shaded lamp, the last line smudged",
-    "sthr-questdone-ayako": "the same page finished, the final word covered by a trembling hand, lamplight pooling on the paper",
-    "sthr-quest-cass": "a worn deck of playing cards fanned face down on green baize, only their plain dark backs showing, one card tipped half over under a fingertip so its face stays hidden, a thin curl of cigarette smoke",
-    "sthr-questdone-cass": "the same deck squared and left at an empty chair, a crowd of shadows watching from the walls of a back room",
-    "sthr-quest-seraphine": "a tarnished coin and a small bell on a dark cloth, a candle burning low, one thread of silver light",
-    "sthr-questdone-seraphine": "the same bell silent on the cloth, a few crooked groups of tally marks scratched into the table beside it, each scratched at a different depth and angle, drifting off line",
-    "sthr-quest-birdie": "a battered duffel at the foot of a leaning roadside post with a small blank, rust-streaked tin plate, at dusk, an empty road bending away into fog",
-    "sthr-questdone-birdie": "the same road at first light, the duffel set down, footprints leading back toward the town",
+    "sthr-quest-elias": "braced in a lighthouse doorway against a surge of black water and splintered wreckage, lantern raised high, taking the blow so the one sheltering behind him does not",
+    "sthr-questdone-elias": "at the top of the lighthouse stair at grey dawn, lantern lowered, salt drying on his coat, looking back down the spiral at faint earlier versions of himself still climbing, each one paler and more uncertain",
+    "sthr-quest-ayako": "facing a looming half-seen shape in a dark archive aisle, notebook open in one hand, pen raised as if pinning it with a single word, pale abstract marks drifting from the page and settling on its outline",
+    "sthr-questdone-ayako": "alone at a lamplit desk after midnight, spectacles pushed up, her ink-stained hand pressed flat over the last line of a finished page, lips closed on a word she will not say",
+    "sthr-quest-cass": "at a smoky back-room card table mid-deal, flicking one card face down across the baize toward an empty chair where only a shadow sits, her half-smile tight, every card showing only its plain dark back",
+    "sthr-questdone-cass": "rising from the card table and squaring the deck in one hand, while every shadow on the back-room walls has turned to watch her go",
+    "sthr-quest-seraphine": "mid-seance, a small bronze hand-bell raised and ringing in one hand, the other pressed to her chest as if each note costs her, candle flames leaning away from the sound",
+    "sthr-questdone-seraphine": "sitting very still with the silent bell in her lap, shawl slipping from her shoulders; in the dark window glass behind her a fainter, older reflection of her looks back",
+    "sthr-quest-birdie": "running down a fog-bound road at dusk, duffel over her shoulder and coat flying, glancing down at the brass compass in her fist as the road ahead bends somewhere it should not",
+    "sthr-questdone-birdie": "at first light at the edge of town, the duffel set down at her feet, the brass compass steady on its cord, looking down a clear road with the tired, sure half-smile of someone who knows the way",
 })
 
 
@@ -297,6 +309,8 @@ def main():
         }
         if cid in CHARACTER:
             job["character"] = CHARACTER[cid]
+        if cid in QUEST_ART:
+            job["overrides"] = dict(QUEST_ART[cid])
         manifest.append(job)
         # investigators also need a text-only deckbuilding back (Strange Eons renders it)
         if c["type"] == "Investigator":

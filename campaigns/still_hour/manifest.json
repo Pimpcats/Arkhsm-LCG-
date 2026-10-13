@@ -222,62 +222,112 @@
   {
     "id": "sthr-quest-elias",
     "art_type": "asset",
-    "scene": "a brass key and a heavy ledger on a lighthouse keeper's desk, the lamp guttering, a second shadow thrown behind the empty chair",
-    "seed": 3489
+    "scene": "braced in a lighthouse doorway against a surge of black water and splintered wreckage, lantern raised high, taking the blow so the one sheltering behind him does not",
+    "seed": 3489,
+    "character": "elias",
+    "overrides": {
+      "allow_character": true,
+      "type_positive": "the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose, detail concentrated on the focal point"
+    }
   },
   {
     "id": "sthr-questdone-elias",
     "art_type": "asset",
-    "scene": "the same ledger lying open to ruled lines in one careful hand, the lamp steady now, salt crusting the cover",
-    "seed": 6443
+    "scene": "at the top of the lighthouse stair at grey dawn, lantern lowered, salt drying on his coat, looking back down the spiral at faint earlier versions of himself still climbing, each one paler and more uncertain",
+    "seed": 6443,
+    "character": "elias",
+    "overrides": {
+      "allow_character": true,
+      "type_positive": "the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose, detail concentrated on the focal point"
+    }
   },
   {
     "id": "sthr-quest-ayako",
     "art_type": "asset",
-    "scene": "a stack of annotated manuscripts and a brass pen, a half-translated page under a green-shaded lamp, the last line smudged",
-    "seed": 3538
+    "scene": "facing a looming half-seen shape in a dark archive aisle, notebook open in one hand, pen raised as if pinning it with a single word, pale abstract marks drifting from the page and settling on its outline",
+    "seed": 3538,
+    "character": "ayako",
+    "overrides": {
+      "allow_character": true,
+      "type_positive": "the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose, detail concentrated on the focal point"
+    }
   },
   {
     "id": "sthr-questdone-ayako",
     "art_type": "asset",
-    "scene": "the same page finished, the final word covered by a trembling hand, lamplight pooling on the paper",
-    "seed": 6492
+    "scene": "alone at a lamplit desk after midnight, spectacles pushed up, her ink-stained hand pressed flat over the last line of a finished page, lips closed on a word she will not say",
+    "seed": 6492,
+    "character": "ayako",
+    "overrides": {
+      "allow_character": true,
+      "type_positive": "the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose, detail concentrated on the focal point"
+    }
   },
   {
     "id": "sthr-quest-cass",
     "art_type": "asset",
-    "scene": "a worn deck of playing cards fanned face down on green baize, only their plain dark backs showing, one card tipped half over under a fingertip so its face stays hidden, a thin curl of cigarette smoke",
-    "seed": 2789
+    "scene": "at a smoky back-room card table mid-deal, flicking one card face down across the baize toward an empty chair where only a shadow sits, her half-smile tight, every card showing only its plain dark back",
+    "seed": 2789,
+    "character": "cass",
+    "overrides": {
+      "allow_character": true,
+      "type_positive": "the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose, detail concentrated on the focal point"
+    }
   },
   {
     "id": "sthr-questdone-cass",
     "art_type": "asset",
-    "scene": "the same deck squared and left at an empty chair, a crowd of shadows watching from the walls of a back room",
-    "seed": 5743
+    "scene": "rising from the card table and squaring the deck in one hand, while every shadow on the back-room walls has turned to watch her go",
+    "seed": 5743,
+    "character": "cass",
+    "overrides": {
+      "allow_character": true,
+      "type_positive": "the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose, detail concentrated on the focal point"
+    }
   },
   {
     "id": "sthr-quest-seraphine",
     "art_type": "asset",
-    "scene": "a tarnished coin and a small bell on a dark cloth, a candle burning low, one thread of silver light",
-    "seed": 6520
+    "scene": "mid-seance, a small bronze hand-bell raised and ringing in one hand, the other pressed to her chest as if each note costs her, candle flames leaning away from the sound",
+    "seed": 6520,
+    "character": "sera",
+    "overrides": {
+      "allow_character": true,
+      "type_positive": "the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose, detail concentrated on the focal point"
+    }
   },
   {
     "id": "sthr-questdone-seraphine",
     "art_type": "asset",
-    "scene": "the same bell silent on the cloth, a few crooked groups of tally marks scratched into the table beside it, each scratched at a different depth and angle, drifting off line",
-    "seed": 1474
+    "scene": "sitting very still with the silent bell in her lap, shawl slipping from her shoulders; in the dark window glass behind her a fainter, older reflection of her looks back",
+    "seed": 1474,
+    "character": "sera",
+    "overrides": {
+      "allow_character": true,
+      "type_positive": "the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose, detail concentrated on the focal point"
+    }
   },
   {
     "id": "sthr-quest-birdie",
     "art_type": "asset",
-    "scene": "a battered duffel at the foot of a leaning roadside post with a small blank, rust-streaked tin plate, at dusk, an empty road bending away into fog",
-    "seed": 4168
+    "scene": "running down a fog-bound road at dusk, duffel over her shoulder and coat flying, glancing down at the brass compass in her fist as the road ahead bends somewhere it should not",
+    "seed": 4168,
+    "character": "birdie",
+    "overrides": {
+      "allow_character": true,
+      "type_positive": "the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose, detail concentrated on the focal point"
+    }
   },
   {
     "id": "sthr-questdone-birdie",
     "art_type": "asset",
-    "scene": "the same road at first light, the duffel set down, footprints leading back toward the town",
-    "seed": 7122
+    "scene": "at first light at the edge of town, the duffel set down at her feet, the brass compass steady on its cord, looking down a clear road with the tired, sure half-smile of someone who knows the way",
+    "seed": 7122,
+    "character": "birdie",
+    "overrides": {
+      "allow_character": true,
+      "type_positive": "the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose, detail concentrated on the focal point"
+    }
   },
   {
     "id": "sthr-appointed",

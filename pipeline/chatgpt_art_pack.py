@@ -60,6 +60,13 @@ def aspect(prof):
     return "square 1:1"
 
 
+def job_profile(job, profiles):
+    """The art type's profile with the job's own overrides on top (cardforge/compose.py does the same)."""
+    prof = dict(profiles[job["art_type"]])
+    prof.update(job.get("overrides", {}))
+    return prof
+
+
 def framing(prof):
     text = prof["type_positive"].split(GENERIC_TAIL)[0]
     parts = [p.strip() for p in text.split(",")
@@ -211,7 +218,8 @@ def request_prompt(camp, chars, cards, jobs_by_id, profiles):
     ratio = {"landscape 3:2": "3:2 (landscape)", "portrait 2:3": "2:3 (portrait)",
              "square 1:1": "1:1 (square)"}
     for i, c in enumerate(cards, 1):
-        job, prof = jobs_by_id[c["id"]], profiles[c["art_type"]]
+        job = jobs_by_id[c["id"]]
+        prof = job_profile(job, profiles)
         who = "none"
         if job.get("character") and prof.get("allow_character"):
             who = "{} — {}".format(NAMES.get(job["character"], job["character"]),
@@ -253,10 +261,12 @@ def build():
     if unknown:
         raise SystemExit("art types missing from TYPE_ORDER: " + ", ".join(unknown))
     jobs.sort(key=lambda j: (TYPE_ORDER.index(j["art_type"]),
-                             0 if j.get("character") else 1))
+                             # an art type's own character cards first; a job that adds a character by
+                             # override keeps its place, so pack numbers never shift
+                             0 if j.get("character") and profiles[j["art_type"]].get("allow_character") else 1))
     cards = []
     for n, job in enumerate(jobs, 1):
-        prof = profiles[job["art_type"]]
+        prof = job_profile(job, profiles)
         text = brief(n, job, prof, chars)
         cards.append({"n": n, "id": job["id"], "art_type": job["art_type"],
                       "aspect": aspect(prof), "character": job.get("character"),

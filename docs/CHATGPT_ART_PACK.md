@@ -22,16 +22,16 @@ KEEP OUT OF EVERY IMAGE: any text, letters, numbers or signatures (writing only 
 SIZES: L = landscape, 1536 x 1024 pixels (wider than tall). P = portrait, 1024 x 1536 pixels (taller than wide). Paint every image at its own size, never square.
 
 THE IMAGES:
-1. #026 (L) a brass key and a heavy ledger on a lighthouse keeper's desk, the lamp guttering, a second shadow thrown behind the empty chair (any writing or numbers only as unreadable marks, never legible). Composition: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-2. #027 (L) the same ledger lying open to ruled lines in one careful hand, the lamp steady now, salt crusting the cover (any writing or numbers only as unreadable marks, never legible). Composition: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-3. #028 (L) a stack of annotated manuscripts and a brass pen, a half-translated page under a green-shaded lamp, the last line smudged (any writing or numbers only as unreadable marks, never legible). Composition: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-4. #029 (L) the same page finished, the final word covered by a trembling hand, lamplight pooling on the paper (any writing or numbers only as unreadable marks, never legible). Composition: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-5. #030 (L) a worn deck of playing cards fanned face down on green baize, only their plain dark backs showing, one card tipped half over under a fingertip so its face stays hidden, a thin curl of cigarette smoke. Composition: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-6. #031 (L) the same deck squared and left at an empty chair, a crowd of shadows watching from the walls of a back room (any writing or numbers only as unreadable marks, never legible). Composition: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-7. #032 (L) a tarnished coin and a small bell on a dark cloth, a candle burning low, one thread of silver light. Composition: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-8. #033 (L) the same bell silent on the cloth, a few crooked groups of tally marks scratched into the table beside it, each scratched at a different depth and angle, drifting off line. Composition: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-9. #034 (L) a battered duffel at the foot of a leaning roadside post with a small blank, rust-streaked tin plate, at dusk, an empty road bending away into fog. Composition: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-10. #035 (L) the same road at first light, the duffel set down, footprints leading back toward the town. Composition: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
+1. #026 (L) braced in a lighthouse doorway against a surge of black water and splintered wreckage, lantern raised high, taking the blow so the one sheltering behind him does not. Composition: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+2. #027 (L) at the top of the lighthouse stair at grey dawn, lantern lowered, salt drying on his coat, looking back down the spiral at faint earlier versions of himself still climbing, each one paler and more uncertain. Composition: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+3. #028 (L) facing a looming half-seen shape in a dark archive aisle, notebook open in one hand, pen raised as if pinning it with a single word, pale abstract marks drifting from the page and settling on its outline (any writing or numbers only as unreadable marks, never legible). Composition: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+4. #029 (L) alone at a lamplit desk after midnight, spectacles pushed up, her ink-stained hand pressed flat over the last line of a finished page, lips closed on a word she will not say (any writing or numbers only as unreadable marks, never legible). Composition: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+5. #030 (L) at a smoky back-room card table mid-deal, flicking one card face down across the baize toward an empty chair where only a shadow sits, her half-smile tight, every card showing only its plain dark back. Composition: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+6. #031 (L) rising from the card table and squaring the deck in one hand, while every shadow on the back-room walls has turned to watch her go (any writing or numbers only as unreadable marks, never legible). Composition: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+7. #032 (L) mid-seance, a small bronze hand-bell raised and ringing in one hand, the other pressed to her chest as if each note costs her, candle flames leaning away from the sound. Composition: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+8. #033 (L) sitting very still with the silent bell in her lap, shawl slipping from her shoulders; in the dark window glass behind her a fainter, older reflection of her looks back. Composition: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+9. #034 (L) running down a fog-bound road at dusk, duffel over her shoulder and coat flying, glancing down at the brass compass in her fist as the road ahead bends somewhere it should not. Composition: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+10. #035 (L) at first light at the edge of town, the duffel set down at her feet, the brass compass steady on its cord, looking down a clear road with the tired, sure half-smile of someone who knows the way. Composition: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
 11. #058 (L) the same tall faceless figure as the Appointed (a peaked hood with no face inside, a long narrow robe, arms too long with angular joints; no antlers, no horns), standing among a crowd of raised hands on the Town Hall steps long ago, bright new lanterns and bunting, sepia, dread. Composition: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.
 12. #059 (L) the same tall faceless figure as the Appointed (a peaked hood with no face inside, a long narrow robe, arms too long with angular joints; no antlers, no horns), gaunt and patient, waiting alone in the empty town square at grey dawn, rotted bunting on its strings, fog on the shore road, the town decayed around it, cold light. Composition: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.
 13. #060 (L) the same tall faceless figure as the Appointed (a peaked hood with no face inside, a long narrow robe, arms too long with angular joints; no antlers, no horns), vast, filling the lantern-lit town square at night, its outline breaking into too many angles, the stars sliding behind it, a few small investigators facing it. Composition: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.
@@ -54,8 +54,9 @@ Please create ONE painting as a single image.
 
 FORMAT (most important): a landscape (wider than tall) image, 1536 x 1024 pixels (3:2). The painting fills the whole canvas, edge to edge: no border, frame, white margin, letterbox bars, panels, grid, collage, strip or banner.
 
-WHAT TO PAINT: a brass key and a heavy ledger on a lighthouse keeper's desk, the lamp guttering, a second shadow thrown behind the empty chair (any writing or numbers only as unreadable marks, never legible).
-COMPOSITION: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
+WHAT TO PAINT: braced in a lighthouse doorway against a surge of black water and splintered wreckage, lantern raised high, taking the blow so the one sheltering behind him does not.
+WHO: Elias Warde - weathered lighthouse keeper, late fifties, grey-streaked beard, deep-set tired resolute eyes, heavy dark oilcloth coat, holding a lantern. Paint them exactly as described.
+COMPOSITION: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
 
 STYLE: A hand-painted oil illustration in the manner of a 1930s weird-fiction pulp magazine: broad, economical brushwork, large calm areas of thin paint, bold simple shapes of light and dark, crisp detail only at the focal point, edges and background left loose and partly unfinished. Restrained, muted, desaturated colour; lamplight is the only warm note. Setting: a 1920s New England coastal town. Mood: uncanny, quiet dread, never gore.
 
@@ -71,8 +72,9 @@ Please create ONE painting as a single image.
 
 FORMAT (most important): a landscape (wider than tall) image, 1536 x 1024 pixels (3:2). The painting fills the whole canvas, edge to edge: no border, frame, white margin, letterbox bars, panels, grid, collage, strip or banner.
 
-WHAT TO PAINT: the same ledger lying open to ruled lines in one careful hand, the lamp steady now, salt crusting the cover (any writing or numbers only as unreadable marks, never legible).
-COMPOSITION: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
+WHAT TO PAINT: at the top of the lighthouse stair at grey dawn, lantern lowered, salt drying on his coat, looking back down the spiral at faint earlier versions of himself still climbing, each one paler and more uncertain.
+WHO: Elias Warde - weathered lighthouse keeper, late fifties, grey-streaked beard, deep-set tired resolute eyes, heavy dark oilcloth coat, holding a lantern. Paint them exactly as described.
+COMPOSITION: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
 
 STYLE: A hand-painted oil illustration in the manner of a 1930s weird-fiction pulp magazine: broad, economical brushwork, large calm areas of thin paint, bold simple shapes of light and dark, crisp detail only at the focal point, edges and background left loose and partly unfinished. Restrained, muted, desaturated colour; lamplight is the only warm note. Setting: a 1920s New England coastal town. Mood: uncanny, quiet dread, never gore.
 
@@ -88,8 +90,9 @@ Please create ONE painting as a single image.
 
 FORMAT (most important): a landscape (wider than tall) image, 1536 x 1024 pixels (3:2). The painting fills the whole canvas, edge to edge: no border, frame, white margin, letterbox bars, panels, grid, collage, strip or banner.
 
-WHAT TO PAINT: a stack of annotated manuscripts and a brass pen, a half-translated page under a green-shaded lamp, the last line smudged (any writing or numbers only as unreadable marks, never legible).
-COMPOSITION: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
+WHAT TO PAINT: facing a looming half-seen shape in a dark archive aisle, notebook open in one hand, pen raised as if pinning it with a single word, pale abstract marks drifting from the page and settling on its outline (any writing or numbers only as unreadable marks, never legible).
+WHO: Dr. Ayako Sōma - Japanese woman, thirties, sharp intelligent gaze, wire spectacles, ink-stained fingers, dark travelling coat, notebook. Paint them exactly as described.
+COMPOSITION: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
 
 STYLE: A hand-painted oil illustration in the manner of a 1930s weird-fiction pulp magazine: broad, economical brushwork, large calm areas of thin paint, bold simple shapes of light and dark, crisp detail only at the focal point, edges and background left loose and partly unfinished. Restrained, muted, desaturated colour; lamplight is the only warm note. Setting: a 1920s New England coastal town. Mood: uncanny, quiet dread, never gore.
 
@@ -105,8 +108,9 @@ Please create ONE painting as a single image.
 
 FORMAT (most important): a landscape (wider than tall) image, 1536 x 1024 pixels (3:2). The painting fills the whole canvas, edge to edge: no border, frame, white margin, letterbox bars, panels, grid, collage, strip or banner.
 
-WHAT TO PAINT: the same page finished, the final word covered by a trembling hand, lamplight pooling on the paper (any writing or numbers only as unreadable marks, never legible).
-COMPOSITION: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
+WHAT TO PAINT: alone at a lamplit desk after midnight, spectacles pushed up, her ink-stained hand pressed flat over the last line of a finished page, lips closed on a word she will not say (any writing or numbers only as unreadable marks, never legible).
+WHO: Dr. Ayako Sōma - Japanese woman, thirties, sharp intelligent gaze, wire spectacles, ink-stained fingers, dark travelling coat, notebook. Paint them exactly as described.
+COMPOSITION: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
 
 STYLE: A hand-painted oil illustration in the manner of a 1930s weird-fiction pulp magazine: broad, economical brushwork, large calm areas of thin paint, bold simple shapes of light and dark, crisp detail only at the focal point, edges and background left loose and partly unfinished. Restrained, muted, desaturated colour; lamplight is the only warm note. Setting: a 1920s New England coastal town. Mood: uncanny, quiet dread, never gore.
 
@@ -122,8 +126,9 @@ Please create ONE painting as a single image.
 
 FORMAT (most important): a landscape (wider than tall) image, 1536 x 1024 pixels (3:2). The painting fills the whole canvas, edge to edge: no border, frame, white margin, letterbox bars, panels, grid, collage, strip or banner.
 
-WHAT TO PAINT: a worn deck of playing cards fanned face down on green baize, only their plain dark backs showing, one card tipped half over under a fingertip so its face stays hidden, a thin curl of cigarette smoke.
-COMPOSITION: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
+WHAT TO PAINT: at a smoky back-room card table mid-deal, flicking one card face down across the baize toward an empty chair where only a shadow sits, her half-smile tight, every card showing only its plain dark back.
+WHO: Cass Lindqvist - sharp-featured woman, late twenties, short slicked hair, worn pinstripe waistcoat, a deck of cards, wary confident half-smile. Paint them exactly as described.
+COMPOSITION: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
 
 STYLE: A hand-painted oil illustration in the manner of a 1930s weird-fiction pulp magazine: broad, economical brushwork, large calm areas of thin paint, bold simple shapes of light and dark, crisp detail only at the focal point, edges and background left loose and partly unfinished. Restrained, muted, desaturated colour; lamplight is the only warm note. Setting: a 1920s New England coastal town. Mood: uncanny, quiet dread, never gore.
 
@@ -139,8 +144,9 @@ Please create ONE painting as a single image.
 
 FORMAT (most important): a landscape (wider than tall) image, 1536 x 1024 pixels (3:2). The painting fills the whole canvas, edge to edge: no border, frame, white margin, letterbox bars, panels, grid, collage, strip or banner.
 
-WHAT TO PAINT: the same deck squared and left at an empty chair, a crowd of shadows watching from the walls of a back room (any writing or numbers only as unreadable marks, never legible).
-COMPOSITION: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
+WHAT TO PAINT: rising from the card table and squaring the deck in one hand, while every shadow on the back-room walls has turned to watch her go (any writing or numbers only as unreadable marks, never legible).
+WHO: Cass Lindqvist - sharp-featured woman, late twenties, short slicked hair, worn pinstripe waistcoat, a deck of cards, wary confident half-smile. Paint them exactly as described.
+COMPOSITION: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
 
 STYLE: A hand-painted oil illustration in the manner of a 1930s weird-fiction pulp magazine: broad, economical brushwork, large calm areas of thin paint, bold simple shapes of light and dark, crisp detail only at the focal point, edges and background left loose and partly unfinished. Restrained, muted, desaturated colour; lamplight is the only warm note. Setting: a 1920s New England coastal town. Mood: uncanny, quiet dread, never gore.
 
@@ -156,8 +162,9 @@ Please create ONE painting as a single image.
 
 FORMAT (most important): a landscape (wider than tall) image, 1536 x 1024 pixels (3:2). The painting fills the whole canvas, edge to edge: no border, frame, white margin, letterbox bars, panels, grid, collage, strip or banner.
 
-WHAT TO PAINT: a tarnished coin and a small bell on a dark cloth, a candle burning low, one thread of silver light.
-COMPOSITION: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
+WHAT TO PAINT: mid-seance, a small bronze hand-bell raised and ringing in one hand, the other pressed to her chest as if each note costs her, candle flames leaning away from the sound.
+WHO: Seraphine Vale - pale spiritualist woman, forties, dark loose hair, haunted distant eyes, layered dark shawls, faint occult jewelry. Paint them exactly as described.
+COMPOSITION: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
 
 STYLE: A hand-painted oil illustration in the manner of a 1930s weird-fiction pulp magazine: broad, economical brushwork, large calm areas of thin paint, bold simple shapes of light and dark, crisp detail only at the focal point, edges and background left loose and partly unfinished. Restrained, muted, desaturated colour; lamplight is the only warm note. Setting: a 1920s New England coastal town. Mood: uncanny, quiet dread, never gore.
 
@@ -173,8 +180,9 @@ Please create ONE painting as a single image.
 
 FORMAT (most important): a landscape (wider than tall) image, 1536 x 1024 pixels (3:2). The painting fills the whole canvas, edge to edge: no border, frame, white margin, letterbox bars, panels, grid, collage, strip or banner.
 
-WHAT TO PAINT: the same bell silent on the cloth, a few crooked groups of tally marks scratched into the table beside it, each scratched at a different depth and angle, drifting off line.
-COMPOSITION: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
+WHAT TO PAINT: sitting very still with the silent bell in her lap, shawl slipping from her shoulders; in the dark window glass behind her a fainter, older reflection of her looks back.
+WHO: Seraphine Vale - pale spiritualist woman, forties, dark loose hair, haunted distant eyes, layered dark shawls, faint occult jewelry. Paint them exactly as described.
+COMPOSITION: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
 
 STYLE: A hand-painted oil illustration in the manner of a 1930s weird-fiction pulp magazine: broad, economical brushwork, large calm areas of thin paint, bold simple shapes of light and dark, crisp detail only at the focal point, edges and background left loose and partly unfinished. Restrained, muted, desaturated colour; lamplight is the only warm note. Setting: a 1920s New England coastal town. Mood: uncanny, quiet dread, never gore.
 
@@ -190,8 +198,9 @@ Please create ONE painting as a single image.
 
 FORMAT (most important): a landscape (wider than tall) image, 1536 x 1024 pixels (3:2). The painting fills the whole canvas, edge to edge: no border, frame, white margin, letterbox bars, panels, grid, collage, strip or banner.
 
-WHAT TO PAINT: a battered duffel at the foot of a leaning roadside post with a small blank, rust-streaked tin plate, at dusk, an empty road bending away into fog.
-COMPOSITION: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
+WHAT TO PAINT: running down a fog-bound road at dusk, duffel over her shoulder and coat flying, glancing down at the brass compass in her fist as the road ahead bends somewhere it should not.
+WHO: Birdie Okonkwo - young Black woman, early twenties, patched practical coat, alert scrappy expression, small brass compass on a cord. Paint them exactly as described.
+COMPOSITION: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
 
 STYLE: A hand-painted oil illustration in the manner of a 1930s weird-fiction pulp magazine: broad, economical brushwork, large calm areas of thin paint, bold simple shapes of light and dark, crisp detail only at the focal point, edges and background left loose and partly unfinished. Restrained, muted, desaturated colour; lamplight is the only warm note. Setting: a 1920s New England coastal town. Mood: uncanny, quiet dread, never gore.
 
@@ -207,8 +216,9 @@ Please create ONE painting as a single image.
 
 FORMAT (most important): a landscape (wider than tall) image, 1536 x 1024 pixels (3:2). The painting fills the whole canvas, edge to edge: no border, frame, white margin, letterbox bars, panels, grid, collage, strip or banner.
 
-WHAT TO PAINT: the same road at first light, the duffel set down, footprints leading back toward the town.
-COMPOSITION: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
+WHAT TO PAINT: at first light at the edge of town, the duffel set down at her feet, the brass compass steady on its cord, looking down a clear road with the tired, sure half-smile of someone who knows the way.
+WHO: Birdie Okonkwo - young Black woman, early twenties, patched practical coat, alert scrappy expression, small brass compass on a cord. Paint them exactly as described.
+COMPOSITION: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
 
 STYLE: A hand-painted oil illustration in the manner of a 1930s weird-fiction pulp magazine: broad, economical brushwork, large calm areas of thin paint, bold simple shapes of light and dark, crisp detail only at the focal point, edges and background left loose and partly unfinished. Restrained, muted, desaturated colour; lamplight is the only warm note. Setting: a 1920s New England coastal town. Mood: uncanny, quiet dread, never gore.
 
@@ -737,27 +747,27 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 026)
 Aspect ratio: 3:2 (landscape)
-Scene: a brass key and a heavy ledger on a lighthouse keeper's desk, the lamp guttering, a second shadow thrown behind the empty chair (any writing or numbers only as unreadable marks, never legible).
-Framing: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-Character: none
+Scene: braced in a lighthouse doorway against a surge of black water and splintered wreckage, lantern raised high, taking the blow so the one sheltering behind him does not.
+Framing: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+Character: Elias Warde — weathered lighthouse keeper, late fifties, grey-streaked beard, deep-set tired resolute eyes, heavy dark oilcloth coat, holding a lantern
 
 IMAGE 2 (save as 027)
 Aspect ratio: 3:2 (landscape)
-Scene: the same ledger lying open to ruled lines in one careful hand, the lamp steady now, salt crusting the cover (any writing or numbers only as unreadable marks, never legible).
-Framing: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-Character: none
+Scene: at the top of the lighthouse stair at grey dawn, lantern lowered, salt drying on his coat, looking back down the spiral at faint earlier versions of himself still climbing, each one paler and more uncertain.
+Framing: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+Character: Elias Warde — weathered lighthouse keeper, late fifties, grey-streaked beard, deep-set tired resolute eyes, heavy dark oilcloth coat, holding a lantern
 
 IMAGE 3 (save as 028)
 Aspect ratio: 3:2 (landscape)
-Scene: a stack of annotated manuscripts and a brass pen, a half-translated page under a green-shaded lamp, the last line smudged (any writing or numbers only as unreadable marks, never legible).
-Framing: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-Character: none
+Scene: facing a looming half-seen shape in a dark archive aisle, notebook open in one hand, pen raised as if pinning it with a single word, pale abstract marks drifting from the page and settling on its outline (any writing or numbers only as unreadable marks, never legible).
+Framing: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+Character: Dr. Ayako Sōma — Japanese woman, thirties, sharp intelligent gaze, wire spectacles, ink-stained fingers, dark travelling coat, notebook
 
 IMAGE 4 (save as 029)
 Aspect ratio: 3:2 (landscape)
-Scene: the same page finished, the final word covered by a trembling hand, lamplight pooling on the paper (any writing or numbers only as unreadable marks, never legible).
-Framing: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-Character: none
+Scene: alone at a lamplit desk after midnight, spectacles pushed up, her ink-stained hand pressed flat over the last line of a finished page, lips closed on a word she will not say (any writing or numbers only as unreadable marks, never legible).
+Framing: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+Character: Dr. Ayako Sōma — Japanese woman, thirties, sharp intelligent gaze, wire spectacles, ink-stained fingers, dark travelling coat, notebook
 ```
 
 ### #030–#033
@@ -790,27 +800,27 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 030)
 Aspect ratio: 3:2 (landscape)
-Scene: a worn deck of playing cards fanned face down on green baize, only their plain dark backs showing, one card tipped half over under a fingertip so its face stays hidden, a thin curl of cigarette smoke.
-Framing: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-Character: none
+Scene: at a smoky back-room card table mid-deal, flicking one card face down across the baize toward an empty chair where only a shadow sits, her half-smile tight, every card showing only its plain dark back.
+Framing: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+Character: Cass Lindqvist — sharp-featured woman, late twenties, short slicked hair, worn pinstripe waistcoat, a deck of cards, wary confident half-smile
 
 IMAGE 2 (save as 031)
 Aspect ratio: 3:2 (landscape)
-Scene: the same deck squared and left at an empty chair, a crowd of shadows watching from the walls of a back room (any writing or numbers only as unreadable marks, never legible).
-Framing: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-Character: none
+Scene: rising from the card table and squaring the deck in one hand, while every shadow on the back-room walls has turned to watch her go (any writing or numbers only as unreadable marks, never legible).
+Framing: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+Character: Cass Lindqvist — sharp-featured woman, late twenties, short slicked hair, worn pinstripe waistcoat, a deck of cards, wary confident half-smile
 
 IMAGE 3 (save as 032)
 Aspect ratio: 3:2 (landscape)
-Scene: a tarnished coin and a small bell on a dark cloth, a candle burning low, one thread of silver light.
-Framing: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-Character: none
+Scene: mid-seance, a small bronze hand-bell raised and ringing in one hand, the other pressed to her chest as if each note costs her, candle flames leaning away from the sound.
+Framing: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+Character: Seraphine Vale — pale spiritualist woman, forties, dark loose hair, haunted distant eyes, layered dark shawls, faint occult jewelry
 
 IMAGE 4 (save as 033)
 Aspect ratio: 3:2 (landscape)
-Scene: the same bell silent on the cloth, a few crooked groups of tally marks scratched into the table beside it, each scratched at a different depth and angle, drifting off line.
-Framing: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-Character: none
+Scene: sitting very still with the silent bell in her lap, shawl slipping from her shoulders; in the dark window glass behind her a fainter, older reflection of her looks back.
+Framing: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+Character: Seraphine Vale — pale spiritualist woman, forties, dark loose hair, haunted distant eyes, layered dark shawls, faint occult jewelry
 ```
 
 ### #034–#035
@@ -843,15 +853,15 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 034)
 Aspect ratio: 3:2 (landscape)
-Scene: a battered duffel at the foot of a leaning roadside post with a small blank, rust-streaked tin plate, at dusk, an empty road bending away into fog.
-Framing: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-Character: none
+Scene: running down a fog-bound road at dusk, duffel over her shoulder and coat flying, glancing down at the brass compass in her fist as the road ahead bends somewhere it should not.
+Framing: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+Character: Birdie Okonkwo — young Black woman, early twenties, patched practical coat, alert scrappy expression, small brass compass on a cord
 
 IMAGE 2 (save as 035)
 Aspect ratio: 3:2 (landscape)
-Scene: the same road at first light, the duffel set down, footprints leading back toward the town.
-Framing: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
-Character: none
+Scene: at first light at the edge of town, the duffel set down at her feet, the brass compass steady on its cord, looking down a clear road with the tired, sure half-smile of someone who knows the way.
+Framing: the investigator in a defining moment of their own story, the key object in hand or close by, close composition, tension in the pose.
+Character: Birdie Okonkwo — young Black woman, early twenties, patched practical coat, alert scrappy expression, small brass compass on a cord
 ```
 
 ## Batch 5
