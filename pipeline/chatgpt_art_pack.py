@@ -293,11 +293,13 @@ def build():
     have -= provisional(art_dir)
     # story cards print without an art window (the official layout), so they are never asked for
     todo = [c for c in cards if c["id"] not in have and c["art_type"] != "story"]
-    remaining = [{"cards": [c["n"] for c in todo[i:i + REMAINING_PER_REQUEST]],
-                  "prompt": request_prompt(camp, chars,
-                                           todo[i:i + REMAINING_PER_REQUEST],
-                                           jobs_by_id, profiles)}
-                 for i in range(0, len(todo), REMAINING_PER_REQUEST)]
+    groups = [todo[i:i + REMAINING_PER_REQUEST] for i in range(0, len(todo), REMAINING_PER_REQUEST)]
+    if len(groups) > 1 and len(groups[-1]) == 1:      # a lone last image rides with the request before it
+        last = groups.pop()
+        groups[-1] = groups[-1] + last
+    remaining = [{"cards": [c["n"] for c in g],
+                  "prompt": request_prompt(camp, chars, g, jobs_by_id, profiles)}
+                 for g in groups]
     pack = {"campaign": CAMPAIGN,
             "batches": [[c["n"] for c in b] for b in batches],
             "requests": requests, "remaining": remaining, "cards": cards}
