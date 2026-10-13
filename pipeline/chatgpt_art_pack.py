@@ -33,7 +33,7 @@ WHOLE_BATCHES = lambda bi: bi in (1, 2) or bi >= 9
 # scenes that invite painted writing or numerals get an explicit guard
 LETTERING_WORDS = ("script", "ink", "writ", "page", "letter", "numeral", "sign",
                    "handbill", "marking", "journal", "notebook", "logbook",
-                   "map", "clock", "watch", "photograph", "name")
+                   "map", "clock", "watch", "photograph", "name", "ledger")
 
 # words that pull image models toward the glossy generated look; stripped from
 # the per-type framing because the house style already says how to paint

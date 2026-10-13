@@ -246,7 +246,7 @@
   {
     "id": "sthr-quest-cass",
     "art_type": "asset",
-    "scene": "a worn deck of cards fanned on green baize, one card face down, a thin curl of cigarette smoke",
+    "scene": "a worn deck of playing cards fanned face down on green baize, only their plain dark backs showing, one card tipped half over under a fingertip so its face stays hidden, a thin curl of cigarette smoke",
     "seed": 2789
   },
   {
@@ -264,13 +264,13 @@
   {
     "id": "sthr-questdone-seraphine",
     "art_type": "asset",
-    "scene": "the same bell silent on the cloth, a long column of tally marks scratched into the table beside it",
+    "scene": "the same bell silent on the cloth, a few crooked groups of tally marks scratched into the table beside it, each scratched at a different depth and angle, drifting off line",
     "seed": 1474
   },
   {
     "id": "sthr-quest-birdie",
     "art_type": "asset",
-    "scene": "a battered duffel and a bus-stop sign at dusk, an empty road bending away into fog",
+    "scene": "a battered duffel at the foot of a leaning roadside post with a small blank, rust-streaked tin plate, at dusk, an empty road bending away into fog",
     "seed": 4168
   },
   {

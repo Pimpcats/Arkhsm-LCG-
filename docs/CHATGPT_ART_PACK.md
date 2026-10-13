@@ -15,7 +15,7 @@ Please create ONE painting as a single image.
 
 FORMAT (most important): a landscape (wider than tall) image, 1536 x 1024 pixels (3:2). The painting fills the whole canvas, edge to edge: no border, frame, white margin, letterbox bars, panels, grid, collage, strip or banner.
 
-WHAT TO PAINT: a brass key and a heavy ledger on a lighthouse keeper's desk, the lamp guttering, a second shadow thrown behind the empty chair.
+WHAT TO PAINT: a brass key and a heavy ledger on a lighthouse keeper's desk, the lamp guttering, a second shadow thrown behind the empty chair (any writing or numbers only as unreadable marks, never legible).
 COMPOSITION: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
 
 STYLE: A hand-painted oil illustration in the manner of a 1930s weird-fiction pulp magazine: broad, economical brushwork, large calm areas of thin paint, bold simple shapes of light and dark, crisp detail only at the focal point, edges and background left loose and partly unfinished. Restrained, muted, desaturated colour; lamplight is the only warm note. Setting: a 1920s New England coastal town. Mood: uncanny, quiet dread, never gore.
@@ -32,7 +32,7 @@ Please create ONE painting as a single image.
 
 FORMAT (most important): a landscape (wider than tall) image, 1536 x 1024 pixels (3:2). The painting fills the whole canvas, edge to edge: no border, frame, white margin, letterbox bars, panels, grid, collage, strip or banner.
 
-WHAT TO PAINT: the same ledger lying open to ruled lines in one careful hand, the lamp steady now, salt crusting the cover.
+WHAT TO PAINT: the same ledger lying open to ruled lines in one careful hand, the lamp steady now, salt crusting the cover (any writing or numbers only as unreadable marks, never legible).
 COMPOSITION: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
 
 STYLE: A hand-painted oil illustration in the manner of a 1930s weird-fiction pulp magazine: broad, economical brushwork, large calm areas of thin paint, bold simple shapes of light and dark, crisp detail only at the focal point, edges and background left loose and partly unfinished. Restrained, muted, desaturated colour; lamplight is the only warm note. Setting: a 1920s New England coastal town. Mood: uncanny, quiet dread, never gore.
@@ -83,7 +83,7 @@ Please create ONE painting as a single image.
 
 FORMAT (most important): a landscape (wider than tall) image, 1536 x 1024 pixels (3:2). The painting fills the whole canvas, edge to edge: no border, frame, white margin, letterbox bars, panels, grid, collage, strip or banner.
 
-WHAT TO PAINT: a worn deck of cards fanned on green baize, one card face down, a thin curl of cigarette smoke.
+WHAT TO PAINT: a worn deck of playing cards fanned face down on green baize, only their plain dark backs showing, one card tipped half over under a fingertip so its face stays hidden, a thin curl of cigarette smoke.
 COMPOSITION: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
 
 STYLE: A hand-painted oil illustration in the manner of a 1930s weird-fiction pulp magazine: broad, economical brushwork, large calm areas of thin paint, bold simple shapes of light and dark, crisp detail only at the focal point, edges and background left loose and partly unfinished. Restrained, muted, desaturated colour; lamplight is the only warm note. Setting: a 1920s New England coastal town. Mood: uncanny, quiet dread, never gore.
@@ -134,7 +134,7 @@ Please create ONE painting as a single image.
 
 FORMAT (most important): a landscape (wider than tall) image, 1536 x 1024 pixels (3:2). The painting fills the whole canvas, edge to edge: no border, frame, white margin, letterbox bars, panels, grid, collage, strip or banner.
 
-WHAT TO PAINT: the same bell silent on the cloth, a long column of tally marks scratched into the table beside it.
+WHAT TO PAINT: the same bell silent on the cloth, a few crooked groups of tally marks scratched into the table beside it, each scratched at a different depth and angle, drifting off line.
 COMPOSITION: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
 
 STYLE: A hand-painted oil illustration in the manner of a 1930s weird-fiction pulp magazine: broad, economical brushwork, large calm areas of thin paint, bold simple shapes of light and dark, crisp detail only at the focal point, edges and background left loose and partly unfinished. Restrained, muted, desaturated colour; lamplight is the only warm note. Setting: a 1920s New England coastal town. Mood: uncanny, quiet dread, never gore.
@@ -151,7 +151,7 @@ Please create ONE painting as a single image.
 
 FORMAT (most important): a landscape (wider than tall) image, 1536 x 1024 pixels (3:2). The painting fills the whole canvas, edge to edge: no border, frame, white margin, letterbox bars, panels, grid, collage, strip or banner.
 
-WHAT TO PAINT: a battered duffel and a bus-stop sign at dusk, an empty road bending away into fog (any writing or numbers only as unreadable marks, never legible).
+WHAT TO PAINT: a battered duffel at the foot of a leaning roadside post with a small blank, rust-streaked tin plate, at dusk, an empty road bending away into fog.
 COMPOSITION: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
 
 STYLE: A hand-painted oil illustration in the manner of a 1930s weird-fiction pulp magazine: broad, economical brushwork, large calm areas of thin paint, bold simple shapes of light and dark, crisp detail only at the focal point, edges and background left loose and partly unfinished. Restrained, muted, desaturated colour; lamplight is the only warm note. Setting: a 1920s New England coastal town. Mood: uncanny, quiet dread, never gore.
@@ -698,13 +698,13 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 026)
 Aspect ratio: 3:2 (landscape)
-Scene: a brass key and a heavy ledger on a lighthouse keeper's desk, the lamp guttering, a second shadow thrown behind the empty chair.
+Scene: a brass key and a heavy ledger on a lighthouse keeper's desk, the lamp guttering, a second shadow thrown behind the empty chair (any writing or numbers only as unreadable marks, never legible).
 Framing: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
 Character: none
 
 IMAGE 2 (save as 027)
 Aspect ratio: 3:2 (landscape)
-Scene: the same ledger lying open to ruled lines in one careful hand, the lamp steady now, salt crusting the cover.
+Scene: the same ledger lying open to ruled lines in one careful hand, the lamp steady now, salt crusting the cover (any writing or numbers only as unreadable marks, never legible).
 Framing: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
 Character: none
 
@@ -751,7 +751,7 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 030)
 Aspect ratio: 3:2 (landscape)
-Scene: a worn deck of cards fanned on green baize, one card face down, a thin curl of cigarette smoke.
+Scene: a worn deck of playing cards fanned face down on green baize, only their plain dark backs showing, one card tipped half over under a fingertip so its face stays hidden, a thin curl of cigarette smoke.
 Framing: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
 Character: none
 
@@ -769,7 +769,7 @@ Character: none
 
 IMAGE 4 (save as 033)
 Aspect ratio: 3:2 (landscape)
-Scene: the same bell silent on the cloth, a long column of tally marks scratched into the table beside it.
+Scene: the same bell silent on the cloth, a few crooked groups of tally marks scratched into the table beside it, each scratched at a different depth and angle, drifting off line.
 Framing: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
 Character: none
 ```
@@ -804,7 +804,7 @@ AVOID: photorealistic, photoreal skin, hyperrealism, photograph, dslr, lens, dep
 
 IMAGE 1 (save as 034)
 Aspect ratio: 3:2 (landscape)
-Scene: a battered duffel and a bus-stop sign at dusk, an empty road bending away into fog (any writing or numbers only as unreadable marks, never legible).
+Scene: a battered duffel at the foot of a leaning roadside post with a small blank, rust-streaked tin plate, at dusk, an empty road bending away into fog.
 Framing: the object in use in a lived-in 1920s setting, close but readable, a hand or figure implied.
 Character: none
 
@@ -906,7 +906,7 @@ Character: none
 
 IMAGE 2 (save as 041)
 Aspect ratio: 3:2 (landscape)
-Scene: a debt collector in a long coat at the end of a hallway, ledger in hand, face in shadow, patient.
+Scene: a debt collector in a long coat at the end of a hallway, ledger in hand, face in shadow, patient (any writing or numbers only as unreadable marks, never legible).
 Framing: a single threatening figure, menacing, occupying most of the frame, caught mid-approach.
 Character: none
 
@@ -1655,7 +1655,7 @@ Character: none
 
 IMAGE 6 (save as 101)
 Aspect ratio: 3:2 (landscape)
-Scene: a records office of tall wooden drawers and ledgers, a single green-shaded lamp over a desk.
+Scene: a records office of tall wooden drawers and ledgers, a single green-shaded lamp over a desk (any writing or numbers only as unreadable marks, never legible).
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
