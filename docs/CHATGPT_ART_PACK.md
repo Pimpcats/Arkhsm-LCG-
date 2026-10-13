@@ -236,7 +236,7 @@ Please create ONE painting as a single image.
 
 FORMAT (most important): a landscape (wider than tall) image, 1536 x 1024 pixels (3:2). The painting fills the whole canvas, edge to edge: no border, frame, white margin, letterbox bars, panels, grid, collage, strip or banner.
 
-WHAT TO PAINT: the same town square long ago, brand-new lanterns and bunting, townsfolk in older fashions raising their hands in a vote on the Town Hall steps, sepia lamplight.
+WHAT TO PAINT: the same town square long ago in sepia lamplight, brand-new lanterns and bunting, the Town Hall steps just emptied after a vote, a dropped hat and scattered handbills on the stones, one shadow of a raised hand still cast on the wall with no one there to cast it (any writing or numbers only as unreadable marks, never legible).
 COMPOSITION: the place itself, empty of people, wrong-feeling stillness. Keep the main subject well inside the frame: the card frame crops about a tenth off each side.
 
 STYLE: A hand-painted oil illustration in the manner of a 1930s weird-fiction pulp magazine: broad, economical brushwork, large calm areas of thin paint, bold simple shapes of light and dark, crisp detail only at the focal point, edges and background left loose and partly unfinished. Restrained, muted, desaturated colour; lamplight is the only warm note. Setting: a 1920s New England coastal town. Mood: uncanny, quiet dread, never gore.
@@ -1740,7 +1740,7 @@ Character: none
 
 IMAGE 5 (save as 110)
 Aspect ratio: 3:2 (landscape)
-Scene: the same town square long ago, brand-new lanterns and bunting, townsfolk in older fashions raising their hands in a vote on the Town Hall steps, sepia lamplight.
+Scene: the same town square long ago in sepia lamplight, brand-new lanterns and bunting, the Town Hall steps just emptied after a vote, a dropped hat and scattered handbills on the stones, one shadow of a raised hand still cast on the wall with no one there to cast it (any writing or numbers only as unreadable marks, never legible).
 Framing: the place itself, empty of people, wrong-feeling stillness.
 Character: none
 
