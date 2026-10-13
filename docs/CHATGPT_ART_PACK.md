@@ -425,6 +425,8 @@ Generate exactly ONE independent image for EACH numbered prompt below: 5 separat
 
 These are different scenes, not 5 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
+
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
 
@@ -485,6 +487,8 @@ BATCH REQUEST: 10 SEPARATE IMAGES
 Generate exactly ONE independent image for EACH numbered prompt below: 10 separate images total.
 
 These are different scenes, not 10 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
+
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
 
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
@@ -577,6 +581,8 @@ Generate exactly ONE independent image for EACH numbered prompt below: 4 separat
 
 These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
+
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
 
@@ -629,6 +635,8 @@ BATCH REQUEST: 4 SEPARATE IMAGES
 Generate exactly ONE independent image for EACH numbered prompt below: 4 separate images total.
 
 These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
+
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
 
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
@@ -683,6 +691,8 @@ Generate exactly ONE independent image for EACH numbered prompt below: 2 separat
 
 These are different scenes, not 2 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
+
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
 
@@ -725,6 +735,8 @@ BATCH REQUEST: 4 SEPARATE IMAGES
 Generate exactly ONE independent image for EACH numbered prompt below: 4 separate images total.
 
 These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
+
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
 
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
@@ -779,6 +791,8 @@ Generate exactly ONE independent image for EACH numbered prompt below: 4 separat
 
 These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
+
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
 
@@ -832,6 +846,8 @@ Generate exactly ONE independent image for EACH numbered prompt below: 2 separat
 
 These are different scenes, not 2 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
+
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
 
@@ -874,6 +890,8 @@ BATCH REQUEST: 4 SEPARATE IMAGES
 Generate exactly ONE independent image for EACH numbered prompt below: 4 separate images total.
 
 These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
+
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
 
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
@@ -928,6 +946,8 @@ Generate exactly ONE independent image for EACH numbered prompt below: 4 separat
 
 These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
+
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
 
@@ -981,6 +1001,8 @@ Generate exactly ONE independent image for EACH numbered prompt below: 2 separat
 
 These are different scenes, not 2 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
+
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
 
@@ -1023,6 +1045,8 @@ BATCH REQUEST: 4 SEPARATE IMAGES
 Generate exactly ONE independent image for EACH numbered prompt below: 4 separate images total.
 
 These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
+
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
 
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
@@ -1077,6 +1101,8 @@ Generate exactly ONE independent image for EACH numbered prompt below: 4 separat
 
 These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
+
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
 
@@ -1130,6 +1156,8 @@ Generate exactly ONE independent image for EACH numbered prompt below: 2 separat
 
 These are different scenes, not 2 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
+
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
 
@@ -1172,6 +1200,8 @@ BATCH REQUEST: 4 SEPARATE IMAGES
 Generate exactly ONE independent image for EACH numbered prompt below: 4 separate images total.
 
 These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
+
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
 
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
@@ -1226,6 +1256,8 @@ Generate exactly ONE independent image for EACH numbered prompt below: 4 separat
 
 These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
+
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
 
@@ -1279,6 +1311,8 @@ Generate exactly ONE independent image for EACH numbered prompt below: 2 separat
 
 These are different scenes, not 2 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
+
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
 
@@ -1321,6 +1355,8 @@ BATCH REQUEST: 4 SEPARATE IMAGES
 Generate exactly ONE independent image for EACH numbered prompt below: 4 separate images total.
 
 These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
+
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
 
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
@@ -1375,6 +1411,8 @@ Generate exactly ONE independent image for EACH numbered prompt below: 4 separat
 
 These are different scenes, not 4 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
+
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
 
@@ -1428,6 +1466,8 @@ Generate exactly ONE independent image for EACH numbered prompt below: 2 separat
 
 These are different scenes, not 2 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
+
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
 
@@ -1470,6 +1510,8 @@ BATCH REQUEST: 10 SEPARATE IMAGES
 Generate exactly ONE independent image for EACH numbered prompt below: 10 separate images total.
 
 These are different scenes, not 10 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
+
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
 
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
@@ -1562,6 +1604,8 @@ Generate exactly ONE independent image for EACH numbered prompt below: 10 separa
 
 These are different scenes, not 10 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
+
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
 
@@ -1652,6 +1696,8 @@ BATCH REQUEST: 10 SEPARATE IMAGES
 Generate exactly ONE independent image for EACH numbered prompt below: 10 separate images total.
 
 These are different scenes, not 10 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
+
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
 
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
@@ -1744,6 +1790,8 @@ Generate exactly ONE independent image for EACH numbered prompt below: 10 separa
 
 These are different scenes, not 10 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
+
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
 
@@ -1834,6 +1882,8 @@ BATCH REQUEST: 10 SEPARATE IMAGES
 Generate exactly ONE independent image for EACH numbered prompt below: 10 separate images total.
 
 These are different scenes, not 10 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
+
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
 
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
@@ -1926,6 +1976,8 @@ Generate exactly ONE independent image for EACH numbered prompt below: 10 separa
 
 These are different scenes, not 10 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
+
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
 
@@ -2017,6 +2069,8 @@ Generate exactly ONE independent image for EACH numbered prompt below: 10 separa
 
 These are different scenes, not 10 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
 
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
+
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.
 
@@ -2107,6 +2161,8 @@ BATCH REQUEST: 9 SEPARATE IMAGES
 Generate exactly ONE independent image for EACH numbered prompt below: 9 separate images total.
 
 These are different scenes, not 9 variations of one scene. Do not combine them into a collage, grid, or contact sheet. Do not ask for approval between images. Apply the shared house style to every image. No text, letters, numbers, captions, borders, or frames inside any image.
+
+ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. Each time I reply "next", paint the next image the same way. Never put two images in one picture or one reply. Before each image, write its save-as number as text in your reply.
 
 SHARED HOUSE STYLE:
 1920s cosmic horror card illustration, hand-painted in oil on illustration board in the manner of a 1930s weird-fiction pulp magazine interior painting, dramatic value design, bold simplified value masses, confident broad brush strokes, economical, workmanlike finish with visible simplification and occasional unfinished passages, restrained muted color, clearly hand-painted by a working commercial illustrator. Broad, economical brushwork with large quiet areas of thin, relatively flat paint; visible brush marks only where the illustrator needs them. Hand-painted irregularity comes from uneven drawing, drifting spacing, crooked architecture, varied silhouette shapes, lost edges, overworked focal passages and unfinished peripheral areas, not from texture on every surface. Any repeated figure, echo or afterimage is painted separately each time, drifting in pose, spacing and clarity, never a copy.

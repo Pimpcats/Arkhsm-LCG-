@@ -213,7 +213,14 @@ def request_prompt(camp, chars, cards, jobs_by_id, profiles):
            "combine them into a collage, grid, or contact sheet. Do not ask for "
            "approval between images. Apply the shared house style to every image. "
            "No text, letters, numbers, captions, borders, or frames inside any "
-           "image.\n\nSHARED HOUSE STYLE:\n".format(k=k)
+           "image.\n\n"
+           # 2026-10-13: ten images asked for in one reply came back as one 1536 x 1024
+           # sheet of ten strips (765 x ~200 each, too small to use); one per reply works
+           "ONE IMAGE PER REPLY: paint IMAGE 1 now as one full-size picture at its "
+           "aspect ratio (1536 x 1024 landscape or 1024 x 1536 portrait), then stop. "
+           "Each time I reply \"next\", paint the next image the same way. Never put "
+           "two images in one picture or one reply. Before each image, write its "
+           "save-as number as text in your reply.\n\nSHARED HOUSE STYLE:\n".format(k=k)
            + style_block(camp).replace("HOUSE STYLE: ", "", 1)]
     ratio = {"landscape 3:2": "3:2 (landscape)", "portrait 2:3": "2:3 (portrait)",
              "square 1:1": "1:1 (square)"}
