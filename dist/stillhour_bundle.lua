@@ -2461,6 +2461,15 @@ end
 
 --- TokenManagerApi.spawnForCard(card): Global.callTable routing into
 -- TokenManager.spawnForCard (spawns the side's `uses`, e.g. location clues).
+--- TokenManagerApi.spawnTokenGroup(card, tokenType, count): damage / horror as one token showing the
+-- count, on the card. False off SCED.
+function SCED.spawnTokenGroup(card, tokenType, count)
+  if not SCED.isPresent() then return false end
+  SCED.globalCall("callTable", { { "TokenManager", "spawnTokenGroup" },
+    { card = card, tokenType = tokenType, tokenCount = count } })
+  return true
+end
+
 function SCED.spawnForCard(card)
   if not SCED.isPresent() then return false end
   SCED.globalCall("callTable", { { "TokenManager", "spawnForCard" }, { card = card } })
@@ -2535,7 +2544,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/8d1729cead7e4f76f9ea3b13082f900f4640ff04/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/16bf471d8527200588f0a29585608ea71d487f2c/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -2911,6 +2920,471 @@ function Guide.addMenu(obj)
 end
 
 return Guide
+
+end
+
+__modules["StillHour/Setup"] = function()
+--- THE STILL HOUR — the table's setup, done for the players.
+--
+-- Seating an investigator (Campaign Setup steps 2-3), the investigators' part of Loop Setup (step 1:
+-- every card they own back into their deck, healed, tokens off, 5 resources, an opening hand of 5),
+-- and which district boxes a loop lays out (step 2), chosen from the Campaign Log. The scenario boxes'
+-- own layout is SCED's Place (src/tts/memory_bag.lua) and the Control token's board sync.
+--
+-- Everything goes through SCED's own objects the way its deck importer does
+-- (src/deckbuilder/DeckImporter.ttslua, src/playercards/CardSpawner.ttslua): official cards come out
+-- of SCED's All Player Cards bag by ArkhamDB id, a deck is spawned as one Deck object on the
+-- playmat's Deck zone (src/playermat/Zones.ttslua), counters are the mat's own (updateCounter) and
+-- the opening hand is the mat's own draw (drawCardsWithReshuffleWrapper). Every call is guarded:
+-- without SCED the campaign's own cards are still seated and the chat says what is left to do.
+
+local Setup = {}
+
+local SCED = require("StillHour/SCED")
+
+-- Baked in by pipeline/bundle_mod.py: each investigator's starter deck (docs/STARTER_DECKS.md as
+-- SCED ids, campaigns/<id>/starter_decks.json) and the cards their back requires (the card spec's
+-- signatures: their signature asset and event, their weakness and their personal quest card).
+-- (Loaded from src/ unbundled, as the rules tests do, the placeholders are unset globals: empty tables.)
+Setup.STARTER = {["sthrelias"] = {{"01018", 2}, {"01019", 2}, {"01020", 2}, {"08083", 2}, {"01017", 2}, {"04017", 2}, {"09103", 1}, {"08021", 2}, {"01023", 2}, {"01022", 2}, {"03106", 1}, {"01088", 2}, {"04033", 2}, {"06165", 2}, {"01025", 2}, {"01089", 2}}, ["sthrayako"] = {{"02149", 2}, {"01033", 2}, {"01034", 2}, {"01030", 2}, {"01032", 2}, {"01059", 2}, {"60214", 2}, {"01036", 2}, {"01037", 2}, {"01088", 1}, {"06117", 2}, {"01065", 1}, {"01039", 2}, {"03231", 1}, {"01089", 2}, {"01090", 2}, {"01093", 1}}, ["sthrcass"] = {{"01045", 2}, {"60305", 2}, {"01046", 2}, {"12047", 2}, {"03028", 2}, {"12048", 1}, {"01059", 2}, {"01051", 1}, {"01050", 2}, {"01052", 2}, {"60316", 2}, {"01023", 2}, {"01088", 2}, {"01065", 1}, {"05030", 2}, {"01053", 1}, {"01089", 2}}, ["sthrbirdie"] = {{"01077", 2}, {"12074", 1}, {"01072", 2}, {"01076", 2}, {"01087", 1}, {"01086", 2}, {"04200", 2}, {"01079", 2}, {"01080", 2}, {"06165", 2}, {"01088", 2}, {"01023", 1}, {"01050", 1}, {"01037", 2}, {"01081", 2}, {"04201", 2}, {"01089", 2}}, ["sthrseraphine"] = {{"01062", 2}, {"02030", 1}, {"12060", 2}, {"02028", 2}, {"01060", 2}, {"01030", 2}, {"01066", 2}, {"08061", 1}, {"01065", 2}, {"01088", 2}, {"01037", 2}, {"02190", 2}, {"01067", 2}, {"01089", 2}, {"01090", 1}, {"01093", 2}, {"01039", 1}}} or {}
+Setup.REQUIRED = {["sthrelias"] = {"sthr-lamp", "sthr-donebefore", "sthr-eighthgrave", "sthr-quest-elias"}, ["sthrayako"] = {"sthr-lexicon", "sthr-itmeanswait", "sthr-untranslatable", "sthr-quest-ayako"}, ["sthrcass"] = {"sthr-markeddeck", "sthr-seenthishand", "sthr-housewins", "sthr-quest-cass"}, ["sthrseraphine"] = {"sthr-bell", "sthr-rememberending", "sthr-debtofhours", "sthr-quest-seraphine"}, ["sthrbirdie"] = {"sthr-compass", "sthr-igetout", "sthr-nobodybelieves", "sthr-quest-birdie"}} or {}
+Setup.INVESTIGATORS = {{["id"] = "sthrelias", ["name"] = "Elias Warde"}, {["id"] = "sthrayako", ["name"] = "Dr. Ayako Sōma"}, {["id"] = "sthrcass", ["name"] = "Cass Lindqvist"}, {["id"] = "sthrseraphine", ["name"] = "Seraphine Vale"}, {["id"] = "sthrbirdie", ["name"] = "\"Birdie\" Okonkwo"}} or {}   -- { { id = ..., name = ... }, ... } in the campaign's order
+
+-- SCED's playmat zones (Zones.ttslua commonZones / mirrorZones): local to the mat; the mirrored ones
+-- flip x for the Orange and Red mats.
+local ZONES = {
+  Investigator = { -1.177, 0, 0.002 }, Deck = { -1.82, 0, 0 }, Discard = { -1.82, 0, 0.61 },
+  Minicard = { -0.911, 0, -0.625 }, SetAside1 = { 2.35, 0, -0.520 }, SetAside2 = { 2.35, 0, 0.042 },
+}
+local MIRRORED = { SetAside1 = true, SetAside2 = true }
+
+Setup.OWNER_TAG_PREFIX = "StillHourOwner_"
+local LOOP_TAG = "StillHourLoop"
+
+local function try(fn, ...)
+  local ok, v = pcall(fn, ...)
+  if ok then return v end
+  return nil
+end
+
+local function alive(o) return o ~= nil and not try(function() return o.isDestroyed() end) end
+
+local function decode(s)
+  if type(s) ~= "string" or s == "" then return nil end
+  local ok, v = pcall(JSON.decode, s)
+  return ok and v or nil
+end
+
+local function copy(t) return JSON.decode(JSON.encode(t)) end
+
+local function metaOf(gmNotes)
+  local md = decode(gmNotes)
+  return type(md) == "table" and md or {}
+end
+
+------------------------------------------------------------------ the mats --
+
+function Setup.zone(matColor, name)
+  local mat = SCED.playermat(matColor)
+  local p = ZONES[name]
+  if not mat or not p then return nil end
+  local x = p[1]
+  if MIRRORED[name] and (matColor == "Orange" or matColor == "Red") then x = -x end
+  return try(function() return mat.positionToWorld({ x, p[2], p[3] }) end)
+end
+
+function Setup.rotation(matColor, faceDown)
+  local mat = SCED.playermat(matColor)
+  local r = mat and try(function() return mat.getRotation() end) or { y = 0 }
+  return { 0, r.y or 0, faceDown and 180 or 0 }
+end
+
+local function above(p, dy) return { p.x, p.y + (dy or 1.5), p.z } end
+
+--- The playermats that hold no investigator yet, in SCED's order.
+function Setup.freeMats(seated)
+  local taken = {}
+  for _, s in ipairs(seated or {}) do if s.matColor then taken[s.matColor] = true end end
+  local out = {}
+  for _, colour in ipairs(SCED.MAT_COLORS) do
+    if SCED.playermat(colour) and not taken[colour] then out[#out + 1] = colour end
+  end
+  return out
+end
+
+-------------------------------------------------------------- card sources --
+
+--- Card data out of a container's data (a bag or deck), the first with this campaign id.
+local function dataById(container, id)
+  local d = container and try(function() return container.getData() end)
+  for _, e in ipairs(d and d.ContainedObjects or {}) do
+    if metaOf(e.GMNotes).id == id then return e end
+  end
+  return nil
+end
+
+--- The bag or deck on the table that holds the card with this campaign id (the campaign's Player Cards
+-- bag holds the investigators and their cards; its minicard deck the minicards). Found by what it holds,
+-- never by name: SCED's own "All Player Cards" bag is on the table too.
+local function holderOf(id)
+  for _, o in ipairs(getObjects()) do
+    if alive(o) and (o.type == "Bag" or o.type == "Deck") then
+      for _, e in ipairs(try(function() return o.getObjects() end) or {}) do
+        if metaOf(e.gm_notes).id == id then return o end
+      end
+    end
+  end
+  return nil
+end
+Setup.holderOf = holderOf
+
+local function withOwner(data, matColor)
+  data.Tags = data.Tags or {}
+  local tag = Setup.OWNER_TAG_PREFIX .. matColor
+  for _, t in ipairs(data.Tags) do if t == tag then return data end end
+  data.Tags[#data.Tags + 1] = tag
+  return data
+end
+
+--- An official card's spawn data from SCED's All Player Cards bag (AllCardsBagApi.getCardById).
+function Setup.officialCard(id)
+  local bag = SCED.getObjectByOwnerAndType("Mythos", "AllCardsBag")
+  if not bag then return nil end
+  local r = try(function() return bag.call("getCardById", { id = id }) end)
+  return type(r) == "table" and r.data and copy(r.data) or nil
+end
+
+function Setup.cardIndexReady()
+  local bag = SCED.getObjectByOwnerAndType("Mythos", "AllCardsBag")
+  return bag ~= nil and try(function() return bag.call("isIndexReady") end) == true
+end
+
+--- One random basic weakness id (AllCardsBagApi.getRandomWeaknessIds), or nil.
+function Setup.randomWeaknessId()
+  local bag = SCED.getObjectByOwnerAndType("Mythos", "AllCardsBag")
+  if not bag then return nil end
+  local ids = try(function() return bag.call("getRandomWeaknessIds", { count = 1 }) end)
+  return type(ids) == "table" and ids[1] or nil
+end
+
+------------------------------------------------------------ decks of data --
+
+--- A Deck object's data holding these cards (CardSpawner.buildDeckDataTemplate / addCardToDeck).
+function Setup.deckData(cards)
+  local first = cards[1] or {}
+  local t = first.Transform or {}
+  local deck = { Name = "Deck", ContainedObjects = {}, DeckIDs = {}, CustomDeck = {},
+    Transform = { scaleX = t.scaleX or 1, scaleY = 1, scaleZ = t.scaleZ or 1 } }
+  local nextId = 1000
+  for _, card in ipairs(cards) do
+    for deckId, custom in pairs(card.CustomDeck or {}) do
+      local have = deck.CustomDeck[deckId]
+      if have == nil then
+        deck.CustomDeck[deckId] = custom
+      elseif have.FaceURL ~= custom.FaceURL then
+        -- two sheets under one id: renumber this card's (TTS identifies a sheet by its id)
+        local newId
+        for id, c in pairs(deck.CustomDeck) do if c.FaceURL == custom.FaceURL then newId = id end end
+        if not newId then
+          while deck.CustomDeck[tostring(nextId)] ~= nil do nextId = nextId + 1 end
+          newId = tostring(nextId)
+          deck.CustomDeck[newId] = custom
+        end
+        card.CardID = tonumber(newId .. string.sub(tostring(card.CardID), -2))
+        card.CustomDeck = { [newId] = custom }
+      end
+      break
+    end
+    deck.ContainedObjects[#deck.ContainedObjects + 1] = card
+    deck.DeckIDs[#deck.DeckIDs + 1] = card.CardID
+  end
+  return deck
+end
+
+--- Spawn cards as one stack (a single card alone) at a spot; callback(obj) once it is there.
+function Setup.spawnStack(cards, pos, rot, callback)
+  if #cards == 0 then return nil end
+  local data = (#cards == 1) and cards[1] or Setup.deckData(cards)
+  return spawnObjectData({ data = data, position = pos, rotation = rot, callback_function = callback })
+end
+
+----------------------------------------------------------------- seating --
+
+local function nameOf(id)
+  for _, inv in ipairs(Setup.INVESTIGATORS) do if inv.id == id then return inv.name end end
+  return id
+end
+
+--- Seat one investigator on a free playmat: their card on the mat's investigator spot, their minicard,
+-- their permanent cards beside the mat, and their deck (the cards their back requires, their starter
+-- deck from SCED's player cards and 1 random basic weakness) face down on the Deck zone, shuffled.
+-- Every card they own carries StillHourOwner_<mat colour>, so Loop Setup finds it wherever it ends up.
+-- Returns a report { ok, mat, deck, missing = {...} } (missing: what could not be spawned, by id).
+function Setup.seat(invId, matColor, opts)
+  opts = opts or {}
+  local rep = { ok = false, mat = matColor, deck = 0, missing = {} }
+  local bag = holderOf(invId)
+  local invPos, deckPos = Setup.zone(matColor, "Investigator"), Setup.zone(matColor, "Deck")
+  if not bag or not invPos or not deckPos then
+    rep.why = not bag and "the Player Cards bag (with this investigator in it) is not on the table"
+      or ("no " .. tostring(matColor) .. " playmat")
+    return rep
+  end
+  local inv = dataById(bag, invId)
+  if not inv then rep.why = "the investigator card is not in the Player Cards bag" ; return rep end
+  -- the cards their back requires: from the same bag (or any holder of each)
+  spawnObjectData({ data = withOwner(copy(inv), matColor), position = above(invPos), rotation = Setup.rotation(matColor) })
+  local mini = dataById(holderOf(invId .. "-m"), invId .. "-m")
+  local miniPos = Setup.zone(matColor, "Minicard")
+  if mini and miniPos then
+    spawnObjectData({ data = copy(mini), position = above(miniPos), rotation = Setup.rotation(matColor) })
+  end
+  local deck, permanents = {}, {}
+  for _, id in ipairs(Setup.REQUIRED[invId] or {}) do
+    local d = dataById(bag, id) or dataById(holderOf(id), id)
+    if d then
+      d = withOwner(copy(d), matColor)
+      if metaOf(d.GMNotes).permanent then permanents[#permanents + 1] = d else deck[#deck + 1] = d end
+    else
+      rep.missing[#rep.missing + 1] = id
+    end
+  end
+  if opts.starter ~= false then
+    for _, row in ipairs(Setup.STARTER[invId] or {}) do
+      for _ = 1, row[2] do
+        local d = Setup.officialCard(row[1])
+        if d then deck[#deck + 1] = withOwner(d, matColor) else rep.missing[#rep.missing + 1] = row[1] end
+      end
+    end
+    local weak = Setup.randomWeaknessId()
+    local wd = weak and Setup.officialCard(weak)
+    if wd then deck[#deck + 1] = withOwner(wd, matColor) else rep.missing[#rep.missing + 1] = "random basic weakness" end
+  end
+  local aside = Setup.zone(matColor, "SetAside1")
+  for i, d in ipairs(permanents) do
+    if aside then
+      spawnObjectData({ data = d, position = { aside.x, aside.y + 1 + 0.2 * i, aside.z }, rotation = Setup.rotation(matColor) })
+    end
+  end
+  rep.deck = #deck
+  Setup.spawnStack(deck, above(deckPos), Setup.rotation(matColor, true), function(o)
+    pcall(function() if o.type == "Deck" then o.shuffle() end end)
+  end)
+  rep.ok = true
+  rep.name = nameOf(invId)
+  return rep
+end
+
+-------------------------------------------------- the investigators' reset --
+
+local function tagsOf(o) return try(function() return o.getTags() end) or {} end
+
+local function hasTag(list, tag)
+  for _, t in ipairs(list or {}) do if t == tag then return true end end
+  return false
+end
+
+local function ownedBySomeone(list)
+  for _, t in ipairs(list or {}) do if t:sub(1, #Setup.OWNER_TAG_PREFIX) == Setup.OWNER_TAG_PREFIX then return true end end
+  return false
+end
+
+local function isLoop(list)
+  for _, t in ipairs(list or {}) do if t == LOOP_TAG or t:sub(1, 13) == "StillHourBox_" then return true end end
+  return false
+end
+
+--- In the mat's set-aside columns (where permanents and bonded cards wait): left alone by the reset.
+local function inSetAside(mat, p, matColor)
+  local lp = try(function() return mat.positionToLocal(p) end)
+  if not lp then return false end
+  local x = lp.x
+  if matColor == "Orange" or matColor == "Red" then x = -x end
+  return x >= 2.1 and math.abs(lp.z) <= 1.3
+end
+
+local function nearMat(mat, p)
+  local lp = try(function() return mat.positionToLocal(p) end)
+  return lp ~= nil and math.abs(lp.x) <= 3.2 and math.abs(lp.z) <= 1.9
+end
+
+--- A card the reset shuffles back: theirs (owner tag, or an untagged player card on their mat or in their
+-- hand), not the investigator card, a minicard, a permanent card or a card set aside beside the mat.
+local function keepsInPlay(md)
+  return md.type == "Investigator" or md.type == "Minicard" or md.permanent == true or md.startsInPlay == true
+end
+
+local PLAYER_TYPES = { Asset = true, Event = true, Skill = true, Treachery = true, Enemy = true }
+
+--- The investigators' part of Loop Setup step 1, for the investigator on this mat. opts.tokensOn(card)
+-- lists the tokens resting on a card (the Control's Clear Board rule). Returns a report.
+function Setup.resetInvestigator(matColor, opts)
+  opts = opts or {}
+  local rep = { mat = matColor, cards = 0, tokens = 0 }
+  local mat = SCED.playermat(matColor)
+  local deckPos = Setup.zone(matColor, "Deck")
+  if not mat or not deckPos then rep.why = "no playmat" ; return rep end
+  local owner = Setup.OWNER_TAG_PREFIX .. matColor
+  local playerColor = try(function() return mat.getVar("playerColor") end)
+  local inHand = {}
+  if playerColor and Player and Player[playerColor] then
+    for _, o in ipairs(try(function() return Player[playerColor].getHandObjects() end) or {}) do inHand[o] = true end
+  end
+  local cards, take = {}, {}
+  for _, o in ipairs(getObjects()) do
+    if alive(o) and (o.type == "Card" or o.type == "Deck") then
+      local p = try(function() return o.getPosition() end)
+      local tags = tagsOf(o)
+      local here = p and nearMat(mat, p)
+      if o.type == "Card" then
+        local md = metaOf(o.getGMNotes())
+        -- theirs by tag; an untagged player card (one taken from a bag by hand) by where it lies
+        local mine = hasTag(tags, owner) or ((here or inHand[o]) and PLAYER_TYPES[md.type] and not isLoop(tags)
+          and not ownedBySomeone(tags))
+        if mine and not keepsInPlay(md) and not (p and inSetAside(mat, p, matColor)) then
+          take[#take + 1] = o
+        end
+      else
+        -- a deck: whole when every card in it is theirs, otherwise their cards are taken out of it
+        local entries = try(function() return o.getObjects() end) or {}
+        local mineGuids, others = {}, 0
+        for _, e in ipairs(entries) do
+          local md = metaOf(e.gm_notes)
+          local mine = hasTag(e.tags, owner) or (here and PLAYER_TYPES[md.type] and not isLoop(e.tags)
+            and not ownedBySomeone(e.tags))
+          if mine and not keepsInPlay(md) then mineGuids[#mineGuids + 1] = e.guid else others = others + 1 end
+        end
+        if #mineGuids > 0 and others == 0 and not (p and inSetAside(mat, p, matColor)) then
+          take[#take + 1] = o
+        elseif #mineGuids > 0 and others > 0 then
+          for _, g in ipairs(mineGuids) do
+            local c = try(function() return o.takeObject({ guid = g, position = { p.x, p.y + 3, p.z }, smooth = false }) end)
+            if c then take[#take + 1] = c end
+          end
+        end
+      end
+    end
+  end
+  for o in pairs(inHand) do
+    local md = metaOf(try(function() return o.getGMNotes() end))
+    local listed = false
+    for _, t in ipairs(take) do if t == o then listed = true end end
+    if not listed and alive(o) and o.type == "Card" and not keepsInPlay(md) then take[#take + 1] = o end
+  end
+  for _, o in ipairs(take) do
+    local d = try(function() return o.getData() end)
+    if d then
+      if d.Name == "Deck" or d.Name == "DeckCustom" then
+        for _, c in ipairs(d.ContainedObjects or {}) do cards[#cards + 1] = withOwner(c, matColor) end
+      else
+        cards[#cards + 1] = withOwner(d, matColor)
+      end
+    end
+    if opts.tokensOn then
+      for _, t in ipairs(opts.tokensOn(o) or {}) do
+        if alive(t) then t.destruct() ; rep.tokens = rep.tokens + 1 end
+      end
+    end
+    pcall(function() o.destruct() end)
+  end
+  rep.cards = #cards
+  -- healed, nothing on the mat, 5 resources (the mat's own counters)
+  for _, c in ipairs({ { "DamageCounter", 0 }, { "HorrorCounter", 0 }, { "ResourceCounter", 5 } }) do
+    pcall(function() mat.call("updateCounter", { type = c[1], newValue = c[2] }) end)
+  end
+  pcall(function() mat.call("removeClues", 99) end)
+  local rot = Setup.rotation(matColor, true)
+  local function draw()
+    pcall(function() mat.call("drawCardsWithReshuffleWrapper", { numCards = opts.hand or 5 }) end)
+    if opts.after then pcall(opts.after, rep) end
+  end
+  if #cards > 0 then
+    Wait.frames(function()
+      Setup.spawnStack(cards, above(deckPos), rot, function(o)
+        pcall(function() if o.type == "Deck" then o.shuffle() end end)
+        Wait.frames(draw, 30)
+      end)
+    end, 2)
+  else
+    Wait.frames(draw, 2)
+  end
+  return rep
+end
+
+--- Weaknesses drawn in an opening hand go back into the deck and are replaced (Loop Setup step 1).
+function Setup.replaceDrawnWeaknesses(matColor)
+  local mat = SCED.playermat(matColor)
+  local playerColor = mat and try(function() return mat.getVar("playerColor") end)
+  if not (playerColor and Player and Player[playerColor]) then return 0 end
+  local deckPos = Setup.zone(matColor, "Deck")
+  local n = 0
+  for _, o in ipairs(try(function() return Player[playerColor].getHandObjects() end) or {}) do
+    local md = metaOf(try(function() return o.getGMNotes() end))
+    if o.type == "Card" and md.weakness == true and deckPos then
+      pcall(function()
+        o.setRotation(Setup.rotation(matColor, true))
+        o.setPosition(above(deckPos, 2 + 0.2 * n))
+      end)
+      n = n + 1
+    end
+  end
+  if n > 0 then
+    Wait.time(function()
+      for _, o in ipairs(getObjects()) do
+        if o.type == "Deck" and alive(o) then
+          local p = o.getPosition()
+          if math.abs(p.x - deckPos.x) < 0.5 and math.abs(p.z - deckPos.z) < 0.5 then pcall(function() o.shuffle() end) end
+        end
+      end
+      pcall(function() mat.call("drawCardsWithReshuffleWrapper", { numCards = n }) end)
+    end, 1.5)
+  end
+  return n
+end
+
+--------------------------------------------------- the night's district boxes --
+
+-- The districts a loop can lay out besides the Square, in the map's order, and the act ids / log
+-- entries that say what each has left (the Control's DISTRICT_ACTS: act 1a, act 2a, surface entry,
+-- deep entry, act 3a, late record).
+Setup.DISTRICTS = { "district_church", "district_almanac", "district_fairground", "district_road", "district_lighthouse" }
+
+--- What a district's act deck would be at its next Place ("1a", "2a", "3a" or nil when none), by the
+-- same rules the Control sets the deck up with (The Districts: a district's act deck).
+function Setup.currentAct(acts, knows, partTwo, almanacSecondOpen)
+  if not acts then return nil end
+  if knows(acts[6]) then return nil end
+  if knows(acts[4]) then return partTwo and "3a" or nil end
+  if knows(acts[3]) then
+    if not partTwo then return nil end
+    if acts[2] == "sthr-act-appointedname" and not almanacSecondOpen then return nil end
+    return "2a"
+  end
+  return "1a"
+end
+
+--- The districts the Control proposes for the night: those whose act deck has something to do, the
+-- deeper objectives first (one path a loop: at most two districts), with the Sunken Road whenever the
+-- Lighthouse is proposed (it is reached only through the Road). Returns a set { [box id] = true }.
+function Setup.proposeDistricts(districtActs, knows, partTwo, almanacSecondOpen, limit)
+  local rank = { ["3a"] = 1, ["2a"] = 2, ["1a"] = 3 }
+  local open = {}
+  for i, id in ipairs(Setup.DISTRICTS) do
+    local act = Setup.currentAct(districtActs[id], knows, partTwo, almanacSecondOpen)
+    if act then open[#open + 1] = { id = id, rank = rank[act], i = i } end
+  end
+  table.sort(open, function(a, b) if a.rank ~= b.rank then return a.rank < b.rank end return a.i < b.i end)
+  local out, n = {}, 0
+  for _, d in ipairs(open) do
+    if n >= (limit or 2) then break end
+    out[d.id] = true
+    n = n + 1
+  end
+  if out.district_lighthouse then out.district_road = true end
+  return out
+end
+
+return Setup
 
 end
 
@@ -3633,8 +4107,8 @@ local STAGE_BUTTONS = {
     z = 1.75, w = 1100, fs = 120, tip = "The Appointed's Approach stage. The Control token moves it; you do not click this." },
   { fn = "shHoldBack", label = function() return "Hold Back (success)" end, z = 2.2, w = 1100, fs = 120,
     tip = "Click once after a Hold Back success (the walker's ring and The Hour I Learned Your Name count): it "
-      .. "pushes the Approach back 1 stage and rewinds the Hour counter (not in the finale; 3 rewinds a loop). Move "
-      .. "the Hours deck yourself but do not right-click Hour. Disengage and exhaust the Appointed yourself." },
+      .. "pushes the Approach back 1 stage and rewinds the Hour counter (not in the finale; 3 rewinds a loop); the "
+      .. "Hours on the table follow. Do not also right-click Hour. Disengage and exhaust the Appointed yourself." },
 }
 
 --- Put the Hold Back / Hunt buttons on the Appointed card (idempotent).
@@ -3956,6 +4430,25 @@ function Board.readLogMirror(log, deep)
   return best
 end
 
+--- A value ticked or written on the campaign log, on whichever page it is (the log has one State per
+-- page, each with its own values: the page on show answers itself, the others from their saved state).
+function Board.logValue(key, log)
+  log = log or Board.campaignLog()
+  if not log then return nil end
+  local function from(raw)
+    local t = decode(raw)
+    return t and type(t.values) == "table" and t.values[key] or nil
+  end
+  local shown = safe(function() return log.call("getLogValues") end)
+  if type(shown) == "table" and type(shown.values) == "table" and shown.values[key] ~= nil then return shown.values[key] end
+  local data = safe(function() return log.getData() end)
+  for _, state in pairs(type(data) == "table" and type(data.States) == "table" and data.States or {}) do
+    local v = type(state) == "table" and from(state.LuaScriptState)
+    if v ~= nil then return v end
+  end
+  return from(safe(function() return log.script_state end))
+end
+
 --- Does a campaign log (any page) hold entries somebody made? Its starting
 -- values (the party size) do not count. (Reads every page: see readLogMirror.)
 function Board.logHasContent(log)
@@ -4007,6 +4500,7 @@ local SCED          = require("StillHour/SCED")
 local ChaosBag      = require("StillHour/ChaosBag")
 local Board         = require("StillHour/Board")
 local Guide         = require("StillHour/Guide")
+local Setup         = require("StillHour/Setup")
 
 local SAVE_VERSION = 2
 
@@ -4039,6 +4533,11 @@ local aging = {}                -- investigatorId -> interlude aging inputs {def
 local saveSeq = 0               -- bumps on every change; newest copy wins (control vs campaign log)
 local beginWarned = false       -- Begin Next Loop already told the table what is outstanding
 local resetAsked = false        -- Reset Loop asked once (the loop is not over by the Control's count): the next click ends it
+local seatPick = {}             -- Setup panel: investigator ids picked to seat, in the order picked
+local nightPick = nil           -- Setup panel: { [box id] = true } the districts picked for the night (nil: the proposal)
+local proposeNight              -- forward: the districts the Control proposes for the night (Loop Setup)
+local setupRunning = false      -- the one-button setup is laying the table out
+local tableSetUp = false        -- this loop's (or the Prologue's) table was laid out by the Setup panel
 
 -------------------------------------------------------------- board contexts --
 
@@ -4047,6 +4546,10 @@ local function hourLog(h, name, msg)
 end
 
 local refreshControl  -- forward
+local findScenarioBox -- forward (a scenario box on the table by its id)
+local syncHoursDeck   -- forward (the Hours deck on the table follows the Control's Hour)
+local finaleTable     -- forward (The Last Hour's own setup, after Begin Finale)
+local hoursShown = nil  -- the Hour the Hours deck on the table was last laid out for
 local refreshBag      -- forward (the campaign's chaos-bag changes)
 
 local function syncBoard()
@@ -4092,11 +4595,22 @@ local function announceResetReached()
   end
 end
 
+--- The campaign log's shown page fills itself in from this token (Between Loops step 4).
+local function syncLogPage()
+  if type(getObjectsWithTag) ~= "function" then return end
+  for _, o in ipairs(getObjectsWithTag(Board.CAMPAIGN_LOG_TAG)) do
+    pcall(function() Wait.frames(function() pcall(function() o.call("syncQuietly") end) end, 5) end)
+  end
+end
+
 local function afterChange()
   if refreshBag then guarded("chaos bag", refreshBag) end
   syncBoard()
   guarded("investigators", Board.refreshInvestigators, false)
   refreshControl()
+  if syncHoursDeck then guarded("hours deck", syncHoursDeck) end
+  -- Between Loops (Reset Loop to Begin Next Loop) the log follows every step on its own
+  if mode == "interlude" or CampaignState.isLoopEnded() then guarded("campaign log", syncLogPage) end
 end
 
 -------------------------------------------------------------------- actions --
@@ -4915,6 +5429,9 @@ local function beginNextLoop(force)
   Dissonance.syncBag(bag)
   aging = {}
   mode = "play"
+  nightPick = nil
+  tableSetUp = false            -- Loop Setup next: the Setup button says so
+  guarded("campaign log", syncLogPage)
   guarded("aging", Board.refreshInvestigators, true)
   announce(string.format("A new loop begins. Memory capped at %d; %d lost.",
     CampaignState.constants().memoryCap, lost))
@@ -5096,8 +5613,8 @@ local function drawPlay()
         .. "is added by Hour (if Hour VI is canceled, use Undo Hour VI).")
     local h = CampaignState.getHour()
     button("shClickHour", string.format("Hour %d · %s", h, Hourglass.HOUR_NAMES[h] or "?"), -PAIR_X, -0.5, 1000,
-      "Each time the Hourglass advances or rewinds, move the Hours deck and click once per Hour (left advance, "
-        .. "right rewind). With SCED it clears all doom in play (take doom off the Hours cards yourself). It applies "
+      "Each time the Hourglass advances or rewinds, click once per Hour (left advance, right rewind): the Hours "
+        .. "on the table follow. With SCED it clears all doom in play. It applies "
         .. "Hour III's +1 Dissonance, the Approach at Hours V, VII and VIII, Hour VI's Static token and Hour VIII's "
         .. "+2 Dissonance. You resolve the rest: each investigator heals 1 damage and 1 horror, Hour II's draws, "
         .. "Hour III's extra +1 at a Church location (click Dissonance) and The Belfry, Hour IV, Hour VII's "
@@ -5112,12 +5629,15 @@ local function drawPlay()
       button("shInvMem" .. i, string.format("%s · Memory %d", inv.name, CampaignState.getOnCardMemory(inv.id)),
         (i % 2 == 1) and -PAIR_X or PAIR_X, 0.1 + math.floor((i - 1) / 2) * 0.55, 1000,
         "Memory on this investigator's cards (the Appointed hunts the most). Click whenever Memory is placed on "
-          .. "or removed from their cards. " .. PLUS_MINUS .. ". At Loop Setup, Anchor Point's token takes one "
-          .. "click; an Elder or Ancient investigator's start Memory is already counted.", 80)
+          .. "or removed from their cards. " .. PLUS_MINUS .. ". Set Up Loop counts Anchor Point's token and "
+          .. "an Elder or Ancient investigator's start Memory for you.", 80)
     end
   end
   -- rows of three, spaced so no button overlaps another
   button("shStatus", "Status", -ROW3_X, 1.4, 620, "Print the Hour, Dissonance, band, scar, Memory and Part to the chat.")
+  button("shOpenSetup", tableSetUp and "Setup" or (CampaignState.inPrologue() and "Set Up Prologue" or
+    (between and "Setup" or "Set Up Loop")), ROW3_X, 1.4, 620, "Seat the investigators, pick tonight's districts "
+    .. "and lay the table out with one click.", 85)
   button("shSyncBoard", "Sync Board", 0.0, 1.4, 620, "Use when the table and the Control disagree: re-applies location sides and CLOSED labels, the "
     .. "Appointed's position and the chaos bag's Static tokens.")
   button("shReset", "Reset Loop", -ROW3_X, 2.0, 620, "When the loop ends (Between Loops). Counts once per loop. "
@@ -5166,6 +5686,73 @@ local function drawPlay()
       "One pending token: left resolves, right cancels. Multiple tokens: use Resolve on the actual token. "
         .. "Returning an unresolved token to the bag also discards that token's pending reveal.", 85)
   end
+end
+
+-- The districts a night can add to the Square, in the order the setup lays them out (the Sunken
+-- Road before the Lighthouse, which is reached through it), and the finale's box.
+local NIGHT_ORDER = { "district_church", "district_almanac", "district_fairground", "district_road",
+  "district_lighthouse", "finale" }
+local BOX_NAMES = { district_square = "The Square (Town Hall)", district_church = "The Drowned Church",
+  district_almanac = "The Almanac House", district_fairground = "The Fairground", district_road = "The Sunken Road",
+  district_lighthouse = "The Lighthouse", finale = "The Last Hour", prologue = "The First Hour" }
+
+local function seatedByMat()
+  local out = {}
+  for _, inv in ipairs(guarded("investigators", Board.investigators) or {}) do
+    if inv.matColor then out[#out + 1] = inv end
+  end
+  return out
+end
+
+local function drawSetup()
+  header("SETUP", -2.3)
+  local seated = seatedByMat()
+  local at = {}
+  for _, inv in ipairs(seated) do at[inv.id] = inv.matColor end
+  local free = Setup.freeMats(seated)
+  for i, inv in ipairs(Setup.INVESTIGATORS) do
+    if i > 6 then break end
+    local label, tip = "[ ] " .. inv.name, "Click to seat this investigator; click again to take them off the list. "
+      .. "They are seated on the free playmats in the order picked."
+    if at[inv.id] then
+      label, tip = inv.name .. " · " .. at[inv.id], "Seated on the " .. at[inv.id] .. " playmat."
+    else
+      for k, id in ipairs(seatPick) do
+        if id == inv.id then label = "[x] " .. inv.name .. " → " .. (free[k] or "no free mat") end
+      end
+    end
+    button("shSeatPick" .. i, label, (i % 2 == 1) and -PAIR_X or PAIR_X, -1.7 + math.floor((i - 1) / 2) * 0.55, 1000, tip, 80)
+  end
+  local z = -1.7 + math.ceil(math.min(#Setup.INVESTIGATORS, 6) / 2) * 0.55
+  button("shSeatInvestigators", string.format("Seat investigators (%d)", #seatPick), 0, z, 1400,
+    "Campaign Setup steps 2-3 for each picked investigator: their card, minicard and permanent cards on their "
+      .. "playmat, and their deck (the cards their back requires, the starter deck from Appendix: Starting Decks "
+      .. "and 1 random basic weakness) shuffled on the Deck spot.", 90)
+  z = z + 0.65
+  if CampaignState.inPrologue() then
+    button("shNoop", "[x] " .. BOX_NAMES.prologue, 0, z, 1400, "The Prologue lays out The First Hour.", 80)
+    z = z + 0.55
+  else
+    local pick = nightPick or proposeNight()
+    button("shNoop", "[x] " .. BOX_NAMES.district_square, -PAIR_X, z, 1000, "Every loop lays out the Square.", 80)
+    local shown = 1
+    for i, id in ipairs(NIGHT_ORDER) do
+      if id ~= "finale" or CampaignState.knows("the-way-the-night-breaks") then
+        local col = shown % 2
+        local row = math.floor(shown / 2)
+        button("shNightPick" .. i, (pick[id] and "[x] " or "[ ] ") .. BOX_NAMES[id], col == 0 and -PAIR_X or PAIR_X,
+          z + row * 0.55, 1000, "Lay this box out tonight (picked for you from the Campaign Log: the districts with "
+            .. "an objective left, one path a loop). Click to change. The Lighthouse brings the Sunken Road.", 80)
+        shown = shown + 1
+      end
+    end
+    z = z + math.ceil(shown / 2) * 0.55
+  end
+  button("shSetUp", CampaignState.inPrologue() and "Set Up Prologue" or "Set Up Loop", -0.55, z + 0.1, 1100,
+    "Lays the table out: Clear Board, each investigator's cards back into their deck (shuffled), healed, "
+      .. "5 resources and an opening hand of 5, then the boxes ticked above Placed in order and the investigators "
+      .. "at the Square. Then check the table.", 100)
+  button("shCloseSetup", "Back", 1.35, z + 0.1, 620, "Return to the main panel.")
 end
 
 local function drawInterlude()
@@ -5256,7 +5843,7 @@ refreshControl = function()
   -- every other click redraws the panel, which withdraws a pending "Reset Loop?"
   resetAsked = false
   pcall(function() self.clearButtons() end)
-  if mode == "interlude" then drawInterlude() else drawPlay() end
+  if mode == "interlude" then drawInterlude() elseif mode == "setup" then drawSetup() else drawPlay() end
   -- Token UI is transient in TTS. Reattach by saved GUID on reload/restore;
   -- clearing first makes repeated restoration idempotent.
   for _, guid in ipairs(bag.save().pendingStatic or {}) do
@@ -5439,6 +6026,8 @@ function shAge3() ageAt(3) end
 function shAge4() ageAt(4) end
 
 function shBeginFinale()
+  local hourAtStart = CampaignState.getHour()
+  local wasFinale = CampaignState.inFinale()
   guarded("finale", function()
     if not CampaignState.knows("the-way-the-night-breaks") or CampaignState.inFinale() then return end
     -- the button is not drawn in the Prologue; a call from outside must not begin the finale there
@@ -5464,13 +6053,11 @@ function shBeginFinale()
     guarded("Appointed", Board.syncAppointed, { log = hourLog })
     -- The true page reached the Press: 1 fewer Static for the finale, on top of
     -- Hour VI's (the next reset clears it)
-    local log = Board.campaignLog()
-    local lv = log and guarded("log", function() return log.call("getLogValues") end)
-    if type(lv) == "table" and type(lv.values) == "table" and lv.values.page_a then
+    if guarded("log", Board.logValue, "page_a") == true then
       bag.setPress(true)
       announce("The true page reached the Press: until the finale ends, the chaos bag holds 1 fewer Static token.")
     end
-    announce("The finale begins: the Appointed is set aside. Spawn As It Was, As It Will Be and As It Is. "
+    announce("The finale begins: the Appointed is set aside. "
       .. "If Hour IX is reached before As It Is is defeated, the finale ends (Resolution 5 or 6).")
     -- late records (each district's act 3a): 1 damage each on the form of its period
     local nLate, by = Knowledge.lateKnown()
@@ -5482,6 +6069,16 @@ function shBeginFinale()
     end
   end)
   afterChange()
+  if wasFinale or not CampaignState.inFinale() then return end
+  -- the finale's box, if it is not laid out yet, then the finale's own setup
+  local box = findScenarioBox("finale")
+  local function go() guarded("finale setup", finaleTable, hourAtStart) ; afterChange() end
+  if box and boxIsFull(box) then
+    pcall(function() box.call("buttonClick_place") end)
+    Wait.time(function() Wait.condition(go, function() return not shApiBoxBusy() end, 20, go) end, 0.5)
+  else
+    go()
+  end
 end
 
 --- Hour VI's Forced ability was canceled: undo what it applied.
@@ -5872,6 +6469,219 @@ local function takeById(stack, id, pos)
   return nil
 end
 
+-- The finale's own setup (The Last Hour, Setup steps 1-3), done for the players once Begin Finale has
+-- begun it: every district's act deck set aside, the enemies the districts' act 2a spawned removed,
+-- the forms of the Appointed and The Uninvited spawned where the guide says, the Hourglass set by the
+-- Hour the finale began at, and what the log records applied (damage on the forms, an Hour rewound).
+local FORM_SPOTS = { { "sthr-form-past", "sthr-loc-firstoccultation" }, { "sthr-form-future", "sthr-loc-morningafter" },
+  { "sthr-form-present", "sthr-loc-hubsquare" } }
+local ACT_TWO_SPAWNS = { "sthr-wearssheriff", "sthr-bellringer" }
+
+local function cardOnTable(id)
+  for _, o in ipairs(getObjects()) do
+    if not o.isDestroyed() and o.type == "Card" and idOf(o.getGMNotes()) == id then return o end
+  end
+  return nil
+end
+
+local function onto(card, loc, dx)
+  local p = loc.getPosition()
+  pcall(function()
+    card.setPosition({ p.x + (dx or 0), p.y + 0.8, p.z })
+    card.setRotation({ 0, loc.getRotation().y, 0 })
+  end)
+end
+
+local function logChoice(key)
+  return guarded("log", Board.logValue, key) == true
+end
+
+finaleTable = function(hourAtStart)
+  local done = {}
+  -- every district's act deck set aside; the act 2a enemies leave the game
+  local decks = 0
+  for _, box in ipairs({ "district_square", "district_church", "district_road", "district_lighthouse",
+      "district_fairground", "district_almanac" }) do
+    local d = boxStack("StillHourBox_" .. box, "Act Deck")
+    if d then pcall(function() d.destruct() end) ; decks = decks + 1 end
+    for _, id in ipairs(DISTRICT_ACTS[box] or {}) do
+      local loose = cardOnTable(id)
+      if loose and loose.hasTag("StillHourLoop") then pcall(function() loose.destruct() end) ; decks = decks + 1 end
+    end
+  end
+  if decks > 0 then done[#done + 1] = "the districts' act decks set aside" end
+  for _, id in ipairs(ACT_TWO_SPAWNS) do
+    local e = cardOnTable(id)
+    if e then pcall(function() e.destruct() end) ; done[#done + 1] = "an enemy an act 2a spawned removed" end
+  end
+  -- the forms and The Uninvited from the finale's set-aside pile
+  local aside = boxStack("StillHourBox_finale", "Set Aside")
+  local forms = {}
+  for _, f in ipairs(FORM_SPOTS) do
+    local loc = cardOnTable(f[2])
+    local c = aside and takeById(aside, f[1])
+    aside = boxStack("StillHourBox_finale", "Set Aside") or aside
+    if c and loc then onto(c, loc) ; forms[f[1]] = c end
+  end
+  if next(forms) then done[#done + 1] = "As It Was, As It Will Be and As It Is spawned" end
+  local uninvited = aside and takeById(aside, "sthr-uninvited")
+  if uninvited then
+    -- at the revealed location farthest from all investigators
+    local best, bestD
+    local minis = {}
+    for _, inv in ipairs(seatedByMat()) do if inv.minicard then minis[#minis + 1] = inv.minicard.getPosition() end end
+    for _, o in ipairs(getObjects()) do
+      if not o.isDestroyed() and o.type == "Card" and o.hasTag("Location") and o.hasTag("StillHourLoop") then
+        local r = o.getRotation()
+        if math.abs(r.z) < 10 or math.abs(r.z - 360) < 10 then
+          local p, d = o.getPosition(), math.huge
+          for _, m in ipairs(minis) do d = math.min(d, (p.x - m.x) ^ 2 + (p.z - m.z) ^ 2) end
+          if #minis == 0 then d = 0 end
+          if not bestD or d > bestD then best, bestD = o, d end
+        end
+      end
+    end
+    if best then onto(uninvited, best, 0.6) ; done[#done + 1] = "The Uninvited spawned" end
+  end
+  -- the Hourglass by the Hour the finale began at (Setup step 2)
+  if hourAtStart >= 9 then
+    for _ = 1, 4 do guarded("hour", function() Hourglass.rewind(1, playCtx()) end) end
+    done[#done + 1] = "the Hourglass set back to Hour V (no Hour resolves)"
+  elseif hourAtStart < 5 then
+    for _ = hourAtStart, 4 do guarded("hour", changeHour, 1) end
+    done[#done + 1] = "the Hourglass advanced to Hour V (each Hour resolved)"
+  end
+  -- what the log records (Setup step 3)
+  local past = forms["sthr-form-past"]
+  if logChoice("name_a") and past then
+    Wait.frames(function() SCED.spawnTokenGroup(past, "damage", 1) end, 20)
+    done[#done + 1] = "1 damage on As It Was (you have spoken the name)"
+  end
+  if logChoice("page_b") then
+    guarded("hour", function() Hourglass.rewind(1, playCtx()) end)
+    done[#done + 1] = "the Hourglass rewound 1 Hour (the drowned heard the true hour)"
+  end
+  local nLate, by = Knowledge.lateKnown()
+  if nLate > 0 then
+    local half = CampaignState.constants().investigators
+    local p, f = math.min(by.past, half), math.min(by.future, half)
+    local fut = forms["sthr-form-future"]
+    Wait.frames(function()
+      if past and p > 0 then SCED.spawnTokenGroup(past, "damage", p + (logChoice("name_a") and 1 or 0)) end
+      if fut and f > 0 then SCED.spawnTokenGroup(fut, "damage", f) end
+    end, 30)
+    done[#done + 1] = string.format("your late records: %d damage on As It Was, %d on As It Will Be", p, f)
+  end
+  if logChoice("ticket_b") then
+    done[#done + 1] = "remember: you refused the ticket (cancel the first Lost Hour's revelation this finale)"
+  end
+  hoursShown = nil
+  guarded("hours deck", syncHoursDeck)
+  announce("The Last Hour is set up: " .. (#done > 0 and table.concat(done, "; ") or "nothing to change") .. ". Check the table.")
+  return done
+end
+
+-- The Hours on the table follow the Control's Hour: the current Hour face up on the agenda spot with
+-- the later Hours under it, the Hours already past set aside face down (the guide's "move the Hours
+-- deck" is done for the players). Rebuilt from the cards' own data whenever the Hour changes; the
+-- Hour's doom is gone by then (SCED's doom reset at every Hour change).
+local AGENDA_SPOT = { pos = { x = -2.94, y = 1.61, z = 0.36 }, rot = { 0, 180, 0 } }
+local ASIDE_SPOT = { pos = { x = 1.69, y = 1.56, z = 14.24 }, rot = { 0, 225, 180 } }
+
+local function hourOf(gm)
+  local id = idOf(gm)
+  local n = id and tostring(id):match("^sthr%-hour%-(%d)$")
+  return n and tonumber(n) or nil
+end
+
+--- The Hour the Hours deck on the agenda spot shows (its last card, face up), or nil.
+local function shownHour()
+  for _, o in ipairs(getObjects()) do
+    if type(o.isDestroyed) == "function" and not o.isDestroyed() and (o.type == "Deck" or o.type == "Card")
+        and near(o.getPosition(), AGENDA_SPOT.pos, 0.6) then
+      if o.type == "Card" then return hourOf(o.getGMNotes()) end
+      local list = o.getObjects() or {}
+      return list[#list] and hourOf(list[#list].gm_notes) or nil
+    end
+  end
+  return nil
+end
+
+--- onlyIfWrong: after a Place, leave a freshly laid Hours deck alone when it already shows the Hour.
+syncHoursDeck = function(onlyIfWrong)
+  local h = CampaignState.getHour()
+  if hoursShown == h then return end
+  if type(getObjects) ~= "function" or type(spawnObjectData) ~= "function" then return end
+  if onlyIfWrong and shownHour() == h then hoursShown = h ; return end
+  local data, holders = {}, 0
+  local looks = nil          -- the Hours deck's own name and tags, kept on the deck laid out again
+  local function keep(d)
+    local n = hourOf(d.GMNotes)
+    if n and not data[n] then data[n] = d end
+  end
+  for _, o in ipairs(getObjects()) do
+    if type(o.isDestroyed) ~= "function" or type(o.getGMNotes) ~= "function" then
+      -- not a table object (a stub): nothing of the Hours
+    elseif not o.isDestroyed() and o.type == "Card" and hourOf(o.getGMNotes()) then
+      holders = holders + 1
+      keep(o.getData())
+      o.destruct()
+    elseif not o.isDestroyed() and o.type == "Deck" then
+      local hours, others = {}, 0
+      for _, e in ipairs(o.getObjects() or {}) do
+        if hourOf(e.gm_notes) then hours[#hours + 1] = e.guid else others = others + 1 end
+      end
+      if #hours > 0 then
+        holders = holders + 1
+        if others == 0 then
+          local d = o.getData()
+          if tostring(d.Nickname or ""):find("Agenda Deck", 1, true) or not looks then
+            looks = { Nickname = d.Nickname, Tags = d.Tags, Description = d.Description }
+          end
+          for _, c in ipairs(d.ContainedObjects or {}) do keep(c) end
+          o.destruct()
+        else
+          local p = o.getPosition()
+          for _, g in ipairs(hours) do
+            local c = o.takeObject({ guid = g, position = { p.x, p.y + 3, p.z }, smooth = false })
+            if c then keep(c.getData()) ; c.destruct() end
+          end
+        end
+      end
+    end
+  end
+  hoursShown = h
+  if holders == 0 then return end
+  local now, past = {}, {}
+  for n = 9, 1, -1 do
+    -- a face-up stack shows its last card: Hour IX first, the current Hour last
+    if data[n] and n >= h then now[#now + 1] = data[n] end
+  end
+  for n = 1, 9 do
+    if data[n] and n < h then past[#past + 1] = data[n] end
+  end
+  Wait.frames(function()
+    local a = AGENDA_SPOT.pos
+    if #now > 1 and looks then
+      local deck = Setup.deckData(now)
+      deck.Nickname, deck.Tags, deck.Description = looks.Nickname, looks.Tags, looks.Description
+      spawnObjectData({ data = deck, position = { a.x, a.y + 0.5, a.z }, rotation = AGENDA_SPOT.rot })
+    else
+      Setup.spawnStack(now, { a.x, a.y + 0.5, a.z }, AGENDA_SPOT.rot)
+    end
+    if #past > 0 then
+      local s2 = ASIDE_SPOT.pos
+      local pile
+      for _, o in ipairs(getObjects()) do
+        if not o.isDestroyed() and (o.type == "Deck" or o.type == "Card") and near(o.getPosition(), s2, 0.8) then pile = o end
+      end
+      Setup.spawnStack(past, { s2.x, s2.y + 1.5, s2.z }, ASIDE_SPOT.rot, function(o)
+        if pile and not pile.isDestroyed() then pcall(function() pile.putObject(o) end) end
+      end)
+    end
+  end, 2)
+end
+
 local function putInto(target, obj, faceDown)
   if not (target and obj) or target == obj then return false end
   if faceDown then
@@ -5996,6 +6806,7 @@ function shApiSyncBoardStaged(p)
   end
   local steps = {
     { "loop setup", function() setUpPlacedBox(p) end },
+    { "the Hours", function() hoursShown = nil ; syncHoursDeck(true) end },
     { "locations", function() almanacActTwoAtPlace(p) ; Board.syncLocations() end },
     { "the Appointed", function() Board.syncAppointed({ log = hourLog, applyStats = true }) end },
     { "investigators", function() Board.refreshInvestigators(true) end },
@@ -6127,6 +6938,224 @@ function shClearBoard()
 end
 
 function shApiClearBoard() return clearAndRefill() end
+
+----------------------------------------------------------------- Setup panel --
+-- Campaign Setup steps 2-3 (seat the investigators) and Loop Setup (or the Prologue's Setup) in one
+-- click each. The night's districts are picked from the Campaign Log (Setup.proposeDistricts: the
+-- districts with an objective left, the deeper ones first, two at most, the Road with the Lighthouse);
+-- the players can change the pick before clicking Set Up Loop. Everything the guide's setup steps
+-- ask for is laid out; the players check the table and play.
+
+findScenarioBox = function(id)
+  if type(getObjects) ~= "function" then return nil end
+  for _, o in ipairs(getObjects()) do
+    if not o.isDestroyed() and scenarioBoxId(o) == id then return o end
+  end
+  return nil
+end
+
+proposeNight = function()
+  local knows = function(id) return CampaignState.knows(id) end
+  local open = CampaignState.knows("what-the-almanac-hid") and CampaignState.knows("the-vote-that-never-ends")
+  local pick = Setup.proposeDistricts(DISTRICT_ACTS, knows, CampaignState.inPartTwo(), open, 2)
+  if Knowledge.finaleForced() then pick.finale = true end
+  return pick
+end
+
+local function togglePick(i)
+  local inv = Setup.INVESTIGATORS[i]
+  if not inv then return end
+  for _, s in ipairs(seatedByMat()) do if s.id == inv.id then return refreshControl() end end
+  for k, id in ipairs(seatPick) do
+    if id == inv.id then table.remove(seatPick, k) ; return refreshControl() end
+  end
+  seatPick[#seatPick + 1] = inv.id
+  refreshControl()
+end
+function shSeatPick1() togglePick(1) end
+function shSeatPick2() togglePick(2) end
+function shSeatPick3() togglePick(3) end
+function shSeatPick4() togglePick(4) end
+function shSeatPick5() togglePick(5) end
+function shSeatPick6() togglePick(6) end
+
+local function toggleNight(i)
+  local id = NIGHT_ORDER[i]
+  if not id then return end
+  nightPick = nightPick or proposeNight()
+  nightPick[id] = not nightPick[id] or nil
+  -- the Lighthouse is reached only through the Sunken Road
+  if id == "district_lighthouse" and nightPick[id] then nightPick.district_road = true end
+  if id == "district_road" and not nightPick[id] then nightPick.district_lighthouse = nil end
+  refreshControl()
+end
+function shNightPick1() toggleNight(1) end
+function shNightPick2() toggleNight(2) end
+function shNightPick3() toggleNight(3) end
+function shNightPick4() toggleNight(4) end
+function shNightPick5() toggleNight(5) end
+function shNightPick6() toggleNight(6) end
+
+function shOpenSetup() mode = "setup" ; refreshControl() end
+function shCloseSetup() mode = "play" ; refreshControl() end
+
+--- The campaign log's page 1 fills its investigator rows from the table (its own Fill investigators).
+local function fillLog()
+  for _, o in ipairs(getObjectsWithTag(Board.CAMPAIGN_LOG_TAG)) do
+    pcall(function() o.call("fillInvestigators") end)
+  end
+end
+
+--- Seat the picked investigators (runner API: p = { ids = {...} } picks them first).
+function shApiSeat(p)
+  if type(p) == "table" and type(p.ids) == "table" then seatPick = p.ids end
+  local seated = seatedByMat()
+  local free = Setup.freeMats(seated)
+  if #seatPick == 0 then
+    announce("Pick the investigators to seat first (click their names on the Setup panel).")
+    return { seated = 0 }
+  end
+  if SCED.isPresent() and not Setup.cardIndexReady() then
+    announce("SCED is still reading its player cards. Click Seat investigators again in a few seconds.")
+    return { seated = 0, waiting = true }
+  end
+  local done, reports = 0, {}
+  for k, id in ipairs(seatPick) do
+    local mat = free[k]
+    if not mat then
+      announce("No free playmat for " .. tostring(id) .. ": every mat holds an investigator.")
+      break
+    end
+    local r = Setup.seat(id, mat) or {}
+    reports[#reports + 1] = r
+    if r.ok then
+      done = done + 1
+      local missing = #(r.missing or {}) > 0 and (" " .. #r.missing .. " card(s) could not be found: "
+        .. table.concat(r.missing, ", ") .. ".") or ""
+      announce(string.format("%s seated on the %s playmat: %d cards in the deck, shuffled.%s", r.name, mat, r.deck, missing))
+    else
+      announce("Could not seat " .. tostring(id) .. ": " .. tostring(r.why))
+    end
+  end
+  seatPick = {}
+  -- once the cards are on the mats: the party size, SCED's counter and the log's investigator rows
+  Wait.time(function()
+    local n = #seatedByMat()
+    if n > 0 and n ~= CampaignState.constants().investigators then
+      guarded("investigators", changeInvestigators, n - CampaignState.constants().investigators)
+    end
+    guarded("investigators", Board.refreshInvestigators, true)
+    guarded("campaign log", fillLog)
+    afterChange()
+  end, 3)
+  refreshControl()
+  return { seated = done, reports = reports }
+end
+function shSeatInvestigators() shApiSeat() end
+
+--- The investigators onto a location card (by id), spread across it.
+local function investigatorsTo(locId)
+  local loc
+  for _, o in ipairs(getObjects()) do
+    if o.type == "Card" and not o.isDestroyed() and idOf(o.getGMNotes()) == locId then loc = o end
+  end
+  if not loc then return 0 end
+  local p = loc.getPosition()
+  local n = 0
+  for i, inv in ipairs(seatedByMat()) do
+    if inv.minicard and not inv.minicard.isDestroyed() then
+      local dx = ((i - 1) % 2 == 0) and -0.45 or 0.45
+      local dz = (i <= 2) and -0.35 or 0.35
+      pcall(function() inv.minicard.setPositionSmooth({ p.x + dx, p.y + 0.6, p.z + dz }, false, true) end)
+      n = n + 1
+    end
+  end
+  return n
+end
+
+--- Anchor Point in play: its Memory token goes on its investigator's card at Loop Setup.
+local function anchorPointMemory()
+  local n = 0
+  for _, inv in ipairs(seatedByMat()) do
+    local tag = Setup.OWNER_TAG_PREFIX .. inv.matColor
+    for _, o in ipairs(getObjects()) do
+      if o.type == "Card" and not o.isDestroyed() and idOf(o.getGMNotes()) == "sthr-anchorpoint" and o.hasTag(tag) then
+        CampaignState.addOnCardMemory(inv.id, 1)
+        n = n + 1
+      end
+    end
+  end
+  return n
+end
+
+--- Set Up Prologue / Set Up Loop. Returns false when it could not start.
+function shApiSetUp()
+  if setupRunning then
+    announce("The table is still being laid out.")
+    return false
+  end
+  local seated = seatedByMat()
+  if #seated == 0 then
+    announce("Seat the investigators first (Setup panel: pick them, then Seat investigators).")
+    return false
+  end
+  if CampaignState.isLoopEnded() then
+    announce("Between Loops: click Begin Next Loop first, then Set Up Loop.")
+    return false
+  end
+  setupRunning = true
+  local prologue = CampaignState.inPrologue()
+  local boxes = prologue and { "prologue" } or { "district_square" }
+  if not prologue then
+    local pick = nightPick or proposeNight()
+    for _, id in ipairs(NIGHT_ORDER) do if pick[id] then boxes[#boxes + 1] = id end end
+  end
+  local names = {}
+  for _, id in ipairs(boxes) do names[#names + 1] = BOX_NAMES[id] or id end
+  announce((prologue and "Setting up the Prologue: " or "Setting up the loop: ") .. table.concat(names, ", ") .. ".")
+  local cleared = clearAndRefill()
+  local function finish()
+    local moved = investigatorsTo(prologue and "sthr-loc-square" or "sthr-loc-hubsquare")
+    local anchors = prologue and 0 or (guarded("anchor point", anchorPointMemory) or 0)
+    setupRunning = false
+    nightPick = nil
+    tableSetUp = true
+    mode = "play"
+    announce(string.format("Set up: %s laid out; %d investigator(s) at the Square, decks shuffled, 5 resources and "
+      .. "5 cards each%s. Check the table, choose a lead investigator (mulligan as normal) and begin.",
+      table.concat(names, ", "), moved, anchors > 0 and ", Anchor Point's Memory on its investigator" or ""))
+    afterChange()
+  end
+  Wait.frames(function()
+    for _, inv in ipairs(seated) do
+      local mat = inv.matColor
+      guarded("investigator reset", Setup.resetInvestigator, mat, { tokensOn = tokensOn, after = function()
+        Wait.time(function() guarded("opening hand", Setup.replaceDrawnWeaknesses, mat) end, 3)
+      end })
+    end
+    -- the boxes one after another, each once the board sync of the one before has run
+    local i = 0
+    local function nextBox()
+      i = i + 1
+      local id = boxes[i]
+      if not id then return Wait.time(finish, 1) end
+      local box = findScenarioBox(id)
+      if box and boxIsFull(box) then
+        pcall(function() box.call("buttonClick_place") end)
+      elseif box then
+        announce((BOX_NAMES[id] or id) .. " is already laid out.")
+      else
+        announce((BOX_NAMES[id] or id) .. "'s box is not on the table: Place it from the campaign box.")
+      end
+      Wait.time(function()
+        Wait.condition(nextBox, function() return not shApiBoxBusy() end, 20, nextBox)
+      end, 0.5)
+    end
+    nextBox()
+  end, 5)
+  return { cleared = cleared, boxes = boxes }
+end
+function shSetUp() shApiSetUp() end
 function shApiSetPartTwo(p)
   CampaignState.setPartTwo(p == nil or p.on ~= false)
   local rep = guarded("locations", Board.syncLocations)

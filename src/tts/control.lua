@@ -1153,8 +1153,8 @@ local function drawPlay()
       button("shInvMem" .. i, string.format("%s · Memory %d", inv.name, CampaignState.getOnCardMemory(inv.id)),
         (i % 2 == 1) and -PAIR_X or PAIR_X, 0.1 + math.floor((i - 1) / 2) * 0.55, 1000,
         "Memory on this investigator's cards (the Appointed hunts the most). Click whenever Memory is placed on "
-          .. "or removed from their cards. " .. PLUS_MINUS .. ". At Loop Setup, Anchor Point's token takes one "
-          .. "click; an Elder or Ancient investigator's start Memory is already counted.", 80)
+          .. "or removed from their cards. " .. PLUS_MINUS .. ". Set Up Loop counts Anchor Point's token and "
+          .. "an Elder or Ancient investigator's start Memory for you.", 80)
     end
   end
   -- rows of three, spaced so no button overlaps another
@@ -2118,16 +2118,35 @@ local function hourOf(gm)
   return n and tonumber(n) or nil
 end
 
-syncHoursDeck = function()
+--- The Hour the Hours deck on the agenda spot shows (its last card, face up), or nil.
+local function shownHour()
+  for _, o in ipairs(getObjects()) do
+    if type(o.isDestroyed) == "function" and not o.isDestroyed() and (o.type == "Deck" or o.type == "Card")
+        and near(o.getPosition(), AGENDA_SPOT.pos, 0.6) then
+      if o.type == "Card" then return hourOf(o.getGMNotes()) end
+      local list = o.getObjects() or {}
+      return list[#list] and hourOf(list[#list].gm_notes) or nil
+    end
+  end
+  return nil
+end
+
+--- onlyIfWrong: after a Place, leave a freshly laid Hours deck alone when it already shows the Hour.
+syncHoursDeck = function(onlyIfWrong)
   local h = CampaignState.getHour()
   if hoursShown == h then return end
+  if type(getObjects) ~= "function" or type(spawnObjectData) ~= "function" then return end
+  if onlyIfWrong and shownHour() == h then hoursShown = h ; return end
   local data, holders = {}, 0
+  local looks = nil          -- the Hours deck's own name and tags, kept on the deck laid out again
   local function keep(d)
     local n = hourOf(d.GMNotes)
     if n and not data[n] then data[n] = d end
   end
   for _, o in ipairs(getObjects()) do
-    if not o.isDestroyed() and o.type == "Card" and hourOf(o.getGMNotes()) then
+    if type(o.isDestroyed) ~= "function" or type(o.getGMNotes) ~= "function" then
+      -- not a table object (a stub): nothing of the Hours
+    elseif not o.isDestroyed() and o.type == "Card" and hourOf(o.getGMNotes()) then
       holders = holders + 1
       keep(o.getData())
       o.destruct()
@@ -2139,7 +2158,11 @@ syncHoursDeck = function()
       if #hours > 0 then
         holders = holders + 1
         if others == 0 then
-          for _, c in ipairs(o.getData().ContainedObjects or {}) do keep(c) end
+          local d = o.getData()
+          if tostring(d.Nickname or ""):find("Agenda Deck", 1, true) or not looks then
+            looks = { Nickname = d.Nickname, Tags = d.Tags, Description = d.Description }
+          end
+          for _, c in ipairs(d.ContainedObjects or {}) do keep(c) end
           o.destruct()
         else
           local p = o.getPosition()
@@ -2163,7 +2186,13 @@ syncHoursDeck = function()
   end
   Wait.frames(function()
     local a = AGENDA_SPOT.pos
-    Setup.spawnStack(now, { a.x, a.y + 0.5, a.z }, AGENDA_SPOT.rot)
+    if #now > 1 and looks then
+      local deck = Setup.deckData(now)
+      deck.Nickname, deck.Tags, deck.Description = looks.Nickname, looks.Tags, looks.Description
+      spawnObjectData({ data = deck, position = { a.x, a.y + 0.5, a.z }, rotation = AGENDA_SPOT.rot })
+    else
+      Setup.spawnStack(now, { a.x, a.y + 0.5, a.z }, AGENDA_SPOT.rot)
+    end
     if #past > 0 then
       local s2 = ASIDE_SPOT.pos
       local pile
@@ -2301,7 +2330,7 @@ function shApiSyncBoardStaged(p)
   end
   local steps = {
     { "loop setup", function() setUpPlacedBox(p) end },
-    { "the Hours", function() hoursShown = nil ; syncHoursDeck() end },
+    { "the Hours", function() hoursShown = nil ; syncHoursDeck(true) end },
     { "locations", function() almanacActTwoAtPlace(p) ; Board.syncLocations() end },
     { "the Appointed", function() Board.syncAppointed({ log = hourLog, applyStats = true }) end },
     { "investigators", function() Board.refreshInvestigators(true) end },

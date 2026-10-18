@@ -871,8 +871,11 @@ return function(H)
     check("the Forms defeated counter counts", hasLabel(control(), "Forms defeated 2 / 3"), labels(control()))
     fellMark = #(E.fellInto or {})
     local bagBefore = chaosBag() and #chaosBag().getObjects()
-    local fin = placeBox("finale")
-    E.run(3)
+    -- Begin Finale lays The Last Hour's box out itself (SCED's Place) and sets the finale up
+    E.run(8)
+    local fin = scenarioBox("finale")
+    check("Begin Finale lays out The Last Hour's box", fin ~= nil and #fin.getObjects() == 0,
+      fin and (#fin.getObjects() .. " left in the box") or "no box")
     local falls = newFalls()
     check("nothing the finale box laid out fell into a bag", #falls == 0, table.concat(falls, "; "))
     check("SCED's chaos bag holds the same number of objects", chaosBag() ~= nil and #chaosBag().getObjects() == bagBefore,
@@ -889,6 +892,9 @@ return function(H)
 
   step("save and load the table (onSave -> onLoad)", function()
     local s0 = st()
+    -- the log's shown page fills itself from the Control (Between Loops step 4): let it do so before the
+    -- snapshot, so what survives the load is compared with what was there, not with a page catching up
+    if campaignLog() then pcall(function() campaignLog().call("syncQuietly") end) ; E.run(0.5) end
     local log0 = campaignLog() and campaignLog().call("getLogValues")
     local boxes0 = {}
     for _, o in ipairs(findAll(function(o) return gm(o).type == "ScenarioBox" end)) do

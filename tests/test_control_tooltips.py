@@ -9,7 +9,7 @@ BOARD = open(os.path.join(ROOT, "src", "StillHour", "Board.ttslua"), encoding="u
 
 def test_every_moved_instruction_is_on_a_button():
     for text, src in (
-        ("move the Hours deck and click once per Hour", CONTROL),          # Hour
+        ("click once per Hour (left advance, right rewind): the Hours", CONTROL),   # Hour
         ("Hour III's extra +1 at a Church location", CONTROL),
         ("After Hold Back, do not right-click", CONTROL),
         ("use Resolve on the token", CONTROL),                              # Dissonance
@@ -18,7 +18,7 @@ def test_every_moved_instruction_is_on_a_button():
         ("The Crossing or the finale", CONTROL),        # Appointed
         ("to undo a canceled advance", CONTROL),
         ("a card that takes it away", CONTROL),                                 # banked Memory
-        ("Anchor Point's token takes one", CONTROL),
+        ("Set Up Loop counts Anchor Point's token", CONTROL),
         ("click it again", CONTROL),                                        # Reset Loop
         ("Unticking a mistake takes them back", CONTROL),                   # Knowledge
         ("click when a form of the Appointed is defeated", CONTROL),        # Forms defeated

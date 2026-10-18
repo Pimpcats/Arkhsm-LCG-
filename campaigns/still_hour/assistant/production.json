@@ -21,14 +21,14 @@
     "objectives_feasible_1_to_4_investigators": true,
     "lua_rules_tests": "322/322 each on Lua 5.2 and 5.4 (2026-10-13; now also run by pytest, tests/test_lua_suites.py)",
     "play_engine_regressions": "7 fixtures, 652 checks each on Lua 5.2 and 5.4",
-    "pytest": "286 passed, 24 skipped, 178 subtests in a clean checkout with Lua 5.2/5.4, reportlab and PyMuPDF (2026-10-18)",
+    "pytest": "287 passed, 24 skipped, 178 subtests (2026-10-18)",
     "verify_bundle": "OK on Lua 5.2 and 5.4 (2026-10-13), published dist/stillhour_bundle.lua; verify_control runStillHourTests 59/59",
     "cardforge_selftest": "20 passed, 0 failed, sandboxed (re-run 2026-10-02); owner-only golden prompts unavailable",
     "independent_review": "3 independent reviewers; no remaining blocker in their recorded scopes",
     "scenario_audit": "8/8 locked, 0 errors (2026-10-13)",
     "godot": "4.7.2: three real-SCED emulator scenes rendered, exit0, no scene/script errors",
     "godot_limits": "Two-round scenes; one nonvisual SCED sound/effect bundle has no mesh renderer. Campaign raw assets seeded from hash-verified local bytes matching the immutable GitHub commit.",
-    "hosted_asset_commit": "8d1729cead7e4f76f9ea3b13082f900f4640ff04",
+    "hosted_asset_commit": "16bf471d8527200588f0a29585608ea71d487f2c",
     "immutable_remote_assets_verified": true,
     "full_renderer_run": true,
     "art_missing": 0,
@@ -76,7 +76,8 @@
     "art_complete": true,
     "campaign_log_hidden_names": "implemented: unearned names stay hidden on the log until ticked",
     "database_audit": "python3 tools/audit_database.py: 0 ERROR, 4 WARN, 33 INFO (2026-10-13)",
-    "place": "every scenario box carries SCED's MemoryBag script unchanged (2026-10-18; the custom loop_box.lua is gone): Place empties the box; the Control's Clear Board refills each used box from the Spare Scenario Boxes bag in the campaign box (spawnObjectJSON, same GUIDs) and settles shared spots (act decks). Headless real-SCED suites pass on the pinned SCED and v4.9.3; NOT run in real Tabletop Simulator"
+    "place": "every scenario box carries SCED's MemoryBag script unchanged (2026-10-18; the custom loop_box.lua is gone): Place empties the box; the Control's Clear Board refills each used box from the Spare Scenario Boxes bag in the campaign box (spawnObjectJSON, same GUIDs) and settles shared spots (act decks). Headless real-SCED suites pass on the pinned SCED and v4.9.3; NOT run in real Tabletop Simulator",
+    "setup": "Setup panel on the Control token (2026-10-18): Seat investigators (card, minicard, quest card, starter deck from SCED's All Player Cards bag by id + 1 random basic weakness, owner-tagged), Set Up Prologue / Set Up Loop (Clear Board + refill, each investigator's cards back into their deck, healed, 5 resources, 5 cards, weaknesses replaced, boxes Placed in order, minicards to the Square, Anchor Point's Memory; the night's districts picked from the log), the Hours deck follows the Control's Hour, Begin Finale sets The Last Hour up, the log fills itself Between Loops. Headless real-SCED table_setup suite 62 checks; NOT run in real Tabletop Simulator"
   },
   "evidence": [
     "python3 pipeline/scenario_content.py: 8/8 scenarios, 0 errors (notes: one inherited stat deviation, five cross-district symbol repeats in distinct colours)",
@@ -98,10 +99,11 @@
     "2026-10-06: Place rebuilt (loop_box.lua: native copy, SCED's own takeObject, sprite sheets), Control flow and log mirror fixes, guide with contents, bookmarks and a right-click page menu (40 pages), starter decks for all five investigators, doom reset on Hour changes, database audit tool, parity/flow/stuck-state audits (docs/design/PARITY_AND_FLOW_AUDIT.md, DATABASE_AUDIT.md, PLACE_BUTTON_AUDIT.md, DECKBUILDING_REVIEW.md); dist/ rebuilt and pushed with images pinned to 096328c. Offline only: nothing here ran in real Tabletop Simulator and nothing has been played by a person.",
     "2026-10-13: claude/loving-bohr-n7ixl4 (132 commits, 2026-10-06 to 10-12) fast-forwarded into main; main is the working branch again and the in-game Download Box now reads this build. Three Lua checks had gone stale after intended rule changes (Hold Back skips Hour I, the finale's Forms defeated counter, the guide's right-click menu missing from the bundle stub): tests updated, no game code changed; the Lua suites now run in pytest. Offline only.",
     "2026-10-17: headless real-SCED suites (tests/test_sced_*.py: playthrough, runner, Place/Recall/Clear Board, Control flow, Hour doom reset, story resolutions) 16/16 on the pinned SCED 0e12534 and 16/16 on SCED v4.9.3 (670fbf5, 2026-10-15; SCED_DIR set to a v4.9.3 clone). Emulator only: no rendering, approximate physics, not real Tabletop Simulator.",
-    "2026-10-18: scenario boxes switched to SCED's own MemoryBag script (owner: use SCED's scripting). Clear Board refills used boxes from a Spare Scenario Boxes bag; the Control settles shared act-deck spots and runs the board sync after SCED's Place. Guide, LOADING and PLACE_TEST updated; dist rebuilt, images unchanged, guide re-pinned to 8d1729c. pytest 286 passed; Lua rules 322/322, bundle and runStillHourTests on 5.2/5.4; headless real-SCED suites 16/16 on the pinned SCED and on v4.9.3; relay offline 11/11. Offline only."
+    "2026-10-18: scenario boxes switched to SCED's own MemoryBag script (owner: use SCED's scripting). Clear Board refills used boxes from a Spare Scenario Boxes bag; the Control settles shared act-deck spots and runs the board sync after SCED's Place. Guide, LOADING and PLACE_TEST updated; dist rebuilt, images unchanged, guide re-pinned to 8d1729c. pytest 286 passed; Lua rules 322/322, bundle and runStillHourTests on 5.2/5.4; headless real-SCED suites 16/16 on the pinned SCED and on v4.9.3; relay offline 11/11. Offline only.",
+    "2026-10-18: setup automated (owner: 'all of set up is automated'): Setup panel, Set Up Prologue / Set Up Loop, investigator seating from SCED's player cards (pipeline/starter_deck_ids.py -> campaigns/still_hour/starter_decks.json), Hours deck follows the Hour, Begin Finale's table setup, the log syncs itself. Guide setup sections rewritten. Tests: pytest 287 passed; Lua 322/322; headless real-SCED suites 17/17 on the pinned SCED and on v4.9.3 (incl. tests/sced_real/table_setup.lua, 62 checks). Offline only."
   ],
   "next_actions": [
-    "Owner: load the rebuilt campaign file (docs/LOADING.md), press Place on The First Hour box (SCED's own Place now) and say whether Tabletop Simulator stopped; if it did, run docs/PLACE_TEST.md and send the last 60 lines of Player.log.",
+    "Owner: load the rebuilt campaign file (docs/LOADING.md), press Place on the campaign box, then on the Control token: Set Up Prologue -> pick investigators -> Seat investigators -> difficulty -> Set Up Prologue. Report whether anything is misplaced and whether TTS stopped.",
     "Owner: check that a laid-out box keeps its GUIDs through TTS's copy (Place a district, flip a location, Clear Board, Place again, count clues); landscape sheet cells; legibility of the smallest rules text; then play the Prologue and Night 1.",
     "Art: 20 paintings still to paint (docs/CHATGPT_ART_PACK.md 'Still to paint'); import with python3 pipeline/import_art.py, then publish and rebuild dist.",
     "Human playtest: opening, first night and complete campaigns at intended difficulty/player count; record objective success, defeats, earned XP and purchases by played slot."
