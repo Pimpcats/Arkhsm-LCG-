@@ -1,5 +1,11 @@
 # Place button audit (rewritten 2026-10-06, updated after the rebuild)
 
+> **Superseded 2026-10-18:** the scenario boxes now carry SCED's own MemoryBag script unchanged
+> (src/tts/memory_bag.lua); `src/tts/loop_box.lua`, described under "The new Place" below, is gone.
+> Clear Board on the Control token refills a used box from the Spare Scenario Boxes bag
+> (src/tts/control.lua refillBoxes) and the Control settles shared spots after a Place. The
+> analysis of the native crash below still stands.
+
 Designer-facing; no campaign content. Question: why does Tabletop Simulator
 stop when the owner presses Place on a scenario box (The First Hour), and is
 the box built the way SCED builds its own?

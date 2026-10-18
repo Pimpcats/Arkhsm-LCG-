@@ -34,12 +34,11 @@ GitHub, so the build works on any PC.
    **Place**. The **campaign log** token has three pages: right-click it and
    choose **Next page** to turn to the next one.
 
-Every box has **Place** and **Recall**. A scenario box's **Place** takes a few
-seconds: it lays its cards out one at a time and says what it is placing in the
-chat. Press it once; pressing it again while its cards are on the table is
-refused (it would lay a second copy on top of the first). To take a box back (a
-district placed by mistake, or a loop that is over), press **Recall** on that
-box, or **Clear Board** on the Control token for every box at once.
+Every box has SCED's own **Place** and **Recall**. **Place** lays the box's
+cards out at once and leaves the box empty. When a loop is over, click **Clear
+Board** on the Control token: it takes every district's cards off the table and
+fills each used box again, ready for its next **Place**. **Recall** puts one
+box's cards back into it (a district placed by mistake).
 
 If Tabletop Simulator stops when you press **Place**, do not press it again: see
 `docs/PLACE_TEST.md` (a small Saved Object that finds out why).
@@ -140,9 +139,11 @@ build scripts refuse to write placeholder or `file:///` image URLs into
 `dist/`; `--local` makes a private test build that must not be committed.
 
 `bundle_mod.py` inlines `src/StillHour/*.ttslua` behind a local `require` and
-appends `src/tts/control.lua` as the entry script. Scenario boxes carry
-`src/tts/loop_box.lua` (Place lays out a fresh copy every loop; the box never
-empties); the campaign box carries SCED's own `src/tts/memory_bag.lua`. Never
+appends `src/tts/control.lua` as the entry script. Every box, campaign and
+scenario, carries SCED's own `src/tts/memory_bag.lua` unchanged: Place takes the
+box's contents out and the box is empty afterwards. The campaign box also holds
+a Spare Scenario Boxes bag; the Control token's Clear Board replaces each used
+scenario box with its spare, so the next loop's Place lays it out again. Never
 edit generated files in `dist/` by hand.
 
 In-game verification runs through the TTS relay: `docs/TTS_RELAY.md`.

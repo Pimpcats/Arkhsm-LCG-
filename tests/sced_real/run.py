@@ -122,8 +122,8 @@ def candidate_payload(dest_dir):
             o["LuaScript"] = campaign_log.lua_script(page)
             swapped["log"] += 1
         elif isinstance(gm, dict) and gm.get("type") == "ScenarioBox":
-            # the scenario boxes' Place script and the loop tags on what they hold
-            o["LuaScript"] = table_presence.loop_box_script()
+            # SCED's own box script and the loop tags on what they hold (the spares too)
+            o["LuaScript"] = table_presence.memory_bag_script()
             table_presence.tag_loop_objects(o.get("ContainedObjects") or [], gm["id"])
             swapped["boxes"] += 1
     assert swapped["control"] == 1 and swapped["log"] == 3 and swapped["boxes"] >= 1, swapped

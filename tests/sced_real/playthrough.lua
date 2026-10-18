@@ -128,9 +128,10 @@ return function(H)
 
   -- objects a box laid out (its per-box tag), counting cards inside decks
   local function boxTag(box)
-    -- loop_box.lua boxTag(): "StillHourBox_<GMNotes id>"; the first published build tags with the GUID
+    -- "StillHourBox_<GMNotes id>", baked into the build; the first published build tags with the GUID
     local script = box.getLuaScript and box.getLuaScript() or ""
-    if script ~= "" and not script:find("StillHourBox_", 1, true) then return "StillHourBox:" .. box.getGUID() end
+    if script ~= "" and not script:find("StillHourBox_", 1, true)
+        and not script:find("function buttonClick_place", 1, true) then return "StillHourBox:" .. box.getGUID() end
     return "StillHourBox_" .. tostring(gm(box).id or box.getGUID())
   end
   local function placedBy(box)
@@ -402,11 +403,14 @@ return function(H)
     check("scenario box " .. id .. " is on the table", box ~= nil)
     if not box then return nil end
     local inside = #box.getObjects()
-    local ok, n = E.click(box, "Place")
+    local ml = (decode(box.script_state) or {}).ml or {}
+    local want = 0
+    for _ in pairs(ml) do want = want + 1 end
+    check(id .. ": the box is full before its Place (" .. inside .. ")", inside > 0 and inside == want, inside .. "/" .. want)
+    local ok = E.click(box, "Place")
     E.run(4)
-    check(id .. ": Place lays out a copy of every object in its box (" .. inside .. ")", ok and n == inside,
-      tostring(n) .. "/" .. inside)
-    check(id .. ": the box never empties", #box.getObjects() == inside)
+    check(id .. ": SCED's Place takes every object out of the box", ok and #box.getObjects() == 0,
+      #box.getObjects() .. " left inside")
     return box
   end
 

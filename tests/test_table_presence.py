@@ -352,7 +352,7 @@ def test_compile_campaign_with_fixture(tmp_path, monkeypatch):
     (only,) = mlb.values()
     assert (only["pos"]["x"], only["pos"]["z"]) == cc.slot_xz(2, 2)
     kinds = sorted(o["Name"] for o in box["ContainedObjects"])
-    assert kinds == ["Custom_Model_Bag", "Custom_Model_Bag", "Custom_PDF", "Custom_Token", "Deck"]
+    assert kinds == ["Bag", "Custom_Model_Bag", "Custom_Model_Bag", "Custom_PDF", "Custom_Token", "Deck"]
     # unlocked scenarios still refuse
     assign["fixture-b"]["_locked"] = False
     (tmp_path / "a.json").write_text(json.dumps(assign))
@@ -661,113 +661,31 @@ def test_no_box_lays_a_stack_on_sceds_own_objects(tmp_path):
 
 
 # ------------------------------------------ replayable scenario box (fake TTS) --
-LOOP_BOX_CHUNK = r"""
-local BOX = %s
-local box = spawnObjectJSON({ json = BOX })
-local out = {}
-local function count(tag)
-  local n = 0
-  for _, o in ipairs(getObjects()) do
-    if o ~= box and o.hasTag(tag) then
-      n = n + (o.type == "Deck" and #o.getObjects() or 1)
-    end
-  end
-  return n
-end
-local function strays()
-  local n = 0
-  for _, o in ipairs(getObjects()) do
-    if tostring(o.getName()):find("(placing)", 1, true) then n = n + 1 end
-  end
-  return n
-end
-Wait.frames(function()
-  local inside = #box.getObjects()
-  out.inside = inside
-  out.placed1 = box.call("buttonClick_place")
-  -- pressed again while it is still placing: refused
-  out.whilePlacing = box.call("buttonClick_place")
-  -- the box makes a working copy and takes its objects out one at a time
-  Wait.frames(function()
-    out.onTable1 = count("StillHourLoop")
-    out.boxTag1 = count(%s)
-    out.copies1 = strays()
-    -- pressed again once everything is out: refused, no second copy
-    out.whenPlaced = box.call("buttonClick_place")
-    -- play: draw a card off the placed deck and leave it on the table
-    for _, o in ipairs(getObjects()) do
-      if o.type == "Deck" and o.hasTag("StillHourLoop") then
-        local c = o.takeObject({ index = 0, position = { 5, 2, 5 } })
-        out.drawnTagged = c.hasTag("StillHourLoop")
-        break
-      end
-    end
-    out.recalled = box.call("buttonClick_recall")
-    -- TTS removes destroyed objects at the end of the frame: look next frame
-    Wait.frames(function()
-      out.onTable2 = count("StillHourLoop")
-      out.boxKept = #box.getObjects() == inside
-      out.placed2 = box.call("buttonClick_place")
-      Wait.frames(function()
-        out.onTable3 = count("StillHourLoop")
-        out.copies3 = strays()
-        local seen, dup = {}, 0
-        for _, o in ipairs(getObjects()) do
-          if seen[o.getGUID()] then dup = dup + 1 end
-          seen[o.getGUID()] = true
-        end
-        out.dupGuids = dup
-        print("@@OUT " .. JSON.encode(out))
-      end, 400)
-    end, 1)
-  end, 400)
-end, 10)
-"""
-
-
-def test_scenario_box_places_fresh_every_loop(tmp_path):
-    import shutil
-    lua = shutil.which("lua5.2")
-    if not lua:
-        pytest.skip("lua5.2 not installed")
-    sys.path.insert(0, os.path.join(ROOT, "tools", "tts_relay"))
-    import relay
+def test_scenario_boxes_carry_sceds_own_script_and_a_spare_each():
+    # every scenario box carries SCED's MemoryBag script unchanged, as every official and fan-made box does;
+    # the campaign box also holds one untouched spare of each (Clear Board refills a used box from it)
     camp = json.load(open(os.path.join(ROOT, "dist", "the_still_hour_campaign.json"),
                           encoding="utf-8"))["ObjectStates"][0]
-    books = [o for o in camp["ContainedObjects"] if o["Name"] == "Custom_Model_Bag"]
-    book = next(b for b in books if json.loads(b["GMNotes"]).get("id") == "district_church")
-    book = json.loads(json.dumps(book))
-    book["LuaScript"] = T.loop_box_script()
-    T.tag_loop_objects(book["ContainedObjects"], "district_church")   # as the build does
-    box_tag = T.loop_tags("district_church")[1]
-    chunk = LOOP_BOX_CHUNK % (relay.lua_long_string(json.dumps(book, ensure_ascii=False)),
-                              json.dumps(box_tag))
-    path = tmp_path / "chunk.lua"
-    path.write_text(chunk, encoding="utf-8")
-    r = subprocess.run([lua, os.path.join(ROOT, "tests", "tts_fake", "mock_tts.lua"), str(path)],
-                       capture_output=True, text=True, cwd=ROOT, timeout=120)
-    outs, errors = [], []
-    for ln in r.stdout.splitlines():
-        if ln.startswith("@@MSG "):
-            m = json.loads(ln[6:])
-            msg = m.get("message", "")
-            if msg.startswith("@@OUT "):
-                outs.append(msg[6:])
-            if m.get("messageID") == 3:
-                errors.append(m.get("error"))
-    assert outs, r.stdout[-2000:] + r.stderr[-2000:]
-    assert not errors, errors[:3]
-    out = json.loads(outs[-1])
-    n = len(book["ContainedObjects"])
-    assert out["placed1"] == n and out["placed2"] == n
-    assert out["whilePlacing"] == 0 and out["whenPlaced"] == 0, "a second press must not lay a second copy"
-    assert out["onTable1"] > 0 and out["drawnTagged"] is True
-    assert out["boxTag1"] == out["onTable1"], "everything placed carries the box's own tag"
-    assert out["copies1"] == 0 and out["copies3"] == 0, "the working copy is thrown away"
-    assert out["onTable2"] == 0, "Recall must remove every placed copy, drawn cards too"
-    assert out["boxKept"] is True, "the box never empties"
-    assert out["onTable3"] == out["onTable1"]
-    assert out["dupGuids"] == 0
+    books = [o for o in camp["ContainedObjects"] if json.loads(o.get("GMNotes") or "{}").get("type") == "ScenarioBox"]
+    assert len(books) == 8
+    assert all(b["LuaScript"] == T.memory_bag_script() for b in books)
+    spares = [o for o in camp["ContainedObjects"]
+              if json.loads(o.get("GMNotes") or "{}").get("type") == T.MASTERS_TYPE]
+    assert len(spares) == 1
+    bag = spares[0]
+    assert bag["Name"] == "Bag" and bag["Locked"] is True and "CleanUpHelper_ignore" in bag["Tags"]
+    ml = json.loads(camp["LuaScriptState"])["ml"]
+    assert bag["GUID"] in ml and ml[bag["GUID"]]["lock"] is True
+    by_id = {json.loads(b["GMNotes"])["id"]: b for b in bag["ContainedObjects"]}
+    for b in books:
+        sid = json.loads(b["GMNotes"])["id"]
+        spare = by_id[sid]
+        # the same box: same script, same remembered layout, same contents with the same GUIDs and tags
+        assert spare["LuaScript"] == b["LuaScript"] and spare["LuaScriptState"] == b["LuaScriptState"]
+        assert spare["ContainedObjects"] == b["ContainedObjects"]
+    # the spare spot is free: no scenario book is laid out on it
+    spots = {(round(e["pos"]["x"], 2), round(e["pos"]["z"], 2)) for g, e in ml.items() if g != bag["GUID"]}
+    assert (round(ml[bag["GUID"]]["pos"]["x"], 2), round(ml[bag["GUID"]]["pos"]["z"], 2)) not in spots
 
 
 def test_scenario_box_objects_are_tagged_for_the_loop():

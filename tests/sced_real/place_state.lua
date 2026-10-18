@@ -1,20 +1,21 @@
--- The scenario boxes' Place and Recall, and what the Control token remembers about what they lay
--- out, on the emulated table (tests only; designer-facing, it names cards by id).
+-- The scenario boxes' Place (SCED's own MemoryBag script) and the Control token's Clear Board, and
+-- what the Control remembers about what they lay out, on the emulated table (tests only;
+-- designer-facing, it names cards by id).
 --
--- A box lays its objects out again every loop with the GUIDs they had before, so anything keyed by
--- GUID (SCED's Token Spawn Tracker, the Control's CLOSED labels) must not outlive the objects, and a
--- Place or a Clear Board that comes while another Place is running must not leave a half layout:
+-- SCED's Place takes a box's objects out onto their spots and leaves the box empty. Clear Board takes
+-- the scenario cards off the table and puts a full box back from the Spare Scenario Boxes bag, with the
+-- same GUIDs, so anything keyed by GUID (SCED's Token Spawn Tracker, the Control's CLOSED labels) must
+-- not outlive the objects:
 --
---   N-1  loop 2 spawns a location's clues again (the tracker forgets the GUIDs a Place lays out)
+--   N-1  loop 2 spawns a location's clues again (Clear Board makes the tracker forget the box's GUIDs)
 --   N-2  the CLOSED label is read off the card, so a new card gets it and Sync Board repairs it
---   N-4  Recall and Clear Board stop a Place that is still running; the next Place is not refused
---   N-5  Recall takes the tokens resting on the cards it removes, and nothing else
---   N-9  the delayed sweep after a Recall never takes the clues of a location laid on the same spot
---   N-8  a clue beside a removed card, or one SCED spawns just after it left, is taken too; a Place
---        clears leftover clues standing on its location spots
---   N-6  a save taken during a Place leaves no second, Place-able box behind
+--   R-1  SCED's Recall puts a box's objects back; Clear Board refills a used box; Place lays it out again
+--   N-5  Clear Board takes the tokens resting on the cards it removes, and nothing else
+--   N-9  the delayed sweep after a Clear Board never takes the clues of a location laid on the same spot
+--   N-8  a clue beside a removed card, or one SCED spawns just after it left, is taken too
+--   N-6  a save and load keeps the spares: a box used before the save is refilled after it
 --   N-7  a box out of context is laid out all the same and the chat says so, once
---   G12  a Place is refused while another box's cards (or an older build's) lie where it lays out
+--   A-1  shared spots: a district's act deck yields the Act slot, the finale's act takes it
 --
 -- tests/test_sced_place.py runs it on the SCED stand-in and, when SCED is available, on its real
 -- table, with the Control and box scripts rebuilt from src/ (run.candidate_payload).
@@ -53,7 +54,7 @@ return function(H)
   local function scenarioBox(id)
     return find(function(o)
       local m = gm(o)
-      return m.type == "ScenarioBox" and m.id == id and not tostring(o.getName()):find("(placing)", 1, true)
+      return m.type == "ScenarioBox" and m.id == id
     end)
   end
   local function looseCard(id) return find(function(o) return o.type == "Card" and gm(o).id == id end) end
@@ -92,12 +93,21 @@ return function(H)
   end
   local function boxCount(id) return counted("StillHourBox_" .. id) end
   local function loopCount() return counted("StillHourLoop") end
-  local function strays()
+  -- how many objects a box holds against how many its Place lays out
+  local function fullness(id)
+    local box = scenarioBox(id)
+    if not box then return -1, -1 end
+    local ml = (decode(box.script_state) or {}).ml or {}
     local n = 0
-    for _, o in ipairs(objects()) do
-      if tostring(o.getName()):find("(placing)", 1, true) then n = n + 1 end
-    end
-    return n
+    for _ in pairs(ml) do n = n + 1 end
+    return #box.getObjects(), n
+  end
+  local function isFull(id)
+    local have, want = fullness(id)
+    return want > 0 and have == want
+  end
+  local function clearBoard()
+    click(control(), "Clear Board"); E.run(0.5)
   end
 
   -- tokens (not SCED's own pieces) resting within a rectangle
@@ -137,9 +147,12 @@ return function(H)
   local function place(id, withSync)
     local box = scenarioBox(id)
     local mark = chatMark()
+    local function busy() return control().call("shApiBoxBusy") == true end
+    E.runUntil(function() return not busy() end, 15)      -- an earlier box's board sync is over first
+    mark = chatMark()
     click(box, "Place")
-    E.runUntil(function() return not box.call("isPlacing") end, 12)
-    if withSync then E.runUntil(function() return chatHas(mark, "Board synced.") end, 12) else E.run(0.3) end
+    E.run(0.5)                                  -- SCED's Place is one frame; the Control settles shared spots
+    if withSync then E.runUntil(function() return not busy() end, 15) else E.run(0.3) end
     return box, mark
   end
   local function saw(mark, needle) return chatHas(mark, needle) end
@@ -178,8 +191,11 @@ return function(H)
     check("the chat says nothing connects it to the Square yet, naming the box as printed on it",
       saw(mark, lighthouse.getName() .. " is laid out, but nothing on the table connects it to the Square yet."), tail(mark))
     check("...once", chatCount(mark, "is laid out, but") == 1, chatCount(mark, "is laid out, but"))
-    click(lighthouse, "Recall"); E.run(0.3)
-    check("Recall takes it away again", boxCount("district_lighthouse") == 0)
+    check("the box is empty after its Place, as every SCED box is", not isFull("district_lighthouse")
+      and select(1, fullness("district_lighthouse")) == 0)
+    clearBoard()
+    check("Clear Board takes it away again", boxCount("district_lighthouse") == 0)
+    check("...and puts a full box back", isFull("district_lighthouse"), table.concat({ fullness("district_lighthouse") }, "/"))
   end)
 
   ----------------------------------------------------------- N-1, N-2 --
@@ -223,12 +239,10 @@ return function(H)
     nextLoop()
     check("Clear Board left no loop object", loopCount() == 0, loopCount())
     check("...and the Control forgot what it remembered about the removed cards", board().sealedMarked[rec.studyGuid] == nil)
-    local box = scenarioBox("district_square")
-    click(box, "Place")
-    -- before anything is taken out of the box the tracker has forgotten every GUID it is about to lay out
-    check("pressing Place made the tracker forget the cards at once", not trackerKnows(rec.roGuid) and not trackerKnows(rec.wellGuid))
-    check("...before the first object came out", loopCount() == 0, loopCount())
-    E.runUntil(function() return not box.call("isPlacing") end, 12)
+    check("...and both boxes are full again", isFull("district_square") and isFull("district_almanac"))
+    -- before anything is laid out again the tracker has forgotten every GUID the boxes hold
+    check("Clear Board made the tracker forget the cards", not trackerKnows(rec.roGuid) and not trackerKnows(rec.wellGuid))
+    place("district_square", true)
     place("district_almanac", true)
     local ro, well = looseCard("sthr-loc-recordsoffice"), looseCard("sthr-loc-well")
     check("the new cards carry the old GUIDs (a box keeps its objects' GUIDs)", ro ~= nil and well ~= nil
@@ -257,7 +271,9 @@ return function(H)
     check("an open location never keeps a CLOSED label", labels(open):find("CLOSED", 1, true) == nil, labels(open))
     check("(the Control remembers the closed location again)", board().sealedMarked[rec.studyGuid] == true)
     scenarioBox("district_almanac").call("buttonClick_recall"); E.run(0.5)
-    check("Recall drops it too: the Control hears of every object destroyed", board().sealedMarked[rec.studyGuid] == nil)
+    check("SCED's Recall puts the closed location back into its box", looseCard("sthr-loc-sealedstudy") == nil)
+    check("...and the Control forgets what it remembered about it", board().sealedMarked[rec.studyGuid] == nil)
+    clearBoard()
   end)
 
   ----------------------------------------------------------- N-7, continued --
@@ -266,7 +282,8 @@ return function(H)
     local lighthouse, mark = place("district_lighthouse", true)
     check("the Lighthouse without the Road is out of context",
       saw(mark, lighthouse.getName() .. " is laid out, but nothing on the table connects it to the Square yet."), tail(mark))
-    click(lighthouse, "Recall"); E.run(0.3)
+    clearBoard()
+    place("district_square", false)
     place("district_road", false)
     lighthouse, mark = place("district_lighthouse", true)
     check("with the Road laid out the Lighthouse is in context", boxCount("district_lighthouse") > 0 and not saw(mark, "is laid out, but"), tail(mark))
@@ -279,63 +296,56 @@ return function(H)
     check("it is laid out all the same", boxCount("finale") > 0)
     check("the chat says it is not its time yet, naming the box as printed on it",
       saw(mark, finale.getName() .. " is laid out, but it is not its time yet."), tail(mark))
-    click(finale, "Recall"); E.run(0.3)
+    clearBoard()
     local blob = decode(control().call("shApiSnapshot"))
     blob.campaign.knowledge["the-way-the-night-breaks"] = true
     control().call("shApiRestore", { blob = J.encode(blob) }); E.run(1)
     local _, mark2 = place("finale", true)
     check("with its entry recorded nothing is said", boxCount("finale") > 0 and not saw(mark2, "is laid out, but"), tail(mark2))
-    check("...and no box of this loop was refused for another box's cards", not saw(mark, "cards from a box laid out earlier"))
-    scenarioBox("finale").call("buttonClick_recall"); E.run(0.3)
+    clearBoard()
   end)
 
-  ----------------------------------------------------------- N-4 --
+  ----------------------------------------------------------- R-1 --
 
-  step("N-4: Recall stops a Place that is still running", function()
-    local box = scenarioBox("district_fairground")
-    click(box, "Place"); E.run(0.2)
-    check("a Place is running (some of the box is out, not all)", boxCount("district_fairground") > 0 and box.call("isPlacing") == true)
-    local out = boxCount("district_fairground")
-    local mark = chatMark()
-    click(box, "Recall"); E.run(0.1)
-    check("Recall says the Place was stopped", saw(mark, "the Place in progress was stopped"), tail(mark))
-    E.run(3)
-    check("nothing more arrived and nothing is left", boxCount("district_fairground") == 0 and strays() == 0,
-      boxCount("district_fairground") .. " / " .. strays() .. " (" .. out .. " were out)")
-    mark = chatMark()
-    click(box, "Place"); E.runUntil(function() return not box.call("isPlacing") end, 8)
-    check("the next Place is not refused", not saw(mark, "already laid out") and boxCount("district_fairground") > 0)
+  step("R-1: SCED's Recall puts a box back together; Clear Board refills a used box; Place lays out the same again", function()
+    clearBoard()
+    check("(the box is full)", isFull("district_fairground"), table.concat({ fullness("district_fairground") }, "/"))
+    place("district_fairground", false)
     local full = boxCount("district_fairground")
-    mark = chatMark()
-    click(box, "Recall"); E.run(0.3)
-    check("a Recall with no Place running does not say it stopped one", not saw(mark, "stopped"))
-    check("...and removes the whole box", boxCount("district_fairground") == 0)
-    click(box, "Place"); E.runUntil(function() return not box.call("isPlacing") end, 8)
-    check("a Place after that lays out the same box again", boxCount("district_fairground") == full, boxCount("district_fairground") .. " vs " .. full)
-    click(box, "Recall"); E.run(0.3)
-  end)
-
-  step("N-4: Clear Board stops a Place that is still running", function()
-    local box = scenarioBox("district_fairground")
-    local others = loopCount()
-    click(box, "Place"); E.run(0.2)
-    check("a Place is running", loopCount() > others)
+    check("its Place lays everything out and empties it", full > 0 and select(1, fullness("district_fairground")) == 0)
+    scenarioBox("district_fairground").call("buttonClick_recall"); E.run(0.5)
+    check("SCED's Recall puts every laid-out object back", boxCount("district_fairground") == 0
+      and isFull("district_fairground"), boxCount("district_fairground") .. " left")
+    place("district_fairground", false)
+    check("a Place after the Recall lays out the same box", boxCount("district_fairground") == full,
+      boxCount("district_fairground") .. " vs " .. full)
+    -- play: a card drawn off a laid-out deck, then the night ends
+    for _, o in ipairs(objects()) do
+      if o.type == "Deck" and o.hasTag("StillHourBox_district_fairground") then
+        local q = o.getPosition()
+        o.takeObject({ position = { q.x, q.y + 2, q.z + 3 }, smooth = false })
+        break
+      end
+    end
+    E.run(0.5)
     local mark = chatMark()
-    click(control(), "Clear Board"); E.run(0.1)
-    check("Clear Board says the Place was stopped", saw(mark, "A Place that was still running was stopped."), tail(mark))
-    E.run(3)
-    check("nothing more arrived and nothing is left", loopCount() == 0 and strays() == 0, loopCount() .. " / " .. strays())
+    clearBoard()
+    check("Clear Board takes every card the box laid out, the drawn one too", boxCount("district_fairground") == 0,
+      boxCount("district_fairground"))
+    check("...puts a full box back in its place", isFull("district_fairground"), table.concat({ fullness("district_fairground") }, "/"))
+    check("...and says it filled the box again", saw(mark, "scenario box(es) filled again"), tail(mark))
+    place("district_fairground", false)
+    check("the next Place lays out the same box again", boxCount("district_fairground") == full,
+      boxCount("district_fairground") .. " vs " .. full)
+    clearBoard()
     mark = chatMark()
-    click(box, "Place"); E.runUntil(function() return not box.call("isPlacing") end, 8)
-    check("the next Place is not refused", not saw(mark, "already laid out") and boxCount("district_fairground") > 0)
-    mark = chatMark()
-    click(control(), "Clear Board"); E.run(0.3)
-    check("a Clear Board with no Place running does not say it stopped one", not saw(mark, "stopped"))
+    clearBoard()
+    check("a Clear Board with every box full fills none", not saw(mark, "filled again"), tail(mark))
   end)
 
   ----------------------------------------------------------- N-5 --
 
-  step("N-5: Recall takes the tokens resting on the cards it removes, and only those", function()
+  step("N-5: Clear Board takes the tokens resting on the cards it removes, and only those", function()
     local road = place("district_road", false)
     local card = looseCard("sthr-loc-milestones")
     local b = E.aabb(card)
@@ -347,7 +357,7 @@ return function(H)
     local far = E.spawnData({ Name = "Custom_Token", Nickname = "Marker", Tags = { "MyMarker" },
       Transform = { posX = b.max.x + 6, posY = 1.6, posZ = b.max.z + 6, scaleX = 0.3, scaleY = 0.3, scaleZ = 0.3 } }, {}, "table")
     E.run(0.5)
-    road.call("buttonClick_recall"); E.run(0.5)
+    clearBoard()
     check("the tokens that rested on the removed card went with it", tokensIn(b) == 0, tokensIn(b))
     check("the token that was not on one of its cards stays", far ~= nil and not far.isDestroyed())
     local lost = 0
@@ -358,7 +368,7 @@ return function(H)
 
   ----------------------------------------------------------- N-8 --
 
-  step("N-8: a clue beside a removed card, or spawned just after it, goes too; a Place clears leftovers on its spots", function()
+  step("N-8: a clue beside a removed card, or spawned just after it, goes too", function()
     local road = place("district_road", false)
     local card = looseCard("sthr-loc-milestones")
     local b = E.aabb(card)
@@ -369,29 +379,36 @@ return function(H)
         Transform = { posX = px, posY = 1.7, posZ = pz, scaleX = 0.25, scaleY = 1, scaleZ = 0.25 } }, {}, "table")
     end
     local beside = clue(b.max.x + 0.9, cz)          -- rolled off the card's edge
-    local far = clue(b.max.x + 12, b.max.z + 12)    -- nowhere near
+    -- nowhere near: Clear Board takes every box's cards, so a spot clear of all of them
+    local function clearOfCards(px, pz)
+      for _, o in ipairs(objects()) do
+        if (o.type == "Card" or o.type == "Deck") and o.hasTag("StillHourLoop") then
+          local q = o.getPosition()
+          if math.abs(q.x - px) < 4 and math.abs(q.z - pz) < 4 then return false end
+        end
+      end
+      return true
+    end
+    local fx, fz = b.max.x + 12, b.max.z + 12
+    for _, d in ipairs({ { 12, 12 }, { -12, 12 }, { 12, -12 }, { -12, -12 }, { 20, 0 }, { -20, 0 }, { 0, 20 }, { 0, -20 } }) do
+      if clearOfCards(cx + d[1], cz + d[2]) then fx, fz = cx + d[1], cz + d[2] ; break end
+    end
+    local far = clue(fx, fz)
     E.run(0.3)
-    road.call("buttonClick_recall"); E.run(0.5)
+    clearBoard()
     check("a clue standing just outside the removed card went with it", beside.isDestroyed())
     check("a clue far from every removed card stays", not far.isDestroyed())
     local late = clue(cx, cz)                       -- SCED's staggered spawn of a revealed location's clues
     E.run(2)
     check("a clue spawned a moment after the card left is taken too", late.isDestroyed())
     far.destruct(); E.run(0.3)
-    -- a leftover standing on a location spot is taken when a box lays out there
-    local left = clue(cx, cz)
-    E.run(0.3)
-    place("district_road", false)
-    check("a clue left on a location spot is gone when the box lays out", left.isDestroyed())
-    check("the Place still laid its cards out", looseCard("sthr-loc-milestones") ~= nil)
-    road.call("buttonClick_recall"); E.run(0.5)
   end)
 
   ----------------------------------------------------------- N-9 --
 
-  step("N-9: the delayed sweep after a Recall leaves the clues of a location laid on the same spot", function()
-    local road = place("district_road", false)
-    road.call("buttonClick_recall"); E.run(0.2)
+  step("N-9: the delayed sweep after a Clear Board leaves the clues of a location laid on the same spot", function()
+    place("district_road", false)
+    click(control(), "Clear Board"); E.run(0.2)
     place("district_road", false)               -- the next Place, inside the sweep's 12 seconds
     local card = looseCard("sthr-loc-milestones")
     local b = E.aabb(card)
@@ -399,9 +416,9 @@ return function(H)
     local mine = E.spawnData({ Name = "Custom_Tile", Nickname = "", Memo = "clueDoom",
       Transform = { posX = cx, posY = 1.7, posZ = cz, scaleX = 0.25, scaleY = 1, scaleZ = 0.25 } }, {}, "table")
     E.run(14)
-    check("a clue on a location a later Place laid survives the earlier Recall's sweeps", not mine.isDestroyed())
+    check("a clue on a location a later Place laid survives the earlier Clear Board's sweeps", not mine.isDestroyed())
     mine.destruct(); E.run(0.2)
-    road.call("buttonClick_recall"); E.run(0.5)
+    clearBoard()
   end)
 
   ----------------------------------------------------------- A-1 --
@@ -431,16 +448,12 @@ return function(H)
     check("...and the Lighthouse's act deck goes to its own column of the row", at(lh, -13.8, 9.18),
       lh and tostring(lh.getPosition().x) .. "," .. tostring(lh.getPosition().z))
     -- The Last Hour's act takes the slot from the Square's act deck, which moves to its own column
-    local finale = scenarioBox("finale")
-    local mark = chatMark()
-    click(finale, "Place")
-    E.runUntil(function() return not finale.call("isPlacing") end, 12); E.run(0.5)
+    place("finale", false)
     local contest = looseCard("sthr-act-lasthour")
     check("the finale's act takes the Act slot", contest ~= nil and at(contest, -2.94, -5.05),
       contest and tostring(contest.getPosition().x) .. "," .. tostring(contest.getPosition().z))
     check("the Square's act deck moved to its own column of the row", at(actDeck("The Square"), -13.8, -3.06),
       actDeck("The Square") and tostring(actDeck("The Square").getPosition().z))
-    check("the Place was not refused for it", not chatHas(mark, "are still on the table where this one lays out"), tail(mark))
     click(control(), "Clear Board"); E.run(0.5)
     check("Clear Board takes both act decks", actDeck("The Square") == nil and actDeck("The Lighthouse") == nil)
   end)
@@ -504,8 +517,7 @@ return function(H)
     check("Clear Board takes the Appointed's card (it is not put back as undefeatable)",
       looseCard("sthr-appointed") == nil and not saw(mark2, "cannot be defeated"), chatSince(mark2):sub(1, 400))
     local _, mark3 = place("district_square", true)
-    check("...and the Square lays out again", not saw(mark3, "already laid out")
-      and (looseCard("sthr-loc-hubsquare") ~= nil or looseCard("sthr-loc-square") ~= nil),
+    check("...and the Square lays out again", (looseCard("sthr-loc-hubsquare") ~= nil or looseCard("sthr-loc-square") ~= nil),
       tail(mark3))
     check("...with the Appointed manifesting again", looseCard("sthr-appointed") ~= nil, tail(mark3))
     click(control(), "Clear Board"); E.run(2)
@@ -514,65 +526,34 @@ return function(H)
 
   ----------------------------------------------------------- N-6 --
 
-  step("N-6: a save taken during a Place leaves no second box behind", function()
-    local box = scenarioBox("district_road")
-    click(box, "Place"); E.run(0.3)
-    check("a working copy is on the table", strays() == 1, strays())
+  step("N-6: a save and load keeps the spares: a box used before the save is refilled after it", function()
+    clearBoard()
+    place("district_road", false)
+    check("(the Road's box is used)", not isFull("district_road"))
     local saved = E.save()
     E.clearWorld(); E.loadSave(saved, "saved"); E.run(3)
-    check("after the load no working copy is left", strays() == 0, strays())
-    local boxes = 0
-    for _, o in ipairs(objects()) do
-      local m = gm(o)
-      if m.type == "ScenarioBox" and m.id == "district_road" then boxes = boxes + 1 end
-    end
-    check("the box itself is still there, once", boxes == 1, boxes)
-    box = scenarioBox("district_road")
-    box.call("buttonClick_recall"); E.run(0.5)
-    click(box, "Place"); E.runUntil(function() return not box.call("isPlacing") end, 8)
-    check("it lays the box out after the load", boxCount("district_road") > 0 and strays() == 0)
-    click(control(), "Clear Board"); E.run(0.5)
+    local spares = find(function(o) return gm(o).type == "ScenarioBoxMasters" end)
+    check("the Spare Scenario Boxes bag is still on the table after the load", spares ~= nil)
+    check("...holding a spare of every box", spares ~= nil and #spares.getObjects() == 8, spares and #spares.getObjects())
+    clearBoard()
+    check("Clear Board refills the Road's box after the load", isFull("district_road"), table.concat({ fullness("district_road") }, "/"))
+    place("district_road", false)
+    check("it lays the box out after the load", boxCount("district_road") > 0)
+    clearBoard()
   end)
 
-  ----------------------------------------------------------- G12 --
+  ----------------------------------------------------------- N-7, the Prologue --
 
-  step("G12: the Prologue's cards on the mythos mat refuse the Square's Place until Clear Board", function()
+  step("N-7: the Prologue's box after the Prologue is laid out all the same, and the chat says so once", function()
     local prologue, mark = place("prologue", true)
-    local prologueCount = boxCount("prologue")
-    check("the Prologue's box is laid out", prologueCount > 0)
+    check("the Prologue's box is laid out", boxCount("prologue") > 0)
     check("the chat says the Prologue is over, naming the box as printed on it, once",
-      saw(mark, prologue.getName() .. " is laid out, but the Prologue is already over.") and chatCount(mark, "the Prologue is already over") == 1, tail(mark))
-    local square = scenarioBox("district_square")
-    mark = chatMark()
-    local n = square.call("buttonClick_place"); E.run(0.5)
-    check("the Square's Place is refused", n == 0 and boxCount("district_square") == 0, tostring(n) .. " / " .. boxCount("district_square"))
-    check("it says to click Clear Board first, naming the box as printed on it",
-      saw(mark, square.getName() .. ": cards from a box laid out earlier are still on the table where this one lays out."
-        .. " Click Clear Board on the Control token first."), tail(mark))
-    check("the Prologue's cards were not touched", boxCount("prologue") == prologueCount)
-    click(control(), "Clear Board"); E.run(0.5)
-    click(square, "Place"); E.run(0.3)
-    check("after Clear Board the Square's Place starts", square.call("isPlacing") == true and boxCount("district_square") > 0)
-    square.call("buttonClick_recall"); E.run(0.3)
-  end)
-
-  step("G12: a leftover that carries only the loop tag, or the old build's box tag, refuses a Place on its spot", function()
-    local church = scenarioBox("district_church")
-    local spot = spotsOf("district_church")[1]
-    for _, tags in ipairs({ { "StillHourLoop" }, { "StillHourLoop", "StillHourBox:3c5e1a" }, { "StillHourBox:3c5e1a" } }) do
-      local old = E.spawnData({ Name = "Custom_Tile", Nickname = "leftover", Tags = tags,
-        Transform = { posX = spot.x + 0.1, posY = 1.6, posZ = spot.z - 0.1 } }, {}, "table")
-      E.run(0.3)
-      local mark = chatMark()
-      local n = church.call("buttonClick_place"); E.run(0.3)
-      check("an object tagged " .. table.concat(tags, " + ") .. " on one of its spots refuses the Place",
-        n == 0 and boxCount("district_church") == 0 and saw(mark, "Click Clear Board on the Control token first."), tail(mark))
-      old.destruct(); E.run(0.3)
-    end
-    local mark = chatMark()
-    church.call("buttonClick_place")
-    E.runUntil(function() return not church.call("isPlacing") end, 8)
-    check("with the leftover gone the same Place lays the box out", boxCount("district_church") > 0 and not saw(mark, "Clear Board"))
-    church.call("buttonClick_recall"); E.run(0.3)
+      saw(mark, prologue.getName() .. " is laid out, but the Prologue is already over.")
+        and chatCount(mark, "the Prologue is already over") == 1, tail(mark))
+    clearBoard()
+    check("Clear Board takes it away and fills its box again", boxCount("prologue") == 0 and isFull("prologue"))
+    place("district_square", false)
+    check("the Square lays out after it", boxCount("district_square") > 0)
+    clearBoard()
   end)
 end

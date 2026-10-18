@@ -48,9 +48,8 @@ CAMPAIGN = CFG.name
 FILENAME = CFG.slug                # SCED download key (GMNotes filename)
 OUT = os.path.join(ROOT, "dist", CFG.slug + "_table.json")
 GUIDE_PDF = os.path.join(ROOT, "dist", "guide", CFG.slug + "_campaign_guide.pdf")
+# every box (campaign and scenario) carries SCED's MemoryBag script unchanged
 MEMORY_BAG_LUA = os.path.join(ROOT, "src", "tts", "memory_bag.lua")
-# scenario books are laid out again every loop: a replayable memory bag
-LOOP_BOX_LUA = os.path.join(ROOT, "src", "tts", "loop_box.lua")
 BOX_TEXTURE_ID = CFG.box_texture_id
 
 # SCED's own box meshes (src/Global/Global.ttslua meshTable; the same URLs the
@@ -235,11 +234,6 @@ def ml_entry(pos, ry=270, rz=0, lock=False):
             "rot": {"x": 0, "y": ry, "z": rz}}
 
 
-def loop_box_script():
-    import campaign_config
-    return campaign_config.lua_text(LOOP_BOX_LUA)
-
-
 def memory_bag(name, gm, tags, mesh, scale, contained, ml, desc="", script=None):
     box = _common(
         GUID=guid("box:" + gm.get("id", name)), Name="Custom_Model_Bag",
@@ -261,9 +255,8 @@ LOOP_TAG = "StillHourLoop"
 
 
 def loop_tags(sid):
-    """The two tags every object in a scenario box carries (src/tts/loop_box.lua):
-    the loop tag the Control token's Reset Loop clears by, and the box's own for
-    Recall. Letters, digits and underscores only, like every tag SCED itself
+    """The two tags every object in a scenario box carries: the loop tag the
+    Control token's Clear Board clears by, and the box's own. Letters, digits and underscores only, like every tag SCED itself
     uses."""
     return [LOOP_TAG, "StillHourBox_" + re.sub(r"[^A-Za-z0-9_]", "_", sid)]
 
@@ -284,17 +277,35 @@ def tag_loop_objects(objs, sid):
 
 
 def scenario_box(name, sid, contained, ml):
-    """A scenario book: SCED's small box mesh + the replayable memory bag (the
-    box itself carries no tags, as the exported scenario boxes have none;
+    """A scenario book: SCED's small box mesh + SCED's MemoryBag script, unchanged
+    (the box itself carries no tags, as the exported scenario boxes have none;
     GMNotes {id, type: ScenarioBox}). Its Description is the campaign's name,
     as the official boxes carry theirs. What it holds is tagged for the loop."""
     return memory_bag(name, {"id": sid, "type": "ScenarioBox"}, None,
                       MESH_SMALL, SCALE_SMALL, tag_loop_objects(contained, sid), ml,
-                      desc=CAMPAIGN, script=loop_box_script())
+                      desc=CAMPAIGN)
+
+
+MASTERS_TYPE = "ScenarioBoxMasters"
+
+
+def spares_bag(scenario_boxes, pos):
+    """A spare, untouched copy of every scenario box, in a plain locked bag. SCED's Place empties a box;
+    the Control token's Clear Board replaces a used box with its spare (src/tts/control.lua refillBoxes),
+    so a box can be laid out again in every loop. SCED's Clean Up Helper leaves it alone."""
+    return _common(
+        GUID=guid("box:spares:" + CFG.slug), Name="Bag",
+        Transform=transform(pos, 270), Nickname=CAMPAIGN + " - Spare Scenario Boxes",
+        Description="Clear Board on the Control token refills a used scenario box from this bag. Leave it closed.",
+        GMNotes=json.dumps({"type": MASTERS_TYPE}, separators=(",", ":")),
+        ColorDiffuse={"r": 0.25, "g": 0.25, "b": 0.3}, Tags=["CleanUpHelper_ignore"],
+        Locked=True, MaterialIndex=-1, MeshIndex=-1, Bag={"Order": 0},
+        ContainedObjects=[copy.deepcopy(sb) for sb in scenario_boxes],
+    )
 
 
 def campaign_box(scenario_boxes=(), name=CAMPAIGN, filename=FILENAME,
-                 box_id=CFG.box_id, table=True):
+                 box_id=CFG.box_id, table=True, spares=True):
     """The campaign box: scenario books (+ for The Still Hour: minicards, log,
     guide), each with a Place spot. Returns the Custom_Model_Bag object."""
     contained, ml = [], {}
@@ -304,6 +315,11 @@ def campaign_box(scenario_boxes=(), name=CAMPAIGN, filename=FILENAME,
         sb["Transform"] = transform(pos, 270, SCALE_SMALL)
         contained.append(sb)
         ml[sb["GUID"]] = ml_entry(pos, lock=sb.get("Locked", False))
+    if scenario_boxes and spares:
+        pos = scenario_box_slot(len(scenario_boxes))
+        spares = spares_bag(contained, pos)
+        contained.append(spares)
+        ml[spares["GUID"]] = ml_entry(pos, lock=True)
     if table:
         for obj, pos in ((build_minicard_deck(PLACE_MINIS), PLACE_MINIS),
                          (build_log(PLACE_LOG), PLACE_LOG),

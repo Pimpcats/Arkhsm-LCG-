@@ -1309,6 +1309,7 @@ local SB = { placed = {}, boxes = {} }
 
 local function pieceKind(md, tags, script, isBag)
   if md.type == "ScenarioBox" then return "scenario box" end
+  if md.type == "ScenarioBoxMasters" then return "spare scenario boxes" end
   if md.type == "CampaignLog" or tags.CampaignLog then return "campaign log" end
   if md.type == "CampaignGuide" or tags.CampaignGuide then return "campaign guide" end
   if tags.Minicard then return "minicard deck" end
@@ -1335,6 +1336,7 @@ end
 -- what the package holds (docs/LOADING.md, "Everything you need is one file")
 local SAVED_HOLDS = {
   { "scenario box", 8, "8 scenario boxes" },
+  { "spare scenario boxes", 1, "the spare scenario boxes (Clear Board refills a used box from them)" },
   { "campaign log", 1, "the campaign log" },
   { "campaign guide", 1, "the campaign guide" },
   { "minicard deck", 1, "the investigator minicards" },
@@ -1414,13 +1416,13 @@ step("saved object: what the box holds", function(go)
     if kindOfData(e) == "scenario box" then
       nb = nb + 1
       local ml = (decode(e.LuaScriptState) or {}).ml
-      if (e.LuaScript or ""):find("StillHourLoop", 1, true) and type(ml) == "table" and next(ml) ~= nil
+      if (e.LuaScript or ""):find("function buttonClick_place", 1, true) and type(ml) == "table" and next(ml) ~= nil
          and #(e.ContainedObjects or {}) > 0 then
         good = good + 1
       end
     end
   end
-  check("every scenario box is replayable, remembers its layout and holds its cards", nb > 0 and good == nb,
+  check("every scenario box carries SCED's box script, remembers its layout and holds its cards", nb > 0 and good == nb,
     good .. "/" .. nb)
   local acc = scanCards(SB.data)
   check("the box's cards are inside it", acc.cards > 0, acc.cards .. " card(s)")
@@ -1608,9 +1610,10 @@ local function onTablePieces(list)
   return out
 end
 
--- A loop is set up again every night: a scenario box must Place a full,
--- fresh copy each time, and the Control's Clear Board must take every card it
--- laid out (and any card drawn from it) back off the table.
+-- A loop is set up again every night. A scenario box's Place is SCED's own: it takes everything out of the
+-- box, which is empty afterwards. The Control's Clear Board must take every card it laid out (and any card
+-- drawn from it) back off the table and put a full box back in its place, so the next Place lays the same
+-- cards out again.
 step("saved object: a scenario box's Place, Clear Board, Place again", function(go)
   if SB.blocked or not SAVED then return go() end
   local ctl, book = SB.ctl, nil
@@ -1618,31 +1621,30 @@ step("saved object: a scenario box's Place, Clear Board, Place again", function(
   book = book or SB.boxes[1]
   check("a scenario box from the saved object and its Control are on the table", alive(book) and alive(ctl))
   if not alive(book) or not alive(ctl) then return go() end
-  -- src/tts/loop_box.lua boxTag() is "StillHourBox_<GMNotes id>"; the first published build's boxes
-  -- tag what they lay out with the box's GUID ("StillHourBox:<guid>"): test whichever the box has
-  local tag = "StillHourBox_" .. tostring(gm(book).id or book.getGUID())
-  local script = tostring(book.getLuaScript() or "")
-  if script ~= "" and not script:find("StillHourBox_", 1, true) then tag = "StillHourBox:" .. book.getGUID() end
+  local id = gm(book).id
+  local tag = "StillHourBox_" .. tostring(id or book.getGUID())
   relayBoxTags[tag] = true
   local inside = #(book.getObjects() or {})
   local expected = cardsIn(book.getData())
-  -- Clear Board takes every campaign scenario card on the table: with the
-  -- owner's own laid out, clear with this box's Recall (only what it placed)
+  -- with the owner's own campaign laid out, Clear Board would take their cards too: not exercised then
   local foreign = foreignLoopCards(tag)
   if foreign > 0 then
-    info(foreign .. " campaign scenario card(s) already on the table: this check clears with the box's Recall, "
-      .. "not the Control's Clear Board")
+    info(foreign .. " campaign scenario card(s) already on the table: Place / Clear Board not exercised "
+      .. "(Clear Board would take them). Run the relay on a fresh SCED table to test it.")
+    return go()
   end
-  local function clear()
-    if foreign > 0 then return pcall(function() return book.call("buttonClick_recall") end) end
-    return pcall(function() return ctl.call("shApiClearBoard") end)
+  local function findBook()
+    for _, o in ipairs(getObjects()) do
+      if alive(o) and gm(o).type == "ScenarioBox" and gm(o).id == id then return o end
+    end
+    return nil
   end
-  local okp, placed = pcall(function() return book.call("buttonClick_place") end)
-  check("the scenario box's Place lays out a copy of every object in it", okp and placed == inside,
-    tostring(placed) .. "/" .. inside)
+  local okp, err = pcall(function() book.call("buttonClick_place") end)
+  check("the scenario box's Place (SCED's script) runs", okp, err)
   Wait.time(function()
     local n1, list = cardsTagged(tag)
     check("every card it laid out is on the table (none fell into a bag)", n1 == expected, n1 .. "/" .. expected)
+    check("the box is empty after its Place, as every SCED box is", alive(book) and #(book.getObjects() or {}) == 0)
     local untagged = 0
     for _, o in ipairs(list) do if not o.hasTag("StillHourLoop") then untagged = untagged + 1 end end
     check("the laid-out cards carry the loop tag", n1 > 0 and untagged == 0, untagged .. " without it")
@@ -1660,21 +1662,28 @@ step("saved object: a scenario box's Place, Clear Board, Place again", function(
       end
     end
     Wait.time(function()
-      local okc, r = clear()
-      check(foreign > 0 and "the box's Recall runs" or "Clear Board runs", okc, (not okc) and r or nil)
+      local okc, r = pcall(function() return ctl.call("shApiClearBoard") end)
+      check("Clear Board runs", okc, (not okc) and r or nil)
       Wait.time(function()
         local left = cardsTagged(tag)
         check("every card the box laid out leaves the table (drawn ones too)", left == 0, left .. " left")
-        check("the scenario box never empties", #(book.getObjects() or {}) == inside)
-        local ok2, placed2 = pcall(function() return book.call("buttonClick_place") end)
+        local fresh = findBook()
+        check("Clear Board puts a full box back", fresh ~= nil and #(fresh.getObjects() or {}) == inside,
+          fresh and (#(fresh.getObjects() or {}) .. "/" .. inside) or "no box")
+        -- the box Clear Board put back is this run's too: the clean-up takes it
+        if fresh then fresh.addTag(TAG) ; SB.boxes[#SB.boxes + 1] = fresh end
+        local ok2 = fresh and pcall(function() fresh.call("buttonClick_place") end)
         Wait.time(function()
           local n2 = cardsTagged(tag)
-          check("the next loop's Place lays out the same cards again", ok2 and placed2 == inside and n2 == n1,
-            n2 .. " vs " .. n1)
-          clear()
-          Wait.time(go, 2)
+          check("the next loop's Place lays out the same cards again", ok2 and n2 == n1, n2 .. " vs " .. n1)
+          pcall(function() ctl.call("shApiClearBoard") end)
+          Wait.time(function()
+            local again = findBook()
+            if again then again.addTag(TAG) end
+            go()
+          end, 3)
         end, 3)
-      end, 2)
+      end, 3)
     end, 2)
   end, 3)
 end)

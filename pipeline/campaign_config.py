@@ -104,7 +104,7 @@ def load(cid=None):
 CFG = load()
 
 
-# The shared table scripts (src/tts/loop_box.lua, download_box.lua,
+# The shared table scripts (src/tts/download_box.lua,
 # campaign_log.lua) were written for The Still Hour; the build swaps its names
 # for the campaign's (an identity for The Still Hour itself).
 def lua_text(path, cfg=None):

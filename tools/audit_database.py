@@ -3158,7 +3158,7 @@ class Auditor(object):
         """Do the embedded scripts match the sources the build is made from?"""
         roles = [("src/tts/memory_bag.lua", "campaign box (SCED MemoryBag)", lambda gm, o: gm.get("type") == "CampaignBox"
                   and o.get("Name") == "Custom_Model_Bag"),
-                 ("src/tts/loop_box.lua", "scenario box (replayable Place)", lambda gm, o: gm.get("type") == "ScenarioBox"),
+                 ("src/tts/memory_bag.lua", "scenario box (SCED MemoryBag)", lambda gm, o: gm.get("type") == "ScenarioBox"),
                  ("src/tts/download_box.lua", "placeholder download box",
                   lambda gm, o: gm.get("type") == "CampaignBox" and o.get("Name") == "Bag")]
         for rel_path, label, pick in roles:

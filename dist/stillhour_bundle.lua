@@ -2535,7 +2535,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/8b3f9e842d9756f456742daa1e4297a3aebcd387/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/8d1729cead7e4f76f9ea3b13082f900f4640ff04/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -4322,7 +4322,7 @@ end
 --- Clue and doom tokens standing near where a card was, resting on it or not. SCED's token spawner gives
 -- every clue and doom token the memo "clueDoom". One can roll off a card's edge, and SCED spawns a
 -- revealed location's clues over a second or two, so a Clear Board a moment after a Place could leave
--- clues standing on an empty map slot (the same rule as src/tts/loop_box.lua).
+-- clues standing on an empty map slot.
 local function memoOf(o)
   local ok, m = pcall(function() return o.memo end)
   return ok and m or nil
@@ -4381,20 +4381,6 @@ local function placeOf(o)
   return { x = b.center.x, z = b.center.z, hx = b.size.x / 2, hz = b.size.z / 2 }
 end
 
---- A scenario box's Place takes about a second to lay its objects out. Stop any
--- that is still running (src/tts/loop_box.lua cancelPlace), or the rest of the
--- box would arrive on the cleared board. Returns how many were stopped.
-local function stopPlaces()
-  local stopped = 0
-  for _, o in ipairs(getObjects()) do
-    if not o.isDestroyed() and tostring(o.getGMNotes()):find("ScenarioBox", 1, true) then
-      local ok, was = pcall(function() return o.call("cancelPlace") end)
-      if ok and was == true then stopped = stopped + 1 end
-    end
-  end
-  return stopped
-end
-
 --- Loop Setup step 1: take every card the scenario boxes laid out (and the
 -- tokens on them) off the table, so the boxes can be Placed fresh. Player
 -- cards, minicards, mats and the campaign's own objects are never touched.
@@ -4403,7 +4389,7 @@ end
 local function clearLoopBoard()
   local removed, tokens = 0, 0
   if type(getObjects) ~= "function" then return { cards = 0, tokens = 0, stopped = 0 } end
-  local stopped = stopPlaces()
+  local stopped = 0                 -- SCED's Place lays a box out in one frame: nothing is ever still running
   local places = {}
   local function note(o)
     local ok, pl = pcall(placeOf, o)
@@ -4445,6 +4431,180 @@ local function clearLoopBoard()
   end
   tokens = tokens + sweepClues(places)
   return { cards = removed, tokens = tokens, stopped = stopped }
+end
+
+------------------------------------------------- scenario boxes (SCED's own) --
+-- Every scenario box carries SCED's MemoryBag script unchanged (src/tts/memory_bag.lua): its Place takes
+-- the objects out of the box onto their spots, as in every official and fan-made campaign, and the box is
+-- empty afterwards. A Still Hour box is laid out again in later loops, so Clear Board puts a full box back:
+-- the campaign box holds a spare copy of each one ("Spare Scenario Boxes", GMNotes type
+-- ScenarioBoxMasters), and a used box is replaced by its spare, spawned with spawnObjectJSON (what SCED's
+-- own Download menu does with a campaign). The spare stays in the bag; nothing in it is renamed or renumbered.
+
+local MASTERS_TYPE = "ScenarioBoxMasters"
+
+local function gmOf(o)
+  local ok, gm = pcall(function() return JSON.decode(o.getGMNotes() or "") end)
+  return (ok and type(gm) == "table") and gm or {}
+end
+
+local function scenarioBoxId(o)
+  local gm = gmOf(o)
+  if gm.type == "ScenarioBox" and gm.id ~= nil then return tostring(gm.id) end
+  return nil
+end
+
+local function memoryOf(scriptState)
+  local ok, st = pcall(JSON.decode, scriptState or "")
+  return (ok and type(st) == "table" and type(st.ml) == "table") and st.ml or {}
+end
+
+--- True when the box still holds everything its Place lays out.
+local function boxIsFull(box)
+  local inside = {}
+  for _, e in ipairs(box.getObjects() or {}) do inside[e.guid] = true end
+  local any = false
+  for guid in pairs(memoryOf(box.script_state)) do
+    any = true
+    if not inside[guid] then return false end
+  end
+  return any
+end
+
+local function sparesBag()
+  for _, o in ipairs(getObjects()) do
+    if not o.isDestroyed() and gmOf(o).type == MASTERS_TYPE then return o end
+  end
+  return nil
+end
+
+--- Loop Setup step 2: every scenario box on the table that was laid out (or Recalled only in part) is
+-- replaced by a full copy of itself. Returns how many were refilled and whether the spares were found.
+local function refillBoxes()
+  if type(getObjects) ~= "function" or type(spawnObjectJSON) ~= "function" then return { refilled = 0 } end
+  local used = {}
+  for _, o in ipairs(getObjects()) do
+    if not o.isDestroyed() and scenarioBoxId(o) and not boxIsFull(o) then used[#used + 1] = o end
+  end
+  if #used == 0 then return { refilled = 0 } end
+  local spares = sparesBag()
+  if not spares then return { refilled = 0, missing = true } end
+  local byId = {}
+  for _, entry in ipairs((spares.getData() or {}).ContainedObjects or {}) do
+    local ok, gm = pcall(JSON.decode, entry.GMNotes or "")
+    if ok and type(gm) == "table" and gm.type == "ScenarioBox" and gm.id ~= nil then byId[tostring(gm.id)] = entry end
+  end
+  local refilled = 0
+  for _, box in ipairs(used) do
+    local entry = byId[scenarioBoxId(box)]
+    if entry then
+      local pos, rot, locked = box.getPosition(), box.getRotation(), box.getLock()
+      -- what the board and SCED's clue spawner remember by GUID belongs to the cards just cleared:
+      -- the fresh box lays out the same GUIDs, and its locations spawn their clues again
+      for guid in pairs(memoryOf(entry.LuaScriptState)) do
+        Board.forgetGuid(guid)
+        SCED.resetTokensSpawned(guid)
+      end
+      -- the full box comes back under the used one's GUID (the campaign box's Recall finds its boxes by
+      -- GUID), so it is spawned once the used one is gone, two frames later
+      local json = JSON.encode(entry)
+      box.destruct()
+      Wait.frames(function()
+        spawnObjectJSON({ json = json, position = pos, rotation = rot,
+          callback_function = function(b) pcall(function() b.setLock(locked) end) end })
+      end, 2)
+      refilled = refilled + 1
+    end
+  end
+  return { refilled = refilled }
+end
+
+-- Two boxes can share a spot. A district's act deck takes the mythos mat's labelled Act slot when it is
+-- free and its own column of the district row when another box's object lies there (its spot's `alt`);
+-- the finale's act takes the Act slot and the other box's act deck moves to the place the finale's box
+-- names for it (`yield`). SCED's Place lays everything on its first spot, so the Control moves them a
+-- few frames later. Spots and fallbacks are in the box's own remembered layout (LuaScriptState ml).
+local SPOT_REACH = 0.75
+
+local function boxIdOfObject(o)
+  local ok, tags = pcall(function() return o.getTags() end)
+  for _, t in ipairs(ok and tags or {}) do
+    if t:sub(1, 13) == "StillHourBox_" then return t:sub(14) end
+  end
+  return nil
+end
+
+local function othersAt(pos, mine, except)
+  local out = {}
+  for _, o in ipairs(getObjects()) do
+    if o ~= except and not o.isDestroyed() then
+      local id = boxIdOfObject(o)
+      if id and id ~= mine then
+        local q = o.getPosition()
+        if math.abs(q.x - pos.x) < SPOT_REACH and math.abs(q.z - pos.z) < SPOT_REACH then
+          out[#out + 1] = { obj = o, box = id }
+        end
+      end
+    end
+  end
+  return out
+end
+
+local function moveTo(o, spot)
+  o.setPosition({ spot.pos.x, spot.pos.y + 0.5, spot.pos.z })
+  o.setRotation({ spot.rot.x or 0, spot.rot.y or 0, o.getRotation().z })
+end
+
+local function settleSpots(p)
+  local ml = memoryOf(p.memory)
+  for _, guid in ipairs(p.guids) do
+    local e, o = ml[guid], getObjectFromGUID(guid)
+    if type(e) == "table" and e.pos and o ~= nil and not o.isDestroyed() then
+      if type(e.yield) == "table" then
+        for _, hit in ipairs(othersAt(e.pos, p.box, o)) do
+          local to = e.yield[hit.box]
+          if type(to) == "table" and to.pos then moveTo(hit.obj, to) end
+        end
+      end
+      if type(e.alt) == "table" and e.alt.pos and #othersAt(e.pos, p.box, o) > 0 then moveTo(o, e.alt) end
+    end
+  end
+end
+
+-- A box's Place (SCED's script) takes its objects out in one frame: each one is a leave-container event.
+-- A few frames later the shared spots are settled; two seconds after the last one, the board sync runs
+-- for that box, as it did after a Place before.
+local pendingPlace = {}
+
+local function notePlaced(container, obj)
+  local id = scenarioBoxId(container)
+  if not id then return end
+  local p = pendingPlace[id]
+  if not p then
+    p = { box = id, name = container.getName(), memory = container.script_state, guids = {}, seq = 0 }
+    pendingPlace[id] = p
+    Wait.frames(function() guarded("shared spots", settleSpots, p) end, 5)
+  end
+  p.guids[#p.guids + 1] = tostring(obj.getGUID())
+  p.seq = p.seq + 1
+  local mine = p.seq
+  Wait.time(function()
+    if pendingPlace[id] ~= p or p.seq ~= mine then return end
+    pendingPlace[id] = nil
+    shApiSyncBoardStaged({ box = p.box, name = p.name, guids = p.guids })
+  end, 2)
+end
+
+local syncsRunning = 0
+
+--- True while a box's Place is waiting for its board sync, or a board sync is running (runner API).
+function shApiBoxBusy()
+  return next(pendingPlace) ~= nil or syncsRunning > 0
+end
+
+--- SCED's Recall puts a box's objects back into it: what the board remembered about them goes.
+local function noteRecalled(container, obj)
+  if scenarioBoxId(container) then Board.forgetGuid(tostring(obj.getGUID())) end
 end
 
 -- The campaign guide's chaos bags (Campaign Setup), as SCED's token ids
@@ -4991,7 +5151,7 @@ local function drawPlay()
       "Click when you begin the finale (The Last Hour). Hour IX then ends the finale, not the loop.")
   end
   button("shClearBoard", "Clear Board", -ROW3_X, 2.6, 620,
-    "Loop Setup: remove every card the scenario boxes laid out, and the tokens on them.")
+    "Loop Setup: remove every card the scenario boxes laid out, and the tokens on them, and fill each used box again.")
   if Hourglass.hourSixResolved() then
     button("shUndoHourSix", "Undo Hour VI", ROW3_X, 2.6, 620,
       "Hour VI's Forced ability was canceled: take back its Static token (or, with What the Almanac Hid, "
@@ -5469,6 +5629,7 @@ function onObjectLeaveContainer(container, obj)
     end
     Board.onLeaveContainer(container, obj)
   end)
+  guarded("box place", notePlaced, container, obj)
 end
 
 function onObjectEnterContainer(container, obj)
@@ -5479,6 +5640,7 @@ function onObjectEnterContainer(container, obj)
     end
     Board.onEnterContainer(container, obj)
   end)
+  guarded("box recall", noteRecalled, container, obj)
 end
 
 function onObjectDestroy(obj)
@@ -5840,9 +6002,11 @@ function shApiSyncBoardStaged(p)
     { "chaos bag", function() Dissonance.syncBag(bag) end },
     { "control panel", function() refreshControl() end },
   }
+  syncsRunning = syncsRunning + 1
   local function run(i)
     local step = steps[i]
     if not step then
+      syncsRunning = math.max(0, syncsRunning - 1)
       note("Board synced.")
       return
     end
@@ -5938,17 +6102,31 @@ function shRaiseDissonance()
   afterChange()
 end
 
-function shClearBoard()
-  resetAsked = false
+--- Clear Board: the scenario cards off the table, then every used scenario box full again.
+local function clearAndRefill()
   local r = guarded("clear board", function() return Board.withoutAppointedGuard(clearLoopBoard) end)
     or { cards = 0, tokens = 0, stopped = 0 }
-  announce(string.format("The board is cleared: %d scenario card(s) and %d token(s) removed. %s"
-    .. "Press Place on The Square (Town Hall) box to set up the next loop.", r.cards, r.tokens,
-    (r.stopped or 0) > 0 and "A Place that was still running was stopped. " or ""))
+  local f = guarded("refill boxes", refillBoxes) or { refilled = 0 }
+  r.refilled, r.sparesMissing = f.refilled or 0, f.missing == true
   return r
 end
 
-function shApiClearBoard() return guarded("clear board", function() return Board.withoutAppointedGuard(clearLoopBoard) end) end
+function shClearBoard()
+  resetAsked = false
+  local r = clearAndRefill()
+  local boxes = ""
+  if r.refilled > 0 then
+    boxes = string.format("%d scenario box(es) filled again. ", r.refilled)
+  elseif r.sparesMissing then
+    boxes = "The Spare Scenario Boxes bag is not on the table, so the used boxes stay empty: press Place on the "
+      .. "campaign box to bring it out, then Clear Board again. "
+  end
+  announce(string.format("The board is cleared: %d scenario card(s) and %d token(s) removed. %s"
+    .. "Press Place on The Square (Town Hall) box to set up the next loop.", r.cards, r.tokens, boxes))
+  return r
+end
+
+function shApiClearBoard() return clearAndRefill() end
 function shApiSetPartTwo(p)
   CampaignState.setPartTwo(p == nil or p.on ~= false)
   local rep = guarded("locations", Board.syncLocations)

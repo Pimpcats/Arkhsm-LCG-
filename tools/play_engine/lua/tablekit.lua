@@ -204,13 +204,16 @@ end
 
 ------------------------------------------------------------ boxes --
 
--- The tag every object a scenario box lays out carries: src/tts/loop_box.lua boxTag() is
--- "StillHourBox_<GMNotes id>", baked into the build. The first published build's boxes tag what
--- they lay out with their GUID instead ("StillHourBox:<guid>"), so a Saved Object from before
--- the change still plays (the engine's own payload rebuilds the boxes from src/).
+-- The tag every object a scenario box lays out carries: "StillHourBox_<GMNotes id>", baked into the
+-- build (pipeline/table_presence.py loop_tags). The first published build's boxes tag what they lay
+-- out with their GUID instead ("StillHourBox:<guid>"): their script is neither SCED's box script nor
+-- one that names the baked tag, so a Saved Object from before the change still plays.
 function T.boxTag(box)
   local script = box.getLuaScript and box.getLuaScript() or ""
-  if script ~= "" and not script:find("StillHourBox_", 1, true) then return "StillHourBox:" .. box.getGUID() end
+  if script ~= "" and not script:find("StillHourBox_", 1, true)
+      and not script:find("function buttonClick_place", 1, true) then
+    return "StillHourBox:" .. box.getGUID()
+  end
   return "StillHourBox_" .. tostring(T.gm(box).id or box.getGUID())
 end
 function T.placedBy(box) return T.findAll(function(o) return o.hasTag(T.boxTag(box)) end) end
