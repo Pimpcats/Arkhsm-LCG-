@@ -1,0 +1,461 @@
+--- THE STILL HOUR — the table's setup, done for the players.
+--
+-- Seating an investigator (Campaign Setup steps 2-3), the investigators' part of Loop Setup (step 1:
+-- every card they own back into their deck, healed, tokens off, 5 resources, an opening hand of 5),
+-- and which district boxes a loop lays out (step 2), chosen from the Campaign Log. The scenario boxes'
+-- own layout is SCED's Place (src/tts/memory_bag.lua) and the Control token's board sync.
+--
+-- Everything goes through SCED's own objects the way its deck importer does
+-- (src/deckbuilder/DeckImporter.ttslua, src/playercards/CardSpawner.ttslua): official cards come out
+-- of SCED's All Player Cards bag by ArkhamDB id, a deck is spawned as one Deck object on the
+-- playmat's Deck zone (src/playermat/Zones.ttslua), counters are the mat's own (updateCounter) and
+-- the opening hand is the mat's own draw (drawCardsWithReshuffleWrapper). Every call is guarded:
+-- without SCED the campaign's own cards are still seated and the chat says what is left to do.
+
+local Setup = {}
+
+local SCED = require("StillHour/SCED")
+
+-- Baked in by pipeline/bundle_mod.py: each investigator's starter deck (docs/STARTER_DECKS.md as
+-- SCED ids, campaigns/<id>/starter_decks.json) and the cards their back requires (the card spec's
+-- signatures: their signature asset and event, their weakness and their personal quest card).
+-- (Loaded from src/ unbundled, as the rules tests do, the placeholders are unset globals: empty tables.)
+Setup.STARTER = __STILLHOUR_STARTER_DECKS__ or {}
+Setup.REQUIRED = __STILLHOUR_REQUIRED_CARDS__ or {}
+Setup.INVESTIGATORS = __STILLHOUR_INVESTIGATORS__ or {}   -- { { id = ..., name = ... }, ... } in the campaign's order
+
+-- SCED's playmat zones (Zones.ttslua commonZones / mirrorZones): local to the mat; the mirrored ones
+-- flip x for the Orange and Red mats.
+local ZONES = {
+  Investigator = { -1.177, 0, 0.002 }, Deck = { -1.82, 0, 0 }, Discard = { -1.82, 0, 0.61 },
+  Minicard = { -0.911, 0, -0.625 }, SetAside1 = { 2.35, 0, -0.520 }, SetAside2 = { 2.35, 0, 0.042 },
+}
+local MIRRORED = { SetAside1 = true, SetAside2 = true }
+
+Setup.OWNER_TAG_PREFIX = "StillHourOwner_"
+local LOOP_TAG = "StillHourLoop"
+
+local function try(fn, ...)
+  local ok, v = pcall(fn, ...)
+  if ok then return v end
+  return nil
+end
+
+local function alive(o) return o ~= nil and not try(function() return o.isDestroyed() end) end
+
+local function decode(s)
+  if type(s) ~= "string" or s == "" then return nil end
+  local ok, v = pcall(JSON.decode, s)
+  return ok and v or nil
+end
+
+local function copy(t) return JSON.decode(JSON.encode(t)) end
+
+local function metaOf(gmNotes)
+  local md = decode(gmNotes)
+  return type(md) == "table" and md or {}
+end
+
+------------------------------------------------------------------ the mats --
+
+function Setup.zone(matColor, name)
+  local mat = SCED.playermat(matColor)
+  local p = ZONES[name]
+  if not mat or not p then return nil end
+  local x = p[1]
+  if MIRRORED[name] and (matColor == "Orange" or matColor == "Red") then x = -x end
+  return try(function() return mat.positionToWorld({ x, p[2], p[3] }) end)
+end
+
+function Setup.rotation(matColor, faceDown)
+  local mat = SCED.playermat(matColor)
+  local r = mat and try(function() return mat.getRotation() end) or { y = 0 }
+  return { 0, r.y or 0, faceDown and 180 or 0 }
+end
+
+local function above(p, dy) return { p.x, p.y + (dy or 1.5), p.z } end
+
+--- The playermats that hold no investigator yet, in SCED's order.
+function Setup.freeMats(seated)
+  local taken = {}
+  for _, s in ipairs(seated or {}) do if s.matColor then taken[s.matColor] = true end end
+  local out = {}
+  for _, colour in ipairs(SCED.MAT_COLORS) do
+    if SCED.playermat(colour) and not taken[colour] then out[#out + 1] = colour end
+  end
+  return out
+end
+
+-------------------------------------------------------------- card sources --
+
+--- Card data out of a container's data (a bag or deck), the first with this campaign id.
+local function dataById(container, id)
+  local d = container and try(function() return container.getData() end)
+  for _, e in ipairs(d and d.ContainedObjects or {}) do
+    if metaOf(e.GMNotes).id == id then return e end
+  end
+  return nil
+end
+
+--- The bag or deck on the table that holds the card with this campaign id (the campaign's Player Cards
+-- bag holds the investigators and their cards; its minicard deck the minicards). Found by what it holds,
+-- never by name: SCED's own "All Player Cards" bag is on the table too.
+local function holderOf(id)
+  for _, o in ipairs(getObjects()) do
+    if alive(o) and (o.type == "Bag" or o.type == "Deck") then
+      for _, e in ipairs(try(function() return o.getObjects() end) or {}) do
+        if metaOf(e.gm_notes).id == id then return o end
+      end
+    end
+  end
+  return nil
+end
+Setup.holderOf = holderOf
+
+local function withOwner(data, matColor)
+  data.Tags = data.Tags or {}
+  local tag = Setup.OWNER_TAG_PREFIX .. matColor
+  for _, t in ipairs(data.Tags) do if t == tag then return data end end
+  data.Tags[#data.Tags + 1] = tag
+  return data
+end
+
+--- An official card's spawn data from SCED's All Player Cards bag (AllCardsBagApi.getCardById).
+function Setup.officialCard(id)
+  local bag = SCED.getObjectByOwnerAndType("Mythos", "AllCardsBag")
+  if not bag then return nil end
+  local r = try(function() return bag.call("getCardById", { id = id }) end)
+  return type(r) == "table" and r.data and copy(r.data) or nil
+end
+
+function Setup.cardIndexReady()
+  local bag = SCED.getObjectByOwnerAndType("Mythos", "AllCardsBag")
+  return bag ~= nil and try(function() return bag.call("isIndexReady") end) == true
+end
+
+--- One random basic weakness id (AllCardsBagApi.getRandomWeaknessIds), or nil.
+function Setup.randomWeaknessId()
+  local bag = SCED.getObjectByOwnerAndType("Mythos", "AllCardsBag")
+  if not bag then return nil end
+  local ids = try(function() return bag.call("getRandomWeaknessIds", { count = 1 }) end)
+  return type(ids) == "table" and ids[1] or nil
+end
+
+------------------------------------------------------------ decks of data --
+
+--- A Deck object's data holding these cards (CardSpawner.buildDeckDataTemplate / addCardToDeck).
+function Setup.deckData(cards)
+  local first = cards[1] or {}
+  local t = first.Transform or {}
+  local deck = { Name = "Deck", ContainedObjects = {}, DeckIDs = {}, CustomDeck = {},
+    Transform = { scaleX = t.scaleX or 1, scaleY = 1, scaleZ = t.scaleZ or 1 } }
+  local nextId = 1000
+  for _, card in ipairs(cards) do
+    for deckId, custom in pairs(card.CustomDeck or {}) do
+      local have = deck.CustomDeck[deckId]
+      if have == nil then
+        deck.CustomDeck[deckId] = custom
+      elseif have.FaceURL ~= custom.FaceURL then
+        -- two sheets under one id: renumber this card's (TTS identifies a sheet by its id)
+        local newId
+        for id, c in pairs(deck.CustomDeck) do if c.FaceURL == custom.FaceURL then newId = id end end
+        if not newId then
+          while deck.CustomDeck[tostring(nextId)] ~= nil do nextId = nextId + 1 end
+          newId = tostring(nextId)
+          deck.CustomDeck[newId] = custom
+        end
+        card.CardID = tonumber(newId .. string.sub(tostring(card.CardID), -2))
+        card.CustomDeck = { [newId] = custom }
+      end
+      break
+    end
+    deck.ContainedObjects[#deck.ContainedObjects + 1] = card
+    deck.DeckIDs[#deck.DeckIDs + 1] = card.CardID
+  end
+  return deck
+end
+
+--- Spawn cards as one stack (a single card alone) at a spot; callback(obj) once it is there.
+function Setup.spawnStack(cards, pos, rot, callback)
+  if #cards == 0 then return nil end
+  local data = (#cards == 1) and cards[1] or Setup.deckData(cards)
+  return spawnObjectData({ data = data, position = pos, rotation = rot, callback_function = callback })
+end
+
+----------------------------------------------------------------- seating --
+
+local function nameOf(id)
+  for _, inv in ipairs(Setup.INVESTIGATORS) do if inv.id == id then return inv.name end end
+  return id
+end
+
+--- Seat one investigator on a free playmat: their card on the mat's investigator spot, their minicard,
+-- their permanent cards beside the mat, and their deck (the cards their back requires, their starter
+-- deck from SCED's player cards and 1 random basic weakness) face down on the Deck zone, shuffled.
+-- Every card they own carries StillHourOwner_<mat colour>, so Loop Setup finds it wherever it ends up.
+-- Returns a report { ok, mat, deck, missing = {...} } (missing: what could not be spawned, by id).
+function Setup.seat(invId, matColor, opts)
+  opts = opts or {}
+  local rep = { ok = false, mat = matColor, deck = 0, missing = {} }
+  local bag = holderOf(invId)
+  local invPos, deckPos = Setup.zone(matColor, "Investigator"), Setup.zone(matColor, "Deck")
+  if not bag or not invPos or not deckPos then
+    rep.why = not bag and "the Player Cards bag (with this investigator in it) is not on the table"
+      or ("no " .. tostring(matColor) .. " playmat")
+    return rep
+  end
+  local inv = dataById(bag, invId)
+  if not inv then rep.why = "the investigator card is not in the Player Cards bag" ; return rep end
+  -- the cards their back requires: from the same bag (or any holder of each)
+  spawnObjectData({ data = withOwner(copy(inv), matColor), position = above(invPos), rotation = Setup.rotation(matColor) })
+  local mini = dataById(holderOf(invId .. "-m"), invId .. "-m")
+  local miniPos = Setup.zone(matColor, "Minicard")
+  if mini and miniPos then
+    spawnObjectData({ data = copy(mini), position = above(miniPos), rotation = Setup.rotation(matColor) })
+  end
+  local deck, permanents = {}, {}
+  for _, id in ipairs(Setup.REQUIRED[invId] or {}) do
+    local d = dataById(bag, id) or dataById(holderOf(id), id)
+    if d then
+      d = withOwner(copy(d), matColor)
+      if metaOf(d.GMNotes).permanent then permanents[#permanents + 1] = d else deck[#deck + 1] = d end
+    else
+      rep.missing[#rep.missing + 1] = id
+    end
+  end
+  if opts.starter ~= false then
+    for _, row in ipairs(Setup.STARTER[invId] or {}) do
+      for _ = 1, row[2] do
+        local d = Setup.officialCard(row[1])
+        if d then deck[#deck + 1] = withOwner(d, matColor) else rep.missing[#rep.missing + 1] = row[1] end
+      end
+    end
+    local weak = Setup.randomWeaknessId()
+    local wd = weak and Setup.officialCard(weak)
+    if wd then deck[#deck + 1] = withOwner(wd, matColor) else rep.missing[#rep.missing + 1] = "random basic weakness" end
+  end
+  local aside = Setup.zone(matColor, "SetAside1")
+  for i, d in ipairs(permanents) do
+    if aside then
+      spawnObjectData({ data = d, position = { aside.x, aside.y + 1 + 0.2 * i, aside.z }, rotation = Setup.rotation(matColor) })
+    end
+  end
+  rep.deck = #deck
+  Setup.spawnStack(deck, above(deckPos), Setup.rotation(matColor, true), function(o)
+    pcall(function() if o.type == "Deck" then o.shuffle() end end)
+  end)
+  rep.ok = true
+  rep.name = nameOf(invId)
+  return rep
+end
+
+-------------------------------------------------- the investigators' reset --
+
+local function tagsOf(o) return try(function() return o.getTags() end) or {} end
+
+local function hasTag(list, tag)
+  for _, t in ipairs(list or {}) do if t == tag then return true end end
+  return false
+end
+
+local function ownedBySomeone(list)
+  for _, t in ipairs(list or {}) do if t:sub(1, #Setup.OWNER_TAG_PREFIX) == Setup.OWNER_TAG_PREFIX then return true end end
+  return false
+end
+
+local function isLoop(list)
+  for _, t in ipairs(list or {}) do if t == LOOP_TAG or t:sub(1, 13) == "StillHourBox_" then return true end end
+  return false
+end
+
+--- In the mat's set-aside columns (where permanents and bonded cards wait): left alone by the reset.
+local function inSetAside(mat, p, matColor)
+  local lp = try(function() return mat.positionToLocal(p) end)
+  if not lp then return false end
+  local x = lp.x
+  if matColor == "Orange" or matColor == "Red" then x = -x end
+  return x >= 2.1 and math.abs(lp.z) <= 1.3
+end
+
+local function nearMat(mat, p)
+  local lp = try(function() return mat.positionToLocal(p) end)
+  return lp ~= nil and math.abs(lp.x) <= 3.2 and math.abs(lp.z) <= 1.9
+end
+
+--- A card the reset shuffles back: theirs (owner tag, or an untagged player card on their mat or in their
+-- hand), not the investigator card, a minicard, a permanent card or a card set aside beside the mat.
+local function keepsInPlay(md)
+  return md.type == "Investigator" or md.type == "Minicard" or md.permanent == true or md.startsInPlay == true
+end
+
+local PLAYER_TYPES = { Asset = true, Event = true, Skill = true, Treachery = true, Enemy = true }
+
+--- The investigators' part of Loop Setup step 1, for the investigator on this mat. opts.tokensOn(card)
+-- lists the tokens resting on a card (the Control's Clear Board rule). Returns a report.
+function Setup.resetInvestigator(matColor, opts)
+  opts = opts or {}
+  local rep = { mat = matColor, cards = 0, tokens = 0 }
+  local mat = SCED.playermat(matColor)
+  local deckPos = Setup.zone(matColor, "Deck")
+  if not mat or not deckPos then rep.why = "no playmat" ; return rep end
+  local owner = Setup.OWNER_TAG_PREFIX .. matColor
+  local playerColor = try(function() return mat.getVar("playerColor") end)
+  local inHand = {}
+  if playerColor and Player and Player[playerColor] then
+    for _, o in ipairs(try(function() return Player[playerColor].getHandObjects() end) or {}) do inHand[o] = true end
+  end
+  local cards, take = {}, {}
+  for _, o in ipairs(getObjects()) do
+    if alive(o) and (o.type == "Card" or o.type == "Deck") then
+      local p = try(function() return o.getPosition() end)
+      local tags = tagsOf(o)
+      local here = p and nearMat(mat, p)
+      if o.type == "Card" then
+        local md = metaOf(o.getGMNotes())
+        -- theirs by tag; an untagged player card (one taken from a bag by hand) by where it lies
+        local mine = hasTag(tags, owner) or ((here or inHand[o]) and PLAYER_TYPES[md.type] and not isLoop(tags)
+          and not ownedBySomeone(tags))
+        if mine and not keepsInPlay(md) and not (p and inSetAside(mat, p, matColor)) then
+          take[#take + 1] = o
+        end
+      else
+        -- a deck: whole when every card in it is theirs, otherwise their cards are taken out of it
+        local entries = try(function() return o.getObjects() end) or {}
+        local mineGuids, others = {}, 0
+        for _, e in ipairs(entries) do
+          local md = metaOf(e.gm_notes)
+          local mine = hasTag(e.tags, owner) or (here and PLAYER_TYPES[md.type] and not isLoop(e.tags)
+            and not ownedBySomeone(e.tags))
+          if mine and not keepsInPlay(md) then mineGuids[#mineGuids + 1] = e.guid else others = others + 1 end
+        end
+        if #mineGuids > 0 and others == 0 and not (p and inSetAside(mat, p, matColor)) then
+          take[#take + 1] = o
+        elseif #mineGuids > 0 and others > 0 then
+          for _, g in ipairs(mineGuids) do
+            local c = try(function() return o.takeObject({ guid = g, position = { p.x, p.y + 3, p.z }, smooth = false }) end)
+            if c then take[#take + 1] = c end
+          end
+        end
+      end
+    end
+  end
+  for o in pairs(inHand) do
+    local md = metaOf(try(function() return o.getGMNotes() end))
+    local listed = false
+    for _, t in ipairs(take) do if t == o then listed = true end end
+    if not listed and alive(o) and o.type == "Card" and not keepsInPlay(md) then take[#take + 1] = o end
+  end
+  for _, o in ipairs(take) do
+    local d = try(function() return o.getData() end)
+    if d then
+      if d.Name == "Deck" or d.Name == "DeckCustom" then
+        for _, c in ipairs(d.ContainedObjects or {}) do cards[#cards + 1] = withOwner(c, matColor) end
+      else
+        cards[#cards + 1] = withOwner(d, matColor)
+      end
+    end
+    if opts.tokensOn then
+      for _, t in ipairs(opts.tokensOn(o) or {}) do
+        if alive(t) then t.destruct() ; rep.tokens = rep.tokens + 1 end
+      end
+    end
+    pcall(function() o.destruct() end)
+  end
+  rep.cards = #cards
+  -- healed, nothing on the mat, 5 resources (the mat's own counters)
+  for _, c in ipairs({ { "DamageCounter", 0 }, { "HorrorCounter", 0 }, { "ResourceCounter", 5 } }) do
+    pcall(function() mat.call("updateCounter", { type = c[1], newValue = c[2] }) end)
+  end
+  pcall(function() mat.call("removeClues", 99) end)
+  local rot = Setup.rotation(matColor, true)
+  local function draw()
+    pcall(function() mat.call("drawCardsWithReshuffleWrapper", { numCards = opts.hand or 5 }) end)
+    if opts.after then pcall(opts.after, rep) end
+  end
+  if #cards > 0 then
+    Wait.frames(function()
+      Setup.spawnStack(cards, above(deckPos), rot, function(o)
+        pcall(function() if o.type == "Deck" then o.shuffle() end end)
+        Wait.frames(draw, 30)
+      end)
+    end, 2)
+  else
+    Wait.frames(draw, 2)
+  end
+  return rep
+end
+
+--- Weaknesses drawn in an opening hand go back into the deck and are replaced (Loop Setup step 1).
+function Setup.replaceDrawnWeaknesses(matColor)
+  local mat = SCED.playermat(matColor)
+  local playerColor = mat and try(function() return mat.getVar("playerColor") end)
+  if not (playerColor and Player and Player[playerColor]) then return 0 end
+  local deckPos = Setup.zone(matColor, "Deck")
+  local n = 0
+  for _, o in ipairs(try(function() return Player[playerColor].getHandObjects() end) or {}) do
+    local md = metaOf(try(function() return o.getGMNotes() end))
+    if o.type == "Card" and md.weakness == true and deckPos then
+      pcall(function()
+        o.setRotation(Setup.rotation(matColor, true))
+        o.setPosition(above(deckPos, 2 + 0.2 * n))
+      end)
+      n = n + 1
+    end
+  end
+  if n > 0 then
+    Wait.time(function()
+      for _, o in ipairs(getObjects()) do
+        if o.type == "Deck" and alive(o) then
+          local p = o.getPosition()
+          if math.abs(p.x - deckPos.x) < 0.5 and math.abs(p.z - deckPos.z) < 0.5 then pcall(function() o.shuffle() end) end
+        end
+      end
+      pcall(function() mat.call("drawCardsWithReshuffleWrapper", { numCards = n }) end)
+    end, 1.5)
+  end
+  return n
+end
+
+--------------------------------------------------- the night's district boxes --
+
+-- The districts a loop can lay out besides the Square, in the map's order, and the act ids / log
+-- entries that say what each has left (the Control's DISTRICT_ACTS: act 1a, act 2a, surface entry,
+-- deep entry, act 3a, late record).
+Setup.DISTRICTS = { "district_church", "district_almanac", "district_fairground", "district_road", "district_lighthouse" }
+
+--- What a district's act deck would be at its next Place ("1a", "2a", "3a" or nil when none), by the
+-- same rules the Control sets the deck up with (The Districts: a district's act deck).
+function Setup.currentAct(acts, knows, partTwo, almanacSecondOpen)
+  if not acts then return nil end
+  if knows(acts[6]) then return nil end
+  if knows(acts[4]) then return partTwo and "3a" or nil end
+  if knows(acts[3]) then
+    if not partTwo then return nil end
+    if acts[2] == "sthr-act-appointedname" and not almanacSecondOpen then return nil end
+    return "2a"
+  end
+  return "1a"
+end
+
+--- The districts the Control proposes for the night: those whose act deck has something to do, the
+-- deeper objectives first (one path a loop: at most two districts), with the Sunken Road whenever the
+-- Lighthouse is proposed (it is reached only through the Road). Returns a set { [box id] = true }.
+function Setup.proposeDistricts(districtActs, knows, partTwo, almanacSecondOpen, limit)
+  local rank = { ["3a"] = 1, ["2a"] = 2, ["1a"] = 3 }
+  local open = {}
+  for i, id in ipairs(Setup.DISTRICTS) do
+    local act = Setup.currentAct(districtActs[id], knows, partTwo, almanacSecondOpen)
+    if act then open[#open + 1] = { id = id, rank = rank[act], i = i } end
+  end
+  table.sort(open, function(a, b) if a.rank ~= b.rank then return a.rank < b.rank end return a.i < b.i end)
+  local out, n = {}, 0
+  for _, d in ipairs(open) do
+    if n >= (limit or 2) then break end
+    out[d.id] = true
+    n = n + 1
+  end
+  if out.district_lighthouse then out.district_road = true end
+  return out
+end
+
+return Setup

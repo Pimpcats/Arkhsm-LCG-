@@ -378,7 +378,11 @@ function onLoad(saved)
   Wait.condition(function() Wait.frames(buildUi, 2) end, isLoaded, 30,
     function() buildUi() end)
   Wait.frames(seedMirror, 15)
+  -- each page fills itself from the Control token whenever it is shown (Between Loops step 4 needs
+  -- no clicks): ticks only, so nothing written by hand is ever cleared
+  Wait.frames(syncQuietly, 45)
 end
+
 
 ---------------------------------------------------------------------- api --
 
@@ -516,6 +520,13 @@ function syncFromCampaignState(st)
   refreshDerived()
   updateSave()
   return { ok = true, page = PAGE, updated = n }
+end
+
+--- Sync from campaign without a word in the chat when no Control token is on the table (the Control
+-- calls it after each change Between Loops; a page that is shown calls it on its own).
+function syncQuietly()
+  if type(findCampaignState()) ~= "table" then return { ok = false, page = PAGE, updated = 0 } end
+  return syncFromCampaignState()
 end
 
 -- Page 1: investigator names/classes from the investigator cards on the table

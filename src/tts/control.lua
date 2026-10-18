@@ -24,6 +24,7 @@ local SCED          = require("StillHour/SCED")
 local ChaosBag      = require("StillHour/ChaosBag")
 local Board         = require("StillHour/Board")
 local Guide         = require("StillHour/Guide")
+local Setup         = require("StillHour/Setup")
 
 local SAVE_VERSION = 2
 
@@ -56,6 +57,11 @@ local aging = {}                -- investigatorId -> interlude aging inputs {def
 local saveSeq = 0               -- bumps on every change; newest copy wins (control vs campaign log)
 local beginWarned = false       -- Begin Next Loop already told the table what is outstanding
 local resetAsked = false        -- Reset Loop asked once (the loop is not over by the Control's count): the next click ends it
+local seatPick = {}             -- Setup panel: investigator ids picked to seat, in the order picked
+local nightPick = nil           -- Setup panel: { [box id] = true } the districts picked for the night (nil: the proposal)
+local proposeNight              -- forward: the districts the Control proposes for the night (Loop Setup)
+local setupRunning = false      -- the one-button setup is laying the table out
+local tableSetUp = false        -- this loop's (or the Prologue's) table was laid out by the Setup panel
 
 -------------------------------------------------------------- board contexts --
 
@@ -64,6 +70,7 @@ local function hourLog(h, name, msg)
 end
 
 local refreshControl  -- forward
+local findScenarioBox -- forward (a scenario box on the table by its id)
 local refreshBag      -- forward (the campaign's chaos-bag changes)
 
 local function syncBoard()
@@ -109,11 +116,21 @@ local function announceResetReached()
   end
 end
 
+--- The campaign log's shown page fills itself in from this token (Between Loops step 4).
+local function syncLogPage()
+  if type(getObjectsWithTag) ~= "function" then return end
+  for _, o in ipairs(getObjectsWithTag(Board.CAMPAIGN_LOG_TAG)) do
+    pcall(function() Wait.frames(function() pcall(function() o.call("syncQuietly") end) end, 5) end)
+  end
+end
+
 local function afterChange()
   if refreshBag then guarded("chaos bag", refreshBag) end
   syncBoard()
   guarded("investigators", Board.refreshInvestigators, false)
   refreshControl()
+  -- Between Loops (Reset Loop to Begin Next Loop) the log follows every step on its own
+  if mode == "interlude" or CampaignState.isLoopEnded() then guarded("campaign log", syncLogPage) end
 end
 
 -------------------------------------------------------------------- actions --
@@ -932,6 +949,9 @@ local function beginNextLoop(force)
   Dissonance.syncBag(bag)
   aging = {}
   mode = "play"
+  nightPick = nil
+  tableSetUp = false            -- Loop Setup next: the Setup button says so
+  guarded("campaign log", syncLogPage)
   guarded("aging", Board.refreshInvestigators, true)
   announce(string.format("A new loop begins. Memory capped at %d; %d lost.",
     CampaignState.constants().memoryCap, lost))
@@ -1135,6 +1155,9 @@ local function drawPlay()
   end
   -- rows of three, spaced so no button overlaps another
   button("shStatus", "Status", -ROW3_X, 1.4, 620, "Print the Hour, Dissonance, band, scar, Memory and Part to the chat.")
+  button("shOpenSetup", tableSetUp and "Setup" or (CampaignState.inPrologue() and "Set Up Prologue" or
+    (between and "Setup" or "Set Up Loop")), ROW3_X, 1.4, 620, "Seat the investigators, pick tonight's districts "
+    .. "and lay the table out with one click.", 85)
   button("shSyncBoard", "Sync Board", 0.0, 1.4, 620, "Use when the table and the Control disagree: re-applies location sides and CLOSED labels, the "
     .. "Appointed's position and the chaos bag's Static tokens.")
   button("shReset", "Reset Loop", -ROW3_X, 2.0, 620, "When the loop ends (Between Loops). Counts once per loop. "
@@ -1183,6 +1206,73 @@ local function drawPlay()
       "One pending token: left resolves, right cancels. Multiple tokens: use Resolve on the actual token. "
         .. "Returning an unresolved token to the bag also discards that token's pending reveal.", 85)
   end
+end
+
+-- The districts a night can add to the Square, in the order the setup lays them out (the Sunken
+-- Road before the Lighthouse, which is reached through it), and the finale's box.
+local NIGHT_ORDER = { "district_church", "district_almanac", "district_fairground", "district_road",
+  "district_lighthouse", "finale" }
+local BOX_NAMES = { district_square = "The Square (Town Hall)", district_church = "The Drowned Church",
+  district_almanac = "The Almanac House", district_fairground = "The Fairground", district_road = "The Sunken Road",
+  district_lighthouse = "The Lighthouse", finale = "The Last Hour", prologue = "The First Hour" }
+
+local function seatedByMat()
+  local out = {}
+  for _, inv in ipairs(guarded("investigators", Board.investigators) or {}) do
+    if inv.matColor then out[#out + 1] = inv end
+  end
+  return out
+end
+
+local function drawSetup()
+  header("SETUP", -2.3)
+  local seated = seatedByMat()
+  local at = {}
+  for _, inv in ipairs(seated) do at[inv.id] = inv.matColor end
+  local free = Setup.freeMats(seated)
+  for i, inv in ipairs(Setup.INVESTIGATORS) do
+    if i > 6 then break end
+    local label, tip = "[ ] " .. inv.name, "Click to seat this investigator; click again to take them off the list. "
+      .. "They are seated on the free playmats in the order picked."
+    if at[inv.id] then
+      label, tip = inv.name .. " · " .. at[inv.id], "Seated on the " .. at[inv.id] .. " playmat."
+    else
+      for k, id in ipairs(seatPick) do
+        if id == inv.id then label = "[x] " .. inv.name .. " → " .. (free[k] or "no free mat") end
+      end
+    end
+    button("shSeatPick" .. i, label, (i % 2 == 1) and -PAIR_X or PAIR_X, -1.7 + math.floor((i - 1) / 2) * 0.55, 1000, tip, 80)
+  end
+  local z = -1.7 + math.ceil(math.min(#Setup.INVESTIGATORS, 6) / 2) * 0.55
+  button("shSeatInvestigators", string.format("Seat investigators (%d)", #seatPick), 0, z, 1400,
+    "Campaign Setup steps 2-3 for each picked investigator: their card, minicard and permanent cards on their "
+      .. "playmat, and their deck (the cards their back requires, the starter deck from Appendix: Starting Decks "
+      .. "and 1 random basic weakness) shuffled on the Deck spot.", 90)
+  z = z + 0.65
+  if CampaignState.inPrologue() then
+    button("shNoop", "[x] " .. BOX_NAMES.prologue, 0, z, 1400, "The Prologue lays out The First Hour.", 80)
+    z = z + 0.55
+  else
+    local pick = nightPick or proposeNight()
+    button("shNoop", "[x] " .. BOX_NAMES.district_square, -PAIR_X, z, 1000, "Every loop lays out the Square.", 80)
+    local shown = 1
+    for i, id in ipairs(NIGHT_ORDER) do
+      if id ~= "finale" or CampaignState.knows("the-way-the-night-breaks") then
+        local col = shown % 2
+        local row = math.floor(shown / 2)
+        button("shNightPick" .. i, (pick[id] and "[x] " or "[ ] ") .. BOX_NAMES[id], col == 0 and -PAIR_X or PAIR_X,
+          z + row * 0.55, 1000, "Lay this box out tonight (picked for you from the Campaign Log: the districts with "
+            .. "an objective left, one path a loop). Click to change. The Lighthouse brings the Sunken Road.", 80)
+        shown = shown + 1
+      end
+    end
+    z = z + math.ceil(shown / 2) * 0.55
+  end
+  button("shSetUp", CampaignState.inPrologue() and "Set Up Prologue" or "Set Up Loop", -0.55, z + 0.1, 1100,
+    "Lays the table out: Clear Board, each investigator's cards back into their deck (shuffled), healed, "
+      .. "5 resources and an opening hand of 5, then the boxes ticked above Placed in order and the investigators "
+      .. "at the Square. Then check the table.", 100)
+  button("shCloseSetup", "Back", 1.35, z + 0.1, 620, "Return to the main panel.")
 end
 
 local function drawInterlude()
@@ -1273,7 +1363,7 @@ refreshControl = function()
   -- every other click redraws the panel, which withdraws a pending "Reset Loop?"
   resetAsked = false
   pcall(function() self.clearButtons() end)
-  if mode == "interlude" then drawInterlude() else drawPlay() end
+  if mode == "interlude" then drawInterlude() elseif mode == "setup" then drawSetup() else drawPlay() end
   -- Token UI is transient in TTS. Reattach by saved GUID on reload/restore;
   -- clearing first makes repeated restoration idempotent.
   for _, guid in ipairs(bag.save().pendingStatic or {}) do
@@ -2144,6 +2234,223 @@ function shClearBoard()
 end
 
 function shApiClearBoard() return clearAndRefill() end
+
+----------------------------------------------------------------- Setup panel --
+-- Campaign Setup steps 2-3 (seat the investigators) and Loop Setup (or the Prologue's Setup) in one
+-- click each. The night's districts are picked from the Campaign Log (Setup.proposeDistricts: the
+-- districts with an objective left, the deeper ones first, two at most, the Road with the Lighthouse);
+-- the players can change the pick before clicking Set Up Loop. Everything the guide's setup steps
+-- ask for is laid out; the players check the table and play.
+
+findScenarioBox = function(id)
+  for _, o in ipairs(getObjects()) do
+    if not o.isDestroyed() and scenarioBoxId(o) == id then return o end
+  end
+  return nil
+end
+
+proposeNight = function()
+  local knows = function(id) return CampaignState.knows(id) end
+  local open = CampaignState.knows("what-the-almanac-hid") and CampaignState.knows("the-vote-that-never-ends")
+  local pick = Setup.proposeDistricts(DISTRICT_ACTS, knows, CampaignState.inPartTwo(), open, 2)
+  if Knowledge.finaleForced() then pick.finale = true end
+  return pick
+end
+
+local function togglePick(i)
+  local inv = Setup.INVESTIGATORS[i]
+  if not inv then return end
+  for _, s in ipairs(seatedByMat()) do if s.id == inv.id then return refreshControl() end end
+  for k, id in ipairs(seatPick) do
+    if id == inv.id then table.remove(seatPick, k) ; return refreshControl() end
+  end
+  seatPick[#seatPick + 1] = inv.id
+  refreshControl()
+end
+function shSeatPick1() togglePick(1) end
+function shSeatPick2() togglePick(2) end
+function shSeatPick3() togglePick(3) end
+function shSeatPick4() togglePick(4) end
+function shSeatPick5() togglePick(5) end
+function shSeatPick6() togglePick(6) end
+
+local function toggleNight(i)
+  local id = NIGHT_ORDER[i]
+  if not id then return end
+  nightPick = nightPick or proposeNight()
+  nightPick[id] = not nightPick[id] or nil
+  -- the Lighthouse is reached only through the Sunken Road
+  if id == "district_lighthouse" and nightPick[id] then nightPick.district_road = true end
+  if id == "district_road" and not nightPick[id] then nightPick.district_lighthouse = nil end
+  refreshControl()
+end
+function shNightPick1() toggleNight(1) end
+function shNightPick2() toggleNight(2) end
+function shNightPick3() toggleNight(3) end
+function shNightPick4() toggleNight(4) end
+function shNightPick5() toggleNight(5) end
+function shNightPick6() toggleNight(6) end
+
+function shOpenSetup() mode = "setup" ; refreshControl() end
+function shCloseSetup() mode = "play" ; refreshControl() end
+
+--- The campaign log's page 1 fills its investigator rows from the table (its own Fill investigators).
+local function fillLog()
+  for _, o in ipairs(getObjectsWithTag(Board.CAMPAIGN_LOG_TAG)) do
+    pcall(function() o.call("fillInvestigators") end)
+  end
+end
+
+--- Seat the picked investigators (runner API: p = { ids = {...} } picks them first).
+function shApiSeat(p)
+  if type(p) == "table" and type(p.ids) == "table" then seatPick = p.ids end
+  local seated = seatedByMat()
+  local free = Setup.freeMats(seated)
+  if #seatPick == 0 then
+    announce("Pick the investigators to seat first (click their names on the Setup panel).")
+    return { seated = 0 }
+  end
+  if SCED.isPresent() and not Setup.cardIndexReady() then
+    announce("SCED is still reading its player cards. Click Seat investigators again in a few seconds.")
+    return { seated = 0, waiting = true }
+  end
+  local done, reports = 0, {}
+  for k, id in ipairs(seatPick) do
+    local mat = free[k]
+    if not mat then
+      announce("No free playmat for " .. tostring(id) .. ": every mat holds an investigator.")
+      break
+    end
+    local r = Setup.seat(id, mat) or {}
+    reports[#reports + 1] = r
+    if r.ok then
+      done = done + 1
+      local missing = #(r.missing or {}) > 0 and (" " .. #r.missing .. " card(s) could not be found: "
+        .. table.concat(r.missing, ", ") .. ".") or ""
+      announce(string.format("%s seated on the %s playmat: %d cards in the deck, shuffled.%s", r.name, mat, r.deck, missing))
+    else
+      announce("Could not seat " .. tostring(id) .. ": " .. tostring(r.why))
+    end
+  end
+  seatPick = {}
+  -- once the cards are on the mats: the party size, SCED's counter and the log's investigator rows
+  Wait.time(function()
+    local n = #seatedByMat()
+    if n > 0 and n ~= CampaignState.constants().investigators then
+      guarded("investigators", changeInvestigators, n - CampaignState.constants().investigators)
+    end
+    guarded("investigators", Board.refreshInvestigators, true)
+    guarded("campaign log", fillLog)
+    afterChange()
+  end, 3)
+  refreshControl()
+  return { seated = done, reports = reports }
+end
+function shSeatInvestigators() shApiSeat() end
+
+--- The investigators onto a location card (by id), spread across it.
+local function investigatorsTo(locId)
+  local loc
+  for _, o in ipairs(getObjects()) do
+    if o.type == "Card" and not o.isDestroyed() and idOf(o.getGMNotes()) == locId then loc = o end
+  end
+  if not loc then return 0 end
+  local p = loc.getPosition()
+  local n = 0
+  for i, inv in ipairs(seatedByMat()) do
+    if inv.minicard and not inv.minicard.isDestroyed() then
+      local dx = ((i - 1) % 2 == 0) and -0.45 or 0.45
+      local dz = (i <= 2) and -0.35 or 0.35
+      pcall(function() inv.minicard.setPositionSmooth({ p.x + dx, p.y + 0.6, p.z + dz }, false, true) end)
+      n = n + 1
+    end
+  end
+  return n
+end
+
+--- Anchor Point in play: its Memory token goes on its investigator's card at Loop Setup.
+local function anchorPointMemory()
+  local n = 0
+  for _, inv in ipairs(seatedByMat()) do
+    local tag = Setup.OWNER_TAG_PREFIX .. inv.matColor
+    for _, o in ipairs(getObjects()) do
+      if o.type == "Card" and not o.isDestroyed() and idOf(o.getGMNotes()) == "sthr-anchorpoint" and o.hasTag(tag) then
+        CampaignState.addOnCardMemory(inv.id, 1)
+        n = n + 1
+      end
+    end
+  end
+  return n
+end
+
+--- Set Up Prologue / Set Up Loop. Returns false when it could not start.
+function shApiSetUp()
+  if setupRunning then
+    announce("The table is still being laid out.")
+    return false
+  end
+  local seated = seatedByMat()
+  if #seated == 0 then
+    announce("Seat the investigators first (Setup panel: pick them, then Seat investigators).")
+    return false
+  end
+  if CampaignState.isLoopEnded() then
+    announce("Between Loops: click Begin Next Loop first, then Set Up Loop.")
+    return false
+  end
+  setupRunning = true
+  local prologue = CampaignState.inPrologue()
+  local boxes = prologue and { "prologue" } or { "district_square" }
+  if not prologue then
+    local pick = nightPick or proposeNight()
+    for _, id in ipairs(NIGHT_ORDER) do if pick[id] then boxes[#boxes + 1] = id end end
+  end
+  local names = {}
+  for _, id in ipairs(boxes) do names[#names + 1] = BOX_NAMES[id] or id end
+  announce((prologue and "Setting up the Prologue: " or "Setting up the loop: ") .. table.concat(names, ", ") .. ".")
+  local cleared = clearAndRefill()
+  local function finish()
+    local moved = investigatorsTo(prologue and "sthr-loc-square" or "sthr-loc-hubsquare")
+    local anchors = prologue and 0 or (guarded("anchor point", anchorPointMemory) or 0)
+    setupRunning = false
+    nightPick = nil
+    tableSetUp = true
+    mode = "play"
+    announce(string.format("Set up: %s laid out; %d investigator(s) at the Square, decks shuffled, 5 resources and "
+      .. "5 cards each%s. Check the table, choose a lead investigator (mulligan as normal) and begin.",
+      table.concat(names, ", "), moved, anchors > 0 and ", Anchor Point's Memory on its investigator" or ""))
+    afterChange()
+  end
+  Wait.frames(function()
+    for _, inv in ipairs(seated) do
+      local mat = inv.matColor
+      guarded("investigator reset", Setup.resetInvestigator, mat, { tokensOn = tokensOn, after = function()
+        Wait.time(function() guarded("opening hand", Setup.replaceDrawnWeaknesses, mat) end, 3)
+      end })
+    end
+    -- the boxes one after another, each once the board sync of the one before has run
+    local i = 0
+    local function nextBox()
+      i = i + 1
+      local id = boxes[i]
+      if not id then return Wait.time(finish, 1) end
+      local box = findScenarioBox(id)
+      if box and boxIsFull(box) then
+        pcall(function() box.call("buttonClick_place") end)
+      elseif box then
+        announce((BOX_NAMES[id] or id) .. " is already laid out.")
+      else
+        announce((BOX_NAMES[id] or id) .. "'s box is not on the table: Place it from the campaign box.")
+      end
+      Wait.time(function()
+        Wait.condition(nextBox, function() return not shApiBoxBusy() end, 20, nextBox)
+      end, 0.5)
+    end
+    nextBox()
+  end, 5)
+  return { cleared = cleared, boxes = boxes }
+end
+function shSetUp() shApiSetUp() end
 function shApiSetPartTwo(p)
   CampaignState.setPartTwo(p == nil or p.on ~= false)
   local rep = guarded("locations", Board.syncLocations)

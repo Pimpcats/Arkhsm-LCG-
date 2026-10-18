@@ -30,7 +30,7 @@ SUITES = ("playthrough", "runner")
 # payload built from src/, see candidate_payload) and the boxes' Place / Recall
 # suite (tests/test_sced_place.py, the same way), the doom reset on an Hour change
 # (tests/test_sced_hour_doom.py) and the Control token's flow (tests/test_sced_control_flow.py)
-EXTRA_SUITES = ("demo", "resolutions", "place_state", "hour_doom", "control_flow")
+EXTRA_SUITES = ("demo", "resolutions", "place_state", "hour_doom", "control_flow", "table_setup")
 
 PLAY_AREA_STAND_IN = """
 local enabled = false

@@ -51,6 +51,46 @@ def guide_pages_text(root):
                     if t in pages)
 
 
+# The table setup's data (src/<lua_dir>/Setup.ttslua): each investigator's starter deck as SCED ids
+# (campaigns/<id>/starter_decks.json, pipeline/starter_deck_ids.py), the cards their back requires
+# (the card spec's signatures) and the investigators in the campaign's order. Empty tables when the
+# campaign has none.
+SETUP_PLACEHOLDERS = ("__STILLHOUR_STARTER_DECKS__", "__STILLHOUR_REQUIRED_CARDS__", "__STILLHOUR_INVESTIGATORS__")
+
+
+def lua_literal(v):
+    """A JSON-shaped value as a Lua table constructor."""
+    if isinstance(v, dict):
+        return "{" + ", ".join("[%s] = %s" % (json.dumps(str(k)), lua_literal(x)) for k, x in v.items()) + "}"
+    if isinstance(v, (list, tuple)):
+        return "{" + ", ".join(lua_literal(x) for x in v) + "}"
+    if isinstance(v, bool):
+        return "true" if v else "false"
+    if isinstance(v, (int, float)):
+        return repr(v)
+    return json.dumps(v, ensure_ascii=False)
+
+
+def setup_data(root):
+    starter_path = os.path.join(root, "campaigns", CFG.id, "starter_decks.json")
+    starter = json.load(open(starter_path, encoding="utf-8")) if os.path.exists(starter_path) else {}
+    spec_path = CFG.path("cards_spec")
+    spec = json.load(open(spec_path, encoding="utf-8")) if os.path.exists(spec_path) else []
+    required, investigators = {}, []
+    for c in spec:
+        if c.get("type") != "Investigator":
+            continue
+        investigators.append({"id": c["id"], "name": c.get("name", c["id"])})
+        ids = []
+        for group in c.get("signatures") or []:
+            for cid, n in group.items():
+                ids.extend([cid] * int(n))
+        required[c["id"]] = ids
+    return {"__STILLHOUR_STARTER_DECKS__": lua_literal(starter),
+            "__STILLHOUR_REQUIRED_CARDS__": lua_literal(required),
+            "__STILLHOUR_INVESTIGATORS__": lua_literal(investigators)}
+
+
 def static_token_url(root):
     path = CFG.path("art_urls")
     if os.path.exists(path):
@@ -103,10 +143,13 @@ def build_bundle(root):
     parts = [PREAMBLE]
     token_url = static_token_url(root)
     guide_pages = guide_pages_text(root)
+    setup = setup_data(root)
     for name in MODULES:
         path = os.path.join(root, "src", CFG.lua_dir, name + ".ttslua")
         body = (open(path, encoding="utf-8").read().replace(STATIC_TOKEN_PLACEHOLDER, token_url)
                 .replace(GUIDE_PAGES_PLACEHOLDER, guide_pages))
+        for key, text in setup.items():
+            body = body.replace(key, text)
         parts.append('__modules["%s/%s"] = function()\n%s\nend\n' % (CFG.lua_dir, name, body))
     control = open(os.path.join(root, CFG.control_lua), encoding="utf-8").read()
     parts.append("-- ===== control entry script =====\n" + control)

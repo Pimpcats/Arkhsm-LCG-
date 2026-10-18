@@ -1821,7 +1821,15 @@ local function playerFor(color)
     return nil
   end }
   setmetatable(p, mt)
-  p.getHandObjects = function() return {} end
+  -- what deal() handed to this colour and is still out (a card dealt is marked with its hand)
+  p.getHandObjects = function()
+    local out = {}
+    for _, o in ipairs(E.objects) do
+      local st = S[o]
+      if st and st.hand == color and not st.removed then out[#out + 1] = o end
+    end
+    return out
+  end
   p.getHandCount = function() return 1 end
   p.getHandTransform = function() return { position = Vector(0, 3, -30), rotation = Vector(0, 0, 0),
     scale = Vector(10, 5, 3), forward = Vector(0, 0, 1), right = Vector(1, 0, 0), up = Vector(0, 1, 0) } end
