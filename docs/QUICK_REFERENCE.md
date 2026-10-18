@@ -12,7 +12,7 @@
 
 | Phase | As usual, plus |
 |---|---|
-| **Mythos** (from round 2) | Place 1 doom on the current **Hour**, then check its threshold. If the Hour passes: turn the Hours deck and click **Hour** on the Control token (with SCED it also removes all doom in play; take any doom off the Hours cards yourself). *Guide: Campaign Rules, The Hourglass.* |
+| **Mythos** (from round 2) | Place 1 doom on the current **Hour**, then check its threshold. If the Hour passes: click **Hour** on the Control token (the Hours on the table turn with it; with SCED it also removes all doom in play). *Guide: Campaign Rules, The Hourglass.* |
 | **Investigation** | The first move each round along a connection between two districts places 1 doom on the current Hour (**crossing doom**). *Guide: Districts and travel.* |
 | **Enemy** | If the Appointed hunts and is ready and unengaged, click **Hunt** once. *Guide: The Appointed; hover over Hunt for when to click.* |
 | **Upkeep** | As usual. |

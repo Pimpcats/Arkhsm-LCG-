@@ -716,8 +716,8 @@ local STAGE_BUTTONS = {
     z = 1.75, w = 1100, fs = 120, tip = "The Appointed's Approach stage. The Control token moves it; you do not click this." },
   { fn = "shHoldBack", label = function() return "Hold Back (success)" end, z = 2.2, w = 1100, fs = 120,
     tip = "Click once after a Hold Back success (the walker's ring and The Hour I Learned Your Name count): it "
-      .. "pushes the Approach back 1 stage and rewinds the Hour counter (not in the finale; 3 rewinds a loop). Move "
-      .. "the Hours deck yourself but do not right-click Hour. Disengage and exhaust the Appointed yourself." },
+      .. "pushes the Approach back 1 stage and rewinds the Hour counter (not in the finale; 3 rewinds a loop); the "
+      .. "Hours on the table follow. Do not also right-click Hour. Disengage and exhaust the Appointed yourself." },
 }
 
 --- Put the Hold Back / Hunt buttons on the Appointed card (idempotent).
@@ -1037,6 +1037,25 @@ function Board.readLogMirror(log, deep)
     if m and (best == nil or m.seq > best.seq) then best = m end
   end
   return best
+end
+
+--- A value ticked or written on the campaign log, on whichever page it is (the log has one State per
+-- page, each with its own values: the page on show answers itself, the others from their saved state).
+function Board.logValue(key, log)
+  log = log or Board.campaignLog()
+  if not log then return nil end
+  local function from(raw)
+    local t = decode(raw)
+    return t and type(t.values) == "table" and t.values[key] or nil
+  end
+  local shown = safe(function() return log.call("getLogValues") end)
+  if type(shown) == "table" and type(shown.values) == "table" and shown.values[key] ~= nil then return shown.values[key] end
+  local data = safe(function() return log.getData() end)
+  for _, state in pairs(type(data) == "table" and type(data.States) == "table" and data.States or {}) do
+    local v = type(state) == "table" and from(state.LuaScriptState)
+    if v ~= nil then return v end
+  end
+  return from(safe(function() return log.script_state end))
 end
 
 --- Does a campaign log (any page) hold entries somebody made? Its starting

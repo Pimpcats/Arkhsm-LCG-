@@ -7,6 +7,9 @@
 --   S-2  Set Up Prologue: the Prologue's box laid out, 5 resources and 5 cards each, at the Square
 --   S-3  Set Up Loop: the night's districts picked from the log; every card an investigator played,
 --        discarded or held goes back into their deck; Clear Board and the boxes in order; at the Square
+--   S-4  the Hours deck follows the Control's Hour (advance and rewind)
+--   S-5  Begin Finale sets The Last Hour up: its box, the act decks aside, the forms and The Uninvited
+--        spawned, the Hourglass set back from Hour IX, the log's damage on the forms
 --
 -- tests/test_sced_setup.py runs it on SCED's real table (it needs SCED's All Player Cards bag).
 
@@ -194,5 +197,74 @@ return function(H)
       and near(card("sthrcass-m").getPosition(), sq.getPosition(), 1.0))
     check("the chat says the loop is set up", chatSince(mark):find("Set up:", 1, true) ~= nil, chatSince(mark):sub(-700))
     info("loop cards on the table: " .. loopCards())
+  end)
+
+  ----------------------------------------------------------------- S-4 --
+
+  local AGENDA = { x = -2.94, z = 0.36 }
+  local function shownHour()
+    local d = stackAt({ x = AGENDA.x, y = 1.6, z = AGENDA.z })
+    if not d then return nil, 0 end
+    if d.type == "Card" then return gm(d).id, 1 end
+    local list = d.getObjects()
+    return decode(list[#list].gm_notes).id, #list
+  end
+  local function hourButton()
+    for _, b in ipairs(control().getButtons()) do
+      if tostring(b.label):find("^Hour %d") then return tostring(b.label) end
+    end
+  end
+
+  step("S-4: the Hours deck on the table follows the Control's Hour", function()
+    local id, n = shownHour()
+    check("Hour I shows on the agenda spot, the eight later Hours under it", id == "sthr-hour-1" and n == 9, tostring(id) .. " / " .. n)
+    click(control(), hourButton()); E.run(1)
+    id, n = shownHour()
+    check("an advance shows Hour II, eight Hours in the deck", id == "sthr-hour-2" and n == 8, tostring(id) .. " / " .. n)
+    check("Hour I is set aside, face down", find(function(o)
+      if o.type == "Card" and gm(o).id == "sthr-hour-1" then return true end
+      if o.type == "Deck" then
+        for _, e in ipairs(o.getObjects()) do if decode(e.gm_notes).id == "sthr-hour-1" then return true end end
+      end
+      return false
+    end) ~= nil)
+    click(control(), hourButton(), true); E.run(1)
+    id, n = shownHour()
+    check("a rewind shows Hour I again, all nine Hours in the deck", id == "sthr-hour-1" and n == 9, tostring(id) .. " / " .. n)
+  end)
+
+  ----------------------------------------------------------------- S-5 --
+
+  step("S-5: Begin Finale at Hour IX sets The Last Hour up from the log", function()
+    local blob = decode(control().call("shApiSnapshot"))
+    blob.campaign.partTwo = true
+    blob.campaign.knowledge["the-way-the-night-breaks"] = true
+    blob.campaign.knowledge["every-name-was-read"] = true
+    blob.campaign.knowledge["the-light-is-kept"] = true
+    blob.campaign.hourglass = 9
+    control().call("shApiRestore", { blob = J.encode(blob) }); E.run(6)
+    check("(the Hour is IX)", st().hour == 9, st().hour)
+    local mark = chatMark()
+    click(control(), "Begin Finale"); E.run(25)
+    check("the finale has begun", st().finale == true)
+    check("The Last Hour's box is laid out", boxEmpty("finale"))
+    local function at(formId, locId)
+      local f, l = card(formId), card(locId)
+      return f ~= nil and l ~= nil and near(f.getPosition(), l.getPosition(), 1.2)
+    end
+    check("As It Was is at The First Occultation", at("sthr-form-past", "sthr-loc-firstoccultation"))
+    check("As It Will Be is at The Morning After", at("sthr-form-future", "sthr-loc-morningafter"))
+    check("As It Is is at The Square", at("sthr-form-present", "sthr-loc-hubsquare"))
+    check("The Uninvited is on the table", card("sthr-uninvited") ~= nil)
+    check("no district's act deck is left", find(function(o)
+      return o.type == "Deck" and tostring(o.getName()):find("Act Deck", 1, true) ~= nil
+    end) == nil)
+    check("the Hourglass is set back to Hour V", st().hour == 5, st().hour)
+    local id = shownHour()
+    check("the Hours deck shows Hour V", id == "sthr-hour-5", tostring(id))
+    check("the chat says the finale is set up", chatSince(mark):find("The Last Hour is set up", 1, true) ~= nil,
+      chatSince(mark):sub(-800))
+    check("...with the late records' damage", chatSince(mark):find("1 damage on As It Was, 1 on As It Will Be", 1, true) ~= nil,
+      chatSince(mark):sub(-800))
   end)
 end

@@ -71,6 +71,9 @@ end
 
 local refreshControl  -- forward
 local findScenarioBox -- forward (a scenario box on the table by its id)
+local syncHoursDeck   -- forward (the Hours deck on the table follows the Control's Hour)
+local finaleTable     -- forward (The Last Hour's own setup, after Begin Finale)
+local hoursShown = nil  -- the Hour the Hours deck on the table was last laid out for
 local refreshBag      -- forward (the campaign's chaos-bag changes)
 
 local function syncBoard()
@@ -129,6 +132,7 @@ local function afterChange()
   syncBoard()
   guarded("investigators", Board.refreshInvestigators, false)
   refreshControl()
+  if syncHoursDeck then guarded("hours deck", syncHoursDeck) end
   -- Between Loops (Reset Loop to Begin Next Loop) the log follows every step on its own
   if mode == "interlude" or CampaignState.isLoopEnded() then guarded("campaign log", syncLogPage) end
 end
@@ -1133,8 +1137,8 @@ local function drawPlay()
         .. "is added by Hour (if Hour VI is canceled, use Undo Hour VI).")
     local h = CampaignState.getHour()
     button("shClickHour", string.format("Hour %d · %s", h, Hourglass.HOUR_NAMES[h] or "?"), -PAIR_X, -0.5, 1000,
-      "Each time the Hourglass advances or rewinds, move the Hours deck and click once per Hour (left advance, "
-        .. "right rewind). With SCED it clears all doom in play (take doom off the Hours cards yourself). It applies "
+      "Each time the Hourglass advances or rewinds, click once per Hour (left advance, right rewind): the Hours "
+        .. "on the table follow. With SCED it clears all doom in play. It applies "
         .. "Hour III's +1 Dissonance, the Approach at Hours V, VII and VIII, Hour VI's Static token and Hour VIII's "
         .. "+2 Dissonance. You resolve the rest: each investigator heals 1 damage and 1 horror, Hour II's draws, "
         .. "Hour III's extra +1 at a Church location (click Dissonance) and The Belfry, Hour IV, Hour VII's "
@@ -1546,6 +1550,8 @@ function shAge3() ageAt(3) end
 function shAge4() ageAt(4) end
 
 function shBeginFinale()
+  local hourAtStart = CampaignState.getHour()
+  local wasFinale = CampaignState.inFinale()
   guarded("finale", function()
     if not CampaignState.knows("the-way-the-night-breaks") or CampaignState.inFinale() then return end
     -- the button is not drawn in the Prologue; a call from outside must not begin the finale there
@@ -1571,13 +1577,11 @@ function shBeginFinale()
     guarded("Appointed", Board.syncAppointed, { log = hourLog })
     -- The true page reached the Press: 1 fewer Static for the finale, on top of
     -- Hour VI's (the next reset clears it)
-    local log = Board.campaignLog()
-    local lv = log and guarded("log", function() return log.call("getLogValues") end)
-    if type(lv) == "table" and type(lv.values) == "table" and lv.values.page_a then
+    if guarded("log", Board.logValue, "page_a") == true then
       bag.setPress(true)
       announce("The true page reached the Press: until the finale ends, the chaos bag holds 1 fewer Static token.")
     end
-    announce("The finale begins: the Appointed is set aside. Spawn As It Was, As It Will Be and As It Is. "
+    announce("The finale begins: the Appointed is set aside. "
       .. "If Hour IX is reached before As It Is is defeated, the finale ends (Resolution 5 or 6).")
     -- late records (each district's act 3a): 1 damage each on the form of its period
     local nLate, by = Knowledge.lateKnown()
@@ -1589,6 +1593,16 @@ function shBeginFinale()
     end
   end)
   afterChange()
+  if wasFinale or not CampaignState.inFinale() then return end
+  -- the finale's box, if it is not laid out yet, then the finale's own setup
+  local box = findScenarioBox("finale")
+  local function go() guarded("finale setup", finaleTable, hourAtStart) ; afterChange() end
+  if box and boxIsFull(box) then
+    pcall(function() box.call("buttonClick_place") end)
+    Wait.time(function() Wait.condition(go, function() return not shApiBoxBusy() end, 20, go) end, 0.5)
+  else
+    go()
+  end
 end
 
 --- Hour VI's Forced ability was canceled: undo what it applied.
@@ -1979,6 +1993,190 @@ local function takeById(stack, id, pos)
   return nil
 end
 
+-- The finale's own setup (The Last Hour, Setup steps 1-3), done for the players once Begin Finale has
+-- begun it: every district's act deck set aside, the enemies the districts' act 2a spawned removed,
+-- the forms of the Appointed and The Uninvited spawned where the guide says, the Hourglass set by the
+-- Hour the finale began at, and what the log records applied (damage on the forms, an Hour rewound).
+local FORM_SPOTS = { { "sthr-form-past", "sthr-loc-firstoccultation" }, { "sthr-form-future", "sthr-loc-morningafter" },
+  { "sthr-form-present", "sthr-loc-hubsquare" } }
+local ACT_TWO_SPAWNS = { "sthr-wearssheriff", "sthr-bellringer" }
+
+local function cardOnTable(id)
+  for _, o in ipairs(getObjects()) do
+    if not o.isDestroyed() and o.type == "Card" and idOf(o.getGMNotes()) == id then return o end
+  end
+  return nil
+end
+
+local function onto(card, loc, dx)
+  local p = loc.getPosition()
+  pcall(function()
+    card.setPosition({ p.x + (dx or 0), p.y + 0.8, p.z })
+    card.setRotation({ 0, loc.getRotation().y, 0 })
+  end)
+end
+
+local function logChoice(key)
+  return guarded("log", Board.logValue, key) == true
+end
+
+finaleTable = function(hourAtStart)
+  local done = {}
+  -- every district's act deck set aside; the act 2a enemies leave the game
+  local decks = 0
+  for _, box in ipairs({ "district_square", "district_church", "district_road", "district_lighthouse",
+      "district_fairground", "district_almanac" }) do
+    local d = boxStack("StillHourBox_" .. box, "Act Deck")
+    if d then pcall(function() d.destruct() end) ; decks = decks + 1 end
+    for _, id in ipairs(DISTRICT_ACTS[box] or {}) do
+      local loose = cardOnTable(id)
+      if loose and loose.hasTag("StillHourLoop") then pcall(function() loose.destruct() end) ; decks = decks + 1 end
+    end
+  end
+  if decks > 0 then done[#done + 1] = "the districts' act decks set aside" end
+  for _, id in ipairs(ACT_TWO_SPAWNS) do
+    local e = cardOnTable(id)
+    if e then pcall(function() e.destruct() end) ; done[#done + 1] = "an enemy an act 2a spawned removed" end
+  end
+  -- the forms and The Uninvited from the finale's set-aside pile
+  local aside = boxStack("StillHourBox_finale", "Set Aside")
+  local forms = {}
+  for _, f in ipairs(FORM_SPOTS) do
+    local loc = cardOnTable(f[2])
+    local c = aside and takeById(aside, f[1])
+    aside = boxStack("StillHourBox_finale", "Set Aside") or aside
+    if c and loc then onto(c, loc) ; forms[f[1]] = c end
+  end
+  if next(forms) then done[#done + 1] = "As It Was, As It Will Be and As It Is spawned" end
+  local uninvited = aside and takeById(aside, "sthr-uninvited")
+  if uninvited then
+    -- at the revealed location farthest from all investigators
+    local best, bestD
+    local minis = {}
+    for _, inv in ipairs(seatedByMat()) do if inv.minicard then minis[#minis + 1] = inv.minicard.getPosition() end end
+    for _, o in ipairs(getObjects()) do
+      if not o.isDestroyed() and o.type == "Card" and o.hasTag("Location") and o.hasTag("StillHourLoop") then
+        local r = o.getRotation()
+        if math.abs(r.z) < 10 or math.abs(r.z - 360) < 10 then
+          local p, d = o.getPosition(), math.huge
+          for _, m in ipairs(minis) do d = math.min(d, (p.x - m.x) ^ 2 + (p.z - m.z) ^ 2) end
+          if #minis == 0 then d = 0 end
+          if not bestD or d > bestD then best, bestD = o, d end
+        end
+      end
+    end
+    if best then onto(uninvited, best, 0.6) ; done[#done + 1] = "The Uninvited spawned" end
+  end
+  -- the Hourglass by the Hour the finale began at (Setup step 2)
+  if hourAtStart >= 9 then
+    for _ = 1, 4 do guarded("hour", function() Hourglass.rewind(1, playCtx()) end) end
+    done[#done + 1] = "the Hourglass set back to Hour V (no Hour resolves)"
+  elseif hourAtStart < 5 then
+    for _ = hourAtStart, 4 do guarded("hour", changeHour, 1) end
+    done[#done + 1] = "the Hourglass advanced to Hour V (each Hour resolved)"
+  end
+  -- what the log records (Setup step 3)
+  local past = forms["sthr-form-past"]
+  if logChoice("name_a") and past then
+    Wait.frames(function() SCED.spawnTokenGroup(past, "damage", 1) end, 20)
+    done[#done + 1] = "1 damage on As It Was (you have spoken the name)"
+  end
+  if logChoice("page_b") then
+    guarded("hour", function() Hourglass.rewind(1, playCtx()) end)
+    done[#done + 1] = "the Hourglass rewound 1 Hour (the drowned heard the true hour)"
+  end
+  local nLate, by = Knowledge.lateKnown()
+  if nLate > 0 then
+    local half = CampaignState.constants().investigators
+    local p, f = math.min(by.past, half), math.min(by.future, half)
+    local fut = forms["sthr-form-future"]
+    Wait.frames(function()
+      if past and p > 0 then SCED.spawnTokenGroup(past, "damage", p + (logChoice("name_a") and 1 or 0)) end
+      if fut and f > 0 then SCED.spawnTokenGroup(fut, "damage", f) end
+    end, 30)
+    done[#done + 1] = string.format("your late records: %d damage on As It Was, %d on As It Will Be", p, f)
+  end
+  if logChoice("ticket_b") then
+    done[#done + 1] = "remember: you refused the ticket (cancel the first Lost Hour's revelation this finale)"
+  end
+  hoursShown = nil
+  guarded("hours deck", syncHoursDeck)
+  announce("The Last Hour is set up: " .. (#done > 0 and table.concat(done, "; ") or "nothing to change") .. ". Check the table.")
+  return done
+end
+
+-- The Hours on the table follow the Control's Hour: the current Hour face up on the agenda spot with
+-- the later Hours under it, the Hours already past set aside face down (the guide's "move the Hours
+-- deck" is done for the players). Rebuilt from the cards' own data whenever the Hour changes; the
+-- Hour's doom is gone by then (SCED's doom reset at every Hour change).
+local AGENDA_SPOT = { pos = { x = -2.94, y = 1.61, z = 0.36 }, rot = { 0, 180, 0 } }
+local ASIDE_SPOT = { pos = { x = 1.69, y = 1.56, z = 14.24 }, rot = { 0, 225, 180 } }
+
+local function hourOf(gm)
+  local id = idOf(gm)
+  local n = id and tostring(id):match("^sthr%-hour%-(%d)$")
+  return n and tonumber(n) or nil
+end
+
+syncHoursDeck = function()
+  local h = CampaignState.getHour()
+  if hoursShown == h then return end
+  local data, holders = {}, 0
+  local function keep(d)
+    local n = hourOf(d.GMNotes)
+    if n and not data[n] then data[n] = d end
+  end
+  for _, o in ipairs(getObjects()) do
+    if not o.isDestroyed() and o.type == "Card" and hourOf(o.getGMNotes()) then
+      holders = holders + 1
+      keep(o.getData())
+      o.destruct()
+    elseif not o.isDestroyed() and o.type == "Deck" then
+      local hours, others = {}, 0
+      for _, e in ipairs(o.getObjects() or {}) do
+        if hourOf(e.gm_notes) then hours[#hours + 1] = e.guid else others = others + 1 end
+      end
+      if #hours > 0 then
+        holders = holders + 1
+        if others == 0 then
+          for _, c in ipairs(o.getData().ContainedObjects or {}) do keep(c) end
+          o.destruct()
+        else
+          local p = o.getPosition()
+          for _, g in ipairs(hours) do
+            local c = o.takeObject({ guid = g, position = { p.x, p.y + 3, p.z }, smooth = false })
+            if c then keep(c.getData()) ; c.destruct() end
+          end
+        end
+      end
+    end
+  end
+  hoursShown = h
+  if holders == 0 then return end
+  local now, past = {}, {}
+  for n = 9, 1, -1 do
+    -- a face-up stack shows its last card: Hour IX first, the current Hour last
+    if data[n] and n >= h then now[#now + 1] = data[n] end
+  end
+  for n = 1, 9 do
+    if data[n] and n < h then past[#past + 1] = data[n] end
+  end
+  Wait.frames(function()
+    local a = AGENDA_SPOT.pos
+    Setup.spawnStack(now, { a.x, a.y + 0.5, a.z }, AGENDA_SPOT.rot)
+    if #past > 0 then
+      local s2 = ASIDE_SPOT.pos
+      local pile
+      for _, o in ipairs(getObjects()) do
+        if not o.isDestroyed() and (o.type == "Deck" or o.type == "Card") and near(o.getPosition(), s2, 0.8) then pile = o end
+      end
+      Setup.spawnStack(past, { s2.x, s2.y + 1.5, s2.z }, ASIDE_SPOT.rot, function(o)
+        if pile and not pile.isDestroyed() then pcall(function() pile.putObject(o) end) end
+      end)
+    end
+  end, 2)
+end
+
 local function putInto(target, obj, faceDown)
   if not (target and obj) or target == obj then return false end
   if faceDown then
@@ -2103,6 +2301,7 @@ function shApiSyncBoardStaged(p)
   end
   local steps = {
     { "loop setup", function() setUpPlacedBox(p) end },
+    { "the Hours", function() hoursShown = nil ; syncHoursDeck() end },
     { "locations", function() almanacActTwoAtPlace(p) ; Board.syncLocations() end },
     { "the Appointed", function() Board.syncAppointed({ log = hourLog, applyStats = true }) end },
     { "investigators", function() Board.refreshInvestigators(true) end },
@@ -2243,6 +2442,7 @@ function shApiClearBoard() return clearAndRefill() end
 -- ask for is laid out; the players check the table and play.
 
 findScenarioBox = function(id)
+  if type(getObjects) ~= "function" then return nil end
   for _, o in ipairs(getObjects()) do
     if not o.isDestroyed() and scenarioBoxId(o) == id then return o end
   end

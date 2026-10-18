@@ -163,6 +163,15 @@ end
 
 --- TokenManagerApi.spawnForCard(card): Global.callTable routing into
 -- TokenManager.spawnForCard (spawns the side's `uses`, e.g. location clues).
+--- TokenManagerApi.spawnTokenGroup(card, tokenType, count): damage / horror as one token showing the
+-- count, on the card. False off SCED.
+function SCED.spawnTokenGroup(card, tokenType, count)
+  if not SCED.isPresent() then return false end
+  SCED.globalCall("callTable", { { "TokenManager", "spawnTokenGroup" },
+    { card = card, tokenType = tokenType, tokenCount = count } })
+  return true
+end
+
 function SCED.spawnForCard(card)
   if not SCED.isPresent() then return false end
   SCED.globalCall("callTable", { { "TokenManager", "spawnForCard" }, { card = card } })

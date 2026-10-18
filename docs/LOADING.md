@@ -23,16 +23,16 @@ GitHub, so the build works on any PC.
 3. Press **Place** on the campaign box. It lays out the scenario boxes, the
    campaign guide, the campaign log, the minicards, the player-card bag, the
    **Control** token and the `[static]` token.
-4. Put the investigators on the table. Each player takes their **investigator
-   card** from the **Player Cards** bag (step 3 laid it out), together with the
-   signature and other required cards listed on its back and the cards of their
-   deck, and puts the investigator card on a **playmat**. The Control token's
-   per-investigator rows (Memory, Age) and the buttons on each investigator card
-   appear only once the investigator cards are on the table, on their playmats.
-5. Open the **campaign guide** and follow it from *Campaign Setup*. The guide
-   tells you when to press each button on the Control token and each box's
-   **Place**. The **campaign log** token has three pages: right-click it and
-   choose **Next page** to turn to the next one.
+4. On the **Control** token click **Set Up Prologue**. On the Setup panel click
+   the investigators you are playing, then **Seat investigators**: each gets
+   their investigator card, minicard, quest card and a shuffled starting deck on
+   a playmat. Then click your difficulty (**Standard** etc.) on the main panel.
+5. Back on the Setup panel, click **Set Up Prologue**: the Prologue is laid out
+   and everyone is dealt in. From then on each loop is one click: **Set Up Loop**
+   after **Begin Next Loop** (tonight's districts are picked from your log).
+   Open the **campaign guide** and follow it from *Campaign Setup*; it says what
+   each button does. The **campaign log** token has three pages: right-click it
+   and choose **Next page** to turn to the next one.
 
 Every box has SCED's own **Place** and **Recall**. **Place** lays the box's
 cards out at once and leaves the box empty. When a loop is over, click **Clear
