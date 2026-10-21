@@ -3203,7 +3203,14 @@ function Setup.seat(invId, matColor, opts)
     end
     local weak = Setup.randomWeaknessId()
     local wd = weak and Setup.officialCard(weak)
-    if wd then deck[#deck + 1] = withOwner(wd, matColor) else rep.missing[#rep.missing + 1] = "random basic weakness" end
+    -- a permanent basic weakness starts in play beside the mat, like any permanent card
+    if wd and metaOf(wd.GMNotes).permanent then
+      permanents[#permanents + 1] = withOwner(wd, matColor)
+    elseif wd then
+      deck[#deck + 1] = withOwner(wd, matColor)
+    else
+      rep.missing[#rep.missing + 1] = "random basic weakness"
+    end
   end
   local aside = Setup.zone(matColor, "SetAside1")
   for i, d in ipairs(permanents) do
@@ -3297,18 +3304,22 @@ function Setup.resetInvestigator(matColor, opts)
       else
         -- a deck: whole when every card in it is theirs, otherwise their cards are taken out of it
         local entries = try(function() return o.getObjects() end) or {}
-        local mineGuids, others = {}, 0
-        for _, e in ipairs(entries) do
+        local mine, others = {}, 0
+        for i, e in ipairs(entries) do
           local md = metaOf(e.gm_notes)
-          local mine = hasTag(e.tags, owner) or (here and PLAYER_TYPES[md.type] and not isLoop(e.tags)
+          local theirs = hasTag(e.tags, owner) or (here and PLAYER_TYPES[md.type] and not isLoop(e.tags)
             and not ownedBySomeone(e.tags))
-          if mine and not keepsInPlay(md) then mineGuids[#mineGuids + 1] = e.guid else others = others + 1 end
+          if theirs and not keepsInPlay(md) then mine[#mine + 1] = e.index or (i - 1) else others = others + 1 end
         end
-        if #mineGuids > 0 and others == 0 and not (p and inSetAside(mat, p, matColor)) then
+        if #mine > 0 and others == 0 and not (p and inSetAside(mat, p, matColor)) then
           take[#take + 1] = o
-        elseif #mineGuids > 0 and others > 0 and not (p and inSetAside(mat, p, matColor)) then
-          for _, g in ipairs(mineGuids) do
-            local c = try(function() return o.takeObject({ guid = g, position = { p.x, p.y + 3, p.z }, smooth = false }) end)
+        elseif #mine > 0 and others > 0 and not (p and inSetAside(mat, p, matColor)) then
+          -- by place in the deck, last first so the earlier places do not move (a card's GUID can be blank
+          -- until TTS has assigned one); the deck's last card comes out as a lone card on its own
+          table.sort(mine, function(a, b) return a > b end)
+          for _, idx in ipairs(mine) do
+            if not alive(o) then break end
+            local c = try(function() return o.takeObject({ index = idx, position = { p.x, p.y + 3, p.z }, smooth = false }) end)
             if c then take[#take + 1] = c end
           end
         end
