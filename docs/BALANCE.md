@@ -426,3 +426,15 @@ docs/STARTER_DECKS.md) by SCED id, so they cannot drift again; every card in
 them is encoded in the engine (approximations listed in the engine's coverage
 report). XP upgrade paths now replace cards those decks hold. Results from
 before this change measure the wrong decks; rerun before comparing.
+
+## Real starter decks (2026-10-21)
+
+The engine now plays the seated starter decks (campaigns/still_hour/starter_decks.json); every number above
+measured older lists that shared 10-20 of each 30 cards. Engine, 25 games per cell, target -> result:
+Prologue 80 -> 96 / 88 / 88 / 88% at 1-4 investigators. Night 1 as the Setup panel picks it (Square, Church,
+Almanac House): at least one objective 100% at every size; all three 36 / 68 / 52 / 44%; objectives per night
+2.24 / 2.56 / 2.24 / 2.28. Two-investigator Night 1 defeats by investigator (25 games, paired with Elias, Ayako
+with Elias): Elias 6, Ayako 0, Cass 2, Birdie 1, Seraphine 11 — her own ability averaged 8.8 horror a game; a
+stricter policy (keep 6 sanity for the extra action, 5 for a boost) gave 7.3 horror a game and still 11 defeats,
+with fewer objectives, so it was not kept. Watch her in the human playtest before changing her card.
+Simulation only; not a playtest.
