@@ -90,6 +90,20 @@ def table_for(save):
     return table, (os.path.join(src, "src") if src else ROOT)
 
 
+def save_from_checkout():
+    """No exported SCED save here: the table assembled from a SCED checkout (as tests/sced_real does),
+    written once as a save; its scripts' requires resolve against the checkout's src/."""
+    import sced_table
+    src, commit = sced_table.find_sced()
+    if not src:
+        return None
+    out = os.path.join(OUT, "sced_checkout_%s.json" % commit[:12])
+    if not os.path.isfile(out):
+        os.makedirs(OUT, exist_ok=True)
+        json.dump(sced_table.Assembler(src).table(), open(out, "w", encoding="utf-8"))
+    return out
+
+
 def provenance(save, table, cpath, dpath):
     """Fingerprints of the code and actual data used by a process, not just HEAD."""
     paths = list(Path(HERE).glob("*.py")) + list(Path(HERE, "lua").glob("*.lua"))
@@ -236,8 +250,10 @@ def main(argv=None):
             ap.error("--party is for one party; use separate invocations to compare parties")
         a.players = len(party)
     if not os.path.isfile(a.save):
-        print("SKIPPED: no SCED save at", a.save)
-        return 0
+        a.save = save_from_checkout()
+        if not a.save:
+            print("SKIPPED: no SCED save and no SCED checkout")
+            return 0
     if a.report:
         import report
         print(report.build(OUT))

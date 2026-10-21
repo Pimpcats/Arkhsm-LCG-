@@ -30,7 +30,7 @@ SUITES = ("playthrough", "runner")
 # payload built from src/, see candidate_payload) and the boxes' Place / Recall
 # suite (tests/test_sced_place.py, the same way), the doom reset on an Hour change
 # (tests/test_sced_hour_doom.py) and the Control token's flow (tests/test_sced_control_flow.py)
-EXTRA_SUITES = ("demo", "resolutions", "place_state", "hour_doom", "control_flow", "table_setup")
+EXTRA_SUITES = ("demo", "resolutions", "place_state", "hour_doom", "control_flow", "table_setup", "fuzz", "buttons")
 
 PLAY_AREA_STAND_IN = """
 local enabled = false
@@ -138,7 +138,7 @@ def find_lua(name):
 
 
 def run(lua="lua5.2", suite="playthrough", fake=False, echo=False, verbose=False, timeout=600, payload=None, save=None,
-        snapshots=None):
+        snapshots=None, extra=None):
     """Run one suite; returns dict(checks=[...], rc=, stdout=, stderr=, skipped=reason)."""
     exe = find_lua(lua)
     if not exe:
@@ -168,6 +168,9 @@ def run(lua="lua5.2", suite="playthrough", fake=False, echo=False, verbose=False
         cmd += ["--payload", os.path.abspath(payload)]
     if verbose:
         cmd += ["--verbose", "1"]
+    for k, v in (extra or {}).items():
+        # suite arguments (H.args), e.g. the fuzz suite's seed and number of actions
+        cmd += ["--" + k, str(v)]
     if snapshots:
         # a JSON snapshot of the table after boot and after every step
         # (tools/godot_table renders them); the folder must be gitignored
