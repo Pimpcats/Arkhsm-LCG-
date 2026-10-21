@@ -262,13 +262,19 @@ def build_deck(cards, nickname, key, x, z, face_down=False, box=None):
     # a card listed n times is n objects; build_card derives the GUID from the id alone, so every
     # copy after the first gets its own (Place keeps the GUIDs a box holds, and SCED keys state,
     # such as which locations already spawned their clues, on them)
+    # A card two boxes both hold (the Prologue's and the Square's shared cards) gets a GUID of its box's:
+    # SCED's Place moves an object already on the table that has a GUID it remembers instead of laying
+    # out its own copy, so one box's Place must never find another box's card under that GUID.
     seen = {}
     for c, o in zip(cards, objs):
         cid = c.get("id") or o["GUID"]
         k = seen.get(cid, 0)
         seen[cid] = k + 1
-        if k:
-            o["GUID"] = guid("{}-copy{}".format(cid, k))
+        card_key = "{}-copy{}".format(cid, k) if k else cid
+        if box:
+            o["GUID"] = guid("{}:{}".format(box, card_key))
+        elif k:
+            o["GUID"] = guid(card_key)
     if not face_down:
         objs.reverse()
     if not objs:

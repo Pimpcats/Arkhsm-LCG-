@@ -33,7 +33,8 @@
     "sthrelias",
     "sthr-lamp",
     "sthr-donebefore",
-    "sthr-eighthgrave"
+    "sthr-eighthgrave",
+    "sthr-quest-elias"
   ],
   "starter_out": "stillhour_starter.json",
   "bundle_out": "stillhour_bundle.lua",

@@ -2,10 +2,10 @@
 """
 bundle_mod.py — assemble the loadable Tabletop Simulator mod for THE STILL HOUR.
 
-A TTS object exposes a single `LuaScript` string, so the six StillHour modules
+A TTS object exposes a single `LuaScript` string, so the StillHour modules
 are inlined behind a local `require` (a hand-rolled luabundle) and the control
 script is appended as the entry code. The result is attached to a control token
-and shipped alongside the 30-card player-card bag as one loadable save.
+and shipped alongside the player-card bag as one loadable save.
 
 Outputs:
   dist/stillhour_bundle.lua    the combined LuaScript (for inspection/debug)

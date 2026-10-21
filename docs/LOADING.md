@@ -150,7 +150,7 @@ In-game verification runs through the TTS relay: `docs/TTS_RELAY.md`.
 
 ## Loading with the Download box (optional)
 
-Instead of copying the 1 MB Saved Object into the Saved Objects folder you can
+Instead of copying the 1.5 MB Saved Object into the Saved Objects folder you can
 copy the 2 KB `dist/downloads/the_still_hour_box.json` there. **Objects → Saved
 Objects → The Still Hour — Download Box**, then press **Download** on it: it
 fetches the campaign from GitHub (the way SCED's own Download menu loads its

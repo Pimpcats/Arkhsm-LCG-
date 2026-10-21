@@ -197,6 +197,14 @@ local function findControl()
   return nil
 end
 
+-- a tick the Control token cannot hear about pays (or refunds) nothing: say so
+local function noControl()
+  pcall(function()
+    broadcastToAll("Campaign Log: no Control token on the table, so this tick changed the log only "
+      .. "(no Memory paid or refunded). Put the Control token out and tick it again.", { 1, 0.6, 0.3 })
+  end)
+end
+
 local function clickCheckbox(key)
   setValue(key, not values[key])
   refreshDerived()
@@ -209,7 +217,7 @@ local function clickCheckbox(key)
   if fact then
     local ctl = findControl()
     local fn = values[key] and "shApiUnlockFact" or "shApiForgetFact"
-    if ctl then pcall(function() ctl.call(fn, { id = fact }) end) end
+    if ctl then pcall(function() ctl.call(fn, { id = fact }) end) else noControl() end
   end
   -- ticking a Named enemy as defeated banks its Victory (once per campaign);
   -- clearing the box (a mis-tick) takes the claim back and refunds what it paid
@@ -222,6 +230,8 @@ local function clickCheckbox(key)
     elseif ctl then
       local ok, removed = pcall(function() return ctl.call("shApiForgetVictory", { id = named }) end)
       if ok and removed then setValue("vb:" .. named, false) ; updateSave() end
+    else
+      noControl()
     end
   end
 end

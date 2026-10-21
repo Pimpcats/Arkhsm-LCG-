@@ -92,11 +92,13 @@ function Dissonance.raise(n, bag)
   }
 end
 
---- Reduce Dissonance and reconcile the bag.
+--- Reduce Dissonance and reconcile the bag. Lowering from Noticed into Glitch is entering Glitch, so
+-- the Approach still advances to at least Sensed (guide: Dissonance); lowering never pushes it back.
 function Dissonance.reduce(n, bag)
   local value, before, after = CampaignState.reduceDissonance(n or 1)
   reconcileBand(bag, before, after)
-  return { value = value, band = after }
+  driveAppointedOnBand(before, after)
+  return { value = value, band = after, appointedStage = CampaignState.getAppointedStage() }
 end
 
 --- The [static] token's symbol effect: after it is revealed, raise Dissonance by 1.

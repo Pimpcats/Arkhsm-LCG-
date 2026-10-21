@@ -34,6 +34,7 @@ PACK_CYCLE = {
     "The Scarlet Keys Investigator Expansion": "The Scarlet Keys",
     "The Forgotten Age": "The Forgotten Age", "Heart of the Elders": "The Forgotten Age",
     "The Dunwich Legacy": "The Dunwich Legacy", "The Essex County Express": "The Dunwich Legacy",
+    "Blood on the Altar": "The Dunwich Legacy",
     "The Path to Carcosa": "The Path to Carcosa", "Echoes of the Past": "The Path to Carcosa",
     "The Pallid Mask": "The Path to Carcosa",
     "The Circle Undone": "The Circle Undone",
@@ -103,8 +104,10 @@ def resolve(index, name, pack):
     candidates = index.get(norm(name)) or index.get(norm(re.split(r"\s+[—-]\s+", name)[0])) or []
     if not candidates:
         raise SystemExit("no level 0 card named %r in SCED's player cards" % name)
-    want = PACK_CYCLE.get(pack)
-    exact = [c for c in candidates if want and c[1] == want]
+    if pack not in PACK_CYCLE:
+        raise SystemExit("pack %r (for %r) is not in PACK_CYCLE: add the cycle SCED files it under" % (pack, name))
+    want = PACK_CYCLE[pack]
+    exact = [c for c in candidates if c[1] == want]
     pick = sorted(exact or candidates, key=lambda c: (c[1] != "Core", c[0]))[0]
     return pick[0]
 
@@ -114,6 +117,12 @@ def build():
     out = {}
     for who, rows in parse_doc().items():
         out[who] = [[resolve(index, name, pack), qty] for qty, name, pack in rows]
+        copies = {}
+        for qty, name, _ in rows:
+            copies[norm(name)] = copies.get(norm(name), 0) + qty
+        over = [n for n, q in copies.items() if q > 2]
+        if over:
+            raise SystemExit("%s: more than 2 copies of %s" % (who, ", ".join(sorted(over))))
         total = sum(q for _, q in out[who])
         if total != 30:
             raise SystemExit("%s: the list holds %d cards, not 30" % (who, total))

@@ -29,7 +29,10 @@ Locations.LOCATIONS = {
   -- The Drowned Church
   ["nave"]            = { name = "The Nave",           district = "Church" },
   ["belfry"]          = { name = "The Belfry",         district = "Church" },
-  ["flooded-crypt"]   = { name = "The Flooded Crypt",  district = "Church", sealedUntil = { "the-thirteenth-toll" }, partTwo = true },
+  -- "Closed. It opens when The Hour Was Wrong becomes the current act. Once your
+  -- Campaign Log records The Hour Was Wrong, it enters play open (revealed)."
+  ["flooded-crypt"]   = { name = "The Flooded Crypt",  district = "Church", sealedUntil = { "the-thirteenth-toll" }, partTwo = true,
+                          actFlag = "church-act2a-current", openFact = "the-hour-was-wrong" },
   ["vestry"]          = { name = "The Vestry",         district = "Church" },
   -- The Sunken Road
   ["milestones"]      = { name = "The Milestones",     district = "Sunken Road" },
@@ -68,11 +71,28 @@ end
 -- act 1a's entry recorded (guide: the district's act deck). Returns true if
 -- it is (now) current; false (nothing recorded) if its requirements are not
 -- met or its deep entry is already recorded (the act deck is then removed).
+-- During the finale every district's act deck is set aside without resolving its abilities
+-- (guide: The Last Hour), so no act 2a becomes current then.
 function Locations.markAlmanacActTwoCurrent()
-  if CampaignState.knows("the-appointeds-name") or not Locations.almanacActTwoRequirementsMet() then
+  if CampaignState.knows("the-appointeds-name") or not Locations.almanacActTwoRequirementsMet()
+      or CampaignState.inFinale() then
     return false
   end
   CampaignState.setFlag(Locations.ALMANAC_ACT2A_FLAG)
+  return true
+end
+
+-- The Church's act 2a (The Hour Was Wrong): "Part II only"; it follows act 1a (The Thirteenth Toll).
+Locations.CHURCH_ACT2A_FLAG = "church-act2a-current"
+
+--- Act 2a becomes the Church's current act this loop: act 1a advances in Part II, or the Church's
+-- box is Placed in Part II with act 1a's entry recorded. False once its deep entry is recorded.
+function Locations.markChurchActTwoCurrent()
+  if CampaignState.knows("the-hour-was-wrong") or not CampaignState.inPartTwo()
+      or not CampaignState.knows("the-thirteenth-toll") or CampaignState.inFinale() then
+    return false
+  end
+  CampaignState.setFlag(Locations.CHURCH_ACT2A_FLAG)
   return true
 end
 
@@ -214,7 +234,11 @@ end
 -- Also returns all destinations tied at the greatest legal distance.
 function Locations.farthest(graph, sources, tiebreak, candidates)
   local dist = Locations.distances(graph, sources)
-  local anyReachable = next(dist) ~= nil
+  -- reachable means a destination the sources reach: with none, every destination counts as distance 0
+  local anyReachable = false
+  for k, d in pairs(dist) do
+    if candidates == nil or candidates[k] then anyReachable = true break end
+  end
   local best, bestD, tied = nil, nil, {}
   local keys = {}
   for k in pairs(graph) do keys[#keys + 1] = k end

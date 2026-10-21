@@ -168,7 +168,7 @@ end
 function SCED.spawnTokenGroup(card, tokenType, count)
   if not SCED.isPresent() then return false end
   SCED.globalCall("callTable", { { "TokenManager", "spawnTokenGroup" },
-    { card = card, tokenType = tokenType, tokenCount = count } })
+    { card = card, tokenType = tokenType, tokenCount = count, shiftDown = 0 } })  -- SCED adds shiftDown to its offset
   return true
 end
 

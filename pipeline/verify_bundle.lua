@@ -150,15 +150,20 @@ expect("panel has level-up buttons", hasLabel("Lvl 3 (3)") ~= nil and hasLabel("
 local m0 = env.shApiState().memory
 local rb = hasLabel("The Long Way Round (2)")
 env[rb.click_function](nil, "White", false)
-expect("clicking a Recollection spends its memoryCost", env.shApiState().memory == m0 - 2)
-env.shBuyLvl3(nil, "White", false)
-expect("clicking Lvl 3 spends 3", env.shApiState().memory == m0 - 5)
-expect("unaffordable purchase is refused", env.shApiBuy({ level = 5 }).ok == (m0 - 5 >= 5))
+expect("buying mid-loop is refused (purchases are Between Loops)", env.shApiState().memory == m0)
 local hour0 = env.shApiState().hour
 env.shBeginNextLoop()
 expect("Begin Next Loop before Reset Loop is refused (the night is not over)",
   env.shApiState().mode == "interlude" and env.shApiState().hour == hour0 and not env.shApiState().loopEnded)
 env.shApiReset()                      -- Between Loops: the loop is reset first
+env.shOpenInterlude()
+m0 = env.shApiState().memory
+rb = hasLabel("The Long Way Round (2)")
+env[rb.click_function](nil, "White", false)
+expect("clicking a Recollection spends its memoryCost", env.shApiState().memory == m0 - 2)
+env.shBuyLvl3(nil, "White", false)
+expect("clicking Lvl 3 spends 3", env.shApiState().memory == m0 - 5)
+expect("unaffordable purchase is refused", env.shApiBuy({ level = 5 }).ok == (m0 - 5 >= 5))
 beginNext(env)
 expect("Begin Next Loop returns to the play panel", env.shApiState().mode == "play" and hasLabel("Sync Board") ~= nil)
 
@@ -245,7 +250,7 @@ expect("interlude shows Bank on-card Memory (2)", hasLabel("Bank on-card Memory 
 expect("loop ended in danger is shown", hasLabel("Loop ended in danger: yes") ~= nil)
 local mem0 = env.shApiState().memory
 env.shBankOnCard()
-expect("banking moves on-card Memory to the bank", env.shApiState().memory == mem0 + 2)
+expect("Bank before Age is refused (Between Loops step 1 comes first)", env.shApiState().memory == mem0)
 env.shApiCounter({ name = "memory", delta = 0 })
 local b = hasLabel("Birdie · Years 0")
 expect("aging row per investigator", b ~= nil and hasLabel("Defeated:") ~= nil)
@@ -271,11 +276,17 @@ expect("aging only once per interlude", env.shApiAge({ id = "sthrbirdie" }) == n
 env.shApiAge({ id = "sthrelias" })
 local r2 = env.shApiAge({ id = "sthrbirdie" })
 expect("Birdie's card shows her Years", cardLabel(birdie, "Years 4 · Prime") ~= nil)
+env.shBankOnCard()
+expect("banking moves on-card Memory to the bank", env.shApiState().memory == mem0 + 2)
 beginNext(env)
 expect("Begin Next Loop clears the tallies", cardLabel(birdie, "Dissonance raised 0") ~= nil
   and cardLabel(birdie, "Loop-power Memory 0") ~= nil)
+expect("Age mid-loop is refused (it is done Between Loops)",
+  env.shApiAge({ id = "sthrbirdie", physical = "agility", mental = "willpower" }) == nil)
+env.shApiReset()
 env.shApiAge({ id = "sthrbirdie", physical = "agility", mental = "willpower" })   -- 4 -> 5 Weathered
-expect("the card shows the new bracket", cardLabel(birdie, "Years 6 · Weathered") ~= nil)
+-- 1 reset Year: this loop did not end in danger, Birdie was not defeated and did not lean on it
+expect("the card shows the new bracket", cardLabel(birdie, "Years 5 · Weathered") ~= nil)
 -- a fresh control token adopts the newer state from the campaign log (SCED export/import path)
 local before2 = env.shApiState()
 local env2 = setmetatable({ self = { createButton = function() return true end, clearButtons = function() return true end,
@@ -288,7 +299,7 @@ local after2 = env2.shApiState()
 local yrs = 0
 for _, i in ipairs(env2.shApiInvestigators()) do yrs = yrs + i.years end
 expect("a fresh control token adopts the campaign-log copy (SCED export/import path)",
-  after2.loops == before2.loops and after2.memory == before2.memory and yrs == 8)
+  after2.loops == before2.loops and after2.memory == before2.memory and yrs == 7)
 
 -- a closed location gets a CLOSED label, and loses it once every fact it
 -- waits on is known (the in-TTS relay reported the label staying on)

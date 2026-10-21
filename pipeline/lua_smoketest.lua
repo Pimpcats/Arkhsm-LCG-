@@ -289,7 +289,20 @@ check("Flooded Crypt sealed until the Toll", Locations.isSealed("flooded-crypt")
 CampaignState.unlockFact("the-thirteenth-toll")
 check("Flooded Crypt stays closed in Part I, Toll or not", Locations.isSealed("flooded-crypt") == true)
 CampaignState.setPartTwo(true)
-check("Flooded Crypt opens once the Toll is known in Part II", Locations.isOpen("flooded-crypt") == true)
+check("Flooded Crypt stays closed on the Toll alone (act 2a never became current)", Locations.isSealed("flooded-crypt") == true)
+check("Church act 2a becomes current in Part II with the Toll", Locations.markChurchActTwoCurrent() == true)
+check("Flooded Crypt opens when The Hour Was Wrong becomes the current act", Locations.isOpen("flooded-crypt") == true)
+CampaignState.reset()
+check("a reset closes the Crypt again until act 2a is current again", Locations.isSealed("flooded-crypt") == true)
+CampaignState.setFinale(true)
+check("no act 2a becomes current during the finale (Church)", Locations.markChurchActTwoCurrent() == false)
+check("...nor the Almanac House's", Locations.markAlmanacActTwoCurrent() == false)
+check("...so the Crypt stays closed", Locations.isSealed("flooded-crypt") == true)
+CampaignState.setFinale(false)
+CampaignState.unlockFact("the-hour-was-wrong")
+check("once The Hour Was Wrong is recorded the Crypt enters play open", Locations.isOpen("flooded-crypt") == true)
+check("Church act 2a is not current again once its deep entry is recorded", Locations.markChurchActTwoCurrent() == false)
+CampaignState.forgetFact("the-hour-was-wrong")
 check("Sealed Study needs BOTH facts", Locations.isSealed("sealed-study") == true)
 CampaignState.unlockFact("what-the-almanac-hid")
 check("Sealed Study still sealed with only one fact", Locations.isSealed("sealed-study") == true)
@@ -833,6 +846,8 @@ local function loadControl()
     getPosition = function() return { x = 0, y = 1, z = 0 } end,
   }
   env.print = function() end
+  env.log = function() end
+  env.Wait = { frames = function(fn) fn() end, time = function(fn) fn() end, condition = function(fn) fn() end }
   env.lastBroadcast = ""
   env.broadcastToAll = function(msg) env.lastBroadcast = msg end
   assert(loadfile("src/tts/control.lua", "t", env))()
@@ -912,7 +927,12 @@ do
   check("Control: the Vote recorded after act 1a is gone -> Sealed Study stays closed this loop",
     Locations.isSealed("sealed-study"))
   C.shApiReset() ; C.shApiBeginNextLoop()
-  check("Control: next loop in Part II act 2a is current -> it opens", Locations.isOpen("sealed-study"))
+  check("Control: next loop, before its box is Placed, act 2a is not current yet", Locations.isSealed("sealed-study"))
+  C.shApiSyncBoardStaged({ box = "district_almanac", guids = {} })
+  check("Control: next loop in Part II the Almanac's Place makes act 2a current -> it opens", Locations.isOpen("sealed-study"))
+  C.shApiUnlockFact({ id = "the-thirteenth-toll" })
+  check("Control: the Toll recorded in Part II makes the Church's act 2a current -> the Crypt opens",
+    Locations.isOpen("flooded-crypt"))
   CampaignState.init(3) ; CampaignState.setPartTwo(true)
   C.shApiUnlockFact({ id = "the-vote-that-never-ends" })
   C.shApiUnlockFact({ id = "what-the-almanac-hid" })

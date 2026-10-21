@@ -145,6 +145,9 @@ return function(H)
        and not c.knowledge["the-appointeds-name"] then
       c.oncePerLoopFlags["almanac-act2a-current"] = true
     end
+    if sc.part == 2 and c.knowledge["the-thirteenth-toll"] and not c.knowledge["the-hour-was-wrong"] then
+      c.oncePerLoopFlags["church-act2a-current"] = true
+    end
     c.victoryLog = {}
     c.loopEnded = false
     c.finale = false

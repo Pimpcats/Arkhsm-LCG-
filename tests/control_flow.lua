@@ -525,7 +525,18 @@ do
   local card7 = study(N, W7)
   N.click("Reset Loop") ; N.click("Reset Loop") ; N.click("Interlude")
   N.beginNextLoop()
-  check("Begin Next Loop in Part II with both entries opens it (the flag is set for the new loop)", not closed(card7))
+  check("Begin Next Loop alone leaves it CLOSED (its act deck is set up at the box's Place)", closed(card7))
+  N.env.shApiSyncBoardStaged({ box = "district_almanac", name = "The Almanac House", guids = {} })
+  check("the next loop's Place in Part II with both entries opens it", not closed(card7))
+  -- a box first Placed during the finale sets its act deck aside: nothing opens
+  local F, W8 = inLoop()
+  partTwo(F, { "what-the-almanac-hid", "the-vote-that-never-ends" })
+  local card8 = study(F, W8)
+  F.env.shApiUnlockFact({ id = "the-way-the-night-breaks" })
+  F.env.shApiSetFinale({ on = true })
+  check("(the finale has begun)", F.st().finale == true)
+  F.env.shApiSyncBoardStaged({ box = "district_almanac", name = "The Almanac House", guids = {} })
+  check("a Place during the finale leaves it CLOSED", closed(card8))
 end
 
 -------------------------------------------------------------------- F-08: banner --

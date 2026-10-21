@@ -475,7 +475,12 @@ function bagChange(key, delta)
   state.bag[key] = state.bag[key] + delta
   local name = key
   for _, s in ipairs(SYMBOLS) do if s.key == key then name = s.name end end
-  local filled = fillBag()
+  -- add or remove just that token: a full refill (setChaosBagState) would also destroy the tokens
+  -- in play and reset Bless and Curse
+  local filled = state.difficulty ~= nil and pcall(function()
+    if Global.call("canTouchChaosTokens") == false then error("bag searched") end
+    Global.call(delta > 0 and "spawnChaosToken" or "removeChaosToken", key)
+  end)
   announce(string.format("Campaign chaos-bag change: %%s 1 %%s token for the rest of the campaign%%s",
     delta > 0 and "add" or "remove", name, filled and " (done on the chaos bag)." or ". Change the bag by hand."))
   return true

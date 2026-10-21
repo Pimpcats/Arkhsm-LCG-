@@ -29,7 +29,7 @@ function onLoad()
     click_function = "downloadStillHour",
     function_owner = self,
     label = "Download\nTHE STILL HOUR",
-    tooltip = "Fetch the campaign from GitHub (about 1 MB) and put its box here",
+    tooltip = "Fetch the campaign from GitHub (about 1.5 MB) and put its box here",
     position = { 0, 0.2, 0 },
     width = 1600, height = 600, font_size = 180,
     color = { 0.13, 0.11, 0.18 }, font_color = { 0.95, 0.9, 0.7 },
@@ -57,7 +57,10 @@ function downloadStillHour()
         { 1, 0.4, 0.4 })
       return
     end
-    local pos, rot = self.getPosition(), self.getRotation()
+    -- the box may have been deleted while the file was downloading: the campaign then lands mid-table
+    local here = not self.isDestroyed()
+    local pos = here and self.getPosition() or { x = 0, y = 1, z = 0 }
+    local rot = here and self.getRotation() or { x = 0, y = 0, z = 0 }
     local ok, err = pcall(spawnObjectJSON, {
       json = request.text,
       position = { pos.x, pos.y + 1, pos.z },

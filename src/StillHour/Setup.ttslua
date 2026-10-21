@@ -51,6 +51,15 @@ end
 
 local function copy(t) return JSON.decode(JSON.encode(t)) end
 
+--- A copy to spawn: without the GUID of the card it was copied from (as SCED's CardSpawner does),
+-- so two copies of one card never share a GUID; TTS gives each a new one.
+local function fresh(t)
+  local d = copy(t)
+  d.GUID = nil
+  for _, c in ipairs(d.ContainedObjects or {}) do c.GUID = nil end
+  return d
+end
+
 local function metaOf(gmNotes)
   local md = decode(gmNotes)
   return type(md) == "table" and md or {}
@@ -100,9 +109,13 @@ end
 --- The bag or deck on the table that holds the card with this campaign id (the campaign's Player Cards
 -- bag holds the investigators and their cards; its minicard deck the minicards). Found by what it holds,
 -- never by name: SCED's own "All Player Cards" bag is on the table too.
+-- SCED's own card bags hold thousands of cards: reading each of them for every card would stall the
+-- table, and the campaign's cards are never in them, so a container that large is skipped.
+local HOLDER_MAX = 400
 local function holderOf(id)
   for _, o in ipairs(getObjects()) do
-    if alive(o) and (o.type == "Bag" or o.type == "Deck") then
+    if alive(o) and (o.type == "Bag" or o.type == "Deck")
+        and (try(function() return o.getQuantity() end) or 0) <= HOLDER_MAX then
       for _, e in ipairs(try(function() return o.getObjects() end) or {}) do
         if metaOf(e.gm_notes).id == id then return o end
       end
@@ -125,7 +138,7 @@ function Setup.officialCard(id)
   local bag = SCED.getObjectByOwnerAndType("Mythos", "AllCardsBag")
   if not bag then return nil end
   local r = try(function() return bag.call("getCardById", { id = id }) end)
-  return type(r) == "table" and r.data and copy(r.data) or nil
+  return type(r) == "table" and r.data and fresh(r.data) or nil
 end
 
 function Setup.cardIndexReady()
@@ -207,17 +220,17 @@ function Setup.seat(invId, matColor, opts)
   local inv = dataById(bag, invId)
   if not inv then rep.why = "the investigator card is not in the Player Cards bag" ; return rep end
   -- the cards their back requires: from the same bag (or any holder of each)
-  spawnObjectData({ data = withOwner(copy(inv), matColor), position = above(invPos), rotation = Setup.rotation(matColor) })
+  spawnObjectData({ data = withOwner(fresh(inv), matColor), position = above(invPos), rotation = Setup.rotation(matColor) })
   local mini = dataById(holderOf(invId .. "-m"), invId .. "-m")
   local miniPos = Setup.zone(matColor, "Minicard")
   if mini and miniPos then
-    spawnObjectData({ data = copy(mini), position = above(miniPos), rotation = Setup.rotation(matColor) })
+    spawnObjectData({ data = fresh(mini), position = above(miniPos), rotation = Setup.rotation(matColor) })
   end
   local deck, permanents = {}, {}
   for _, id in ipairs(Setup.REQUIRED[invId] or {}) do
     local d = dataById(bag, id) or dataById(holderOf(id), id)
     if d then
-      d = withOwner(copy(d), matColor)
+      d = withOwner(fresh(d), matColor)
       if metaOf(d.GMNotes).permanent then permanents[#permanents + 1] = d else deck[#deck + 1] = d end
     else
       rep.missing[#rep.missing + 1] = id
@@ -277,9 +290,14 @@ local function inSetAside(mat, p, matColor)
   return x >= 2.1 and math.abs(lp.z) <= 1.3
 end
 
-local function nearMat(mat, p)
+--- On this mat: from just past its Deck zone (x -1.82) to the far edge of its set-aside columns
+-- (x 2.93, mirrored on the Orange and Red mats), so a neighbouring mat's cards are never counted.
+local function nearMat(mat, p, matColor)
   local lp = try(function() return mat.positionToLocal(p) end)
-  return lp ~= nil and math.abs(lp.x) <= 3.2 and math.abs(lp.z) <= 1.9
+  if not lp then return false end
+  local x = lp.x
+  if matColor == "Orange" or matColor == "Red" then x = -x end
+  return x >= -2.4 and x <= 3.2 and math.abs(lp.z) <= 1.9
 end
 
 --- A card the reset shuffles back: theirs (owner tag, or an untagged player card on their mat or in their
@@ -309,7 +327,7 @@ function Setup.resetInvestigator(matColor, opts)
     if alive(o) and (o.type == "Card" or o.type == "Deck") then
       local p = try(function() return o.getPosition() end)
       local tags = tagsOf(o)
-      local here = p and nearMat(mat, p)
+      local here = p and nearMat(mat, p, matColor)
       if o.type == "Card" then
         local md = metaOf(o.getGMNotes())
         -- theirs by tag; an untagged player card (one taken from a bag by hand) by where it lies
@@ -330,7 +348,7 @@ function Setup.resetInvestigator(matColor, opts)
         end
         if #mineGuids > 0 and others == 0 and not (p and inSetAside(mat, p, matColor)) then
           take[#take + 1] = o
-        elseif #mineGuids > 0 and others > 0 then
+        elseif #mineGuids > 0 and others > 0 and not (p and inSetAside(mat, p, matColor)) then
           for _, g in ipairs(mineGuids) do
             local c = try(function() return o.takeObject({ guid = g, position = { p.x, p.y + 3, p.z }, smooth = false }) end)
             if c then take[#take + 1] = c end
@@ -385,33 +403,48 @@ function Setup.resetInvestigator(matColor, opts)
   return rep
 end
 
+--- The Deck object lying on this mat's Deck zone, or nil.
+local function deckOn(deckPos)
+  for _, o in ipairs(getObjects()) do
+    if o.type == "Deck" and alive(o) then
+      local p = try(function() return o.getPosition() end)
+      if p and math.abs(p.x - deckPos.x) < 0.5 and math.abs(p.z - deckPos.z) < 0.5 then return o end
+    end
+  end
+  return nil
+end
+
 --- Weaknesses drawn in an opening hand go back into the deck and are replaced (Loop Setup step 1).
+-- Each goes in with the deck's putObject (as SCED's DeckLib does: a card dropped onto a deck is not
+-- reliably merged), then the deck is shuffled and the mat draws as many again.
 function Setup.replaceDrawnWeaknesses(matColor)
   local mat = SCED.playermat(matColor)
   local playerColor = mat and try(function() return mat.getVar("playerColor") end)
   if not (playerColor and Player and Player[playerColor]) then return 0 end
   local deckPos = Setup.zone(matColor, "Deck")
+  if not deckPos then return 0 end
   local n = 0
   for _, o in ipairs(try(function() return Player[playerColor].getHandObjects() end) or {}) do
     local md = metaOf(try(function() return o.getGMNotes() end))
-    if o.type == "Card" and md.weakness == true and deckPos then
+    if o.type == "Card" and md.weakness == true then
       pcall(function()
         o.setRotation(Setup.rotation(matColor, true))
-        o.setPosition(above(deckPos, 2 + 0.2 * n))
+        local deck = deckOn(deckPos)
+        if deck then
+          deck.putObject(o)
+        else
+          o.setPosition(above(deckPos, 1 + 0.2 * n))
+        end
       end)
       n = n + 1
     end
   end
   if n > 0 then
     Wait.time(function()
-      for _, o in ipairs(getObjects()) do
-        if o.type == "Deck" and alive(o) then
-          local p = o.getPosition()
-          if math.abs(p.x - deckPos.x) < 0.5 and math.abs(p.z - deckPos.z) < 0.5 then pcall(function() o.shuffle() end) end
-        end
-      end
+      local deck = deckOn(deckPos)
+      if deck then pcall(function() deck.shuffle() end) end
       pcall(function() mat.call("drawCardsWithReshuffleWrapper", { numCards = n }) end)
-    end, 1.5)
+    end, 1)
   end
   return n
 end

@@ -197,11 +197,16 @@ function ChaosBag.new(opts)
     end
   end
 
+  -- SCED says "Someone is searching the chaos bag" in the chat each time it is asked, so a search
+  -- that stays open is asked again less and less often (2 s, 4 s, 8 s ... at most every 30 s)
+  local retryDelay = 2
   local function scheduleRetry()
     if a.retryScheduled then return end
     a.retryScheduled = true
+    local delay = retryDelay
+    retryDelay = math.min(30, retryDelay * 2)
     pcall(function()
-      Wait.time(function() a.retryScheduled = false ; a.reconcile() end, 2)
+      Wait.time(function() a.retryScheduled = false ; a.reconcile() end, delay)
     end)
   end
 
@@ -214,6 +219,7 @@ function ChaosBag.new(opts)
       scheduleRetry()
       return a.count
     end
+    retryDelay = 2
     local present = inBag(bag)
     local have = #present + outCount() + a.pendingAdd
     local delta = a.count - have

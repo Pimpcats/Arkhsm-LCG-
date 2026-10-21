@@ -61,6 +61,7 @@ local seatPick = {}             -- Setup panel: investigator ids picked to seat,
 local nightPick = nil           -- Setup panel: { [box id] = true } the districts picked for the night (nil: the proposal)
 local proposeNight              -- forward: the districts the Control proposes for the night (Loop Setup)
 local setupRunning = false      -- the one-button setup is laying the table out
+local setupRun = nil            -- the run in progress (a watchdog ends only its own run)
 local tableSetUp = false        -- this loop's (or the Prologue's) table was laid out by the Setup panel
 
 -------------------------------------------------------------- board contexts --
@@ -132,7 +133,8 @@ local function afterChange()
   syncBoard()
   guarded("investigators", Board.refreshInvestigators, false)
   refreshControl()
-  if syncHoursDeck then guarded("hours deck", syncHoursDeck) end
+  -- rebuilt only when the Hours on the table show another Hour (after a load nothing is remembered)
+  if syncHoursDeck then guarded("hours deck", syncHoursDeck, true) end
   -- Between Loops (Reset Loop to Begin Next Loop) the log follows every step on its own
   if mode == "interlude" or CampaignState.isLoopEnded() then guarded("campaign log", syncLogPage) end
 end
@@ -193,9 +195,12 @@ local function changeDissonance(delta)
     end
     if info.reachedReset then announceResetReached() end
   else
-    Dissonance.reduce(-delta, bag)
+    local info = Dissonance.reduce(-delta, bag)
     if bandBefore ~= Constants.BAND_CALM and CampaignState.band() == Constants.BAND_CALM then
       announce("Dissonance returns to Calm: Echoes fall asleep again (Sleepwalking).")
+    end
+    if info.appointedStage > before then
+      announce("The Appointed draws nearer: " .. Appointed.stageName() .. ".")
     end
   end
 end
@@ -212,6 +217,9 @@ local function changeHour(delta)
   if delta > 0 then
     local before = CampaignState.getHour()
     local bandBefore = CampaignState.band()
+    local stageBefore = Appointed.stage()
+    local reset = CampaignState.constants().resetThreshold
+    local wasBelowReset = CampaignState.getDissonance() < reset
     Hourglass.advance(delta, playCtx())
     if CampaignState.getHour() > before then
       local cleared = resetDoomInPlay()
@@ -223,6 +231,11 @@ local function changeHour(delta)
       end
     end
     announceWake(bandBefore)
+    -- an Hour that raises Dissonance can move the Approach or reach the reset value too
+    if Appointed.stage() > stageBefore then
+      announce("The Appointed draws nearer: " .. Appointed.stageName() .. ".")
+    end
+    if wasBelowReset and CampaignState.getDissonance() >= reset then announceResetReached() end
   else
     local before = CampaignState.getHour()
     Hourglass.rewind(-delta, playCtx())
@@ -239,6 +252,8 @@ local function holdBack()
   local s, rewound = Appointed.holdBack(playCtx())
   if CampaignState.inFinale() then
     announce("Held back: the Appointed is " .. Appointed.stageName() .. " (in the finale the Hourglass does not rewind).")
+  elseif not rewound and CampaignState.getHour() <= Constants.HOUR_FIRST then
+    announce("Held back: the Appointed is " .. Appointed.stageName() .. " (the Hourglass never rewinds before Hour I).")
   elseif not rewound then
     announce("Held back: the Appointed is " .. Appointed.stageName() .. " (Hold Back has rewound the Hourglass "
       .. Constants.HOLD_BACK_REWINDS_PER_LOOP .. " times this loop: no more rewinds until the next loop).")
@@ -518,6 +533,15 @@ end
 
 --- Loop Setup step 2: every scenario box on the table that was laid out (or Recalled only in part) is
 -- replaced by a full copy of itself. Returns how many were refilled and whether the spares were found.
+local refillsPending = 0   -- refilled boxes still being spawned (Set Up waits for them)
+
+--- A box is ready for SCED's Place once it has spawned and its own script has loaded its layout.
+local function boxReady(box)
+  if not box or box.isDestroyed() then return false end
+  local ok, ready = pcall(function() return not box.spawning and box.getVar("memoryList") ~= nil end)
+  return ok and ready == true
+end
+
 local function refillBoxes()
   if type(getObjects) ~= "function" or type(spawnObjectJSON) ~= "function" then return { refilled = 0 } end
   local used = {}
@@ -547,10 +571,22 @@ local function refillBoxes()
       -- GUID), so it is spawned once the used one is gone, two frames later
       local json = JSON.encode(entry)
       box.destruct()
+      refillsPending = refillsPending + 1
+      local settled = false
+      local function done()
+        if settled then return end
+        settled = true
+        refillsPending = math.max(0, refillsPending - 1)
+      end
       Wait.frames(function()
-        spawnObjectJSON({ json = json, position = pos, rotation = rot,
-          callback_function = function(b) pcall(function() b.setLock(locked) end) end })
+        local ok = pcall(function()
+          spawnObjectJSON({ json = json, position = pos, rotation = rot,
+            callback_function = function(b) pcall(function() b.setLock(locked) end) ; done() end })
+        end)
+        if not ok then done() end
       end, 2)
+      -- never wait on a spawn that does not report back
+      Wait.time(done, 10)
       refilled = refilled + 1
     end
   end
@@ -701,11 +737,18 @@ end
 
 local appliedSig  -- the changes the physical bag holds (set at load and on each refill)
 
+--- True when SCED lets the chaos tokens be touched (nobody is searching the bag). SCED says so in
+-- the chat itself when they cannot be.
+local function bagFree()
+  return SCED.globalCall("canTouchChaosTokens") ~= false
+end
+
 --- Fill SCED's chaos bag for a difficulty, then put the band's [static] back.
 local function setDifficulty(i)
   resetAsked = false
   local d = DIFFICULTY[i]
   if not d then return false end
+  if SCED.isPresent() and not bagFree() then return false end
   CampaignState.setDifficulty(i)
   if not SCED.isPresent() then
     announce("Chaos bag presets need the SCED mod: build the " .. d.label
@@ -724,28 +767,10 @@ local function setDifficulty(i)
   return true
 end
 
--- SCED respawns its bag on each setChaosBagState; a second refill sent while the
--- first is still landing is lost, so changes that arrive together (two entries
--- recorded in a row) wait for the refill in flight and then refill once more.
-local bagBusy, bagAgain = false, false
-local function refillBag(i)
-  if bagBusy then bagAgain = true ; return end
-  bagBusy = true
-  SCED.globalCall("setChaosBagState", bagFor(i))
-  Wait.time(function()
-    guarded("chaos bag", Dissonance.syncBag, bag)
-    bagBusy = false
-    if bagAgain then
-      bagAgain = false
-      refillBag(CampaignState.getDifficulty() or i)
-    else
-      refreshControl()
-    end
-  end, 1.5)
-end
-
---- When a story result changes the campaign's chaos-bag tokens, refill SCED's
--- bag (the chosen difficulty plus every change) and tell the table.
+--- When a story result changes the campaign's chaos-bag tokens, add or remove just those tokens
+-- in SCED's bag (SCED's spawnChaosToken / removeChaosToken) and tell the table. Refilling the whole
+-- bag (setChaosBagState) would also destroy tokens in play and reset Bless and Curse.
+local bagWaitSaid = false
 refreshBag = function()
   local c = bagChanges()
   local sig = changeSig(c)
@@ -753,21 +778,38 @@ refreshBag = function()
   if sig == appliedSig then return end
   local before = {}
   before.cultist, before.tablet, before.elder = appliedSig:match("(-?%d+)/(-?%d+)/(-?%d+)")
-  local parts = {}
+  local parts, deltas = {}, {}
   for _, sym in ipairs(BAG_SYMBOLS) do
     local delta = c[sym.key] - (tonumber(before[sym.key]) or 0)
     local n = math.abs(delta)
     if n > 0 then
+      deltas[#deltas + 1] = { key = sym.key, delta = delta }
       parts[#parts + 1] = string.format("%s %d %s token%s", delta > 0 and "add" or "remove", n, sym.name, n > 1 and "s" or "")
     end
   end
-  appliedSig = sig
   local what = table.concat(parts, ", ")
   local i = CampaignState.getDifficulty()
   if i and DIFFICULTY[i] and SCED.isPresent() then
-    refillBag(i)
-    announce("Campaign chaos-bag change: " .. what .. " for the rest of the campaign (done on the chaos bag).")
+    if not bagFree() then
+      -- the change waits for the search to end: the next change on the Control token makes it
+      if not bagWaitSaid then
+        bagWaitSaid = true
+        announce("Campaign chaos-bag change waiting (" .. what .. "): close the chaos bag search, then click any "
+          .. "Control button, or make the change by hand.")
+      end
+      return
+    end
+    bagWaitSaid = false
+    appliedSig = sig
+    for _, d in ipairs(deltas) do
+      for _ = 1, math.abs(d.delta) do
+        SCED.globalCall(d.delta > 0 and "spawnChaosToken" or "removeChaosToken", d.key)
+      end
+    end
+    announce("Campaign chaos-bag change: " .. what .. " for the rest of the campaign (done on the chaos bag; "
+      .. "a token that is out of the bag right now is not removed: take it out by hand).")
   else
+    appliedSig = sig
     announce("Campaign chaos-bag change: " .. what .. " for the rest of the campaign. Change the chaos bag by hand.")
   end
 end
@@ -790,14 +832,19 @@ local function unlockFact(id)
     announce(string.format("%s recorded: +%d banked Memory (%d banked).", factName(id), paid,
       CampaignState.getBankedMemory()))
   end
-  if newly and mode == "interlude" then checkPartTwo() end
+  -- Part II begins at Between Loops step 5, never mid-loop (the Interlude panel can be open then)
+  if newly and CampaignState.isLoopEnded() then checkPartTwo() end
   -- the Almanac House's act 1a advancing in Part II: act 2a becomes current
   -- if its requirements are met (the Sealed Study opens). The other order, the
   -- Vote recorded after act 1a's entry, makes nothing current: the act deck is
   -- gone (guide: a district's act deck); only a Place of the box does it
-  -- (almanacActTwoAtPlace)
+  -- (actTwoAtPlace)
   if newly and id == "what-the-almanac-hid" and Locations.markAlmanacActTwoCurrent() then
     note("The Appointed's Name is the current act: the Sealed Study opens.")
+  end
+  -- the Church's act 1a advancing in Part II: act 2a becomes current (the Flooded Crypt opens)
+  if newly and id == "the-thirteenth-toll" and Locations.markChurchActTwoCurrent() then
+    note("The Hour Was Wrong is the current act: the Flooded Crypt opens.")
   end
   -- the assembled entry: record it the moment its inputs are all known
   if newly and Knowledge.assembleFinale() then
@@ -870,7 +917,16 @@ local function readRecollections()
   return list
 end
 
+--- Interlude actions (Age, Bank, purchases) belong to Between Loops: mid-loop they would use a
+-- loop that is not over yet. False (and the table is told) while a night is in play.
+local function betweenLoopsOnly(what)
+  if CampaignState.isLoopEnded() then return true end
+  announce(what .. " is done Between Loops: click Reset Loop once the loop has ended.")
+  return false
+end
+
 local function buyRecollection(id)
+  if not betweenLoopsOnly("Buying") then return false end
   local ok = Interlude.buyRecollection(id)
   local cost = Interlude.recollectionCost(id)
   local name = Interlude.RECOLLECTION_NAME[id] or id
@@ -887,6 +943,7 @@ local function buyRecollection(id)
 end
 
 local function buyLevel(level)
+  if not betweenLoopsOnly("Buying") then return false end
   local ok = Interlude.buyUpgrade(level)
   if ok then
     announce(string.format("Level-%d upgrade bought for %d Memory (%d banked).", level, level,
@@ -946,9 +1003,8 @@ local function beginNextLoop(force)
   local before = CampaignState.getBankedMemory()
   Interlude.beginNextLoop(inPlaySet())
   local lost = math.max(0, before - CampaignState.getBankedMemory())
-  -- Part II with both Almanac entries: act 2a is current from the Almanac
-  -- House's Place this loop (the Sealed Study opens)
-  Locations.markAlmanacActTwoCurrent()
+  -- a district's act 2a becomes current when its box is Placed this loop (actTwoAtPlace), not
+  -- here: a box first Placed during the finale sets its act deck aside instead
   guarded("locations", Board.syncLocations)
   Dissonance.syncBag(bag)
   aging = {}
@@ -1006,6 +1062,23 @@ local function changeQuest(id, delta)
 end
 
 local function bankOnCard()
+  if not betweenLoopsOnly("Banking on-card Memory") then return 0 end
+  -- Between Loops step 1 (Age) comes before step 2 (Bank): an investigator who ages out at step 1
+  -- loses the Memory on their cards
+  if CampaignState.getLoopsCompleted() > 0 then
+    local names = {}
+    for _, inv in ipairs(guarded("investigators", Board.investigators) or {}) do
+      local a = aging[inv.id]
+      if not (a and a.aged) and CampaignState.getYears(inv.id) < Constants.AGE_OUT_YEARS then
+        names[#names + 1] = inv.name
+      end
+    end
+    if #names > 0 then
+      announce("Age comes first (Between Loops step 1): click Age for " .. table.concat(names, ", ")
+        .. ", then Bank on-card Memory.")
+      return 0
+    end
+  end
   local n, dropped = Interlude.bankOnCard(inPlaySet())
   announce(string.format("Banked %d on-card Memory (%d banked).%s", n, CampaignState.getBankedMemory(),
     (dropped or 0) > 0 and string.format(" %d on departed investigators' cards is lost.", dropped) or ""))
@@ -1027,6 +1100,7 @@ end
 -- (Interlude.leanedOnLoop: raised Dissonance 3+ times or spent 4+ Memory on
 -- loop powers) — the design has no override, so neither does the panel.
 local function ageInvestigator(id)
+  if not betweenLoopsOnly("Age") then return nil end
   -- Between Loops after the Prologue: step 1 is skipped (no Years)
   if CampaignState.getLoopsCompleted() == 0 then
     announce("After the Prologue, investigators do not gain Years: skip Age.")
@@ -1093,11 +1167,11 @@ local function button(fn, label, x, z, w, tooltip, fs)
   end)
 end
 
-local function header(label, z)
+local function header(label, z, x)
   pcall(function()
     self.createButton({
       click_function = "shNoop", function_owner = self, label = label,
-      position = { 0, BTN_Y, z }, rotation = { 0, 0, 0 },
+      position = { x or 0, BTN_Y, z }, rotation = { 0, 0, 0 },
       width = 0, height = 0, font_size = 120, font_color = BTN_FONT,
     })
   end)
@@ -1295,7 +1369,8 @@ local function drawInterlude()
   local rows = math.ceil(math.min(#recollectionList, 16) / 2)
   local z = -1.1 + rows * 0.55 + 0.1
   for lvl = 1, 5 do
-    button("shBuyLvl" .. lvl, "Lvl " .. lvl .. " (" .. lvl .. ")", -2.4 + (lvl - 1) * 1.2, z, 520,
+    -- the row ends short of the aging column (its Defeated toggles start at x 2.4)
+    button("shBuyLvl" .. lvl, "Lvl " .. lvl .. " (" .. lvl .. ")", -2.0 + (lvl - 1) * 0.95, z, 440,
       "Level a card up to level " .. lvl .. " for " .. lvl .. " Memory.", 90)
   end
   button("shBeginNextLoop", "Begin Next Loop", -0.8, z + 0.6, 1000, "Cap Memory and start the next loop.")
@@ -1304,7 +1379,7 @@ local function drawInterlude()
   local onCard = 0
   for _, n in pairs(CampaignState.onCardMemoryMap()) do onCard = onCard + n end
   local X = 4.2
-  header("AGING", -2.3)
+  header("AGING", -2.3, X)
   button("shBankOnCard", "Bank on-card Memory (" .. onCard .. ")", X, -1.7, 1400,
     "Between Loops step 2: move all Memory on cards to banked Memory.", 90)
   local danger = Interlude.loopEndedInDanger()
@@ -1367,11 +1442,14 @@ refreshControl = function()
   -- every other click redraws the panel, which withdraws a pending "Reset Loop?"
   resetAsked = false
   pcall(function() self.clearButtons() end)
-  if mode == "interlude" then drawInterlude() elseif mode == "setup" then drawSetup() else drawPlay() end
+  -- guarded: a drawing error leaves a partial panel but never skips saving the state below
+  if mode == "interlude" then guarded("panel", drawInterlude)
+  elseif mode == "setup" then guarded("panel", drawSetup)
+  else guarded("panel", drawPlay) end
   -- Token UI is transient in TTS. Reattach by saved GUID on reload/restore;
   -- clearing first makes repeated restoration idempotent.
   for _, guid in ipairs(bag.save().pendingStatic or {}) do
-    local obj = getObjectFromGUID(guid)
+    local obj = type(getObjectFromGUID) == "function" and getObjectFromGUID(guid) or nil
     if obj and obj.createButton then
       if obj.clearButtons then pcall(obj.clearButtons) end
       obj.createButton({ click_function = "shResolveStaticToken", function_owner = self, label = "Resolve",
@@ -1549,9 +1627,14 @@ function shAge2() ageAt(2) end
 function shAge3() ageAt(3) end
 function shAge4() ageAt(4) end
 
+-- what Begin Finale changed, so a Begin Finale clicked by mistake can be taken back (shClickContest)
+local finaleUndo = nil
+
 function shBeginFinale()
   local hourAtStart = CampaignState.getHour()
   local wasFinale = CampaignState.inFinale()
+  local stageAtStart = CampaignState.getAppointedStage()
+  local pressAtStart = bag.press == true
   guarded("finale", function()
     if not CampaignState.knows("the-way-the-night-breaks") or CampaignState.inFinale() then return end
     -- the button is not drawn in the Prologue; a call from outside must not begin the finale there
@@ -1594,6 +1677,7 @@ function shBeginFinale()
   end)
   afterChange()
   if wasFinale or not CampaignState.inFinale() then return end
+  finaleUndo = { hour = hourAtStart, stage = stageAtStart, press = pressAtStart }
   -- the finale's box, if it is not laid out yet, then the finale's own setup
   local box = findScenarioBox("finale")
   local function go() guarded("finale setup", finaleTable, hourAtStart) ; afterChange() end
@@ -1688,6 +1772,8 @@ local function adoptLogMirror(log, deep)
   if not m or m.seq <= saveSeq then return false end
   restore(m.blob)
   saveSeq = m.seq
+  -- the bag on the table already holds the restored campaign's changes (as at onLoad)
+  appliedSig = changeSig(bagChanges())
   Dissonance.syncBag(bag)
   guarded("investigator counter", pushInvestigatorCount)
   announce("Still Hour campaign state restored from the campaign log.")
@@ -1901,20 +1987,28 @@ function shApiHoldBack() local s = guarded("hold back", holdBack) ; afterChange(
 function shApiHunt() local m = guarded("hunt", hunt) ; afterChange() ; return m end
 function shApiReset() guarded("reset", resetLoop) ; afterChange() ; return shApiState() end
 function shApiSyncBoard() return shSyncBoard() end
---- Part II, the Almanac House laid out with both of its entries recorded: act 2a
--- is its current act this loop (guide: a district's act deck), so the Sealed
--- Study opens. `p` names the box that was Placed; without it, any Almanac House
--- location on the table counts.
-local function almanacActTwoAtPlace(p)
-  local placed = type(p) == "table" and p.box ~= nil and p.box == "district_almanac"
-  if not placed and not (type(p) == "table" and p.box ~= nil) then
+--- Part II, a district laid out with act 1a's entry recorded: act 2a is its current act this loop
+-- when its requirements are met (guide: a district's act deck), so its closed location opens (the
+-- Almanac House's Sealed Study, the Church's Flooded Crypt). `p` names the box that was Placed;
+-- without it, any of that district's locations on the table counts. Not during the finale.
+local ACT_TWO_AT_PLACE = {
+  { box = "district_almanac", district = "Almanac", mark = Locations.markAlmanacActTwoCurrent,
+    says = "The Appointed's Name is the current act: the Sealed Study opens." },
+  { box = "district_church", district = "Church", mark = Locations.markChurchActTwoCurrent,
+    says = "The Hour Was Wrong is the current act: the Flooded Crypt opens." },
+}
+local function actTwoAtPlace(p)
+  local named = type(p) == "table" and p.box ~= nil
+  local onTable = {}
+  if not named then
     for _, l in ipairs(guarded("locations", Board.locationCards) or {}) do
       local def = l.locId and Locations.LOCATIONS[l.locId]
-      if def and def.district == "Almanac" then placed = true end
+      if def then onTable[def.district] = true end
     end
   end
-  if placed and Locations.markAlmanacActTwoCurrent() then
-    note("The Appointed's Name is the current act: the Sealed Study opens.")
+  for _, a in ipairs(ACT_TWO_AT_PLACE) do
+    local placed = (named and p.box == a.box) or (not named and onTable[a.district])
+    if placed and a.mark() then note(a.says) end
   end
 end
 
@@ -2077,18 +2171,20 @@ finaleTable = function(hourAtStart)
   end
   -- what the log records (Setup step 3)
   local past = forms["sthr-form-past"]
+  local nLate, by = Knowledge.lateKnown()
+  local half = CampaignState.constants().investigators
+  local pastLate = nLate > 0 and math.min(by.past, half) or 0
   if logChoice("name_a") and past then
-    Wait.frames(function() SCED.spawnTokenGroup(past, "damage", 1) end, 20)
+    -- one damage counter per form: with late records on As It Was too, it carries both (below)
+    if pastLate == 0 then Wait.frames(function() SCED.spawnTokenGroup(past, "damage", 1) end, 20) end
     done[#done + 1] = "1 damage on As It Was (you have spoken the name)"
   end
   if logChoice("page_b") then
     guarded("hour", function() Hourglass.rewind(1, playCtx()) end)
     done[#done + 1] = "the Hourglass rewound 1 Hour (the drowned heard the true hour)"
   end
-  local nLate, by = Knowledge.lateKnown()
   if nLate > 0 then
-    local half = CampaignState.constants().investigators
-    local p, f = math.min(by.past, half), math.min(by.future, half)
+    local p, f = pastLate, math.min(by.future, half)
     local fut = forms["sthr-form-future"]
     Wait.frames(function()
       if past and p > 0 then SCED.spawnTokenGroup(past, "damage", p + (logChoice("name_a") and 1 or 0)) end
@@ -2212,7 +2308,10 @@ local function putInto(target, obj, faceDown)
     local r = target.getRotation()
     obj.setRotation({ 0, r.y, 180 })
   end
-  return pcall(function() target.putObject(obj) end)
+  -- putObject onto a lone card makes a new deck (the card is gone): the caller keeps what it returns
+  local ok, r = pcall(function() return target.putObject(obj) end)
+  if not ok then return nil end
+  return r or target
 end
 
 --- Loop Setup for one laid-out box (p = { box = its id }). Returns what was done, for the chat.
@@ -2229,20 +2328,24 @@ local function setUpPlacedBox(p)
   if box ~= "district_square" then
     -- its encounter set joins the shared encounter deck
     local set = boxStack(tag, "Encounter Deck")
-    if set and enc and putInto(enc, set, true) then done[#done + 1] = "encounter set shuffled in" end
+    local into = set and enc and putInto(enc, set, true)
+    if into then enc = into ; done[#done + 1] = "encounter set shuffled in" end
     -- its Named enemy: shuffled in with the set where its entry says so (the Fairground, Part II),
     -- otherwise set aside with the rest
     local named = boxStack(tag, "Named Enemies")
     if named then
       if box == "district_fairground" and partTwo and enc then
-        if putInto(enc, named, true) then done[#done + 1] = "its Part II enemy shuffled in" end
-      elseif squareAside and putInto(squareAside, named, true) then
-        done[#done + 1] = "its enemy set aside"
+        local into = putInto(enc, named, true)
+        if into then enc = into ; done[#done + 1] = "its Part II enemy shuffled in" end
+      elseif squareAside then
+        local into = putInto(squareAside, named, true)
+        if into then squareAside = into ; done[#done + 1] = "its enemy set aside" end
       end
     end
     -- its set-aside cards join the one set-aside pile on the mythos mat
     local aside = boxStack(tag, "Set Aside")
-    if aside and squareAside and putInto(squareAside, aside, true) then done[#done + 1] = "set-aside cards with the others" end
+    local into = aside and squareAside and putInto(squareAside, aside, true)
+    if into then squareAside = into ; done[#done + 1] = "set-aside cards with the others" end
   else
     -- the Square: the Approach beside the Hours, and from Part II the Whispers in the encounter deck
     local spot = matPoint(MAT_APPROACH)
@@ -2255,12 +2358,14 @@ local function setUpPlacedBox(p)
       local n = 0
       for _ = 1, 2 do
         local w = takeById(boxStack("StillHourBox_district_square", "Set Aside"), "sthr-appointedwhisper")
-        if w and putInto(enc, w, true) then n = n + 1 end
+        local into = w and putInto(enc, w, true)
+        if into then enc = into ; n = n + 1 end
       end
       if n > 0 then done[#done + 1] = "the Whispers shuffled in" end
     end
     local named = boxStack(tag, "Named Enemies")
-    if named and squareAside and putInto(squareAside, named, true) then done[#done + 1] = "its enemy set aside" end
+    local into = named and squareAside and putInto(squareAside, named, true)
+    if into then squareAside = into ; done[#done + 1] = "its enemy set aside" end
   end
   -- its act deck, from the Campaign Log
   local deck = boxStack(tag, "Act Deck")
@@ -2331,7 +2436,7 @@ function shApiSyncBoardStaged(p)
   local steps = {
     { "loop setup", function() setUpPlacedBox(p) end },
     { "the Hours", function() hoursShown = nil ; syncHoursDeck(true) end },
-    { "locations", function() almanacActTwoAtPlace(p) ; Board.syncLocations() end },
+    { "locations", function() actTwoAtPlace(p) ; Board.syncLocations() end },
     { "the Appointed", function() Board.syncAppointed({ log = hourLog, applyStats = true }) end },
     { "investigators", function() Board.refreshInvestigators(true) end },
     { "chaos bag", function() Dissonance.syncBag(bag) end },
@@ -2375,9 +2480,14 @@ function shApiSnapshot() return onSave() end
 -- board's own tracking (what it placed / flipped) stays live, so the objects
 -- are reconciled to the restored state rather than forgotten.
 function shApiRestore(p)
+  -- decode first: a bad blob leaves the campaign as it was instead of blank
+  local ok, blob = pcall(function() return JSON.decode(p.blob) end)
+  if not ok or type(blob) ~= "table" or type(blob.campaign) ~= "table" then
+    note("restore: no campaign in that blob")
+    return shApiState()
+  end
   CampaignState.init(CampaignState.constants().investigators)
   guarded("restore", function()
-    local blob = JSON.decode(p.blob)
     CampaignState.deserialize(JSON.encode(blob.campaign))
     bag.load(blob.bag)
     aging = type(blob.aging) == "table" and blob.aging or {}  -- who has aged this interlude
@@ -2531,9 +2641,22 @@ local function fillLog()
 end
 
 --- Seat the picked investigators (runner API: p = { ids = {...} } picks them first).
+-- mats whose investigator is still landing (SCED only sees them once the card is on the mat), and
+-- who is on them, so a second quick Seat click neither reuses a mat nor seats anyone twice
+local seatingNow = {}
+
 function shApiSeat(p)
   if type(p) == "table" and type(p.ids) == "table" then seatPick = p.ids end
   local seated = seatedByMat()
+  local already = {}
+  for _, inv in ipairs(seated) do already[inv.id] = true end
+  for mat, id in pairs(seatingNow) do
+    seated[#seated + 1] = { id = id, matColor = mat }
+    already[id] = true
+  end
+  local picks = {}
+  for _, id in ipairs(seatPick) do if not already[id] then picks[#picks + 1] = id end end
+  seatPick = picks
   local free = Setup.freeMats(seated)
   if #seatPick == 0 then
     announce("Pick the investigators to seat first (click their names on the Setup panel).")
@@ -2550,10 +2673,11 @@ function shApiSeat(p)
       announce("No free playmat for " .. tostring(id) .. ": every mat holds an investigator.")
       break
     end
-    local r = Setup.seat(id, mat) or {}
+    local r = guarded("seat " .. tostring(id), Setup.seat, id, mat) or {}
     reports[#reports + 1] = r
     if r.ok then
       done = done + 1
+      seatingNow[mat] = id
       local missing = #(r.missing or {}) > 0 and (" " .. #r.missing .. " card(s) could not be found: "
         .. table.concat(r.missing, ", ") .. ".") or ""
       announce(string.format("%s seated on the %s playmat: %d cards in the deck, shuffled.%s", r.name, mat, r.deck, missing))
@@ -2563,7 +2687,10 @@ function shApiSeat(p)
   end
   seatPick = {}
   -- once the cards are on the mats: the party size, SCED's counter and the log's investigator rows
+  local mine = {}
+  for m in pairs(seatingNow) do mine[#mine + 1] = m end
   Wait.time(function()
+    for _, m in ipairs(mine) do seatingNow[m] = nil end
     local n = #seatedByMat()
     if n > 0 and n ~= CampaignState.constants().investigators then
       guarded("investigators", changeInvestigators, n - CampaignState.constants().investigators)
@@ -2613,11 +2740,21 @@ local function anchorPointMemory()
 end
 
 --- Set Up Prologue / Set Up Loop. Returns false when it could not start.
-function shApiSetUp()
+local setUpAgainAsked = false
+function shApiSetUp(p)
   if setupRunning then
     announce("The table is still being laid out.")
     return false
   end
+  -- a second Set Up in the same loop deals everyone in again and grants Anchor Point again: ask first
+  if tableSetUp and not (type(p) == "table" and p.again) and not setUpAgainAsked then
+    setUpAgainAsked = true
+    announce("This loop's table is already set up. Click Set Up again within 10 seconds to lay it out again "
+      .. "(every investigator's cards are shuffled back and the boxes are laid out anew).")
+    Wait.time(function() setUpAgainAsked = false end, 10)
+    return false
+  end
+  setUpAgainAsked = false
   local seated = seatedByMat()
   if #seated == 0 then
     announce("Seat the investigators first (Setup panel: pick them, then Seat investigators).")
@@ -2628,6 +2765,15 @@ function shApiSetUp()
     return false
   end
   setupRunning = true
+  local runId = {}
+  setupRun = runId
+  -- a step that fails, or a callback TTS never makes, must not leave the panel locked
+  Wait.time(function()
+    if setupRunning and setupRun == runId then
+      setupRunning = false
+      announce("Set Up stopped before it finished: check the table, then Place any box that is still full.")
+    end
+  end, 180)
   local prologue = CampaignState.inPrologue()
   local boxes = prologue and { "prologue" } or { "district_square" }
   if not prologue then
@@ -2637,17 +2783,21 @@ function shApiSetUp()
   local names = {}
   for _, id in ipairs(boxes) do names[#names + 1] = BOX_NAMES[id] or id end
   announce((prologue and "Setting up the Prologue: " or "Setting up the loop: ") .. table.concat(names, ", ") .. ".")
-  local cleared = clearAndRefill()
+  local cleared = guarded("clear board", clearAndRefill)
+  local failed = {}
   local function finish()
-    local moved = investigatorsTo(prologue and "sthr-loc-square" or "sthr-loc-hubsquare")
-    local anchors = prologue and 0 or (guarded("anchor point", anchorPointMemory) or 0)
     setupRunning = false
+    local moved = guarded("minicards", investigatorsTo, prologue and "sthr-loc-square" or "sthr-loc-hubsquare") or 0
+    local anchors = prologue and 0 or (guarded("anchor point", anchorPointMemory) or 0)
     nightPick = nil
     tableSetUp = true
     mode = "play"
     announce(string.format("Set up: %s laid out; %d investigator(s) at the Square, decks shuffled, 5 resources and "
       .. "5 cards each%s. Check the table, choose a lead investigator (mulligan as normal) and begin.",
       table.concat(names, ", "), moved, anchors > 0 and ", Anchor Point's Memory on its investigator" or ""))
+    if #failed > 0 then
+      announce("Not laid out: " .. table.concat(failed, ", ") .. ". Press Place on its box.", { 1, 0.6, 0.3 })
+    end
     afterChange()
   end
   Wait.frames(function()
@@ -2659,13 +2809,16 @@ function shApiSetUp()
     end
     -- the boxes one after another, each once the board sync of the one before has run
     local i = 0
-    local function nextBox()
-      i = i + 1
-      local id = boxes[i]
-      if not id then return Wait.time(finish, 1) end
+    local nextBox
+    local function placeBox(id)
       local box = findScenarioBox(id)
       if box and boxIsFull(box) then
         pcall(function() box.call("buttonClick_place") end)
+        -- SCED's Place empties the box; one that is still full was not laid out
+        Wait.time(function()
+          local ok, full = pcall(boxIsFull, box)
+          if ok and full and not box.isDestroyed() then failed[#failed + 1] = BOX_NAMES[id] or id end
+        end, 0.4)
       elseif box then
         announce((BOX_NAMES[id] or id) .. " is already laid out.")
       else
@@ -2675,7 +2828,21 @@ function shApiSetUp()
         Wait.condition(nextBox, function() return not shApiBoxBusy() end, 20, nextBox)
       end, 0.5)
     end
-    nextBox()
+    nextBox = function()
+      if setupRun ~= runId then return end
+      i = i + 1
+      local id = boxes[i]
+      if not id then return Wait.time(finish, 1) end
+      -- a box refilled a moment ago is placed once it has spawned and loaded its layout
+      local function ready()
+        if refillsPending > 0 then return false end
+        local box = findScenarioBox(id)
+        return box == nil or boxReady(box)
+      end
+      Wait.condition(function() guarded("place " .. id, placeBox, id) end, ready, 15,
+        function() guarded("place " .. id, placeBox, id) end)
+    end
+    guarded("boxes", nextBox)
   end, 5)
   return { cleared = cleared, boxes = boxes }
 end
@@ -2722,9 +2889,21 @@ end
 
 function shClickContest(_, _, alt)
   if alt and CampaignState.getContest() == 0 and CampaignState.inFinale() then
-    -- Begin Finale was clicked by mistake
+    -- Begin Finale was clicked by mistake: put back what it changed on the Control token
     CampaignState.setFinale(false)
-    note("The finale was not begun: Hour IX ends the loop again.")
+    if finaleUndo then
+      CampaignState.setHour(finaleUndo.hour)
+      CampaignState.advanceAppointed(finaleUndo.stage)
+      if bag.setPress then bag.setPress(finaleUndo.press) end
+      finaleUndo = nil
+      Dissonance.syncBag(bag)
+      guarded("Appointed", Board.syncAppointed, { log = hourLog })
+      announce("The finale was not begun: the Hour, the Appointed's Approach and the chaos bag are as they were; "
+        .. "Hour IX ends the loop again. Click Recall on The Last Hour's box to take its cards back, and put any "
+        .. "act deck or enemy it moved back by hand.")
+    else
+      note("The finale was not begun: Hour IX ends the loop again.")
+    end
     afterChange()
     return
   end
