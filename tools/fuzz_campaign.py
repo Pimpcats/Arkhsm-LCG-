@@ -42,17 +42,30 @@ def main(argv=None):
     ap.add_argument("--actions", type=int, default=300)
     ap.add_argument("--lua", default="lua5.4")
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
-    ap.add_argument("--out", help="write every result as JSON here")
+    ap.add_argument("--out", help="append each seed's result here as one JSON line; seeds already in it are skipped "
+                                  "(a run cut short resumes where it stopped)")
     a = ap.parse_args(argv)
     src, commit = sced_table.find_sced()
     if not src:
         raise SystemExit("SCED not available: %s" % commit)
     sced_table.build_table(src, commit)      # assemble once before the workers start
-    jobs = [(s, a.lua, a.actions) for s in range(a.first, a.first + a.seeds)]
-    results = []
+    done = {}
+    if a.out and os.path.isfile(a.out):
+        for line in open(a.out, encoding="utf-8"):
+            try:
+                r = json.loads(line)
+            except ValueError:
+                continue
+            if r.get("lua") == a.lua:
+                done[r["seed"]] = r
+    jobs = [(s, a.lua, a.actions) for s in range(a.first, a.first + a.seeds) if s not in done]
+    results = [r for s, r in done.items() if a.first <= s < a.first + a.seeds]
     with concurrent.futures.ProcessPoolExecutor(a.jobs) as ex:
         for res in ex.map(one, jobs):
             results.append(res)
+            if a.out:
+                with open(a.out, "a", encoding="utf-8") as f:
+                    f.write(json.dumps(res) + "\n")
             if res.get("skipped"):
                 print("seed %d skipped: %s" % (res["seed"], res["skipped"]))
             elif not res["ok"]:
@@ -61,9 +74,6 @@ def main(argv=None):
                     or "exit %s %s" % (res["rc"], res["stderr"])), flush=True)
     ok = sum(1 for r in results if r.get("ok"))
     print("SCED %s, %s: %d of %d seeds passed (%d actions each)" % (commit[:12], a.lua, ok, len(results), a.actions))
-    if a.out:
-        with open(a.out, "w", encoding="utf-8") as f:
-            json.dump(results, f, indent=1)
     return 0 if ok == len(results) else 1
 
 
