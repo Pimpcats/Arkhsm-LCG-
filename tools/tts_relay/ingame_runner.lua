@@ -877,6 +877,7 @@ step("board: an interlude purchase", function(go)
   local ctl = findControl()
   if not ctl then return go() end
   ctl.call("shApiRestore", { blob = snapshot })
+  ctl.call("shApiReset")                                    -- purchases are Between Loops
   ctl.call("shApiCounter", { name = "memory", delta = 5 })
   local cost
   for _, r in ipairs(ctl.call("shApiInterlude", {}) or {}) do
@@ -901,6 +902,10 @@ step("board: bank on-card Memory", function(go)
   local ctl = findControl()
   if not ctl or not INV.elias then check("investigators available for banking", false) ; return go() end
   ctl.call("shApiRestore", { blob = snapshot })
+  ctl.call("shApiReset")                                    -- Bank is Between Loops step 2, after Age
+  for _, inv in ipairs(ctl.call("shApiInvestigators") or {}) do
+    ctl.call("shApiAge", { id = inv.id, physical = "combat", mental = "willpower" })
+  end
   ctl.call("shApiOnCardMemory", { id = "sthrelias", delta = 2 })
   ctl.call("shApiOnCardMemory", { id = "sthrbirdie", delta = 1 })
   local departedCheck = ctlHas(ctl, "function Interlude.isDeparted")
