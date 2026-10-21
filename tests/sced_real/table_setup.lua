@@ -57,6 +57,14 @@ return function(H)
     return nil
   end
   local function count(o) if not o then return 0 end return o.type == "Deck" and #o.getObjects() or 1 end
+  -- a permanent random basic weakness starts in play beside the mat, so the deck holds one card fewer
+  local function permanentWeaknesses(colour)
+    local n = 0
+    for _, o in ipairs(objects()) do
+      if o.type == "Card" and o.hasTag("StillHourOwner_" .. colour) and gm(o).permanent and gm(o).weakness then n = n + 1 end
+    end
+    return n
+  end
   local function hand(colour)
     local pc = mat(colour).getVar("playerColor")
     return E.G.Player[pc].getHandObjects()
@@ -101,8 +109,9 @@ return function(H)
       check(colour .. ": the investigator card is on the mat's investigator spot", c ~= nil and gm(c).id == inv,
         c and tostring(gm(c).id) or "nothing there")
       local d = stackAt(zone(colour, DECK))
-      check(colour .. ": a 34-card deck is on the Deck spot (3 required + 30 starter + 1 random basic weakness)",
-        count(d) == 34, count(d))
+      local pw = permanentWeaknesses(colour)
+      check(colour .. ": a 34-card deck is on the Deck spot (3 required + 30 starter + 1 random basic weakness;"
+        .. " a permanent one starts beside the mat)", count(d) == 34 - pw, count(d) .. " (" .. pw .. " set aside)")
       local untagged = 0
       for _, e in ipairs(d and d.type == "Deck" and d.getObjects() or {}) do
         local mine = false
@@ -121,6 +130,7 @@ return function(H)
 
   ----------------------------------------------------------------- S-2 --
 
+
   step("S-2: Set Up Prologue lays the Prologue out and deals each investigator in", function()
     local mark = chatMark()
     local r = control().call("shApiSetUp")
@@ -130,7 +140,8 @@ return function(H)
     check("its locations are on the table", card("sthr-loc-square") ~= nil and card("sthr-loc-longpier") ~= nil)
     for _, colour in ipairs({ "White", "Orange" }) do
       check(colour .. ": 5 cards in hand", #hand(colour) == 5, #hand(colour))
-      check(colour .. ": 29 cards left in the deck", count(stackAt(zone(colour, DECK))) == 29, count(stackAt(zone(colour, DECK))))
+      check(colour .. ": 29 cards left in the deck", count(stackAt(zone(colour, DECK))) == 29 - permanentWeaknesses(colour),
+        count(stackAt(zone(colour, DECK))))
       check(colour .. ": 5 resources", mat(colour).call("getCounterValue", "ResourceCounter") == 5,
         mat(colour).call("getCounterValue", "ResourceCounter"))
     end
@@ -176,22 +187,29 @@ return function(H)
     check("the boxes not picked stay full", not boxEmpty("district_fairground") and not boxEmpty("district_road"))
     for _, colour in ipairs({ "White", "Orange" }) do
       check(colour .. ": every card is back and dealt again: 5 in hand, 29 in the deck",
-        #hand(colour) == 5 and count(stackAt(zone(colour, DECK))) == 29,
+        #hand(colour) == 5 and count(stackAt(zone(colour, DECK))) == 29 - permanentWeaknesses(colour),
         #hand(colour) .. " / " .. count(stackAt(zone(colour, DECK))))
     end
-    local strays = 0
-    for _, o in ipairs(objects()) do
-      if o.type == "Card" then
-        for _, t in ipairs(o.getTags()) do
-          if t == "StillHourOwner_White" and gm(o).type ~= "Investigator" and not gm(o).permanent then
-            local inHand = false
-            for _, c in ipairs(hand("White")) do if c == o then inHand = true end end
-            if not inHand then strays = strays + 1 end
+    for _, colour in ipairs({ "White", "Orange" }) do
+      local strays = {}
+      for _, o in ipairs(objects()) do
+        if o.type == "Card" then
+          for _, t in ipairs(o.getTags()) do
+            if t == "StillHourOwner_" .. colour and gm(o).type ~= "Investigator" and not gm(o).permanent then
+              local inHand = false
+              for _, c in ipairs(hand(colour)) do if c == o then inHand = true end end
+              if not inHand then
+                local p = o.getPosition()
+                strays[#strays + 1] = string.format("%s%s at %.1f,%.1f,%.1f", o.getName(),
+                  gm(o).weakness and " (weakness)" or "", p.x, p.y, p.z)
+              end
+            end
           end
         end
       end
+      check("no card of " .. colour .. "'s is left on the table outside the deck and hand", #strays == 0,
+        #strays .. " " .. table.concat(strays, "; "))
     end
-    check("no card of White's is left on the table outside the deck and hand", strays == 0, strays)
     local sq = card("sthr-loc-hubsquare")
     check("both investigators are at the Square", sq ~= nil and near(card("sthrelias-m").getPosition(), sq.getPosition(), 1.0)
       and near(card("sthrcass-m").getPosition(), sq.getPosition(), 1.0))
