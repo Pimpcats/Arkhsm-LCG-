@@ -252,6 +252,8 @@ redesign (FINALE_REDESIGN.md). Night 4/6 high and 7/8 low are route effects at n
 
 ### The boss finale (2026-10-11)
 
+> Measured with the engine's stand-in decks (before 2026-10-21, "Real starter decks" in docs/BALANCE.md): re-run on the real starter decks before trusting these numbers.
+
 The Last Hour is now the three-form boss fight (FINALE_REDESIGN.md). Same method, 27 campaigns (seeds
 5000/6000/7000, 9 each), health 2 [perinv] per form, As It Is 2 damage / 1 horror:
 
@@ -266,6 +268,8 @@ but is the slot to watch. `campaign_summary.py` now counts the finale as met onl
 the stranded share separately.
 
 ### Late objectives (2026-10-12)
+
+> Measured with the engine's stand-in decks (before 2026-10-21, "Real starter decks" in docs/BALANCE.md): re-run on the real starter decks before trusting these numbers.
 
 Each district gained an act 3a (LATE_OBJECTIVES.md) and As It Is now deals 1 damage. Same method, 3 investigators,
 `goalsPerNight 2`; the planner works surface and deep objectives before late ones.
@@ -282,6 +286,8 @@ No night in 54 campaigns was left without a goal (before: 18 of 27 Night 8s). Fi
 route effects at this sample size (±13 points at 54).
 
 ### Party sizes with the boss finale (2026-10-12)
+
+> Measured with the engine's stand-in decks (before 2026-10-21, "Real starter decks" in docs/BALANCE.md): re-run on the real starter decks before trusting these numbers.
 
 Carried campaigns, `goalsPerNight 2`, the late-objectives build (As It Is 1 damage). Finale endings, of all campaigns:
 
@@ -300,6 +306,8 @@ Difficulty and player count; the form cards): each form gets −1 fight and −1
 Hourglass by 2 Hours. Solo with both, 27 campaigns: home 30%, not ended 67% (a fallen form rewinding 2 alone: 22%).
 
 ### Night evenness (2026-10-12)
+
+> Measured with the engine's stand-in decks (before 2026-10-21, "Real starter decks" in docs/BALANCE.md): re-run on the real starter decks before trusting these numbers.
 
 Changes: Why Thirteen? 3 → 2 [perinv] (Night 1 was 69%); The Vote That Never Ends and Call the Roll 2 → 3 [perinv]
 (the Square's acts were met 98–100%: the Square is always placed). The engine planner counts a Lighthouse trip as two

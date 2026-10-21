@@ -1,8 +1,19 @@
 THE STILL HOUR — HANDOFF
-Updated 2026-10-12. Spoiler-free.
+Updated 2026-10-21. Spoiler-free. Start with CURRENT STATE; the dated STATUS blocks below it are history (newest are at the end of the file).
 
 Repository: https://github.com/Pimpcats/Arkhsm-LCG-
 Working branch: main.
+
+CURRENT STATE (2026-10-21, main at 07cd23c)
+What the campaign is now: the Prologue, a loop of nights across six districts (each with three objectives: surface, deep and a late one that helps in the finale), and a boss finale fought across three times with several endings, including two bittersweet "stranded" wins. When every late objective is done, the next loop is the finale, so no night is left with nothing to do. Solo play has its own finale rules (the boss forms get -1 fight and -1 evade, and a fallen form turns the clock back 2 Hours).
+At the table: the Control token's Setup panel seats investigators and sets up the Prologue, each loop and the finale; the Campaign Log fills itself Between Loops. Clear Board with the Appointed out no longer leaves its card behind.
+Checks on main: see the latest STATUS at the end (pytest, Lua rules, headless real-SCED suites on the pinned SCED, v4.9.3 and the development head, 200 randomized whole-campaign playthroughs, an every-button sweep: all passing).
+Not yet done:
+1. Real Tabletop Simulator on the owner's PC: never run (all table tests are headless emulation). Load the saved object, press Place, use the Setup panel.
+2. A human playtest: none yet. Everything about difficulty is simulation.
+3. Balance needs re-measuring on the real starter decks. The engine only began playing the seated starter decks on 2026-10-21; the finale, party-size and night-cost results of 2026-10-11/12 (finale full victory about 40-50% at three investigators, solo about 30%, every night at or above its target) were measured with stand-in decks and must be re-run before they are trusted. Flagged by the real-deck runs: Seraphine is defeated in 11 of 25 two-investigator Night 1 games.
+4. Art: 21 illustrations still to paint (stand-in crops today). Prompts: docs/CHATGPT_ART_PACK.md, "Still to paint" (one image per ChatGPT chat; save as the number, import with python3 pipeline/import_art.py).
+How to load: HOW TO LOAD below and docs/LOADING.md.
 
 STATUS 2026-10-12 (later)
 Balance across party sizes and nights: two, three and four investigators win the finale about equally often; solo was far too hard and now has two solo finale rules (the boss forms get -1 fight and -1 evade, and a fallen form turns the clock back 2 Hours). Night costs adjusted so no night dips below its target. Fixed a table bug: Clear Board while the Appointed was out left its card behind and blocked the Square's next Place. Art: three new paintings imported; 20 still to paint from the art request page. Simulation, not a playtest.
