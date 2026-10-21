@@ -37,7 +37,8 @@ LUA = shutil.which("lua5.2")
 
 @pytest.mark.parametrize("script", ["play_engine_regressions.lua", "play_engine_independent.lua", "play_engine_upgrades.lua",
                                     "play_engine_final_independent.lua", "play_engine_objective_windows.lua",
-                                    "play_engine_balance_costs.lua", "play_engine_encounter_draws.lua"])
+                                    "play_engine_balance_costs.lua", "play_engine_encounter_draws.lua",
+                                    "play_engine_starter_cards.lua"])
 @pytest.mark.parametrize("lua", ["lua5.2", "lua5.4"])
 def test_campaign_rules_interactions(script, lua):
     exe = shutil.which(lua)
@@ -83,6 +84,63 @@ def test_effects_table_covers_every_scenario_card(tmp_path):
     assert not missing, "scenario cards with no entry in the effects table: %s" % missing
     unknown = sorted(i for i in have if i not in all_cards)
     assert not unknown, "effects for cards the campaign does not have: %s" % unknown
+
+
+CODED_LUA = r"""
+local R, T = {}, { E = {}, J = {} }
+local P = dofile(arg[1] .. "/players.lua")(R, T)
+local names = {}
+for n in pairs(P.CODED) do names[#names + 1] = n end
+io.write(table.concat(names, "\n"))
+"""
+
+
+def _starter_doc_cards():
+    """{investigator heading: {card names}} from docs/STARTER_DECKS.md's list tables."""
+    import re
+    out, inv = {}, None
+    for line in open(os.path.join(ROOT, "docs", "STARTER_DECKS.md"), encoding="utf-8"):
+        if line.startswith("## "):
+            inv = line[3:].strip()
+        m = re.match(r"\|\s*(\d+)\s*\|\s*([^|]+?)\s*\|\s*(Asset|Event|Skill)\s*\|", line)
+        if m and inv:
+            name = m.group(2).split(" \u2014 ")[0]          # "Jim Culver — Haunted Musician": the subtitle is not the name
+            out.setdefault(inv, {})[name.replace("\u201c", '"').replace("\u201d", '"')] = int(m.group(1))
+    return out
+
+
+def test_engine_plays_the_seated_starter_decks():
+    import re
+    # decks.py reads the ids the Control seats from, so the engine's decks cannot drift from them
+    import decks
+    seated = json.load(open(os.path.join(ROOT, "campaigns", "still_hour", "starter_decks.json"), encoding="utf-8"))
+    assert decks.LISTS == {inv: [(cid, n) for cid, n in rows] for inv, rows in seated.items()}
+    assert set(decks.LISTS) == {"sthrelias", "sthrayako", "sthrcass", "sthrbirdie", "sthrseraphine"}
+    assert all(sum(n for _, n in rows) == 30 for rows in decks.LISTS.values())
+    doc = _starter_doc_cards()
+    assert len(doc) == 5 and all(sum(d.values()) == 30 for d in doc.values()), doc
+    who = {"Elias": "sthrelias", "Ayako": "sthrayako", "Cass": "sthrcass", "Birdie": "sthrbirdie", "Seraphine": "sthrseraphine"}
+    by_inv = {next(i for k, i in who.items() if k in heading): cards for heading, cards in doc.items()}
+    assert set(by_inv) == set(seated)
+    for inv, cards in by_inv.items():
+        # every row of a list resolves to one id with the same number of copies
+        assert sorted(cards.values()) == sorted(n for _, n in seated[inv]), inv
+        # every XP upgrade replaces a card the deck holds (or an upgrade bought before it)
+        held = set(cards)
+        for _xp, old, new, _n in decks.UPGRADES[inv]:
+            assert old in held, (inv, old, new)
+            held |= {new, re.sub(r" \(\d\)$", "", new)}
+
+
+@pytest.mark.skipif(not LUA, reason="no lua5.2 installed")
+def test_every_starter_deck_card_is_encoded(tmp_path):
+    script = tmp_path / "coded.lua"
+    script.write_text(CODED_LUA)
+    out = subprocess.run([LUA, str(script), os.path.join(ENGINE, "lua")], capture_output=True, text=True, timeout=60)
+    assert out.returncode == 0, out.stderr
+    coded = set(out.stdout.split("\n"))
+    missing = sorted({n for cards in _starter_doc_cards().values() for n in cards} - coded)
+    assert not missing, "starter deck cards the play engine does not encode: %s" % missing
 
 
 USERDATA_LUA = r"""
@@ -169,6 +227,7 @@ def test_one_short_game_per_scenario(clean_tree):
     r = run.run_batch(SAVE, None, 3, 0, 0, jobs=jobs, max_rounds=2, timeout=1800)
     assert r["coverage"] is not None, r["stderr"][-3000:]
     assert not r["coverage"]["missing"], r["coverage"]["missing"]
+    assert not r["coverage"].get("player_missing"), r["coverage"]["player_missing"]
     games = r["games"]
     assert len(games) == len(run.SCENARIOS), "played %d of %d: %s" % (len(games), len(run.SCENARIOS),
                                                                      r["stderr"][-3000:] or r["stdout_tail"])

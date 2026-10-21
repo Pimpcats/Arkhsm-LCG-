@@ -53,7 +53,11 @@ return function(R, T)
       end
     end
     local total = base + boost
-    for _, c in ipairs(committed) do total = total + c.icons end
+    local defy = {}           -- Defiance: the chosen symbols are ignored (modifier and effects)
+    for _, c in ipairs(committed) do
+      total = total + c.icons
+      if c.defy then defy[c.defy] = true end
+    end
     -- RR ST.2 -> ST.3: the second player window precedes token reveal.
     -- A test inside an encounter therefore can offer a paid objective even
     -- though Mythos has not yet reached its general post-draw player window.
@@ -91,6 +95,10 @@ return function(R, T)
       end
       -- Quest back: after you reveal a symbol token: 1 Memory (limit twice per game)
       if inv.id == "sthrcass" and name and tonumber(name) == nil then P.memoryReaction(inv, "Cass: revealed a symbol token") end
+      if not cancelled and defy[name] then
+        cancelled = true
+        R.log("Defiance: %s ignores %s", inv.name, name)
+      end
       if not cancelled and total >= diff and (mod == nil or total + mod < diff)
          and P.cancelToken(inv, name, mod and total + mod - diff or -1, total - diff, opts) then cancelled = true end
       tokenName = cancelled and "Canceled" or name
@@ -318,14 +326,23 @@ return function(R, T)
   function R.enemyAttack(en, inv, why)
     local G = R.G
     if inv.defeated or en.dead then return end
+    -- "Get behind me!" / Heroic Rescue: another investigator here takes the attack
+    local redirect = P.redirectAttack(inv, en)
+    if redirect then
+      inv = redirect.to
+      if en.engaged ~= inv then en.engaged = inv ; R.placeEnemy(en) end
+    end
     if P.dodge(inv, en) then return end
     G.metrics.attacks = G.metrics.attacks + 1
     R.log("%s attacks %s (%s)", en.name, inv.name, why or "")
-    local dealt = R.hurt(inv, en.def.damage or 0, en.def.horror or 0, en.name, { enemy = en })
+    local hor = math.max(0, (en.def.horror or 0) - (redirect and redirect.cancelHorror or 0))
+    local dealt = R.hurt(inv, en.def.damage or 0, hor, en.name, { enemy = en })
+    if redirect and redirect.damage and not en.dead and not inv.defeated then R.damageEnemy(en, redirect.damage, inv, "Heroic Rescue") end
     -- The House Always Wins, Forced: after its attack deals damage, that investigator discards 2 resources
     if en.id == "sthr-housewins" and dealt and dealt.damage > 0 then inv.resources = math.max(0, inv.resources - 2) end
     FX.afterAttack(en, inv)
     if en.id == "weakness:Silver Twilight Acolyte" or en.name == "Silver Twilight Acolyte" then R.placeDoom(1, "Silver Twilight Acolyte (doom)") end
+    P.afterEnemyAttack(inv, en, dealt)
   end
 
   --- Attacks of opportunity before a provoking action.
@@ -359,7 +376,12 @@ return function(R, T)
 
   local A_ = {}
   R.ACT = A_
+  local function G_ended() return R.G.ended end
 
+  --- Investigate. opts (cards that investigate): skill (Rite of Seeking: [wil]),
+  -- bonus (Read the Signs, Lockpicks), extraClues on success, resources (Burglary:
+  -- gain them instead of discovering clues), noFlash (not the Flashlight's own action).
+  -- Returns success, margin, token.
   function A_.investigate(inv, opts)
     opts = opts or {}
     local L = R.locOf(inv)
@@ -369,26 +391,38 @@ return function(R, T)
       fl.uses = fl.uses - 1
       shroud = math.max(0, shroud - 2)
     end
-    local ok, margin = R.test(inv, "int", shroud, { kind = "investigate", important = opts.important, target = opts.target })
+    local ok, margin, token = R.test(inv, opts.skill or "int", shroud, { kind = "investigate", important = opts.important,
+      target = opts.target, bonus = opts.bonus })
+    if G_ended() then return ok, margin, token end
     if ok then
-      local n = 1 + P.resultBonus(inv, "Deduction", margin)
-      R.discover(inv, L, n)
+      if opts.resources then
+        inv.resources = inv.resources + opts.resources
+      else
+        local n = 1 + P.resultBonus(inv, "Deduction", margin) + (opts.extraClues or 0)
+        R.discover(inv, L, n)
+      end
       if P.findAsset(inv, "Dr. Milan Christopher") then inv.resources = inv.resources + 1 end
+    elseif not inv.defeated then
+      P.lookWhatIFound(inv, L, margin)
     end
-    return ok
+    return ok, margin, token
   end
 
   function A_.move(inv, to, opts)
     R.moveInv(inv, to, opts)
   end
 
-  function A_.fight(inv, en, weapon)
+  --- Fight. extra (cards that fight): skill (Backstab: [agi]), bonus, fightMod (the
+  -- enemy's fight for this attack: Improvised Weapon -1), extraDmg.
+  function A_.fight(inv, en, weapon, extra)
     local G = R.G
-    local skill = "com"
+    extra = extra or {}
+    local skill = extra.skill or "com"
     local w = weapon and P.WEAPON[weapon.name]
     if w and w[4] then skill = w[4] end
     if weapon and w and w[3] then weapon.uses = weapon.uses - 1 end
-    local ok, margin, token = R.test(inv, skill, R.enemyFight(en), { kind = "fight", weapon = weapon, enemy = en, important = true })
+    local ok, margin, token = R.test(inv, skill, math.max(0, R.enemyFight(en) + (extra.fightMod or 0)),
+      { kind = "fight", weapon = weapon, enemy = en, important = true, bonus = extra.bonus })
     if weapon and weapon.name:find("Shrivelling",1,true) and (token == "Skull" or token == "Cultist" or token == "Tablet"
         or token == "Elder Thing" or token == "Auto-fail") then
       R.hurt(inv, 0, weapon.name == "Shrivelling (5)" and 2 or 1, "Shrivelling")
@@ -397,7 +431,7 @@ return function(R, T)
       for i, a in ipairs(inv.assets) do if a == weapon then table.remove(inv.assets, i) inv.discard[#inv.discard + 1] = a.rec break end end
     end
     if ok then
-      local dmg = 1 + ((w and w[2]) or 0)
+      local dmg = 1 + ((w and w[2]) or 0) + (extra.extraDmg or 0)
       if weapon and weapon.name == "Shotgun (4)" then dmg = math.max(1, math.min(5, margin)) end
       if weapon and weapon.name == ".41 Derringer (2)" and margin < 1 then dmg = dmg - 1 end
       if weapon and weapon.name == "Switchblade (2)" and margin < 2 then dmg = dmg - 1 end
@@ -428,20 +462,22 @@ return function(R, T)
     return true
   end
 
+  --- Evade. opts: skill, blinding (Blinding Light), evadeMod and stealth (Stealth:
+  -- -2 evade; on success disengage without exhausting, and it cannot engage you this turn).
   function A_.evade(inv, en, opts)
     opts = opts or {}
     if R.cannotEvade(en) then return false end
-    local ok, _, token = R.test(inv, opts.skill or "agi", R.enemyEvade(en), { kind = "evade", enemy = en, important = true })
+    local ok, _, token = R.test(inv, opts.skill or "agi", math.max(0, R.enemyEvade(en) + (opts.evadeMod or 0)),
+      { kind = "evade", enemy = en, important = true })
     if opts.blinding and (token == "Skull" or token == "Cultist" or token == "Tablet" or token == "Elder Thing" or token == "Auto-fail") then
       inv.actionsLeft = math.max(0,(inv.actionsLeft or 0)-1)
       if opts.blinding >= 2 then R.hurt(inv,0,1,"Blinding Light") end
     end
     if ok then
-      en.exhausted = true
+      if opts.stealth then en.noEngage = inv else en.exhausted = true end
       if en.engaged then en.engaged = nil end
       R.placeEnemy(en)
-      local pp = P.findAsset(inv, "Pickpocketing")
-      if pp and not pp.exhausted then pp.exhausted = true ; P.draw(inv, 1) end
+      P.afterEvade(inv, en)
       if opts.blinding then R.damageEnemy(en, opts.blinding, inv, "Blinding Light") end
       R.G.metrics.evades = R.G.metrics.evades + 1
       FX.onEvade(inv, en)
@@ -484,7 +520,7 @@ return function(R, T)
   end
 
   --- Play a card from hand (asset or event); returns true if played.
-  function A_.play(inv, card)
+  function A_.play(inv, card, target)
     local G = R.G
     local n = card.name
     if card.type == "Asset" then
@@ -500,6 +536,51 @@ return function(R, T)
     R.log("%s plays %s", inv.name, n)
     if n == "Emergency Cache" then inv.resources = inv.resources + 3
     elseif n == "Working a Hunch" then R.discover(inv, R.locOf(inv), 1)
+    elseif n == "Burning the Midnight Oil" then
+      inv.resources = inv.resources + 2
+      A_.investigate(inv, { important = R.clues(R.locOf(inv)) > 0, noFlash = true })
+    elseif n == "Read the Signs" then
+      -- add your [wil] value to your skill value; 1 additional clue on success
+      A_.investigate(inv, { important = true, noFlash = true, extraClues = 1,
+        bonus = R.skillBase(inv, "wil") + P.staticBonus(inv, "wil", { kind = "investigate" }) })
+    elseif n == "Improvised Weapon" or n == "Backstab" then
+      local t = target or R.AI.bestEnemyHere(inv, function(en) return en.engaged == inv end)
+      if t and not t.dead then
+        if n == "Backstab" then A_.fight(inv, t, nil, { skill = "agi", extraDmg = 2 })
+        else A_.fight(inv, t, nil, { fightMod = -1, extraDmg = card.fromDiscard and 1 or 0 }) end
+      end
+      if n == "Improvised Weapon" and card.fromDiscard then
+        -- played from the discard pile: shuffled into the deck after it resolves
+        card.fromDiscard = nil
+        for i = #inv.discard, 1, -1 do if inv.discard[i] == card then table.remove(inv.discard, i) break end end
+        inv.deck[#inv.deck + 1] = card
+        R.shuffle(inv.deck)
+      end
+    elseif n == "Sneak By" then
+      inv.resources = inv.resources + 2
+      local t = target or R.AI.bestEnemyHere(inv, function(en) return en.engaged == inv end)
+      if t and not t.dead then A_.evade(inv, t) end
+    elseif n == "Scrounge for Supplies" then
+      -- a level 0 card from the discard pile to hand
+      local best, bi, bv
+      for i, c in ipairs(inv.discard) do
+        if c ~= card and (c.level or 0) == 0 and not c.weakness then
+          local v = R.AI.cardValue(inv, c)
+          if bv == nil or v > bv then best, bi, bv = c, i, v end
+        end
+      end
+      if best then
+        table.remove(inv.discard, bi)
+        inv.hand[#inv.hand + 1] = best
+        R.log("%s takes %s back", inv.name, best.name)
+      end
+    elseif n == "Meditative Trance" then
+      -- each filled arcane slot: heal 1 damage or 1 horror (the closer to defeat first)
+      for _ = 1, P.arcaneFilled(inv) do
+        if inv.damage == 0 and inv.horror == 0 then break end
+        if inv.horror > 0 and (inv.sanity - inv.horror <= inv.health - inv.damage or inv.damage == 0) then R.heal(inv, 0, 1)
+        else R.heal(inv, 1, 0) end
+      end
     elseif n == "Drawn to the Flame" then
       R.drawEncounter(inv)
       if not inv.defeated and not G.ended then R.discover(inv, R.locOf(inv), 2) end
@@ -587,10 +668,50 @@ return function(R, T)
     return true
   end
 
+  --- Play a card from the discard pile (Improvised Shield, Improvised Weapon).
+  function A_.playFromDiscard(inv, card, target)
+    for i = #inv.discard, 1, -1 do if inv.discard[i] == card then table.remove(inv.discard, i) break end end
+    if card.type == "Asset" then
+      inv.hand[#inv.hand + 1] = card        -- P.playAsset takes it from hand into play
+      P.playAsset(inv, card)
+      return true
+    end
+    inv.hand[#inv.hand + 1] = card
+    card.fromDiscard = true
+    return A_.play(inv, card, target)
+  end
+
   --- An [action] ability of an asset in play.
   function A_.assetAbility(inv, a, mode, target, repeating)
     local G = R.G
-    if a.name == "Encyclopedia (2)" then
+    R.log("%s uses %s", inv.name, a.name)
+    if a.name == "Clarity of Mind" then
+      a.uses = a.uses - 1
+      local t = target or R.AI.mostHorrorHere(inv)
+      if t then R.heal(t, 0, 1) end
+    elseif a.name == "Rite of Seeking" then
+      -- investigate using [wil]; 1 additional clue on success; a symbol token ends the turn
+      a.uses = a.uses - 1
+      local _, _, token = A_.investigate(inv, { skill = "wil", extraClues = 1, noFlash = true, important = true })
+      if token == "Skull" or token == "Cultist" or token == "Tablet" or token == "Elder Thing" or token == "Auto-fail" then
+        R.log("%s's Rite of Seeking ends the turn (%s)", inv.name, token)
+        inv.actionsLeft = 0
+      end
+    elseif a.name == "Burglary" then
+      a.exhausted = true
+      A_.investigate(inv, { resources = 3 })
+    elseif a.name == "Lockpicks" then
+      a.exhausted = true
+      local ok, margin = A_.investigate(inv, { noFlash = true, important = true,
+        bonus = R.skillBase(inv, "agi") + P.staticBonus(inv, "agi", { kind = "investigate" }) })
+      if not ok or (margin or -1) < 2 then
+        for i, x in ipairs(inv.assets) do if x == a then table.remove(inv.assets, i) ; inv.discard[#inv.discard + 1] = a.rec break end end
+        R.log("%s discards Lockpicks", inv.name)
+      end
+    elseif a.name == "Stealth" then
+      a.exhausted = true
+      if target and not target.dead then A_.evade(inv, target, { evadeMod = -2, stealth = true }) end
+    elseif a.name == "Encyclopedia (2)" then
       a.exhausted = true
       target = target or inv
       if target == inv or not target.round.nobodyBelieves then target.round.encyclopedia = {skill=mode or "int"} end
@@ -778,6 +899,10 @@ return function(R, T)
     end
     P.endTurn(inv)
     inv.turnDone = true
+    -- Stealth: "until the end of your turn, that enemy cannot engage you"
+    local stealthy = false
+    for _, en in ipairs(G.enemies) do if en.noEngage == inv then en.noEngage = nil ; stealthy = true end end
+    if stealthy and not inv.defeated and not G.ended then R.engageAt(R.locOf(inv)) end
   end
 
   -- a copy of a list to iterate while it changes (a move, attack or defeat can

@@ -1,8 +1,9 @@
 -- The player side (designer tooling): the five investigators of The Still
 -- Hour (their abilities, elder signs, signature cards and weaknesses, from
 -- the campaign's card data) and the level-0 SCED player cards the starting
--- decks use (tools/play_engine/decks.py picks them from the save's own
--- player-card bag; their effects are encoded here by name).
+-- decks use (tools/play_engine/decks.py reads the seated starter decks,
+-- campaigns/still_hour/starter_decks.json, and takes the cards from the save's
+-- own player-card bag; their effects are encoded here by name).
 
 return function(R, T)
   local E = T.E
@@ -12,7 +13,8 @@ return function(R, T)
   -- soak (health, sanity) of allies and armor
   local SOAK = { ["Guard Dog"] = { 3, 1 }, ["Beat Cop"] = { 2, 2 }, ["Dr. Milan Christopher"] = { 1, 2 },
                  ["Stray Cat"] = { 1, 1 }, ["Leo De Luca"] = { 2, 2 }, ["Leather Coat"] = { 2, 0 },
-                 ["Holy Rosary"] = { 0, 2 },
+                 ["Holy Rosary"] = { 0, 2 }, ["Medical Student"] = { 1, 1 }, ["Art Student"] = { 1, 2 },
+                 ["Research Librarian"] = { 1, 1 }, ["Jim Culver"] = { 2, 2 }, ["Improvised Shield"] = { 3, 0 },
                  -- XP cards (decks.py UPGRADES)
                  ["Elder Sign Amulet (3)"] = { 0, 4 }, ["Bulletproof Vest (3)"] = { 4, 0 }, ["Hired Muscle (1)"] = { 3, 1 },
                  ["Peter Sylvestre (2)"] = { 1, 3 } }
@@ -20,10 +22,12 @@ return function(R, T)
   local USES = { [".45 Automatic"] = 4, ["Flashlight"] = 3, ["First Aid"] = 3, ["Shrivelling"] = 4,
                  ["The Bell of Ambergrove"] = 4, ["The Lexicon of the Hour"] = 0, ["Stolen Minute"] = 2,
                  ["Shotgun (4)"] = 2, ["Lightning Gun (5)"] = 3, [".41 Derringer (2)"] = 3, ["Chicago Typewriter (4)"] = 4,
-                 ["Shrivelling (3)"] = 4, ["Shrivelling (5)"] = 4 }
+                 ["Shrivelling (3)"] = 4, ["Shrivelling (5)"] = 4,
+                 ["Clarity of Mind"] = 3, ["Rite of Seeking"] = 3, ["Hunter's Instinct"] = 3 }
   -- constant +skill while in play: name -> {skill, amount, when}
   local CONST = {
     ["Holy Rosary"] = { "wil", 1 }, ["Beat Cop"] = { "com", 1 }, ["Dr. Milan Christopher"] = { "int", 1 },
+    ["Jim Culver"] = { "wil", 1 },
     ["Magnifying Glass"] = { "int", 1, "investigate" },
     ["Hired Muscle (1)"] = { "com", 1 }, ["Peter Sylvestre (2)"] = { "agi", 1 },
   }
@@ -31,15 +35,19 @@ return function(R, T)
   local TALENT = { ["Physical Training"] = { wil = true, com = true }, ["Hard Knocks"] = { com = true, agi = true },
                    ["Dig Deep"] = { wil = true, agi = true }, ["Hyperawareness"] = { int = true, agi = true },
                    ["Arcane Studies"] = { wil = true, int = true },
+                   -- +2 instead on an evasion or parley (P.boosts)
+                   ["Silver Tongue"] = { int = true, agi = true },
                    ["Higher Education (3)"] = { wil = true, int = true }, ["Scrapper (3)"] = { com = true, agi = true },
                    ["Streetwise (3)"] = { int = true, agi = true } }
   -- weapons: name -> {skill bonus, extra damage, uses?, skill used}
   local WEAPON = { ["Machete"] = { 1, 1 }, [".45 Automatic"] = { 1, 1, true }, ["Knife"] = { 1, 0 },
+                   ["Survival Knife"] = { 1, 0 },
                    ["Switchblade"] = { 0, 0 }, ["Baseball Bat"] = { 2, 1 }, ["Shrivelling"] = { 0, 1, true, "wil" },
                    ["Shotgun (4)"] = { 3, 2, true }, ["Lightning Gun (5)"] = { 5, 2, true }, [".41 Derringer (2)"] = { 2, 1, true },
                    ["Chicago Typewriter (4)"] = { 2, 2, true }, ["Switchblade (2)"] = { 2, 1 },
                    ["Shrivelling (3)"] = { 2, 1, true, "wil" }, ["Shrivelling (5)"] = { 3, 2, true, "wil" } }
   P.WEAPON = WEAPON
+  P.USES = USES
   P.CODED = {}
   for _, t in ipairs({ SOAK, USES, CONST, TALENT, WEAPON }) do for k in pairs(t) do P.CODED[k] = true end end
   for _, n in ipairs({ "Vicious Blow", "Deduction", "Guts", "Perception", "Overpower", "Manual Dexterity",
@@ -47,6 +55,11 @@ return function(R, T)
                        "Working a Hunch", "Evidence!", "Dodge", "Elusive", "Sneak Attack", "Mind over Matter",
                        "Ward of Protection", "Blinding Light", "Drawn to the Flame", "Lucky!", "Cunning Distraction",
                        "Rabbit's Foot", "Pickpocketing", "Old Book of Lore", "Medical Texts", "First Aid",
+                       -- the starter decks' cards (docs/STARTER_DECKS.md)
+                       "\"Get behind me!\"", "Heroic Rescue", "Improvised Weapon", "Scrounge for Supplies",
+                       "Burning the Midnight Oil", "Read the Signs", "Eureka!", "Burglary", "Lockpicks", "Stealth",
+                       "Sticky Fingers", "Backstab", "Sneak By", "Live and Learn", "\"Look what I found!\"", "Take Heart",
+                       "Meditative Trance", "Defiance", "Cunning", "Encyclopedia (2)",
                        "Paranoia", "Amnesia", "Haunted", "Psychosis", "Hypochondria", "Mob Enforcer",
                        "Silver Twilight Acolyte", "Stubborn Detective", "Indebted", "Internal Injury", "Chronophobia" }) do
     P.CODED[n] = true
@@ -66,6 +79,11 @@ return function(R, T)
     ["Survival Instinct"] = "disengages other enemies on an evade success; the optional move is not selected",
     ["Survival Instinct (2)"] = "automatically evades other legal enemies on an evade success; the optional move is not selected",
     ["Magnifying Glass (1)"] = "fast play and +1 intellect; the optional return to hand is not selected",
+    ["Live and Learn"] = "re-reveals a chaos token at +2 (no new commits) before the failed test's effects resolve; played on important or treachery tests",
+    ["Read the Signs"] = "the option to ignore the location's effects during the investigation is not selected",
+    ["\"Get behind me!\""] = "played at the first enemy attack (not The Appointed's, not Massive) worth taking for a frailer investigator at the location; then redirects every such attack that phase",
+    ["Heroic Rescue"] = "played on an enemy attack (not The Appointed's, not Massive) worth taking for a frailer investigator at the location",
+    ["Hunter's Instinct"] = "triggers on any new engagement (enemy engages you or you engage it); takes the most useful level 0 event",
   }
 
   local BASIC_ENEMY = {
@@ -83,6 +101,11 @@ return function(R, T)
       or n == "Flashlight" or n == "Magnifying Glass" or n == "The Ambergrove Lamp"
       or n == "The Lexicon of the Hour" or n == "Cassandra's Notebook" or n == "Stolen Minute"
       or n == "Leo De Luca" or n == "Marked Deck" or n == "Rabbit's Foot" or n == "Lucky Compass"
+    -- one investigation tool (Lockpicks, Burglary, Rite of Seeking)
+    if n == "Lockpicks" or n == "Burglary" or n == "Rite of Seeking" then
+      if kept.tool then return false end
+      kept.tool=true ; useful=true
+    end
     if WEAPON[n] and (inv.id == "sthrelias" or inv.id == "sthrseraphine" or inv.id == "sthrbirdie") then
       if kept.weapon then return false end
       kept.weapon=true ; useful=true
@@ -191,6 +214,16 @@ return function(R, T)
     inv.discard[#inv.discard + 1] = card
   end
 
+  --- Filled arcane slots (Meditative Trance).
+  function P.arcaneFilled(inv)
+    local n = 0
+    for _, a in ipairs(inv.assets) do
+      local slot = a.rec and a.rec.slot or ""
+      if slot == "Arcane" then n = n + 1 elseif slot == "Arcane x2" then n = n + 2 end
+    end
+    return math.min(n, 2)
+  end
+
   function P.findAsset(inv, name)
     for _, a in ipairs(inv.assets) do if a.name == name then return a end end
     return nil
@@ -250,7 +283,188 @@ return function(R, T)
     R.syncMemory(inv)
     R.G.metrics.cards_played = R.G.metrics.cards_played + 1
     R.log("%s plays %s", inv.name, card.name)
+    P.onEnterPlay(inv, a)
     return a
+  end
+
+  --- Search the top n cards of the deck for the most useful one, draw it, shuffle (Eureka!).
+  function P.searchTop(inv, n)
+    local best, bi, bv
+    for k = 0, math.min(n, #inv.deck) - 1 do
+      local i = #inv.deck - k            -- the top of the deck is its last entry
+      local c = inv.deck[i]
+      local v = c.weakness and -1 or R.AI.cardValue(inv, c)
+      if v >= 0 and (bv == nil or v > bv) then best, bi, bv = c, i, v end
+    end
+    if best then
+      table.remove(inv.deck, bi)
+      inv.hand[#inv.hand + 1] = best
+      R.log("%s searches the top %d cards and draws %s", inv.name, n, best.name)
+    end
+    R.shuffle(inv.deck)
+  end
+
+  --- "After ... enters play" reactions of allies.
+  function P.onEnterPlay(inv, a)
+    local L = R.locOf(inv)
+    if a.name == "Medical Student" then
+      -- heal 1 damage and 1 horror from an investigator or Ally asset at your location
+      local t = R.AI.mostHurtHere(inv)
+      if t then R.heal(t, 1, 1) ; R.log("Medical Student heals %s", t.name) return end
+      for _, x in ipairs(L and R.investigatorsAt(L) or {}) do
+        for _, b in ipairs(x.assets) do
+          if b ~= a and b.rec and b.rec.slot == "Ally" and ((b.dmg or 0) > 0 or (b.hor or 0) > 0)
+             and (x == inv or not x.round.nobodyBelieves) then
+            b.dmg, b.hor = math.max(0, (b.dmg or 0) - 1), math.max(0, (b.hor or 0) - 1)
+            R.log("Medical Student heals %s's %s", x.name, b.name)
+            return
+          end
+        end
+      end
+    elseif a.name == "Art Student" then
+      -- discover 1 clue at your location
+      if L and L.revealed and R.clues(L) > 0 then R.discover(inv, L, 1) end
+    elseif a.name == "Research Librarian" then
+      -- search your deck for a Tome asset, add it to your hand, shuffle
+      for i = #inv.deck, 1, -1 do
+        local c = inv.deck[i]
+        if c.type == "Asset" and tostring(c.traits or ""):find("Tome", 1, true) then
+          table.remove(inv.deck, i)
+          inv.hand[#inv.hand + 1] = c
+          R.log("Research Librarian finds %s", c.name)
+          break
+        end
+      end
+      R.shuffle(inv.deck)
+    end
+  end
+
+  --- Hunter's Instinct: after you engage an enemy, spend 1 supply and exhaust:
+  -- add a level 0 event from your discard pile to your hand (discarded with no supplies).
+  function P.onEngaged(inv, en)
+    if inv.defeated then return end
+    for i, a in ipairs(inv.assets) do
+      if a.name == "Hunter's Instinct" and not a.exhausted and a.uses > 0 then
+        local best, bi, bv
+        for j, c in ipairs(inv.discard) do
+          if c.type == "Event" and (c.level or 0) == 0 and not c.weakness then
+            local v = R.AI.cardValue(inv, c)
+            if v >= 3 and (bv == nil or v > bv) then best, bi, bv = c, j, v end
+          end
+        end
+        if not best then return end
+        table.remove(inv.discard, bi)
+        inv.hand[#inv.hand + 1] = best
+        a.exhausted, a.uses = true, a.uses - 1
+        R.log("%s's Hunter's Instinct returns %s to hand", inv.name, best.name)
+        if a.uses <= 0 then table.remove(inv.assets, i) ; inv.discard[#inv.discard + 1] = a.rec end
+        return
+      end
+    end
+  end
+
+  --- Sticky Fingers and Pickpocketing: after you successfully evade an enemy.
+  function P.afterEvade(inv, en)
+    local pp = P.findAsset(inv, "Pickpocketing")
+    if pp and not pp.exhausted then pp.exhausted = true ; P.draw(inv, 1) end
+    local sf = P.findAsset(inv, "Sticky Fingers")
+    if sf and not sf.exhausted then sf.exhausted = true ; inv.resources = inv.resources + 1 end
+  end
+
+  --- Remaining health and sanity, counting soak in play, after taking d damage and h horror.
+  local function room(x, d, h)
+    local sh, ss = 0, 0
+    for _, a in ipairs(x.assets) do
+      sh = sh + math.max(0, (a.hp or 0) - (a.dmg or 0))
+      ss = ss + math.max(0, (a.sp or 0) - (a.hor or 0))
+    end
+    return x.health - x.damage + sh - d, x.sanity - x.horror + ss - h
+  end
+
+  --- "Get behind me!" / Heroic Rescue: an enemy would attack an investigator;
+  -- another investigator at that location may take the attack instead.
+  -- Returns {to, cancelHorror, damage} or nil.
+  function P.redirectAttack(target, en)
+    local G = R.G
+    if not en or not en.def or R.isMassive(en) or target.round.nobodyBelieves then return nil end
+    local dmg, hor = en.def.damage or 0, en.def.horror or 0
+    if dmg + hor <= 0 then return nil end
+    local L = R.locOf(target)
+    if not L then return nil end
+    local key = tostring(G.round) .. ":" .. tostring(G.phase)
+    for _, x in ipairs(R.investigatorsAt(L)) do
+      if x ~= target and not x.defeated and x.getBehind == key then
+        R.log("%s takes %s's attack instead (\"Get behind me!\")", x.name, en.name)
+        return { to = x, cancelHorror = 1 }
+      end
+    end
+    local th, ts = room(target, dmg, hor)
+    for _, x in ipairs(R.investigatorsAt(L)) do
+      if x ~= target and not x.defeated then
+        local xh, xs = room(x, dmg, math.max(0, hor - 1))
+        local worth = th <= 1 or ts <= 1 or (dmg + hor >= 2 and xh + xs > th + ts)
+        if worth then
+          for _, c in ipairs(x.hand) do
+            if c.name == "\"Get behind me!\"" and P.playCost(x, c) <= x.resources and xh >= 3 and xs >= 3 then
+              P.discardFromHand(x, c)
+              x.resources = x.resources - P.playCost(x, c)
+              x.getBehind = key
+              G.metrics.cards_played = G.metrics.cards_played + 1
+              R.log("%s plays \"Get behind me!\" and takes %s's attack", x.name, en.name)
+              return { to = x, cancelHorror = 1 }
+            end
+          end
+          for _, c in ipairs(x.hand) do
+            local rh, rs = room(x, dmg, hor)
+            if c.name == "Heroic Rescue" and not R.hasTrait(en.def, "Elite") and P.playCost(x, c) <= x.resources
+               and rh >= 2 and rs >= 2 then
+              P.discardFromHand(x, c)
+              x.resources = x.resources - P.playCost(x, c)
+              G.metrics.cards_played = G.metrics.cards_played + 1
+              R.log("%s plays Heroic Rescue and takes %s's attack", x.name, en.name)
+              return { to = x, damage = 1 }
+            end
+          end
+        end
+      end
+    end
+    return nil
+  end
+
+  --- Survival Knife: after an enemy attack deals damage to you during the enemy
+  -- phase, exhaust: fight that enemy with +2 [com] and +1 damage.
+  function P.afterEnemyAttack(inv, en, dealt)
+    if inv.defeated or en.dead or R.G.ended or R.G.phase ~= "enemy" or not dealt or dealt.damage <= 0 then return end
+    local knife = P.findAsset(inv, "Survival Knife")
+    if not knife or knife.exhausted then return end
+    local p = R.prob(inv, R.skillBase(inv, "com", { enemy = en }) + P.staticBonus(inv, "com", { kind = "fight", weapon = knife })
+      + 1 - R.enemyFight(en))
+    if p < 0.35 or (R.FX.cannotBeDamaged and R.FX.cannotBeDamaged(en)) then return end
+    knife.exhausted = true
+    R.log("%s strikes back with Survival Knife", inv.name)
+    R.ACT.fight(inv, en, knife, { bonus = 1, extraDmg = 1 })
+  end
+
+  --- Jim Culver: after you take damage and/or horror, exhaust: draw 1 card.
+  function P.afterHurt(inv)
+    local jim = P.findAsset(inv, "Jim Culver")
+    if jim and not jim.exhausted then jim.exhausted = true ; P.draw(inv, 1) end
+  end
+
+  --- "Look what I found!": after you fail an investigation by 2 or less, discover 2 clues here.
+  function P.lookWhatIFound(inv, L, margin)
+    if margin < -2 or not L or R.clues(L) <= 0 then return false end
+    for _, c in ipairs(inv.hand) do
+      if c.name == "\"Look what I found!\"" and P.playCost(inv, c) <= inv.resources then
+        P.discardFromHand(inv, c)
+        inv.resources = inv.resources - P.playCost(inv, c)
+        R.G.metrics.cards_played = R.G.metrics.cards_played + 1
+        R.log("%s plays \"Look what I found!\"", inv.name)
+        R.discover(inv, L, 2)
+        return true
+      end
+    end
+    return false
   end
 
   ------------------------------------------------------------ weaknesses --
@@ -353,6 +567,7 @@ return function(R, T)
       local t = TALENT[a.name]
       local price, gain = a.name == "Streetwise (3)" and 2 or 1, a.name == "Streetwise (3)" and 3 or 1
       if a.name == "Higher Education (3)" then gain = 2 end
+      if a.name == "Silver Tongue" and (opts.kind == "evade" or opts.kind == "parley") then gain = 2 end
       if t and t[skill] and inv.resources >= price and (a.name ~= "Higher Education (3)" or #inv.hand >= 5) then
         out[#out + 1] = { gain = gain, price = price, cost = "resource", repeatable = true, asset = a,
           pay = function() inv.resources = inv.resources - price end }
@@ -401,6 +616,10 @@ return function(R, T)
           if (skill == "com" or skill == "agi") and ((inv.years or 0) >= 5 or inv.bracket == "Weathered" or inv.bracket == "Elder" or inv.bracket == "Ancient") then n = n + 1 end
         end
         if c.name == "Foreknowledge" then n = ((inv.memory or 0) > 0) and 3 or 2 end
+        -- Cunning gains [int][agi] with 5 or more resources ([int][int][agi][agi] with 10 or more)
+        if c.name == "Cunning" and (skill == "int" or skill == "agi") then
+          n = 1 + (inv.resources >= 5 and 1 or 0) + (inv.resources >= 10 and 1 or 0)
+        end
         if c.name == "I've Done This Before" and opts.helper then n = 0 end
         if c.name == "Opportunist" and opts.helper then n = 0 end
         if n > 0 then
@@ -433,10 +652,40 @@ return function(R, T)
         T.api("shApiTally", { id = inv.id, kind = "spent", delta = 1 })
         c.icons, c.memoryPaid = 3, true
       end
-    elseif card.name == "Muscle Memory" and inv.testedTypes[skill] then c.drawOnSuccess = true end
+    elseif card.name == "Muscle Memory" and inv.testedTypes[skill] then c.drawOnSuccess = true
+    elseif card.name == "Defiance" then c.defy = P.defianceSymbol(opts.taker or inv) end
     committed[#committed + 1] = c
     inv.lastCommitted = inv.lastCommitted or {}
     return c
+  end
+
+  --- Defiance: the symbol to ignore, the one in the bag with the worst modifier for the test taker.
+  function P.defianceSymbol(inv)
+    local best, bv
+    local present = {}
+    for _, name in ipairs(R.bag()) do present[name] = true end
+    for _, name in ipairs({ "Skull", "Cultist", "Tablet", "Elder Thing" }) do
+      if present[name] then
+        local v = R.FX.tokenValue(name, inv) or -99
+        if bv == nil or v < bv then best, bv = name, v end
+      end
+    end
+    return best or "Skull"
+  end
+
+  --- Take Heart (any test, max 1): committed by the test taker when the test will likely fail.
+  function P.takeHeart(inv, committed)
+    for _, c in ipairs(committed) do if c.card.name == "Take Heart" then return nil end end
+    for _, c in ipairs(inv.hand) do
+      if c.name == "Take Heart" then
+        P.discardFromHand(inv, c)
+        table.remove(inv.discard)
+        local e = { card = c, icons = 0, owner = inv }
+        committed[#committed + 1] = e
+        return e
+      end
+    end
+    return nil
   end
 
   -- These skills change the test taker's result, including when a helper
@@ -517,6 +766,10 @@ return function(R, T)
       if ok and n == "Fearless" then R.heal(c.owner, 0, (c.card.level or 0) >= 2 and margin >= 2 and 2 or 1) end
       if ok and n == "Foreknowledge" and c.memoryPaid then P.draw(c.owner, 1) end
       if ok and n == "Muscle Memory" and c.drawOnSuccess then P.draw(c.owner, 1) end
+      -- Take Heart: if this test fails, the performing investigator draws 2 cards and gains 2 resources
+      if not ok and n == "Take Heart" then P.draw(inv, 2) ; inv.resources = inv.resources + 2 end
+      -- Eureka!: if successful, the performing investigator searches the top 3 cards of their deck for one
+      if ok and n == "Eureka!" then P.searchTop(inv, 3) end
       if ok and n == "Survival Instinct" and opts.kind == "evade" then
         for _, en in ipairs(G.enemies) do
           if en.engaged == inv and en ~= opts.enemy then
@@ -818,7 +1071,9 @@ return function(R, T)
   -- your discard pile to your hand (once per round). Policy: only an event
   -- that is worth having again; Lucky! first. Returns true if one came back.
   local RECUR = { ["Lucky!"] = 9, ["Emergency Cache"] = 6, ["Cunning Distraction"] = 5, ["Rehearsed Escape"] = 7,
-                  ["Elusive"] = 5, ["Dodge"] = 8, ["Working a Hunch"] = 6 }
+                  ["Elusive"] = 5, ["Dodge"] = 8, ["Working a Hunch"] = 6, ["\"Look what I found!\""] = 7,
+                  ["Live and Learn"] = 6, ["Scrounge for Supplies"] = 3, ["Improvised Weapon"] = 3 }
+  P.RECUR = RECUR
   function P.birdieRecur(inv)
     if inv.id ~= "sthrbirdie" or (inv.resolve or 0) < 2 or inv.round.recur then return false end
     local best, bv
@@ -850,6 +1105,18 @@ return function(R, T)
   end
 
   function P.retryTest(inv, opts)
+    -- Live and Learn: attempt the failed test again at +2
+    if opts.important or opts.kind == "treachery" then
+      for _, c in ipairs(inv.hand) do
+        if c.name == "Live and Learn" and P.playCost(inv, c) <= inv.resources then
+          P.discardFromHand(inv, c)
+          inv.resources = inv.resources - P.playCost(inv, c)
+          R.G.metrics.cards_played = R.G.metrics.cards_played + 1
+          R.log("%s plays Live and Learn", inv.name)
+          return true
+        end
+      end
+    end
     if not opts.important then return false end
     for _, c in ipairs(inv.hand) do
       if c.name == "This Time, For Sure" or c.name == "This Time For Sure" then

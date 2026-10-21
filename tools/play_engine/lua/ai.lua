@@ -157,6 +157,14 @@ return function(R, T)
     return best
   end
 
+  function A.mostHorrorHere(inv)
+    local best, bv
+    for _, x in ipairs(R.investigatorsAt(R.locOf(inv))) do
+      if (x == inv or not x.round.nobodyBelieves) and x.horror > 0 and (bv == nil or x.horror > bv) then best, bv = x, x.horror end
+    end
+    return best
+  end
+
   --- The location a hunter moves toward: its prey among the nearest investigators.
   function A.huntTarget(en)
     local G = R.G
@@ -474,6 +482,8 @@ return function(R, T)
         end
       end
     end
+    -- Take Heart pays off on a test that will likely fail
+    if cur < 0.35 then P.takeHeart(inv, committed) end
     return committed, boost
   end
 
@@ -554,15 +564,91 @@ return function(R, T)
     ["Switchblade (2)"] = { "sthrcass", 5 }, [".41 Derringer (2)"] = { "sthrcass", 7 }, ["Hired Muscle (1)"] = { nil, 5 },
     ["Chicago Typewriter (4)"] = { "sthrcass", 9 }, ["Streetwise (3)"] = { nil, 5 }, ["Shrivelling (3)"] = { "sthrseraphine", 8 },
     ["Shrivelling (5)"] = { "sthrseraphine", 9 }, ["Peter Sylvestre (2)"] = { nil, 6 }, ["Scrapper (3)"] = { nil, 4 },
+    -- the starter decks' assets
+    ["Survival Knife"] = { "sthrelias", 6 }, ["Medical Student"] = { nil, 4 }, ["Art Student"] = { nil, 4 },
+    ["Research Librarian"] = { nil, 3 }, ["Jim Culver"] = { nil, 6 }, ["Rite of Seeking"] = { "sthrseraphine", 7 },
+    ["Clarity of Mind"] = { nil, 3 }, ["Burglary"] = { "sthrcass", 5 }, ["Lockpicks"] = { "sthrcass", 7 },
+    ["Silver Tongue"] = { nil, 4 }, ["Stealth"] = { nil, 4 }, ["Sticky Fingers"] = { nil, 3 },
+    ["Hunter's Instinct"] = { nil, 3 }, ["Improvised Shield"] = { nil, 4 },
   }
-  local function assetScore(inv, c)
+  -- what an asset already in play is worth keeping (its slot is wanted by another):
+  -- allies whose value was entering play are worth only their soak
+  local KEEP = { ["Art Student"] = 2, ["Research Librarian"] = 1, ["Medical Student"] = 2 }
+  local function keepValue(a)
+    if (P.USES[a.name] or (a.rec and a.rec.uses and a.rec.uses[1] and a.rec.uses[1].type ~= "Universal")) and (a.uses or 0) <= 0 then
+      return 0
+    end
+    if KEEP[a.name] then return KEEP[a.name] end
+    local w = WANT[a.name]
+    return w and w[2] or 3
+  end
+  local function slotOf(s)
+    if not s then return nil, 0 end
+    return s:gsub(" x2$", ""), s:find(" x2$", 1) and 2 or 1
+  end
+  --- Assets this card would push out of play (slots), and the least of their worths.
+  local function displaced(inv, c)
+    local want, required = slotOf(c.slot)
+    if not want then return 0 end
+    local cap = (want == "Hand" or want == "Arcane") and 2 or 1
+    local used, worst = 0, nil
+    for _, a in ipairs(inv.assets) do
+      local s2, n2 = slotOf(a.rec and a.rec.slot)
+      if s2 == want then
+        used = used + n2
+        local v = keepValue(a)
+        if worst == nil or v < worst then worst = v end
+      end
+    end
+    if used + required <= cap then return 0 end
+    return worst or 0
+  end
+  local function assetScore(inv, c, fromDiscard)
     local w = WANT[c.name]
     if not w then return 0 end
+    if c.name == "Improvised Shield" and not fromDiscard then return 0 end   -- played only from the discard pile
     if w[1] and w[1] ~= inv.id then return w[2] * 0.3 end
     for _, a in ipairs(inv.assets) do if a.name == c.name and (c.name ~= "Knife") then return 0 end end
     local s = w[2]
     if R.G.round <= 2 then s = s + 1 end
+    local L = R.locOf(inv)
+    if c.name == "Art Student" and L and L.revealed and R.clues(L) > 0 then s = s + 4 end
+    if c.name == "Medical Student" then
+      local t = A.mostHurtHere(inv)
+      if t and t.damage + t.horror >= 2 then s = s + 3 end
+    end
+    if c.name == "Research Librarian" then
+      for _, d in ipairs(inv.deck) do if d.type == "Asset" and tostring(d.traits or ""):find("Tome", 1, true) then s = s + 3 break end end
+    end
+    -- a full slot: only for something clearly better than what it replaces
+    local occ = displaced(inv, c)
+    if occ > 0 then
+      if s <= occ + 3 then return 0 end
+      s = s - occ * 0.5
+    end
     return s
+  end
+
+  --- What a card is worth having in hand (Eureka!, Scrounge for Supplies, Hunter's Instinct).
+  local EVENT_VALUE = { ["Emergency Cache"] = 4, ["Evidence!"] = 4, ["Heroic Rescue"] = 4, ["\"Get behind me!\""] = 4,
+    ["Improvised Weapon"] = 3, ["Scrounge for Supplies"] = 2, ["Burning the Midnight Oil"] = 4, ["Read the Signs"] = 6,
+    ["Backstab"] = 5, ["Sneak By"] = 4, ["Sneak Attack"] = 4, ["Meditative Trance"] = 3, ["Mind over Matter"] = 3,
+    ["Ward of Protection"] = 5, ["Blinding Light"] = 5 }
+  function A.cardValue(inv, c)
+    if c.weakness then return -1 end
+    if c.type == "Asset" then
+      if c.name == "Improvised Shield" then return 1 end          -- it is played from the discard pile
+      local w = WANT[c.name]
+      if not w then return 2 end
+      if w[1] and w[1] ~= inv.id then return w[2] * 0.3 end
+      for _, a in ipairs(inv.assets) do if a.name == c.name and c.name ~= "Knife" then return 1 end end
+      return w[2]
+    elseif c.type == "Event" then
+      return EVENT_VALUE[c.name] or P.RECUR[c.name] or 2
+    end
+    local icons = 0
+    for _, v in pairs(c.icons or {}) do icons = icons + (tonumber(v) or 0) end
+    return 1 + icons
   end
 
   --- Choose the next action: {kind, actions, provokes, run}.
@@ -616,6 +702,40 @@ return function(R, T)
       end
       add(fightScore, "fight", function() R.ACT.fight(inv, en, weapon) end, { provokes = false })
       add(evadeScore, "evade", function() R.ACT.evade(inv, en) end, { provokes = false })
+      -- events that fight (Improvised Weapon: -1 fight, +1 damage from the discard pile;
+      -- Backstab: [agi], +2 damage) or evade (Sneak By: 2 resources), and Stealth
+      local function cardFight(c, fromDiscard)
+        local skill = c.name == "Backstab" and "agi" or "com"
+        local diff = R.enemyFight(en) - (c.name == "Improvised Weapon" and 1 or 0)
+        local p = R.prob(inv, R.skillBase(inv, skill, { enemy = en }) + P.staticBonus(inv, skill, { kind = "fight" }) - diff + 1)
+        local dmg = c.name == "Backstab" and 3 or (fromDiscard and 2 or 1)
+        local s = (30 + threat) * p / math.ceil(left / dmg)
+        if en.form and not FX.cannotBeDamaged(en) then s = (40 + threat) * p * math.min(1, dmg / math.max(1, left)) + 4 * (dmg - 1) end
+        if (inv.health - inv.damage) <= (en.def.damage or 0) + 1 then s = s * 0.7 end
+        if G.finale and en.id == "sthr-uninvited" then s = s * 1.6 end
+        return s - (c.name == "Backstab" and 3 or (fromDiscard and 1 or 2))
+      end
+      for _, c in ipairs(inv.hand) do
+        if (c.name == "Improvised Weapon" or c.name == "Backstab") and P.playCost(inv, c) <= inv.resources then
+          add(cardFight(c, false), "fight", function() R.ACT.play(inv, c, en) end, { provokes = false })
+        end
+        if c.name == "Sneak By" and evadeScore > 0 then
+          add(evadeScore + 2, "evade", function() R.ACT.play(inv, c, en) end, { provokes = false })
+        end
+      end
+      for _, c in ipairs(inv.discard) do
+        if c.name == "Improvised Weapon" and P.playCost(inv, c) <= inv.resources then
+          add(cardFight(c, true), "fight", function() R.ACT.playFromDiscard(inv, c, en) end, { provokes = false })
+          break
+        end
+      end
+      local stealth = P.findAsset(inv, "Stealth")
+      if stealth and not stealth.exhausted and evadeScore > 0 then
+        local pe2 = R.prob(inv, R.skillBase(inv, "agi", { enemy = en }) + P.staticBonus(inv, "agi", { kind = "evade" }) - R.enemyEvade(en) + 3)
+        -- it disengages without exhausting: worth less, and nothing against an enemy that must be exhausted
+        local s = (26 + threat) * pe2 * (wantEvade and 0.3 or 0.85)
+        add(s, "evade", function() R.ACT.assetAbility(inv, stealth, nil, en) end, { provokes = false })
+      end
     end
     if worst then
       local en = worst
@@ -741,8 +861,8 @@ return function(R, T)
     -- 4. clues here
     local need = A.need(act, inv)
     local clues = L.revealed and R.clues(L) or 0
-    if clues > 0 then
-      local p = A.invP(inv, "int", R.shroud(L), "investigate")
+    local shroud = L.revealed and R.shroud(L) or 0
+    local function invScore(p)
       local score
       if act and need > 0 then score = 18 + 14 * p
       elseif spec.sequence and A.actLocation(act, inv) == L then score = 40 + 10 * p
@@ -755,7 +875,49 @@ return function(R, T)
       if G.finale then score = 1 end            -- clues win nothing in the finale
       local targetHere = act and A.actLocation(act, inv) == L
       if not targetHere then score = score - 2 * A.danger(L, inv) end
-      add(score, "investigate", function() R.ACT.investigate(inv, { important = need > 0 }) end)
+      return score
+    end
+    -- skill values while investigating (cards in hand add about one point)
+    local handExtra = (#inv.hand >= 3 and 1 or 0)
+    local function value(skill) return R.skillBase(inv, skill) + P.staticBonus(inv, skill, { kind = "investigate" }) end
+    if clues > 0 then
+      local p = A.invP(inv, "int", shroud, "investigate")
+      add(invScore(p), "investigate", function() R.ACT.investigate(inv, { important = need > 0 }) end)
+      -- cards that investigate: an additional clue is worth most while the act needs it
+      local more = (need >= 2 and clues >= 2) and 5 or (clues >= 2 and 1 or 0)
+      for _, c in ipairs(inv.hand) do
+        if c.name == "Read the Signs" and P.playCost(inv, c) <= inv.resources then
+          local pr = R.prob(inv, value("int") + value("wil") - shroud + handExtra)
+          add(invScore(pr) + more - 2, "investigate", function() R.ACT.play(inv, c) end)
+        elseif c.name == "Burning the Midnight Oil" then
+          add(invScore(p) + 3, "investigate", function() R.ACT.play(inv, c) end)
+        end
+      end
+      local rite = P.findAsset(inv, "Rite of Seeking")
+      if rite and rite.uses > 0 then
+        local pr = R.prob(inv, value("wil") - shroud + handExtra)
+        -- a symbol token ends the turn: the actions it would cost
+        local bag, sym = R.bag(), 0
+        for _, t in ipairs(bag) do
+          if t == "Skull" or t == "Cultist" or t == "Tablet" or t == "Elder Thing" or t == "Auto-fail" then sym = sym + 1 end
+        end
+        local lose = (#bag > 0 and sym / #bag or 0) * 5 * math.max(0, (inv.actionsLeft or 1) - 1)
+        add(invScore(pr) + more - lose, "investigate", function() R.ACT.assetAbility(inv, rite) end)
+      end
+      local picks = P.findAsset(inv, "Lockpicks")
+      if picks and not picks.exhausted then
+        local v = value("int") + value("agi") - shroud + handExtra
+        local pr, keep = R.prob(inv, v), R.prob(inv, v - 2)
+        add(invScore(pr) - (1 - keep) * 3, "investigate", function() R.ACT.assetAbility(inv, picks) end)
+      end
+    end
+    -- Burglary: an investigation that gains 3 resources instead of clues
+    local burglary = P.findAsset(inv, "Burglary")
+    if burglary and not burglary.exhausted and L.revealed and not G.finale then
+      local pr = R.prob(inv, value("int") - shroud + handExtra)
+      local s = (inv.resources <= 6 and 5 or 2.5) + 5 * pr
+      if clues > 0 and act and need > 0 then s = s - 3 end
+      add(s, "investigate", function() R.ACT.assetAbility(inv, burglary) end)
     end
 
     -- 5. move toward the target
@@ -871,6 +1033,28 @@ return function(R, T)
         if n == "I Remember the Ending" and not inv.loopUsed.rememberEnding and R.hour() >= 3 then
           add(17, "play", function() R.ACT.play(inv, c) end)
         end
+        if n == "Scrounge for Supplies" then
+          local bv = 0
+          for _, d in ipairs(inv.discard) do
+            if (d.level or 0) == 0 and not d.weakness then bv = math.max(bv, A.cardValue(inv, d)) end
+          end
+          if bv >= 4 then add(2 + 0.8 * bv, "play", function() R.ACT.play(inv, c) end) end
+        end
+        if n == "Meditative Trance" then
+          local heal = math.min(P.arcaneFilled(inv), inv.damage + inv.horror)
+          if heal >= 1 then
+            if A.frail(inv) then add(22, "play", function() R.ACT.play(inv, c) end)
+            elseif inv.damage + inv.horror >= 3 then add(4 * heal, "play", function() R.ACT.play(inv, c) end) end
+          end
+        end
+      end
+    end
+    -- Improvised Shield is played from the discard pile
+    for _, c in ipairs(inv.discard) do
+      if c.name == "Improvised Shield" and P.playCost(inv, c) <= inv.resources then
+        local s = assetScore(inv, c, true)
+        if s > 0 then add(s + (#eng > 0 and 3 or 0), "play", function() R.ACT.playFromDiscard(inv, c) end) end
+        break
       end
     end
     for _, a in ipairs(inv.assets) do
@@ -894,6 +1078,11 @@ return function(R, T)
         elseif t and (t.damage + t.horror) >= 3 then add(8, "ability", function() R.ACT.assetAbility(inv, a) end) end
       end
       if a.name == "Old Book of Lore" and not a.exhausted and #inv.hand <= 3 then add(3, "ability", function() R.ACT.assetAbility(inv, a) end) end
+      if a.name == "Clarity of Mind" and a.uses > 0 then
+        local t = A.mostHorrorHere(inv)
+        if t and t.sanity - t.horror <= 2 then add(30, "ability", function() R.ACT.assetAbility(inv, a, nil, t) end)
+        elseif t and t.horror >= 2 then add(8, "ability", function() R.ACT.assetAbility(inv, a, nil, t) end) end
+      end
       if a.name == "Encyclopedia (2)" and not a.exhausted and clues > 1 and need > 0 and inv.actionsLeft >= 2
          and not inv.round.encyclopedia then
         add(36, "ability", function() R.ACT.assetAbility(inv, a, "int", inv) end)

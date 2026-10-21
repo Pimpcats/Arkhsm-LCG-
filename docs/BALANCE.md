@@ -416,3 +416,13 @@ Engine, 3 investigators, target -> result: Prologue 80 -> 83%, night 1 80 ->
 76%, night 3 70 -> 76%, nights 4-5 60 -> 66%, nights 6-7 50 -> 45%, finale
 40 -> 38% (1p 42%, 2p 38%, 4p 27%). Details: docs/design/PLAYTEST_SIM.md.
 Simulation only; not a playtest.
+
+## Play engine plays the real starter decks (2026-10-21)
+
+Earlier engine results used stand-in decks that shared only 10-20 of each
+starter deck's 30 cards. `tools/play_engine/decks.py` now reads the decks the
+Control seats (`campaigns/still_hour/starter_decks.json`, from
+docs/STARTER_DECKS.md) by SCED id, so they cannot drift again; every card in
+them is encoded in the engine (approximations listed in the engine's coverage
+report). XP upgrade paths now replace cards those decks hold. Results from
+before this change measure the wrong decks; rerun before comparing.

@@ -396,6 +396,7 @@ def render(summaries, coverage, tempo):
     if coverage:
         lines += ["## Encoding coverage", "",
                   "%d scenario cards; not encoded: %s" % (coverage.get("scenario_cards", 0), coverage.get("missing") or "none"), "",
+                  "Player cards in the decks not encoded: %s" % (", ".join(coverage.get("player_missing") or []) or "none"), "",
                   "Approximated:", ""]
         for a in L(coverage.get("approx")):
             lines.append("- %s: %s" % (a["id"], a["how"]))

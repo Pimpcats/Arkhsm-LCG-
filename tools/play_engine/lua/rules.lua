@@ -547,7 +547,13 @@ return function(R, T)
         local a = inv.assets[i]
         if (a.hp and a.dmg >= a.hp) or (a.sp and a.sp > 0 and a.hor >= a.sp) then
           table.remove(inv.assets, i)
-          inv.discard[#inv.discard + 1] = a.rec
+          if a.name == "Improvised Shield" then
+            -- Forced: when defeated, shuffle it into your deck instead of discarding it
+            inv.deck[#inv.deck + 1] = a.rec
+            R.shuffle(inv.deck)
+          else
+            inv.discard[#inv.discard + 1] = a.rec
+          end
           R.log("%s's %s is defeated", inv.name, a.name)
         end
       end
@@ -575,6 +581,7 @@ return function(R, T)
     if hor > 0 and inv.threat["Psychosis"] and not opts.fromWeakness then R.hurt(inv, 1, 0, "Psychosis", { direct = true, fromWeakness = true }) end
     if dmg > 0 and inv.threat["Hypochondria"] and not opts.fromWeakness then R.hurt(inv, 0, 1, "Hypochondria", { direct = true, fromWeakness = true }) end
     if inv.damage >= inv.health or inv.horror >= inv.sanity then R.defeat(inv, source, opts) end
+    if not inv.defeated and (dmg > 0 or hor > 0) then R.P.afterHurt(inv) end      -- Jim Culver
     return dealt
   end
 
@@ -775,6 +782,12 @@ return function(R, T)
   --- Put an enemy card where the engine says it is: engaged ones in the
   -- threat area of that investigator's playmat, others below their location.
   function R.placeEnemy(en)
+    -- a new engagement: "after you engage an enemy" reactions (Hunter's Instinct)
+    if en.engaged and en.engaged ~= en.lastEngaged and not en.dead then
+      en.lastEngaged = en.engaged
+      R.P.onEngaged(en.engaged, en)
+    end
+    en.lastEngaged = en.engaged
     if not T.alive(en.obj) then return end
     local G = R.G
     if en.engaged then
@@ -831,12 +844,18 @@ return function(R, T)
     if #here == 0 then return end
     if (R.WHATIF or {}).wakeExhausted ~= false then R.FX.checkWakes() end     -- a waking Echo is exhausted first
     for _, en in ipairs(R.G.enemies) do
-      if en.loc == L.guid and not en.engaged and not en.exhausted and not R.sleepwalking(en) and not R.isAloof(en) then
+      -- Stealth: an evaded enemy cannot engage that investigator until the end of their turn
+      local cands = here
+      if en.noEngage then
+        cands = {}
+        for _, x in ipairs(here) do if x ~= en.noEngage then cands[#cands + 1] = x end end
+      end
+      if en.loc == L.guid and not en.engaged and not en.exhausted and not R.sleepwalking(en) and not R.isAloof(en) and #cands > 0 then
         local only = R.onlyPrey(en)
-        if only and only.loc ~= L.guid then
+        if (only and only.loc ~= L.guid) or (only and only == en.noEngage) then
           -- it engages only its prey
         else
-          en.engaged = only or R.prey(en, here)
+          en.engaged = only or R.prey(en, cands)
           R.log("%s engages %s", en.name, en.engaged.name)
           R.placeEnemy(en)
         end

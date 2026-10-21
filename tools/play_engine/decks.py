@@ -1,12 +1,14 @@
-"""Starting decks for the play engine, built from SCED's own card pool.
+"""Starting decks for the play engine: the starter decks the game actually seats.
 
-Each deck is 30 real level-0 player cards taken from the "All Player Cards"
-bag in the owner's SCED save (their SCED ids and metadata: class, level,
-cost, icons, uses), chosen under the investigator's printed deckbuilding
-options (the back of the investigator card), plus the three signature cards
-and one random basic weakness (picked per game by the engine from the
-encoded list below). Only cards whose effects the engine encodes are used
-(tools/play_engine/lua/players.lua keys them by name).
+Each deck is the investigator's starter list (docs/STARTER_DECKS.md, resolved
+to SCED card ids by pipeline/starter_deck_ids.py in
+campaigns/still_hour/starter_decks.json, the file the Control seats from),
+read here directly so the engine can never drift from what players get. The
+cards come out of the "All Player Cards" bag of the SCED save by those ids
+(their SCED metadata: class, level, cost, icons, uses), plus the three
+signature cards and one random basic weakness (picked per game by the engine
+from the encoded list below). Their effects are encoded in
+tools/play_engine/lua/players.lua, keyed by name.
 
     python3 tools/play_engine/decks.py --save "/home/user/sce480/Arkham SCE 4.8.0.json"
 """
@@ -17,34 +19,18 @@ import re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
+STARTER = os.path.join(ROOT, "campaigns", "still_hour", "starter_decks.json")
 
-# (name, copies); the order is the pick order. Off-class cards are checked
-# against the investigator's limit.
-LISTS = {
-    "sthrelias": [
-        ("Machete", 2), (".45 Automatic", 2), ("Physical Training", 2), ("Guard Dog", 2), ("Vicious Blow", 2),
-        ("Beat Cop", 2), ("Dodge", 2), ("Evidence!", 2), ("First Aid", 2), ("Emergency Cache", 2),
-        ("Unexpected Courage", 2), ("Guts", 2), ("Overpower", 2), ("Leather Coat", 2), ("Lucky!", 2)],
-    "sthrayako": [
-        ("Magnifying Glass", 2), ("Dr. Milan Christopher", 2), ("Deduction", 2), ("Working a Hunch", 2),
-        ("Hyperawareness", 2), ("Medical Texts", 2), ("Old Book of Lore", 2), ("Mind over Matter", 2),
-        ("Emergency Cache", 2), ("Unexpected Courage", 2), ("Perception", 2), ("Guts", 2), ("Flashlight", 2),
-        ("Knife", 1), ("Ward of Protection", 2), ("Arcane Studies", 1)],
-    "sthrcass": [
-        ("Elusive", 2), ("Sneak Attack", 2), ("Pickpocketing", 2), ("Opportunist", 2), ("Hard Knocks", 2),
-        ("Switchblade", 2), ("Leo De Luca", 1), ("Emergency Cache", 2), ("Unexpected Courage", 2),
-        ("Manual Dexterity", 2), ("Overpower", 2), ("Perception", 2), ("Knife", 2), ("Flashlight", 2),
-        ("Lucky!", 2), ("Dodge", 1)],
-    "sthrseraphine": [
-        ("Shrivelling", 2), ("Arcane Studies", 2), ("Ward of Protection", 2), ("Holy Rosary", 2), ("Fearless", 2),
-        ("Blinding Light", 2), ("Drawn to the Flame", 2), ("Emergency Cache", 2), ("Unexpected Courage", 2),
-        ("Guts", 2), ("Perception", 2), ("Knife", 2), ("Flashlight", 2), ("Magnifying Glass", 2), ("Deduction", 2)],
-    "sthrbirdie": [
-        ("Baseball Bat", 2), ("Lucky!", 2), ("Rabbit's Foot", 2), ("Stray Cat", 2), ("Dig Deep", 2),
-        ("Survival Instinct", 2), ("Leather Coat", 2), ("Cunning Distraction", 1), ("Emergency Cache", 2),
-        ("Unexpected Courage", 2), ("Guts", 2), ("Perception", 2), ("Manual Dexterity", 2), ("Knife", 2),
-        ("Flashlight", 2), ("Magnifying Glass", 1)],
-}
+
+def starter_lists(path=STARTER):
+    """{investigator id: [(SCED id, copies)]} from the seated starter decks."""
+    d = json.load(open(path, encoding="utf-8"))
+    return {inv: [(str(cid), int(n)) for cid, n in rows] for inv, rows in d.items()}
+
+
+LISTS = starter_lists()
+# printed values SCED's metadata leaves out (ArkhamDB): id -> fields
+CARD_FIX = {"12060": {"cost": 4}}       # Jim Culver
 
 # XP upgrades in the order a careful player buys them: (xp, level-0 card it
 # replaces, upgraded card's SCED name, copies). Same-title upgrades keep the
@@ -52,23 +38,23 @@ LISTS = {
 # printing); cards the engine encodes under their full name keep it (FULL).
 UPGRADES = {
     "sthrelias": [(4, "Vicious Blow", "Vicious Blow (2)", 2), (4, "Beat Cop", "Beat Cop (2)", 2),
-                  (4, ".45 Automatic", "Shotgun (4)", 1), (3, "Lucky!", "Elder Sign Amulet (3)", 1),
-                  (5, ".45 Automatic", "Lightning Gun (5)", 1), (3, "Leather Coat", "Bulletproof Vest (3)", 1)],
+                  (4, "Improvised Weapon", "Shotgun (4)", 1), (3, "Scrounge for Supplies", "Elder Sign Amulet (3)", 1),
+                  (5, "Improvised Weapon", "Lightning Gun (5)", 1), (3, "Scrounge for Supplies", "Bulletproof Vest (3)", 1)],
     "sthrayako": [(4, "Deduction", "Deduction (2)", 2), (2, "Magnifying Glass", "Magnifying Glass (1)", 2),
-                  (3, "Arcane Studies", "Higher Education (3)", 1), (3, "Old Book of Lore", "Elder Sign Amulet (3)", 1),
-                  (2, "Medical Texts", "Encyclopedia (2)", 1), (3, "Old Book of Lore", "Bulletproof Vest (3)", 1),
-                  (2, "Medical Texts", "Encyclopedia (2)", 1)],
-    "sthrcass": [(4, "Switchblade", "Switchblade (2)", 2), (1, "Leo De Luca", "Leo De Luca (1)", 1),
-                 (4, "Opportunist", "Opportunist (2)", 2), (2, "Knife", ".41 Derringer (2)", 1),
-                 (1, "Pickpocketing", "Hired Muscle (1)", 1), (4, "Knife", "Chicago Typewriter (4)", 1),
-                 (3, "Pickpocketing", "Streetwise (3)", 1), (3, "Lucky!", "Elder Sign Amulet (3)", 1)],
+                  (3, "Hyperawareness", "Higher Education (3)", 1), (3, "Holy Rosary", "Elder Sign Amulet (3)", 1),
+                  (2, "Mind over Matter", "Encyclopedia (2)", 1), (3, "Burning the Midnight Oil", "Bulletproof Vest (3)", 1),
+                  (2, "Mind over Matter", "Encyclopedia (2)", 1)],
+    "sthrcass": [(2, "Sneak By", ".41 Derringer (2)", 1), (1, "Ward of Protection", "Leo De Luca (1)", 1),
+                 (2, "Opportunist", "Opportunist (2)", 1), (1, "Pickpocketing", "Hired Muscle (1)", 1),
+                 (4, "Sneak By", "Chicago Typewriter (4)", 1), (3, "Pickpocketing", "Streetwise (3)", 1),
+                 (3, "Holy Rosary", "Elder Sign Amulet (3)", 1), (4, "Sneak Attack", "Switchblade (2)", 2)],
     "sthrseraphine": [(6, "Shrivelling", "Shrivelling (3)", 2), (4, "Fearless", "Fearless (2)", 2),
                       (4, "Blinding Light", "Blinding Light (2)", 2), (5, "Shrivelling (3)", "Shrivelling (5)", 1),
-                      (3, "Drawn to the Flame", "Elder Sign Amulet (3)", 1),
-                      (3, "Drawn to the Flame", "Bulletproof Vest (3)", 1)],
+                      (3, "Working a Hunch", "Elder Sign Amulet (3)", 1),
+                      (3, "Working a Hunch", "Bulletproof Vest (3)", 1)],
     "sthrbirdie": [(4, "Lucky!", "Lucky! (2)", 2), (4, "Survival Instinct", "Survival Instinct (2)", 2),
                    (2, "Stray Cat", "Peter Sylvestre (2)", 1), (3, "Dig Deep", "Scrapper (3)", 1),
-                   (3, "Rabbit's Foot", "Elder Sign Amulet (3)", 1), (3, "Leather Coat", "Bulletproof Vest (3)", 1)],
+                   (3, "Scrounge for Supplies", "Elder Sign Amulet (3)", 1), (3, "Leather Coat", "Bulletproof Vest (3)", 1)],
 }
 FULL = {"Shotgun (4)", "Lightning Gun (5)", "Elder Sign Amulet (3)", "Bulletproof Vest (3)", "Higher Education (3)",
         "Encyclopedia (2)", "Switchblade (2)", ".41 Derringer (2)", "Hired Muscle (1)", "Chicago Typewriter (4)",
@@ -126,6 +112,27 @@ def pool(save, upgraded=False):
     return {n: v[1] for n, v in best.items()}
 
 
+def pool_by_id(save):
+    """SCED id -> metadata (with the bag's name) of every player card in the save, taboo versions left out."""
+    out = {}
+    for x in player_bag(save):
+        try:
+            md = json.loads(x.get("GMNotes") or "{}")
+        except ValueError:
+            continue
+        name = x.get("Nickname")
+        cid = str(md.get("id") or "")
+        if not name or not cid or "Taboo" in name or cid in out:
+            continue
+        out[cid] = dict(md, name=name, **CARD_FIX.get(cid, {}))
+    return out
+
+
+def in_class(k, klass):
+    """A multiclass card (SCED: "Guardian|Seeker") is in class when any of its classes is."""
+    return any(c in (klass, "Neutral") for c in str(k or "").split("|"))
+
+
 def options(back_text):
     """(main class, off-class allowance {classes}, limit, max level) from the investigator's back."""
     t = back_text or ""
@@ -148,24 +155,28 @@ def build(save, cards_json=None):
     out = {"decks": {}, "weaknesses": [], "problems": []}
     out["recollections"] = {c["id"]: campaign_player_card(c) for c in campaign.values() if "memoryCost" in c}
     out["recollection_picks"] = RECOLLECTION_PICKS
+    by_id = pool_by_id(save)
     for inv, picks in LISTS.items():
         c = campaign[inv]
         klass = c["class"]
         opt = options(c.get("back_text", ""))
         deck, off = [], 0
-        for name, n in picks:
-            md = p.get(name)
+        for cid, n in picks:
+            md = by_id.get(cid)
             if not md:
-                out["problems"].append("%s: %s not in SCED's player cards" % (inv, name))
+                out["problems"].append("%s: %s not in SCED's player cards" % (inv, cid))
                 continue
-            k = md.get("class")
-            if k not in (klass, "Neutral"):
-                if k not in opt["classes"] or md.get("level", 0) > opt["level"]:
+            name, k = md["name"], md.get("class")
+            if (md.get("level") or 0) != 0:
+                out["problems"].append("%s: %s (%s) is not level 0" % (inv, name, cid))
+                continue
+            if not in_class(k, klass):
+                if not any(x in opt["classes"] for x in str(k).split("|")) or md.get("level", 0) > opt["level"]:
                     out["problems"].append("%s: %s (%s) is not allowed" % (inv, name, k))
                     continue
                 off += n
             for _ in range(n):
-                deck.append({"name": name, "sced": md.get("id"), "type": md.get("type"), "class": k,
+                deck.append({"name": name, "sced": cid, "type": md.get("type"), "class": k,
                              "cost": md.get("cost"), "traits": md.get("traits", ""), "slot": md.get("slot"),
                              "uses": md.get("uses"), "icons": {
                                  "wil": md.get("willpowerIcons", 0), "int": md.get("intellectIcons", 0),
@@ -199,7 +210,7 @@ def build(save, cards_json=None):
                     continue
                 xp = n * md["level"]  # every copy pays its full printed level
                 k = md.get("class")
-                if k not in (klass, "Neutral") and (k not in opt["classes"] or md.get("level", 0) > opt["level"]):
+                if not in_class(k, klass) and (k not in opt["classes"] or md.get("level", 0) > opt["level"]):
                     out["problems"].append("%s: %s (%s) is not allowed" % (inv, new, k))
                     break
                 for _ in range(n):

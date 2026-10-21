@@ -55,7 +55,21 @@ return function(H)
     for id, how in pairs(R.FX.COVERAGE) do if how ~= "full" then approx[#approx + 1] = { id = id, how = how } end end
     for name, how in pairs(R.P.APPROX) do approx[#approx + 1] = { id = name, how = how } end
     table.sort(approx, function(a, b) return a.id < b.id end)
-    emit("COVERAGE", { missing = missing, approx = approx, scenario_cards = #cards.scenario_ids })
+    -- every official player card the decks hold (starter decks, XP tiers) has its effect encoded
+    local playerMissing, seen = {}, {}
+    local function scan(deck)
+      for _, c in ipairs((deck or {}).cards or {}) do
+        if c.sced and not R.P.CODED[c.name] and not seen[c.name] then
+          seen[c.name] = true
+          playerMissing[#playerMissing + 1] = c.name
+        end
+      end
+    end
+    for _, deck in pairs(decks.decks or {}) do scan(deck) end
+    for _, party in pairs(decks.tiers or {}) do for _, deck in pairs(party) do scan(deck) end end
+    table.sort(playerMissing)
+    emit("COVERAGE", { missing = missing, approx = approx, scenario_cards = #cards.scenario_ids,
+                       player_missing = playerMissing })
   end
 
   ------------------------------------------------------------ the table --
