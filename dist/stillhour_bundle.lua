@@ -2187,7 +2187,7 @@ Interlude.RECOLLECTION_COST = {
   ["sthr-hourlearnedname"]    = 5,
 }
 
--- Their card names, for the panel when the Player Cards bag is not on the table.
+-- Their card names, for the panel when the Recollections pouch is not on the table.
 Interlude.RECOLLECTION_NAME = {
   ["sthr-foreknowledge"]      = "Foreknowledge",
   ["sthr-dejavu"]             = "The Same Doorway Twice",
@@ -2570,7 +2570,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/b3d64561d021c4227dbd7acdb3925b67fc634aa8/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/8e2f4744f42b196c52f1d823ed4bc8a07af2ab43/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -2747,9 +2747,19 @@ function ChaosBag.new(opts)
     end)
   end
 
+  --- SCED replaces its whole chaos bag when a difficulty is set (setChaosBagState): the old bag is
+  -- destroyed at the end of that frame. For `seconds` nothing is done to the bag on the table; the
+  -- caller reconciles once the new bag has landed.
+  function a.hold(seconds)
+    a.held = true
+    local function release() a.held = false end
+    if not pcall(function() Wait.time(release, seconds or 1.5) end) then release() end
+  end
+
   --- Bring the physical bag to target(). Safe to call any time.
   function a.reconcile()
     a.count = a.target()
+    if a.held then return a.count end
     local bag = a.findBag()
     if not bag then return a.count end
     if not SCED.canTouchChaosTokens() then
@@ -3064,8 +3074,8 @@ local function dataById(container, id)
   return nil
 end
 
---- The bag or deck on the table that holds the card with this campaign id (the campaign's Player Cards
--- bag holds the investigators and their cards; its minicard deck the minicards). Found by what it holds,
+--- The bag or deck on the table that holds the card with this campaign id (the campaign's player-card
+-- pouches hold the investigators and their cards; its minicard deck the minicards). Found by what it holds,
 -- never by name: SCED's own "All Player Cards" bag is on the table too.
 -- SCED's own card bags hold thousands of cards: reading each of them for every card would stall the
 -- table, and the campaign's cards are never in them, so a container that large is skipped.
@@ -3171,12 +3181,12 @@ function Setup.seat(invId, matColor, opts)
   local bag = holderOf(invId)
   local invPos, deckPos = Setup.zone(matColor, "Investigator"), Setup.zone(matColor, "Deck")
   if not bag or not invPos or not deckPos then
-    rep.why = not bag and "the Player Cards bag (with this investigator in it) is not on the table"
+    rep.why = not bag and "this investigator's pouch (Player Cards) is not on the table"
       or ("no " .. tostring(matColor) .. " playmat")
     return rep
   end
   local inv = dataById(bag, invId)
-  if not inv then rep.why = "the investigator card is not in the Player Cards bag" ; return rep end
+  if not inv then rep.why = "the investigator card is not in their pouch" ; return rep end
   -- the cards their back requires: from the same bag (or any holder of each)
   spawnObjectData({ data = withOwner(fresh(inv), matColor), position = above(invPos), rotation = Setup.rotation(matColor) })
   local mini = dataById(holderOf(invId .. "-m"), invId .. "-m")
@@ -3850,7 +3860,8 @@ local function removeByPrefix(o, prefixes)
   end
 end
 
-Board.INV_PREFIXES = { "Memory ", "Years ", "Dissonance raised ", "Loop-power Memory ", "Quest " }
+-- (the older, longer labels too, so a card from an earlier build is cleaned up)
+Board.INV_PREFIXES = { "Memory ", "Years ", "Raised ", "Spent ", "Pending ", "Quest ", "Dissonance raised ", "Loop-power Memory " }
 
 --- The printed stat line from investigator metadata (SCED GMNotes keys).
 function Board.baseStats(md)
@@ -3897,68 +3908,75 @@ function Board.refreshInvestigators(applyStats)
       if eff and inv.md and (eff.health ~= inv.md.health or eff.sanity ~= inv.md.sanity) then
         yearsLabel = yearsLabel .. string.format(" · max %d/%d", eff.health, eff.sanity)
       end
+      -- An investigator card lies sideways: in its own space the picture's right is +z and its top is +x,
+      -- and a button rotated 270 degrees reads left to right along it. The buttons sit in one block over
+      -- the lower part of the portrait (the picture's left side), inside the card, so they take no table
+      -- space and cover no rules text: Years across the top, then Memory | Raised, Spent | Pending, Quest.
+      -- The tooltips say what each one counts.
+      -- columns 1 and 2, and 0 for the full-width top row; the portrait spans z -1.36 .. -0.17
+      local COL_Z = { [0] = -0.765, -1.06, -0.47 }
+      local ROW_X = { -0.25, -0.47, -0.69, -0.91 }   -- its lower part, top row first
+      local BW, BH = 250, 92
+      local DARK, GOLD = { 0.12, 0.08, 0.16 }, { 0.95, 0.85, 0.6 }
+      local function put(col, row, def)
+        def.function_owner = host
+        def.position = { ROW_X[row], 0.3, COL_Z[col] }
+        def.rotation = { 0, 270, 0 }
+        def.width = def.width or (col == 0 and 2 * BW + 20 or BW)
+        def.height = def.height or BH
+        def.font_size = def.font_size or 64
+        def.color = def.color or DARK
+        def.font_color = def.font_color or GOLD
+        createFitted(card, def)
+      end
       safe(function()
-        createFitted(card, {
-          click_function = "shCardMemory", function_owner = host,
+        put(1, 2, {
+          click_function = "shCardMemory",
           label = "Memory " .. CampaignState.getOnCardMemory(inv.id),
           tooltip = "Memory on this investigator's cards: click whenever Memory is placed on or removed from them. "
             .. "Left-click +1 · Right-click -1. At Loop Setup, Anchor Point's token takes one click; an Elder or "
             .. "Ancient start Memory is already counted.",
-          position = { -0.75, 0.3, 1.25 }, rotation = { 0, 0, 0 },
-          width = 620, height = 200, font_size = 120,
-          color = { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
         })
-        createFitted(card, {
-          click_function = "shNoop", function_owner = host, label = yearsLabel,
-          tooltip = "Years lived in the loop (see Years in the guide). The playmat's skill tracker already includes the age-bracket changes.",
-          position = { 0.65, 0.3, 1.25 }, rotation = { 0, 0, 0 },
-          width = 0, height = 0, font_size = 90, font_color = { 0.95, 0.85, 0.6 },
+        put(0, 1, {
+          click_function = "shNoop", label = string.format("Years %d · %s", years, Aging.bracketForYears(years)),
+          tooltip = yearsLabel .. ". Years lived in the loop (see Years in the guide). The playmat's skill tracker "
+            .. "already includes the age-bracket changes.",
+          color = { 0.2, 0.15, 0.1 },
         })
         -- "leaned on the loop" tallies (aging v0.3 §1.1), this investigator's own
         local t = CampaignState.getTallies(inv.id)
-        createFitted(card, {
-          click_function = "shCardRaised", function_owner = host,
-          label = "Dissonance raised " .. t.raises,
-          tooltip = "Click each time THIS investigator pays 'raise Dissonance' as a cost, once per payment however "
-            .. "much it raises (The Turning: one click here, two on Dissonance). Also click Dissonance on the Control. "
-            .. "3+ this loop = leaned on the loop (+1 Year). Left-click +1 · Right-click -1",
-          position = { -0.75, 0.3, 1.65 }, rotation = { 0, 0, 0 },
-          width = 760, height = 180, font_size = 90,
-          color = { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
+        put(2, 2, {
+          click_function = "shCardRaised",
+          label = "Raised " .. t.raises,
+          tooltip = "Dissonance raised: click each time THIS investigator pays 'raise Dissonance' as a cost, once "
+            .. "per payment however much it raises (The Turning: one click here, two on Dissonance). Also click "
+            .. "Dissonance on the Control. 3+ this loop = leaned on the loop (+1 Year). Left-click +1 · Right-click -1",
         })
-        createFitted(card, {
-          click_function = "shCardSpent", function_owner = host,
-          label = "Loop-power Memory " .. t.spent,
-          tooltip = "Click once per Memory THIS investigator removes from their own cards for their own cards or "
-            .. "abilities (for example Foreknowledge). 4+ this loop = leaned on the loop (+1 Year). "
-            .. "Left-click +1 · Right-click -1",
-          position = { 0.75, 0.3, 1.65 }, rotation = { 0, 0, 0 },
-          width = 760, height = 180, font_size = 90,
-          color = { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
+        put(1, 3, {
+          click_function = "shCardSpent",
+          label = "Spent " .. t.spent,
+          tooltip = "Loop-power Memory: click once per Memory THIS investigator removes from their own cards for "
+            .. "their own cards or abilities (for example Foreknowledge). 4+ this loop = leaned on the loop "
+            .. "(+1 Year). Left-click +1 · Right-click -1",
+        })
+        put(2, 3, {
+          click_function = "shCardYears",
+          label = "Pending " .. CampaignState.getPendingYears(inv.id),
+          tooltip = "Years pending: Years a card or resolution gave THIS investigator during the loop (A Year in a "
+            .. "Night, the Hall of Mirrors, the ninth line, the name). Added when they Age. Right-click when the "
+            .. "Records Office takes one back. Left-click +1 · Right-click -1",
         })
         local quest = CampaignState.getQuest(inv.id)
         if quest.goal then
-          createFitted(card, {
-            click_function = "shCardQuest", function_owner = host,
-            label = quest.unlocked and "Quest met" or string.format("Quest %d / %d", quest.tally, quest.goal),
+          put(1, 4, {
+            click_function = "shCardQuest",
+            label = quest.unlocked and "Quest met" or string.format("Quest %d/%d", quest.tally, quest.goal),
             tooltip = "Your personal quest card's tally, kept across the campaign (the Campaign Log shows it too). "
-              .. "At the goal the Control tells you: swap the quest card for its unlocked card from the Player "
-              .. "Cards bag and tick met in your panel on page 1 of the Campaign Log. Left-click +1 · Right-click -1",
-            position = { 0, 0.3, 2.45 }, rotation = { 0, 0, 0 },
-            width = 760, height = 180, font_size = 90,
-            color = quest.unlocked and { 0.1, 0.25, 0.12 } or { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
+              .. "At the goal the Control tells you: swap the quest card for its unlocked card from your pouch "
+              .. "and tick met in your panel on page 1 of the Campaign Log. Left-click +1 · Right-click -1",
+            color = quest.unlocked and { 0.1, 0.25, 0.12 } or nil,
           })
         end
-        createFitted(card, {
-          click_function = "shCardYears", function_owner = host,
-          label = "Years pending " .. CampaignState.getPendingYears(inv.id),
-          tooltip = "Years a card or resolution gave THIS investigator during the loop (A Year in a Night, "
-            .. "the Hall of Mirrors, the ninth line, the name). Added when they Age. Right-click when the Records "
-            .. "Office takes one back. Left-click +1 · Right-click -1",
-          position = { 0, 0.3, 2.05 }, rotation = { 0, 0, 0 },
-          width = 760, height = 180, font_size = 90,
-          color = { 0.12, 0.08, 0.16 }, font_color = { 0.95, 0.85, 0.6 },
-        })
       end)
     end
     local t = CampaignState.getTallies(inv.id)
@@ -4123,7 +4141,8 @@ end
 local function findAppointedInContainer(guid)
   for _, o in ipairs(topLevel()) do
     local t = safe(function() return o.type end)
-    if t == "Bag" or t == "Deck" then
+    -- SCED's own card bags (thousands of cards) never hold it: reading them stalls the table
+    if (t == "Bag" or t == "Deck") and (safe(function() return o.getQuantity() end) or 0) <= 400 then
       for _, e in ipairs(safe(function() return o.getObjects() end) or {}) do
         if (guid and e.guid == guid) or isAppointedMeta(decode(e.gm_notes)) then
           return o, e
@@ -4964,21 +4983,24 @@ local function clueTokensNear(places, margin, keepCovered)
   return found
 end
 
-local function sweepClues(places)
-  local n = 0
-  for _, t in ipairs(clueTokensNear(places, 1.2)) do
-    if not t.isDestroyed() then t.destruct() ; n = n + 1 end
+-- TTS destroys an object at the end of the frame, and until then it is still in getObjects() with
+-- isDestroyed() false. Whatever this token destroys is remembered for a couple of frames, so no other step
+-- in the same frame works on it again (Unity then adds components to an object it is tearing down).
+local dyingGuids, dyingArmed = {}, false
+local function markDying(o)
+  local ok, g = pcall(function() return o.getGUID() end)
+  if ok and g then dyingGuids[g] = true end
+  if not dyingArmed then
+    dyingArmed = true
+    local function clear() dyingGuids = {} ; dyingArmed = false end
+    if not pcall(function() Wait.frames(clear, 2) end) then clear() end
   end
-  if #places > 0 then
-    for _, delay in ipairs({ 1.5, 5, 12 }) do
-      Wait.time(function()
-        for _, t in ipairs(clueTokensNear(places, 1.2, true)) do
-          if not t.isDestroyed() then t.destruct() end
-        end
-      end, delay)
-    end
-  end
-  return n
+end
+local function isDying(o)
+  local ok, g = pcall(function() return o.getGUID() end)
+  if ok and g and dyingGuids[g] then return true end
+  local ok2, d = pcall(function() return o.isDestroyed() end)
+  return ok2 and d == true
 end
 
 local function placeOf(o)
@@ -5000,16 +5022,25 @@ local function clearLoopBoard()
     local ok, pl = pcall(placeOf, o)
     if ok then places[#places + 1] = pl end
   end
-  for pass = 1, 2 do
+  -- TTS destroys an object at the end of the frame: until then isDestroyed() is false and the object is
+  -- still in getObjects(). Each object is therefore handled once, by GUID, and nothing is done to an
+  -- object after its destruct() (doing so made Unity add components to objects it was tearing down).
+  local function kill(o)
+    if isDying(o) then return false end
+    markDying(o)
+    pcall(function() o.destruct() end)
+    return true
+  end
+  local function sweep()
     for _, o in ipairs(getObjects()) do
-      if not o.isDestroyed() and (o.type == "Card" or o.type == "Deck") then
+      local g = o.getGUID()
+      if not isDying(o) and (o.type == "Card" or o.type == "Deck") then
         if o.type == "Card" then
           if isLoopCard(o.getTags and o.getTags() or {}, o.getGMNotes()) then
-            for _, t in ipairs(tokensOn(o)) do t.destruct() ; tokens = tokens + 1 end
+            for _, t in ipairs(tokensOn(o)) do if kill(t) then tokens = tokens + 1 end end
             note(o)
-            Board.forgetGuid(o.getGUID())
-            o.destruct()
-            removed = removed + 1
+            Board.forgetGuid(g)
+            if kill(o) then removed = removed + 1 end
           end
         else
           local mine, others = {}, 0
@@ -5017,24 +5048,40 @@ local function clearLoopBoard()
             if isLoopCard(e.tags, e.gm_notes) then mine[#mine + 1] = e.guid else others = others + 1 end
           end
           if #mine > 0 and others == 0 then
-            for _, t in ipairs(tokensOn(o)) do t.destruct() ; tokens = tokens + 1 end
+            for _, t in ipairs(tokensOn(o)) do if kill(t) then tokens = tokens + 1 end end
             note(o)
             Board.forgetGuids(mine)
-            o.destruct()
-            removed = removed + #mine
+            if kill(o) then removed = removed + #mine end
           elseif #mine > 0 then
+            -- a deck mixing the loop's cards with others: take the loop's cards out while two or more cards
+            -- remain (taking from a two-card deck dissolves it; the last card is then left on its own and a
+            -- later sweep finds it as a loose card)
             local pos = o.getPosition()
-            for _, g in ipairs(mine) do
-              if o.isDestroyed() then break end
-              local ok, c = pcall(o.takeObject, { guid = g, position = { pos.x, pos.y + 3, pos.z }, smooth = false })
-              if ok and c then Board.forgetGuid(g) ; c.destruct() ; removed = removed + 1 end
+            for _, eg in ipairs(mine) do
+              local ok, n = pcall(function() return o.getQuantity() end)
+              if not ok or (n or 0) < 3 then break end
+              local okT, c = pcall(o.takeObject, { guid = eg, position = { pos.x, pos.y + 3, pos.z }, smooth = false })
+              if okT and c then Board.forgetGuid(eg) ; if kill(c) then removed = removed + 1 end end
             end
           end
         end
       end
     end
   end
-  tokens = tokens + sweepClues(places)
+  sweep()
+  for _, t in ipairs(clueTokensNear(places, 1.2)) do if kill(t) then tokens = tokens + 1 end end
+  -- what the first sweep could not reach (a card left alone when a mixed deck dissolved), once TTS has
+  -- finished destroying what it removed
+  pcall(function() Wait.frames(sweep, 5) end)
+  if #places > 0 then
+    for _, delay in ipairs({ 1.5, 5, 12 }) do
+      Wait.time(function()
+        for _, t in ipairs(clueTokensNear(places, 1.2, true)) do
+          if not t.isDestroyed() then t.destruct() end
+        end
+      end, delay)
+    end
+  end
   return { cards = removed, tokens = tokens, stopped = stopped }
 end
 
@@ -5095,7 +5142,7 @@ local function boxReady(box)
 end
 
 local function refillBoxes()
-  if type(getObjects) ~= "function" or type(spawnObjectJSON) ~= "function" then return { refilled = 0 } end
+  if type(getObjects) ~= "function" or type(spawnObjectData) ~= "function" then return { refilled = 0 } end
   local used = {}
   for _, o in ipairs(getObjects()) do
     if not o.isDestroyed() and scenarioBoxId(o) and not boxIsFull(o) then used[#used + 1] = o end
@@ -5112,6 +5159,7 @@ local function refillBoxes()
   for _, box in ipairs(used) do
     local entry = byId[scenarioBoxId(box)]
     if entry then
+      local slot = refilled
       local pos, rot, locked = box.getPosition(), box.getRotation(), box.getLock()
       -- what the board and SCED's clue spawner remember by GUID belongs to the cards just cleared:
       -- the fresh box lays out the same GUIDs, and its locations spawn their clues again
@@ -5120,8 +5168,8 @@ local function refillBoxes()
         SCED.resetTokensSpawned(guid)
       end
       -- the full box comes back under the used one's GUID (the campaign box's Recall finds its boxes by
-      -- GUID), so it is spawned once the used one is gone, two frames later
-      local json = JSON.encode(entry)
+      -- GUID), so it is spawned once the used one is gone: from its data (spawnObjectData; encoding a
+      -- whole box to JSON in Lua stalls the table), one box every few frames rather than all at once
       box.destruct()
       refillsPending = refillsPending + 1
       local settled = false
@@ -5132,11 +5180,11 @@ local function refillBoxes()
       end
       Wait.frames(function()
         local ok = pcall(function()
-          spawnObjectJSON({ json = json, position = pos, rotation = rot,
+          spawnObjectData({ data = entry, position = pos, rotation = rot,
             callback_function = function(b) pcall(function() b.setLock(locked) end) ; done() end })
         end)
         if not ok then done() end
-      end, 2)
+      end, 3 + 4 * slot)
       -- never wait on a spawn that does not report back
       Wait.time(done, 10)
       refilled = refilled + 1
@@ -5309,6 +5357,7 @@ local function setDifficulty(i)
   end
   local tokens = bagFor(i)
   appliedSig = changeSig(bagChanges())
+  bag.hold(1.4)                -- SCED destroys the old bag this frame: leave it alone until the new one lands
   SCED.globalCall("setChaosBagState", tokens)
   -- SCED respawns the bag; once it has landed, re-add the band's [static] tokens
   Wait.time(function()
@@ -5449,7 +5498,9 @@ local function readRecollections()
     if type(getObjects) ~= "function" then return end
     for _, o in ipairs(getObjects()) do
       local t = o.type
-      if t == "Bag" or t == "Deck" then
+      -- SCED's own card bags hold thousands of cards and never a Recollection: reading them on every
+      -- redraw stalls the table, so a container that large is skipped (as Seat investigators does)
+      if (t == "Bag" or t == "Deck") and (o.getQuantity() or 0) <= 400 then
         for _, e in ipairs(o.getObjects() or {}) do
           local ok, md = pcall(JSON.decode, e.gm_notes or "")
           if ok and type(md) == "table" and md.memoryCost ~= nil then consider(md.id, e.name or "", md) end
@@ -6769,7 +6820,7 @@ end
 --- The Hour the Hours deck on the agenda spot shows (its last card, face up), or nil.
 local function shownHour()
   for _, o in ipairs(getObjects()) do
-    if type(o.isDestroyed) == "function" and not o.isDestroyed() and (o.type == "Deck" or o.type == "Card")
+    if type(o.isDestroyed) == "function" and not isDying(o) and (o.type == "Deck" or o.type == "Card")
         and near(o.getPosition(), AGENDA_SPOT.pos, 0.6) then
       if o.type == "Card" then return hourOf(o.getGMNotes()) end
       local list = o.getObjects() or {}
@@ -6794,11 +6845,12 @@ syncHoursDeck = function(onlyIfWrong)
   for _, o in ipairs(getObjects()) do
     if type(o.isDestroyed) ~= "function" or type(o.getGMNotes) ~= "function" then
       -- not a table object (a stub): nothing of the Hours
-    elseif not o.isDestroyed() and o.type == "Card" and hourOf(o.getGMNotes()) then
+    elseif not isDying(o) and o.type == "Card" and hourOf(o.getGMNotes()) then
       holders = holders + 1
       keep(o.getData())
+      markDying(o)
       o.destruct()
-    elseif not o.isDestroyed() and o.type == "Deck" then
+    elseif not isDying(o) and o.type == "Deck" then
       local hours, others = {}, 0
       for _, e in ipairs(o.getObjects() or {}) do
         if hourOf(e.gm_notes) then hours[#hours + 1] = e.guid else others = others + 1 end
@@ -6811,12 +6863,17 @@ syncHoursDeck = function(onlyIfWrong)
             looks = { Nickname = d.Nickname, Tags = d.Tags, Description = d.Description }
           end
           for _, c in ipairs(d.ContainedObjects or {}) do keep(c) end
+          markDying(o)
           o.destruct()
         else
+          -- the Hours out of a mixed deck, while it still holds two or more cards (taking from a
+          -- two-card deck dissolves it); a lone Hour left behind is found as a card next time
           local p = o.getPosition()
           for _, g in ipairs(hours) do
+            local ok, n = pcall(function() return o.getQuantity() end)
+            if not ok or (n or 0) < 3 then break end
             local c = o.takeObject({ guid = g, position = { p.x, p.y + 3, p.z }, smooth = false })
-            if c then keep(c.getData()) ; c.destruct() end
+            if c then keep(c.getData()) ; markDying(c) ; c.destruct() end
           end
         end
       end

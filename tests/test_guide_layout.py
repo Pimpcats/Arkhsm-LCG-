@@ -67,10 +67,10 @@ def test_what_you_saw_starts_its_own_page(guide):
     assert _body(page).startswith("What You Saw"), "What You Saw shares a page with the Prologue's endings"
 
 
-def test_every_page_names_its_part_in_its_header_and_on_an_edge_tab(guide):
+def test_every_page_names_its_part_in_its_header_and_has_no_edge_tab(guide):
     """Rules, setup, the Prologue, the loop, each district, the finale and the appendices each say so in
-    a running header (and on a coloured tab at the page's edge), from the page their heading starts on
-    to the page before the next one starts."""
+    a running header, from the page their heading starts on to the page before the next one starts. The
+    pages carry no index tab on their outer edge (owner, 2026-10-31)."""
     import build_guide_pdf as G
     starts = sorted((page, title) for _lvl, title, page in guide["toc"] if title != "Campaign Log")
     log_start = next((page for _lvl, title, page in guide["toc"] if title == "Campaign Log"),
@@ -94,8 +94,8 @@ def test_every_page_names_its_part_in_its_header_and_on_an_edge_tab(guide):
         edge = [w for w in page.get_text("words")
                 if (w[2] > page.rect.width - 40 if n % 2 else w[0] < 40) and 60 < w[1] < 400]
         tab = squash("".join(w[4] for w in edge))
-        assert squash(label.split(" \u2014 ")[-1]) in tab or squash(label.split(" \u2014 ")[-1])[::-1] in tab, \
-            "page %d: the edge tab should read %s, not %r" % (n, label, tab)
+        name = squash(label.split(" \u2014 ")[-1])
+        assert name not in tab and name[::-1] not in tab, "page %d still has an edge tab: %r" % (n, tab)
 
 
 def test_printed_contents_name_the_real_pages(guide):

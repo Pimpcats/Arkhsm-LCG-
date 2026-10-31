@@ -348,12 +348,18 @@ return function(H)
     local n = st().investigators
     times(math.abs(n - 3), function() ctl("shClickInvestigators", n > 3) end)
     check("Investigators = 3", st().investigators == 3, st().investigators)
-    local pbag = find(function(o) return o.type == "Bag" and o.hasTag("StillHour")
-      and tostring(o.getName()):find("Player Cards", 1, true) ~= nil end)
+    local pouches = {}
+    for _, o in ipairs(E.G.getObjects()) do
+      if o.type == "Bag" and o.hasTag("StillHour") and tostring(o.getName()):find("Player Cards", 1, true) then
+        pouches[#pouches + 1] = o
+      end
+    end
     for i, id in ipairs(PARTY) do
-      local guid
-      for _, e in ipairs(pbag and pbag.getObjects() or {}) do
-        if (decode(e.gm_notes) or {}).id == id then guid = e.guid end
+      local guid, pbag
+      for _, b in ipairs(pouches) do
+        for _, e in ipairs(b.getObjects() or {}) do
+          if (decode(e.gm_notes) or {}).id == id then guid, pbag = e.guid, b end
+        end
       end
       local pos = { 40 + 4 * i, 2.5, -30 }
       local c = guid and pbag.takeObject({ guid = guid, position = pos, smooth = false })
@@ -579,7 +585,7 @@ return function(H)
       and years("sthrelias") == 3, list({ years("sthrbirdie"), years("sthrseraphine"), years("sthrelias") }))
     ctl("shBeginNextLoop")
     loopStart("NR")
-    check("Begin Next Loop clears the tallies", hasLabel(cards.sthrelias, "Dissonance raised 0"), labels(cards.sthrelias))
+    check("Begin Next Loop clears the tallies", hasLabel(cards.sthrelias, "Raised 0"), labels(cards.sthrelias))
     check("the log counts one Taken loop", logVal("taken") == 1)
   end)
 

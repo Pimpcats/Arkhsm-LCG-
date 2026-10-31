@@ -3341,10 +3341,14 @@ class Auditor(object):
                                      "the mod's static chaos token differs from the saved object's",
                                      "", "Rebuild dist.")
                     elif o.get("Name") == "Bag" and "Player Cards" in (o.get("Nickname") or ""):
-                        other = skids.get(hk(o.get("GUID")))
-                        if other is None:
-                            self.add(ERROR, "F01.mod-bag-missing", d.name, "player-card bag is missing from the saved object")
+                        # the saved object splits the mod's bag into pouches (one per investigator, one of
+                        # Recollections): its cards are compared with every pouch's
+                        pouches = [c for c in kids(sbox) if c.get("Name") == "Bag"
+                                   and "Player Cards" in (c.get("Nickname") or "")] if sbox else []
+                        if not pouches:
+                            self.add(ERROR, "F01.mod-bag-missing", d.name, "player-card pouches are missing from the saved object")
                         else:
+                            other = {"ContainedObjects": [x for pch in pouches for x in kids(pch)]}
                             ours = {hk(card_id_of(c)): self.card_signature(c) for c in kids(o)}
                             theirs = {hk(card_id_of(c)): self.card_signature(c) for c in kids(other)}
                             bad = sorted(i for i in ours if theirs.get(i) != ours[i])

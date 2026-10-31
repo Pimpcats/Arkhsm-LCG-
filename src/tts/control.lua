@@ -412,21 +412,24 @@ local function clueTokensNear(places, margin, keepCovered)
   return found
 end
 
-local function sweepClues(places)
-  local n = 0
-  for _, t in ipairs(clueTokensNear(places, 1.2)) do
-    if not t.isDestroyed() then t.destruct() ; n = n + 1 end
+-- TTS destroys an object at the end of the frame, and until then it is still in getObjects() with
+-- isDestroyed() false. Whatever this token destroys is remembered for a couple of frames, so no other step
+-- in the same frame works on it again (Unity then adds components to an object it is tearing down).
+local dyingGuids, dyingArmed = {}, false
+local function markDying(o)
+  local ok, g = pcall(function() return o.getGUID() end)
+  if ok and g then dyingGuids[g] = true end
+  if not dyingArmed then
+    dyingArmed = true
+    local function clear() dyingGuids = {} ; dyingArmed = false end
+    if not pcall(function() Wait.frames(clear, 2) end) then clear() end
   end
-  if #places > 0 then
-    for _, delay in ipairs({ 1.5, 5, 12 }) do
-      Wait.time(function()
-        for _, t in ipairs(clueTokensNear(places, 1.2, true)) do
-          if not t.isDestroyed() then t.destruct() end
-        end
-      end, delay)
-    end
-  end
-  return n
+end
+local function isDying(o)
+  local ok, g = pcall(function() return o.getGUID() end)
+  if ok and g and dyingGuids[g] then return true end
+  local ok2, d = pcall(function() return o.isDestroyed() end)
+  return ok2 and d == true
 end
 
 local function placeOf(o)
@@ -448,16 +451,25 @@ local function clearLoopBoard()
     local ok, pl = pcall(placeOf, o)
     if ok then places[#places + 1] = pl end
   end
-  for pass = 1, 2 do
+  -- TTS destroys an object at the end of the frame: until then isDestroyed() is false and the object is
+  -- still in getObjects(). Each object is therefore handled once, by GUID, and nothing is done to an
+  -- object after its destruct() (doing so made Unity add components to objects it was tearing down).
+  local function kill(o)
+    if isDying(o) then return false end
+    markDying(o)
+    pcall(function() o.destruct() end)
+    return true
+  end
+  local function sweep()
     for _, o in ipairs(getObjects()) do
-      if not o.isDestroyed() and (o.type == "Card" or o.type == "Deck") then
+      local g = o.getGUID()
+      if not isDying(o) and (o.type == "Card" or o.type == "Deck") then
         if o.type == "Card" then
           if isLoopCard(o.getTags and o.getTags() or {}, o.getGMNotes()) then
-            for _, t in ipairs(tokensOn(o)) do t.destruct() ; tokens = tokens + 1 end
+            for _, t in ipairs(tokensOn(o)) do if kill(t) then tokens = tokens + 1 end end
             note(o)
-            Board.forgetGuid(o.getGUID())
-            o.destruct()
-            removed = removed + 1
+            Board.forgetGuid(g)
+            if kill(o) then removed = removed + 1 end
           end
         else
           local mine, others = {}, 0
@@ -465,24 +477,40 @@ local function clearLoopBoard()
             if isLoopCard(e.tags, e.gm_notes) then mine[#mine + 1] = e.guid else others = others + 1 end
           end
           if #mine > 0 and others == 0 then
-            for _, t in ipairs(tokensOn(o)) do t.destruct() ; tokens = tokens + 1 end
+            for _, t in ipairs(tokensOn(o)) do if kill(t) then tokens = tokens + 1 end end
             note(o)
             Board.forgetGuids(mine)
-            o.destruct()
-            removed = removed + #mine
+            if kill(o) then removed = removed + #mine end
           elseif #mine > 0 then
+            -- a deck mixing the loop's cards with others: take the loop's cards out while two or more cards
+            -- remain (taking from a two-card deck dissolves it; the last card is then left on its own and a
+            -- later sweep finds it as a loose card)
             local pos = o.getPosition()
-            for _, g in ipairs(mine) do
-              if o.isDestroyed() then break end
-              local ok, c = pcall(o.takeObject, { guid = g, position = { pos.x, pos.y + 3, pos.z }, smooth = false })
-              if ok and c then Board.forgetGuid(g) ; c.destruct() ; removed = removed + 1 end
+            for _, eg in ipairs(mine) do
+              local ok, n = pcall(function() return o.getQuantity() end)
+              if not ok or (n or 0) < 3 then break end
+              local okT, c = pcall(o.takeObject, { guid = eg, position = { pos.x, pos.y + 3, pos.z }, smooth = false })
+              if okT and c then Board.forgetGuid(eg) ; if kill(c) then removed = removed + 1 end end
             end
           end
         end
       end
     end
   end
-  tokens = tokens + sweepClues(places)
+  sweep()
+  for _, t in ipairs(clueTokensNear(places, 1.2)) do if kill(t) then tokens = tokens + 1 end end
+  -- what the first sweep could not reach (a card left alone when a mixed deck dissolved), once TTS has
+  -- finished destroying what it removed
+  pcall(function() Wait.frames(sweep, 5) end)
+  if #places > 0 then
+    for _, delay in ipairs({ 1.5, 5, 12 }) do
+      Wait.time(function()
+        for _, t in ipairs(clueTokensNear(places, 1.2, true)) do
+          if not t.isDestroyed() then t.destruct() end
+        end
+      end, delay)
+    end
+  end
   return { cards = removed, tokens = tokens, stopped = stopped }
 end
 
@@ -543,7 +571,7 @@ local function boxReady(box)
 end
 
 local function refillBoxes()
-  if type(getObjects) ~= "function" or type(spawnObjectJSON) ~= "function" then return { refilled = 0 } end
+  if type(getObjects) ~= "function" or type(spawnObjectData) ~= "function" then return { refilled = 0 } end
   local used = {}
   for _, o in ipairs(getObjects()) do
     if not o.isDestroyed() and scenarioBoxId(o) and not boxIsFull(o) then used[#used + 1] = o end
@@ -560,6 +588,7 @@ local function refillBoxes()
   for _, box in ipairs(used) do
     local entry = byId[scenarioBoxId(box)]
     if entry then
+      local slot = refilled
       local pos, rot, locked = box.getPosition(), box.getRotation(), box.getLock()
       -- what the board and SCED's clue spawner remember by GUID belongs to the cards just cleared:
       -- the fresh box lays out the same GUIDs, and its locations spawn their clues again
@@ -568,8 +597,8 @@ local function refillBoxes()
         SCED.resetTokensSpawned(guid)
       end
       -- the full box comes back under the used one's GUID (the campaign box's Recall finds its boxes by
-      -- GUID), so it is spawned once the used one is gone, two frames later
-      local json = JSON.encode(entry)
+      -- GUID), so it is spawned once the used one is gone: from its data (spawnObjectData; encoding a
+      -- whole box to JSON in Lua stalls the table), one box every few frames rather than all at once
       box.destruct()
       refillsPending = refillsPending + 1
       local settled = false
@@ -580,11 +609,11 @@ local function refillBoxes()
       end
       Wait.frames(function()
         local ok = pcall(function()
-          spawnObjectJSON({ json = json, position = pos, rotation = rot,
+          spawnObjectData({ data = entry, position = pos, rotation = rot,
             callback_function = function(b) pcall(function() b.setLock(locked) end) ; done() end })
         end)
         if not ok then done() end
-      end, 2)
+      end, 3 + 4 * slot)
       -- never wait on a spawn that does not report back
       Wait.time(done, 10)
       refilled = refilled + 1
@@ -757,6 +786,7 @@ local function setDifficulty(i)
   end
   local tokens = bagFor(i)
   appliedSig = changeSig(bagChanges())
+  bag.hold(1.4)                -- SCED destroys the old bag this frame: leave it alone until the new one lands
   SCED.globalCall("setChaosBagState", tokens)
   -- SCED respawns the bag; once it has landed, re-add the band's [static] tokens
   Wait.time(function()
@@ -897,7 +927,9 @@ local function readRecollections()
     if type(getObjects) ~= "function" then return end
     for _, o in ipairs(getObjects()) do
       local t = o.type
-      if t == "Bag" or t == "Deck" then
+      -- SCED's own card bags hold thousands of cards and never a Recollection: reading them on every
+      -- redraw stalls the table, so a container that large is skipped (as Seat investigators does)
+      if (t == "Bag" or t == "Deck") and (o.getQuantity() or 0) <= 400 then
         for _, e in ipairs(o.getObjects() or {}) do
           local ok, md = pcall(JSON.decode, e.gm_notes or "")
           if ok and type(md) == "table" and md.memoryCost ~= nil then consider(md.id, e.name or "", md) end
@@ -2217,7 +2249,7 @@ end
 --- The Hour the Hours deck on the agenda spot shows (its last card, face up), or nil.
 local function shownHour()
   for _, o in ipairs(getObjects()) do
-    if type(o.isDestroyed) == "function" and not o.isDestroyed() and (o.type == "Deck" or o.type == "Card")
+    if type(o.isDestroyed) == "function" and not isDying(o) and (o.type == "Deck" or o.type == "Card")
         and near(o.getPosition(), AGENDA_SPOT.pos, 0.6) then
       if o.type == "Card" then return hourOf(o.getGMNotes()) end
       local list = o.getObjects() or {}
@@ -2242,11 +2274,12 @@ syncHoursDeck = function(onlyIfWrong)
   for _, o in ipairs(getObjects()) do
     if type(o.isDestroyed) ~= "function" or type(o.getGMNotes) ~= "function" then
       -- not a table object (a stub): nothing of the Hours
-    elseif not o.isDestroyed() and o.type == "Card" and hourOf(o.getGMNotes()) then
+    elseif not isDying(o) and o.type == "Card" and hourOf(o.getGMNotes()) then
       holders = holders + 1
       keep(o.getData())
+      markDying(o)
       o.destruct()
-    elseif not o.isDestroyed() and o.type == "Deck" then
+    elseif not isDying(o) and o.type == "Deck" then
       local hours, others = {}, 0
       for _, e in ipairs(o.getObjects() or {}) do
         if hourOf(e.gm_notes) then hours[#hours + 1] = e.guid else others = others + 1 end
@@ -2259,12 +2292,17 @@ syncHoursDeck = function(onlyIfWrong)
             looks = { Nickname = d.Nickname, Tags = d.Tags, Description = d.Description }
           end
           for _, c in ipairs(d.ContainedObjects or {}) do keep(c) end
+          markDying(o)
           o.destruct()
         else
+          -- the Hours out of a mixed deck, while it still holds two or more cards (taking from a
+          -- two-card deck dissolves it); a lone Hour left behind is found as a card next time
           local p = o.getPosition()
           for _, g in ipairs(hours) do
+            local ok, n = pcall(function() return o.getQuantity() end)
+            if not ok or (n or 0) < 3 then break end
             local c = o.takeObject({ guid = g, position = { p.x, p.y + 3, p.z }, smooth = false })
-            if c then keep(c.getData()) ; c.destruct() end
+            if c then keep(c.getData()) ; markDying(c) ; c.destruct() end
           end
         end
       end

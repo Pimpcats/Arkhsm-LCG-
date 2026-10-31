@@ -943,6 +943,10 @@ local SETTABLE = {
 
 local methods = {}
 E.methods = methods
+E.DYING_UNSAFE = { takeObject = true, putObject = true, createButton = true, editButton = true, destruct = true,
+  setPosition = true, setPositionSmooth = true, setRotation = true, deal = true, shuffle = true, setLock = true,
+  addTag = true, setGMNotes = true, setName = true, setDescription = true, spread = true, split = true,
+  cut = true, createInput = true, setState = true, flip = true, call = true, setScale = true }
 
 local function st_(o)
   local st = S[o]
@@ -974,6 +978,25 @@ objectMeta.__index = function(o, k)
         if s2.removed and k ~= "isDestroyed" and k ~= "getGUID" then
           requireAlive(o, k)
           return nil
+        end
+        -- TTS destroys an object at the end of the frame: a script that changes it (or takes a card out of
+        -- it) after destruct() in the same frame works on an object Unity is tearing down ("Can't add
+        -- component to object that is being destroyed")
+        if s2.destroying and E.DYING_UNSAFE[k] then
+          E.dyingAccess = (E.dyingAccess or 0) + 1
+          E.dyingLog = E.dyingLog or {}
+          local who = currentWho and currentWho.label or "?"
+          if currentWho and currentWho.origin == "campaign" then
+            E.dyingCampaign = E.dyingCampaign or {}
+            E.dyingCampaign[#E.dyingCampaign + 1] = string.format("%s.%s by %s at %.2fs", s2.data.Nickname or s2.data.Name,
+              k, who, E.now)
+          end
+          local key = who .. " " .. k
+          E.dyingLog[key] = (E.dyingLog[key] or 0) + 1
+          if (E.dyingLog[key] or 0) == 1 then
+            E.warn(string.format("%s.%s on an object destroyed this frame (%s) by %s\n%s",
+              s2.data.Nickname or s2.data.Name, k, s2.guid, who, debug.traceback("", 2)))
+          end
         end
         if rawequal(a, o) then return m(o, ...) end
         return m(o, a, ...)

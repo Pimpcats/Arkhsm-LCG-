@@ -365,18 +365,21 @@ return function(H)
   -- bag onto a playmat, minicard onto the map later
   local seated = {}
   step("Campaign Setup: seat two investigators on SCED playmats", function()
-    local pbag = find(function(o) return o.type == "Bag" and o.hasTag("StillHour")
+    -- one pouch per investigator, and one of Recollections
+    local pouches = findAll(function(o) return o.type == "Bag" and o.hasTag("StillHour")
       and tostring(o.getName()):find("Player Cards", 1, true) ~= nil end)
-    check("the player-card bag is on the table", pbag ~= nil)
-    if not pbag then return end
+    check("the player-card pouches are on the table (one per investigator and the Recollections)", #pouches == 6, #pouches)
+    if #pouches == 0 then return end
     local mats = { "White", "Orange" }
     local want = { "sthrelias", "sthrbirdie" }
     local handler = E.byGuid("123456")
     for i, id in ipairs(want) do
-      local guid
-      for _, e in ipairs(pbag.getObjects()) do
-        local m = decode(e.gm_notes) or {}
-        if m.id == id then guid = e.guid end
+      local guid, pbag
+      for _, b in ipairs(pouches) do
+        for _, e in ipairs(b.getObjects()) do
+          local m = decode(e.gm_notes) or {}
+          if m.id == id then guid, pbag = e.guid, b end
+        end
       end
       local mat = handler and handler.call("getObjectByOwnerAndType", { owner = mats[i], type = "Playermat" })
       -- SCED's investigator slot on the mat (PlayermatApi localInvestigatorPosition)

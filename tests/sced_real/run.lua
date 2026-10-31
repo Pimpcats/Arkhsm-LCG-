@@ -178,12 +178,27 @@ local gaps = {}
 for k, n in pairs(E.gaps) do gaps[#gaps + 1] = string.format("%s x%d", k, n) end
 table.sort(gaps)
 if #gaps > 0 then H.info("emulator gaps (unknown object members read): " .. table.concat(gaps, ", ")) end
+-- the campaign's scripts must never change an object they (or anything) destroyed in the same frame:
+-- TTS is tearing it down (the owner's Clear Board closed TTS this way)
+do
+  local list = E.dyingCampaign or {}
+  H.check("no campaign script works on an object destroyed in the same frame", #list == 0,
+    #list > 0 and (#list .. ": " .. table.concat(list, "; ", 1, math.min(#list, 5))) or nil)
+end
+if (E.dyingAccess or 0) > 0 then
+  local parts = {}
+  for k, n in pairs(E.dyingLog or {}) do parts[#parts + 1] = string.format("%s x%d", k, n) end
+  table.sort(parts)
+  H.info(string.format("%d call(s) on objects destroyed in the same frame: %s", E.dyingAccess, table.concat(parts, ", ")))
+end
 if (E.destroyedAccess or 0) > 0 then
   H.info(string.format("%d access(es) to destroyed objects (warnings; TTS would error unless guarded by ~= nil)",
     E.destroyedAccess))
 end
 for _, w in ipairs(E.warnings) do
-  if w:find("destroyed object", 1, true) then io.write("  [warn] " .. w:sub(1, 600) .. "\n") end
+  if w:find("destroyed object", 1, true) or w:find("destroyed this frame", 1, true) then
+    io.write("  [warn] " .. w:sub(1, 900) .. "\n")
+  end
 end
 io.write(string.format("RESULT: %d passed, %d failed (suite %s, %s, %s, virtual %.1fs)\n", H.passed, H.failed,
   suite, H.mode, _VERSION, E.now))

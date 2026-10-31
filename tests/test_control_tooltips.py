@@ -26,7 +26,7 @@ def test_every_moved_instruction_is_on_a_button():
         ("do not also \"\n          .. \"click Dissonance", CONTROL),       # Static token Resolve
         ("The Turning: one click here, two on Dissonance", BOARD),          # Dissonance raised
         ("for example Foreknowledge", BOARD),                               # Loop-power Memory
-        ("Records \"\n            .. \"Office takes one back", BOARD),       # Years pending
+        ("Records Office takes one back", BOARD),                         # Years pending
         ("Disengage and exhaust the Appointed yourself", BOARD),            # Hold Back
         ("lands on a closed or unrevealed location", BOARD),                # Hunt
     ):

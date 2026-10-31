@@ -720,19 +720,19 @@ step("board: Aging on the investigator", function(go)
   -- leaning is derived from the investigator's own tallies, clicked on the card
   local card = INV.elias
   check("the investigator card has both leaning tallies",
-    hasButton(card, "Dissonance raised 0") and hasButton(card, "Loop-power Memory 0"), labelsOf(card))
+    hasButton(card, "Raised 0") and hasButton(card, "Spent 0"), labelsOf(card))
   local t = ctl.call("shApiTally", { id = "sthrelias", kind = "raises", delta = 2 })
   check("two Dissonance raises are not leaning", t ~= nil and t.leaned == false)
   t = ctl.call("shApiTally", { id = "sthrelias", kind = "spent", delta = 4 })
   check("4 Memory on loop powers is leaning", t ~= nil and t.leaned == true)
-  check("the card shows the tallies", hasButton(card, "Dissonance raised 2") and hasButton(card, "Loop-power Memory 4"),
+  check("the card shows the tallies", hasButton(card, "Raised 2") and hasButton(card, "Spent 4"),
     labelsOf(card))
   local r1 = ctl.call("shApiAge", { id = "sthrelias", defeated = true, physical = "combat", mental = "willpower" })
   check("Age adds Years for defeat, danger and leaning (4)", r1 ~= nil and r1.years == 4,
     r1 and ("years " .. r1.years) or "no result")
   check("a second Age in the same interlude is refused", ctl.call("shApiAge", { id = "sthrelias" }) == nil)
   ctl.call("shApiBeginNextLoop")
-  check("the tallies clear when the next loop begins", hasButton(card, "Loop-power Memory 0"), labelsOf(card))
+  check("the tallies clear when the next loop begins", hasButton(card, "Spent 0"), labelsOf(card))
   ctl.call("shApiReset")
   local r2 = ctl.call("shApiAge", { id = "sthrelias", defeated = true, physical = "combat", mental = "willpower" })
   check("the next interlude reaches Weathered", r2 ~= nil and r2.bracket == "Weathered",
@@ -932,7 +932,7 @@ step("board: pending Years", function(go)
   ctl.call("shApiBeginNextLoop")                           -- a fresh loop: nobody has aged in it
   local p = ctl.call("shApiPendingYears", { id = "sthrelias", delta = 2 })
   check("a card's Years are held as pending (2)", p == 2, tostring(p))
-  check("the investigator card shows its pending Years", hasButton(INV.elias, "Years pending 2"), labelsOf(INV.elias))
+  check("the investigator card shows its pending Years", hasButton(INV.elias, "Pending 2"), labelsOf(INV.elias))
   ctl.call("shApiReset")                                    -- a calm loop: no danger
   local r = ctl.call("shApiAge", { id = "sthrelias", physical = "combat", mental = "willpower" })
   if ctlHas(ctl, "extraYears = cond.extraYears") then
@@ -1345,7 +1345,7 @@ local SAVED_HOLDS = {
   { "campaign log", 1, "the campaign log" },
   { "campaign guide", 1, "the campaign guide" },
   { "minicard deck", 1, "the investigator minicards" },
-  { "player-card bag", 1, "the player-card bag" },
+  { "player-card bag", 6, "the player-card pouches (one per investigator, one of Recollections)" },
   { "Control token", 1, "the Control token" },
   { "[static] token", 1, "the [static] token" },
 }

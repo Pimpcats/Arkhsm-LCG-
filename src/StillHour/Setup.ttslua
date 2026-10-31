@@ -106,8 +106,8 @@ local function dataById(container, id)
   return nil
 end
 
---- The bag or deck on the table that holds the card with this campaign id (the campaign's Player Cards
--- bag holds the investigators and their cards; its minicard deck the minicards). Found by what it holds,
+--- The bag or deck on the table that holds the card with this campaign id (the campaign's player-card
+-- pouches hold the investigators and their cards; its minicard deck the minicards). Found by what it holds,
 -- never by name: SCED's own "All Player Cards" bag is on the table too.
 -- SCED's own card bags hold thousands of cards: reading each of them for every card would stall the
 -- table, and the campaign's cards are never in them, so a container that large is skipped.
@@ -213,12 +213,12 @@ function Setup.seat(invId, matColor, opts)
   local bag = holderOf(invId)
   local invPos, deckPos = Setup.zone(matColor, "Investigator"), Setup.zone(matColor, "Deck")
   if not bag or not invPos or not deckPos then
-    rep.why = not bag and "the Player Cards bag (with this investigator in it) is not on the table"
+    rep.why = not bag and "this investigator's pouch (Player Cards) is not on the table"
       or ("no " .. tostring(matColor) .. " playmat")
     return rep
   end
   local inv = dataById(bag, invId)
-  if not inv then rep.why = "the investigator card is not in the Player Cards bag" ; return rep end
+  if not inv then rep.why = "the investigator card is not in their pouch" ; return rep end
   -- the cards their back requires: from the same bag (or any holder of each)
   spawnObjectData({ data = withOwner(fresh(inv), matColor), position = above(invPos), rotation = Setup.rotation(matColor) })
   local mini = dataById(holderOf(invId .. "-m"), invId .. "-m")
