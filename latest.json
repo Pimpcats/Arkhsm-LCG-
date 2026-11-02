@@ -1,13 +1,13 @@
 {
-  "run": "20261102-173235_3896e73",
-  "commit": "3896e734bbd3e185b7b234f179d5a4a779ec5d1d",
+  "run": "20261102-174855_4817f64",
+  "commit": "4817f64b7262083b5b039e229f29b90a2d4c09e5",
   "branch": "main",
-  "started": "2026-11-02T17:32:35.930641Z",
+  "started": "2026-11-02T17:48:55.976062Z",
   "host": "Windows-10-10.0.19045-SP0",
   "passed": 158,
   "failed": 0,
   "runner_line_offset": 14,
-  "finished": "2026-11-02T17:39:36.672058Z",
+  "finished": "2026-11-02T17:55:56.265888Z",
   "verdict": "incomplete",
   "lua_errors": [
     {
@@ -35,10 +35,6 @@
       "error": "[Global] Lua Error <getChaosBagState>: Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:855>\n    at Condition\n    at <[Global] executeScript:95>\n    at waitFor (local)\n    at <[Global] executeScript:849>\n    at <[Global] executeScript:127>\n    at pcall\n    at <[Global] executeScript:84>Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:855>\n    at Condition\n    at <[Global] executeScript:95>\n    at waitFor (local)\n    at <[Global] executeScript:849>\n    at <[Global] executeScript:127>\n    at pcall\n    at <[Global] executeScript:84>"
     },
     {
-      "guid": "fea079",
-      "error": "[Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()"
-    },
-    {
       "guid": "-1",
       "error": "[Global] Lua Error <getChaosBagState>: Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:855>Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:855>"
     },
@@ -51,12 +47,16 @@
       "error": "[Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()"
     },
     {
-      "guid": "-1",
-      "error": "[Global] Lua Error <getChaosBagState>: Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:864>\n    at Condition\n    at <[Global] executeScript:95>\n    at waitFor (local)\n    at <[Global] executeScript:858>\n    at <[Global] executeScript:127>\n    at pcall\n    at <[Global] executeScript:84>Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:864>\n    at Condition\n    at <[Global] executeScript:95>\n    at waitFor (local)\n    at <[Global] executeScript:858>\n    at <[Global] executeScript:127>\n    at pcall\n    at <[Global] executeScript:84>"
+      "guid": "fea079",
+      "error": "[Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()"
     },
     {
       "guid": "fea079",
       "error": "[Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()"
+    },
+    {
+      "guid": "-1",
+      "error": "[Global] Lua Error <getChaosBagState>: Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:864>\n    at Condition\n    at <[Global] executeScript:95>\n    at waitFor (local)\n    at <[Global] executeScript:858>\n    at <[Global] executeScript:127>\n    at pcall\n    at <[Global] executeScript:84>Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:864>\n    at Condition\n    at <[Global] executeScript:95>\n    at waitFor (local)\n    at <[Global] executeScript:858>\n    at <[Global] executeScript:127>\n    at pcall\n    at <[Global] executeScript:84>"
     },
     {
       "guid": "fea079",
@@ -121,14 +121,14 @@
       "detail": null
     },
     {
-      "name": "in-engine rules tests ran",
-      "ok": true,
-      "detail": null
-    },
-    {
       "name": "in-engine rules tests all pass",
       "ok": true,
       "detail": "59 passed, 0 failed"
+    },
+    {
+      "name": "in-engine rules tests ran",
+      "ok": true,
+      "detail": null
     },
     {
       "name": "control token saves its state",
@@ -461,9 +461,19 @@
       "detail": "Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 2 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 2 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 2 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4"
     },
     {
+      "name": "Memory on a departed investigator's cards is not banked",
+      "ok": true,
+      "detail": null
+    },
+    {
       "name": "the investigator card shows its pending Years",
       "ok": true,
       "detail": "Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 2 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 2 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 2 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 2 | Quest 0/4"
+    },
+    {
+      "name": "pending Years are cleared once added",
+      "ok": true,
+      "detail": null
     },
     {
       "name": "a card's Years are held as pending (2)",
@@ -476,29 +486,9 @@
       "detail": "gained 3"
     },
     {
-      "name": "Memory on a departed investigator's cards is not banked",
+      "name": "reaching Hour VI adds 1 Static token until the end of the loop",
       "ok": true,
-      "detail": null
-    },
-    {
-      "name": "pending Years are cleared once added",
-      "ok": true,
-      "detail": null
-    },
-    {
-      "name": "the control offers Undo Hour VI",
-      "ok": true,
-      "detail": "THE STILL HOUR · loop 1 | Memory 0 / 30 | Investigators 3 | Dissonance 1 / 24 · Calm | [static] 1 | Hour 6 · The Wrong Sky | Appointed: Sensed | Relay Investigator B · Memory 0 | Relay Investigator E · Memory 0 | Status | Set Up Loop | Sync Board | Reset Loop | Interlude | Knowledge | Clear Board | Undo Hour VI | Easy | Standard | Hard | Expert"
-    },
-    {
-      "name": "Undo Hour VI takes its Static token back",
-      "ok": true,
-      "detail": "static, extra 0"
-    },
-    {
-      "name": "after the undo, Hour VI resolves again when reached",
-      "ok": true,
-      "detail": null
+      "detail": "hour 6, extra 1"
     },
     {
       "name": "reaching Hour VI again this loop adds nothing (once per loop)",
@@ -506,9 +496,19 @@
       "detail": "extra 1"
     },
     {
-      "name": "reaching Hour VI adds 1 Static token until the end of the loop",
+      "name": "Undo Hour VI takes its Static token back",
       "ok": true,
-      "detail": "hour 6, extra 1"
+      "detail": "static, extra 0"
+    },
+    {
+      "name": "the control offers Undo Hour VI",
+      "ok": true,
+      "detail": "THE STILL HOUR · loop 1 | Memory 0 / 30 | Investigators 3 | Dissonance 1 / 24 · Calm | [static] 1 | Hour 6 · The Wrong Sky | Appointed: Sensed | Relay Investigator B · Memory 0 | Relay Investigator E · Memory 0 | Status | Set Up Loop | Sync Board | Reset Loop | Interlude | Knowledge | Clear Board | Undo Hour VI | Easy | Standard | Hard | Expert"
+    },
+    {
+      "name": "after the undo, Hour VI resolves again when reached",
+      "ok": true,
+      "detail": null
     },
     {
       "name": "a card can be taken out and lands on the table",
@@ -521,12 +521,12 @@
       "detail": "sthrelias"
     },
     {
-      "name": "campaign box spawned (GMNotes type CampaignBox)",
+      "name": "campaign box carries SCED's memory-bag script",
       "ok": true,
       "detail": null
     },
     {
-      "name": "campaign box carries SCED's memory-bag script",
+      "name": "campaign box spawned (GMNotes type CampaignBox)",
       "ok": true,
       "detail": null
     },
@@ -691,6 +691,11 @@
       "detail": "8"
     },
     {
+      "name": "the box holds the spare scenario boxes (Clear Board refills a used box from them)",
+      "ok": true,
+      "detail": "1"
+    },
+    {
       "name": "the box holds the campaign log",
       "ok": true,
       "detail": "1"
@@ -706,17 +711,17 @@
       "detail": "1"
     },
     {
-      "name": "the box holds the Control token",
-      "ok": true,
-      "detail": "1"
-    },
-    {
       "name": "the box holds the player-card pouches (one per investigator, one of Recollections)",
       "ok": true,
       "detail": "6"
     },
     {
-      "name": "the box holds the spare scenario boxes (Clear Board refills a used box from them)",
+      "name": "the box holds the Control token",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "the box holds the [static] token",
       "ok": true,
       "detail": "1"
     },
@@ -726,9 +731,9 @@
       "detail": "20 piece(s), 0 unrecognised"
     },
     {
-      "name": "the box holds the [static] token",
+      "name": "TTS lists the same pieces inside the box",
       "ok": true,
-      "detail": "1"
+      "detail": "20 vs 20"
     },
     {
       "name": "every scenario box carries SCED's box script, remembers its layout and holds its cards",
@@ -736,14 +741,9 @@
       "detail": "8/8"
     },
     {
-      "name": "TTS lists the same pieces inside the box",
+      "name": "the box's cards are inside it",
       "ok": true,
-      "detail": "20 vs 20"
-    },
-    {
-      "name": "every card face and back is a hosted raw.githubusercontent URL pinned to a commit",
-      "ok": true,
-      "detail": "734/734"
+      "detail": "367 card(s)"
     },
     {
       "name": "every card in the box has consistent SCED metadata",
@@ -751,9 +751,9 @@
       "detail": ""
     },
     {
-      "name": "the box's cards are inside it",
+      "name": "every card face and back is a hosted raw.githubusercontent URL pinned to a commit",
       "ok": true,
-      "detail": "367 card(s)"
+      "detail": "734/734"
     },
     {
       "name": "the box remembers a spot for every piece",
@@ -766,12 +766,12 @@
       "detail": null
     },
     {
-      "name": "the guide PDF is hosted on raw.githubusercontent",
+      "name": "the campaign box is empty afterwards",
       "ok": true,
       "detail": null
     },
     {
-      "name": "the campaign box is empty afterwards",
+      "name": "the guide PDF is hosted on raw.githubusercontent",
       "ok": true,
       "detail": null
     },
@@ -779,11 +779,6 @@
       "name": "each piece lands on its remembered spot",
       "ok": true,
       "detail": "20/20"
-    },
-    {
-      "name": "every scenario box is on the table",
-      "ok": true,
-      "detail": "8/8"
     },
     {
       "name": "Place lays out every piece",
@@ -796,6 +791,11 @@
       "detail": null
     },
     {
+      "name": "every scenario box is on the table",
+      "ok": true,
+      "detail": "8/8"
+    },
+    {
       "name": "the Control token is on the table with its buttons",
       "ok": true,
       "detail": "THE STILL HOUR · Prologue | Memory 0 / 30 | Investigators 3 | Dissonance 0 / 24 · Calm | [static] 0 | Hour 1 · First Dark | Appointed: Unseen | Status | Set Up Prologue | Sync Board | Reset Loop | Interlude | Knowledge | Prologue reward +6 | Clear Board | Easy | Standard | Hard | Expert"
@@ -806,14 +806,14 @@
       "detail": "memory 0, dissonance 0, hour 1, loops 0, prologue true"
     },
     {
-      "name": "the box's Control runs its in-engine tests",
-      "ok": true,
-      "detail": null
-    },
-    {
       "name": "the box's Control's in-engine tests all pass",
       "ok": true,
       "detail": "59 passed, 0 failed"
+    },
+    {
+      "name": "the box's Control runs its in-engine tests",
+      "ok": true,
+      "detail": null
     },
     {
       "name": "a scenario box from the saved object and its Control are on the table",
@@ -826,14 +826,14 @@
       "detail": null
     },
     {
-      "name": "the box is empty after its Place, as every SCED box is",
-      "ok": true,
-      "detail": null
-    },
-    {
       "name": "every card it laid out is on the table (none fell into a bag)",
       "ok": true,
       "detail": "36/36"
+    },
+    {
+      "name": "the box is empty after its Place, as every SCED box is",
+      "ok": true,
+      "detail": null
     },
     {
       "name": "the laid-out cards carry the loop tag",
@@ -873,7 +873,7 @@
   ],
   "notes": [
     "SCED detected (GUID reference handler)",
-    "table has 212 object(s) before the run",
+    "table has 211 object(s) before the run",
     "removed 0 object(s) left by an earlier relay run",
     "control sees SCED; [static] mode virtual",
     "no Still Hour investigator seated on a SCED mat: skill tracker not exercised",
