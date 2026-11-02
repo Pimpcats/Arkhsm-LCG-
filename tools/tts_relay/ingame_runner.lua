@@ -396,11 +396,25 @@ local function bandStarts(ctl)
   return math.floor(reset / 3), math.floor(2 * reset / 3)
 end
 
-local function staticInBag(bag)
-  -- SCED respawns its chaos bag when a difficulty is set (setChaosBagState),
-  -- so a bag found earlier can be gone: look it up again
+-- SCED respawns its chaos bag when a difficulty is set (setChaosBagState): for a moment the new bag is
+-- still spawning and is not yet a container (TTS: "getObjects() on an object that does not support
+-- getObjects()", and SCED's getChaosBagState errors). Only a bag that has finished spawning is read.
+local function readyBag(bag)
   if not alive(bag) then bag = Global.call("findChaosBag") end
-  if not alive(bag) then return 0 end
+  if not alive(bag) then return nil end
+  local ok, ready = pcall(function() return bag.spawning ~= true and bag.type == "Bag" end)
+  return (ok and ready) and bag or nil
+end
+--- SCED's chaos bag state (token ids), or nil while the bag is respawning
+local function bagState()
+  if not readyBag(nil) then return nil end
+  return Global.call("getChaosBagState")
+end
+
+local function staticInBag(bag)
+  -- a bag found earlier can be gone (respawned): look it up again; -1 while it is respawning
+  bag = readyBag(bag)
+  if not bag then return -1 end
   local n = 0
   for _, e in ipairs(bag.getObjects() or {}) do
     for _, t in ipairs(e.tags or {}) do if t == "StillHourStatic" then n = n + 1 end end
@@ -432,7 +446,7 @@ step("board: [static] in the chaos bag", function(go)
     ctl.call("shApiCounter", { name = "dissonance", delta = noticedAt - glitchAt })
     waitFor(function() return staticInBag(bag) == 2 end, 15, function(ok2)
       check("entering Noticed puts a 2nd [static] in the chaos bag", ok2, "in bag: " .. staticInBag(bag))
-      local state = Global.call("getChaosBagState")
+      local state = bagState()
       check("SCED's own bag state still reads (ChaosBagApi.getChaosBagState)", type(state) == "table",
         type(state) == "table" and (#state .. " SCED token(s)") or tostring(state))
       -- a reveal: take one [static] out of the bag (what drawChaosToken does)
@@ -826,28 +840,28 @@ step("board: chaos bag difficulty presets", function(go)
   if not bag then check("SCED chaos bag found for the difficulty presets", false) ; return go() end
   -- the owner's bag is put back exactly as it was afterwards
   local before = {}
-  for i, id in ipairs(Global.call("getChaosBagState") or {}) do before[i] = id end
+  for i, id in ipairs(bagState() or {}) do before[i] = id end
   ctl.call("shApiCounter", { name = "dissonance", delta = (bandStarts(ctl)) })     -- Glitch: 1 [static]
   local ok1 = ctl.call("shApiDifficulty", { i = 1 })              -- Easy: 17 tokens
   waitFor(function()
-    local st = Global.call("getChaosBagState") or {}
+    local st = bagState() or {}
     return #st == 17 and staticInBag(bag) == 1
   end, 15, function(done1)
-    local st = Global.call("getChaosBagState") or {}
+    local st = bagState() or {}
     check("Easy fills SCED's chaos bag with the guide's 17 tokens", ok1 == true and done1 and #st == 17
       and countOf(st, "p1") == 2 and countOf(st, "blue") == 1, #st .. " token(s)")
     check("...and the band's [static] is put back in the bag", staticInBag(bag) == 1, "in bag: " .. staticInBag(bag))
     ctl.call("shApiDifficulty", { i = 4 })                          -- Expert: 19 tokens
     waitFor(function()
-      local s2 = Global.call("getChaosBagState") or {}
+      local s2 = bagState() or {}
       return #s2 == 19 and staticInBag(bag) == 1
     end, 15, function(done2)
-      local s2 = Global.call("getChaosBagState") or {}
+      local s2 = bagState() or {}
       check("Expert replaces the token set (19 tokens, one -8, no +1)", done2 and #s2 == 19
         and countOf(s2, "m8") == 1 and countOf(s2, "p1") == 0, #s2 .. " token(s)")
       Global.call("setChaosBagState", before)
       ctl.call("shApiRestore", { blob = snapshot })
-      waitFor(function() return staticInBag(bag) == 0 and #(Global.call("getChaosBagState") or {}) == #before end,
+      waitFor(function() return staticInBag(bag) == 0 and #(bagState() or {}) == #before end,
         15, function(back)
           check("the table's own chaos bag is put back afterwards", back, "in bag: " .. staticInBag(bag))
           go()

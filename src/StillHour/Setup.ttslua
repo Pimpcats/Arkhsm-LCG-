@@ -405,13 +405,13 @@ function Setup.resetInvestigator(matColor, opts)
   trace("reset " .. tostring(matColor) .. ": " .. #cards .. " cards collected, respawn")
   -- healed, nothing on the mat, 5 resources (the mat's own counters)
   for _, c in ipairs({ { "DamageCounter", 0 }, { "HorrorCounter", 0 }, { "ResourceCounter", 5 } }) do
-    pcall(function() mat.call("updateCounter", { type = c[1], newValue = c[2] }) end)
+    SCED.callMat(matColor, "updateCounter", { type = c[1], newValue = c[2] })
   end
-  pcall(function() mat.call("removeClues", 99) end)
+  SCED.callMat(matColor, "removeClues", 99)
   local rot = Setup.rotation(matColor, true)
   local function draw()
     trace("reset " .. tostring(matColor) .. ": draw")
-    pcall(function() mat.call("drawCardsWithReshuffleWrapper", { numCards = opts.hand or 5 }) end)
+    SCED.callMat(matColor, "drawCardsWithReshuffleWrapper", { numCards = opts.hand or 5 })
     if opts.after then pcall(opts.after, rep) end
   end
   if #cards > 0 then
@@ -467,7 +467,7 @@ function Setup.replaceDrawnWeaknesses(matColor)
     Wait.time(function()
       local deck = deckOn(deckPos)
       if deck then pcall(function() deck.shuffle() end) end
-      pcall(function() mat.call("drawCardsWithReshuffleWrapper", { numCards = n }) end)
+      SCED.callMat(matColor, "drawCardsWithReshuffleWrapper", { numCards = n })
     end, 1)
   end
   return n

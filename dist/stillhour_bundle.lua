@@ -2415,6 +2415,11 @@ end
 -- (Tokens SCED does not know — like [static] — are skipped by SCED itself.)
 function SCED.getChaosBagState()
   if not SCED.isPresent() then return nil end
+  -- right after SCED respawns its bag (setChaosBagState) the new bag is still spawning and is not yet
+  -- a container: SCED's getChaosBagState would error then
+  local bag = SCED.findChaosBag()
+  local ready = bag and try(function() return bag.spawning ~= true and bag.type == "Bag" end)
+  if not ready then return nil end
   return SCED.globalCall("getChaosBagState")
 end
 
@@ -2512,13 +2517,40 @@ function SCED.playermat(matColor)
   return SCED.getObjectByOwnerAndType(matColor, "Playermat")
 end
 
+--- Is this playmat whole? When an investigator card lands on a mat, SCED's playmat reloads itself
+-- with that class's texture (Playermat.updateTexture: self.reload()): the old mat is torn down and the
+-- new one loads its assets for a moment. A script call into a mat in that moment can take TTS down,
+-- so nothing calls a mat until it is whole again.
+function SCED.matReady(mat)
+  if not mat then return false end
+  return try(function() return mat.isDestroyed() == false and mat.spawning ~= true and mat.loading_custom ~= true end) == true
+end
+
+--- Call a function on a mat's script once the mat is whole (at once when it is): a reloading mat is
+-- waited for, up to `tries` checks a quarter second apart. Returns true when it was called now.
+function SCED.callMat(matColor, fn, arg, tries)
+  local mat = SCED.playermat(matColor)
+  if SCED.matReady(mat) then
+    try(function() mat.call(fn, arg) end)
+    return true
+  end
+  tries = tries or 40
+  if tries > 0 then
+    try(function() Wait.time(function() SCED.callMat(matColor, fn, arg, tries - 1) end, 0.25) end)
+  end
+  return false
+end
+
 --- PlayermatApi.getActiveInvestigatorData(matColor) -> {id, class, miniId, ...}.
--- Playermat.ttslua fills it when an investigator card lands on the mat.
+-- Playermat.ttslua fills it when an investigator card lands on the mat. While the mat reloads, the
+-- last answer it gave (it has not changed: the reload is that investigator's own texture).
+local lastActive = {}
 function SCED.activeInvestigatorData(matColor)
   local mat = SCED.playermat(matColor)
   if not mat then return nil end
+  if not SCED.matReady(mat) then return lastActive[matColor] end
   local d = try(function() return mat.call("getActiveInvestigatorData") end)
-  if type(d) == "table" then return d end
+  if type(d) == "table" then lastActive[matColor] = d ; return d end
   return nil
 end
 
@@ -3373,13 +3405,13 @@ function Setup.resetInvestigator(matColor, opts)
   trace("reset " .. tostring(matColor) .. ": " .. #cards .. " cards collected, respawn")
   -- healed, nothing on the mat, 5 resources (the mat's own counters)
   for _, c in ipairs({ { "DamageCounter", 0 }, { "HorrorCounter", 0 }, { "ResourceCounter", 5 } }) do
-    pcall(function() mat.call("updateCounter", { type = c[1], newValue = c[2] }) end)
+    SCED.callMat(matColor, "updateCounter", { type = c[1], newValue = c[2] })
   end
-  pcall(function() mat.call("removeClues", 99) end)
+  SCED.callMat(matColor, "removeClues", 99)
   local rot = Setup.rotation(matColor, true)
   local function draw()
     trace("reset " .. tostring(matColor) .. ": draw")
-    pcall(function() mat.call("drawCardsWithReshuffleWrapper", { numCards = opts.hand or 5 }) end)
+    SCED.callMat(matColor, "drawCardsWithReshuffleWrapper", { numCards = opts.hand or 5 })
     if opts.after then pcall(opts.after, rep) end
   end
   if #cards > 0 then
@@ -3435,7 +3467,7 @@ function Setup.replaceDrawnWeaknesses(matColor)
     Wait.time(function()
       local deck = deckOn(deckPos)
       if deck then pcall(function() deck.shuffle() end) end
-      pcall(function() mat.call("drawCardsWithReshuffleWrapper", { numCards = n }) end)
+      SCED.callMat(matColor, "drawCardsWithReshuffleWrapper", { numCards = n })
     end, 1)
   end
   return n

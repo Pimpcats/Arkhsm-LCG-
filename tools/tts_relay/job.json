@@ -1,12 +1,18 @@
 {
-  "_doc": "TEMPORARY: the relay runs the seating probe (tools/tts_relay/probe_seat.lua) instead of the full suite, to find what freezes TTS while seating. The full job is restored afterwards.",
+  "_doc": "What the TTS relay spawns and runs on each push. payloads: dist files (a TTS save with ObjectStates, or one object). role \"saved_object\": the exact file the owner loads, spawned and tested on its own after the component builds are cleared away. runner: Lua sent into the live game. See docs/TTS_RELAY.md.",
   "payloads": [
+    {
+      "file": "dist/the_still_hour_mod.json"
+    },
+    {
+      "file": "dist/the_still_hour_table.json"
+    },
     {
       "file": "dist/saved_object_the_still_hour.json",
       "role": "saved_object"
     }
   ],
-  "runner": "tools/tts_relay/probe_seat.lua",
-  "timeout_s": 180,
+  "runner": "tools/tts_relay/ingame_runner.lua",
+  "timeout_s": 420,
   "screenshot_pause_s": 2
 }

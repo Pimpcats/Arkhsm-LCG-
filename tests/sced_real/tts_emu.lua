@@ -992,6 +992,10 @@ objectMeta.__index = function(o, k)
           E.dyingCampaign = E.dyingCampaign or {}
           E.dyingCampaign[#E.dyingCampaign + 1] = string.format("%s.%s by %s at %.2fs while it reloads",
             s2.data.Nickname or s2.data.Name, k, currentWho.label or "?", E.now)
+          if #E.dyingCampaign <= 2 then
+            E.warn(string.format("%s.%s while it reloads, by %s\n%s", s2.data.Nickname or s2.data.Name, k,
+              currentWho.label or "?", debug.traceback("", 2)))
+          end
         end
         if s2.destroying and E.DYING_UNSAFE[k] then
           E.dyingAccess = (E.dyingAccess or 0) + 1
@@ -1479,6 +1483,10 @@ end
 -- containers
 function methods.getObjects(o)
   local st = S[o]
+  -- as in TTS: a container spawned this frame is not a container yet (SCED's respawned chaos bag)
+  if st.contained and st.spawning then
+    error("Attempting to call getObjects() on an object that does not support getObjects()", 2)
+  end
   if st.contained then
     local l = {}
     for i, c in ipairs(st.contained) do l[i] = entryOf(c, i) end
