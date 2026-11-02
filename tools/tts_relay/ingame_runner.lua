@@ -1720,7 +1720,12 @@ local function scenarioBoxes()
   end
   return by
 end
-local function boxFull(o) return alive(o) and #(o.getObjects() or {}) > 0 end
+-- (a box Clear Board has just refilled is still spawning, not yet a container: not full yet)
+local function boxFull(o)
+  if not alive(o) then return false end
+  local ok, n = pcall(function() return o.spawning ~= true and #(o.getObjects() or {}) or 0 end)
+  return ok and n and n > 0
+end
 local function sced(owner, kind)
   local h = getObjectFromGUID("123456")
   return h and h.call("getObjectByOwnerAndType", { owner = owner, type = kind }) or nil

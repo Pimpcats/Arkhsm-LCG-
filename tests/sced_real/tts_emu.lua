@@ -1484,7 +1484,7 @@ end
 function methods.getObjects(o)
   local st = S[o]
   -- as in TTS: a container spawned this frame is not a container yet (SCED's respawned chaos bag)
-  if st.contained and st.spawning then
+  if st.contained and st.spawning and not st.fromSave then
     error("Attempting to call getObjects() on an object that does not support getObjects()", 2)
   end
   if st.contained then
@@ -1691,6 +1691,7 @@ function makeObject(data, stateId, opts)
                guid = guid, locked = data.Locked == true, resting = true, spawning = true,
                origin = opts.origin or "table" }
   S[o] = st
+  st.fromSave = E.loadingSave == true
   data.GUID = guid
   for _, t in ipairs(data.Tags or {}) do st.tags[t] = true end
   data.Tags = nil
@@ -2298,6 +2299,7 @@ end
 -- every object's script chunk and onLoad(script_state) run in order, then
 -- Global's onLoad(state).
 function E.loadSave(save, origin)
+  E.loadingSave = true
   E.globalScript = save.LuaScript or ""
   E.globalState = save.LuaScriptState or ""
   if save.SnapPoints then GlobalObj.setSnapPoints(save.SnapPoints) end
@@ -2347,6 +2349,7 @@ function E.loadSave(save, origin)
     E.protect(globalEnv.__who, globalEnv.onLoad, E.globalState)
   end
   currentWho = { label = "harness", origin = "harness" }
+  E.loadingSave = false
   return created
 end
 
