@@ -7334,12 +7334,17 @@ local function investigatorsTo(locId)
   end
   if not loc then return 0 end
   local p = loc.getPosition()
+  -- each minicard comes from a playmat facing its own way: on the location they all take its angle
+  local ry = (loc.getRotation() or {}).y or 180
   local n = 0
   for i, inv in ipairs(seatedByMat()) do
     if inv.minicard and not inv.minicard.isDestroyed() then
       local dx = ((i - 1) % 2 == 0) and -0.45 or 0.45
       local dz = (i <= 2) and -0.35 or 0.35
-      pcall(function() inv.minicard.setPositionSmooth({ p.x + dx, p.y + 0.6, p.z + dz }, false, true) end)
+      pcall(function()
+        inv.minicard.setRotationSmooth({ 0, ry, 0 }, false, true)
+        inv.minicard.setPositionSmooth({ p.x + dx, p.y + 0.6, p.z + dz }, false, true)
+      end)
       n = n + 1
     end
   end

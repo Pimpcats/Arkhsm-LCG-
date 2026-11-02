@@ -149,6 +149,11 @@ return function(H)
     check("both investigators are at the Square", sq ~= nil and card("sthrelias-m") ~= nil
       and near(card("sthrelias-m").getPosition(), sq.getPosition(), 1.0)
       and near(card("sthrcass-m").getPosition(), sq.getPosition(), 1.0))
+    local function sameAngle(a, b) local d = math.abs((a - b) % 360) return d < 3 or d > 357 end
+    local ry = sq and sq.getRotation().y or 0
+    check("both minicards face the same way as the location they stand on",
+      sq ~= nil and sameAngle(card("sthrelias-m").getRotation().y, ry) and sameAngle(card("sthrcass-m").getRotation().y, ry),
+      string.format("%.0f / %.0f vs %.0f", card("sthrelias-m").getRotation().y, card("sthrcass-m").getRotation().y, ry))
     check("the chat says to check the table", chatSince(mark):find("Check the table", 1, true) ~= nil, chatSince(mark):sub(-600))
   end)
 
