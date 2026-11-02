@@ -1,0 +1,573 @@
+17:32:36.071 relay sending runner + 6 object(s), 1776 KB
+17:32:36.282 print [INFO] table has 212 object(s) before the run
+17:32:36.284 print [INFO] SCED detected (GUID reference handler)
+17:32:36.297 print [INFO] removed 0 object(s) left by an earlier relay run
+17:32:36.718 print THE STILL HOUR control ready. Investigators = 3 (SCED detected).
+17:32:36.773 print [PASS] every payload finished spawning  -- 5/5 spawned
+17:32:37.340 print [PASS] spawned content contains cards  -- 51 card(s)
+17:32:37.340 print [PASS] every card has consistent SCED metadata  -- 
+17:32:37.341 print [PASS] no card image points at a local file:/// path  -- 0 local URL(s)
+17:32:37.341 print [PASS] control token is present and scripted
+17:32:37.342 print [PASS] control token created its buttons  -- 19 button(s)
+17:32:37.342 print [PASS] a new campaign opens in the Prologue
+17:32:37.343 print [Still Hour] The night folds for the first time. The Prologue is over (it is not a loop): Loop 1 is next.
+17:32:37.396 print [PASS] ending the Prologue starts Loop 1 without counting a loop
+17:32:37.398 print ──────── THE STILL HOUR — in-engine tests ────────
+17:32:37.398 print [PASS] reset 24 / appointed 16 at 3p
+17:32:37.398 print [PASS] contest target 6 (5 solo, 7 at four)
+17:32:37.398 print [PASS] Calm -> 0 [static]; Appointed Unseen
+17:32:37.399 print [PASS] Glitch -> 1 [static]; Appointed Sensed (1)
+17:32:37.399 print [PASS] Noticed -> 2 [static]; Appointed Arrived (3)
+17:32:37.399 print [PASS] virtual [static] bag tracks baseline + temporary
+17:32:37.399 print [PASS] [static] reveal raises Dissonance
+17:32:37.400 print [PASS] Hour V -> Appointed Sensed (1)
+17:32:37.400 print [PASS] Hour VIII -> Appointed Arrived (3)
+17:32:37.400 print [PASS] Arrived attacks 2/2 and raises Dissonance
+17:32:37.400 print [PASS] Hold Back drops one stage and rewinds one Hour
+17:32:37.400 print [PASS] a fourth Hold Back in a loop does not rewind the Hourglass
+17:32:37.400 print [PASS] Appointed cannot be defeated
+17:32:37.401 print [PASS] removing a manifest Appointed puts it back
+17:32:37.401 print [PASS] Sensed figure deals no attack damage
+17:32:37.686 print [PASS] blocked on reuse
+17:32:37.686 print [PASS] Muscle Memory sees a combat test earlier this loop
+17:32:37.686 print [PASS] a Sensed figure does not hunt
+17:32:37.687 print [PASS] once-per-loop free at node A
+17:32:37.687 print [PASS] Knowledge persists across reset
+17:32:37.688 print [PASS] Memory persists across reset
+17:32:37.688 print [PASS] Muscle Memory: no combat test yet this loop
+17:32:37.689 print [PASS] Hourglass reset to Hour I
+17:32:37.689 print [PASS] Years persist across reset
+17:32:37.689 print [PASS] Dissonance dropped to scar (1)
+17:32:37.689 print [PASS] Muscle Memory: last loop's test does not count this loop
+17:32:37.689 print [PASS] level-3 upgrade debits 3
+17:32:37.689 print [PASS] serialize round-trip (real TTS JSON)
+17:32:37.690 print [PASS] Memory soft-capped to 30 at loop start
+17:32:37.690 print [PASS] advance resolves Hours II,III,IV
+17:32:37.690 print [PASS] Recollection debits memoryCost 5
+17:32:37.690 print [PASS] 'The Hour Was Wrong' keeps Hour IV in the clock (its text stops resolving)
+17:32:37.690 print [PASS] cannot overdraw the pool
+17:32:37.691 print [PASS] Lantern Room front until lamp fact
+17:32:37.691 print [PASS] once-per-loop flags cleared
+17:32:37.691 print [PASS] aging brackets 5/10/15 -> Weathered/Elder/Ancient
+17:32:37.691 print [PASS] Lantern Room flips to back with the fact
+17:32:37.691 print [PASS] Act II opens at 3 surface facts
+17:32:37.691 print [PASS] location cards resolve by metadata id
+17:32:37.692 print [PASS] finale assembles with name+vote+one deep
+17:32:37.806 print [PASS] Ancient drift: int 5->7, health/sanity -1, com floored at 1
+17:32:37.807 print [PASS] Interlude buys level-3 upgrade (=3)
+17:32:37.807 print [PASS] interlude banks on-card Memory
+17:32:37.807 print [PASS] Interlude rejects unaffordable purchase
+17:32:37.807 print [PASS] Hour VI adds 1 Static token
+17:32:37.808 print [PASS] 3 Dissonance raises = leaned on the loop (+1 Year)
+17:32:37.808 print [PASS] prey is the investigator with the most on-card Memory
+17:32:37.808 print [PASS] Victory claims once and banks its Memory
+17:32:37.808 print [PASS] Hour VI once per loop: reaching it again adds nothing
+17:32:37.808 print [PASS] Victory log survives a reset
+17:32:37.808 print [PASS] Interlude buys Recollection at memoryCost (longwayround=2)
+17:32:37.808 print [PASS] undoing a canceled Hour VI takes its token back
+17:32:37.809 print [PASS] Hour VI resolves again in the next loop
+17:32:37.809 print Still Hour tests: 59 passed, 0 failed
+17:32:37.809 print ──────── RESULT: 59 passed, 0 failed ────────
+17:32:37.809 print [PASS] in-engine rules tests ran
+17:32:38.203 print [PASS] Sealed Study enters play open once The Appointed's Name is recorded
+17:32:38.204 print [PASS] ...closed again next loop until act 2a is current again
+17:32:38.204 print [PASS] Sealed Study opens when The Appointed's Name becomes the current act
+17:32:38.204 print [PASS] Sealed Study sealed until both facts
+17:32:38.204 print [PASS] Sealed Study stays closed in Part I
+17:32:38.213 print [PASS] Sealed Study stays closed until its act 2a is current
+17:32:38.312 print [PASS] in-engine rules tests all pass  -- 59 passed, 0 failed
+17:32:38.313 print [PASS] control token saves its state
+17:32:38.498 print THE STILL HOUR control ready. Investigators = 3 (SCED detected).
+17:32:38.798 print [PASS] control token survives save+reload  -- 18 button(s) after reload
+17:32:38.813 print [PASS] state preserved across reload
+17:32:38.817 print [INFO] control sees SCED; [static] mode virtual
+17:32:38.820 print [PASS] control shows Memory / Dissonance / Hour counters  -- THE STILL HOUR · loop 1 | Memory 0 / 30 | Investigators 3 | Dissonance 0 / 24 · Calm | [static] 0 | Hour 1 · First Dark | Appointed: Unseen | Status | Set Up Loop | Sync Board | Reset Loop | Interlude | Knowledge | Clear Board | Easy | Standard | Hard | Expert
+17:32:38.877 print [PASS] Memory counter +2  -- 0 -> 2
+17:32:38.877 print [PASS] Memory button label follows  -- THE STILL HOUR · loop 1 | Memory 2 / 30 | Investigators 3 | Dissonance 0 / 24 · Calm | [static] 0 | Hour 1 · First Dark | Appointed: Unseen | Status | Set Up Loop | Sync Board | Reset Loop | Interlude | Knowledge | Clear Board | Easy | Standard | Hard | Expert
+17:32:38.878 print [Still Hour] Hour 2 — Low Water: Each investigator draws 1 encounter card.
+17:32:38.882 print The Hour turns: SCED removed the doom in play (take any doom off the Hours cards yourself); each investigator heals 1 damage and 1 horror.
+17:32:38.932 print [Still Hour] Hour 1 — First Dark: Hourglass rewound.
+17:32:38.933 print [PASS] Hour counter advances the Hourglass  -- 1 -> 2
+17:32:38.987 print [PASS] Hour counter rewinds
+17:32:39.225 print THE STILL HOUR control ready. Investigators = 3 (SCED detected).
+17:32:40.781 print [PASS] counters persist through save+reload  -- memory 2
+17:32:40.838 print [PASS] save blob is non-empty
+17:32:40.884 print [PASS] SCED chaos bag found (ChaosBagApi.findChaosBag)
+17:32:40.886 print [Still Hour] [static] +1 into the chaos bag (now 1)
+17:32:40.887 print Dissonance leaves Calm: every Echo wakes. Exhaust each Echo as it wakes (it readies in the upkeep phase).
+17:32:40.887 print The Appointed draws nearer: Sensed.
+17:32:40.892 print [Still Hour] The Appointed manifests (Sensed): place it at the location farthest from the investigators.
+17:32:40.953 print [PASS] entering Glitch puts 1 [static] in the chaos bag  -- 0 -> 1
+17:32:40.954 print [Still Hour] [static] +1 into the chaos bag (now 2)
+17:32:40.955 print The Appointed draws nearer: Arrived.
+17:32:40.959 print [Still Hour] The Appointed manifests (Arrived): place it at the location farthest from the investigators.
+17:32:41.033 print [PASS] entering Noticed puts a 2nd [static] in the chaos bag  -- in bag: 2
+17:32:41.034 print [PASS] SCED's own bag state still reads (ChaosBagApi.getChaosBagState)  -- 16 SCED token(s)
+17:32:41.034 print Static token not recognized. Will not be recorded.
+17:32:41.034 print Static token not recognized. Will not be recorded.
+17:32:41.039 print [static] drawn: if it resolves, click Resolve on that token (or Static waiting for a single draw). For a preview or cancellation, return it or right-click Resolve on that token.
+17:32:41.064 print [PASS] drawing a [static] waits for an explicit resolution
+17:32:41.064 print [static] resolves: Dissonance 17 (Noticed).
+17:32:41.102 print [PASS] resolving a [static] from the bag raises Dissonance by 1  -- 16 -> 17
+17:32:41.142 print [Still Hour] [static] -2 from the chaos bag (now 0)
+17:32:41.178 print [PASS] back to Calm removes the [static] tokens again  -- in bag: 0
+17:32:41.353 print [PASS] test locations + minicard spawned
+17:32:41.407 print [Still Hour] Board synced: 2 campaign location(s), 0 flipped, 1 sealed.
+17:32:41.407 print [PASS] board finds both campaign locations by metadata id  -- seen 2
+17:32:41.407 print [PASS] a location with an unknown fact stays on its front
+17:32:41.408 print [PASS] a closed location is labelled CLOSED  -- CLOSED
+17:32:41.408 print The Lamp Remembers recorded: +3 banked Memory (3 banked).
+17:32:41.408 print [PASS] SCED clue spawn is held back while closed (TokenSpawnTrackerApi)
+17:32:41.823 print [PASS] unlocking the flip fact turns the location to its back
+17:32:41.830 print Campaign chaos-bag change: add 1 Tablet token for the rest of the campaign. Change the chaos bag by hand.
+17:32:41.876 print The Vote That Never Ends recorded: +9 banked Memory (12 banked).
+17:32:41.909 print What the Almanac Hid recorded: +3 banked Memory (15 banked).
+17:32:41.909 print [Still Hour] The Appointed's Name is the current act: the Sealed Study opens.
+17:32:41.946 print [PASS] SCED clue spawn is released for the opened location  -- opened 1
+17:32:41.960 print Campaign chaos-bag change: remove 1 Tablet token for the rest of the campaign. Change the chaos bag by hand.
+17:32:42.089 print Campaign chaos-bag change: add 1 Tablet token for the rest of the campaign. Change the chaos bag by hand.
+17:32:42.162 print The Vote That Never Ends recorded: +9 banked Memory (9 banked).
+17:32:42.247 print [Still Hour] The Appointed's Name is the current act: the Sealed Study opens.
+17:32:42.247 print What the Almanac Hid recorded: +3 banked Memory (12 banked).
+17:32:42.380 print [Still Hour] The Appointed manifests at Relay Location B (Sensed).
+17:32:42.380 print The Appointed's Approach advances: Sensed.
+17:32:42.432 print [PASS] a card advance makes it Sensed  -- stage 1
+17:32:42.456 print [PASS] it manifests at the location farthest from the investigators  -- 0.9 from farthest
+17:32:42.457 print [PASS] its card carries a Hold Back button  -- The Appointed: Sensed | Hold Back (success)
+17:32:42.457 print [Still Hour] Hour 2 — Low Water: Each investigator draws 1 encounter card.
+17:32:42.457 print [Still Hour] Hour 3 — The Bell Counts: Raised Dissonance by 1. By hand: if an investigator is at a Church location and your Campaign Log does not record The Thirteenth Toll, click Dissonance once more. Reveal The Belfry now if it is in play.
+17:32:42.461 print The Hour turns: SCED removed the doom in play (take any doom off the Hours cards yourself); each investigator heals 1 damage and 1 horror.
+17:32:42.540 print [Still Hour] Hour 2 — Low Water: Hourglass rewound.
+17:32:42.560 print [Still Hour] The Appointed recedes into shadow (Unseen).
+17:32:42.560 print Held back: the Appointed is Unseen; the Hourglass rewinds to Hour 2.
+17:32:42.563 print SCED removed the doom in play (take any doom off the Hours cards yourself).
+17:32:42.664 print [PASS] Hold Back drops one stage and rewinds one Hour  -- stage 0, hour 3 -> 2
+17:32:42.885 print [PASS] the CLOSED label comes off once every fact is known (Part II)  -- 
+17:32:42.976 print [PASS] at Unseen it leaves the board
+17:32:43.016 print [Still Hour] The Appointed manifests at Relay Location B (Sensed).
+17:32:43.016 print The Appointed's Approach advances: Sensed.
+17:32:43.338 print [Still Hour] The Appointed cannot be defeated. It leaves play only when its Approach is pushed back to Unseen.
+17:32:43.507 print [Still Hour] The Appointed cannot be defeated. It leaves play only when its Approach is pushed back to Unseen.
+17:32:43.515 print [PASS] it cannot be defeated: removed from play, it returns
+17:32:43.530 print The Appointed's Approach advances: Emerging.
+17:32:43.633 print [PASS] Emerging adds a Hunt button  -- The Appointed: Emerging | Hold Back (success) | Hunt (move toward prey)
+17:32:43.700 print [Still Hour] The Appointed moves to Relay Location A (nearest investigator).
+17:32:43.768 print [PASS] Hunt moves it one location toward its prey  -- 0.9 from prey location
+17:32:43.780 print Campaign chaos-bag change: remove 1 Tablet token for the rest of the campaign. Change the chaos bag by hand.
+17:32:43.795 print [Still Hour] The Appointed recedes into shadow (Unseen).
+17:32:44.177 print Campaign chaos-bag change: add 1 Tablet token for the rest of the campaign. Change the chaos bag by hand.
+17:32:44.227 print The Vote That Never Ends recorded: +9 banked Memory (9 banked).
+17:32:44.262 print [Still Hour] The Appointed's Name is the current act: the Sealed Study opens.
+17:32:44.262 print What the Almanac Hid recorded: +3 banked Memory (12 banked).
+17:32:44.384 print [PASS] investigator cards, minicards and a third location spawned
+17:32:44.435 print [PASS] both investigators are found by card metadata
+17:32:44.437 print [PASS] each investigator card has a Memory button  -- Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4
+17:32:44.438 print [PASS] each investigator card shows Years  -- Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/8
+17:32:44.733 print [PASS] the card's Memory button follows the count  -- Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/8 | Memory 3 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/8 | Memory 3 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/8
+17:32:44.839 print [Still Hour] The Appointed manifests at Relay Location C (Sensed).
+17:32:44.839 print The Appointed's Approach advances: Sensed.
+17:32:44.948 print The Appointed's Approach advances: Emerging.
+17:32:45.469 print [PASS] it manifests at the location away from both investigators
+17:32:45.503 print [Still Hour] The Appointed moves to Relay Location B (prey: Relay Investigator B, most Memory (3)).
+17:32:45.590 print [PASS] it hunts the investigator with the most Memory (not merely the nearest)
+17:32:45.692 print [Still Hour] The Appointed is engaged with an investigator: it does not move.
+17:32:45.831 print [PASS] the investigator it engaged holds it there after the prey changes (Rules Reference: Hunter)
+17:32:45.960 print [Still Hour] The Appointed moves to Relay Location A (prey: Relay Investigator E, most Memory (5)).
+17:32:46.044 print [PASS] when another investigator has more Memory, the prey changes
+17:32:46.059 print Campaign chaos-bag change: remove 1 Tablet token for the rest of the campaign. Change the chaos bag by hand.
+17:32:46.075 print [Still Hour] The Appointed recedes into shadow (Unseen).
+17:32:46.141 print [Still Hour] [static] +2 into the chaos bag (now 2)
+17:32:46.141 print The Appointed draws nearer: Arrived.
+17:32:46.142 print Dissonance leaves Calm: every Echo wakes. Exhaust each Echo as it wakes (it readies in the upkeep phase).
+17:32:46.184 print [Still Hour] The Appointed manifests at Relay Location C (Arrived).
+17:32:46.250 print [Still Hour] The night folds. Loop reset: Memory/Knowledge/Years kept; Dissonance dropped to the scar.
+17:32:46.271 print [Still Hour] The Appointed recedes into shadow (Unseen).
+17:32:46.401 print [PASS] the investigator card has both leaning tallies  -- Memory 5 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 5 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4
+17:32:46.473 print [PASS] two Dissonance raises are not leaning
+17:32:46.550 print [PASS] 4 Memory on loop powers is leaning
+17:32:46.556 print [PASS] the card shows the tallies  -- Memory 5 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 5 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 2 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 2 | Spent 4 | Pending 0 | Quest 0/4
+17:32:46.586 print Relay Investigator E gains 4 Year(s): 4 Years (Prime)
+17:32:46.670 print [PASS] Age adds Years for defeat, danger and leaning (4)  -- years 4
+17:32:46.754 print [PASS] a second Age in the same interlude is refused
+17:32:46.816 print A new loop begins. Memory capped at 30; 0 lost.
+17:32:46.999 print [PASS] the tallies clear when the next loop begins  -- Memory 5 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 5 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 2 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 2 | Spent 4 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 2 | Spent 4 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 2 | Spent 4 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 2 | Spent 4 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4
+17:32:47.001 print [Still Hour] The night folds. Loop reset: Memory/Knowledge/Years kept; Dissonance dropped to the scar.
+17:32:47.112 print Relay Investigator E gains 2 Year(s): 6 Years (Weathered) Now: -1 combat, +1 willpower.
+17:32:47.189 print [PASS] the next interlude reaches Weathered  -- 6 Weathered
+17:32:47.499 print [PASS] the investigator card shows Years and bracket  -- Memory 5 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 5 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 2 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 2 | Spent 4 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 2 | Spent 4 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 2 | Spent 4 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 2 | Spent 4 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 6 · Weathered | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 6 · Weathered | Raised 0 | Spent 0 | Pending 0 | Quest 0/4
+17:32:47.500 print [INFO] no Still Hour investigator seated on a SCED mat: skill tracker not exercised
+17:32:47.500 print THE STILL HOUR control ready. Investigators = 3 (SCED detected).
+17:32:48.750 print [Still Hour] [static] -2 from the chaos bag (now 0)
+17:32:49.355 print [PASS] Years persist through save+reload  -- 6
+17:32:49.356 print [INFO] 0 campaign log(s) on the table: export mirror not exercised (needs exactly one)
+17:32:49.569 print [Still Hour] Board synced: 3 campaign location(s), 0 flipped, 1 sealed.
+17:32:49.684 print [Still Hour] [static] +1 into the chaos bag (now 1)
+17:32:49.684 print The Appointed draws nearer: Sensed.
+17:32:49.684 print Dissonance leaves Calm: every Echo wakes. Exhaust each Echo as it wakes (it readies in the upkeep phase).
+17:32:49.780 print [Still Hour] The Appointed manifests at Relay Location C (Sensed).
+17:32:49.855 print Chaos bag set to Easy (17 tokens), plus the Dissonance band's [static].
+17:32:49.857 ERROR [Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()
+17:32:49.858 ERROR [Global] Lua Error <getChaosBagState>: Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)
+    at 
+    at getChaosBagState
+    at Call
+    at <[Global] executeScript:846>
+    at Condition
+    at <[Global] executeScript:95>
+    at waitFor (local)
+    at <[Global] executeScript:830>
+    at pcall
+    at nextStep (local)
+    at go (local)
+    at <[Global] executeScript:780>
+    at pcall
+    at nextStep (local)
+    at go (local)
+    at <[Global] executeScript:770>
+    at pcall
+    at <[Global] executeScript:84>Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)
+    at 
+    at getChaosBagState
+    at Call
+    at <[Global] executeScript:846>
+    at Condition
+    at <[Global] executeScript:95>
+    at waitFor (local)
+    at <[Global] executeScript:830>
+    at pcall
+    at nextStep (local)
+    at go (local)
+    at <[Global] executeScript:780>
+    at pcall
+    at nextStep (local)
+    at go (local)
+    at <[Global] executeScript:770>
+    at pcall
+    at <[Global] executeScript:84>
+17:32:49.859 ERROR [Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()
+17:32:49.859 ERROR [Global] Lua Error <getChaosBagState>: Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)
+    at 
+    at getChaosBagState
+    at Call
+    at <[Global] executeScript:846>Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)
+    at 
+    at getChaosBagState
+    at Call
+    at <[Global] executeScript:846>
+17:32:49.913 print [static] drawn: if it resolves, click Resolve on that token (or Static waiting for a single draw). For a preview or cancellation, return it or right-click Resolve on that token.
+17:32:49.952 print [Still Hour] [static] -1 from the chaos bag (now 0)
+17:32:51.254 print [Still Hour] [static] +1 into the chaos bag (now 1)
+17:32:51.329 print Static token not recognized. Will not be recorded.
+17:32:51.330 print Static token not recognized. Will not be recorded.
+17:32:51.331 print [PASS] Easy fills SCED's chaos bag with the guide's 17 tokens  -- 17 token(s)
+17:32:51.332 print [PASS] ...and the band's [static] is put back in the bag  -- in bag: 1
+17:32:51.338 print Chaos bag set to Expert (19 tokens), plus the Dissonance band's [static].
+17:32:51.339 ERROR [Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()
+17:32:51.339 ERROR [Global] Lua Error <getChaosBagState>: Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)
+    at 
+    at getChaosBagState
+    at Call
+    at <[Global] executeScript:855>
+    at Condition
+    at <[Global] executeScript:95>
+    at waitFor (local)
+    at <[Global] executeScript:849>
+    at <[Global] executeScript:127>
+    at pcall
+    at <[Global] executeScript:84>Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)
+    at 
+    at getChaosBagState
+    at Call
+    at <[Global] executeScript:855>
+    at Condition
+    at <[Global] executeScript:95>
+    at waitFor (local)
+    at <[Global] executeScript:849>
+    at <[Global] executeScript:127>
+    at pcall
+    at <[Global] executeScript:84>
+17:32:51.340 ERROR [Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()
+17:32:51.340 ERROR [Global] Lua Error <getChaosBagState>: Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)
+    at 
+    at getChaosBagState
+    at Call
+    at <[Global] executeScript:855>Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)
+    at 
+    at getChaosBagState
+    at Call
+    at <[Global] executeScript:855>
+17:32:52.806 print [Still Hour] [static] +1 into the chaos bag (now 1)
+17:32:52.879 print Static token not recognized. Will not be recorded.
+17:32:52.880 print Static token not recognized. Will not be recorded.
+17:32:52.881 print [PASS] Expert replaces the token set (19 tokens, one -8, no +1)  -- 19 token(s)
+17:32:52.898 ERROR [Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()
+17:32:52.912 print [Still Hour] The Appointed recedes into shadow (Unseen).
+17:32:52.973 ERROR [Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()
+17:32:52.974 ERROR [Global] Lua Error <getChaosBagState>: Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)
+    at 
+    at getChaosBagState
+    at Call
+    at <[Global] executeScript:864>
+    at Condition
+    at <[Global] executeScript:95>
+    at waitFor (local)
+    at <[Global] executeScript:858>
+    at <[Global] executeScript:127>
+    at pcall
+    at <[Global] executeScript:84>Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)
+    at 
+    at getChaosBagState
+    at Call
+    at <[Global] executeScript:864>
+    at Condition
+    at <[Global] executeScript:95>
+    at waitFor (local)
+    at <[Global] executeScript:858>
+    at <[Global] executeScript:127>
+    at pcall
+    at <[Global] executeScript:84>
+17:32:52.974 ERROR [Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()
+17:32:52.974 ERROR [Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()
+17:32:52.975 ERROR [Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()
+17:32:52.975 ERROR [Global] Lua Error <getChaosBagState>: Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)
+    at 
+    at getChaosBagState
+    at Call
+    at <[Global] executeScript:864>Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)
+    at 
+    at getChaosBagState
+    at Call
+    at <[Global] executeScript:864>
+17:32:52.996 print [PASS] the table's own chaos bag is put back afterwards  -- in bag: 0
+17:32:53.082 print Victory 2: each investigator gains 2 banked Memory (6 banked).
+17:32:53.159 print [PASS] claiming a Named enemy's Victory banks 2 per investigator  -- 0 -> 6
+17:32:53.287 print [PASS] a second claim of the same Victory banks nothing  -- 6 -> 6
+17:32:53.287 print [PASS] an unknown enemy has no Victory to claim
+17:32:53.457 print [Still Hour] The night folds. Loop reset: Memory/Knowledge/Years kept; Dissonance dropped to the scar.
+17:32:53.801 print [PASS] the interlude panel lists a Recollection with its price  -- 2
+17:32:53.803 print [PASS] the control shows the Interlude panel  -- INTERLUDE · spend Memory | Memory 5 / 30 | Anchor Point (4) | Cassandra's Notebook (3) | Foreknowledge (2) | Muscle Memory (2) | Rehearsed Escape (2) | Stolen Minute (3) | The Hour I Learned Your Name (5) | The Long Way Round (2) | The Same Doorway Twice (2) | This Time For Sure (2) | Lvl 1 (1) | Lvl 2 (2) | Lvl 3 (3) | Lvl 4 (4) | Lvl 5 (5) | Begin Next Loop | Back | AGING | Bank on-card Memory (0) | Loop ended in danger: no | Relay Investigator B · Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Defeated:
+no | Leaned: no | -combat | +intellect | Age | Relay Investigator E · Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Defeated:
+no | Leaned: no | -combat | +intellect | Age
+17:32:53.804 print Bought The Long Way Round for 2 Memory (3 banked).
+17:32:53.950 print [PASS] buying a Recollection spends its Memory  -- 5 -> 3
+17:32:53.950 print [Still Hour] Not enough Memory for a level-5 upgrade.
+17:32:54.086 print [PASS] an unaffordable level-up is refused
+17:32:54.086 print Level-3 upgrade bought for 3 Memory (0 banked).
+17:32:54.253 print [PASS] a level-3 upgrade spends 3
+17:32:54.515 print [Still Hour] The night folds. Loop reset: Memory/Knowledge/Years kept; Dissonance dropped to the scar.
+17:32:54.656 print Relay Investigator B gains 1 Year(s): 1 Years (Prime)
+17:32:54.786 print Relay Investigator E gains 1 Year(s): 1 Years (Prime)
+17:32:55.238 print Banked 3 on-card Memory (3 banked). 4 on departed investigators' cards is lost.
+17:32:55.330 print [PASS] Bank on-card Memory moves the investigators' Memory to the bank (3)  -- 3 banked, 0 -> 3
+17:32:55.342 print [PASS] the investigator card's Memory goes back to 0  -- Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 2 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 2 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 2 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4
+17:32:58.346 print [PASS] Memory on a departed investigator's cards is not banked
+17:32:58.346 print [Still Hour] The night folds. Loop reset: Memory/Knowledge/Years kept; Dissonance dropped to the scar.
+17:32:58.347 print Relay Investigator E gains 3 Year(s): 3 Years (Prime)
+17:32:58.347 print [PASS] a card's Years are held as pending (2)  -- 2
+17:32:58.347 print [PASS] the investigator card shows its pending Years  -- Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 2 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 2 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 2 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 2 | Quest 0/4
+17:32:58.348 print [PASS] Age adds the pending Years (1 + 2)  -- gained 3
+17:32:58.348 print [PASS] pending Years are cleared once added
+17:32:58.348 print [Still Hour] Hour 2 — Low Water: Each investigator draws 1 encounter card.
+17:32:58.348 print [Still Hour] Board synced: 3 campaign location(s), 0 flipped, 1 sealed.
+17:32:58.349 print [Still Hour] Hour 4 — The Road Gives Way: The lead investigator makes a revealed location with the fewest clues, other than the Square, impassable.
+17:32:58.349 print [Still Hour] Hour 3 — The Bell Counts: Raised Dissonance by 1. By hand: if an investigator is at a Church location and your Campaign Log does not record The Thirteenth Toll, click Dissonance once more. Reveal The Belfry now if it is in play.
+17:32:58.349 print [Still Hour] Hour 5 — The Streets Empty: The streets empty. The Appointed is at least Sensed (Echoes sleepwalk in Calm).
+17:32:58.349 print A new loop begins. Memory capped at 30; 0 lost.
+17:32:58.842 print Hour VI undone: its Static token leaves the chaos bag.
+17:32:58.842 print The Hour turns: SCED removed the doom in play (take any doom off the Hours cards yourself); each investigator heals 1 damage and 1 horror.
+17:32:58.842 print [PASS] Undo Hour VI takes its Static token back  -- static, extra 0
+17:32:58.843 print [Still Hour] Hour 5 — The Streets Empty: Hourglass rewound.
+17:32:58.843 print [Still Hour] The Appointed recedes into shadow (Unseen).
+17:32:58.843 print [Still Hour] Hour 6 — The Wrong Sky: Add 1 Static token to the chaos bag until the end of the loop.
+17:32:58.843 print [PASS] after the undo, Hour VI resolves again when reached
+17:32:58.849 print [PASS] reaching Hour VI again this loop adds nothing (once per loop)  -- extra 1
+17:32:58.850 print The Hour turns: SCED removed the doom in play (take any doom off the Hours cards yourself); each investigator heals 1 damage and 1 horror.
+17:32:58.850 print [PASS] the control offers Undo Hour VI  -- THE STILL HOUR · loop 1 | Memory 0 / 30 | Investigators 3 | Dissonance 1 / 24 · Calm | [static] 1 | Hour 6 · The Wrong Sky | Appointed: Sensed | Relay Investigator B · Memory 0 | Relay Investigator E · Memory 0 | Status | Set Up Loop | Sync Board | Reset Loop | Interlude | Knowledge | Clear Board | Undo Hour VI | Easy | Standard | Hard | Expert
+17:32:58.853 print The Appointed draws nearer: Sensed.
+17:32:58.853 print [Still Hour] The Appointed manifests at Relay Location C (Sensed).
+17:32:58.853 print [Still Hour] Hour 5 — The Streets Empty: Hourglass rewound.
+17:32:58.854 print [Still Hour] Hour 6 — The Wrong Sky: Hour VI has already resolved this loop: no further effect.
+17:32:58.854 print The Hour turns: SCED removed the doom in play (take any doom off the Hours cards yourself); each investigator heals 1 damage and 1 horror.
+17:32:58.854 print [Still Hour] [static] +1 into the chaos bag (now 1)
+17:32:58.894 print [PASS] reaching Hour VI adds 1 Static token until the end of the loop  -- hour 6, extra 1
+17:32:58.895 print [Still Hour] Hour 6 — The Wrong Sky: Add 1 Static token to the chaos bag until the end of the loop.
+17:32:59.013 print [PASS] a card can be taken out and lands on the table
+17:32:59.016 print [PASS] the dealt card carries its metadata  -- sthrelias
+17:32:59.017 print [PASS] campaign box carries SCED's memory-bag script
+17:32:59.017 print [PASS] campaign box spawned (GMNotes type CampaignBox)
+17:32:59.020 print [PASS] campaign box remembers where its contents go  -- 3 object(s)
+17:32:59.020 print [PASS] campaign box shows Place and Recall
+17:32:59.036 print 3 objects placed
+17:32:59.036 print [PASS] Place lays out every remembered object  -- 3/3
+17:32:59.036 print [PASS] Place runs
+17:32:59.037 print [PASS] each lands on its remembered spot  -- 3/3
+17:32:59.638 print [Still Hour] [static] -1 from the chaos bag (now 0)
+17:32:59.840 print [PASS] minicard deck placed
+17:32:59.843 print [PASS] every minicard follows SCED's minicard schema  -- 5 ok
+17:32:59.844 print [PASS] campaign guide placed (Tag CampaignGuide)
+17:32:59.844 print [PASS] guide is a Custom_PDF with GMNotes type CampaignGuide  -- Custom_PDF
+17:32:59.845 print [PASS] guide PDF is hosted, not a local file  -- https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/8e2f4744f42b196c52f1d823ed4bc8a07af2ab43/dist/guide/the_still_hour_campaign_guide.pdf?v=ff015ade5a
+17:32:59.845 print [PASS] guide opens as a book  -- 0
+17:32:59.846 print [PASS] campaign log placed (Tag CampaignLog)
+17:32:59.846 print [PASS] log GMNotes type CampaignLog
+17:32:59.855 print [PASS] log draws its checkboxes, counters and write-in fields  -- 60 buttons, 23 inputs
+17:32:59.862 print [PASS] clicking a checkbox and a counter records them  -- loops=2
+17:32:59.865 print [PASS] write-in text is recorded
+17:32:59.865 print [PASS] SCED can read trauma from the log
+17:32:59.866 print [PASS] log saves its fields (onSave)
+17:33:00.227 print [PASS] log survives save+reload with its fields
+17:33:00.230 print [PASS] log turns to page 2
+17:33:00.412 print [PASS] page 2 draws the Knowledge Track  -- STHR-LOG2
+17:33:00.417 print [PASS] page 2 records a fact
+17:33:00.424 print The Hour Was Wrong recorded: +9 banked Memory (9 banked).
+17:33:00.441 print Campaign chaos-bag change: remove 1 Elder Thing token for the rest of the campaign. Change the chaos bag by hand.
+17:33:00.500 print [PASS] log syncs from the Control token  -- updated 2
+17:33:00.501 print [PASS] synced fact is ticked on the log
+17:33:00.520 print Campaign chaos-bag change: add 1 Elder Thing token for the rest of the campaign. Change the chaos bag by hand.
+17:33:00.784 ERROR [THE STILL HOUR — Control - 1a2570] Lua Error: Object reference not set to an instance of an object.Object reference not set to an instance of an object.
+17:33:00.863 ERROR [THE STILL HOUR — Control - 1a2570] Lua Error: Object reference not set to an instance of an object.Object reference not set to an instance of an object.
+17:33:00.990 print [PASS] page 1 kept its fields across the page turn
+17:33:04.896 print 3 objects recalled
+17:33:04.896 print [PASS] Recall runs
+17:33:05.288 print [PASS] Recall puts everything back in the box  -- 0 -> 3
+17:33:25.379 print [INFO] removed 13 object(s) of the component builds
+17:33:25.884 print [INFO] 17 object(s) on the table that were not there before the run (component builds cleared): Elder Sign (Tile), +1 (Tile), 0 (Tile), 0 (Tile), Static (Tile), -1 (Tile), -1 (Tile), -1 (Tile), Skull (Tile), Skull (Tile), -2 (Tile), -2 (Tile)
+17:33:25.885 print [INFO] every object that was on the table before the run is still there (component builds cleared)
+17:33:26.057 print [PASS] the saved object spawns
+17:33:26.057 print [PASS] it is SCED's campaign box (GMNotes type CampaignBox)
+17:33:26.058 print [PASS] it carries SCED's memory-bag script
+17:33:26.238 print [PASS] the saved object's box shows Place and Recall  -- Place | Recall
+17:33:26.277 print [PASS] the box holds 8 scenario boxes  -- 8
+17:33:26.277 print [PASS] the box holds the spare scenario boxes (Clear Board refills a used box from them)  -- 1
+17:33:26.278 print [PASS] the box holds the campaign guide  -- 1
+17:33:26.278 print [PASS] the box holds the investigator minicards  -- 1
+17:33:26.279 print [PASS] the box holds the player-card pouches (one per investigator, one of Recollections)  -- 6
+17:33:26.279 print [PASS] the box holds the Control token  -- 1
+17:33:26.279 print [PASS] the box holds the [static] token  -- 1
+17:33:26.280 print [PASS] the box holds the campaign log  -- 1
+17:33:26.280 print [PASS] the box holds nothing else (20 pieces)  -- 20 piece(s), 0 unrecognised
+17:33:26.280 print [PASS] TTS lists the same pieces inside the box  -- 20 vs 20
+17:33:26.357 print [PASS] every scenario box carries SCED's box script, remembers its layout and holds its cards  -- 8/8
+17:33:26.891 print [PASS] the box's cards are inside it  -- 367 card(s)
+17:33:26.891 print [PASS] every card in the box has consistent SCED metadata  -- 
+17:33:26.892 print [PASS] the guide PDF is hosted on raw.githubusercontent
+17:33:26.892 print [PASS] every card face and back is a hosted raw.githubusercontent URL pinned to a commit  -- 734/734
+17:33:27.939 print [PASS] each piece lands on its remembered spot  -- 20/20
+17:33:27.940 print 20 objects placed
+17:33:27.940 print [PASS] Place runs on the saved object's box
+17:33:27.940 print [PASS] Place lays out every piece  -- 20/20
+17:33:27.941 print [PASS] the box remembers a spot for every piece  -- 20 spot(s)
+17:33:27.941 print THE STILL HOUR control ready. Investigators = 3 (SCED detected).
+17:33:27.941 print [PASS] the campaign log is on the table
+17:33:27.941 print [PASS] every scenario box is on the table  -- 8/8
+17:33:27.941 print [PASS] the campaign box is empty afterwards
+17:33:27.951 print [PASS] the Control token is on the table with its buttons  -- THE STILL HOUR · Prologue | Memory 0 / 30 | Investigators 3 | Dissonance 0 / 24 · Calm | [static] 0 | Hour 1 · First Dark | Appointed: Unseen | Status | Set Up Prologue | Sync Board | Reset Loop | Interlude | Knowledge | Prologue reward +6 | Clear Board | Easy | Standard | Hard | Expert
+17:33:29.499 print [PASS] the box's Control opens a new campaign in the Prologue  -- memory 0, dissonance 0, hour 1, loops 0, prologue true
+17:33:29.501 print ──────── THE STILL HOUR — in-engine tests ────────
+17:33:29.501 print [PASS] contest target 6 (5 solo, 7 at four)
+17:33:29.502 print [PASS] reset 24 / appointed 16 at 3p
+17:33:29.502 print [PASS] Calm -> 0 [static]; Appointed Unseen
+17:33:29.502 print [PASS] Noticed -> 2 [static]; Appointed Arrived (3)
+17:33:29.502 print [PASS] Glitch -> 1 [static]; Appointed Sensed (1)
+17:33:29.503 print [PASS] [static] reveal raises Dissonance
+17:33:29.503 print [PASS] virtual [static] bag tracks baseline + temporary
+17:33:29.504 print [PASS] Hour V -> Appointed Sensed (1)
+17:33:29.504 print [PASS] Hour VIII -> Appointed Arrived (3)
+17:33:29.504 print [PASS] Arrived attacks 2/2 and raises Dissonance
+17:33:29.504 print [PASS] Hold Back drops one stage and rewinds one Hour
+17:33:29.504 print [PASS] a fourth Hold Back in a loop does not rewind the Hourglass
+17:33:29.505 print [PASS] Appointed cannot be defeated
+17:33:29.505 print [PASS] removing a manifest Appointed puts it back
+17:33:29.505 print [PASS] Sensed figure deals no attack damage
+17:33:29.505 print [PASS] a Sensed figure does not hunt
+17:33:29.506 print [PASS] once-per-loop free at node A
+17:33:29.506 print [PASS] blocked on reuse
+17:33:29.506 print [PASS] Muscle Memory: no combat test yet this loop
+17:33:29.506 print [PASS] Muscle Memory sees a combat test earlier this loop
+17:33:29.507 print [PASS] Memory persists across reset
+17:33:29.507 print [PASS] Years persist across reset
+17:33:29.507 print [PASS] Knowledge persists across reset
+17:33:29.507 print [PASS] Hourglass reset to Hour I
+17:33:29.550 print [PASS] Lantern Room flips to back with the fact
+17:33:29.550 print [PASS] Lantern Room front until lamp fact
+17:33:29.550 print [PASS] serialize round-trip (real TTS JSON)
+17:33:29.550 print [PASS] 'The Hour Was Wrong' keeps Hour IV in the clock (its text stops resolving)
+17:33:29.551 print [PASS] aging brackets 5/10/15 -> Weathered/Elder/Ancient
+17:33:29.551 print [PASS] cannot overdraw the pool
+17:33:29.551 print [PASS] level-3 upgrade debits 3
+17:33:29.551 print [PASS] Sealed Study stays closed in Part I
+17:33:29.551 print [PASS] Recollection debits memoryCost 5
+17:33:29.552 print [PASS] Sealed Study stays closed until its act 2a is current
+17:33:29.552 print [PASS] Sealed Study opens when The Appointed's Name becomes the current act
+17:33:29.552 print [PASS] Sealed Study enters play open once The Appointed's Name is recorded
+17:33:29.552 print [PASS] ...closed again next loop until act 2a is current again
+17:33:29.552 print [PASS] location cards resolve by metadata id
+17:33:29.552 print [PASS] advance resolves Hours II,III,IV
+17:33:29.553 print [PASS] Sealed Study sealed until both facts
+17:33:29.553 print [PASS] finale assembles with name+vote+one deep
+17:33:30.009 print [PASS] Muscle Memory: last loop's test does not count this loop
+17:33:30.009 print [PASS] once-per-loop flags cleared
+17:33:30.009 print [PASS] Memory soft-capped to 30 at loop start
+17:33:30.055 print [PASS] Act II opens at 3 surface facts
+17:33:30.055 print [PASS] prey is the investigator with the most on-card Memory
+17:33:30.056 print [PASS] Victory claims once and banks its Memory
+17:33:30.056 print [PASS] Interlude rejects unaffordable purchase
+17:33:30.056 print [PASS] Victory log survives a reset
+17:33:30.056 print [PASS] Ancient drift: int 5->7, health/sanity -1, com floored at 1
+17:33:30.057 print [PASS] interlude banks on-card Memory
+17:33:30.057 print [PASS] Interlude buys level-3 upgrade (=3)
+17:33:30.057 print [PASS] Interlude buys Recollection at memoryCost (longwayround=2)
+17:33:30.086 print [PASS] Dissonance dropped to scar (1)
+17:33:30.193 print [PASS] 3 Dissonance raises = leaned on the loop (+1 Year)
+17:33:30.266 print [PASS] Hour VI adds 1 Static token
+17:33:30.266 print [PASS] Hour VI resolves again in the next loop
+17:33:30.266 print [PASS] undoing a canceled Hour VI takes its token back
+17:33:30.266 print [PASS] Hour VI once per loop: reaching it again adds nothing
+17:33:30.266 print Still Hour tests: 59 passed, 0 failed
+17:33:30.267 print [PASS] the box's Control runs its in-engine tests
+17:33:30.267 print ──────── RESULT: 59 passed, 0 failed ────────
+17:33:30.267 print [PASS] the box's Control's in-engine tests all pass  -- 59 passed, 0 failed
+17:33:30.410 print [PASS] a scenario box from the saved object and its Control are on the table
+17:33:30.462 print 8 objects placed
+17:33:30.462 print [PASS] the scenario box's Place (SCED's script) runs
+17:33:30.658 print Encounter deck was shuffled.
+17:33:32.462 print Board sync 1/7: loop setup
+17:33:32.462 print Board sync 1/7: loop setup
+17:33:32.966 print Board sync 2/7: the Hours
+17:33:32.966 print Board sync 2/7: the Hours
+17:33:33.461 print [PASS] every card it laid out is on the table (none fell into a bag)  -- 36/36
+17:33:33.462 print [PASS] the laid-out cards carry the loop tag  -- 0 without it
+17:33:33.462 print [PASS] the box is empty after its Place, as every SCED box is
+17:33:33.462 print [PASS] no two laid-out cards overlap
+17:33:33.552 print [PASS] nothing laid out sits on the table's own pieces (tokens, counters, bags)
+17:33:33.564 print Board sync 3/7: locations
+17:33:33.564 print Board sync 3/7: locations
+17:33:34.110 print Board sync 4/7: the Appointed
+17:33:34.110 print Board sync 4/7: the Appointed
+17:33:34.640 print Board sync 5/7: investigators
+17:33:34.640 print Board sync 5/7: investigators
+17:33:35.151 print Board sync 6/7: chaos bag
+17:33:35.151 print Board sync 6/7: chaos bag
+17:33:35.690 print [PASS] Clear Board runs
+17:33:35.950 print Board sync 7/7: control panel
+17:33:35.951 print Board sync 7/7: control panel
+17:33:36.473 print [Still Hour] Board synced.
+17:33:38.569 print [PASS] every card the box laid out leaves the table (drawn ones too)  -- 0 left
+17:33:38.582 print [PASS] Clear Board puts a full box back  -- 8/8
+17:33:38.617 print 8 objects placed
+17:33:40.585 print Board sync 1/7: loop setup
+17:33:40.585 print Board sync 1/7: loop setup
+17:33:41.088 print Board sync 2/7: the Hours
+17:33:41.088 print Board sync 2/7: the Hours
+17:33:41.574 print [PASS] the next loop's Place lays out the same cards again  -- 36 vs 36
+17:33:41.820 print Board sync 3/7: locations
+17:33:41.820 print Board sync 3/7: locations
+17:33:42.362 print Board sync 4/7: the Appointed
+17:33:42.362 print Board sync 4/7: the Appointed
+17:33:42.863 print Board sync 5/7: investigators
+17:33:42.863 print Board sync 5/7: investigators
+17:33:43.366 print Board sync 6/7: chaos bag
+17:33:43.366 print Board sync 6/7: chaos bag
+17:33:43.871 print Board sync 7/7: control panel
+17:33:43.871 print Board sync 7/7: control panel
+17:33:44.389 print [Still Hour] Board synced.

@@ -1,25 +1,94 @@
 {
-  "run": "20260924-055604_5bb290d",
-  "commit": "5bb290d4a67bb1a0ffc07bf964bb25ba99e16bc2",
+  "run": "20261102-173235_3896e73",
+  "commit": "3896e734bbd3e185b7b234f179d5a4a779ec5d1d",
   "branch": "main",
-  "started": "2026-09-24T05:56:04.187421Z",
+  "started": "2026-11-02T17:32:35.930641Z",
   "host": "Windows-10-10.0.19045-SP0",
-  "passed": 89,
+  "passed": 158,
   "failed": 0,
   "runner_line_offset": 14,
-  "finished": "2026-09-24T05:56:56.681842Z",
-  "verdict": "pass",
-  "lua_errors": [],
+  "finished": "2026-11-02T17:39:36.672058Z",
+  "verdict": "incomplete",
+  "lua_errors": [
+    {
+      "guid": "fea079",
+      "error": "[Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()"
+    },
+    {
+      "guid": "-1",
+      "error": "[Global] Lua Error <getChaosBagState>: Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:846>\n    at Condition\n    at <[Global] executeScript:95>\n    at waitFor (local)\n    at <[Global] executeScript:830>\n    at pcall\n    at nextStep (local)\n    at go (local)\n    at <[Global] executeScript:780>\n    at pcall\n    at nextStep (local)\n    at go (local)\n    at <[Global] executeScript:770>\n    at pcall\n    at <[Global] executeScript:84>Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:846>\n    at Condition\n    at <[Global] executeScript:95>\n    at waitFor (local)\n    at <[Global] executeScript:830>\n    at pcall\n    at nextStep (local)\n    at go (local)\n    at <[Global] executeScript:780>\n    at pcall\n    at nextStep (local)\n    at go (local)\n    at <[Global] executeScript:770>\n    at pcall\n    at <[Global] executeScript:84>"
+    },
+    {
+      "guid": "fea079",
+      "error": "[Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()"
+    },
+    {
+      "guid": "-1",
+      "error": "[Global] Lua Error <getChaosBagState>: Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:846>Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:846>"
+    },
+    {
+      "guid": "fea079",
+      "error": "[Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()"
+    },
+    {
+      "guid": "-1",
+      "error": "[Global] Lua Error <getChaosBagState>: Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:855>\n    at Condition\n    at <[Global] executeScript:95>\n    at waitFor (local)\n    at <[Global] executeScript:849>\n    at <[Global] executeScript:127>\n    at pcall\n    at <[Global] executeScript:84>Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:855>\n    at Condition\n    at <[Global] executeScript:95>\n    at waitFor (local)\n    at <[Global] executeScript:849>\n    at <[Global] executeScript:127>\n    at pcall\n    at <[Global] executeScript:84>"
+    },
+    {
+      "guid": "fea079",
+      "error": "[Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()"
+    },
+    {
+      "guid": "-1",
+      "error": "[Global] Lua Error <getChaosBagState>: Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:855>Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:855>"
+    },
+    {
+      "guid": "fea079",
+      "error": "[Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()"
+    },
+    {
+      "guid": "fea079",
+      "error": "[Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()"
+    },
+    {
+      "guid": "-1",
+      "error": "[Global] Lua Error <getChaosBagState>: Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:864>\n    at Condition\n    at <[Global] executeScript:95>\n    at waitFor (local)\n    at <[Global] executeScript:858>\n    at <[Global] executeScript:127>\n    at pcall\n    at <[Global] executeScript:84>Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:864>\n    at Condition\n    at <[Global] executeScript:95>\n    at waitFor (local)\n    at <[Global] executeScript:858>\n    at <[Global] executeScript:127>\n    at pcall\n    at <[Global] executeScript:84>"
+    },
+    {
+      "guid": "fea079",
+      "error": "[Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()"
+    },
+    {
+      "guid": "fea079",
+      "error": "[Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()"
+    },
+    {
+      "guid": "fea079",
+      "error": "[Chaos Bag - fea079] Lua Error <getObjects>: Attempting to call getObjects() on an object that does not support getObjects()Attempting to call getObjects() on an object that does not support getObjects()"
+    },
+    {
+      "guid": "-1",
+      "error": "[Global] Lua Error <getChaosBagState>: Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:864>Global:(1934,2-46): bad argument #1 to '!!next_i!!' (table expected, got nil)\n    at \n    at getChaosBagState\n    at Call\n    at <[Global] executeScript:864>"
+    },
+    {
+      "guid": "1a2570",
+      "error": "[THE STILL HOUR — Control - 1a2570] Lua Error: Object reference not set to an instance of an object.Object reference not set to an instance of an object."
+    },
+    {
+      "guid": "1a2570",
+      "error": "[THE STILL HOUR — Control - 1a2570] Lua Error: Object reference not set to an instance of an object.Object reference not set to an instance of an object."
+    }
+  ],
   "checks": [
     {
       "name": "every payload finished spawning",
       "ok": true,
-      "detail": "6/6 spawned"
+      "detail": "5/5 spawned"
     },
     {
       "name": "spawned content contains cards",
       "ok": true,
-      "detail": "190 card(s)"
+      "detail": "51 card(s)"
     },
     {
       "name": "every card has consistent SCED metadata",
@@ -39,17 +108,17 @@
     {
       "name": "control token created its buttons",
       "ok": true,
-      "detail": "13 button(s)"
+      "detail": "19 button(s)"
     },
     {
-      "name": "control token saves its state",
+      "name": "a new campaign opens in the Prologue",
       "ok": true,
       "detail": null
     },
     {
-      "name": "in-engine rules tests all pass",
+      "name": "ending the Prologue starts Loop 1 without counting a loop",
       "ok": true,
-      "detail": "48 passed, 0 failed"
+      "detail": null
     },
     {
       "name": "in-engine rules tests ran",
@@ -57,9 +126,19 @@
       "detail": null
     },
     {
+      "name": "in-engine rules tests all pass",
+      "ok": true,
+      "detail": "59 passed, 0 failed"
+    },
+    {
+      "name": "control token saves its state",
+      "ok": true,
+      "detail": null
+    },
+    {
       "name": "control token survives save+reload",
       "ok": true,
-      "detail": "13 button(s) after reload"
+      "detail": "18 button(s) after reload"
     },
     {
       "name": "state preserved across reload",
@@ -69,7 +148,7 @@
     {
       "name": "control shows Memory / Dissonance / Hour counters",
       "ok": true,
-      "detail": "THE STILL HOUR · loop 1 | Memory 0 / 18 | Investigators 3 | Dissonance 0 / 18 · Calm | [static] 0 (virtual) | Hour 1 · First Dark | Appointed: Unseen | Run Tests | Status | Sync Board | Reset Loop | Interlude | Knowledge"
+      "detail": "THE STILL HOUR · loop 1 | Memory 0 / 30 | Investigators 3 | Dissonance 0 / 24 · Calm | [static] 0 | Hour 1 · First Dark | Appointed: Unseen | Status | Set Up Loop | Sync Board | Reset Loop | Interlude | Knowledge | Clear Board | Easy | Standard | Hard | Expert"
     },
     {
       "name": "Memory counter +2",
@@ -79,7 +158,7 @@
     {
       "name": "Memory button label follows",
       "ok": true,
-      "detail": "THE STILL HOUR · loop 1 | Memory 2 / 18 | Investigators 3 | Dissonance 0 / 18 · Calm | [static] 0 (virtual) | Hour 1 · First Dark | Appointed: Unseen | Run Tests | Status | Sync Board | Reset Loop | Interlude | Knowledge"
+      "detail": "THE STILL HOUR · loop 1 | Memory 2 / 30 | Investigators 3 | Dissonance 0 / 24 · Calm | [static] 0 | Hour 1 · First Dark | Appointed: Unseen | Status | Set Up Loop | Sync Board | Reset Loop | Interlude | Knowledge | Clear Board | Easy | Standard | Hard | Expert"
     },
     {
       "name": "Hour counter advances the Hourglass",
@@ -122,9 +201,14 @@
       "detail": "16 SCED token(s)"
     },
     {
-      "name": "drawing a [static] from the bag raises Dissonance by 1",
+      "name": "drawing a [static] waits for an explicit resolution",
       "ok": true,
-      "detail": "12 -> 13"
+      "detail": null
+    },
+    {
+      "name": "resolving a [static] from the bag raises Dissonance by 1",
+      "ok": true,
+      "detail": "16 -> 17"
     },
     {
       "name": "back to Calm removes the [static] tokens again",
@@ -147,12 +231,12 @@
       "detail": null
     },
     {
-      "name": "a sealed location is labelled SEALED",
+      "name": "a closed location is labelled CLOSED",
       "ok": true,
-      "detail": "SEALED"
+      "detail": "CLOSED"
     },
     {
-      "name": "SCED clue spawn is held back while sealed (TokenSpawnTrackerApi)",
+      "name": "SCED clue spawn is held back while closed (TokenSpawnTrackerApi)",
       "ok": true,
       "detail": null
     },
@@ -187,7 +271,7 @@
       "detail": "stage 0, hour 3 -> 2"
     },
     {
-      "name": "the SEALED label comes off once every fact is known",
+      "name": "the CLOSED label comes off once every fact is known (Part II)",
       "ok": true,
       "detail": ""
     },
@@ -224,17 +308,17 @@
     {
       "name": "each investigator card has a Memory button",
       "ok": true,
-      "detail": "Memory 0 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0"
+      "detail": "Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4"
     },
     {
       "name": "each investigator card shows Years",
       "ok": true,
-      "detail": "Memory 0 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0"
+      "detail": "Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/8"
     },
     {
       "name": "the card's Memory button follows the count",
       "ok": true,
-      "detail": "Memory 0 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 3 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 3 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0"
+      "detail": "Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/8 | Memory 3 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/8 | Memory 3 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/8"
     },
     {
       "name": "it manifests at the location away from both investigators",
@@ -247,6 +331,11 @@
       "detail": null
     },
     {
+      "name": "the investigator it engaged holds it there after the prey changes (Rules Reference: Hunter)",
+      "ok": true,
+      "detail": null
+    },
+    {
       "name": "when another investigator has more Memory, the prey changes",
       "ok": true,
       "detail": null
@@ -254,7 +343,7 @@
     {
       "name": "the investigator card has both leaning tallies",
       "ok": true,
-      "detail": "Memory 1 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 1 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 5 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 5 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0"
+      "detail": "Memory 5 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 5 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4"
     },
     {
       "name": "two Dissonance raises are not leaning",
@@ -269,7 +358,7 @@
     {
       "name": "the card shows the tallies",
       "ok": true,
-      "detail": "Memory 1 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 1 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 5 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 5 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 0 · Prime | Dissonance raised 2 | Loop-power Memory 0 | Memory 0 | Years 0 · Prime | Dissonance raised 2 | Loop-power Memory 4"
+      "detail": "Memory 5 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 5 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 2 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 2 | Spent 4 | Pending 0 | Quest 0/4"
     },
     {
       "name": "Age adds Years for defeat, danger and leaning (4)",
@@ -284,12 +373,7 @@
     {
       "name": "the tallies clear when the next loop begins",
       "ok": true,
-      "detail": "Memory 1 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 1 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 5 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 5 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 0 · Prime | Dissonance raised 2 | Loop-power Memory 0 | Memory 0 | Years 0 · Prime | Dissonance raised 2 | Loop-power Memory 4 | Memory 0 | Years 4 · Prime | Dissonance raised 2 | Loop-power Memory 4 | Memory 0 | Years 4 · Prime | Dissonance raised 2 | Loop-power Memory 4 | Memory 0 | Years 4 · Prime | Dissonance raised 2 | Loop-power Memory 4 | Memory 0 | Years 4 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 4 · Prime | Dissonance raised 0 | Loop-power Memory 0"
-    },
-    {
-      "name": "the investigator card shows Years and bracket",
-      "ok": true,
-      "detail": "Memory 1 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 1 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 5 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 5 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 0 · Prime | Dissonance raised 2 | Loop-power Memory 0 | Memory 0 | Years 0 · Prime | Dissonance raised 2 | Loop-power Memory 4 | Memory 0 | Years 4 · Prime | Dissonance raised 2 | Loop-power Memory 4 | Memory 0 | Years 4 · Prime | Dissonance raised 2 | Loop-power Memory 4 | Memory 0 | Years 4 · Prime | Dissonance raised 2 | Loop-power Memory 4 | Memory 0 | Years 4 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 4 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 4 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 6 · Weathered | Dissonance raised 0 | Loop-power Memory 0 | Memory 0 | Years 6 · Weathered | Dissonance raised 0 | Loop-power Memory 0"
+      "detail": "Memory 5 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 5 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 2 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 2 | Spent 4 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 2 | Spent 4 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 2 | Spent 4 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 2 | Spent 4 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4"
     },
     {
       "name": "the next interlude reaches Weathered",
@@ -297,9 +381,134 @@
       "detail": "6 Weathered"
     },
     {
+      "name": "the investigator card shows Years and bracket",
+      "ok": true,
+      "detail": "Memory 5 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 5 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 2 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 2 | Spent 4 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 2 | Spent 4 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 2 | Spent 4 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 2 | Spent 4 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 4 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 6 · Weathered | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 6 · Weathered | Raised 0 | Spent 0 | Pending 0 | Quest 0/4"
+    },
+    {
       "name": "Years persist through save+reload",
       "ok": true,
       "detail": "6"
+    },
+    {
+      "name": "Easy fills SCED's chaos bag with the guide's 17 tokens",
+      "ok": true,
+      "detail": "17 token(s)"
+    },
+    {
+      "name": "...and the band's [static] is put back in the bag",
+      "ok": true,
+      "detail": "in bag: 1"
+    },
+    {
+      "name": "Expert replaces the token set (19 tokens, one -8, no +1)",
+      "ok": true,
+      "detail": "19 token(s)"
+    },
+    {
+      "name": "the table's own chaos bag is put back afterwards",
+      "ok": true,
+      "detail": "in bag: 0"
+    },
+    {
+      "name": "claiming a Named enemy's Victory banks 2 per investigator",
+      "ok": true,
+      "detail": "0 -> 6"
+    },
+    {
+      "name": "a second claim of the same Victory banks nothing",
+      "ok": true,
+      "detail": "6 -> 6"
+    },
+    {
+      "name": "an unknown enemy has no Victory to claim",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "the interlude panel lists a Recollection with its price",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "name": "the control shows the Interlude panel",
+      "ok": true,
+      "detail": "INTERLUDE · spend Memory | Memory 5 / 30 | Anchor Point (4) | Cassandra's Notebook (3) | Foreknowledge (2) | Muscle Memory (2) | Rehearsed Escape (2) | Stolen Minute (3) | The Hour I Learned Your Name (5) | The Long Way Round (2) | The Same Doorway Twice (2) | This Time For Sure (2) | Lvl 1 (1) | Lvl 2 (2) | Lvl 3 (3) | Lvl 4 (4) | Lvl 5 (5) | Begin Next Loop | Back | AGING | Bank on-card Memory (0) | Loop ended in danger: no | Relay Investigator B · Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Defeated:\nno | Leaned: no | -combat | +intellect | Age | Relay Investigator E · Years 0 · Prime | Dissonance raised 0 | Loop-power Memory 0 | Defeated:\nno | Leaned: no | -combat | +intellect | Age"
+    },
+    {
+      "name": "buying a Recollection spends its Memory",
+      "ok": true,
+      "detail": "5 -> 3"
+    },
+    {
+      "name": "an unaffordable level-up is refused",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "a level-3 upgrade spends 3",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "Bank on-card Memory moves the investigators' Memory to the bank (3)",
+      "ok": true,
+      "detail": "3 banked, 0 -> 3"
+    },
+    {
+      "name": "the investigator card's Memory goes back to 0",
+      "ok": true,
+      "detail": "Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 2 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 2 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 2 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4"
+    },
+    {
+      "name": "the investigator card shows its pending Years",
+      "ok": true,
+      "detail": "Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 2 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 2 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 2 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 1 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 0 | Quest 0/4 | Memory 0 | Years 0 · Prime | Raised 0 | Spent 0 | Pending 2 | Quest 0/4"
+    },
+    {
+      "name": "a card's Years are held as pending (2)",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "name": "Age adds the pending Years (1 + 2)",
+      "ok": true,
+      "detail": "gained 3"
+    },
+    {
+      "name": "Memory on a departed investigator's cards is not banked",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "pending Years are cleared once added",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "the control offers Undo Hour VI",
+      "ok": true,
+      "detail": "THE STILL HOUR · loop 1 | Memory 0 / 30 | Investigators 3 | Dissonance 1 / 24 · Calm | [static] 1 | Hour 6 · The Wrong Sky | Appointed: Sensed | Relay Investigator B · Memory 0 | Relay Investigator E · Memory 0 | Status | Set Up Loop | Sync Board | Reset Loop | Interlude | Knowledge | Clear Board | Undo Hour VI | Easy | Standard | Hard | Expert"
+    },
+    {
+      "name": "Undo Hour VI takes its Static token back",
+      "ok": true,
+      "detail": "static, extra 0"
+    },
+    {
+      "name": "after the undo, Hour VI resolves again when reached",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "reaching Hour VI again this loop adds nothing (once per loop)",
+      "ok": true,
+      "detail": "extra 1"
+    },
+    {
+      "name": "reaching Hour VI adds 1 Static token until the end of the loop",
+      "ok": true,
+      "detail": "hour 6, extra 1"
     },
     {
       "name": "a card can be taken out and lands on the table",
@@ -324,7 +533,7 @@
     {
       "name": "campaign box remembers where its contents go",
       "ok": true,
-      "detail": "11 object(s)"
+      "detail": "3 object(s)"
     },
     {
       "name": "campaign box shows Place and Recall",
@@ -339,12 +548,12 @@
     {
       "name": "Place lays out every remembered object",
       "ok": true,
-      "detail": "11/11"
+      "detail": "3/3"
     },
     {
       "name": "each lands on its remembered spot",
       "ok": true,
-      "detail": "11/11"
+      "detail": "3/3"
     },
     {
       "name": "minicard deck placed",
@@ -367,19 +576,19 @@
       "detail": "Custom_PDF"
     },
     {
-      "name": "campaign log placed (Tag CampaignLog)",
-      "ok": true,
-      "detail": null
-    },
-    {
       "name": "guide PDF is hosted, not a local file",
       "ok": true,
-      "detail": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/25cfef761882013f5498e5c6516e306d6121d51f/dist/guide/the_still_hour_campaign_guide.pdf?v=4a66690632"
+      "detail": "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/8e2f4744f42b196c52f1d823ed4bc8a07af2ab43/dist/guide/the_still_hour_campaign_guide.pdf?v=ff015ade5a"
     },
     {
       "name": "guide opens as a book",
       "ok": true,
       "detail": "0"
+    },
+    {
+      "name": "campaign log placed (Tag CampaignLog)",
+      "ok": true,
+      "detail": null
     },
     {
       "name": "log GMNotes type CampaignLog",
@@ -389,7 +598,7 @@
     {
       "name": "log draws its checkboxes, counters and write-in fields",
       "ok": true,
-      "detail": "58 buttons, 23 inputs"
+      "detail": "60 buttons, 23 inputs"
     },
     {
       "name": "clicking a checkbox and a counter records them",
@@ -432,9 +641,9 @@
       "detail": null
     },
     {
-      "name": "log syncs from the campaign-state token",
+      "name": "log syncs from the Control token",
       "ok": true,
-      "detail": "updated 1"
+      "detail": "updated 2"
     },
     {
       "name": "synced fact is ticked on the log",
@@ -454,25 +663,232 @@
     {
       "name": "Recall puts everything back in the box",
       "ok": true,
-      "detail": "0 -> 11"
+      "detail": "0 -> 3"
+    },
+    {
+      "name": "the saved object spawns",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "it is SCED's campaign box (GMNotes type CampaignBox)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "it carries SCED's memory-bag script",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "the saved object's box shows Place and Recall",
+      "ok": true,
+      "detail": "Place | Recall"
+    },
+    {
+      "name": "the box holds 8 scenario boxes",
+      "ok": true,
+      "detail": "8"
+    },
+    {
+      "name": "the box holds the campaign log",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "the box holds the campaign guide",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "the box holds the investigator minicards",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "the box holds the Control token",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "the box holds the player-card pouches (one per investigator, one of Recollections)",
+      "ok": true,
+      "detail": "6"
+    },
+    {
+      "name": "the box holds the spare scenario boxes (Clear Board refills a used box from them)",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "the box holds nothing else (20 pieces)",
+      "ok": true,
+      "detail": "20 piece(s), 0 unrecognised"
+    },
+    {
+      "name": "the box holds the [static] token",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "every scenario box carries SCED's box script, remembers its layout and holds its cards",
+      "ok": true,
+      "detail": "8/8"
+    },
+    {
+      "name": "TTS lists the same pieces inside the box",
+      "ok": true,
+      "detail": "20 vs 20"
+    },
+    {
+      "name": "every card face and back is a hosted raw.githubusercontent URL pinned to a commit",
+      "ok": true,
+      "detail": "734/734"
+    },
+    {
+      "name": "every card in the box has consistent SCED metadata",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the box's cards are inside it",
+      "ok": true,
+      "detail": "367 card(s)"
+    },
+    {
+      "name": "the box remembers a spot for every piece",
+      "ok": true,
+      "detail": "20 spot(s)"
+    },
+    {
+      "name": "Place runs on the saved object's box",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "the guide PDF is hosted on raw.githubusercontent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "the campaign box is empty afterwards",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "each piece lands on its remembered spot",
+      "ok": true,
+      "detail": "20/20"
+    },
+    {
+      "name": "every scenario box is on the table",
+      "ok": true,
+      "detail": "8/8"
+    },
+    {
+      "name": "Place lays out every piece",
+      "ok": true,
+      "detail": "20/20"
+    },
+    {
+      "name": "the campaign log is on the table",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "the Control token is on the table with its buttons",
+      "ok": true,
+      "detail": "THE STILL HOUR · Prologue | Memory 0 / 30 | Investigators 3 | Dissonance 0 / 24 · Calm | [static] 0 | Hour 1 · First Dark | Appointed: Unseen | Status | Set Up Prologue | Sync Board | Reset Loop | Interlude | Knowledge | Prologue reward +6 | Clear Board | Easy | Standard | Hard | Expert"
+    },
+    {
+      "name": "the box's Control opens a new campaign in the Prologue",
+      "ok": true,
+      "detail": "memory 0, dissonance 0, hour 1, loops 0, prologue true"
+    },
+    {
+      "name": "the box's Control runs its in-engine tests",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "the box's Control's in-engine tests all pass",
+      "ok": true,
+      "detail": "59 passed, 0 failed"
+    },
+    {
+      "name": "a scenario box from the saved object and its Control are on the table",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "the scenario box's Place (SCED's script) runs",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "the box is empty after its Place, as every SCED box is",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "every card it laid out is on the table (none fell into a bag)",
+      "ok": true,
+      "detail": "36/36"
+    },
+    {
+      "name": "the laid-out cards carry the loop tag",
+      "ok": true,
+      "detail": "0 without it"
+    },
+    {
+      "name": "no two laid-out cards overlap",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "nothing laid out sits on the table's own pieces (tokens, counters, bags)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "Clear Board runs",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "every card the box laid out leaves the table (drawn ones too)",
+      "ok": true,
+      "detail": "0 left"
+    },
+    {
+      "name": "Clear Board puts a full box back",
+      "ok": true,
+      "detail": "8/8"
+    },
+    {
+      "name": "the next loop's Place lays out the same cards again",
+      "ok": true,
+      "detail": "36 vs 36"
     }
   ],
   "notes": [
-    "table has 211 object(s) before the run",
     "SCED detected (GUID reference handler)",
+    "table has 212 object(s) before the run",
     "removed 0 object(s) left by an earlier relay run",
     "control sees SCED; [static] mode virtual",
     "no Still Hour investigator seated on a SCED mat: skill tracker not exercised",
-    "0 campaign log(s) on the table: export mirror not exercised (needs exactly one)"
+    "0 campaign log(s) on the table: export mirror not exercised (needs exactly one)",
+    "removed 13 object(s) of the component builds",
+    "17 object(s) on the table that were not there before the run (component builds cleared): Elder Sign (Tile), +1 (Tile), 0 (Tile), 0 (Tile), Static (Tile), -1 (Tile), -1 (Tile), -1 (Tile), Skull (Tile), Skull (Tile), -2 (Tile), -2 (Tile)",
+    "every object that was on the table before the run is still there (component builds cleared)"
   ],
   "screenshots": [
     "screenshots/01_campaign_log.jpg",
-    "screenshots/02_the_still_hour_campaign_json_0_Still_Hour.jpg",
-    "screenshots/03_the_still_hour_mod_json_0_THE_STILL_HOUR___Player_Cards.jpg",
-    "screenshots/04_the_still_hour_mod_json_1_THE_STILL_HOUR___The_Appointed.jpg",
-    "screenshots/05_the_still_hour_mod_json_2_THE_STILL_HOUR___Control.jpg",
-    "screenshots/06_the_still_hour_mod_json_3_Static.jpg",
-    "screenshots/07_the_still_hour_table_json_0_The_Still_Hour.jpg"
+    "screenshots/02_the_still_hour_mod_json_0_THE_STILL_HOUR___Player_Cards.jpg",
+    "screenshots/03_the_still_hour_mod_json_1_THE_STILL_HOUR___The_Appointed.jpg",
+    "screenshots/04_the_still_hour_mod_json_2_THE_STILL_HOUR___Control.jpg",
+    "screenshots/05_the_still_hour_mod_json_3_Static.jpg",
+    "screenshots/06_the_still_hour_table_json_0_The_Still_Hour.jpg"
   ],
-  "timed_out": false
+  "timed_out": true
 }
