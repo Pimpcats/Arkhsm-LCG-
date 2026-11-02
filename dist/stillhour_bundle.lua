@@ -6505,6 +6505,18 @@ function shApiState()
   }
 end
 
+--- A brand-new campaign on this Control (runner API: the relay plays a whole night from the start on
+-- its own copy of the Control; nothing calls it during play).
+function shApiNewCampaign()
+  CampaignState.init(CampaignState.constants().investigators)
+  CampaignState.setPrologue(true)
+  mode = "play"
+  tableSetUp, setupRunning, finaleUndo = false, false, nil
+  aging = {}
+  afterChange()
+  return shApiState()
+end
+
 --- End the Prologue if it is still running (tests and the relay start at Loop 1
 -- straight away, so the next loop is under way: no Between Loops).
 function shApiEndPrologue()
@@ -7298,6 +7310,7 @@ function shApiSeat(p)
   -- once the cards are on the mats: the party size, SCED's counter and the log's investigator rows
   local mine = {}
   for m in pairs(seatingNow) do mine[#mine + 1] = m end
+  -- seating settles: the cards have landed and SCED has registered each investigator on their mat
   Wait.time(function()
     for _, m in ipairs(mine) do seatingNow[m] = nil end
     local n = #seatedByMat()
@@ -7307,7 +7320,7 @@ function shApiSeat(p)
     guarded("investigators", Board.refreshInvestigators, true)
     guarded("campaign log", fillLog)
     afterChange()
-  end, 3)
+  end, 4)
   refreshControl()
   return { seated = done, reports = reports }
 end
@@ -7364,6 +7377,16 @@ function shApiSetUp(p)
     return false
   end
   setUpAgainAsked = false
+  -- investigators seated a moment ago are still landing (their card on the mat, their deck on its spot):
+  -- dealing them in now would find no deck, so Set Up waits until seating has settled and then runs
+  if next(seatingNow) then
+    announce("Waiting a moment for the investigators to finish being seated, then setting up.")
+    local function again() shApiSetUp(p) end
+    if not pcall(function() Wait.condition(again, function() return next(seatingNow) == nil end, 20, again) end) then
+      return false
+    end
+    return { waiting = true }
+  end
   local seated = seatedByMat()
   if #seated == 0 then
     announce("Seat the investigators first (Setup panel: pick them, then Seat investigators).")

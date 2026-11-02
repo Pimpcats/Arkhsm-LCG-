@@ -1693,6 +1693,198 @@ step("saved object: a scenario box's Place, Clear Board, Place again", function(
   end, 3)
 end)
 
+-- The whole night the way the owner plays it, in this TTS: Seat investigators, Set Up Prologue, the
+-- loop's turn (Reset Loop, Begin Next Loop), Set Up Loop (Clear Board, every used box refilled, the
+-- night's boxes Placed), Clear Board on its own, a second Set Up, the Hours on the table following the
+-- Hour, Begin Finale (The Last Hour laid out) and a last Clear Board. After each the table is looked at:
+-- the boxes full or laid out as they should be, one Hours deck, the investigators dealt in, no two
+-- objects under one GUID, and no Lua error. Everything it creates is cleaned up afterwards.
+local function scenarioBoxes()
+  local by = {}
+  for _, o in ipairs(getObjects()) do
+    if alive(o) and gm(o).type == "ScenarioBox" and gm(o).id then by[gm(o).id] = o end
+  end
+  return by
+end
+local function boxFull(o) return alive(o) and #(o.getObjects() or {}) > 0 end
+local function sced(owner, kind)
+  local h = getObjectFromGUID("123456")
+  return h and h.call("getObjectByOwnerAndType", { owner = owner, type = kind }) or nil
+end
+local function handOf(colour)
+  local mat = sced(colour, "Playermat")
+  local pc = mat and mat.getVar("playerColor")
+  local ok, list = pcall(function() return Player[pc].getHandObjects() end)
+  return ok and list or {}
+end
+local function hoursDecks()
+  local n, shown = 0, nil
+  for _, o in ipairs(getObjects()) do
+    if alive(o) and (o.type == "Deck" or o.type == "Card") then
+      local entries = o.type == "Deck" and (o.getObjects() or {}) or { { gm_notes = o.getGMNotes() } }
+      local hours = 0
+      for _, e in ipairs(entries) do
+        local id = (decode(e.gm_notes) or {}).id
+        if id and tostring(id):match("^sthr%-hour%-%d$") then hours = hours + 1 end
+      end
+      if hours > 0 and #entries == hours then
+        local p = o.getPosition()
+        if math.abs(p.x + 2.94) < 0.7 and math.abs(p.z - 0.36) < 0.7 then
+          n = n + 1
+          local last = entries[#entries]
+          shown = (decode(last.gm_notes) or {}).id
+        end
+      end
+    end
+  end
+  return n, shown
+end
+local function duplicateGuids()
+  local seen, dup = {}, {}
+  for _, o in ipairs(getObjects()) do
+    if alive(o) then
+      local g = o.getGUID()
+      if seen[g] then dup[#dup + 1] = g .. " " .. tostring(o.getName()) end
+      seen[g] = true
+    end
+  end
+  return dup
+end
+
+step("saved object: the whole night, as the owner plays it", function(go)
+  if SB.blocked or not SAVED then return go() end
+  local ctl = SB.ctl
+  if not alive(ctl) then check("the saved object's Control is on the table for the whole night", false) ; return go() end
+  if foreignLoopCards("StillHourRelayNone") > 0 then
+    info("campaign scenario cards already on the table: the whole night is not played (run on a fresh SCED table)")
+    return go()
+  end
+  if not (sced("White", "Playermat") and sced("Orange", "Playermat")) then
+    info("no White and Orange SCED playmats: the whole night is not played")
+    return go()
+  end
+  local before = {}
+  for _, o in ipairs(getObjects()) do before[o.getGUID()] = true end
+  -- the night starts from a new campaign (earlier steps moved this Control on); a build without the call
+  -- plays from wherever the Control is
+  pcall(function() ctl.call("shApiNewCampaign") end)
+  -- (Lua errors: the relay collects every one TTS reports, and the headless harness checks each step)
+  local function sound(what)
+    local dup = duplicateGuids()
+    check(what .. ": no two objects share a GUID", #dup == 0, #dup > 0 and table.concat(dup, "; ", 1, math.min(#dup, 5)) or nil)
+  end
+  local function finish()
+    pcall(function() ctl.call("shApiClearBoard") end)
+    Wait.time(function()
+      -- everything the night created goes with the run (the boxes refilled under their old GUIDs too)
+      for _, o in ipairs(getObjects()) do
+        if alive(o) and not isOwners(o) and (not before[o.getGUID()] or gm(o).type == "ScenarioBox"
+            or o.hasTag("StillHourLoop")) then
+          pcall(function() o.addTag(TAG) end)
+        end
+        if alive(o) then
+          for _, t in ipairs(o.getTags() or {}) do
+            if t:sub(1, 15) == "StillHourOwner_" then pcall(function() o.addTag(TAG) end) end
+          end
+        end
+      end
+      go()
+    end, 4)
+  end
+  -- 1. Seat investigators
+  local seat = ctl.call("shApiSeat", { ids = { "sthrelias", "sthrcass" } })
+  if type(seat) == "table" and seat.waiting then info("SCED was still reading its player cards: seating again") end
+  waitFor(function()
+    local n = 0
+    for _, i in ipairs(ctl.call("shApiInvestigators") or {}) do if i.matColor then n = n + 1 end end
+    return n >= 2
+  end, 30, function(seated)
+    check("Seat investigators puts two investigators on the White and Orange playmats", seated)
+    sound("seating")
+    -- 2. Set Up Prologue
+    local boxes = scenarioBoxes()
+    ctl.call("shApiSetUp")
+    waitFor(function() return not boxFull(scenarioBoxes().prologue) and #handOf("White") >= 5 end, 90, function(ok)
+      Wait.time(function()
+        check("Set Up Prologue lays the Prologue out and deals 5 cards to each investigator", ok
+          and #handOf("White") == 5 and #handOf("Orange") == 5,
+          #handOf("White") .. " / " .. #handOf("Orange") .. " in hand")
+        local n, shown = hoursDecks()
+        check("one Hours deck on the agenda spot, showing Hour I", n == 1 and shown == "sthr-hour-1", n .. " " .. tostring(shown))
+        sound("Set Up Prologue")
+        -- 3. the Prologue ends; the next loop begins; Set Up Loop
+        ctl.call("shApiReset") ; ctl.call("shApiReset")
+        ctl.call("shApiBeginNextLoop")
+        if (stateOf(ctl) or {}).loopEnded then ctl.call("shApiBeginNextLoop") end
+        ctl.call("shApiSetUp")
+        waitFor(function()
+          local b = scenarioBoxes()
+          return boxFull(b.prologue) and not boxFull(b.district_square) and not boxFull(b.district_church)
+            and not boxFull(b.district_almanac)
+        end, 120, function(ok3)
+          Wait.time(function()
+            local b = scenarioBoxes()
+            check("Set Up Loop refills the Prologue's box and lays out the Square and the night's districts", ok3,
+              "prologue " .. tostring(boxFull(b.prologue)) .. ", square " .. tostring(not boxFull(b.district_square)))
+            check("the investigators are dealt in again (5 cards each)", #handOf("White") == 5 and #handOf("Orange") == 5,
+              #handOf("White") .. " / " .. #handOf("Orange"))
+            local n3, shown3 = hoursDecks()
+            check("one Hours deck, showing Hour I", n3 == 1 and shown3 == "sthr-hour-1", n3 .. " " .. tostring(shown3))
+            sound("Set Up Loop")
+            -- 4. Clear Board on its own
+            local okc = pcall(function() ctl.call("shApiClearBoard") end)
+            Wait.time(function()
+              local b4, full = scenarioBoxes(), 0
+              local total = 0
+              for _, o in pairs(b4) do total = total + 1 ; if boxFull(o) then full = full + 1 end end
+              check("Clear Board runs and every scenario box is full again", okc and full == total, full .. "/" .. total)
+              local loose = 0
+              for _, o in ipairs(getObjectsWithTag("StillHourLoop")) do if alive(o) and o.type ~= "Bag" then loose = loose + 1 end end
+              check("Clear Board leaves no scenario card on the table", loose == 0, loose .. " left")
+              sound("Clear Board")
+              -- 5. a second Set Up in the same loop (the owner confirms it)
+              ctl.call("shApiSetUp", { again = true })
+              waitFor(function() return not boxFull(scenarioBoxes().district_square) end, 120, function(ok5)
+                Wait.time(function()
+                  check("a second Set Up lays the night out again from the refilled boxes", ok5)
+                  local n5 = hoursDecks()
+                  check("still one Hours deck", n5 == 1, n5)
+                  sound("second Set Up")
+                  -- 6. the Hours follow the Hour
+                  ctl.call("shApiCounter", { name = "hour", delta = 1 })
+                  Wait.time(function()
+                    local n6, shown6 = hoursDecks()
+                    check("the Hours on the table show Hour II after an advance", n6 == 1 and shown6 == "sthr-hour-2",
+                      n6 .. " " .. tostring(shown6))
+                    ctl.call("shApiCounter", { name = "hour", delta = -1 })
+                    Wait.time(function()
+                      local n7, shown7 = hoursDecks()
+                      check("and Hour I again after a rewind", n7 == 1 and shown7 == "sthr-hour-1", n7 .. " " .. tostring(shown7))
+                      sound("the Hours")
+                      -- 7. Begin Finale
+                      ctl.call("shApiUnlockFact", { id = "the-way-the-night-breaks" })
+                      ctl.call("shApiSetFinale", { on = true })
+                      waitFor(function() return not boxFull(scenarioBoxes().finale) end, 60, function(ok7)
+                        Wait.time(function()
+                          check("Begin Finale lays out The Last Hour", ok7 and (stateOf(ctl) or {}).finale == true)
+                          local n8 = hoursDecks()
+                          check("one Hours deck in the finale", n8 == 1, n8)
+                          sound("Begin Finale")
+                          finish()
+                        end, 6)
+                      end)
+                    end, 3)
+                  end, 3)
+                end, 10)
+              end)
+            end, 6)
+          end, 12)
+        end)
+      end, 8)
+    end)
+  end)
+end)
+
 -- docs/LOADING.md "Moving a campaign in progress to a newer build": the
 -- Control copies its state into the campaign log's memo (TTS saves it with the
 -- log); the owner deletes the old Control and takes the new build's Control
