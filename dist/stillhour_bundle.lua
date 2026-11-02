@@ -3003,6 +3003,11 @@ local MIRRORED = { SetAside1 = true, SetAside2 = true }
 Setup.OWNER_TAG_PREFIX = "StillHourOwner_"
 local LOOP_TAG = "StillHourLoop"
 
+Setup.TRACE = false
+local function trace(msg)
+  if Setup.TRACE then pcall(function() print("[trace] setup: " .. tostring(msg)) end) end
+end
+
 local function try(fn, ...)
   local ok, v = pcall(fn, ...)
   if ok then return v end
@@ -3178,6 +3183,7 @@ end
 function Setup.seat(invId, matColor, opts)
   opts = opts or {}
   local rep = { ok = false, mat = matColor, deck = 0, missing = {} }
+  trace("seat " .. tostring(invId) .. ": find its pouch")
   local bag = holderOf(invId)
   local invPos, deckPos = Setup.zone(matColor, "Investigator"), Setup.zone(matColor, "Deck")
   if not bag or not invPos or not deckPos then
@@ -3188,7 +3194,9 @@ function Setup.seat(invId, matColor, opts)
   local inv = dataById(bag, invId)
   if not inv then rep.why = "the investigator card is not in their pouch" ; return rep end
   -- the cards their back requires: from the same bag (or any holder of each)
+  trace("seat: spawn the investigator card")
   spawnObjectData({ data = withOwner(fresh(inv), matColor), position = above(invPos), rotation = Setup.rotation(matColor) })
+  trace("seat: the minicard")
   local mini = dataById(holderOf(invId .. "-m"), invId .. "-m")
   local miniPos = Setup.zone(matColor, "Minicard")
   if mini and miniPos then
@@ -3204,6 +3212,7 @@ function Setup.seat(invId, matColor, opts)
       rep.missing[#rep.missing + 1] = id
     end
   end
+  trace("seat: the starter deck from SCED's player cards")
   if opts.starter ~= false then
     for _, row in ipairs(Setup.STARTER[invId] or {}) do
       for _ = 1, row[2] do
@@ -3229,6 +3238,7 @@ function Setup.seat(invId, matColor, opts)
     end
   end
   rep.deck = #deck
+  trace("seat: spawn the deck (" .. #deck .. " cards)")
   Setup.spawnStack(deck, above(deckPos), Setup.rotation(matColor, true), function(o)
     pcall(function() if o.type == "Deck" then o.shuffle() end end)
   end)
@@ -3291,6 +3301,7 @@ function Setup.resetInvestigator(matColor, opts)
   local mat = SCED.playermat(matColor)
   local deckPos = Setup.zone(matColor, "Deck")
   if not mat or not deckPos then rep.why = "no playmat" ; return rep end
+  trace("reset " .. tostring(matColor) .. ": collect")
   local owner = Setup.OWNER_TAG_PREFIX .. matColor
   local playerColor = try(function() return mat.getVar("playerColor") end)
   local inHand = {}
@@ -3359,6 +3370,7 @@ function Setup.resetInvestigator(matColor, opts)
     pcall(function() o.destruct() end)
   end
   rep.cards = #cards
+  trace("reset " .. tostring(matColor) .. ": " .. #cards .. " cards collected, respawn")
   -- healed, nothing on the mat, 5 resources (the mat's own counters)
   for _, c in ipairs({ { "DamageCounter", 0 }, { "HorrorCounter", 0 }, { "ResourceCounter", 5 } }) do
     pcall(function() mat.call("updateCounter", { type = c[1], newValue = c[2] }) end)
@@ -3366,6 +3378,7 @@ function Setup.resetInvestigator(matColor, opts)
   pcall(function() mat.call("removeClues", 99) end)
   local rot = Setup.rotation(matColor, true)
   local function draw()
+    trace("reset " .. tostring(matColor) .. ": draw")
     pcall(function() mat.call("drawCardsWithReshuffleWrapper", { numCards = opts.hand or 5 }) end)
     if opts.after then pcall(opts.after, rep) end
   end
@@ -4599,6 +4612,12 @@ local Setup         = require("StillHour/Setup")
 
 local SAVE_VERSION = 2
 
+-- Breadcrumbs for the relay's in-game test (off in play): when TTS freezes, the relay's log ends at the last one.
+local traceOn = false
+local function trace(msg)
+  if traceOn then pcall(function() print("[trace] " .. tostring(msg)) end) end
+end
+
 local function note(msg)
   pcall(print, "[Still Hour] " .. tostring(msg))
 end
@@ -4700,10 +4719,15 @@ local function syncLogPage()
 end
 
 local function afterChange()
+  trace("afterChange: chaos bag")
   if refreshBag then guarded("chaos bag", refreshBag) end
+  trace("afterChange: board")
   syncBoard()
+  trace("afterChange: investigators")
   guarded("investigators", Board.refreshInvestigators, false)
+  trace("afterChange: panel")
   refreshControl()
+  trace("afterChange: hours deck")
   -- rebuilt only when the Hours on the table show another Hour (after a load nothing is remembered)
   if syncHoursDeck then guarded("hours deck", syncHoursDeck, true) end
   -- Between Loops (Reset Loop to Begin Next Loop) the log follows every step on its own
@@ -5179,6 +5203,7 @@ local function refillBoxes()
         refillsPending = math.max(0, refillsPending - 1)
       end
       Wait.frames(function()
+        trace("refill: spawn " .. tostring(scenarioBoxId(box) or "?"))
         local ok = pcall(function()
           spawnObjectData({ data = entry, position = pos, rotation = rot,
             callback_function = function(b) pcall(function() b.setLock(locked) end) ; done() end })
@@ -6038,12 +6063,14 @@ local function persist()
   -- TTS only refreshes script_state when the game saves; reload() (and SCED
   -- tools that reload objects) rebuild from it, so keep it current ourselves
   pcall(function() self.script_state = onSave() end)
+  trace("save: mirror to the campaign log")
   guarded("campaign log", function() Board.mirrorToLog(onSave(), saveSeq) end)
 end
 
 refreshControl = function()
   -- every other click redraws the panel, which withdraws a pending "Reset Loop?"
   resetAsked = false
+  trace("panel: draw " .. tostring(mode))
   pcall(function() self.clearButtons() end)
   -- guarded: a drawing error leaves a partial panel but never skips saving the state below
   if mode == "interlude" then guarded("panel", drawInterlude)
@@ -6062,7 +6089,9 @@ refreshControl = function()
           .. "sealed token later treated as revealed: click Dissonance yourself only if it resolves." })
     end
   end
+  trace("panel: save")
   persist()
+  trace("panel: done")
 end
 
 -- Click handlers: click_function(obj, player_color, alt_click) (TTS createButton).
@@ -6507,6 +6536,8 @@ end
 
 --- A brand-new campaign on this Control (runner API: the relay plays a whole night from the start on
 -- its own copy of the Control; nothing calls it during play).
+function shApiTrace(p) traceOn = not (type(p) == "table" and p.on == false) ; Setup.TRACE = traceOn ; return traceOn end
+
 function shApiNewCampaign()
   CampaignState.init(CampaignState.constants().investigators)
   CampaignState.setPrologue(true)
@@ -6844,6 +6875,7 @@ end
 
 --- onlyIfWrong: after a Place, leave a freshly laid Hours deck alone when it already shows the Hour.
 syncHoursDeck = function(onlyIfWrong)
+  trace("hours deck: check")
   local h = CampaignState.getHour()
   if hoursShown == h then return end
   if type(getObjects) ~= "function" or type(spawnObjectData) ~= "function" then return end
@@ -7071,6 +7103,7 @@ function shApiSyncBoardStaged(p)
       note("Board synced.")
       return
     end
+    trace("sync step " .. i .. " done")
     local msg = string.format("Board sync %d/%d: %s", i, #steps, step[1])
     log(msg)
     broadcastToAll(msg, { 0.7, 0.7, 0.7 })
@@ -7170,9 +7203,12 @@ end
 
 --- Clear Board: the scenario cards off the table, then every used scenario box full again.
 local function clearAndRefill()
+  trace("clear board: cards")
   local r = guarded("clear board", function() return Board.withoutAppointedGuard(clearLoopBoard) end)
     or { cards = 0, tokens = 0, stopped = 0 }
+  trace("clear board: refill boxes")
   local f = guarded("refill boxes", refillBoxes) or { refilled = 0 }
+  trace("clear board: done")
   r.refilled, r.sparesMissing = f.refilled or 0, f.missing == true
   return r
 end
@@ -7294,7 +7330,9 @@ function shApiSeat(p)
       announce("No free playmat for " .. tostring(id) .. ": every mat holds an investigator.")
       break
     end
+    trace("seat " .. tostring(id) .. " on " .. tostring(mat))
     local r = guarded("seat " .. tostring(id), Setup.seat, id, mat) or {}
+    trace("seated " .. tostring(id) .. ": " .. tostring(r.ok) .. " " .. tostring(r.why))
     reports[#reports + 1] = r
     if r.ok then
       done = done + 1
@@ -7420,9 +7458,12 @@ function shApiSetUp(p)
   local names = {}
   for _, id in ipairs(boxes) do names[#names + 1] = BOX_NAMES[id] or id end
   announce((prologue and "Setting up the Prologue: " or "Setting up the loop: ") .. table.concat(names, ", ") .. ".")
+  trace("set up: clear board")
   local cleared = guarded("clear board", clearAndRefill)
+  trace("set up: cleared")
   local failed = {}
   local function finish()
+    trace("set up: finish")
     setupRunning = false
     local moved = guarded("minicards", investigatorsTo, prologue and "sthr-loc-square" or "sthr-loc-hubsquare") or 0
     local anchors = prologue and 0 or (guarded("anchor point", anchorPointMemory) or 0)
@@ -7448,6 +7489,7 @@ function shApiSetUp(p)
     local i = 0
     local nextBox
     local function placeBox(id)
+      trace("set up: place " .. tostring(id))
       local box = findScenarioBox(id)
       if box and boxIsFull(box) then
         pcall(function() box.call("buttonClick_place") end)

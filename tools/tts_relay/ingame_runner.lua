@@ -1767,7 +1767,11 @@ step("saved object: the whole night, as the owner plays it", function(go)
   for _, o in ipairs(getObjects()) do before[o.getGUID()] = true end
   -- the night starts from a new campaign (earlier steps moved this Control on); a build without the call
   -- plays from wherever the Control is
+  -- breadcrumbs from the Control while the night runs: if TTS freezes, the relay's log ends at the last one
+  pcall(function() ctl.call("shApiTrace", { on = true }) end)
+  print("[trace] night: new campaign")
   pcall(function() ctl.call("shApiNewCampaign") end)
+  print("[trace] night: seat")
   -- (Lua errors: the relay collects every one TTS reports, and the headless harness checks each step)
   local function sound(what)
     local dup = duplicateGuids()
@@ -1803,6 +1807,7 @@ step("saved object: the whole night, as the owner plays it", function(go)
     sound("seating")
     -- 2. Set Up Prologue
     local boxes = scenarioBoxes()
+    print("[trace] night: Set Up Prologue")
     ctl.call("shApiSetUp")
     waitFor(function() return not boxFull(scenarioBoxes().prologue) and #handOf("White") >= 5 end, 90, function(ok)
       Wait.time(function()
@@ -1813,6 +1818,7 @@ step("saved object: the whole night, as the owner plays it", function(go)
         check("one Hours deck on the agenda spot, showing Hour I", n == 1 and shown == "sthr-hour-1", n .. " " .. tostring(shown))
         sound("Set Up Prologue")
         -- 3. the Prologue ends; the next loop begins; Set Up Loop
+        print("[trace] night: Reset Loop")
         ctl.call("shApiReset") ; ctl.call("shApiReset")
         ctl.call("shApiBeginNextLoop")
         if (stateOf(ctl) or {}).loopEnded then ctl.call("shApiBeginNextLoop") end
@@ -1832,6 +1838,7 @@ step("saved object: the whole night, as the owner plays it", function(go)
             check("one Hours deck, showing Hour I", n3 == 1 and shown3 == "sthr-hour-1", n3 .. " " .. tostring(shown3))
             sound("Set Up Loop")
             -- 4. Clear Board on its own
+            print("[trace] night: Clear Board")
             local okc = pcall(function() ctl.call("shApiClearBoard") end)
             Wait.time(function()
               local b4, full = scenarioBoxes(), 0

@@ -974,6 +974,11 @@ objectMeta.__index = function(o, k)
     local f = cache[k]
     if not f then
       f = function(a, ...)
+        E.calls = (E.calls or 0) + 1
+        if E.callsBy and currentWho then
+          local key = (currentWho.label or "?") .. " " .. k
+          E.callsBy[key] = (E.callsBy[key] or 0) + 1
+        end
         local s2 = S[o]
         if s2.removed and k ~= "isDestroyed" and k ~= "getGUID" then
           requireAlive(o, k)
