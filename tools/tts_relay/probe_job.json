@@ -1,0 +1,12 @@
+{
+  "_doc": "A short relay job that seats investigators one piece at a time (tools/tts_relay/probe_seat.lua) to find what freezes TTS. Copy it over job.json to run it; put job.json back afterwards.",
+  "payloads": [
+    {
+      "file": "dist/saved_object_the_still_hour.json",
+      "role": "saved_object"
+    }
+  ],
+  "runner": "tools/tts_relay/probe_seat.lua",
+  "timeout_s": 180,
+  "screenshot_pause_s": 2
+}

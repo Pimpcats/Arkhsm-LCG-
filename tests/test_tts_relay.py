@@ -27,7 +27,7 @@ pytestmark = pytest.mark.skipif(LUA is None, reason="lua5.2 not installed")
 BRANCH = "relay-test"
 JOB = json.load(open(os.path.join(ROOT, "tools", "tts_relay", "job.json"), encoding="utf-8"))
 SNAPSHOT = [p["file"] for p in JOB["payloads"]] + ["tools/tts_relay/job.json",
-                                                   "tools/tts_relay/ingame_runner.lua"]
+                                                   "tools/tts_relay/ingame_runner.lua", JOB["runner"]]
 
 
 def free_port():

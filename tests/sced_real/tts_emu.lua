@@ -987,6 +987,12 @@ objectMeta.__index = function(o, k)
         -- TTS destroys an object at the end of the frame: a script that changes it (or takes a card out of
         -- it) after destruct() in the same frame works on an object Unity is tearing down ("Can't add
         -- component to object that is being destroyed")
+        -- an object reloading (its replacement still loading its custom assets): TTS can tear the call down
+        if (s2.loadingUntil or -1) > E.frame and E.DYING_UNSAFE[k] and currentWho and currentWho.origin == "campaign" then
+          E.dyingCampaign = E.dyingCampaign or {}
+          E.dyingCampaign[#E.dyingCampaign + 1] = string.format("%s.%s by %s at %.2fs while it reloads",
+            s2.data.Nickname or s2.data.Name, k, currentWho.label or "?", E.now)
+        end
         if s2.destroying and E.DYING_UNSAFE[k] then
           E.dyingAccess = (E.dyingAccess or 0) + 1
           E.dyingLog = E.dyingLog or {}
@@ -1023,7 +1029,7 @@ objectMeta.__index = function(o, k)
   if k == "locked" then return st.locked end
   if k == "resting" then return st.resting end
   if k == "spawning" then return st.spawning end
-  if k == "loading_custom" then return false end
+  if k == "loading_custom" then return (st.loadingUntil or -1) > E.frame end
   if k == "interactable" then
     if st.props.interactable == nil then return true end
     return st.props.interactable
@@ -1401,7 +1407,7 @@ function methods.setState(o, id)
   nxt.States[tostring(st.stateId)] = cur
   nxt.Transform = cur.Transform
   -- each state keeps its own GUID (TTS swaps the whole object)
-  methods.destruct(o, true)
+  methods.destruct(o)
   removeNow(o)
   local n = makeObject(nxt, tonumber(id), { origin = st.origin })
   E.fire("onObjectStateChange", n, st.guid)
@@ -1432,7 +1438,8 @@ function removeNow(o)
   local st = S[o]
   if st.removed then return end
   st.removed = true
-  byGuid[st.guid] = nil
+  -- (a reloaded object's replacement keeps its GUID: only drop the GUID when it still names this one)
+  if byGuid[st.guid] == o then byGuid[st.guid] = nil end
   for i, x in ipairs(E.objects) do if x == o then table.remove(E.objects, i) break end end
 end
 E.removeNow = removeNow
@@ -1448,12 +1455,18 @@ function methods.destruct(o, silent)
   pendingDestroy[#pendingDestroy + 1] = o
   return true
 end
+-- As in TTS: the old object is torn down at the end of the frame (a script still holding it works on
+-- an object being destroyed), and the replacement under the same GUID loads its custom assets for a
+-- moment (loading_custom) before it is whole.
+E.RELOAD_FRAMES = 10
 function methods.reload(o)
+  E.reloads = (E.reloads or 0) + 1 ; if os.getenv("EMU_DEBUG_RELOAD") then io.stderr:write("[reload] " .. tostring(S[o].data.Nickname) .. " frame " .. E.frame .. "\n") end
   local d = methods.getData(o)
   local st = S[o]
   methods.destruct(o)
-  removeNow(o)
-  return makeObject(d, st.stateId > 0 and st.stateId or nil, { keepGuid = true, origin = st.origin })
+  local n = makeObject(d, st.stateId > 0 and st.stateId or nil, { keepGuid = true, origin = st.origin })
+  S[n].loadingUntil = E.frame + E.RELOAD_FRAMES
+  return n
 end
 function methods.clone(o, p)
   p = p or {}
@@ -1665,7 +1678,7 @@ end
 function makeObject(data, stateId, opts)
   opts = opts or {}
   local o = setmetatable({}, objectMeta)
-  local guid = newGuid(data.GUID)
+  local guid = (opts.keepGuid and type(data.GUID) == "string" and #data.GUID > 0) and data.GUID or newGuid(data.GUID)
   local st = { data = data, buttons = {}, inputs = {}, menu = {}, tags = {}, props = {}, bound = {},
                guid = guid, locked = data.Locked == true, resting = true, spawning = true,
                origin = opts.origin or "table" }
