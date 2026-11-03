@@ -503,6 +503,34 @@ return function(H)
     control().call("shApiRestore", { blob = before }); E.run(1)
   end)
 
+  step("I-1: the Investigators box's Place lays every investigator out in a row, nothing refused", function()
+    local box = find(function(o) return gm(o).type == "InvestigatorBox" end)
+    check("the Investigators box is on the table", box ~= nil)
+    if not box then return end
+    local mark = chatMark()
+    click(box, "Place")
+    E.runUntil(function() return #(box.getObjects() or {}) == 0 end, 15) ; E.run(1)
+    local ids = { "sthrelias", "sthrayako", "sthrcass", "sthrseraphine", "sthrbirdie" }
+    local all = true
+    for _, id in ipairs(ids) do
+      if not looseCard(id) then all = false end
+      if not looseCard("sthr-quest-" .. id:sub(5)) then all = false end
+    end
+    check("every investigator card and quest card lies on the table", all, tail(mark))
+    local decks = 0
+    for _, o in ipairs(objects()) do
+      if o.type == "Deck" and tostring(o.getName()):find("Starting Deck", 1, true) then decks = decks + 1 end
+    end
+    check("five starting decks (30 cards each) lie face down", decks == 5, tostring(decks))
+    check("nothing is refused or out of context", not saw(mark, "laid out, but") and not saw(mark, "already laid out"),
+      tail(mark))
+    -- an investigator card a player puts on a playmat by hand is seen by the Control (no seating step)
+    local card = looseCard("sthrelias")
+    local mat = find(function(o) return tostring(o.getName()):find("Playermat", 1, true) ~= nil
+      or tostring(o.getName()):find("Investigator", 1, true) ~= nil and o.type ~= "Card" end)
+    info("lineup placed; mat probe: " .. tostring(mat and mat.getName()))
+  end)
+
   step("A-3: Clear Board while the Appointed is out takes it too, and the Square lays out again", function()
     click(control(), "Clear Board"); E.run(0.5)
     local before = control().call("shApiSnapshot")

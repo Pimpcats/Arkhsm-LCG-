@@ -495,7 +495,7 @@ function Board.refreshInvestigators(applyStats)
             click_function = "shCardQuest",
             label = quest.unlocked and "Quest met" or string.format("Quest %d/%d", quest.tally, quest.goal),
             tooltip = "Your personal quest card's tally, kept across the campaign (the Campaign Log shows it too). "
-              .. "At the goal the Control tells you: swap the quest card for its unlocked card from your pouch "
+              .. "At the goal the Control tells you: swap the quest card for its unlocked card (face down beside it in your row) "
               .. "and tick met in your panel on page 1 of the Campaign Log. Left-click +1 · Right-click -1",
             color = quest.unlocked and { 0.1, 0.25, 0.12 } or nil,
           })

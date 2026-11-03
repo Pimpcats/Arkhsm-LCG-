@@ -21,15 +21,16 @@ GitHub, so the build works on any PC.
 2. **Objects → Saved Objects →** click **The Still Hour**. The campaign box
    appears in the box area at the top of the table.
 3. Press **Place** on the campaign box. It lays out the scenario boxes, the
-   campaign guide, the campaign log, the player-card pouches (one per investigator and one of Recollections), the
+   campaign guide, the campaign log, the **Investigators** box, the Recollections pouch, the
    **Control** token and the `[static]` token.
-4. Hand each player the pouch named for their investigator: it holds their
-   investigator card, minicard, the cards their back requires, their quest
-   cards and their 30-card starting deck. Each player puts the investigator card
-   on their playmat, shuffles in 1 random basic weakness (SCED's player card
-   panel) and puts the deck on the playmat's Deck spot. (Optional: the Control
-   token's Setup panel has **Seat investigators**, which does this for you.)
-   Then click your difficulty (**Standard** etc.) on the Control token.
+4. Press **Place** on the **Investigators** box: every investigator is laid
+   out in a row with their minicard, signature cards, weakness, quest card and
+   starting deck. Choose; each player takes their row to their playmat, puts the
+   investigator card on the mat, shuffles 1 random basic weakness (SCED's player
+   card panel) into the deck and puts the deck on the Deck spot. (Optional:
+   **Seat investigators** on the Control token's Setup panel does this for you,
+   before the Investigators box is laid out.) Then click your difficulty
+   (**Standard** etc.) on the Control token.
 5. On the Control token click **Set Up Prologue** (it opens the Setup panel), then **Set Up Prologue** on the
    panel: the Prologue is laid out
    and everyone is dealt in. From then on each loop is one click: **Set Up Loop**
@@ -106,7 +107,7 @@ Board** once the loop is over.
    above).
 
 A campaign begun on a build from before the personal quest cards has no quest
-cards yet. Take each investigator's quest card from their pouch (it
+cards yet. Take each investigator's quest card from the Investigators box (it
 is listed on the back of their investigator card) and start its tally at 0 on
 the investigator card's **Quest** button; from here on the Control token and the
 campaign log keep it. Until a quest is met, that investigator has no Memory

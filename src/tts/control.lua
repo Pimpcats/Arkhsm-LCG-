@@ -1367,7 +1367,7 @@ local function drawSetup()
   end
   local z = -1.7 + math.ceil(math.min(#Setup.INVESTIGATORS, 6) / 2) * 0.55
   button("shSeatInvestigators", string.format("Seat investigators (%d, optional)", #seatPick), 0, z, 1400,
-    "Optional: players can instead take their pouch and lay out their own cards. Campaign Setup steps 2-3 for "
+    "Optional: players can instead Place the Investigators box and take their own row. Campaign Setup steps 2-3 for "
       .. "each picked investigator: their card, minicard and permanent cards on their "
       .. "playmat, and their deck (the cards their back requires, the starter deck from Appendix: Starting Decks "
       .. "and 1 random basic weakness) shuffled on the Deck spot.", 90)
@@ -2849,8 +2849,8 @@ function shApiSetUp(p)
   end
   local seated = seatedByMat()
   if #seated == 0 then
-    announce("Put each player's investigator card on their playmat first (everything is in their pouch), or use "
-      .. "Seat investigators on the Setup panel.")
+    announce("Put each player's investigator card on their playmat first (Place the Investigators box to lay "
+      .. "them all out), or use Seat investigators on the Setup panel.")
     return false
   end
   if CampaignState.isLoopEnded() then

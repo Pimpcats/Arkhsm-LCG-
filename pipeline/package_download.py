@@ -140,6 +140,62 @@ def starting_deck(inv, name):
             "ContainedObjects": cards}
 
 
+# The Investigators box's Place: one row per investigator, reading left to right along -z (as the scenario
+# cards lie), rows down the table along +x, in the open area beside the campaign's loose objects.
+LINEUP_X0, LINEUP_DX = 28.0, 4.4          # first row, row spacing
+LINEUP_Z0 = 0.0                           # the investigator card
+LINEUP_DZ = 2.7                           # each further card
+LINEUP_Y = 1.6
+
+
+def investigators_box(rows):
+    """SCED's MemoryBag box holding every investigator; Place lays each one out in a row: investigator card,
+    minicard, the cards their back requires (signatures and weakness), their quest card, its unlocked card
+    face down, and their starting deck face down."""
+    import table_presence as T
+    contained, ml = [], {}
+
+    def put(obj, pos, ry, rz=0):
+        contained.append(obj)
+        ml[obj["GUID"]] = T.ml_entry(pos, ry, rz)
+
+    for i, (inv, row, mini, deck) in enumerate(rows):
+        x = LINEUP_X0 + LINEUP_DX * i
+        z = LINEUP_Z0
+        kinds = {}
+        for c in row:
+            md = json.loads(c.get("GMNotes") or "{}")
+            kinds.setdefault(md.get("type"), []).append((md, c))
+        ordered = [c for md, c in kinds.get("Investigator", [])]
+        quest = [c for md, c in sum(kinds.values(), []) if "-quest-" in md.get("id", "")]
+        done = [c for md, c in sum(kinds.values(), []) if "-questdone-" in md.get("id", "")]
+        weak = [c for md, c in sum(kinds.values(), []) if md.get("weakness") or md.get("type") == "Treachery"
+                and c not in quest and c not in done]
+        rest = [c for c in row if c not in ordered and c not in quest and c not in done and c not in weak]
+        for c in ordered:
+            put(c, {"x": x, "y": LINEUP_Y, "z": z}, 180)          # the sideways investigator card
+            z -= 3.3
+        if mini:
+            put(mini, {"x": x, "y": LINEUP_Y, "z": z + 0.6}, 270)
+            z -= LINEUP_DZ - 0.6
+        for c in rest + weak + quest:
+            put(c, {"x": x, "y": LINEUP_Y, "z": z}, 270)
+            z -= LINEUP_DZ
+        for c in done:
+            put(c, {"x": x, "y": LINEUP_Y, "z": z}, 270, 180)     # face down until its quest is met
+            z -= LINEUP_DZ
+        if deck:
+            put(deck, {"x": x, "y": LINEUP_Y, "z": z}, 270, 180)
+    box = T.memory_bag(CFG.name + " — Investigators", {"id": "investigators", "type": "InvestigatorBox"}, None,
+                       T.MESH_SMALL, T.SCALE_SMALL, contained, ml,
+                       desc="Place lays out every investigator in a row: their card, minicard, signature cards, "
+                            "weakness, quest card (its unlocked card face down beside it) and starting deck. Choose, "
+                            "then each player takes their row to their playmat and shuffles 1 random basic weakness "
+                            "(SCED's player card panel) into the deck.")
+    box["GUID"] = guid("box:investigators:" + CFG.slug)
+    return box
+
+
 def player_pouches(bag, minicards=None):
     """The player-card bag split into pouches: one per investigator (their investigator card, the cards their
     back requires, their personal quest card and its unlocked card) in the campaign's order, then one with
@@ -177,21 +233,15 @@ def player_pouches(bag, minicards=None):
                 "GUID": guid("pouch:" + nickname), "Tags": list(bag.get("Tags") or []),
                 "ColorDiffuse": {"r": r, "g": g, "b": b}, "Transform": dict(bag.get("Transform") or {}),
                 "ContainedObjects": cards}
+    # every investigator in one box whose Place lays them all out, one row each (owner, 2026-11-03: see them
+    # all to choose, then hand a row to its player; no seating step)
+    rows = []
     for inv, _ in groups:
-        if by[inv]:
-            # everything a player needs, to hand over whole: investigator card, minicard, required cards, quest
-            # cards and their starting deck (owner, 2026-11-03: no seating step)
-            contents = list(by[inv])
-            mini = (minicards or {}).get(inv)
-            if mini:
-                contents.insert(1, mini)
-            deck = starting_deck(inv, names[inv])
-            if deck:
-                contents.append(deck)
-            pouches.append(pouch("%s — Player Cards" % names[inv], contents, CLASS_TINT.get(classes[inv], CLASS_TINT["Neutral"]),
-                                 "Hand this to the player: their investigator card, minicard, the cards their back "
-                                 "requires, their personal quest cards and their starting deck. Put them on your "
-                                 "playmat; shuffle in 1 random basic weakness (SCED's player card panel)."))
+        row = list(by[inv])
+        mini = (minicards or {}).get(inv)
+        deck = starting_deck(inv, names[inv])
+        rows.append((inv, row, mini, deck))
+    pouches.append(investigators_box(rows))
     if rest:
         pouches.append(pouch("Recollections — Player Cards", rest, CLASS_TINT["Neutral"],
                              "Recollections, bought between loops: two of each (Anchor Point: one)."))

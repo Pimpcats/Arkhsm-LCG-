@@ -2602,7 +2602,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/95b360be75ca6aaeaaf03446d20624e791b00c94/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/e235d2b4180f0d31fc150c7f8a883bc06646a0b5/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -3112,7 +3112,7 @@ local function dataById(container, id)
 end
 
 --- The bag or deck on the table that holds the card with this campaign id (the campaign's player-card
--- pouches hold the investigators and their cards; its minicard deck the minicards). Found by what it holds,
+-- Investigators box holds the investigators, their cards and minicards until it is laid out). Found by what it holds,
 -- never by name: SCED's own "All Player Cards" bag is on the table too.
 -- SCED's own card bags hold thousands of cards: reading each of them for every card would stall the
 -- table, and the campaign's cards are never in them, so a container that large is skipped.
@@ -3219,12 +3219,13 @@ function Setup.seat(invId, matColor, opts)
   local bag = holderOf(invId)
   local invPos, deckPos = Setup.zone(matColor, "Investigator"), Setup.zone(matColor, "Deck")
   if not bag or not invPos or not deckPos then
-    rep.why = not bag and "this investigator's pouch (Player Cards) is not on the table"
+    rep.why = not bag and "this investigator's cards are not in the Investigators box (already laid out? then "
+      .. "put their investigator card on a playmat by hand)"
       or ("no " .. tostring(matColor) .. " playmat")
     return rep
   end
   local inv = dataById(bag, invId)
-  if not inv then rep.why = "the investigator card is not in their pouch" ; return rep end
+  if not inv then rep.why = "the investigator card is not in the Investigators box" ; return rep end
   -- the cards their back requires: from the same bag (or any holder of each)
   trace("seat: spawn the investigator card")
   spawnObjectData({ data = withOwner(fresh(inv), matColor), position = above(invPos), rotation = Setup.rotation(matColor) })
@@ -4017,7 +4018,7 @@ function Board.refreshInvestigators(applyStats)
             click_function = "shCardQuest",
             label = quest.unlocked and "Quest met" or string.format("Quest %d/%d", quest.tally, quest.goal),
             tooltip = "Your personal quest card's tally, kept across the campaign (the Campaign Log shows it too). "
-              .. "At the goal the Control tells you: swap the quest card for its unlocked card from your pouch "
+              .. "At the goal the Control tells you: swap the quest card for its unlocked card (face down beside it in your row) "
               .. "and tick met in your panel on page 1 of the Campaign Log. Left-click +1 · Right-click -1",
             color = quest.unlocked and { 0.1, 0.25, 0.12 } or nil,
           })
@@ -5983,7 +5984,7 @@ local function drawSetup()
   end
   local z = -1.7 + math.ceil(math.min(#Setup.INVESTIGATORS, 6) / 2) * 0.55
   button("shSeatInvestigators", string.format("Seat investigators (%d, optional)", #seatPick), 0, z, 1400,
-    "Optional: players can instead take their pouch and lay out their own cards. Campaign Setup steps 2-3 for "
+    "Optional: players can instead Place the Investigators box and take their own row. Campaign Setup steps 2-3 for "
       .. "each picked investigator: their card, minicard and permanent cards on their "
       .. "playmat, and their deck (the cards their back requires, the starter deck from Appendix: Starting Decks "
       .. "and 1 random basic weakness) shuffled on the Deck spot.", 90)
@@ -7465,8 +7466,8 @@ function shApiSetUp(p)
   end
   local seated = seatedByMat()
   if #seated == 0 then
-    announce("Put each player's investigator card on their playmat first (everything is in their pouch), or use "
-      .. "Seat investigators on the Setup panel.")
+    announce("Put each player's investigator card on their playmat first (Place the Investigators box to lay "
+      .. "them all out), or use Seat investigators on the Setup panel.")
     return false
   end
   if CampaignState.isLoopEnded() then
