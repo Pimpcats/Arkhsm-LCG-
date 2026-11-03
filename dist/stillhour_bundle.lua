@@ -2602,7 +2602,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/8e2f4744f42b196c52f1d823ed4bc8a07af2ab43/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/95b360be75ca6aaeaaf03446d20624e791b00c94/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -5982,8 +5982,9 @@ local function drawSetup()
     button("shSeatPick" .. i, label, (i % 2 == 1) and -PAIR_X or PAIR_X, -1.7 + math.floor((i - 1) / 2) * 0.55, 1000, tip, 80)
   end
   local z = -1.7 + math.ceil(math.min(#Setup.INVESTIGATORS, 6) / 2) * 0.55
-  button("shSeatInvestigators", string.format("Seat investigators (%d)", #seatPick), 0, z, 1400,
-    "Campaign Setup steps 2-3 for each picked investigator: their card, minicard and permanent cards on their "
+  button("shSeatInvestigators", string.format("Seat investigators (%d, optional)", #seatPick), 0, z, 1400,
+    "Optional: players can instead take their pouch and lay out their own cards. Campaign Setup steps 2-3 for "
+      .. "each picked investigator: their card, minicard and permanent cards on their "
       .. "playmat, and their deck (the cards their back requires, the starter deck from Appendix: Starting Decks "
       .. "and 1 random basic weakness) shuffled on the Deck spot.", 90)
   z = z + 0.65
@@ -7464,7 +7465,8 @@ function shApiSetUp(p)
   end
   local seated = seatedByMat()
   if #seated == 0 then
-    announce("Seat the investigators first (Setup panel: pick them, then Seat investigators).")
+    announce("Put each player's investigator card on their playmat first (everything is in their pouch), or use "
+      .. "Seat investigators on the Setup panel.")
     return false
   end
   if CampaignState.isLoopEnded() then

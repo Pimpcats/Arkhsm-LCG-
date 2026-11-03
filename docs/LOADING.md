@@ -21,13 +21,17 @@ GitHub, so the build works on any PC.
 2. **Objects → Saved Objects →** click **The Still Hour**. The campaign box
    appears in the box area at the top of the table.
 3. Press **Place** on the campaign box. It lays out the scenario boxes, the
-   campaign guide, the campaign log, the minicards, the player-card pouches (one per investigator and one of Recollections), the
+   campaign guide, the campaign log, the player-card pouches (one per investigator and one of Recollections), the
    **Control** token and the `[static]` token.
-4. On the **Control** token click **Set Up Prologue**. On the Setup panel click
-   the investigators you are playing, then **Seat investigators**: each gets
-   their investigator card, minicard, quest card and a shuffled starting deck on
-   a playmat. Then click your difficulty (**Standard** etc.) on the main panel.
-5. Back on the Setup panel, click **Set Up Prologue**: the Prologue is laid out
+4. Hand each player the pouch named for their investigator: it holds their
+   investigator card, minicard, the cards their back requires, their quest
+   cards and their 30-card starting deck. Each player puts the investigator card
+   on their playmat, shuffles in 1 random basic weakness (SCED's player card
+   panel) and puts the deck on the playmat's Deck spot. (Optional: the Control
+   token's Setup panel has **Seat investigators**, which does this for you.)
+   Then click your difficulty (**Standard** etc.) on the Control token.
+5. On the Control token click **Set Up Prologue** (it opens the Setup panel), then **Set Up Prologue** on the
+   panel: the Prologue is laid out
    and everyone is dealt in. From then on each loop is one click: **Set Up Loop**
    after **Begin Next Loop** (tonight's districts are picked from your log).
    Open the **campaign guide** and follow it from *Campaign Setup*; it says what

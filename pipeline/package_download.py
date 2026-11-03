@@ -87,7 +87,60 @@ CLASS_TINT = {"Guardian": (0.13, 0.38, 0.77), "Seeker": (0.92, 0.57, 0.14), "Rog
               "Mystic": (0.47, 0.25, 0.64), "Survivor": (0.75, 0.16, 0.16), "Neutral": (0.55, 0.52, 0.47)}
 
 
-def player_pouches(bag):
+def sced_cards_by_id():
+    """SCED's own player-card objects (objects/AllPlayerCards.*/ in the pinned SCED checkout), by card id,
+    with their GMNotes inlined: the starting decks are built from them, so every card is SCED's own."""
+    import glob
+    import starter_deck_ids as SD
+    root = SD.sced_dir()
+    folders = glob.glob(os.path.join(root, "objects", "AllPlayerCards.*"))
+    folders = [f for f in folders if os.path.isdir(f)]
+    if not folders:
+        raise SystemExit("SCED's AllPlayerCards objects not found under " + root)
+    out = {}
+    for path in glob.glob(os.path.join(folders[0], "*.json")):
+        d = json.load(open(path, encoding="utf-8"))
+        gp = d.pop("GMNotes_path", None)
+        if not gp:
+            continue
+        text = open(os.path.join(root, "objects", gp), encoding="utf-8").read()
+        cid = json.loads(text).get("id")
+        if cid and cid not in out:
+            d["GMNotes"] = text
+            out[cid] = d
+    return out
+
+
+def starting_deck(inv, name):
+    """The investigator's starter deck (Appendix: Starting Decks; campaigns/<id>/starter_decks.json) as one
+    Deck of SCED's own cards, each copy with its own GUID. The random basic weakness is drawn at the table."""
+    lists = json.load(open(os.path.join(ROOT, "campaigns", CFG.id, "starter_decks.json"), encoding="utf-8"))
+    if inv not in lists:
+        return None
+    sced = sced_cards_by_id()
+    cards, custom, ids = [], {}, []
+    for cid, qty in lists[inv]:
+        src = sced.get(cid)
+        if not src:
+            raise SystemExit("starter card %s (%s) is not in SCED's AllPlayerCards" % (cid, inv))
+        for k in range(qty):
+            c = copy.deepcopy(src)
+            c["GUID"] = guid("starter:%s:%s:%d" % (inv, cid, k))
+            c["Transform"] = {"posX": 0, "posY": 0, "posZ": 0, "rotX": 0, "rotY": 180, "rotZ": 180,
+                              "scaleX": 1, "scaleY": 1, "scaleZ": 1}
+            cards.append(c)
+            ids.append(c["CardID"])
+            custom.update(c.get("CustomDeck") or {})
+    return {"Name": "Deck", "Nickname": "%s — Starting Deck" % name,
+            "Description": "Their starter deck (%d cards). Shuffle in 1 random basic weakness from SCED's player "
+                           "card panel, then put the deck on your playmat's Deck spot." % len(cards),
+            "GUID": guid("starterdeck:" + inv), "DeckIDs": ids, "CustomDeck": custom,
+            "Transform": {"posX": 0, "posY": 0, "posZ": 0, "rotX": 0, "rotY": 180, "rotZ": 180,
+                          "scaleX": 1, "scaleY": 1, "scaleZ": 1},
+            "ContainedObjects": cards}
+
+
+def player_pouches(bag, minicards=None):
     """The player-card bag split into pouches: one per investigator (their investigator card, the cards their
     back requires, their personal quest card and its unlocked card) in the campaign's order, then one with
     the Recollections and anything else. Every card keeps its data and GUID."""
@@ -126,9 +179,19 @@ def player_pouches(bag):
                 "ContainedObjects": cards}
     for inv, _ in groups:
         if by[inv]:
-            pouches.append(pouch("%s — Player Cards" % names[inv], by[inv], CLASS_TINT.get(classes[inv], CLASS_TINT["Neutral"]),
-                                 "Their investigator card, the cards their back requires and their personal quest "
-                                 "cards. Seat investigators on the Control token takes what it needs from here."))
+            # everything a player needs, to hand over whole: investigator card, minicard, required cards, quest
+            # cards and their starting deck (owner, 2026-11-03: no seating step)
+            contents = list(by[inv])
+            mini = (minicards or {}).get(inv)
+            if mini:
+                contents.insert(1, mini)
+            deck = starting_deck(inv, names[inv])
+            if deck:
+                contents.append(deck)
+            pouches.append(pouch("%s — Player Cards" % names[inv], contents, CLASS_TINT.get(classes[inv], CLASS_TINT["Neutral"]),
+                                 "Hand this to the player: their investigator card, minicard, the cards their back "
+                                 "requires, their personal quest cards and their starting deck. Put them on your "
+                                 "playmat; shuffle in 1 random basic weakness (SCED's player card panel)."))
     if rest:
         pouches.append(pouch("Recollections — Player Cards", rest, CLASS_TINT["Neutral"],
                              "Recollections, bought between loops: two of each (Anchor Point: one)."))
@@ -221,9 +284,21 @@ def main(argv=None):
         o = copy.deepcopy(o)
         if "Player Cards" in (o.get("Nickname") or ""):
             add_recollection_copies(o)
+            # each minicard rides in its investigator's pouch: the minicard deck leaves the box
+            minicards = {}
+            for k, b in enumerate(list(box["ContainedObjects"])):
+                if b.get("Nickname") == "Investigator Minicards":
+                    for m in b.get("ContainedObjects") or []:
+                        mid = json.loads(m.get("GMNotes") or "{}").get("id", "")
+                        if mid.endswith("-m"):
+                            m = copy.deepcopy(m)
+                            m["Transform"] = dict(m.get("Transform") or {}, rotX=0, rotZ=0)
+                            minicards[mid[:-2]] = m
+                    box["ContainedObjects"].remove(b)
+                    ml.pop(b.get("GUID"), None)
             # one pouch per investigator and one of Recollections (owner): laid out in a row, each with its
             # own Place spot
-            for j, pouch in enumerate(player_pouches(o)):
+            for j, pouch in enumerate(player_pouches(o, minicards)):
                 pos = dict(POUCH_PLACE[0], z=POUCH_PLACE[0]["z"] - POUCH_STEP * j)
                 pouch["Transform"] = T.transform(pos, 270, (1, 1, 1))
                 box["ContainedObjects"].append(pouch)
