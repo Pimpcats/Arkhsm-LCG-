@@ -761,7 +761,7 @@ return function(H)
     tickLog("k:the-lamp-was-never-lit")
     E.run(1)
     local m1 = st().memory
-    check("a surface entry pays 1 per investigator", m1 == m0 + st().investigators, m0 .. " -> " .. m1)
+    check("a surface entry pays 2 per investigator", m1 == m0 + 2 * st().investigators, m0 .. " -> " .. m1)
     check("the log shows it ticked", logValue("k:the-lamp-was-never-lit") == true)
     tickLog("k:the-lamp-was-never-lit")      -- a mis-tick cleared: refund
     E.run(1)

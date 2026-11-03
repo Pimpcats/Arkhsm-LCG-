@@ -1747,10 +1747,11 @@ Knowledge.FACTS = {
 
 -- Knowledge pays Memory: the first time an entry is recorded in the campaign
 -- it adds banked Memory, per investigator (current count), by layer.
--- (official XP per campaign, about 35-45 per investigator: surface entries pay 1,
+-- (official XP per campaign, about 35-45 per investigator: surface entries pay 2 (1 until 2026-11-03: the
+-- real starter decks banked 32 a campaign),
 -- deep entries 3; Victory also pays each investigator)
 -- Late records pay nothing: their reward is in the finale's Setup.
-Knowledge.MEMORY_PER_INVESTIGATOR = { prologue = 0, surface = 1, deep = 3, assembled = 0, late = 0 }
+Knowledge.MEMORY_PER_INVESTIGATOR = { prologue = 0, surface = 2, deep = 3, assembled = 0, late = 0 }
 
 function Knowledge.knows(factId)
   return CampaignState.knows(factId)
@@ -2602,7 +2603,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/e235d2b4180f0d31fc150c7f8a883bc06646a0b5/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/3bd23e824d489d3f470a088cfdd5b035679e6820/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's

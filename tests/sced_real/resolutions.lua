@@ -503,7 +503,7 @@ return function(H)
     restore("loop1")
     local mark = chatMark()
     logTick("k:the-lamp-was-never-lit")        -- a new entry this loop (Light the Lamp)
-    check("a new surface entry pays 1 per investigator", st().memory == 7 + st().investigators, st().memory)
+    check("a new surface entry pays 2 per investigator", st().memory == 7 + 2 * st().investigators, st().memory)
     times(8, function() ctl("shClickHour") end)
     local s = st()
     check("Hour IX: Hour V/VII/VIII brought the Appointed to Arrived; Dissonance 0 + 1 + 2", s.hour == 9
@@ -627,7 +627,7 @@ return function(H)
     logTick("k:the-lamp-was-never-lit")
     logTick("k:the-thirteenth-toll")
     logTick("k:the-road-remembers")
-    check("three surface entries pay 1 banked Memory per investigator each", st().memory == 7 + 3 * st().investigators, st().memory)
+    check("three surface entries pay 2 banked Memory per investigator each", st().memory == 7 + 6 * st().investigators, st().memory)
     check("still Part I during the loop", st().partTwo == false)
     local mark = chatMark()
     endLoop()
@@ -662,7 +662,7 @@ return function(H)
     for _, d in ipairs({ "square", "fairground", "almanac" }) do
       local m = st().memory
       logTick("k:" .. SURFACE[d])
-      check(d .. " R2: the surface entry pays 1 per investigator", st().memory == m + st().investigators, m .. " -> " .. st().memory)
+      check(d .. " R2: the surface entry pays 2 per investigator", st().memory == m + 2 * st().investigators, m .. " -> " .. st().memory)
       check(d .. " R2: oracle reads R2", ORACLE.district(d, { surface = true }) == "R2")
     end
     -- a mis-tick un-ticked: refunded, and re-ticking pays nothing twice

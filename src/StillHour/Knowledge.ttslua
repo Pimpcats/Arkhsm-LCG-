@@ -38,10 +38,11 @@ Knowledge.FACTS = {
 
 -- Knowledge pays Memory: the first time an entry is recorded in the campaign
 -- it adds banked Memory, per investigator (current count), by layer.
--- (official XP per campaign, about 35-45 per investigator: surface entries pay 1,
+-- (official XP per campaign, about 35-45 per investigator: surface entries pay 2 (1 until 2026-11-03: the
+-- real starter decks banked 32 a campaign),
 -- deep entries 3; Victory also pays each investigator)
 -- Late records pay nothing: their reward is in the finale's Setup.
-Knowledge.MEMORY_PER_INVESTIGATOR = { prologue = 0, surface = 1, deep = 3, assembled = 0, late = 0 }
+Knowledge.MEMORY_PER_INVESTIGATOR = { prologue = 0, surface = 2, deep = 3, assembled = 0, late = 0 }
 
 function Knowledge.knows(factId)
   return CampaignState.knows(factId)
