@@ -350,7 +350,8 @@ return function(H)
     check("Investigators = 3", st().investigators == 3, st().investigators)
     local pouches = {}
     for _, o in ipairs(E.G.getObjects()) do
-      if o.type == "Bag" and o.hasTag("StillHour") and tostring(o.getName()):find("Player Cards", 1, true) then
+      if o.type == "Bag" and (o.hasTag("StillHour") and tostring(o.getName()):find("Player Cards", 1, true)
+          or (decode(o.getGMNotes()) or {}).type == "InvestigatorBox") then
         pouches[#pouches + 1] = o
       end
     end

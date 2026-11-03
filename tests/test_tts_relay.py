@@ -175,7 +175,7 @@ SAVED_OBJECT_CHECKS = (
     "the saved object's box shows Place and Recall",
     "the box holds 8 scenario boxes",
     "the box holds the Control token",
-    "the box holds nothing else (20 pieces)",
+    "the box holds nothing else (15 pieces)",
     "every card face and back is a hosted raw.githubusercontent URL pinned to a commit",
     "the guide PDF is hosted on raw.githubusercontent",
     "Place lays out every piece",

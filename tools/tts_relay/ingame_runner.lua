@@ -242,7 +242,9 @@ local function scanCards(data, acc)
     else
       acc.ids[md.id] = md
     end
-    for _, d in pairs(data.CustomDeck or {}) do
+    -- an official card (the starting decks: SCED's own cards) keeps SCED's own images
+    local official = md and type(md.id) == "string" and md.id:sub(1, 5) ~= "sthr-" and md.type ~= "Minicard"
+    for _, d in pairs(official and {} or data.CustomDeck or {}) do
       for _, u in ipairs({ d.FaceURL or "", d.BackURL or "" }) do
         acc.urls = acc.urls + 1
         if u:find("^file:") then acc.local_urls = acc.local_urls + 1 end
@@ -1093,15 +1095,21 @@ step("campaign box: Place", function(go)
 end)
 
 step("investigator minicards", function(go)
-  local deck
+  -- the minicards ride in the Investigators box (one in each investigator's row)
+  -- (the table-presence box lays them out as a deck; the packaged campaign box keeps them in the
+  -- Investigators box, one in each investigator's row)
+  local box
   for _, o in ipairs(tp.placed) do
-    if o.hasTag("Minicard") then deck = o end
+    if o.hasTag("Minicard") or (gm(o) or {}).type == "InvestigatorBox" then box = o end
   end
   if tp.skipped then return go() end
-  check("minicard deck placed", deck ~= nil)
-  if not deck then return go() end
-  local d = deck.getData()
-  local cards, good, bad = d.ContainedObjects or { d }, 0, {}
+  check("the minicards are placed (a deck, or in the Investigators box)", box ~= nil)
+  if not box then return go() end
+  local d = box.getData()
+  local cards, good, bad = {}, 0, {}
+  for _, c in ipairs(d.ContainedObjects or { d }) do
+    if (decode(c.GMNotes) or {}).type == "Minicard" then cards[#cards + 1] = c end
+  end
   for _, c in ipairs(cards) do
     local md = decode(c.GMNotes) or {}
     local ok = c.Name == "CardCustom" and md.type == "Minicard"
@@ -1329,6 +1337,7 @@ local SB = { placed = {}, boxes = {} }
 local function pieceKind(md, tags, script, isBag)
   if md.type == "ScenarioBox" then return "scenario box" end
   if md.type == "ScenarioBoxMasters" then return "spare scenario boxes" end
+  if md.type == "InvestigatorBox" then return "investigators box" end
   if md.type == "CampaignLog" or tags.CampaignLog then return "campaign log" end
   if md.type == "CampaignGuide" or tags.CampaignGuide then return "campaign guide" end
   if tags.Minicard then return "minicard deck" end
@@ -1358,8 +1367,8 @@ local SAVED_HOLDS = {
   { "spare scenario boxes", 1, "the spare scenario boxes (Clear Board refills a used box from them)" },
   { "campaign log", 1, "the campaign log" },
   { "campaign guide", 1, "the campaign guide" },
-  { "minicard deck", 1, "the investigator minicards" },
-  { "player-card bag", 6, "the player-card pouches (one per investigator, one of Recollections)" },
+  { "investigators box", 1, "the Investigators box (every investigator, their cards, minicard and starting deck)" },
+  { "player-card bag", 1, "the Recollections pouch" },
   { "Control token", 1, "the Control token" },
   { "[static] token", 1, "the [static] token" },
 }

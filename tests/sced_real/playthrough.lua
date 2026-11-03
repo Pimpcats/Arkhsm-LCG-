@@ -365,10 +365,10 @@ return function(H)
   -- bag onto a playmat, minicard onto the map later
   local seated = {}
   step("Campaign Setup: seat two investigators on SCED playmats", function()
-    -- one pouch per investigator, and one of Recollections
-    local pouches = findAll(function(o) return o.type == "Bag" and o.hasTag("StillHour")
-      and tostring(o.getName()):find("Player Cards", 1, true) ~= nil end)
-    check("the player-card pouches are on the table (one per investigator and the Recollections)", #pouches == 6, #pouches)
+    -- the Investigators box (every investigator and their cards) and the Recollections pouch
+    local pouches = findAll(function(o) return o.type == "Bag" and (o.hasTag("StillHour")
+      and tostring(o.getName()):find("Player Cards", 1, true) ~= nil or (decode(o.getGMNotes()) or {}).type == "InvestigatorBox") end)
+    check("the Investigators box and the Recollections pouch are on the table", #pouches == 2, #pouches)
     if #pouches == 0 then return end
     local mats = { "White", "Orange" }
     local want = { "sthrelias", "sthrbirdie" }

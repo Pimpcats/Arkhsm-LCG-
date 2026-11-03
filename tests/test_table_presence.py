@@ -371,7 +371,8 @@ def test_release_asset_is_one_hosted_campaign_box():
     md = json.loads(rel["GMNotes"])
     assert md["type"] == "CampaignBox" and md["filename"] == "the_still_hour"
     names = {o["Name"] for o in rel["ContainedObjects"]}
-    assert {"Custom_PDF", "Custom_Token", "Deck", "Bag"} <= names
+    # the minicards ride in the Investigators box (a Custom_Model_Bag), not a loose deck
+    assert {"Custom_PDF", "Custom_Token", "Bag", "Custom_Model_Bag"} <= names
     assert "file:///" not in json.dumps(rel)
     ml = json.loads(rel["LuaScriptState"])["ml"]
     assert set(ml) == {o["GUID"] for o in rel["ContainedObjects"]}

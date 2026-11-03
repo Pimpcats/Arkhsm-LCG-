@@ -114,7 +114,9 @@ def sced_cards_by_id():
 def starting_deck(inv, name):
     """The investigator's starter deck (Appendix: Starting Decks; campaigns/<id>/starter_decks.json) as one
     Deck of SCED's own cards, each copy with its own GUID. The random basic weakness is drawn at the table."""
-    lists = json.load(open(os.path.join(ROOT, "campaigns", CFG.id, "starter_decks.json"), encoding="utf-8"))
+    # the repository's own data (ROOT may point at a packaging folder)
+    repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    lists = json.load(open(os.path.join(repo, "campaigns", CFG.id, "starter_decks.json"), encoding="utf-8"))
     if inv not in lists:
         return None
     sced = sced_cards_by_id()
