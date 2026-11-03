@@ -35,6 +35,11 @@ local MIRRORED = { SetAside1 = true, SetAside2 = true }
 Setup.OWNER_TAG_PREFIX = "StillHourOwner_"
 local LOOP_TAG = "StillHourLoop"
 
+Setup.TRACE = false
+local function trace(msg)
+  if Setup.TRACE then pcall(function() print("[trace] setup: " .. tostring(msg)) end) end
+end
+
 local function try(fn, ...)
   local ok, v = pcall(fn, ...)
   if ok then return v end
@@ -106,8 +111,8 @@ local function dataById(container, id)
   return nil
 end
 
---- The bag or deck on the table that holds the card with this campaign id (the campaign's Player Cards
--- bag holds the investigators and their cards; its minicard deck the minicards). Found by what it holds,
+--- The bag or deck on the table that holds the card with this campaign id (the campaign's player-card
+-- pouches hold the investigators and their cards; its minicard deck the minicards). Found by what it holds,
 -- never by name: SCED's own "All Player Cards" bag is on the table too.
 -- SCED's own card bags hold thousands of cards: reading each of them for every card would stall the
 -- table, and the campaign's cards are never in them, so a container that large is skipped.
@@ -210,17 +215,20 @@ end
 function Setup.seat(invId, matColor, opts)
   opts = opts or {}
   local rep = { ok = false, mat = matColor, deck = 0, missing = {} }
+  trace("seat " .. tostring(invId) .. ": find its pouch")
   local bag = holderOf(invId)
   local invPos, deckPos = Setup.zone(matColor, "Investigator"), Setup.zone(matColor, "Deck")
   if not bag or not invPos or not deckPos then
-    rep.why = not bag and "the Player Cards bag (with this investigator in it) is not on the table"
+    rep.why = not bag and "this investigator's pouch (Player Cards) is not on the table"
       or ("no " .. tostring(matColor) .. " playmat")
     return rep
   end
   local inv = dataById(bag, invId)
-  if not inv then rep.why = "the investigator card is not in the Player Cards bag" ; return rep end
+  if not inv then rep.why = "the investigator card is not in their pouch" ; return rep end
   -- the cards their back requires: from the same bag (or any holder of each)
+  trace("seat: spawn the investigator card")
   spawnObjectData({ data = withOwner(fresh(inv), matColor), position = above(invPos), rotation = Setup.rotation(matColor) })
+  trace("seat: the minicard")
   local mini = dataById(holderOf(invId .. "-m"), invId .. "-m")
   local miniPos = Setup.zone(matColor, "Minicard")
   if mini and miniPos then
@@ -236,6 +244,7 @@ function Setup.seat(invId, matColor, opts)
       rep.missing[#rep.missing + 1] = id
     end
   end
+  trace("seat: the starter deck from SCED's player cards")
   if opts.starter ~= false then
     for _, row in ipairs(Setup.STARTER[invId] or {}) do
       for _ = 1, row[2] do
@@ -261,6 +270,7 @@ function Setup.seat(invId, matColor, opts)
     end
   end
   rep.deck = #deck
+  trace("seat: spawn the deck (" .. #deck .. " cards)")
   Setup.spawnStack(deck, above(deckPos), Setup.rotation(matColor, true), function(o)
     pcall(function() if o.type == "Deck" then o.shuffle() end end)
   end)
@@ -323,6 +333,7 @@ function Setup.resetInvestigator(matColor, opts)
   local mat = SCED.playermat(matColor)
   local deckPos = Setup.zone(matColor, "Deck")
   if not mat or not deckPos then rep.why = "no playmat" ; return rep end
+  trace("reset " .. tostring(matColor) .. ": collect")
   local owner = Setup.OWNER_TAG_PREFIX .. matColor
   local playerColor = try(function() return mat.getVar("playerColor") end)
   local inHand = {}
@@ -391,14 +402,16 @@ function Setup.resetInvestigator(matColor, opts)
     pcall(function() o.destruct() end)
   end
   rep.cards = #cards
+  trace("reset " .. tostring(matColor) .. ": " .. #cards .. " cards collected, respawn")
   -- healed, nothing on the mat, 5 resources (the mat's own counters)
   for _, c in ipairs({ { "DamageCounter", 0 }, { "HorrorCounter", 0 }, { "ResourceCounter", 5 } }) do
-    pcall(function() mat.call("updateCounter", { type = c[1], newValue = c[2] }) end)
+    SCED.callMat(matColor, "updateCounter", { type = c[1], newValue = c[2] })
   end
-  pcall(function() mat.call("removeClues", 99) end)
+  SCED.callMat(matColor, "removeClues", 99)
   local rot = Setup.rotation(matColor, true)
   local function draw()
-    pcall(function() mat.call("drawCardsWithReshuffleWrapper", { numCards = opts.hand or 5 }) end)
+    trace("reset " .. tostring(matColor) .. ": draw")
+    SCED.callMat(matColor, "drawCardsWithReshuffleWrapper", { numCards = opts.hand or 5 })
     if opts.after then pcall(opts.after, rep) end
   end
   if #cards > 0 then
@@ -454,7 +467,7 @@ function Setup.replaceDrawnWeaknesses(matColor)
     Wait.time(function()
       local deck = deckOn(deckPos)
       if deck then pcall(function() deck.shuffle() end) end
-      pcall(function() mat.call("drawCardsWithReshuffleWrapper", { numCards = n }) end)
+      SCED.callMat(matColor, "drawCardsWithReshuffleWrapper", { numCards = n })
     end, 1)
   end
   return n

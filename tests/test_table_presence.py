@@ -293,7 +293,11 @@ def test_the_packaged_campaign_box_locks_the_control(tmp_path, monkeypatch):
     rel = json.load(open(tmp_path / "dist" / "downloads" / "the_still_hour.json", encoding="utf-8"))
     ml = json.loads(rel["LuaScriptState"])["ml"]
     assert ml["c0ffee"]["lock"] is True                                    # the Control is laid out locked
-    assert ml["ba9000"]["lock"] is False and ml["5a71c0"]["lock"] is False
+    # everything else but the spare boxes' bag is laid out unlocked (the player-card bag becomes pouches,
+    # none of them locked)
+    spares = {o["GUID"] for o in rel["ContainedObjects"] if "Spare Scenario Boxes" in (o.get("Nickname") or "")}
+    assert all(v["lock"] is False for g, v in ml.items() if g != "c0ffee" and g not in spares)
+    assert ml["5a71c0"]["lock"] is False
     log = next(o for o in rel["ContainedObjects"] if "CampaignLog" in (o.get("Tags") or []))
     guide = next(o for o in rel["ContainedObjects"] if "CampaignGuide" in (o.get("Tags") or []))
     assert ml[log["GUID"]]["lock"] is False and ml[guide["GUID"]]["lock"] is False

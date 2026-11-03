@@ -6,7 +6,8 @@
 
 return function(H)
   local E, J = H.E, H.E.J
-  local job = J.decode(H.readFile(H.ROOT .. "/tools/tts_relay/job.json"))
+  -- (STILLHOUR_RELAY_JOB: another job file, e.g. tools/tts_relay/probe_job.json)
+  local job = J.decode(H.readFile(H.ROOT .. "/" .. (os.getenv("STILLHOUR_RELAY_JOB") or "tools/tts_relay/job.json")))
   local parts = { "local RELAY = { run = \"emulator\", pause = 0, payloads = {" }
   for _, p in ipairs(job.payloads) do
     local text = H.readFile(H.ROOT .. "/" .. p.file)

@@ -28,6 +28,12 @@ local Setup         = require("StillHour/Setup")
 
 local SAVE_VERSION = 2
 
+-- Breadcrumbs for the relay's in-game test (off in play): when TTS freezes, the relay's log ends at the last one.
+local traceOn = false
+local function trace(msg)
+  if traceOn then pcall(function() print("[trace] " .. tostring(msg)) end) end
+end
+
 local function note(msg)
   pcall(print, "[Still Hour] " .. tostring(msg))
 end
@@ -129,10 +135,15 @@ local function syncLogPage()
 end
 
 local function afterChange()
+  trace("afterChange: chaos bag")
   if refreshBag then guarded("chaos bag", refreshBag) end
+  trace("afterChange: board")
   syncBoard()
+  trace("afterChange: investigators")
   guarded("investigators", Board.refreshInvestigators, false)
+  trace("afterChange: panel")
   refreshControl()
+  trace("afterChange: hours deck")
   -- rebuilt only when the Hours on the table show another Hour (after a load nothing is remembered)
   if syncHoursDeck then guarded("hours deck", syncHoursDeck, true) end
   -- Between Loops (Reset Loop to Begin Next Loop) the log follows every step on its own
@@ -412,21 +423,24 @@ local function clueTokensNear(places, margin, keepCovered)
   return found
 end
 
-local function sweepClues(places)
-  local n = 0
-  for _, t in ipairs(clueTokensNear(places, 1.2)) do
-    if not t.isDestroyed() then t.destruct() ; n = n + 1 end
+-- TTS destroys an object at the end of the frame, and until then it is still in getObjects() with
+-- isDestroyed() false. Whatever this token destroys is remembered for a couple of frames, so no other step
+-- in the same frame works on it again (Unity then adds components to an object it is tearing down).
+local dyingGuids, dyingArmed = {}, false
+local function markDying(o)
+  local ok, g = pcall(function() return o.getGUID() end)
+  if ok and g then dyingGuids[g] = true end
+  if not dyingArmed then
+    dyingArmed = true
+    local function clear() dyingGuids = {} ; dyingArmed = false end
+    if not pcall(function() Wait.frames(clear, 2) end) then clear() end
   end
-  if #places > 0 then
-    for _, delay in ipairs({ 1.5, 5, 12 }) do
-      Wait.time(function()
-        for _, t in ipairs(clueTokensNear(places, 1.2, true)) do
-          if not t.isDestroyed() then t.destruct() end
-        end
-      end, delay)
-    end
-  end
-  return n
+end
+local function isDying(o)
+  local ok, g = pcall(function() return o.getGUID() end)
+  if ok and g and dyingGuids[g] then return true end
+  local ok2, d = pcall(function() return o.isDestroyed() end)
+  return ok2 and d == true
 end
 
 local function placeOf(o)
@@ -448,16 +462,25 @@ local function clearLoopBoard()
     local ok, pl = pcall(placeOf, o)
     if ok then places[#places + 1] = pl end
   end
-  for pass = 1, 2 do
+  -- TTS destroys an object at the end of the frame: until then isDestroyed() is false and the object is
+  -- still in getObjects(). Each object is therefore handled once, by GUID, and nothing is done to an
+  -- object after its destruct() (doing so made Unity add components to objects it was tearing down).
+  local function kill(o)
+    if isDying(o) then return false end
+    markDying(o)
+    pcall(function() o.destruct() end)
+    return true
+  end
+  local function sweep()
     for _, o in ipairs(getObjects()) do
-      if not o.isDestroyed() and (o.type == "Card" or o.type == "Deck") then
+      local g = o.getGUID()
+      if not isDying(o) and (o.type == "Card" or o.type == "Deck") then
         if o.type == "Card" then
           if isLoopCard(o.getTags and o.getTags() or {}, o.getGMNotes()) then
-            for _, t in ipairs(tokensOn(o)) do t.destruct() ; tokens = tokens + 1 end
+            for _, t in ipairs(tokensOn(o)) do if kill(t) then tokens = tokens + 1 end end
             note(o)
-            Board.forgetGuid(o.getGUID())
-            o.destruct()
-            removed = removed + 1
+            Board.forgetGuid(g)
+            if kill(o) then removed = removed + 1 end
           end
         else
           local mine, others = {}, 0
@@ -465,24 +488,40 @@ local function clearLoopBoard()
             if isLoopCard(e.tags, e.gm_notes) then mine[#mine + 1] = e.guid else others = others + 1 end
           end
           if #mine > 0 and others == 0 then
-            for _, t in ipairs(tokensOn(o)) do t.destruct() ; tokens = tokens + 1 end
+            for _, t in ipairs(tokensOn(o)) do if kill(t) then tokens = tokens + 1 end end
             note(o)
             Board.forgetGuids(mine)
-            o.destruct()
-            removed = removed + #mine
+            if kill(o) then removed = removed + #mine end
           elseif #mine > 0 then
+            -- a deck mixing the loop's cards with others: take the loop's cards out while two or more cards
+            -- remain (taking from a two-card deck dissolves it; the last card is then left on its own and a
+            -- later sweep finds it as a loose card)
             local pos = o.getPosition()
-            for _, g in ipairs(mine) do
-              if o.isDestroyed() then break end
-              local ok, c = pcall(o.takeObject, { guid = g, position = { pos.x, pos.y + 3, pos.z }, smooth = false })
-              if ok and c then Board.forgetGuid(g) ; c.destruct() ; removed = removed + 1 end
+            for _, eg in ipairs(mine) do
+              local ok, n = pcall(function() return o.getQuantity() end)
+              if not ok or (n or 0) < 3 then break end
+              local okT, c = pcall(o.takeObject, { guid = eg, position = { pos.x, pos.y + 3, pos.z }, smooth = false })
+              if okT and c then Board.forgetGuid(eg) ; if kill(c) then removed = removed + 1 end end
             end
           end
         end
       end
     end
   end
-  tokens = tokens + sweepClues(places)
+  sweep()
+  for _, t in ipairs(clueTokensNear(places, 1.2)) do if kill(t) then tokens = tokens + 1 end end
+  -- what the first sweep could not reach (a card left alone when a mixed deck dissolved), once TTS has
+  -- finished destroying what it removed
+  pcall(function() Wait.frames(sweep, 5) end)
+  if #places > 0 then
+    for _, delay in ipairs({ 1.5, 5, 12 }) do
+      Wait.time(function()
+        for _, t in ipairs(clueTokensNear(places, 1.2, true)) do
+          if not t.isDestroyed() then t.destruct() end
+        end
+      end, delay)
+    end
+  end
   return { cards = removed, tokens = tokens, stopped = stopped }
 end
 
@@ -543,7 +582,7 @@ local function boxReady(box)
 end
 
 local function refillBoxes()
-  if type(getObjects) ~= "function" or type(spawnObjectJSON) ~= "function" then return { refilled = 0 } end
+  if type(getObjects) ~= "function" or type(spawnObjectData) ~= "function" then return { refilled = 0 } end
   local used = {}
   for _, o in ipairs(getObjects()) do
     if not o.isDestroyed() and scenarioBoxId(o) and not boxIsFull(o) then used[#used + 1] = o end
@@ -560,6 +599,7 @@ local function refillBoxes()
   for _, box in ipairs(used) do
     local entry = byId[scenarioBoxId(box)]
     if entry then
+      local slot = refilled
       local pos, rot, locked = box.getPosition(), box.getRotation(), box.getLock()
       -- what the board and SCED's clue spawner remember by GUID belongs to the cards just cleared:
       -- the fresh box lays out the same GUIDs, and its locations spawn their clues again
@@ -568,8 +608,8 @@ local function refillBoxes()
         SCED.resetTokensSpawned(guid)
       end
       -- the full box comes back under the used one's GUID (the campaign box's Recall finds its boxes by
-      -- GUID), so it is spawned once the used one is gone, two frames later
-      local json = JSON.encode(entry)
+      -- GUID), so it is spawned once the used one is gone: from its data (spawnObjectData; encoding a
+      -- whole box to JSON in Lua stalls the table), one box every few frames rather than all at once
       box.destruct()
       refillsPending = refillsPending + 1
       local settled = false
@@ -579,12 +619,13 @@ local function refillBoxes()
         refillsPending = math.max(0, refillsPending - 1)
       end
       Wait.frames(function()
+        trace("refill: spawn " .. tostring(scenarioBoxId(box) or "?"))
         local ok = pcall(function()
-          spawnObjectJSON({ json = json, position = pos, rotation = rot,
+          spawnObjectData({ data = entry, position = pos, rotation = rot,
             callback_function = function(b) pcall(function() b.setLock(locked) end) ; done() end })
         end)
         if not ok then done() end
-      end, 2)
+      end, 3 + 4 * slot)
       -- never wait on a spawn that does not report back
       Wait.time(done, 10)
       refilled = refilled + 1
@@ -757,6 +798,7 @@ local function setDifficulty(i)
   end
   local tokens = bagFor(i)
   appliedSig = changeSig(bagChanges())
+  bag.hold(1.4)                -- SCED destroys the old bag this frame: leave it alone until the new one lands
   SCED.globalCall("setChaosBagState", tokens)
   -- SCED respawns the bag; once it has landed, re-add the band's [static] tokens
   Wait.time(function()
@@ -897,7 +939,9 @@ local function readRecollections()
     if type(getObjects) ~= "function" then return end
     for _, o in ipairs(getObjects()) do
       local t = o.type
-      if t == "Bag" or t == "Deck" then
+      -- SCED's own card bags hold thousands of cards and never a Recollection: reading them on every
+      -- redraw stalls the table, so a container that large is skipped (as Seat investigators does)
+      if (t == "Bag" or t == "Deck") and (o.getQuantity() or 0) <= 400 then
         for _, e in ipairs(o.getObjects() or {}) do
           local ok, md = pcall(JSON.decode, e.gm_notes or "")
           if ok and type(md) == "table" and md.memoryCost ~= nil then consider(md.id, e.name or "", md) end
@@ -1435,12 +1479,14 @@ local function persist()
   -- TTS only refreshes script_state when the game saves; reload() (and SCED
   -- tools that reload objects) rebuild from it, so keep it current ourselves
   pcall(function() self.script_state = onSave() end)
+  trace("save: mirror to the campaign log")
   guarded("campaign log", function() Board.mirrorToLog(onSave(), saveSeq) end)
 end
 
 refreshControl = function()
   -- every other click redraws the panel, which withdraws a pending "Reset Loop?"
   resetAsked = false
+  trace("panel: draw " .. tostring(mode))
   pcall(function() self.clearButtons() end)
   -- guarded: a drawing error leaves a partial panel but never skips saving the state below
   if mode == "interlude" then guarded("panel", drawInterlude)
@@ -1459,7 +1505,9 @@ refreshControl = function()
           .. "sealed token later treated as revealed: click Dissonance yourself only if it resolves." })
     end
   end
+  trace("panel: save")
   persist()
+  trace("panel: done")
 end
 
 -- Click handlers: click_function(obj, player_color, alt_click) (TTS createButton).
@@ -1902,6 +1950,20 @@ function shApiState()
   }
 end
 
+--- A brand-new campaign on this Control (runner API: the relay plays a whole night from the start on
+-- its own copy of the Control; nothing calls it during play).
+function shApiTrace(p) traceOn = not (type(p) == "table" and p.on == false) ; Setup.TRACE = traceOn ; return traceOn end
+
+function shApiNewCampaign()
+  CampaignState.init(CampaignState.constants().investigators)
+  CampaignState.setPrologue(true)
+  mode = "play"
+  tableSetUp, setupRunning, finaleUndo = false, false, nil
+  aging = {}
+  afterChange()
+  return shApiState()
+end
+
 --- End the Prologue if it is still running (tests and the relay start at Loop 1
 -- straight away, so the next loop is under way: no Between Loops).
 function shApiEndPrologue()
@@ -2217,7 +2279,7 @@ end
 --- The Hour the Hours deck on the agenda spot shows (its last card, face up), or nil.
 local function shownHour()
   for _, o in ipairs(getObjects()) do
-    if type(o.isDestroyed) == "function" and not o.isDestroyed() and (o.type == "Deck" or o.type == "Card")
+    if type(o.isDestroyed) == "function" and not isDying(o) and (o.type == "Deck" or o.type == "Card")
         and near(o.getPosition(), AGENDA_SPOT.pos, 0.6) then
       if o.type == "Card" then return hourOf(o.getGMNotes()) end
       local list = o.getObjects() or {}
@@ -2229,6 +2291,7 @@ end
 
 --- onlyIfWrong: after a Place, leave a freshly laid Hours deck alone when it already shows the Hour.
 syncHoursDeck = function(onlyIfWrong)
+  trace("hours deck: check")
   local h = CampaignState.getHour()
   if hoursShown == h then return end
   if type(getObjects) ~= "function" or type(spawnObjectData) ~= "function" then return end
@@ -2242,11 +2305,12 @@ syncHoursDeck = function(onlyIfWrong)
   for _, o in ipairs(getObjects()) do
     if type(o.isDestroyed) ~= "function" or type(o.getGMNotes) ~= "function" then
       -- not a table object (a stub): nothing of the Hours
-    elseif not o.isDestroyed() and o.type == "Card" and hourOf(o.getGMNotes()) then
+    elseif not isDying(o) and o.type == "Card" and hourOf(o.getGMNotes()) then
       holders = holders + 1
       keep(o.getData())
+      markDying(o)
       o.destruct()
-    elseif not o.isDestroyed() and o.type == "Deck" then
+    elseif not isDying(o) and o.type == "Deck" then
       local hours, others = {}, 0
       for _, e in ipairs(o.getObjects() or {}) do
         if hourOf(e.gm_notes) then hours[#hours + 1] = e.guid else others = others + 1 end
@@ -2259,12 +2323,17 @@ syncHoursDeck = function(onlyIfWrong)
             looks = { Nickname = d.Nickname, Tags = d.Tags, Description = d.Description }
           end
           for _, c in ipairs(d.ContainedObjects or {}) do keep(c) end
+          markDying(o)
           o.destruct()
         else
+          -- the Hours out of a mixed deck, while it still holds two or more cards (taking from a
+          -- two-card deck dissolves it); a lone Hour left behind is found as a card next time
           local p = o.getPosition()
           for _, g in ipairs(hours) do
+            local ok, n = pcall(function() return o.getQuantity() end)
+            if not ok or (n or 0) < 3 then break end
             local c = o.takeObject({ guid = g, position = { p.x, p.y + 3, p.z }, smooth = false })
-            if c then keep(c.getData()) ; c.destruct() end
+            if c then keep(c.getData()) ; markDying(c) ; c.destruct() end
           end
         end
       end
@@ -2450,6 +2519,7 @@ function shApiSyncBoardStaged(p)
       note("Board synced.")
       return
     end
+    trace("sync step " .. i .. " done")
     local msg = string.format("Board sync %d/%d: %s", i, #steps, step[1])
     log(msg)
     broadcastToAll(msg, { 0.7, 0.7, 0.7 })
@@ -2549,9 +2619,12 @@ end
 
 --- Clear Board: the scenario cards off the table, then every used scenario box full again.
 local function clearAndRefill()
+  trace("clear board: cards")
   local r = guarded("clear board", function() return Board.withoutAppointedGuard(clearLoopBoard) end)
     or { cards = 0, tokens = 0, stopped = 0 }
+  trace("clear board: refill boxes")
   local f = guarded("refill boxes", refillBoxes) or { refilled = 0 }
+  trace("clear board: done")
   r.refilled, r.sparesMissing = f.refilled or 0, f.missing == true
   return r
 end
@@ -2673,7 +2746,9 @@ function shApiSeat(p)
       announce("No free playmat for " .. tostring(id) .. ": every mat holds an investigator.")
       break
     end
+    trace("seat " .. tostring(id) .. " on " .. tostring(mat))
     local r = guarded("seat " .. tostring(id), Setup.seat, id, mat) or {}
+    trace("seated " .. tostring(id) .. ": " .. tostring(r.ok) .. " " .. tostring(r.why))
     reports[#reports + 1] = r
     if r.ok then
       done = done + 1
@@ -2689,6 +2764,7 @@ function shApiSeat(p)
   -- once the cards are on the mats: the party size, SCED's counter and the log's investigator rows
   local mine = {}
   for m in pairs(seatingNow) do mine[#mine + 1] = m end
+  -- seating settles: the cards have landed and SCED has registered each investigator on their mat
   Wait.time(function()
     for _, m in ipairs(mine) do seatingNow[m] = nil end
     local n = #seatedByMat()
@@ -2698,7 +2774,7 @@ function shApiSeat(p)
     guarded("investigators", Board.refreshInvestigators, true)
     guarded("campaign log", fillLog)
     afterChange()
-  end, 3)
+  end, 4)
   refreshControl()
   return { seated = done, reports = reports }
 end
@@ -2712,12 +2788,17 @@ local function investigatorsTo(locId)
   end
   if not loc then return 0 end
   local p = loc.getPosition()
+  -- each minicard comes from a playmat facing its own way: on the location they all take its angle
+  local ry = (loc.getRotation() or {}).y or 180
   local n = 0
   for i, inv in ipairs(seatedByMat()) do
     if inv.minicard and not inv.minicard.isDestroyed() then
       local dx = ((i - 1) % 2 == 0) and -0.45 or 0.45
       local dz = (i <= 2) and -0.35 or 0.35
-      pcall(function() inv.minicard.setPositionSmooth({ p.x + dx, p.y + 0.6, p.z + dz }, false, true) end)
+      pcall(function()
+        inv.minicard.setRotationSmooth({ 0, ry, 0 }, false, true)
+        inv.minicard.setPositionSmooth({ p.x + dx, p.y + 0.6, p.z + dz }, false, true)
+      end)
       n = n + 1
     end
   end
@@ -2755,6 +2836,16 @@ function shApiSetUp(p)
     return false
   end
   setUpAgainAsked = false
+  -- investigators seated a moment ago are still landing (their card on the mat, their deck on its spot):
+  -- dealing them in now would find no deck, so Set Up waits until seating has settled and then runs
+  if next(seatingNow) then
+    announce("Waiting a moment for the investigators to finish being seated, then setting up.")
+    local function again() shApiSetUp(p) end
+    if not pcall(function() Wait.condition(again, function() return next(seatingNow) == nil end, 20, again) end) then
+      return false
+    end
+    return { waiting = true }
+  end
   local seated = seatedByMat()
   if #seated == 0 then
     announce("Seat the investigators first (Setup panel: pick them, then Seat investigators).")
@@ -2783,9 +2874,12 @@ function shApiSetUp(p)
   local names = {}
   for _, id in ipairs(boxes) do names[#names + 1] = BOX_NAMES[id] or id end
   announce((prologue and "Setting up the Prologue: " or "Setting up the loop: ") .. table.concat(names, ", ") .. ".")
+  trace("set up: clear board")
   local cleared = guarded("clear board", clearAndRefill)
+  trace("set up: cleared")
   local failed = {}
   local function finish()
+    trace("set up: finish")
     setupRunning = false
     local moved = guarded("minicards", investigatorsTo, prologue and "sthr-loc-square" or "sthr-loc-hubsquare") or 0
     local anchors = prologue and 0 or (guarded("anchor point", anchorPointMemory) or 0)
@@ -2811,6 +2905,7 @@ function shApiSetUp(p)
     local i = 0
     local nextBox
     local function placeBox(id)
+      trace("set up: place " .. tostring(id))
       local box = findScenarioBox(id)
       if box and boxIsFull(box) then
         pcall(function() box.call("buttonClick_place") end)

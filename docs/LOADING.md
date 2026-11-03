@@ -21,7 +21,7 @@ GitHub, so the build works on any PC.
 2. **Objects → Saved Objects →** click **The Still Hour**. The campaign box
    appears in the box area at the top of the table.
 3. Press **Place** on the campaign box. It lays out the scenario boxes, the
-   campaign guide, the campaign log, the minicards, the player-card bag, the
+   campaign guide, the campaign log, the minicards, the player-card pouches (one per investigator and one of Recollections), the
    **Control** token and the `[static]` token.
 4. On the **Control** token click **Set Up Prologue**. On the Setup panel click
    the investigators you are playing, then **Seat investigators**: each gets
@@ -102,7 +102,7 @@ Board** once the loop is over.
    above).
 
 A campaign begun on a build from before the personal quest cards has no quest
-cards yet. Take each investigator's quest card from the **Player Cards** bag (it
+cards yet. Take each investigator's quest card from their pouch (it
 is listed on the back of their investigator card) and start its tally at 0 on
 the investigator card's **Quest** button; from here on the Control token and the
 campaign log keep it. Until a quest is met, that investigator has no Memory

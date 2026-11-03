@@ -210,9 +210,19 @@ function ChaosBag.new(opts)
     end)
   end
 
+  --- SCED replaces its whole chaos bag when a difficulty is set (setChaosBagState): the old bag is
+  -- destroyed at the end of that frame. For `seconds` nothing is done to the bag on the table; the
+  -- caller reconciles once the new bag has landed.
+  function a.hold(seconds)
+    a.held = true
+    local function release() a.held = false end
+    if not pcall(function() Wait.time(release, seconds or 1.5) end) then release() end
+  end
+
   --- Bring the physical bag to target(). Safe to call any time.
   function a.reconcile()
     a.count = a.target()
+    if a.held then return a.count end
     local bag = a.findBag()
     if not bag then return a.count end
     if not SCED.canTouchChaosTokens() then

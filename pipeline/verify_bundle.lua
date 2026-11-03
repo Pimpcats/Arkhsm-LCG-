@@ -259,17 +259,17 @@ expect("no Leaned toggle any more (derived label only)", hasLabel("Leaned: no") 
   and hasLabel("Leaned: no").click_function == "shNoop")
 expect("interlude rows show both tallies", hasLabel("Dissonance raised 0") ~= nil and hasLabel("Loop-power Memory 0") ~= nil)
 env.shCardRaised(birdie, "White", false) ; env.shCardRaised(birdie, "White", false)
-expect("the card's Dissonance-raised tally counts", cardLabel(birdie, "Dissonance raised 2") ~= nil)
+expect("the card's Dissonance-raised tally counts", cardLabel(birdie, "Raised 2") ~= nil)
 expect("the interlude row mirrors it", hasLabel("Dissonance raised 2") ~= nil)
 expect("two raises are not leaning", not env.shApiTally({ id = "sthrbirdie", kind = "spent", delta = 3 }).leaned)
-expect("the spend tally shows on the card", cardLabel(birdie, "Loop-power Memory 3") ~= nil)
+expect("the spend tally shows on the card", cardLabel(birdie, "Spent 3") ~= nil)
 env.shCardSpent(birdie, "White", true)
-expect("right-click lowers a tally", cardLabel(birdie, "Loop-power Memory 2") ~= nil)
+expect("right-click lowers a tally", cardLabel(birdie, "Spent 2") ~= nil)
 local ri
 for i, x in ipairs(env.shApiInvestigators()) do if x.id == "sthrbirdie" then ri = i end end
 env["shTalRaised" .. ri](nil, "White", false)
 expect("3 raises (control row click) -> Leaned: yes", hasLabel("Leaned: yes") ~= nil
-  and cardLabel(birdie, "Dissonance raised 3") ~= nil)
+  and cardLabel(birdie, "Raised 3") ~= nil)
 local r = env.shApiAge({ id = "sthrbirdie", defeated = true, physical = "agility", mental = "willpower" })
 expect("Age applies Years (1 + defeated + danger + leaned = 4)", r ~= nil and r.years == 4 and r.gained == 4)
 expect("aging only once per interlude", env.shApiAge({ id = "sthrbirdie" }) == nil)
@@ -279,8 +279,8 @@ expect("Birdie's card shows her Years", cardLabel(birdie, "Years 4 · Prime") ~=
 env.shBankOnCard()
 expect("banking moves on-card Memory to the bank", env.shApiState().memory == mem0 + 2)
 beginNext(env)
-expect("Begin Next Loop clears the tallies", cardLabel(birdie, "Dissonance raised 0") ~= nil
-  and cardLabel(birdie, "Loop-power Memory 0") ~= nil)
+expect("Begin Next Loop clears the tallies", cardLabel(birdie, "Raised 0") ~= nil
+  and cardLabel(birdie, "Spent 0") ~= nil)
 expect("Age mid-loop is refused (it is done Between Loops)",
   env.shApiAge({ id = "sthrbirdie", physical = "agility", mental = "willpower" }) == nil)
 env.shApiReset()

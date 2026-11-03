@@ -396,11 +396,25 @@ local function bandStarts(ctl)
   return math.floor(reset / 3), math.floor(2 * reset / 3)
 end
 
-local function staticInBag(bag)
-  -- SCED respawns its chaos bag when a difficulty is set (setChaosBagState),
-  -- so a bag found earlier can be gone: look it up again
+-- SCED respawns its chaos bag when a difficulty is set (setChaosBagState): for a moment the new bag is
+-- still spawning and is not yet a container (TTS: "getObjects() on an object that does not support
+-- getObjects()", and SCED's getChaosBagState errors). Only a bag that has finished spawning is read.
+local function readyBag(bag)
   if not alive(bag) then bag = Global.call("findChaosBag") end
-  if not alive(bag) then return 0 end
+  if not alive(bag) then return nil end
+  local ok, ready = pcall(function() return bag.spawning ~= true and bag.type == "Bag" end)
+  return (ok and ready) and bag or nil
+end
+--- SCED's chaos bag state (token ids), or nil while the bag is respawning
+local function bagState()
+  if not readyBag(nil) then return nil end
+  return Global.call("getChaosBagState")
+end
+
+local function staticInBag(bag)
+  -- a bag found earlier can be gone (respawned): look it up again; -1 while it is respawning
+  bag = readyBag(bag)
+  if not bag then return -1 end
   local n = 0
   for _, e in ipairs(bag.getObjects() or {}) do
     for _, t in ipairs(e.tags or {}) do if t == "StillHourStatic" then n = n + 1 end end
@@ -432,7 +446,7 @@ step("board: [static] in the chaos bag", function(go)
     ctl.call("shApiCounter", { name = "dissonance", delta = noticedAt - glitchAt })
     waitFor(function() return staticInBag(bag) == 2 end, 15, function(ok2)
       check("entering Noticed puts a 2nd [static] in the chaos bag", ok2, "in bag: " .. staticInBag(bag))
-      local state = Global.call("getChaosBagState")
+      local state = bagState()
       check("SCED's own bag state still reads (ChaosBagApi.getChaosBagState)", type(state) == "table",
         type(state) == "table" and (#state .. " SCED token(s)") or tostring(state))
       -- a reveal: take one [static] out of the bag (what drawChaosToken does)
@@ -720,19 +734,19 @@ step("board: Aging on the investigator", function(go)
   -- leaning is derived from the investigator's own tallies, clicked on the card
   local card = INV.elias
   check("the investigator card has both leaning tallies",
-    hasButton(card, "Dissonance raised 0") and hasButton(card, "Loop-power Memory 0"), labelsOf(card))
+    hasButton(card, "Raised 0") and hasButton(card, "Spent 0"), labelsOf(card))
   local t = ctl.call("shApiTally", { id = "sthrelias", kind = "raises", delta = 2 })
   check("two Dissonance raises are not leaning", t ~= nil and t.leaned == false)
   t = ctl.call("shApiTally", { id = "sthrelias", kind = "spent", delta = 4 })
   check("4 Memory on loop powers is leaning", t ~= nil and t.leaned == true)
-  check("the card shows the tallies", hasButton(card, "Dissonance raised 2") and hasButton(card, "Loop-power Memory 4"),
+  check("the card shows the tallies", hasButton(card, "Raised 2") and hasButton(card, "Spent 4"),
     labelsOf(card))
   local r1 = ctl.call("shApiAge", { id = "sthrelias", defeated = true, physical = "combat", mental = "willpower" })
   check("Age adds Years for defeat, danger and leaning (4)", r1 ~= nil and r1.years == 4,
     r1 and ("years " .. r1.years) or "no result")
   check("a second Age in the same interlude is refused", ctl.call("shApiAge", { id = "sthrelias" }) == nil)
   ctl.call("shApiBeginNextLoop")
-  check("the tallies clear when the next loop begins", hasButton(card, "Loop-power Memory 0"), labelsOf(card))
+  check("the tallies clear when the next loop begins", hasButton(card, "Spent 0"), labelsOf(card))
   ctl.call("shApiReset")
   local r2 = ctl.call("shApiAge", { id = "sthrelias", defeated = true, physical = "combat", mental = "willpower" })
   check("the next interlude reaches Weathered", r2 ~= nil and r2.bracket == "Weathered",
@@ -826,28 +840,28 @@ step("board: chaos bag difficulty presets", function(go)
   if not bag then check("SCED chaos bag found for the difficulty presets", false) ; return go() end
   -- the owner's bag is put back exactly as it was afterwards
   local before = {}
-  for i, id in ipairs(Global.call("getChaosBagState") or {}) do before[i] = id end
+  for i, id in ipairs(bagState() or {}) do before[i] = id end
   ctl.call("shApiCounter", { name = "dissonance", delta = (bandStarts(ctl)) })     -- Glitch: 1 [static]
   local ok1 = ctl.call("shApiDifficulty", { i = 1 })              -- Easy: 17 tokens
   waitFor(function()
-    local st = Global.call("getChaosBagState") or {}
+    local st = bagState() or {}
     return #st == 17 and staticInBag(bag) == 1
   end, 15, function(done1)
-    local st = Global.call("getChaosBagState") or {}
+    local st = bagState() or {}
     check("Easy fills SCED's chaos bag with the guide's 17 tokens", ok1 == true and done1 and #st == 17
       and countOf(st, "p1") == 2 and countOf(st, "blue") == 1, #st .. " token(s)")
     check("...and the band's [static] is put back in the bag", staticInBag(bag) == 1, "in bag: " .. staticInBag(bag))
     ctl.call("shApiDifficulty", { i = 4 })                          -- Expert: 19 tokens
     waitFor(function()
-      local s2 = Global.call("getChaosBagState") or {}
+      local s2 = bagState() or {}
       return #s2 == 19 and staticInBag(bag) == 1
     end, 15, function(done2)
-      local s2 = Global.call("getChaosBagState") or {}
+      local s2 = bagState() or {}
       check("Expert replaces the token set (19 tokens, one -8, no +1)", done2 and #s2 == 19
         and countOf(s2, "m8") == 1 and countOf(s2, "p1") == 0, #s2 .. " token(s)")
       Global.call("setChaosBagState", before)
       ctl.call("shApiRestore", { blob = snapshot })
-      waitFor(function() return staticInBag(bag) == 0 and #(Global.call("getChaosBagState") or {}) == #before end,
+      waitFor(function() return staticInBag(bag) == 0 and #(bagState() or {}) == #before end,
         15, function(back)
           check("the table's own chaos bag is put back afterwards", back, "in bag: " .. staticInBag(bag))
           go()
@@ -932,7 +946,7 @@ step("board: pending Years", function(go)
   ctl.call("shApiBeginNextLoop")                           -- a fresh loop: nobody has aged in it
   local p = ctl.call("shApiPendingYears", { id = "sthrelias", delta = 2 })
   check("a card's Years are held as pending (2)", p == 2, tostring(p))
-  check("the investigator card shows its pending Years", hasButton(INV.elias, "Years pending 2"), labelsOf(INV.elias))
+  check("the investigator card shows its pending Years", hasButton(INV.elias, "Pending 2"), labelsOf(INV.elias))
   ctl.call("shApiReset")                                    -- a calm loop: no danger
   local r = ctl.call("shApiAge", { id = "sthrelias", physical = "combat", mental = "willpower" })
   if ctlHas(ctl, "extraYears = cond.extraYears") then
@@ -1345,7 +1359,7 @@ local SAVED_HOLDS = {
   { "campaign log", 1, "the campaign log" },
   { "campaign guide", 1, "the campaign guide" },
   { "minicard deck", 1, "the investigator minicards" },
-  { "player-card bag", 1, "the player-card bag" },
+  { "player-card bag", 6, "the player-card pouches (one per investigator, one of Recollections)" },
   { "Control token", 1, "the Control token" },
   { "[static] token", 1, "the [static] token" },
 }
@@ -1691,6 +1705,210 @@ step("saved object: a scenario box's Place, Clear Board, Place again", function(
       end, 3)
     end, 2)
   end, 3)
+end)
+
+-- The whole night the way the owner plays it, in this TTS: Seat investigators, Set Up Prologue, the
+-- loop's turn (Reset Loop, Begin Next Loop), Set Up Loop (Clear Board, every used box refilled, the
+-- night's boxes Placed), Clear Board on its own, a second Set Up, the Hours on the table following the
+-- Hour, Begin Finale (The Last Hour laid out) and a last Clear Board. After each the table is looked at:
+-- the boxes full or laid out as they should be, one Hours deck, the investigators dealt in, no two
+-- objects under one GUID, and no Lua error. Everything it creates is cleaned up afterwards.
+local function scenarioBoxes()
+  local by = {}
+  for _, o in ipairs(getObjects()) do
+    if alive(o) and gm(o).type == "ScenarioBox" and gm(o).id then by[gm(o).id] = o end
+  end
+  return by
+end
+-- (a box Clear Board has just refilled is still spawning, not yet a container: not full yet)
+local function boxFull(o)
+  if not alive(o) then return false end
+  local ok, n = pcall(function() return o.spawning ~= true and #(o.getObjects() or {}) or 0 end)
+  return ok and n and n > 0
+end
+local function sced(owner, kind)
+  local h = getObjectFromGUID("123456")
+  return h and h.call("getObjectByOwnerAndType", { owner = owner, type = kind }) or nil
+end
+local function handOf(colour)
+  local mat = sced(colour, "Playermat")
+  local pc = mat and mat.getVar("playerColor")
+  local ok, list = pcall(function() return Player[pc].getHandObjects() end)
+  return ok and list or {}
+end
+local function hoursDecks()
+  local n, shown = 0, nil
+  for _, o in ipairs(getObjects()) do
+    if alive(o) and (o.type == "Deck" or o.type == "Card") then
+      local entries = o.type == "Deck" and (o.getObjects() or {}) or { { gm_notes = o.getGMNotes() } }
+      local hours = 0
+      for _, e in ipairs(entries) do
+        local id = (decode(e.gm_notes) or {}).id
+        if id and tostring(id):match("^sthr%-hour%-%d$") then hours = hours + 1 end
+      end
+      if hours > 0 and #entries == hours then
+        local p = o.getPosition()
+        if math.abs(p.x + 2.94) < 0.7 and math.abs(p.z - 0.36) < 0.7 then
+          n = n + 1
+          local last = entries[#entries]
+          shown = (decode(last.gm_notes) or {}).id
+        end
+      end
+    end
+  end
+  return n, shown
+end
+local function duplicateGuids()
+  local seen, dup = {}, {}
+  for _, o in ipairs(getObjects()) do
+    if alive(o) then
+      local g = o.getGUID()
+      if seen[g] then dup[#dup + 1] = g .. " " .. tostring(o.getName()) end
+      seen[g] = true
+    end
+  end
+  return dup
+end
+
+step("saved object: the whole night, as the owner plays it", function(go)
+  if SB.blocked or not SAVED then return go() end
+  local ctl = SB.ctl
+  if not alive(ctl) then check("the saved object's Control is on the table for the whole night", false) ; return go() end
+  if foreignLoopCards("StillHourRelayNone") > 0 then
+    info("campaign scenario cards already on the table: the whole night is not played (run on a fresh SCED table)")
+    return go()
+  end
+  if not (sced("White", "Playermat") and sced("Orange", "Playermat")) then
+    info("no White and Orange SCED playmats: the whole night is not played")
+    return go()
+  end
+  local before = {}
+  for _, o in ipairs(getObjects()) do before[o.getGUID()] = true end
+  -- the night starts from a new campaign (earlier steps moved this Control on); a build without the call
+  -- plays from wherever the Control is
+  -- breadcrumbs from the Control while the night runs: if TTS freezes, the relay's log ends at the last one
+  pcall(function() ctl.call("shApiTrace", { on = true }) end)
+  print("[trace] night: new campaign")
+  pcall(function() ctl.call("shApiNewCampaign") end)
+  print("[trace] night: seat")
+  -- (Lua errors: the relay collects every one TTS reports, and the headless harness checks each step)
+  local function sound(what)
+    local dup = duplicateGuids()
+    check(what .. ": no two objects share a GUID", #dup == 0, #dup > 0 and table.concat(dup, "; ", 1, math.min(#dup, 5)) or nil)
+  end
+  local function finish()
+    pcall(function() ctl.call("shApiClearBoard") end)
+    Wait.time(function()
+      -- everything the night created goes with the run (the boxes refilled under their old GUIDs too)
+      for _, o in ipairs(getObjects()) do
+        if alive(o) and not isOwners(o) and (not before[o.getGUID()] or gm(o).type == "ScenarioBox"
+            or o.hasTag("StillHourLoop")) then
+          pcall(function() o.addTag(TAG) end)
+        end
+        if alive(o) then
+          for _, t in ipairs(o.getTags() or {}) do
+            if t:sub(1, 15) == "StillHourOwner_" then pcall(function() o.addTag(TAG) end) end
+          end
+        end
+      end
+      go()
+    end, 4)
+  end
+  -- 1. Seat investigators
+  local seat = ctl.call("shApiSeat", { ids = { "sthrelias", "sthrcass" } })
+  if type(seat) == "table" and seat.waiting then info("SCED was still reading its player cards: seating again") end
+  waitFor(function()
+    local n = 0
+    for _, i in ipairs(ctl.call("shApiInvestigators") or {}) do if i.matColor then n = n + 1 end end
+    return n >= 2
+  end, 30, function(seated)
+    check("Seat investigators puts two investigators on the White and Orange playmats", seated)
+    sound("seating")
+    -- 2. Set Up Prologue
+    local boxes = scenarioBoxes()
+    print("[trace] night: Set Up Prologue")
+    ctl.call("shApiSetUp")
+    waitFor(function() return not boxFull(scenarioBoxes().prologue) and #handOf("White") >= 5 end, 90, function(ok)
+      Wait.time(function()
+        check("Set Up Prologue lays the Prologue out and deals 5 cards to each investigator", ok
+          and #handOf("White") == 5 and #handOf("Orange") == 5,
+          #handOf("White") .. " / " .. #handOf("Orange") .. " in hand")
+        local n, shown = hoursDecks()
+        check("one Hours deck on the agenda spot, showing Hour I", n == 1 and shown == "sthr-hour-1", n .. " " .. tostring(shown))
+        sound("Set Up Prologue")
+        -- 3. the Prologue ends; the next loop begins; Set Up Loop
+        print("[trace] night: Reset Loop")
+        ctl.call("shApiReset") ; ctl.call("shApiReset")
+        ctl.call("shApiBeginNextLoop")
+        if (stateOf(ctl) or {}).loopEnded then ctl.call("shApiBeginNextLoop") end
+        ctl.call("shApiSetUp")
+        waitFor(function()
+          local b = scenarioBoxes()
+          return boxFull(b.prologue) and not boxFull(b.district_square) and not boxFull(b.district_church)
+            and not boxFull(b.district_almanac)
+        end, 120, function(ok3)
+          Wait.time(function()
+            local b = scenarioBoxes()
+            check("Set Up Loop refills the Prologue's box and lays out the Square and the night's districts", ok3,
+              "prologue " .. tostring(boxFull(b.prologue)) .. ", square " .. tostring(not boxFull(b.district_square)))
+            check("the investigators are dealt in again (5 cards each)", #handOf("White") == 5 and #handOf("Orange") == 5,
+              #handOf("White") .. " / " .. #handOf("Orange"))
+            local n3, shown3 = hoursDecks()
+            check("one Hours deck, showing Hour I", n3 == 1 and shown3 == "sthr-hour-1", n3 .. " " .. tostring(shown3))
+            sound("Set Up Loop")
+            -- 4. Clear Board on its own
+            print("[trace] night: Clear Board")
+            local okc = pcall(function() ctl.call("shApiClearBoard") end)
+            Wait.time(function()
+              local b4, full = scenarioBoxes(), 0
+              local total = 0
+              for _, o in pairs(b4) do total = total + 1 ; if boxFull(o) then full = full + 1 end end
+              check("Clear Board runs and every scenario box is full again", okc and full == total, full .. "/" .. total)
+              local loose = 0
+              for _, o in ipairs(getObjectsWithTag("StillHourLoop")) do if alive(o) and o.type ~= "Bag" then loose = loose + 1 end end
+              check("Clear Board leaves no scenario card on the table", loose == 0, loose .. " left")
+              sound("Clear Board")
+              -- 5. a second Set Up in the same loop (the owner confirms it)
+              ctl.call("shApiSetUp", { again = true })
+              waitFor(function() return not boxFull(scenarioBoxes().district_square) end, 120, function(ok5)
+                Wait.time(function()
+                  check("a second Set Up lays the night out again from the refilled boxes", ok5)
+                  local n5 = hoursDecks()
+                  check("still one Hours deck", n5 == 1, n5)
+                  sound("second Set Up")
+                  -- 6. the Hours follow the Hour
+                  ctl.call("shApiCounter", { name = "hour", delta = 1 })
+                  Wait.time(function()
+                    local n6, shown6 = hoursDecks()
+                    check("the Hours on the table show Hour II after an advance", n6 == 1 and shown6 == "sthr-hour-2",
+                      n6 .. " " .. tostring(shown6))
+                    ctl.call("shApiCounter", { name = "hour", delta = -1 })
+                    Wait.time(function()
+                      local n7, shown7 = hoursDecks()
+                      check("and Hour I again after a rewind", n7 == 1 and shown7 == "sthr-hour-1", n7 .. " " .. tostring(shown7))
+                      sound("the Hours")
+                      -- 7. Begin Finale
+                      ctl.call("shApiUnlockFact", { id = "the-way-the-night-breaks" })
+                      ctl.call("shApiSetFinale", { on = true })
+                      waitFor(function() return not boxFull(scenarioBoxes().finale) end, 60, function(ok7)
+                        Wait.time(function()
+                          check("Begin Finale lays out The Last Hour", ok7 and (stateOf(ctl) or {}).finale == true)
+                          local n8 = hoursDecks()
+                          check("one Hours deck in the finale", n8 == 1, n8)
+                          sound("Begin Finale")
+                          finish()
+                        end, 6)
+                      end)
+                    end, 3)
+                  end, 3)
+                end, 10)
+              end)
+            end, 6)
+          end, 12)
+        end)
+      end, 8)
+    end)
+  end)
 end)
 
 -- docs/LOADING.md "Moving a campaign in progress to a newer build": the

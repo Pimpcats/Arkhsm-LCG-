@@ -92,13 +92,36 @@ def remote_sha(remote, branch):
     return out[0] if out else None
 
 
+# what the relay reads from its clone: the job, the in-game runner and the built objects (a few MB). The
+# card art and images (hundreds of MB) stay on GitHub: TTS loads the images from their URLs.
+SPARSE = ["/tools/tts_relay/", "/dist/*.json", "/dist/downloads/"]
+
+
+def _sparse(path):
+    """Limit the clone's files to SPARSE (needs Git 2.25+). False when this Git cannot."""
+    a = git("sparse-checkout", "init", "--no-cone", cwd=path, check=False)
+    b = a.returncode == 0 and git("sparse-checkout", "set", "--no-cone", *SPARSE, cwd=path, check=False)
+    return bool(b) and b.returncode == 0
+
+
 def sync_repo(path, remote, branch):
-    """Private clone at `path`, hard-reset to the tip of `branch`."""
+    """Private clone at `path`, hard-reset to the tip of `branch`: only the newest commit and only the files the
+    relay reads (a sparse, blob-filtered clone), or a plain shallow clone where Git is too old for that."""
     if not os.path.isdir(os.path.join(path, ".git")):
-        say("cloning {} ({}) ...".format(remote, branch))
-        git("clone", "--branch", branch, "--single-branch", "--depth", "20", remote, path)
+        say("cloning {} ({}): only the files the test needs ...".format(remote, branch))
+        p = git("clone", "--branch", branch, "--single-branch", "--depth", "1", "--filter=blob:none",
+                "--no-checkout", remote, path, check=False)
+        if p.returncode == 0 and _sparse(path):
+            git("checkout", branch, cwd=path)
+        else:
+            if os.path.isdir(path):
+                shutil.rmtree(path, ignore_errors=True)
+            say("this Git cannot fetch only some files: cloning the branch (this takes longer) ...")
+            git("clone", "--branch", branch, "--single-branch", "--depth", "1", remote, path)
     else:
-        git("fetch", "--depth", "20", "origin", branch, cwd=path)
+        _sparse(path)       # an older full clone narrows to the same files
+        if git("fetch", "--depth", "1", "--filter=blob:none", "origin", branch, cwd=path, check=False).returncode != 0:
+            git("fetch", "--depth", "1", "origin", branch, cwd=path)
         git("reset", "--hard", "FETCH_HEAD", cwd=path)
     return git("rev-parse", "HEAD", cwd=path).stdout.strip()
 

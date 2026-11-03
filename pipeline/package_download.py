@@ -72,11 +72,67 @@ REPO = "Pimpcats/Arkhsm-LCG-"
 EXTRA_PLACE = [{"x": 24.0, "y": 1.55, "z": -4.0},
                {"x": 24.0, "y": 1.55, "z": -9.0},
                {"x": 25.0, "y": 1.55, "z": 9.0},
-               {"x": 24.0, "y": 1.55, "z": -14.0}]
+               {"x": 24.0, "y": 1.55, "z": -17.0}]
 
 
 def guid(seed):
     return hashlib.sha1(seed.encode("utf-8")).hexdigest()[:6]
+
+
+# the player-card pouches: a row from the old bag's spot toward the Static token, which moves past its end
+POUCH_PLACE = [{"x": 24.0, "y": 1.55, "z": -1.0}]
+POUCH_STEP = 2.4
+# a pouch takes its investigator's class colour (Arkham's class colours)
+CLASS_TINT = {"Guardian": (0.13, 0.38, 0.77), "Seeker": (0.92, 0.57, 0.14), "Rogue": (0.15, 0.55, 0.27),
+              "Mystic": (0.47, 0.25, 0.64), "Survivor": (0.75, 0.16, 0.16), "Neutral": (0.55, 0.52, 0.47)}
+
+
+def player_pouches(bag):
+    """The player-card bag split into pouches: one per investigator (their investigator card, the cards their
+    back requires, their personal quest card and its unlocked card) in the campaign's order, then one with
+    the Recollections and anything else. Every card keeps its data and GUID."""
+    spec = json.load(open(CFG.path("cards_spec"), encoding="utf-8"))
+    groups, names, classes = [], {}, {}
+    for c in spec:
+        if c.get("type") != "Investigator":
+            continue
+        ids = {c["id"]}
+        for group in c.get("signatures") or []:
+            ids.update(group.keys())
+        short = c["id"][len(CFG.prefix):] if c["id"].startswith(CFG.prefix) else c["id"]
+        ids.update({CFG.prefix + "-quest-" + short, CFG.prefix + "-questdone-" + short})
+        groups.append((c["id"], ids))
+        names[c["id"]] = c.get("name", c["id"])
+        classes[c["id"]] = c.get("class") or c.get("faction") or "Neutral"
+    owned = {}
+    for inv, ids in groups:
+        for cid in ids:
+            owned.setdefault(cid, inv)
+    by = {inv: [] for inv, _ in groups}
+    rest = []
+    for card in bag.get("ContainedObjects", []):
+        try:
+            cid = json.loads(card.get("GMNotes") or "{}").get("id")
+        except ValueError:
+            cid = None
+        (by[owned[cid]] if cid in owned else rest).append(card)
+    pouches = []
+
+    def pouch(nickname, cards, tint, desc):
+        r, g, b = tint
+        return {"Name": "Bag", "Nickname": nickname, "Description": desc,
+                "GUID": guid("pouch:" + nickname), "Tags": list(bag.get("Tags") or []),
+                "ColorDiffuse": {"r": r, "g": g, "b": b}, "Transform": dict(bag.get("Transform") or {}),
+                "ContainedObjects": cards}
+    for inv, _ in groups:
+        if by[inv]:
+            pouches.append(pouch("%s — Player Cards" % names[inv], by[inv], CLASS_TINT.get(classes[inv], CLASS_TINT["Neutral"]),
+                                 "Their investigator card, the cards their back requires and their personal quest "
+                                 "cards. Seat investigators on the Control token takes what it needs from here."))
+    if rest:
+        pouches.append(pouch("Recollections — Player Cards", rest, CLASS_TINT["Neutral"],
+                             "Recollections, bought between loops: two of each (Anchor Point: one)."))
+    return pouches
 
 
 def transform(x=0.0):
@@ -165,6 +221,14 @@ def main(argv=None):
         o = copy.deepcopy(o)
         if "Player Cards" in (o.get("Nickname") or ""):
             add_recollection_copies(o)
+            # one pouch per investigator and one of Recollections (owner): laid out in a row, each with its
+            # own Place spot
+            for j, pouch in enumerate(player_pouches(o)):
+                pos = dict(POUCH_PLACE[0], z=POUCH_PLACE[0]["z"] - POUCH_STEP * j)
+                pouch["Transform"] = T.transform(pos, 270, (1, 1, 1))
+                box["ContainedObjects"].append(pouch)
+                ml[pouch["GUID"]] = T.ml_entry(pos, lock=False)
+            continue
         pos = EXTRA_PLACE[i]
         o["Transform"] = T.transform(pos, 270, (o["Transform"].get("scaleX", 1),
                                                 o["Transform"].get("scaleY", 1),

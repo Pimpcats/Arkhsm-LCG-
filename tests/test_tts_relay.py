@@ -27,7 +27,7 @@ pytestmark = pytest.mark.skipif(LUA is None, reason="lua5.2 not installed")
 BRANCH = "relay-test"
 JOB = json.load(open(os.path.join(ROOT, "tools", "tts_relay", "job.json"), encoding="utf-8"))
 SNAPSHOT = [p["file"] for p in JOB["payloads"]] + ["tools/tts_relay/job.json",
-                                                   "tools/tts_relay/ingame_runner.lua"]
+                                                   "tools/tts_relay/ingame_runner.lua", JOB["runner"]]
 
 
 def free_port():
@@ -175,7 +175,7 @@ SAVED_OBJECT_CHECKS = (
     "the saved object's box shows Place and Recall",
     "the box holds 8 scenario boxes",
     "the box holds the Control token",
-    "the box holds nothing else (15 pieces)",
+    "the box holds nothing else (20 pieces)",
     "every card face and back is a hosted raw.githubusercontent URL pinned to a commit",
     "the guide PDF is hosted on raw.githubusercontent",
     "Place lays out every piece",

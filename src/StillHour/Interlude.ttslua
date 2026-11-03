@@ -32,7 +32,7 @@ Interlude.RECOLLECTION_COST = {
   ["sthr-hourlearnedname"]    = 5,
 }
 
--- Their card names, for the panel when the Player Cards bag is not on the table.
+-- Their card names, for the panel when the Recollections pouch is not on the table.
 Interlude.RECOLLECTION_NAME = {
   ["sthr-foreknowledge"]      = "Foreknowledge",
   ["sthr-dejavu"]             = "The Same Doorway Twice",

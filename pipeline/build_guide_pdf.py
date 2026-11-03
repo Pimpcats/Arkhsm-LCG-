@@ -237,7 +237,7 @@ PART_COLORS = {"RULES": "#2f5a55", "SETUP": "#6a5a2a", "PROLOGUE": "#4a3a63", "T
 
 
 def part_color(label):
-    """The colour of a part's header and tab: one per part, and one per district."""
+    """The colour of a part's header: one per part, and one per district."""
     return PART_COLORS.get(label.split(" \u2014 ")[-1], PART_COLORS.get(label, "#2f5a55"))
 
 
@@ -337,10 +337,9 @@ def build_once(out, source, log_pages, toc_pages):
     def draw_part(c, n, label):
         """Say which part of the book this page is in, where it cannot be missed: a running header
         across the top of the page (the part's name in the headings' gothic face between rules and
-        small diamonds) and a coloured index tab on the page's outer edge (the district pages
-        carry their district's colour). Odd pages are right-hand pages: their tab is on the right."""
+        small diamonds, in the part's colour; the district pages carry their district's). No index
+        tabs on the page edges (owner, 2026-10-31)."""
         from reportlab.pdfbase import pdfmetrics
-        name = label.split(" \u2014 ")[-1]
         col = colors.HexColor(part_color(label))
         mid = PAGE_W / 2
         # -- running header, in the paper's top margin
@@ -374,36 +373,6 @@ def build_once(out, source, log_pages, toc_pages):
             pth.lineTo(x, ymid - d - 1.3)
             pth.close()
             c.drawPath(pth, stroke=0, fill=1)
-        # -- index tab on the outer edge: its name is centred across the tab's width and along its length
-        tsize = 16
-        cap = 0.668 * tsize                      # Teutonic's capital height (668 of 1000 units); the
-                                                 # few swashed capitals (B, C, D, R) dip below it
-        ttw = pdfmetrics.stringWidth(name.upper(), "Teutonic", tsize) + 1.2 * (len(name) - 1)
-        tab_w, tab_h = 36, ttw + 50
-        right = n % 2 == 1                       # odd pages are right-hand pages
-        y_top = PAGE_H - 215 * PX
-        y_mid = y_top - tab_h / 2
-        c.setFillColor(col)
-        c.setStrokeColor(colors.HexColor("#e6dcc4"))
-        # the tab runs off the page edge, so only its inner corners show rounded
-        rx = PAGE_W - tab_w if right else -8
-        c.roundRect(rx, y_top - tab_h, tab_w + 8, tab_h, 7, stroke=0, fill=1)
-        c.setLineWidth(0.8)
-        c.roundRect(PAGE_W - tab_w + 3 if right else -8, y_top - tab_h + 4, tab_w + 8 - 3, tab_h - 8, 4,
-                    stroke=1, fill=0)
-        c.setFillColor(colors.HexColor("#f1e8cf"))
-        if right:       # reads downward; the letters' tops point to the outer edge
-            c.translate(PAGE_W - tab_w / 2 - cap / 2, y_mid + ttw / 2)
-            c.rotate(-90)
-        else:           # reads upward; the letters' tops point to the outer edge
-            c.translate(tab_w / 2 + cap / 2, y_mid - ttw / 2)
-            c.rotate(90)
-        t = c.beginText()
-        t.setFont("Teutonic", tsize)
-        t.setCharSpace(1.2)
-        t.setTextOrigin(0, 0)
-        t.textOut(name.upper())
-        c.drawText(t)
         c.restoreState()
 
     def page_bg(c, doc, title=False):
