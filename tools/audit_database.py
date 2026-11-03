@@ -100,6 +100,13 @@ CHECK_TITLES = {
 # --------------------------------------------------------------------------
 INT32_MAX = 2 ** 31 - 1
 LUA_SAFE_INT = 2 ** 53
+# this campaign's own cards carry this cycle; an official card copied in (a starting deck) carries its own
+try:
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "pipeline"))
+    from campaign_config import CFG as _CFG
+    CAMPAIGN_CYCLE = _CFG.name
+except Exception:                              # the audit also runs on files of other campaigns
+    CAMPAIGN_CYCLE = "The Still Hour"
 TTS_MAX_GRID = (10, 7)                  # TTS custom decks: at most 10 x 7 cells
 GUID_RE = re.compile(r"^[0-9a-f]{6}$")
 TAG_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_]*$")     # every official tag matches
@@ -2118,7 +2125,8 @@ class Auditor(object):
             return
         hits = []
         for k, variants in mine.items():
-            if k in ref.deck_pairs:
+            # SCED's own card sheets (the starting decks carry SCED's own cards) share the official id and images
+            if k in ref.deck_pairs and not (set(variants) <= ref.deck_pairs[k]):
                 hits.append(k)
         if hits:
             self.add(ERROR, "A10.deckid-official-collision", self.docs[0].name if self.docs else "",
@@ -2856,7 +2864,12 @@ class Auditor(object):
         for name, d in by_doc.items():
             all_ids.update(d)
         if ref:
-            hit = sorted(i for i in all_ids if i in ref.ids)
+            # an official card carried as itself (the starting decks: SCED's own card, its own cycle) is no collision
+            def official_copy(node):
+                decks = (getattr(node, "obj", node) or {}).get("CustomDeck") or {}
+                return bool(decks) and all((d.get("FaceURL"), d.get("BackURL")) in ref.deck_pairs.get(str(k), ())
+                                           for k, d in decks.items())
+            hit = sorted(i for i in all_ids if i in ref.ids and not official_copy(all_ids[i][1]))
             if hit:
                 self.add(ERROR, "D02.id-collision", "(GMNotes)",
                          "%d card id(s) are also official SCED card ids (SCED's AllCardsBag and deck importer would "
@@ -3300,6 +3313,9 @@ class Auditor(object):
         if saved:
             sbox = saved[0].roots[0] if saved[0].roots else None
             skids = {hk(c.get("GUID")): c for c in kids(sbox)} if sbox else {}
+            # the Investigators box holds the minicards (once a deck of their own) and the investigators' cards
+            invbox = [c for c in kids(sbox) if '"InvestigatorBox"' in (c.get("GMNotes") or "")] if sbox else []
+            inbox = {hk(c.get("GUID")) for b in invbox for c in kids(b)}
             for role, label in (("campaign", "campaign file"), ("table", "table-presence file")):
                 for d in self.doc_by_role(role):
                     box = d.roots[0] if d.roots else None
@@ -3308,6 +3324,8 @@ class Auditor(object):
                     diffs, missing = [], []
                     for c in kids(box):
                         other = skids.get(hk(c.get("GUID")))
+                        if other is None and kids(c) and all(hk(x.get("GUID")) in inbox for x in kids(c)):
+                            continue                  # its cards ride in the Investigators box
                         if other is None:
                             missing.append(c.get("Nickname") or c.get("GUID"))
                         elif self.first_diff(c, other, ignore=("Transform",)):
@@ -3345,6 +3363,7 @@ class Auditor(object):
                         # Recollections): its cards are compared with every pouch's
                         pouches = [c for c in kids(sbox) if c.get("Name") == "Bag"
                                    and "Player Cards" in (c.get("Nickname") or "")] if sbox else []
+                        pouches += invbox
                         if not pouches:
                             self.add(ERROR, "F01.mod-bag-missing", d.name, "player-card pouches are missing from the saved object")
                         else:

@@ -62,7 +62,8 @@ def test_snapshot_objects_carry_what_the_renderer_needs(stand_in_snapshots):
     objs = last["objects"]
     assert objs and all(len(o["pos"]) == 3 and len(o["rot"]) == 3 and len(o["scale"]) == 3 for o in objs)
     cards = [o for o in objs if o["name"] in ("Card", "CardCustom")]
-    decks = [o for o in objs if o["type"] == "Deck"]
+    # decks over the whole playthrough (the last snapshot may have none left on the table)
+    decks = [o for snap in data for o in snap["objects"] if o["type"] == "Deck"]
     assert cards and all((o["card"].get("CustomDeck") or {}).get("FaceURL") for o in cards)
     assert decks and all(d["deck"]["count"] >= 2 and d["deck"]["top"]["CustomDeck"] for d in decks)
     with_buttons = [o for o in objs if o.get("buttons")]
