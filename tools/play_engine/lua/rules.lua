@@ -154,7 +154,7 @@ return function(R, T)
   end
 
   function R.pendingYear(inv, n, why)
-    for _ = 1, n do T.click(inv.card, "Years pending") end
+    for _ = 1, n do T.click(inv.card, "Pending") end
     inv.pendingYears = (inv.pendingYears or 0) + n
     R.log("%s gains %d Year(s) pending (%s)", inv.name, n, why)
     R.G.metrics.card_years = R.G.metrics.card_years + n

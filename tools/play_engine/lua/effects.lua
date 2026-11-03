@@ -352,7 +352,7 @@ return function(R, T)
           out[#out + 1] = { name = "Records Office", actions = 1, kind = "year", fn = function()
             G.group.records = true
             R.spendClues(R.investigatorsAt(L), 2)
-            T.click(x.card, "Years pending", true)
+            T.click(x.card, "Pending", true)
             x.pendingYears = x.pendingYears - 1
           end }
           break
