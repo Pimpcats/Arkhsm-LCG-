@@ -89,11 +89,23 @@ return function(H)
 
   -- seat the investigators on SCED playmats (card from the campaign's player-card bag)
   local seats = {}
-  local pbag = T.find(function(o) return o.type == "Bag" and o.hasTag("StillHour") and tostring(o.getName()):find("Player Cards", 1, true) ~= nil end)
+  -- the bag that holds this investigator's card (the Investigators box, or a pouch in older builds),
+  -- found by what it holds: a wrong bag hands out its first card instead
+  local function holderOf(id)
+    local guid
+    local bag = T.find(function(o)
+      if o.type ~= "Bag" then return false end
+      for _, e in ipairs(o.getObjects() or {}) do
+        if (T.decode(e.gm_notes) or {}).id == id then guid = e.guid return true end
+      end
+      return false
+    end)
+    if not bag then error("no bag on the table holds investigator " .. tostring(id)) end
+    return bag, guid
+  end
   for i, id in ipairs(party) do
     local color = T.MATS[i]
-    local guid
-    for _, e in ipairs(pbag.getObjects()) do if (T.decode(e.gm_notes) or {}).id == id then guid = e.guid end end
+    local pbag, guid = holderOf(id)
     local mat = T.mat(color)
     local pos = mat.positionToWorld({ -1.17, 0.1, -0.01 })
     local card = pbag.takeObject({ guid = guid, position = { pos.x, pos.y + 1, pos.z }, smooth = false })
