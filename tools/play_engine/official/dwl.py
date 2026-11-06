@@ -157,6 +157,7 @@ def main(argv=None):
     ap.add_argument("--cheat", choices=("never", "cardroom", "important"), default="never",
                     help="The House Always Wins: whether the party 'cheats' with Beginner's Luck")
     ap.add_argument("--tag", help="write games to games_<tag>/ (variants)")
+    ap.add_argument("--ai-variant", choices=("fightback",), help="what-if AI policy (not the benchmark's AI)")
     a = ap.parse_args(argv)
     if not os.path.isfile(a.save):
         a.save = run.save_from_checkout()
@@ -164,7 +165,10 @@ def main(argv=None):
             print("SKIPPED: no SCED save and no SCED checkout")
             return 0
     prepare(a.save)
-    extra = {"cheat": a.cheat} if a.cheat != "never" else None
+    extra = {"cheat": a.cheat} if a.cheat != "never" else {}
+    if a.ai_variant:
+        extra["aiVariant"] = a.ai_variant
+    extra = extra or None
     if a.trace:
         r = run_batch(a.save, a.scenario, a.players, 1, a.seed, trace=True, extra=extra)
         for g in r["games"]:

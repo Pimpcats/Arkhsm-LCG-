@@ -120,6 +120,7 @@ return function(R, T)
   --- Can an investigator move from a to b? (locked doors are the scenario's: FX.canEnter)
   function R.canEnter(a, b, inv)
     if not b or b.closed or not a or not a.adj[b.guid] then return false end
+    inv = inv or R.G.routeInv        -- ai.lua asks without saying who moves: the investigator being planned for
     if R.FX.canEnter and not R.FX.canEnter(inv, b) then return false end
     return true
   end

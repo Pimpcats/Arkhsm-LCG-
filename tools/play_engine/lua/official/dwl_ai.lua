@@ -119,11 +119,13 @@ return function(R, T)
 
   local function nearestTo(L)
     local best, bd
+    local keep = R.G.routeInv
     for _, x in ipairs(R.aliveInvs()) do
       R.G.routeInv = x
       local d = travel(R.locOf(x), L)
       if bd == nil or d < bd then best, bd = x, d end
     end
+    R.G.routeInv = keep
     return best
   end
 
@@ -555,6 +557,32 @@ return function(R, T)
         if (choice.score or 0) - pen < evadeScore then
           choice = { score = evadeScore, kind = "evade", actions = 1, provokes = false,
                      run = function() R.ACT.evade(inv, worst) end }
+        end
+      end
+    end
+    -- what-if (cfg.aiVariant = "fightback", not the benchmark's AI): an enemy that will ready and engage
+    -- again at the next upkeep is fought rather than evaded when the fight is likely and short
+    if choice and choice.kind == "evade" and (R.WHATIF or {}).aiVariant == "fightback" and #eng > 0 then
+      local bw
+      for i = 1, 200 do
+        local k, v = debug.getupvalue(chooseBase, i)
+        if not k then break end
+        if k == "bestWeapon" then bw = v break end
+      end
+      local weapon = bw and bw(inv)
+      local w = weapon and P.WEAPON[weapon.name]
+      local skill = (w and w[4]) or "com"
+      for _, en in ipairs(eng) do
+        if not R.isAloof(en) and FX.fightPenalty(inv, en) == 0 then
+          local pf = R.prob(inv, R.skillBase(inv, skill, { enemy = en }) + P.staticBonus(inv, skill, { kind = "fight", weapon = weapon })
+            - R.enemyFight(en))
+          local per = 1 + ((w and w[2]) or 0)
+          if pf >= 0.5 and (R.enemyHealth(en) - en.damage) <= 2 * per then
+            G.metrics.fightback = (G.metrics.fightback or 0) + 1
+            choice = { score = choice.score, kind = "fight", actions = 1, provokes = false,
+                       run = function() R.ACT.fight(inv, en, weapon) end }
+            break
+          end
         end
       end
     end

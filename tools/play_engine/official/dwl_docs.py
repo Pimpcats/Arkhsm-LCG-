@@ -189,6 +189,24 @@ def dunwich_doc():
     L.append("")
     L += ["Most-drawn encounter cards per game: " + "; ".join(
         "%s %dp: %s" % (k[0], k[2], top(sums[k]["drawn"], 6, sums[k]["runs"])) for k in keys if k[1] == "standalone"), ""]
+    # what-if: the AI variant
+    vg, vs, _ = R.dwl_report("fightback")
+    if vs:
+        L += ["## Sensitivity: how much is the AI? (what-if, not the benchmark)", "",
+              "The same games with one policy change (`--ai-variant fightback`): when the AI would evade an enemy that "
+              "will ready and engage again at the next upkeep, it fights it instead if the fight is at least 50% and "
+              "takes at most two hits. Everything else is identical.", "",
+              "| scenario | party | runs | win % benchmark AI | win % fightback | resolutions (fightback) | defeats / game (fightback) |",
+              "|---|---|---|---|---|---|---|"]
+        for k in sorted(vs):
+            if k[1] != "standalone":
+                continue
+            s, b = vs[k], sums.get(k)
+            n = s["runs"]
+            L.append("| %s | %dp | %d | %s | %s (%s) | %s | %s |" % (
+                R.NAMES[k[0]], k[2], n, R.pct(b["wins"], b["runs"]) if b else "–", R.pct(s["wins"], n), R.ci(s["wins"], n),
+                ", ".join("%s %s" % (r, R.pct(c, n)) for r, c in sorted(s["res"].items())), f(s["defeats"], 2)))
+        L.append("")
     # fidelity
     L += ["## Fidelity: what is approximated, what is missing, how the AI differs", "",
           "Approximated or simplified (from the effects table's coverage notes):", ""]
