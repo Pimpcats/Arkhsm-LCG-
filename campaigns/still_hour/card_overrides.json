@@ -1559,7 +1559,7 @@
     "subtitle": "The Appointed",
     "traits": "Monster. Elite.",
     "health": "2[perinv]",
-    "fight": 5,
+    "fight": 4,
     "evade": 4,
     "damage": 1,
     "horror": 1,
