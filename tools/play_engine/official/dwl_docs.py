@@ -382,13 +382,12 @@ def bench_doc():
             L.append("| %s | %d | %s |" % (name, s["runs"], " | ".join(cells)))
         L.append("")
     # carried campaigns (run.py --campaign through the same engine)
-    camp = R.sh_load().items()
+    byp = collections.defaultdict(list)
+    for (scen, p), gs0 in R.sh_load().items():
+        byp[p].extend(g for g in gs0 if g.get("slot"))
     crows = []
     import report as sh_report
-    for (scen, p), gs in sorted(camp):
-        if scen != "campaign" and not any(g.get("slot") for g in gs):
-            continue
-        gs = [g for g in gs if g.get("slot")]
+    for p, gs in sorted(byp.items()):
         if not gs:
             continue
         byslot = collections.defaultdict(list)
@@ -464,34 +463,39 @@ def bench_doc():
     L += ["The ratio of AI win rates (Still Hour ÷ Dunwich) is in the per-party tables above; with Dunwich near "
           "the floor it is unstable, which is why the logit gap is the measure used here.", ""]
     L += ["## Outliers: where a Still Hour scenario is markedly harder or easier than the baseline", "",
-          "Flagged when a metric is more than 1.75× or less than 0.57× the Dunwich 1a/1b average at the same party "
-          "size (win % and losses: a difference of more than 25 points).", ""]
-    names = {"defeats": "defeats / game", "dmg_inv_round": "damage / investigator / round",
-             "hor_inv_round": "horror / investigator / round", "clues_inv_round": "clues / investigator / round",
-             "spawned": "enemies spawned", "enc_failed": "encounter tests failed", "rounds_per_agenda": "rounds per agenda/Hour"}
+          "Against the Dunwich 1a/1b average at the same party size. Nearly every Still Hour scenario is easier on win "
+          "rate, defeats and damage, so the list below gives (a) every case where a Still Hour scenario is *harder* "
+          "than the baseline by more than 25% on a metric (or 15 points of win rate), and (b) per metric, the Still "
+          "Hour scenario furthest on the easy side.", ""]
+    worse = {"defeats": ("defeats / game", 1), "dmg_inv_round": ("damage / investigator / round", 1),
+             "hor_inv_round": ("horror / investigator / round", 1), "enc_failed": ("encounter tests failed / game", 1),
+             "spawned": ("enemies spawned / game", 1), "clues_inv_round": ("clues / investigator / round", -1)}
     for p in (2, 3, 4):
-        d = [sums.get((s, "standalone", p)) for s in ("1a", "1b")]
+        d = [sums.get((x, "standalone", p)) for x in ("1a", "1b")]
         d = [x for x in d if x and x.get("runs")]
-        shp = [(k, label, s) for (k, label, pp), s in sorted(sh.items()) if pp == p]
+        shp = [(k, label, s2) for (k, label, pp), s2 in sorted(sh.items()) if pp == p]
         if not d or not shp:
             continue
-        base = {key: R.mean([x.get(key) for x in d]) for key in names}
+        base = {key: R.mean([x.get(key) for x in d]) for key in worse}
         dw = 100.0 * sum(x["wins"] for x in d) / sum(x["runs"] for x in d)
-        out = []
-        for k, label, s in shp:
-            flags = []
-            w = 100.0 * s["wins"] / s["runs"]
-            if abs(w - dw) > 25:
-                flags.append("win %d%% vs %d%%" % (round(w), round(dw)))
-            for key, nm in names.items():
-                a, b = s.get(key), base.get(key)
-                if a is not None and b:
-                    r = a / b
-                    if r > 1.75 or r < 0.57:
-                        flags.append("%s %s vs %s (×%.1f)" % (nm, f(a, 2), f(b, 2), r))
-            if flags:
-                out.append("- %dp %s: %s" % (p, label, "; ".join(flags)))
-        L += out or ["- %dp: none" % p]
+        hard, easy = [], {}
+        for k, label, s2 in shp:
+            w = 100.0 * s2["wins"] / s2["runs"]
+            if w < dw - 15:
+                hard.append("%s: win %d%% vs %d%%" % (label, round(w), round(dw)))
+            for key, (nm, sign) in worse.items():
+                a, b = s2.get(key), base.get(key)
+                if a is None or not b:
+                    continue
+                r = a / b
+                if (sign > 0 and r > 1.25) or (sign < 0 and r < 0.8):
+                    hard.append("%s: %s %s vs %s (x%.1f)" % (label, nm, f(a, 2), f(b, 2), r))
+                score = r if sign > 0 else 1 / max(r, 1e-9)
+                if key not in easy or score < easy[key][0]:
+                    easy[key] = (score, label, a, b)
+        L.append("- **%dp, harder than the baseline**: %s." % (p, "; ".join(hard) or "none"))
+        L.append("- **%dp, easiest relative to the baseline**: %s." % (p, "; ".join(
+            "%s %s (%s vs %s)" % (worse[key][0], v[1], f(v[2], 2), f(v[3], 2)) for key, v in easy.items())))
     L.append("")
     return "\n".join(L) + "\n"
 

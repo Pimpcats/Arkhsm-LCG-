@@ -481,3 +481,12 @@ Simulation only; not a playtest.
 - The finale is sensitive to the party: an investigator who cannot Hold Back
   (willpower and combat 2) cannot reach it alone; the four-investigator
   party with Seraphine reaches it most.
+
+## Official benchmark (The Dunwich Legacy, 2026-11-06)
+
+`python3 tools/play_engine/run.py --official dwl ...` plays The Dunwich Legacy's
+1a and 1b (SCED's own box, downloaded data under `.cache/official/`) on the same
+table with the same rules layer and AI (`tools/play_engine/official`,
+`lua/official`; The Still Hour's engine files are not modified). Results:
+docs/design/DUNWICH_SIM_REPORT.md; the side-by-side reading of The Still Hour
+against it: docs/design/BENCHMARK_DUNWICH_VS_STILL_HOUR.md.
