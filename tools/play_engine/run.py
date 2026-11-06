@@ -5,6 +5,7 @@
     python3 tools/play_engine/run.py --suite            # the full balance suite (see SUITE)
     python3 tools/play_engine/run.py --campaign --runs 20 --players 3
     python3 tools/play_engine/run.py --report           # rebuild the report from saved games
+    python3 tools/play_engine/run.py --official dwl --scenario 1a --runs 60 --players 2   # Dunwich benchmark
 
 Designer tooling (spoilers). Every game runs on the real SCED table from the
 owner's save with the campaign's Saved Object loaded (tests/sced_real), the
@@ -221,6 +222,17 @@ def run_jobs(save, jobs, workers, seed0=1000, per_process=10, trace=False, party
 
 
 def main(argv=None):
+    args = list(sys.argv[1:] if argv is None else argv)
+    if "--official" in args:
+        # an official campaign as a benchmark (tools/play_engine/official): --official dwl [its options]
+        i = args.index("--official")
+        which = args[i + 1] if i + 1 < len(args) else ""
+        rest = args[:i] + args[i + 2:]
+        if which != "dwl":
+            raise SystemExit("--official: only 'dwl' (The Dunwich Legacy, 1a and 1b) is available")
+        sys.path.insert(0, os.path.join(HERE, "official"))
+        import dwl
+        return dwl.main(rest)
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--save", default=os.environ.get("SCED_SAVE", DEFAULT_SAVE))
     ap.add_argument("--scenario", default="district_church", help="a scenario id, or 'all' (%s)" % ", ".join(SCENARIOS))
