@@ -328,3 +328,22 @@ Every night is now at or above its target (no dips); finale home 52%, stranded 2
 at the finale in 15 of 27; Memory 42.1 per investigator; no night without a goal. Night 3 and Night 8 run easy and the
 campaign as a whole sits above the curve (mean 79% against 62%): at 27 campaigns (±18 points per night) this is where
 further tuning should wait for real play.
+
+## Real starter decks: experience and finale retune (2026-11-03 to 2026-11-06)
+
+Carried campaigns, 3 investigators, `goalsPerNight 2`, the real starter decks (`campaigns/still_hour/starter_decks.json`).
+
+| build | campaigns | Prologue–Night 8 (mean) | finale home | stranded | not ended | Memory / inv. |
+|---|---|---|---|---|---|---|
+| real decks, surface entries pay 1 | 27 | 89/89/59/63/67/59/74/74/67 (71%) | 19% | 41% | 41% | 31.9 |
+| surface entries pay 2 | 27 | 85/93/70/70/63/63/63/67/81 (73%) | 26% | 30% | 44% | 37.9 |
+| + each fallen form rewinds 2 Hours at every size (rejected) | 27 | (68%) | 4% | 37% | 59% | – |
+| **+ the Present form fight 4 (was 5), chosen** | 54 (seeds 5000–10000) | 83/85/56/89/83/76/70/61/80 (76%) | **46%** | 26% | 26% | **38.6** |
+
+- Surface entries now pay 2 banked Memory per investigator (deep 3): Memory returns to the official 35–45 band.
+- The extra rewind gave the Present form more rounds to attack and made the finale worse; most parties that failed had
+  defeated both period forms and fell to the Present form, so its fight value was lowered instead. The two seed sets
+  gave 41% and 52%.
+- Still to measure on the real decks: 1, 2 and 4 investigators and a party with Seraphine. The Dunwich benchmark
+  (BENCHMARK_DUNWICH_VS_STILL_HOUR.md) had the carried finale at 88% / 38% / 12% at 2 / 3 / 4 investigators (8
+  campaigns each, before the fight change). Simulation, not a playtest.

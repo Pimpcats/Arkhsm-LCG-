@@ -45,7 +45,7 @@ connection (no crossing doom). An investigator's period is where they stand; enc
 |---|---|---|---|---|
 | As It Was (Past) | 4 / 3 | 3 [perinv] | 1 / 1 | Cannot move. Forced – end of round: each investigator at The First Occultation takes 1 horror (the applause). |
 | As It Will Be (Future) | 3 / 4 | 3 [perinv] | 2 / 0 | Cannot move. Investigators at The Morning After get −1 [agi] and −1 [com] (the Years). |
-| As It Is (Present) | 5 / 4 | 4 [perinv] | 2 / 2 | Massive, hunter, prey most Memory. Cannot be damaged until As It Was and As It Will Be are both defeated. Hold Back still works on it. |
+| As It Is (Present) | 4 / 4 (5 / 4 until 2026-11-06) | 4 [perinv] | 2 / 2 | Massive, hunter, prey most Memory. Cannot be damaged until As It Was and As It Will Be are both defeated. Hold Back still works on it. |
 
 **What the campaign brings (the branching pays off):** each deep Knowledge entry can be spent once, as an
 [action] at the matching period, to deal 2 damage to the form there:
