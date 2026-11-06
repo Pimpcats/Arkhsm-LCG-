@@ -181,8 +181,20 @@ return function(R, T)
 
   --- Rex's Curse: when you would succeed, the token is revealed again (once per test).
   local testBase = R.test
+  local function countTest(opts, ok)
+    -- skill tests by kind (the benchmark's encounter-test metric; benchmark.py counts The Still Hour's the same way)
+    local m = R.G and R.G.metrics
+    if not m then return end
+    local tk = m.tests_by_kind or {}
+    m.tests_by_kind = tk
+    local k = (opts and opts.kind) or "other"
+    tk[k] = tk[k] or { n = 0, failed = 0 }
+    tk[k].n = tk[k].n + 1
+    if not ok then tk[k].failed = tk[k].failed + 1 end
+  end
   function R.test(inv, skill, diff, opts)
     local ok, margin, token = testBase(inv, skill, diff, opts)
+    countTest(opts, ok)
     if ok and inv.threat and inv.threat["Rex's Curse"] and not R.G.ended and not inv.defeated and token ~= "Canceled" then
       local old = FX.tokenValue(token, inv) or 0
       local name = FX.rawDraw(inv.color)
@@ -198,7 +210,7 @@ return function(R, T)
         if c then inv.deck[#inv.deck + 1] = c.card or c ; R.shuffle(inv.deck) end
         R.G.metrics.tests_passed = R.G.metrics.tests_passed - 1
         local tk = (R.G.metrics.tests_by_kind or {})[opts and opts.kind or "other"]
-        if tk then tk.failed = tk.failed + 1 end
+        if tk then tk.failed = tk.failed + 1 end      -- counted as a success above
         return false, m2, name
       end
       return true, m2, name

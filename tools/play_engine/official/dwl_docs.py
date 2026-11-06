@@ -97,6 +97,29 @@ def dunwich_doc():
           "Peter Clover, then resigning; resigning before the last agenda runs out. It never \"cheats\" with "
           "Beginner's Luck unless a run asks for it (`--cheat`).", ""]
     # headline
+    def wr(scen, mode="standalone"):
+        return ", ".join("%dp %s" % (p, R.pct(sums[(scen, mode, p)]["wins"], sums[(scen, mode, p)]["runs"]))
+                         for p in (2, 3, 4) if (scen, mode, p) in sums)
+    def killers(scen):
+        c = collections.Counter()
+        n = 0
+        for p in (2, 3, 4):
+            s = sums.get((scen, "standalone", p))
+            if s:
+                c.update(s["defeated_by"])
+                n += s["runs"]
+        return ", ".join("%s (%s of defeats)" % (k, R.pct(v, sum(c.values()))) for k, v in c.most_common(3))
+    L += ["## Headline", "",
+          "- **1a Extracurricular Activity**: the AI wins %s (standalone). Almost every win is R1 at the Faculty "
+          "Offices; when it loses, it is mostly every investigator defeated, not the agenda. Main causes of defeat: %s." % (
+              wr("1a"), killers("1a")),
+          "- **1b The House Always Wins**: the AI wins %s. It loses by being defeated before it resigns, mostly in "
+          "act 2 (finding the VIP Area): %s." % (wr("1b"), killers("1b")),
+          "- **In campaign order** the second scenario sees the first: 1a played second (Dormitories, R2 path) wins "
+          "%s; 1b played second (Peter Clover / Fold) wins %s." % (wr("1a", "pair_ba #2"), wr("1b", "pair_ab #2")),
+          "- These are the AI's rates. The downloaded data holds no human win rates (see *Reference points*), so how "
+          "far they sit below a group of people cannot be quoted. The AI is the same one The Still Hour's balance runs "
+          "use; docs/design/BENCHMARK_DUNWICH_VS_STILL_HOUR.md reads The Still Hour against these numbers.", ""]
     L += ["## Results: each scenario played on its own (Standard)", "",
           "Win = a resolution reached through the scenario's objectives (1a: R1/R2 at a location, R3 by defeating the "
           "Experiment; 1b: R1/R2/R3 by resigning in act 3). Loss = the agenda deck ran out (R4) or every investigator "
@@ -295,7 +318,7 @@ def bench_doc():
           "- The Still Hour was played through `official/benchmark.py`, which runs run.py's engine unchanged and only "
           "counts skill tests by kind (for the encounter-test metric).",
           "- Metric definitions: *win* = Dunwich: a resolution by the scenario's objectives (R1–R3); The Still Hour: "
-          "the night's goal acts all advanced (`report.py` completion), the Finale: the contest reached. *Losses*: "
+          "the night's goal acts all advanced (`report.py` completion), the Finale: the forms defeated (ended 'boss'; a stranded form is a partial ending, counted as a loss here). *Losses*: "
           "time/agenda = the agenda deck ran out (Dunwich R4) or Hour IX / the reset came first (Still Hour); defeated "
           "= every investigator defeated. *Rounds* = rounds played (a Still Hour loop always runs to its end, so "
           "*round won* is also shown). *Clues required* = the clue cost of the goal acts (Dunwich: the act clues plus "
@@ -303,6 +326,37 @@ def bench_doc():
           "Hour turned (Still Hour). *Encounter tests* = skill tests on treachery cards per game, failures in "
           "brackets. *XP* = Dunwich XP earned per investigator (Victory X plus the resolution's bonus); Still Hour: "
           "Memory banked by the party per loop (its experience currency; not the same scale).", ""]
+    # headline
+    L += ["## Headline", ""]
+    for p in (2, 3, 4):
+        d = [sums.get((x, "standalone", p)) for x in ("1a", "1b")]
+        d = [x for x in d if x and x.get("runs")]
+        shp = [(k, label, s2) for (k, label, pp), s2 in sorted(sh.items()) if pp == p]
+        if not d or not shp:
+            continue
+        dw = sum(x["wins"] for x in d) / sum(x["runs"] for x in d)
+        nights = [s2 for k, label, s2 in shp if label.startswith("Night") or label == "Prologue"]
+        nw = sum(x["wins"] for x in nights) / max(1, sum(x["runs"] for x in nights))
+        fin = [s2 for k, label, s2 in shp if label == "Finale"]
+        dd = R.mean([x["dmg_inv_round"] for x in d]) + R.mean([x["hor_inv_round"] for x in d])
+        sd = R.mean([x["dmg_inv_round"] for x in nights]) + R.mean([x["hor_inv_round"] for x in nights])
+        L.append("- **%dp**: the AI wins Dunwich's opener %s (1a and 1b pooled) and The Still Hour's Prologue and nights "
+                 "%s (pooled)%s. Damage + horror per investigator per round: Dunwich %s, Still Hour nights %s; "
+                 "defeats per game: Dunwich %s, Still Hour nights %s." % (
+                     p, R.pct(round(100 * dw), 100), R.pct(round(100 * nw), 100),
+                     ("; the Finale %s" % R.pct(fin[0]["wins"], fin[0]["runs"])) if fin else "",
+                     f(dd, 2), f(sd, 2), f(R.mean([x["defeats"] for x in d]), 2), f(R.mean([x["defeats"] for x in nights]), 2)))
+    harder = []
+    for p in (2, 3, 4):
+        d = [sums.get((x, "standalone", p)) for x in ("1a", "1b")]
+        d = [x for x in d if x and x.get("runs")]
+        fin = [s2 for (k, label, pp), s2 in sh.items() if pp == p and label == "Finale"]
+        if d and fin and fin[0]["wins"] / fin[0]["runs"] < sum(x["wins"] for x in d) / sum(x["runs"] for x in d):
+            harder.append("%dp" % p)
+    L += ["- As this AI plays them, The Still Hour's Prologue and nights are markedly easier than Dunwich's opening "
+          "pair and gentler on the investigators (fewer defeats, less damage and horror per round). The Finale is "
+          "harder than the baseline at %s. Most of Dunwich's losses are total defeats; most of The Still Hour's are "
+          "running out of time." % (", ".join(harder) or "no party size"), ""]
     for p in (2, 3, 4):
         rows = []
         for scen in ("1a", "1b"):
@@ -326,6 +380,42 @@ def bench_doc():
                 else:
                     cells.append(f(v.get(key), nd) if isinstance(v.get(key), (int, float)) else "–")
             L.append("| %s | %d | %s |" % (name, s["runs"], " | ".join(cells)))
+        L.append("")
+    # carried campaigns (run.py --campaign through the same engine)
+    camp = R.sh_load().items()
+    crows = []
+    import report as sh_report
+    for (scen, p), gs in sorted(camp):
+        if scen != "campaign" and not any(g.get("slot") for g in gs):
+            continue
+        gs = [g for g in gs if g.get("slot")]
+        if not gs:
+            continue
+        byslot = collections.defaultdict(list)
+        for g in gs:
+            byslot[g["slot"]].append(g)
+        cells = []
+        for slot in range(1, 11):
+            sl = byslot.get(slot) or []
+            if not sl:
+                cells.append("–")
+                continue
+            done = 0
+            for g in sl:
+                goals = g.get("goals") or []
+                if (goals and all(sh_report.act_done(g, a) for a in goals)) or g.get("ended") in ("boss", "contest"):
+                    done += 1
+            cells.append("%s (%d)" % (R.pct(done, len(sl)), len(sl)))
+        ncamp = len(set(g.get("campaign_seed") for g in gs))
+        dg = R.mean([(g.get("metrics") or {}).get("defeats", 0) for g in gs])
+        crows.append("| %dp | %d | %s | %s |" % (p, ncamp, " | ".join(cells), f(dg, 2)))
+    if crows:
+        L += ["## Carried campaigns (The Still Hour, run.py --campaign, same engine)", "",
+              "Each campaign plays the Prologue then up to nine nights with the actual carried state (log, decks, "
+              "weaknesses). Cell: share of that slot's games whose goal acts all advanced (games reaching the slot).", "",
+              "| party | campaigns | " + " | ".join(["Prologue"] + ["slot %d" % k for k in range(2, 11)]) + " | defeats / game |",
+              "|---|---|" + "---|" * 11]
+        L += crows
         L.append("")
     # curve, ratio and outliers
     L += ["## The Still Hour's curve against Dunwich's opener (as the AI plays them)", ""]

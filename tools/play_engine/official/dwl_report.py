@@ -170,16 +170,17 @@ def dwl_summary(games, cs):
                                                            if a.get("why") != "advance directly to 2b"]) or 1)
                                    for g in games if (g.get("metrics") or {}).get("agendas")])
     s["doom_placed"] = mean([(g.get("metrics") or {}).get("doom_placed", 0) for g in games])
-    s["clues_required"] = None
+    s["clues_required"] = guide_need(games[0]["scenario"], players, games[0].get("goal1a"))
     return s
 
 
-def guide_need(scen, players):
+def guide_need(scen, players, goal1a=None):
     """Clues the scenario's objectives require (acts plus the location objective the AI goes for), from the card data."""
     cs = cards()
     if scen == "1a":
         a = cs.get("02045", {}).get("clues", 3) * players
-        return a + 2 * players          # After Hours, then the Faculty Offices' 2 [per_investigator]
+        # After Hours, then the Faculty Offices' 2 [per_investigator] (R1) or the Dormitories' 3 (R2)
+        return a + (3 if goal1a == "R2" else 2) * players
     a = cs.get("02066", {}).get("clues", 4) * players + cs.get("02067", {}).get("clues", 2) * players
     return a
 
@@ -220,7 +221,8 @@ def sh_summaries():
         label, k = sh_label(name)
         if label:
             for g in gs:
-                groups[(k, label, players)].append((name, g))
+                if not g.get("slot"):          # carried-campaign slots are reported on their own
+                    groups[(k, label, players)].append((name, g))
     out = {}
     cs = {}
     try:
@@ -236,7 +238,10 @@ def sh_summaries():
         loss = collections.Counter()
         for name, gs in byname.items():
             sm = sh_report.summarize(name, players, gs)
-            if "completion" in sm:
+            if name.startswith("finale"):
+                # the finale is won when the forms fall (ended "boss"; "contest" in older builds)
+                wins += sum(1 for g in gs if g.get("ended") in ("boss", "contest"))
+            elif "completion" in sm:
                 wins += round(sm["completion"] * len(gs))
                 if sm.get("completed_round"):
                     rounds_won += [sm["completed_round"]] * round(sm["completion"] * len(gs))
@@ -244,8 +249,12 @@ def sh_summaries():
                 wins += round(sm["contest_reached"] * len(gs))
             for g in gs:
                 goals = g.get("goals") or sh_report.NIGHT.get(name) or []
-                done = all(sh_report.act_done(g, a) for a in goals) if goals else (g.get("ended") == "contest")
-                if not done:
+                done = all(sh_report.act_done(g, a) for a in goals) if goals else (g.get("ended") in ("boss", "contest"))
+                if name.startswith("finale"):
+                    done = g.get("ended") in ("boss", "contest")
+                if not done and g.get("ended") == "stranded":
+                    loss["a form stranded (partial ending)"] += 1
+                elif not done:
                     m = g.get("metrics") or {}
                     alive = sum(1 for v in (m.get("defeated") or {}).values() if v)
                     if g.get("ended") == "defeat":
