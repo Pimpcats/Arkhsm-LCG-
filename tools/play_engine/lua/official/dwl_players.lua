@@ -255,6 +255,7 @@ return function(R, T)
   local WORTH = { ["02084"] = 3, ["02085"] = 2, ["02101"] = 2, ["02100"] = 2, ["02083"] = 2, ["02102"] = 2, ["01174"] = 2,
                   ["01166"] = 3, ["02091"] = 1, ["01178"] = 2, ["02092"] = 2, ["02093"] = 1, ["02082"] = 1, ["02099"] = 2,
                   ["02081"] = 1, ["01163"] = 1, ["01164"] = 2, ["01165"] = 1 }
+  P.WARD_WORTH = WORTH
   function P.cancelTreachery(inv, id, def)
     local worth = WORTH[id] or 0
     if worth < 2 or def.weakness then return false end

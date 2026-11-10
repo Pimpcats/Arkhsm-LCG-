@@ -1,12 +1,13 @@
 """Data for the Dunwich Legacy benchmark (designer tooling).
 
-The play engine (tools/play_engine) plays The Dunwich Legacy's opening pair --
-1a Extracurricular Activity and 1b The House Always Wins -- on the same
+The play engine (tools/play_engine) plays The Dunwich Legacy's first three
+scenarios -- 1a Extracurricular Activity, 1b The House Always Wins and 2 The
+Miskatonic Museum -- on the same
 emulated SCED table it uses for The Still Hour, as a baseline to read The
 Still Hour's numbers against. This module turns the downloaded official data
 (gitignored, under .cache/official/) into the two files the Lua side reads:
 
-  * cards.json: every card the two scenarios and the official investigators
+  * cards.json: every card the scenarios and the official investigators
     use, in the shape tools/play_engine/cards.py gives The Still Hour's cards
     (fight, evade, health, shroud, clues, doom, victory, text, ...), read from
     ArkhamDB's card data (pack/dwl, pack/core). Nothing is copied by hand.
@@ -34,7 +35,9 @@ ARKHAMDB = os.path.join(OFFICIAL, "arkhamdb-json-data", "pack")
 GUIDE = os.path.join(OFFICIAL, "arkham-cards-data", "campaigns", "dwl")
 sys.path.insert(0, ENGINE)
 
-SCENARIO_BOXES = {"1a": "1a: Extracurricular Activity", "1b": "1b: The House Always Wins"}
+SCENARIO_BOXES = {"1a": "1a: Extracurricular Activity", "1b": "1b: The House Always Wins",
+                  "2": "2: The Miskatonic Museum"}
+GUIDES = {"1a": "extracurricular_activity", "1b": "the_house_always_wins", "2": "the_miskatonic_museum"}
 
 # official investigator -> The Still Hour starter deck of the same class (its 30 level-0 cards)
 TEMPLATE = {"02001": "sthrelias", "02002": "sthrayako", "02003": "sthrcass", "02004": "sthrseraphine"}
@@ -99,7 +102,8 @@ def card_record(c):
 
 def arkhamdb_cards():
     out = {}
-    for rel in ("dwl/dwl.json", "dwl/dwl_encounter.json", "core/core.json", "core/core_encounter.json"):
+    for rel in ("dwl/dwl.json", "dwl/dwl_encounter.json", "dwl/tmm.json", "dwl/tmm_encounter.json", "core/core.json",
+                "core/core_encounter.json"):
         for c in _load(os.path.join(ARKHAMDB, rel)):
             out.setdefault(c["code"], card_record(c))
     return out
@@ -110,7 +114,7 @@ def sced_box():
 
 
 def scenario_ids(box=None):
-    """{"1a": [card ids], "1b": [...]}: every card SCED's scenario box holds (its decks and set-aside bag)."""
+    """{"1a": [card ids], "1b": [...], "2": [...]}: every card SCED's scenario box holds (its decks and set-aside bag)."""
     box = box or sced_box()
     out = {}
     for key, name in SCENARIO_BOXES.items():
@@ -134,10 +138,22 @@ def scenario_ids(box=None):
     return out
 
 
+def standard_bag(box=None):
+    """The campaign's Standard chaos bag (SCED token ids), read from the difficulty tile in SCED's 1a box.
+    The Miskatonic Museum's box has no such tile: at a table the bag is the campaign's, already filled."""
+    box = box or sced_box()
+    sb = next(c for c in box["ContainedObjects"] if c.get("Nickname") == SCENARIO_BOXES["1a"])
+    for o in sb.get("ContainedObjects") or []:
+        m = re.search(r"Standard\s*=\s*\{\s*token\s*=\s*\{([^}]*)\}", o.get("LuaScript") or "")
+        if m:
+            return re.findall(r"'([^']+)'", m.group(1))
+    raise SystemExit("no Standard difficulty in SCED's 1a box")
+
+
 def write_cards(path):
     cards = arkhamdb_cards()
     ids = scenario_ids()
-    data = {"cards": cards, "scenario_ids": sorted(set(ids["1a"]) | set(ids["1b"])), "scenarios": ids}
+    data = {"cards": cards, "scenario_ids": sorted(set().union(*ids.values())), "scenarios": ids}
     _write_json(path, data, ensure_ascii=False, indent=1, sort_keys=True)
     return path
 
@@ -203,7 +219,7 @@ def guide(name):
 def resolution_steps():
     """{scenario: {resolution id: [step ids]}} from the campaign guide data (arkham-cards-data)."""
     out = {}
-    for key, name in (("1a", "extracurricular_activity"), ("1b", "the_house_always_wins")):
+    for key, name in GUIDES.items():
         g = guide(name)
         out[key] = {r["id"]: r.get("steps", []) for r in g["resolutions"]}
     return out

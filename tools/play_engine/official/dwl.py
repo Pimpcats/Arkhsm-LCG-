@@ -2,14 +2,16 @@
 
     python3 tools/play_engine/run.py --official dwl --runs 60 --players 2
     python3 tools/play_engine/official/dwl.py --scenario 1a --players 2 --trace      # one game, play by play
-    python3 tools/play_engine/official/dwl.py --suite --jobs 3                       # 1a, 1b and both campaign orders at 2/3/4
+    python3 tools/play_engine/official/dwl.py --suite --jobs 3                       # every scenario and campaign order at 2/3/4
+    python3 tools/play_engine/official/dwl.py --scenario 2 --players 3 --runs 60     # The Miskatonic Museum on its own
 
 Designer tooling. The same table, rules layer, AI and level-0 cards as The
 Still Hour's play engine (tools/play_engine), driving SCED's own Dunwich
 campaign box (downloaded data, .cache/official/dwl_sced.json; never committed).
-Scenarios: 1a (Extracurricular Activity), 1b (The House Always Wins), pair_ab
-(1a then 1b in campaign order: the second sees the first's outcome) and
-pair_ba. Parties: official investigators (dwl_data.PARTIES) playing The Still
+Scenarios: 1a (Extracurricular Activity), 1b (The House Always Wins), 2 (The
+Miskatonic Museum), pair_ab (1a then 1b in campaign order: the second sees
+the first's outcome), pair_ba, and trio_ab (1a, 1b, Armitage's Fate, then the
+Museum with the pair's log, tokens, trauma, allies and XP). Parties: official investigators (dwl_data.PARTIES) playing The Still
 Hour's same-class starter cards. Games go to .cache/play_engine/official/games/.
 """
 import argparse
@@ -31,7 +33,8 @@ sys.path.insert(0, os.path.join(ROOT, "tests", "sced_real"))
 import dwl_data  # noqa: E402
 
 OUT = os.path.join(ROOT, ".cache", "play_engine", "official")
-SCENARIOS = ["1a", "1b", "pair_ab", "pair_ba"]
+SCENARIOS = ["1a", "1b", "pair_ab", "pair_ba", "2", "trio_ab"]     # appended only: a job's seeds depend on the index
+GAMES_PER_RUN = {"pair_ab": 2, "pair_ba": 2, "trio_ab": 3}
 
 
 def _engine_run():
@@ -44,7 +47,7 @@ def _engine_run():
 
 def guide_config():
     out = {}
-    for key, name in (("1a", "extracurricular_activity"), ("1b", "the_house_always_wins")):
+    for key, name in dwl_data.GUIDES.items():
         g = dwl_data.guide(name)
         out[key] = {"resolutions": {r["id"]: r.get("steps", []) for r in g["resolutions"]},
                     "steps": {s["id"]: s for s in g["steps"] if "id" in s}}
@@ -72,7 +75,7 @@ def run_batch(save, scenario, players, runs, seed, trace=False, extra=None, time
     run = _engine_run()
     table, src = run.table_for(save)
     cfg = {"cards": os.path.join(OUT, "dwl_cards.json"), "decks": os.path.join(OUT, "dwl_decks.json"),
-           "box": dwl_data.SCED_BOX, "party": dwl_data.PARTIES[players], "guide": guide_config(),
+           "box": dwl_data.SCED_BOX, "party": dwl_data.PARTIES[players], "guide": guide_config(), "standardBag": dwl_data.standard_bag(),
            "trace": trace, "jobs": [{"scenario": scenario, "runs": runs, "seed": seed}]}
     cfg.update(extra or {})
     os.makedirs(os.path.join(OUT, "configs"), exist_ok=True)
@@ -120,7 +123,7 @@ def run_jobs(save, jobs, workers, seed0=5000, per_process=10, tag=None, extra=No
         for t, r in ex.map(one, tasks):
             results.setdefault((t[0], t[1]), []).extend(r["games"])
             coverage = coverage or r["coverage"]
-            want = t[2] * (2 if t[0].startswith("pair") else 1)
+            want = t[2] * GAMES_PER_RUN.get(t[0], 1)
             bad = len(r["games"]) != want or r["rc"] or r["failed_checks"] or any(invalid(g) for g in r["games"])
             print("%-8s %dp seeds %d..%d: %d game(s)%s  [%.0fs]" % (t[0], t[1], t[3], t[3] + t[2] - 1, len(r["games"]),
                   "  ** " + (r["stderr"] or r["stdout_tail"])[-800:] if bad else "", time.time() - t0), flush=True)
@@ -147,7 +150,8 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     run = _engine_run()
     ap.add_argument("--save", default=os.environ.get("SCED_SAVE", run.DEFAULT_SAVE))
-    ap.add_argument("--scenario", default="1a", help="1a, 1b, pair_ab, pair_ba or all")
+    ap.add_argument("--scenario", default="1a", help="1a, 1b, 2 (The Miskatonic Museum), pair_ab, pair_ba, "
+                    "trio_ab (1a, 1b, then the Museum) or all")
     ap.add_argument("--players", type=int, default=2, choices=(2, 3, 4))
     ap.add_argument("--runs", type=int, default=60)
     ap.add_argument("--seed", type=int, default=5000)
@@ -156,8 +160,10 @@ def main(argv=None):
     ap.add_argument("--trace", action="store_true", help="one game, play by play")
     ap.add_argument("--cheat", choices=("never", "cardroom", "important"), default="never",
                     help="The House Always Wins: whether the party 'cheats' with Beginner's Luck")
+    ap.add_argument("--necronomicon", choices=("keep", "destroy"), default="keep",
+                    help="The Miskatonic Museum: the party's choice at act 3b (R2 keep / R1 destroy)")
     ap.add_argument("--tag", help="write games to games_<tag>/ (variants)")
-    ap.add_argument("--ai-variant", choices=("fightback",), help="what-if AI policy (not the benchmark's AI)")
+    ap.add_argument("--ai-variant", choices=("fightback", "hunt"), help="what-if AI policy (not the benchmark's AI)")
     a = ap.parse_args(argv)
     if not os.path.isfile(a.save):
         a.save = run.save_from_checkout()
@@ -168,6 +174,8 @@ def main(argv=None):
     extra = {"cheat": a.cheat} if a.cheat != "never" else {}
     if a.ai_variant:
         extra["aiVariant"] = a.ai_variant
+    if a.necronomicon != "keep":
+        extra["necronomicon"] = a.necronomicon
     extra = extra or None
     if a.trace:
         r = run_batch(a.save, a.scenario, a.players, 1, a.seed, trace=True, extra=extra)

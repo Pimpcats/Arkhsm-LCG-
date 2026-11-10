@@ -93,6 +93,7 @@ return function(R, T)
     return locIn(id)
   end
   FX.putLocation = putLocation
+  FX.LAYOUT = LAYOUT
 
   --- Remove a location from the game (its investigators and enemies were moved first).
   function FX.removeLocation(L)
@@ -224,11 +225,13 @@ return function(R, T)
     if d and d.type == "Deck" then d.shuffle() end
   end
   FX.shuffleIn = shuffleIn
+  FX.attach, FX.discardEnemy = attach, discardEnemy
   --- Shuffle the encounter discard pile into the encounter deck.
   local function shuffleDiscardIn()
     local d = T.encounterDiscard()
     if d then shuffleIn(d) end
   end
+  FX.shuffleDiscardIn = shuffleDiscardIn
 
   ------------------------------------------------------------ scenario reference cards --
 
@@ -407,6 +410,7 @@ return function(R, T)
   end
 
   local AGENDA_BACK = {}
+  FX.AGENDA_BACK = AGENDA_BACK
   AGENDA_BACK[ID.quiet] = function()
     for _, inv in ipairs(R.aliveInvs()) do
       local k = (#inv.discard >= 10) and 2 or (#inv.discard >= 5 and 1 or 0)
@@ -469,7 +473,7 @@ return function(R, T)
     AGENDA_BACK[id]()
     if G.ended then return end
     -- "If the players have completed <the other scenario>, advance directly to agenda 2b"
-    if A.i == 2 and G.camp.otherDone then
+    if A.i == 2 and G.camp.otherDone and (cur() == "1a" or cur() == "1b") then
       local skip = A.list[2]
       G.metrics.agendas[#G.metrics.agendas + 1] = { id = skip, round = G.round, why = "advance directly to 2b" }
       note("AGENDA ADVANCES directly to 2b: %s", R.card(skip).name or skip)
@@ -520,6 +524,7 @@ return function(R, T)
   end
 
   local ACT_BACK = {}
+  FX.ACT_BACK = ACT_BACK
   ACT_BACK[ID.afterhours] = function()
     shuffleDiscardIn()
     shuffleIn(T.takeCard(ID.jazz, asidePos(41)))
@@ -787,6 +792,7 @@ return function(R, T)
     return R.test(inv, skill, diff, opts)
   end
 
+  FX.threat, FX.test = threat, test
   -- the Sorcery set
   cov("02083")
   ENC["02083"] = function(inv)            -- Visions of Futures Past
@@ -955,7 +961,7 @@ return function(R, T)
   cov(ID.peter) ; cov(ID.armitage, "not played in either scenario (Armitage's Fate decides who may add him)")
 
   -- Wizard of Yog-Sothoth: when the engaged investigator draws a [[Hex]] or [[Pact]] card, it attacks
-  for id, h in pairs(ENC) do
+  local function wrapEnc(id, h)
     ENC[id] = function(inv, card)
       local d = R.card(id)
       if R.hasTrait(d, "Hex") or R.hasTrait(d, "Pact") then
@@ -968,6 +974,12 @@ return function(R, T)
       R.G.metrics.treacheries[id] = (R.G.metrics.treacheries[id] or 0) + 1
       return h(inv, card)
     end
+  end
+  FX.wrapEnc = wrapEnc
+  do
+    local list = {}
+    for id, h in pairs(ENC) do list[#list + 1] = { id, h } end
+    for _, x in ipairs(list) do wrapEnc(x[1], x[2]) end
   end
 
   --- Arcane Barrier on a move into or out of its location (an additional cost).

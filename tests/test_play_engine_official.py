@@ -2,8 +2,10 @@
 
   * the Dunwich modules load on every installed Lua and leave The Still Hour's
     engine files alone (they are separate files; this checks they parse);
-  * every card SCED's 1a/1b boxes hold has an effects-table entry, and one
-    short game of each scenario plays without a Lua error. Both need the
+  * every card SCED's 1a/1b boxes and its Miskatonic Museum box hold has an
+    effects-table entry, and one short game of each scenario plays without a
+    Lua error (the Museum's also checks its setup: one office of each kind,
+    the Exhibit deck with the Restricted Hall in its bottom three). Both need the
     downloaded official data (.cache/official, gitignored) and the SCED
     checkout; skipped without them.
 """
@@ -39,6 +41,7 @@ COVERAGE_LUA = r"""
 local R, T = {}, { E = {}, J = {} }
 T.drawToken = function() end
 local FX = dofile(arg[1] .. "/dwl_effects.lua")(R, T)
+dofile(arg[1] .. "/tmm_effects.lua")(R, T)
 local ids = {}
 for id in pairs(FX.COVERAGE) do ids[#ids + 1] = id end
 table.sort(ids)
@@ -62,7 +65,7 @@ def test_dwl_effects_cover_every_box_card(tmp_path):
 
 @pytest.mark.skipif(not os.path.isfile(DATA) or not shutil.which("lua5.2") or os.environ.get("SCED_REAL") == "0",
                     reason="no downloaded Dunwich data, lua5.2, or SCED_REAL=0")
-@pytest.mark.parametrize("scenario", ["1a", "1b"])
+@pytest.mark.parametrize("scenario", ["1a", "1b", "2"])
 def test_dwl_short_game(scenario):
     import dwl
     run = dwl._engine_run()
@@ -77,3 +80,16 @@ def test_dwl_short_game(scenario):
     assert not r["failed_checks"], r["failed_checks"]
     cov = r["coverage"] or {}
     assert not cov.get("missing"), cov.get("missing")
+    if scenario == "2":
+        m = g["metrics"]
+        assert len(m["offices"]) == 2 and m["offices"][0] in ("02128", "02129") and m["offices"][1] in ("02130", "02131")
+        assert m["restricted_at"] in (4, 5, 6)
+        assert m["clues_required"] == 2 + 2 * (m["restricted_at"] + 2)
+        assert g["resolution"] in ("unfinished", "NR", "R1", "R2")
+
+
+def test_museum_is_a_scenario_of_the_runner():
+    import dwl
+    import dwl_data
+    assert "2" in dwl.SCENARIOS and dwl.SCENARIOS[:4] == ["1a", "1b", "pair_ab", "pair_ba"]   # seeds depend on the index
+    assert dwl_data.SCENARIO_BOXES["2"] == "2: The Miskatonic Museum" and dwl_data.GUIDES["2"] == "the_miskatonic_museum"
