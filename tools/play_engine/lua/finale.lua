@@ -187,7 +187,8 @@ return function(R, T)
       if c and L then
         local en = R.spawnEnemy(c, L, nil, { want = L.name })
         local base = fh[f.key]
-        if base then en.maxHealth = base * G.n end
+        if base then en.maxHealth = base * G.n
+        elseif G.n == 4 and f.key ~= "present" then en.maxHealth = 6 end   -- four investigators: the period forms have 6 health (not 8)
         en.form = f.key
         G.boss.en[f.key] = en
       else

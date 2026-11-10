@@ -347,3 +347,21 @@ Carried campaigns, 3 investigators, `goalsPerNight 2`, the real starter decks (`
 - Still to measure on the real decks: 1, 2 and 4 investigators and a party with Seraphine. The Dunwich benchmark
   (BENCHMARK_DUNWICH_VS_STILL_HOUR.md) had the carried finale at 88% / 38% / 12% at 2 / 3 / 4 investigators (8
   campaigns each, before the fight change). Simulation, not a playtest.
+
+### Party sizes on the real decks (2026-11-06 to 2026-11-10)
+
+27 carried campaigns each (seeds 5000/6000/7000), `goalsPerNight 2`, after the Present form's fight change.
+
+| investigators | Prologue–Night 8 (mean) | finale home | stranded | not ended | Memory / inv. |
+|---|---|---|---|---|---|
+| 1 | 70% | 59% | 4% | 37% | 39.4 |
+| 2 (default pair) | 79% | 56% | 19% | 26% | 39.5 |
+| 2 (lead + the fifth investigator) | 54% | 30% | 15% | 52% | – |
+| 4, period forms 8 health | 78% | 19% | 41% | 41% | 39.3 |
+| 4, each fallen form rewinds 2 Hours (rejected) | 77% | 15% | 52% | 33% | – |
+| **4, period forms 6 health (chosen)** | 74% | **44%** | 17% | 39% | – |
+
+- Four investigators ran out of Hours on the two period forms (few defeats); 6 health each (not 8) brings full victory
+  to 44%. The late-record cap (half a form's health) is 3 at four investigators.
+- The second two-investigator party is weak (nights 5–6 at 22–26%, both investigators defeated in many slots): a
+  party-composition finding, not yet acted on.

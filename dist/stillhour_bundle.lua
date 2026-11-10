@@ -2603,7 +2603,7 @@ ChaosBag.TOKEN_TAG = "StillHourStatic"
 ChaosBag.TOKEN_NAME = "Static"
 ChaosBag.TOKEN_DESCRIPTION = "[static] chaos token (-3). When revealed, raise Dissonance by 1."
 -- Replaced with the hosted image URL by pipeline/bundle_mod.py.
-ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/d91c12f2705f34768e46888294a4331ffb648331/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
+ChaosBag.TOKEN_IMAGE_URL = "https://raw.githubusercontent.com/Pimpcats/Arkhsm-LCG-/300f561f6342196e5bdce4d0354f1774aebf5ddb/dist/cards/sthr-static-token.jpg?v=c9e1d5862a"
 ChaosBag.BAG_NAME = "Chaos Bag"
 
 --- Object data for one [static] token. Mirrors SCED Global.spawnChaosToken's
@@ -6338,6 +6338,7 @@ function shBeginFinale()
     if nLate > 0 then
       -- never more than half a form's health (2 [perinv])
       local half = CampaignState.constants().investigators
+      if half == 4 then half = 3 end   -- four investigators: the period forms have 6 health
       announce(string.format("Before the Last Hour: deal %d damage to As It Was and %d to As It Will Be (your late records).",
         math.min(by.past, half), math.min(by.future, half)))
     end

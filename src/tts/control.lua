@@ -1720,6 +1720,7 @@ function shBeginFinale()
     if nLate > 0 then
       -- never more than half a form's health (2 [perinv])
       local half = CampaignState.constants().investigators
+      if half == 4 then half = 3 end   -- four investigators: the period forms have 6 health
       announce(string.format("Before the Last Hour: deal %d damage to As It Was and %d to As It Will Be (your late records).",
         math.min(by.past, half), math.min(by.future, half)))
     end
