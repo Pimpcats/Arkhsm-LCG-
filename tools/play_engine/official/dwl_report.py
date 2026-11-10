@@ -24,8 +24,9 @@ SH_OUT = os.path.join(ROOT, ".cache", "play_engine")
 sys.path.insert(0, HERE)
 sys.path.insert(0, ENGINE)
 
-NAMES = {"1a": "1a Extracurricular Activity", "1b": "1b The House Always Wins"}
-WIN = {"1a": ("R1", "R2", "R3"), "1b": ("R1", "R2", "R3")}
+NAMES = {"1a": "1a Extracurricular Activity", "1b": "1b The House Always Wins", "2": "2 The Miskatonic Museum"}
+WIN = {"1a": ("R1", "R2", "R3"), "1b": ("R1", "R2", "R3"), "2": ("R1", "R2")}
+STANDALONE = ("1a", "1b", "2")
 INV = {"02001": "Zoey Samaras", "02002": "Rex Murphy", "02003": "Jenny Barnes", "02004": "Jim Culver"}
 PARTY = {2: "Zoey, Rex", 3: "Zoey, Rex, Jenny", 4: "Zoey, Rex, Jenny, Jim"}
 
@@ -83,6 +84,13 @@ def loss_kind(g):
         return None
     if g["resolution"] == "R4":
         return "agenda ran out (R4)"
+    if g["scenario"] == "2" and g["resolution"] == "NR":
+        # the Museum's last agenda defeats whoever has not resigned; the AI resigns when it is about to advance
+        if g.get("ended") == "agenda":
+            return "agenda ran out (driven out)"
+        if g.get("ended") == "resigned":
+            return "agenda about to run out: the survivors left by the door"
+        return "every investigator defeated"
     if g["resolution"] == "NR":
         return "every investigator defeated" if not g.get("resigned") else "resigned / defeated before act 3"
     return "unfinished (round cap)"
@@ -121,6 +129,7 @@ def dwl_summary(games, cs):
     if not games:
         return s
     players = games[0]["players"]
+    s["scen"] = games[0]["scenario"]
     s.update(common(games, players))
     n = len(games)
     s["players"] = players
@@ -130,6 +139,7 @@ def dwl_summary(games, cs):
     s["xp"] = mean([mean(list((g.get("xp") or {}).values())) for g in games])
     s["log"] = collections.Counter(e for g in games for e in (g.get("log") or []))
     s["cheated"] = sum(1 for g in games if g.get("cheated"))
+    s["tokens"] = collections.Counter(t for g in games for t in (g.get("tokens_added") or []))
     tr = collections.Counter()
     for g in games:
         for inv, t in (g.get("trauma") or {}).items():
@@ -171,7 +181,53 @@ def dwl_summary(games, cs):
                                    for g in games if (g.get("metrics") or {}).get("agendas")])
     s["doom_placed"] = mean([(g.get("metrics") or {}).get("doom_placed", 0) for g in games])
     s["clues_required"] = guide_need(games[0]["scenario"], players, games[0].get("goal1a"))
+    if games[0]["scenario"] == "2":
+        museum_summary(s, games)
     return s
+
+
+def museum_summary(s, games):
+    """The Miskatonic Museum's own measures (Hunting Horror, the Exhibit deck, the allies)."""
+    n = len(games)
+    ms = [g.get("metrics") or {} for g in games]
+    s["clues_required"] = mean([m.get("clues_required") for m in ms])
+    mu = {}
+    mu["restricted_at"] = mean([m.get("restricted_at") for m in ms])
+    mu["exhibits_drawn"] = mean([m.get("exhibits_drawn", 0) for m in ms])
+    mu["found_restricted"] = sum(1 for g in games if g.get("act_reached") == "02125" or won(g)) / n
+    # act 1 by the door: no Adam Lynch at 1b (older games carry no broke_door flag)
+    mu["broke_door"] = sum(1 for m in ms if m.get("broke_door") or (m.get("ally") != "02139" and any(
+        a["id"] == "02122" for a in m.get("acts_completed") or []))) / n
+    mu["door_attempts"] = mean([m.get("door_attempts", 0) for m in ms])
+    mu["hh_entries"] = mean([m.get("hh_entries", 0) for m in ms])
+    mu["hh_first_round"] = mean([m.get("hh_first_round") for m in ms])
+    mu["hh_defeated"] = mean([(m.get("defeated_by_id") or {}).get("02141", 0) for m in ms])
+    mu["hh_readied"] = mean([m.get("hh_readied", 0) for m in ms])
+    mu["hh_tokens"] = mean([m.get("hh_tokens", 0) for m in ms])
+    mu["shadow"] = collections.Counter(g.get("shadow_resources") if g.get("shadow_resources") is not None else "never in play"
+                                       for g in games)
+    mu["massive"] = sum(1 for g in games if (g.get("shadow_resources") or 0) >= 3) / n
+    src = collections.Counter()
+    for m in ms:
+        for k, v in (m.get("hh_summoned") or {}).items():
+            src[k] += v
+        src["drawn from the encounter deck"] += sum(1 for sp in m.get("spawns") or []
+                                                    if sp.get("id") == "02141" and sp.get("want") in ("drawer", "engaged"))
+        src["Smite the Wicked"] += sum(1 for sp in m.get("spawns") or []
+                                       if sp.get("id") == "02141" and sp.get("want") == "farthest from Zoey")
+    mu["hh_sources"] = src
+    mu["hh_damage"] = mean([(m.get("damage_by") or {}).get("Hunting Horror", 0) for m in ms])
+    mu["hh_horror"] = mean([(m.get("horror_by") or {}).get("Hunting Horror", 0) for m in ms])
+    mu["ally_lost"] = sum(1 for m in ms if m.get("allies_lost")) / n
+    mu["ally_given"] = sum(1 for m in ms if m.get("ally")) / n
+    mu["tablets"] = mean([sum(1 for t in g.get("tokens_added") or [] if t == "tablet") for g in games])
+    mu["driven_out"] = mean([m.get("driven_out", 0) for m in ms])
+    mu["resigned"] = mean([len(m.get("resigned") or {}) for m in ms])
+    mu["clues_returned"] = mean([m.get("clues_returned", 0) for m in ms])
+    mu["assets_discarded"] = mean([m.get("assets_discarded", 0) for m in ms])
+    mu["milled"] = mean([m.get("milled", 0) for m in ms])
+    mu["fight_not_evade"] = mean([m.get("hh_fight_not_evade", 0) for m in ms])
+    s["museum"] = mu
 
 
 def guide_need(scen, players, goal1a=None):
@@ -300,10 +356,10 @@ def dwl_report(tag=None):
     for key, gs in games.items():
         scen, p = key.rsplit("_", 1)
         p = int(p[:-1])
-        if scen in ("1a", "1b"):
+        if scen in STANDALONE:
             sums[(scen, "standalone", p)] = dwl_summary(gs, cs)
         else:
-            for slot in (1, 2):
+            for slot in (1, 2, 3):
                 sub = [g for g in gs if g.get("slot") == slot]
                 if sub:
                     sums[(sub[0]["scenario"], "%s #%d" % (scen, slot), p)] = dwl_summary(sub, cs)

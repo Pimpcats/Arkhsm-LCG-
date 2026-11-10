@@ -28,6 +28,10 @@ LOGTEXT = {
     "experiment_defeated": "the Experiment defeated", "unconscious_for_several_hours": "unconscious for several hours",
     "francis_morgan_rescued": "Morgan rescued", "francis_morgan_kidnapped": "Morgan kidnapped",
     "bone_to_pick": "O'Bannion gang has a bone to pick", "naomi_has_back": "Naomi has the investigators' back",
+    "failed_to_recover_necronomicon": "failed to recover the Necronomicon",
+    "destroyed_necronomicon": "destroyed the Necronomicon",
+    "took_necronomicon": "took custody of the Necronomicon (+1 [elder_thing], the card earned)",
+    "henry_armitage_kidnapped": "Armitage kidnapped", "henry_armitage_rescued": "Armitage rescued",
 }
 RES_TEXT = {
     "1a": {"R1": "R1 (Faculty Offices: Rice rescued)", "R2": "R2 (Dormitories: students rescued)",
@@ -36,6 +40,9 @@ RES_TEXT = {
     "1b": {"R1": "R1 (resigned in act 3 without the NPC)", "R2": "R2 (resigned with Dr. Morgan)",
            "R3": "R3 (resigned with Peter Clover)", "R4": "R4 (agenda ran out)",
            "NR": "no resolution (defeated/resigned before act 3; the guide reads it as R1)"},
+    "2": {"R1": "R1 (act 3 done, the Necronomicon destroyed)", "R2": "R2 (act 3 done, the Necronomicon kept)",
+          "NR": "no resolution (every investigator defeated, driven out by the last agenda, or resigned: the "
+                "Necronomicon is not recovered)"},
 }
 
 
@@ -55,13 +62,113 @@ def top(counter, n, total, cs=None):
     return ", ".join("%s %s" % (k, f(v / total, 2)) for k, v in items) or "–"
 
 
+# ------------------------------------------------------------------ The Miskatonic Museum
+
+def museum_headline(sums):
+    c, lc, n = collections.Counter(), collections.Counter(), 0
+    found = []
+    for p in (2, 3, 4):
+        s = sums.get(("2", "standalone", p))
+        if s:
+            c.update(s["defeated_by"])
+            lc.update(s["loss"])
+            n += s["runs"]
+            found.append("%dp %s" % (p, R.pct(round(s["museum"]["found_restricted"] * s["runs"]), s["runs"])))
+    if not n:
+        return "Not played yet."
+    kill = ", ".join("%s (%s of defeats)" % (k, R.pct(v, sum(c.values()))) for k, v in c.most_common(3))
+    loss = ", ".join("%s %s" % (k, R.pct(v, n)) for k, v in lc.most_common())
+    return ("It reaches the Restricted Hall (act 3) in %s of games; its losses, of all games: %s. Main causes of "
+            "defeat: %s." % (", ".join(found), loss, kill))
+
+
+def museum_section(sums):
+    keys = [k for k in sorted(sums, key=lambda k: (k[1] != "standalone", k[1], k[2])) if k[0] == "2" and "museum" in sums[k]]
+    if not keys:
+        return []
+    L = ["## The Miskatonic Museum in detail", "",
+         "Per game unless a share. *Way in*: act 1 by the Entrance's clues (Adam Lynch, *Night at the Museum*) or by "
+         "breaking the door (Harold Walsted at act 2b, *Breaking and Entering*). *Restricted Hall found*: act 2 "
+         "advanced (an investigator entered it). *Shadow-spawned* is the number of resources on it when the game "
+         "ended (each is +1 fight, health and evade; 3 = Massive). *Ally lost* = Harold Walsted / Adam Lynch left "
+         "play (+1 [tablet] for the campaign).", "",
+         "| mode | party | runs | way in: clues / door | Exhibit Halls put into play (Restricted Hall's place in the deck) | Restricted Hall found | act 3 done (win) | Hunting Horror: first round in play | times it entered play | times defeated (to the void) | readied by its token | its damage / horror | Shadow-spawned at the end | ally lost | driven out by agenda 3 / resigned (investigators) |",
+         "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    for k in keys:
+        s = sums[k]
+        m = s["museum"]
+        n = s["runs"]
+        sh = ", ".join("%s: %s" % (r, R.pct(c, n)) for r, c in sorted(m["shadow"].items(), key=lambda x: str(x[0])))
+        L.append("| %s | %dp | %d | %s / %s | %s (%s) | %s | %s | %s | %s | %s | %s | %s / %s | %s | %s | %s / %s |" % (
+            k[1], k[2], n, R.pct(round((1 - m["broke_door"]) * n), n), R.pct(round(m["broke_door"] * n), n),
+            f(m["exhibits_drawn"]), f(m["restricted_at"]), R.pct(round(m["found_restricted"] * n), n),
+            R.pct(s["wins"], n), f(m["hh_first_round"]), f(m["hh_entries"], 2), f(m["hh_defeated"], 2),
+            f(m["hh_readied"], 2), f(m["hh_damage"]), f(m["hh_horror"]), sh, R.pct(round(m["ally_lost"] * n), n),
+            f(m["driven_out"], 2), f(m["resigned"], 2)))
+    L.append("")
+    for k in keys:
+        if k[1] != "standalone":
+            continue
+        s = sums[k]
+        m = s["museum"]
+        n = s["runs"]
+        L.append("- **%dp**: Hunting Horror came into play by %s. Cards discarded from decks by encounter effects %s / "
+                 "game, assets discarded %s, clues returned to a location by a [tablet] %s, attempts on the door %s." % (
+                     k[2], top(m["hh_sources"], 7, n), f(m["milled"]), f(m["assets_discarded"], 2),
+                     f(m["clues_returned"], 2), f(m["door_attempts"], 2)))
+    L.append("")
+    return L
+
+
+def trio_section(games):
+    rows = []
+    for key, gs in sorted(games.items()):
+        if not key.startswith("trio"):
+            continue
+        order, p = key.rsplit("_", 1)
+        p = int(p[:-1])
+        by = collections.defaultdict(dict)
+        for g in gs:
+            by[g.get("pair_seed")][g.get("slot")] = g
+        tr = [v for v in by.values() if all(s in v for s in (1, 2, 3))]
+        n = len(tr)
+        if not n:
+            continue
+
+        def rs(slot):
+            c = collections.Counter(v[slot]["resolution"] for v in tr)
+            w = sum(1 for v in tr if R.won(v[slot]))
+            return "%s / %s" % (R.pct(w, n), ", ".join("%s %s" % (r, R.pct(x, n)) for r, x in sorted(c.items())))
+        kid = sum(1 for v in tr if (v[3].get("camp") or {}).get("armitage") == "kidnapped")
+        carried = R.mean([sum(t.get("physical", 0) + t.get("mental", 0) for s in (1, 2) for t in v[s]["trauma"].values()) / p
+                          for v in tr])
+        toks = R.mean([len((v[3].get("camp") or {}).get("tokens") or []) for v in tr])
+        xp = R.mean([R.mean([sum((v[s]["xp"] or {}).get(i, 0) for s in (1, 2, 3)) + (
+            2 if (v[3].get("camp") or {}).get("armitage") == "kidnapped" else 0) for i in v[1]["xp"]]) for v in tr])
+        m3 = [v[3].get("metrics") or {} for v in tr]
+        rows.append("| %dp | %d | %s | %s | %s | %s | %s | %s | %s | %s | %s |" % (
+            p, n, rs(1), rs(2), R.pct(kid, n), f(carried, 2), f(toks, 2), rs(3),
+            f(R.mean([m.get("defeats", 0) for m in m3]), 2), f(R.mean([v[3]["round"] for v in tr])), f(xp)))
+    if not rows:
+        return []
+    return ["## Campaign order through the Museum (1a, 1b, Armitage's Fate, then the Museum)", "",
+            "`trio_ab` plays 1a, then 1b (as `pair_ab`, on its own seeds), reads Armitage's Fate from the log "
+            "(kidnapped: 2 bonus XP each; rescued: Dr. Henry Armitage joins a deck as an ally that only soaks), then "
+            "The Miskatonic Museum with what the pair left: the chaos tokens added, every point of trauma as starting "
+            "damage or horror, Rice / Morgan in a deck, the same weaknesses, and all XP so far spent on the Still "
+            "Hour deck's upgrade path. The guide's Museum setup reads the log only for its introduction (Armitage "
+            "kidnapped or not): nothing on the table changes with it.", "",
+            "| party | campaigns | 1a: win % / resolutions | 1b: win % / resolutions | Armitage kidnapped | trauma carried into the Museum (points / investigator) | tokens added to the bag before the Museum | Museum: win % / resolutions | Museum defeats / game | Museum rounds | XP over all three (mean / investigator) |",
+            "|---|---|---|---|---|---|---|---|---|---|---|"] + rows + [""]
+
+
 # ------------------------------------------------------------------ Dunwich report
 
 def dunwich_doc():
     games, sums, cov = R.dwl_report()
     cs = R.cards()
     L = []
-    L += ["# The Dunwich Legacy on the play engine (1a, 1b)", "",
+    L += ["# The Dunwich Legacy on the play engine (1a, 1b, 2 The Miskatonic Museum)", "",
           "Designer tooling report (no Still Hour content). Generated by "
           "`tools/play_engine/official/dwl_docs.py` from games played by `tools/play_engine/official/dwl.py` "
           "(`python3 tools/play_engine/run.py --official dwl ...`), commit %s, %s. Simulation, not a playtest: one AI party, "
@@ -74,9 +181,14 @@ def dunwich_doc():
           "decks, encounter deck and set-aside cards are SCED's real objects. Clues appear when the engine flips a "
           "location (SCED spawns them, per investigator), encounter cards are drawn with the playmat's button, chaos "
           "tokens come from SCED's bag filled by the box's own Standard difficulty tile. SCED's token-spawn tracker is "
-          "reset between games, as its Clean Up helper does.",
-          "- **The cards.** Every card the two boxes hold (%d ids, including the core-set encounter sets the scenarios "
-          "use) has an entry in `lua/official/dwl_effects.lua`, read from ArkhamDB's card data (stats and text) and the "
+          "reset between games, as its Clean Up helper does. The Museum's box has no difficulty tile (at a table the "
+          "campaign's bag is already filled): its bag is set to the Standard list read from the 1a tile. Its setup "
+          "choices are the engine's: one Security Office and one Administration Office at random (the others removed), "
+          "and the Exhibit deck (the Restricted Hall shuffled with two others as the bottom three, the other three on "
+          "top) kept beside the table and put into play card by card.",
+          "- **The cards.** Every card the three boxes hold (%d ids, including the core-set encounter sets the scenarios "
+          "use) has an entry in `lua/official/dwl_effects.lua` or `lua/official/tmm_effects.lua` (the Museum), read "
+          "from ArkhamDB's card data (stats and text) and the "
           "campaign guide data (arkham-cards-data: resolutions, log entries, XP). Missing: %s." % (
               (cov or {}).get("scenario_cards", 0), ", ".join((cov or {}).get("missing") or []) or "none"),
           "- **The rules.** The Rules Reference round (mythos doom and encounter draws from round 2, investigation, enemy, "
@@ -95,7 +207,13 @@ def dunwich_doc():
           "Offices as the goal (R1) when Extracurricular Activity is played first, the Dormitories (R2) when it is "
           "second, the Clover Club's clue actions in act 1, exploring the Back Hall Doorways, parleying Dr. Morgan / "
           "Peter Clover, then resigning; resigning before the last agenda runs out. It never \"cheats\" with "
-          "Beginner's Luck unless a run asks for it (`--cheat`).", ""]
+          "Beginner's Luck unless a run asks for it (`--cheat`). In the Museum (`lua/official/tmm_play.lua`): the "
+          "Entrance's two clues (or the door, when breaking it looks better), then clues from the offices and Exhibit "
+          "Halls, paid 1 per investigator at the Museum Halls for each new Exhibit Hall; the nearest investigator "
+          "walks into each new hall (the AI does not know which is the Restricted Hall); in act 3 everyone goes to "
+          "the Restricted Hall, fights Hunting Horror off it and empties it; whoever is still inside when the last "
+          "agenda is one doom from advancing walks to the Entrance and resigns. At act 3b it keeps the Necronomicon "
+          "(R2) unless a run says otherwise (`--necronomicon destroy`).", ""]
     # headline
     def wr(scen, mode="standalone"):
         return ", ".join("%dp %s" % (p, R.pct(sums[(scen, mode, p)]["wins"], sums[(scen, mode, p)]["runs"]))
@@ -115,15 +233,21 @@ def dunwich_doc():
               wr("1a"), killers("1a")),
           "- **1b The House Always Wins**: the AI wins %s. It loses by being defeated before it resigns, mostly in "
           "act 2 (finding the VIP Area): %s." % (wr("1b"), killers("1b")),
+          "- **2 The Miskatonic Museum** (standalone, level-0 decks, no trauma): the AI wins %s. %s" % (
+              wr("2"), museum_headline(sums)),
           "- **In campaign order** the second scenario sees the first: 1a played second (Dormitories, R2 path) wins "
-          "%s; 1b played second (Peter Clover / Fold) wins %s." % (wr("1a", "pair_ba #2"), wr("1b", "pair_ab #2")),
+          "%s; 1b played second (Peter Clover / Fold) wins %s. The Museum played third (after 1a, 1b and Armitage's "
+          "Fate, carrying their trauma, tokens, allies and XP) wins %s." % (
+              wr("1a", "pair_ba #2"), wr("1b", "pair_ab #2"), wr("2", "trio_ab #3") or "–"),
           "- These are the AI's rates. The downloaded data holds no human win rates (see *Reference points*), so how "
           "far they sit below a group of people cannot be quoted. The AI is the same one The Still Hour's balance runs "
           "use; docs/design/BENCHMARK_DUNWICH_VS_STILL_HOUR.md reads The Still Hour against these numbers.", ""]
     L += ["## Results: each scenario played on its own (Standard)", "",
           "Win = a resolution reached through the scenario's objectives (1a: R1/R2 at a location, R3 by defeating the "
-          "Experiment; 1b: R1/R2/R3 by resigning in act 3). Loss = the agenda deck ran out (R4) or every investigator "
-          "was defeated (no resolution).", "",
+          "Experiment; 1b: R1/R2/R3 by resigning in act 3; the Museum: R1/R2, the Restricted Hall emptied). Loss = the "
+          "agenda deck ran out (1a/1b: R4; the Museum's last agenda defeats whoever has not resigned, so the AI "
+          "walks out when it is about to advance: both count as the agenda) or every investigator was defeated (no "
+          "resolution).", "",
           "| scenario | party | runs | win % (95% CI) | resolutions | losses | rounds | XP / investigator | defeats / game | games with a defeat | trauma / game (phys/ment) |",
           "|---|---|---|---|---|---|---|---|---|---|---|"]
     keys = sorted(sums.keys(), key=lambda k: (k[0], k[1] != "standalone", k[1], k[2]))
@@ -139,15 +263,18 @@ def dunwich_doc():
             f(s["rounds"]), f(s["xp"]), f(s["defeats"], 2), R.pct(round(s["defeat_games"] * n), n),
             f(s["trauma_phys"], 2), f(s["trauma_ment"], 2)))
     L += ["", "Resolution keys: " + "; ".join("1a %s" % v for v in RES_TEXT["1a"].values()) + ". " +
-          "; ".join("1b %s" % v for v in RES_TEXT["1b"].values()) + ".", ""]
+          "; ".join("1b %s" % v for v in RES_TEXT["1b"].values()) + ". " +
+          "; ".join("Museum %s" % v for v in RES_TEXT["2"].values()) + ".", ""]
+    L += museum_section(sums)
     # campaign log
     L += ["## Campaign log outcomes (share of games)", "",
-          "| scenario | mode | party | runs | entries recorded | cheated |", "|---|---|---|---|---|---|"]
+          "| scenario | mode | party | runs | entries recorded | chaos tokens added | cheated |", "|---|---|---|---|---|---|---|"]
     for k in keys:
         s = sums[k]
         n = s["runs"]
         ent = ", ".join("%s %s" % (LOGTEXT.get(e, e), R.pct(c, n)) for e, c in s["log"].most_common())
-        L.append("| %s | %s | %dp | %d | %s | %s |" % (R.NAMES[k[0]], k[1], k[2], n, ent, R.pct(s["cheated"], n)))
+        tok = ", ".join("[%s] %s / game" % (t, f(c / n, 2)) for t, c in sorted(s["tokens"].items())) or "–"
+        L.append("| %s | %s | %dp | %d | %s | %s | %s |" % (R.NAMES[k[0]], k[1], k[2], n, ent, tok, R.pct(s["cheated"], n)))
     L.append("")
     # pairs
     L += ["## Campaign order (both scenarios, the second sees the first)", "",
@@ -185,6 +312,7 @@ def dunwich_doc():
             for v in pairs])
         L.append("| %s | %dp | %d | %s | %s | %s | %s |" % (order, p, n, rs(1), rs(2), R.pct(kid, n), f(xp)))
     L.append("")
+    L += trio_section(games)
     # what hurt
     L += ["## What defeated the investigators, and what hurt", "",
           "Per game (standalone runs). *defeats by* counts the source of the final point of damage/horror.", ""]
@@ -230,6 +358,33 @@ def dunwich_doc():
                 R.NAMES[k[0]], k[2], n, R.pct(b["wins"], b["runs"]) if b else "–", R.pct(s["wins"], n), R.ci(s["wins"], n),
                 ", ".join("%s %s" % (r, R.pct(c, n)) for r, c in sorted(s["res"].items())), f(s["defeats"], 2)))
         L.append("")
+    hg, hs, _ = R.dwl_report("hunt")
+    if hs:
+        L += ["## Sensitivity: Hunting Horror (what-if, not the benchmark)", "",
+              "The benchmark AI treats Hunting Horror with The Still Hour's own fight/evade scoring (it mostly evades "
+              "it, or investigates through its attacks of opportunity when both look poor), except on the Restricted "
+              "Hall in act 3. The what-if `--ai-variant hunt` makes whoever is at least 50% to hit it fight it wherever "
+              "it engages them, attack it while it is exhausted, and has a clearly better fighter walk over and take "
+              "it off a worse one. Same seeds.", "",
+              "| party | runs | win % benchmark AI | win % hunt | losses (hunt) | defeats / game (benchmark / hunt) | Hunting Horror defeated / game (benchmark / hunt) | times it entered play (benchmark / hunt) | its damage + horror / game (benchmark / hunt) |",
+              "|---|---|---|---|---|---|---|---|---|"]
+        for k in sorted(hs):
+            if k[0] != "2" or k[1] != "standalone":
+                continue
+            s, b = hs[k], sums.get(k)
+            if not b:
+                continue
+            n = s["runs"]
+            m, mb = s["museum"], b["museum"]
+            L.append("| %dp | %d | %s | %s (%s) | %s | %s / %s | %s / %s | %s / %s | %s / %s |" % (
+                k[2], n, R.pct(b["wins"], b["runs"]), R.pct(s["wins"], n), R.ci(s["wins"], n),
+                ", ".join("%s %s" % (r, R.pct(c, n)) for r, c in s["loss"].most_common()),
+                f(b["defeats"], 2), f(s["defeats"], 2), f(mb["hh_defeated"], 2), f(m["hh_defeated"], 2),
+                f(mb["hh_entries"], 2), f(m["hh_entries"], 2), f(mb["hh_damage"] + mb["hh_horror"]),
+                f(m["hh_damage"] + m["hh_horror"])))
+        L += ["", "Each defeat sends Hunting Horror to the void and each return adds a resource to Shadow-spawned (+1 "
+              "fight, health and evade), so an AI that kills it on sight meets a stronger one sooner and takes its "
+              "Retaliate on every miss.", ""]
     # fidelity
     L += ["## Fidelity: what is approximated, what is missing, how the AI differs", "",
           "Approximated or simplified (from the effects table's coverage notes):", ""]
@@ -252,18 +407,40 @@ def dunwich_doc():
           "Bella Luna or the Back Alley once act 3's NPC is controlled or lost, or when the last agenda is one doom "
           "from its threshold (plus one per three steps it must walk).",
           "- Standard difficulty only; one random basic weakness from The Still Hour engine's encoded list (core and "
-          "Dunwich basic weaknesses).", ""]
+          "Dunwich basic weaknesses).",
+          "- **The Museum, Hunting Horror.** Encoded as printed: Hunter, Retaliate, the chaos token at the start of "
+          "each enemy phase (a symbol readies it and it engages at once), the void in place of the discard pile, "
+          "Shadow-spawned (attached the first time it enters play, a resource each later time; +1 fight, health and "
+          "evade per resource, Massive at 3), and every effect that brings it back ([cultist] on a failed test, "
+          "Slithering Behind You, agendas 1b/2b, act 2b, a draw from the encounter deck, Zoey's Smite the Wicked). "
+          "The AI has no plan for it beyond the scoring above: it does not keep a fighter next to the clue-getters, "
+          "does not weigh that killing it makes it stronger, investigates through its attacks of opportunity when "
+          "fighting and evading both score low, and does not lead it away from the Restricted Hall (it fights it "
+          "there). It is the main cause of defeat in the table above for that reason as much as for its stats.",
+          "- **The Museum, other choices.** The AI does not know an Exhibit Hall before entering it (it does read "
+          "the two offices' printed clue values before revealing them). The Security Office's look-at-an-Exhibit "
+          "ability is never used. Harold Walsted / Adam Lynch are kept out of harm unless damage or horror would "
+          "defeat their controller, and are not counted as leaving play when that investigator resigns (the card "
+          "says *leaves play*; the guide's token step is the players' call). The *Sacrificed to Yog-Sothoth* log "
+          "section is not touched by this scenario. Standalone Museum runs start with level-0 decks, no trauma and "
+          "the plain Standard bag; a real campaign arrives with what 1a/1b left (the trio runs).", ""]
     L += ["## Reference points", "",
           "The downloaded data (ArkhamDB card data, arkham-cards-data's campaign guide, SCED's box) holds no play "
           "statistics: no win rates or difficulty ratings for these scenarios, so none is quoted here. The data does fix "
           "the scenarios' own budgets, which the table above can be read against: 1a's agendas allow %s doom before the "
           "last (looping) agenda, its acts ask %s clues per investigator before the location objectives (2 at the "
           "Faculty Offices, 3 at the Dormitories); 1b's agendas allow %s doom in all, its acts ask %s clues per "
-          "investigator." % (
+          "investigator. The Museum's agendas allow %s doom in all (doom on Hunting Horror counts); its objectives ask "
+          "%s clues at the Entrance, then 1 per investigator for each Exhibit Hall down to the Restricted Hall (the "
+          "4th to 6th card of the Exhibit deck), then the Restricted Hall's own %s per investigator: %s to %s clues "
+          "per investigator in all, plus the Entrance's." % (
               (cs.get("02042", {}).get("doom", 0) + cs.get("02043", {}).get("doom", 0)),
               cs.get("02045", {}).get("clues", 0),
               sum(cs.get(a, {}).get("doom", 0) for a in ("02063", "02064", "02065")),
-              cs.get("02066", {}).get("clues", 0) + cs.get("02067", {}).get("clues", 0)), ""]
+              cs.get("02066", {}).get("clues", 0) + cs.get("02067", {}).get("clues", 0),
+              sum(cs.get(a, {}).get("doom", 0) for a in ("02119", "02120", "02121")),
+              cs.get("02122", {}).get("clues", 0), cs.get("02137", {}).get("clues", 0),
+              4 + cs.get("02137", {}).get("clues", 0), 6 + cs.get("02137", {}).get("clues", 0)), ""]
     return "\n".join(L) + "\n"
 
 
@@ -298,10 +475,45 @@ def row_values(s, kind):
     return v
 
 
+def games_date(d, prefix=""):
+    """The day the newest game file in d (optionally only those starting with prefix) was written."""
+    import glob
+    ts = [os.path.getmtime(x) for x in glob.glob(os.path.join(d, prefix + "*.jsonl"))]
+    return datetime.date.fromtimestamp(max(ts)).isoformat() if ts else "?"
+
+
+def museum_vs_nights(sums, sh):
+    """One headline line: the Museum against The Still Hour's nights on the shared metrics."""
+    parts = []
+    for p in (2, 3, 4):
+        s = sums.get(("2", "standalone", p))
+        nights = [s2 for (k, label, pp), s2 in sh.items() if pp == p and (label.startswith("Night") or label == "Prologue")]
+        if not s or not nights:
+            continue
+        v = row_values(s, "2")
+        nw = sum(x["wins"] for x in nights) / max(1, sum(x["runs"] for x in nights))
+        parts.append("%dp win %s (agenda %s, all defeated %s), %s rounds, %s defeats / game, damage + horror %s per "
+                     "investigator per round, %s clues per investigator per round against %s required (Still Hour "
+                     "nights: win %s, %s rounds, %s defeats, %s damage + horror, %s clues against %s)" % (
+                         p, R.pct(s["wins"], s["runs"]), R.pct(round(v["loss_time"]), 100), R.pct(round(v["loss_def"]), 100),
+                         f(s["rounds"]), f(s["defeats"], 2), f(s["dmg_inv_round"] + s["hor_inv_round"], 2),
+                         f(s["clues_inv_round"], 2), f(s["clues_required"]), R.pct(round(100 * nw), 100),
+                         f(R.mean([x["rounds"] for x in nights])), f(R.mean([x["defeats"] for x in nights]), 2),
+                         f(R.mean([x["dmg_inv_round"] for x in nights]) + R.mean([x["hor_inv_round"] for x in nights]), 2),
+                         f(R.mean([x["clues_inv_round"] for x in nights]), 2), f(R.mean([x["clues_required"] for x in nights]))))
+    if not parts:
+        return "- The Miskatonic Museum has not been played yet."
+    return ("- **The Miskatonic Museum** (the third Dunwich point: a long clue hunt with one recurring Elite enemy): "
+            + "; ".join(parts) + ". It runs longer than 1a/1b and asks for more clues than any Still Hour night, and "
+            "it is the one Dunwich scenario here where the agenda takes a real share of the losses.")
+
+
 def bench_doc():
     _, sums, _ = R.dwl_report()
     sh = R.sh_summaries()
-    L = ["# Benchmark: The Dunwich Legacy's opening pair vs The Still Hour (same engine, same AI)", "",
+    DW = [x for x in R.STANDALONE if any((x, "standalone", p) in sums for p in (2, 3, 4))]
+    dwn = "1a, 1b and the Museum" if "2" in DW else "1a and 1b"
+    L = ["# Benchmark: The Dunwich Legacy's first three scenarios vs The Still Hour (same engine, same AI)", "",
          "Designer-facing. The Still Hour appears under neutral labels only (Prologue, Night 1–8, Finale; each Night "
          "pools every district's scenario for that night, %s runs per district). Generated by "
          "`tools/play_engine/official/dwl_docs.py`, commit %s, %s. Simulation, not a playtest." % ("10", commit(),
@@ -315,21 +527,29 @@ def bench_doc():
           "Mystic, `run.py PARTIES`), Dunwich seats Zoey, Rex, Jenny, Jim with their own stats, abilities, signature "
           "cards and weaknesses. The Still Hour's nights after the Prologue use its representative XP decks "
           "(`decks.py TIERS`, small upgrades from Night 1); Dunwich 1a/1b are level 0 (as at the start of a campaign).",
+          "- Dunwich's rows are 1a Extracurricular Activity, 1b The House Always Wins and 2 The Miskatonic Museum, "
+          "each played on its own. The Museum is the campaign's third scenario: its row here is the standalone "
+          "one (level-0 decks, no trauma, the plain Standard bag), like for like with 1a/1b; played after 1a and 1b "
+          "with what they leave behind it goes worse (docs/design/DUNWICH_SIM_REPORT.md, campaign order).",
           "- The Still Hour was played through `official/benchmark.py`, which runs run.py's engine unchanged and only "
-          "counts skill tests by kind (for the encounter-test metric).",
-          "- Metric definitions: *win* = Dunwich: a resolution by the scenario's objectives (R1–R3); The Still Hour: "
+          "counts skill tests by kind (for the encounter-test metric). Its games here were played on %s and were not "
+          "replayed when the Museum was added (%s): changes made to The Still Hour since then are not in its rows." % (
+              games_date(R.SH_GAMES), games_date(os.path.join(R.OUT, "games"), "2_")),
+          "- Metric definitions: *win* = Dunwich: a resolution by the scenario's objectives (R1–R3; the Museum R1/R2); The Still Hour: "
           "the night's goal acts all advanced (`report.py` completion), the Finale: the forms defeated (ended 'boss'; a stranded form is a partial ending, counted as a loss here). *Losses*: "
-          "time/agenda = the agenda deck ran out (Dunwich R4) or Hour IX / the reset came first (Still Hour); defeated "
+          "time/agenda = the agenda deck ran out (Dunwich R4; in the Museum the last agenda advanced or was about to "
+          "and the survivors left by the door) or Hour IX / the reset came first (Still Hour); defeated "
           "= every investigator defeated. *Rounds* = rounds played (a Still Hour loop always runs to its end, so "
           "*round won* is also shown). *Clues required* = the clue cost of the goal acts (Dunwich: the act clues plus "
-          "the location objective the AI goes for). *Rounds per agenda* = rounds per agenda advanced (Dunwich) / per "
+          "the location objective the AI goes for; the Museum: the Entrance's, 1 per investigator for each Exhibit "
+          "Hall down to the Restricted Hall, and the Restricted Hall's own, averaged over the games). *Rounds per agenda* = rounds per agenda advanced (Dunwich) / per "
           "Hour turned (Still Hour). *Encounter tests* = skill tests on treachery cards per game, failures in "
           "brackets. *XP* = Dunwich XP earned per investigator (Victory X plus the resolution's bonus); Still Hour: "
           "Memory banked by the party per loop (its experience currency; not the same scale).", ""]
     # headline
     L += ["## Headline", ""]
     for p in (2, 3, 4):
-        d = [sums.get((x, "standalone", p)) for x in ("1a", "1b")]
+        d = [sums.get((x, "standalone", p)) for x in DW]
         d = [x for x in d if x and x.get("runs")]
         shp = [(k, label, s2) for (k, label, pp), s2 in sorted(sh.items()) if pp == p]
         if not d or not shp:
@@ -340,29 +560,31 @@ def bench_doc():
         fin = [s2 for k, label, s2 in shp if label == "Finale"]
         dd = R.mean([x["dmg_inv_round"] for x in d]) + R.mean([x["hor_inv_round"] for x in d])
         sd = R.mean([x["dmg_inv_round"] for x in nights]) + R.mean([x["hor_inv_round"] for x in nights])
-        L.append("- **%dp**: the AI wins Dunwich's opener %s (1a and 1b pooled) and The Still Hour's Prologue and nights "
+        each = ", ".join("%s %s" % ("the Museum" if x["scen"] == "2" else x["scen"], R.pct(x["wins"], x["runs"])) for x in d)
+        L.append("- **%dp**: the AI wins Dunwich's first scenarios %s (%s pooled; %s) and The Still Hour's Prologue and nights "
                  "%s (pooled)%s. Damage + horror per investigator per round: Dunwich %s, Still Hour nights %s; "
                  "defeats per game: Dunwich %s, Still Hour nights %s." % (
-                     p, R.pct(round(100 * dw), 100), R.pct(round(100 * nw), 100),
+                     p, R.pct(round(100 * dw), 100), dwn, each, R.pct(round(100 * nw), 100),
                      ("; the Finale %s" % R.pct(fin[0]["wins"], fin[0]["runs"])) if fin else "",
                      f(dd, 2), f(sd, 2), f(R.mean([x["defeats"] for x in d]), 2), f(R.mean([x["defeats"] for x in nights]), 2)))
     harder = []
     for p in (2, 3, 4):
-        d = [sums.get((x, "standalone", p)) for x in ("1a", "1b")]
+        d = [sums.get((x, "standalone", p)) for x in DW]
         d = [x for x in d if x and x.get("runs")]
         fin = [s2 for (k, label, pp), s2 in sh.items() if pp == p and label == "Finale"]
         if d and fin and fin[0]["wins"] / fin[0]["runs"] < sum(x["wins"] for x in d) / sum(x["runs"] for x in d):
             harder.append("%dp" % p)
-    L += ["- As this AI plays them, The Still Hour's Prologue and nights are markedly easier than Dunwich's opening "
-          "pair and gentler on the investigators (fewer defeats, less damage and horror per round). The Finale is "
-          "harder than the baseline at %s. Most of Dunwich's losses are total defeats; most of The Still Hour's are "
-          "running out of time." % (", ".join(harder) or "no party size"), ""]
+    L += ["- As this AI plays them, The Still Hour's Prologue and nights are markedly easier than Dunwich's first "
+          "three scenarios and gentler on the investigators (fewer defeats, less damage and horror per round). The "
+          "Finale is harder than the baseline at %s. Most of Dunwich's losses are total defeats; most of The Still "
+          "Hour's are running out of time." % (", ".join(harder) or "no party size"),
+          museum_vs_nights(sums, sh), ""]
     for p in (2, 3, 4):
         rows = []
-        for scen in ("1a", "1b"):
+        for scen in DW:
             s = sums.get((scen, "standalone", p))
             if s and s.get("runs"):
-                rows.append(("Dunwich " + scen, s))
+                rows.append(("Dunwich " + (scen if scen != "2" else "2 (Museum)"), s))
         for (k, label, pp), s in sorted(sh.items()):
             if pp == p:
                 rows.append(("Still Hour " + label, s))
@@ -417,9 +639,9 @@ def bench_doc():
         L += crows
         L.append("")
     # curve, ratio and outliers
-    L += ["## The Still Hour's curve against Dunwich's opener (as the AI plays them)", ""]
+    L += ["## The Still Hour's curve against Dunwich's first scenarios (as the AI plays them)", ""]
     for p in (2, 3, 4):
-        d = [sums.get((s, "standalone", p)) for s in ("1a", "1b")]
+        d = [sums.get((s, "standalone", p)) for s in DW]
         d = [x for x in d if x and x.get("runs")]
         if not d:
             continue
@@ -431,25 +653,25 @@ def bench_doc():
         for k, label, s in shp:
             w = s["wins"] / s["runs"]
             parts.append("%s %s (%+.1f logits)" % (label, R.pct(s["wins"], s["runs"]), logit(w) - logit(dw)))
-        L.append("- **%dp**: Dunwich 1a+1b win %s. The Still Hour: %s." % (p, R.pct(round(dw * 100), 100), "; ".join(parts)))
-    L += ["", "A positive logit gap means the AI finds that Still Hour scenario easier than Dunwich's opener; +1 logit "
+        L.append("- **%dp**: Dunwich (%s pooled) win %s. The Still Hour: %s." % (p, dwn, R.pct(round(dw * 100), 100), "; ".join(parts)))
+    L += ["", "A positive logit gap means the AI finds that Still Hour scenario easier than Dunwich's first scenarios; +1 logit "
           "is roughly 50% → 73% or 73% → 88%.", ""]
     L += ["## Reading The Still Hour's targets through Dunwich (the AI-to-official ratio)", "",
           "The Still Hour's balance targets were set as AI completion rates (docs/design/PLAYTEST_SIM.md: about 80% on "
-          "Night 1 falling to 50–60% late). The same AI wins Dunwich's opener at the rate above. No sourced human win "
+          "Night 1 falling to 50–60% late). The same AI wins Dunwich's first three scenarios at the rate above. No sourced human win "
           "rate for these scenarios is in the downloaded data, so the human side can only be read conditionally: if "
-          "a typical group wins Dunwich's opener at H, the AI's gap to people on an official scenario is "
+          "a typical group wins Dunwich's first three scenarios at H, the AI's gap to people on an official scenario is "
           "logit(H) − logit(AI). Applying the same gap to a Still Hour scenario gives the rate a typical group would "
           "be expected to reach there, assuming the AI's weaknesses cost it as much in The Still Hour as in Dunwich "
           "(they may cost less: The Still Hour's AI and objectives were tuned together).", ""]
     for p in (2, 3, 4):
-        d = [sums.get((s, "standalone", p)) for s in ("1a", "1b")]
+        d = [sums.get((s, "standalone", p)) for s in DW]
         d = [x for x in d if x and x.get("runs")]
         shp = [(k, label, s) for (k, label, pp), s in sorted(sh.items()) if pp == p]
         if not d or not shp:
             continue
         dw = sum(x["wins"] for x in d) / sum(x["runs"] for x in d)
-        L += ["**%dp** (AI wins Dunwich %s). Implied rate for a group, if that group wins Dunwich's opener at H "
+        L += ["**%dp** (AI wins Dunwich %s). Implied rate for a group, if that group wins Dunwich's first three scenarios at H "
               "(H is an assumption, not data):" % (p, R.pct(round(dw * 100), 100)), "",
               "| scenario | AI | H = 60% | H = 75% | H = 90% |", "|---|---|---|---|---|"]
         for k, label, s in shp:
@@ -463,7 +685,7 @@ def bench_doc():
     L += ["The ratio of AI win rates (Still Hour ÷ Dunwich) is in the per-party tables above; with Dunwich near "
           "the floor it is unstable, which is why the logit gap is the measure used here.", ""]
     L += ["## Outliers: where a Still Hour scenario is markedly harder or easier than the baseline", "",
-          "Against the Dunwich 1a/1b average at the same party size. Nearly every Still Hour scenario is easier on win "
+          "Against the Dunwich average (" + dwn + ") at the same party size. Nearly every Still Hour scenario is easier on win "
           "rate, defeats and damage, so the list below gives (a) every case where a Still Hour scenario is *harder* "
           "than the baseline by more than 25% on a metric (or 15 points of win rate), and (b) per metric, the Still "
           "Hour scenario furthest on the easy side.", ""]
@@ -471,7 +693,7 @@ def bench_doc():
              "hor_inv_round": ("horror / investigator / round", 1), "enc_failed": ("encounter tests failed / game", 1),
              "spawned": ("enemies spawned / game", 1), "clues_inv_round": ("clues / investigator / round", -1)}
     for p in (2, 3, 4):
-        d = [sums.get((x, "standalone", p)) for x in ("1a", "1b")]
+        d = [sums.get((x, "standalone", p)) for x in DW]
         d = [x for x in d if x and x.get("runs")]
         shp = [(k, label, s2) for (k, label, pp), s2 in sorted(sh.items()) if pp == p]
         if not d or not shp:

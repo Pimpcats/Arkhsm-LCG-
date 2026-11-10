@@ -485,7 +485,8 @@ Simulation only; not a playtest.
 ## Official benchmark (The Dunwich Legacy, 2026-11-06)
 
 `python3 tools/play_engine/run.py --official dwl ...` plays The Dunwich Legacy's
-1a and 1b (SCED's own box, downloaded data under `.cache/official/`) on the same
+1a, 1b and (added 2026-11-10) its third scenario, The Miskatonic Museum
+(`--scenario 2`; `trio_ab` plays it after 1a and 1b) (SCED's own box, downloaded data under `.cache/official/`) on the same
 table with the same rules layer and AI (`tools/play_engine/official`,
 `lua/official`; The Still Hour's engine files are not modified). Results:
 docs/design/DUNWICH_SIM_REPORT.md; the side-by-side reading of The Still Hour
