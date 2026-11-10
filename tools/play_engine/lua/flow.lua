@@ -336,7 +336,11 @@ return function(R, T)
     G.metrics.attacks = G.metrics.attacks + 1
     R.log("%s attacks %s (%s)", en.name, inv.name, why or "")
     local hor = math.max(0, (en.def.horror or 0) - (redirect and redirect.cancelHorror or 0))
-    local dealt = R.hurt(inv, en.def.damage or 0, hor, en.name, { enemy = en })
+    local dmgv = en.def.damage or 0
+    -- what-if: in Part II each non-Elite enemy deals +N damage (lethality toward the official level)
+    local ptd = (R.WHATIF or {}).partTwoDamage
+    if ptd and G.partTwo and not G.finale and not (en.def.traits or ""):find("Elite") then dmgv = dmgv + ptd end
+    local dealt = R.hurt(inv, dmgv, hor, en.name, { enemy = en })
     if redirect and redirect.damage and not en.dead and not inv.defeated then R.damageEnemy(en, redirect.damage, inv, "Heroic Rescue") end
     -- The House Always Wins, Forced: after its attack deals damage, that investigator discards 2 resources
     if en.id == "sthr-housewins" and dealt and dealt.damage > 0 then inv.resources = math.max(0, inv.resources - 2) end
